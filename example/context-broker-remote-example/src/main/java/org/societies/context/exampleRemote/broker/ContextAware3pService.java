@@ -227,22 +227,15 @@ public class ContextAware3pService implements IContextAware3pService{
 		List<CtxAttribute> results = null; 
 		
 		try {
-			//List<CtxIdentifier> attridList = this.ctxBroker.lookup(requestorService, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
-
-			
-
-			//!!!!! to perform the test locally change code in context broker 
+		
 			IIdentity targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
 			LOG.info("targetId "+ targetId.getJid());
 
 			// create remote entity
-			
 			CtxEntity remoteEntity = this.ctxBroker.createEntity(simpleRequestor, targetId, "human").get();
 			LOG.info("remote entity"+ remoteEntity.getId().toString());
 			CtxEntityIdentifier entID = remoteEntity.getId();
 			LOG.info("remote entity owner "+ entID.getOwnerId());
-			entID.setOwnerId("local");
-			LOG.info("remote entity owner changed to local: "+ entID.getOwnerId());
 			
 			// create remote attribute
 			CtxAttribute remoteAttribute = this.ctxBroker.createAttribute(simpleRequestor, entID, CtxAttributeTypes.BOOKS).get();

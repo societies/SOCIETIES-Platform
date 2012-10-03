@@ -128,6 +128,12 @@
 			<version>${version.cm}</version>
 		</dependency>
 		
+	<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-init-data</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+	
 	</dependencies>
 
 	<build>
