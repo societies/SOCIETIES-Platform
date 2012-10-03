@@ -27,6 +27,7 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,5 +191,15 @@ public class Assessment implements IAssessment {
 	@Override
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
 		return dataAccessAnalyzer.getNumDataAccessEvents(requestorClass, start, end);
+	}
+	
+	@Override
+	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEventsForAllIdentities(start, end);
+	}
+	
+	@Override
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
 	}
 }

@@ -26,7 +26,9 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,5 +142,29 @@ public class DataAccessAnalyzer {
 			}
 		}
 		return matches;
+	}
+	
+	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
+		
+		Map<IIdentity, Integer> result = new HashMap<IIdentity, Integer>();
+		List<IIdentity> requestors = getDataAccessRequestors();
+		
+		for (IIdentity requestor : requestors) {
+			result.put(requestor, getNumDataAccessEvents(requestor, start, end));
+		}
+		
+		return result;
+	}
+	
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		List<String> requestors = getDataAccessRequestorClasses();
+		
+		for (String requestor : requestors) {
+			result.put(requestor, getNumDataAccessEvents(requestor, start, end));
+		}
+		
+		return result;
 	}
 }

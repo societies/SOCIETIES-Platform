@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.api.identity.IIdentity;
 
@@ -129,4 +130,22 @@ public interface IAssessment {
 	 * @return All events where requestor matches
 	 */
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end);
+
+	/**
+	 * Get number of local data access events in certain time period, grouped by requestor class name.
+	 * 
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return Number of data access events for each requestor class name
+	 */
+	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end);
+
+	/**
+	 * Get number of local data access events in certain time period, grouped by requestor identity.
+	 * 
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return Number of data access events for each requestor identity
+	 */
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
 }

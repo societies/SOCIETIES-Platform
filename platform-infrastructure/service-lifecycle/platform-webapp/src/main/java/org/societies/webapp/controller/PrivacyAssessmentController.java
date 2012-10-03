@@ -30,6 +30,7 @@ import java.awt.Paint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -238,13 +239,13 @@ public class PrivacyAssessmentController {
 
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
-				List<DataAccessLogEntry> assResult;
-//				assResult = assessment.get;
-//				for (DataAccessLogEntry logEntry : assResult) {
-//					logEntry.getRequestorClass();
-//				}
+				Map<IIdentity, Integer> dataAccessIdentities;
+				Map<String, Integer> dataAccessClasses;
+				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
 				data = new double[][] {
-						{210, 300, 320, 265, 299}
+						//(Integer[]) dataAccessIdentities.values().toArray()
+						{100, 200, 300}
 						};
 			}
 			else {
