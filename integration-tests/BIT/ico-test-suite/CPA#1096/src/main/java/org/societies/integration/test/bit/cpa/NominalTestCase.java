@@ -88,7 +88,7 @@ public class NominalTestCase {
     public void testCreateCises() {
         for(int i = 0 ; i < this.numCIS ; i++){
             String cisId;
-            String testTitle = "testCreateCisWithoutPrivacyPolicyCreation: ";
+            String testTitle = "CPA: ";
             LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
             // Create CIS
