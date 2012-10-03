@@ -140,6 +140,7 @@ public class PilotController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		// data model object to be used for displaying form in html page
 		LoginForm loginForm = new LoginForm();
+		loginForm.setMethod("login");
 		model.put("loginForm", loginForm);
 		model.put("domains", domains);
 		/*
@@ -180,52 +181,9 @@ public class PilotController {
 		String subDomain = loginForm.getSubDomain();
 		String method = loginForm.getMethod();
 		
-		////////////////// REGISTER ////////////////
-		if (method.equals("register")) {
-			// ADD ACCOUNT
-			Map<String, String> params = new LinkedHashMap<String, String>();
-			params.put("username", userName);
-			params.put("password", password);
-			params.put("name", Name);
-			params.put("secret", "defaultSecret");
-			String xmppUrl = new String();
-			xmppUrl = String.format(OPENFIRE_PLUGIN, xmppDomain);
-			String resp = postData(MethodType.ADD, xmppUrl, params);
-			try {
-				// CHECK RESPONSE - DOES ACCOUNT ALREADY EXIST
-				Document respDoc = loadXMLFromString(resp);
-				if (respDoc.getDocumentElement().getNodeName().equals("error")) {
-					model.put("registerError", "Username already exists, please try again");
-					return new ModelAndView("pilot", model);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			// CREATE CLOUD ACCOUNT
-			String jid = userName + "." + subDomain;
-			DaUserRecord userRecord = new DaUserRecord();
-			userRecord.setName(userName);
-			userRecord.setId(jid);
-			userRecord.setHost("");
-			userRecord.setPort("");
-			userRecord.setStatus("new");
-			userRecord.setUserType("user");
-			userRecord.setPassword(password);
-			daRegistry.addXmppIdentityDetails(userRecord);
-
-			//CREATE CSS ADVERT
-			CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
-			cssAdvert.setId(jid);
-			cssAdvert.setUri(jid);
-			cssAdvert.setName(Name);
-			cssDir.addCssAdvertisementRecord(cssAdvert);
-			
-			model.put("result", "Account Created  - Your cloud node will be created in next 24 hours");
-			return new ModelAndView("pilot", model);
-		}
+	
 		////////////////// LOGIN ////////////////
-		else if (method.equals("login")) {
+		
 			// AUTHENTICATE JABBER ID
 			Map<String, String> params = new LinkedHashMap<String, String>();
 			params.put("username", userName);
@@ -236,6 +194,11 @@ public class PilotController {
 			xmppUrl = String.format(OPENFIRE_PLUGIN, xmppDomain);
 			String resp = postData(MethodType.LOGIN, xmppUrl, params);
 			try {
+				if (resp.isEmpty())
+				{
+					model.put("loginError", "Error logging onto openfire Account. Please try again");
+					return new ModelAndView("pilot", model);
+				}
 				// CHECK RESPONSE - DOES ACCOUNT ALREADY EXIST
 				Document respDoc = loadXMLFromString(resp);
 				if (respDoc.getDocumentElement().getNodeName().equals("error")) {
@@ -244,6 +207,8 @@ public class PilotController {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				model.put("loginError", "Error logging onto openfire Account. Please try again");
+				return new ModelAndView("pilot", model);
 			}
 		
 			//GET CONTAINER INFO
@@ -253,7 +218,7 @@ public class PilotController {
 			if (userRecord.getStatus().contentEquals("new")) {
 				//CLOUD NODE NOT SETUP YET
 				model.put("loginError", "Cloud node creation not completed");
-				return new ModelAndView("login", model);
+				return new ModelAndView("pilot", model);
 			}
 			
 			// GET SERVER/PORT NUMBER FROM REGISTRY
@@ -262,12 +227,7 @@ public class PilotController {
 			model.put("webappurl", redirectUrl);
 			model.put("name", userName);	
 			return new ModelAndView("loginsuccess", model);
-		}
-		else {
-			//UNKNOW METHOD CALLED
-			model.put("registerError", "Unknown error occured, please try again");
-			return new ModelAndView("pilot", model);
-		}
+	
 	}
 	
 	private static String postData(MethodType method, String openfireUrl, Map<String, String> params) {
