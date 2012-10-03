@@ -141,7 +141,32 @@ public class TestCommsMgmt {
 			
 		}
 	}
+	/**
+	 * Test get CSSRecord
+	 */
+	public void testGetCssRecord() {
+		LOG.info("Testing testGetCssRecord");
+		this.remoteCSSManager.getCssRecord(new ICSSManagerCallback() {
+		public void receiveResult(CssInterfaceResult result) {
+				LOG.info("Received result from remote call");
+				LOG.info("Result Status: " + result.isResultStatus());
+				
+				List<CssNode> nodes = result.getProfile().getCssNodes();
+				for (CssNode node: nodes) {
+					LOG.info("Received node: " + node.getIdentity() + " status: " + node.getStatus() + " type: " + node.getType());
+				}
+			}
+		});
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+
+	}
 	/**
 	 * Create a default CSSrecord
 	 * This is a temporary measure until genuine CSSs can be created

@@ -221,9 +221,10 @@ public class CisSubscribedImp implements ICis {
 		LOG.info("client call to get list of members from a RemoteCIS");
 
 		CommunityMethods c = new CommunityMethods();
-		
 		WhoRequest w = new WhoRequest();
-		
+		c.setWhoRequest(w);
+		RequestorBean reqB = new RequestorBean();
+		reqB.setRequestorId(this.cisManag.iCommMgr.getIdManager().getThisNetworkNode().getBareJid());
 		this.sendXmpp(c, callback);		
 	}
 	public void getListOfMembers(Requestor req, ICisManagerCallback callback){

@@ -51,13 +51,13 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+/*import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;*/
 
 /**
  * Describe your class here...
@@ -75,7 +75,7 @@ public class Tester {
 	private CtxAttribute nameAttribute2;
 	private Requestor requestor;
 	private IIdentity serviceIdentity;
-	private IPrivacyPreferenceManager privPrefMgr;
+	//private IPrivacyPreferenceManager privPrefMgr;
 	private IHelloWorld helloWorld;
 	
 	public Tester(){
@@ -86,7 +86,7 @@ public class Tester {
 	public void setup(){
 		identityManager = Test861.getIdentityManager();
 		ctxBroker = Test861.getCtxBroker();
-		privPrefMgr = Test861.getPrivPrefMgr();
+		//privPrefMgr = Test861.getPrivPrefMgr();
 		helloWorld = Test861.getHelloWorld();
 		
 		userIdentity = identityManager.getThisNetworkNode();
@@ -108,8 +108,8 @@ public class Tester {
 		
 		this.setupRequestor();
 		this.createNonInferrableAttribute();
-		this.createPPNPreference1();
-		this.createPPNPreference2();
+		//this.createPPNPreference1();
+		//this.createPPNPreference2();
 	}
 	
 	@Test
@@ -162,7 +162,7 @@ public class Tester {
 	}
 	
 	
-	private void createPPNPreference1(){
+/*	private void createPPNPreference1(){
 		
 		Resource resource = new Resource(nameAttribute.getId());
 		List<Action> actions = new ArrayList<Action>();
@@ -218,5 +218,5 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-	}
+	}*/
 }

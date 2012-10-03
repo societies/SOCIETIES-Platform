@@ -17,7 +17,7 @@ window.plugins.SocietiesLocalCISManager = {
 			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'disconnectService'));
 		}
 	},
-	createCIS: function(successCallback, failureCallback) {
+	createCIS: function(successCallback, failureCallback, name, description, type, criterias, privacyPolicy) {
 		console.log("create CIS desktop invoked");
 		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
 			errorCallback('A random error was generated');
@@ -64,6 +64,26 @@ window.plugins.SocietiesLocalCISManager = {
 		}
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'JoinResponse'));
+		}
+	},
+	
+	getActivityFeed: function(cis_id, successCallback, failureCallback) {
+		console.log("getActivityFeed desktop invoked");
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'ActivityFeed'));
+		}
+	},
+	
+	getMembers: function(cis_id, successCallback, failureCallback) {
+		console.log("getActivityFeed desktop invoked");
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'getMembers'));
 		}
 	}
 }

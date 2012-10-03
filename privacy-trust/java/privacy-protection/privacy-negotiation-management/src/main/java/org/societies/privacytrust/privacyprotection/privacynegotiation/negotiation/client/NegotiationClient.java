@@ -57,6 +57,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -101,7 +102,7 @@ public class NegotiationClient implements INegotiationClient {
 	private IPrivacyPreferenceManager privPrefMgr;
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
-	
+	private IUserFeedback userFeedback;
 	public NegotiationClient(INegotiationAgentRemote negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
 		this.negotiationAgentRemote = negotiationAgent;
 		this.policyMgr = privacyPolicyNegotiationManager;
@@ -116,7 +117,7 @@ public class NegotiationClient implements INegotiationClient {
 		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
 		this.agreements = new Hashtable<Requestor, IAgreement>();
 		this.userIdentity = idm.getThisNetworkNode();
-		
+		this.userFeedback = privacyPolicyNegotiationManager.getUserFeedback();
 		
 	}
 	
@@ -143,7 +144,8 @@ public class NegotiationClient implements INegotiationClient {
 		}
 		if (notFoundTypes.size()>0){
 			log("Service requires these contextTypes\n"+str+"which don't exist");
-			JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
+			this.userFeedback.showNotification("Error starting service\n Service requires these data types\n"+str+"which don't exist in your profile");
+			//JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
 				this.eventMgr.publishInternalEvent(evt);
@@ -179,8 +181,16 @@ public class NegotiationClient implements INegotiationClient {
 		log("Received response policy from Provider!");
 		log(policy.toString());
 		if (policy.getStatus().equals(NegotiationStatus.FAILED)){
-			JOptionPane.showMessageDialog(null, "Negotiation Status: "+NegotiationStatus.FAILED+"\n"
-					+"Provider did not accept my terms & conditions");
+			String requestorStr = "";
+			if (policy.getRequestor() instanceof RequestorCis){
+				requestorStr = "Cis administrator";
+			}else{
+				requestorStr = "Service Provider";
+			}
+			this.userFeedback.showNotification("Negotiation Status: "+NegotiationStatus.FAILED+"\n"
+					+requestorStr+" did not accept your privacy terms & conditions");
+/*			JOptionPane.showMessageDialog(null, "Negotiation Status: "+NegotiationStatus.FAILED+"\n"
+					+"Provider did not accept my terms & conditions");*/
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
 				this.eventMgr.publishInternalEvent(evt);
@@ -285,7 +295,8 @@ public class NegotiationClient implements INegotiationClient {
 				
 				Future<Boolean> ack = this.negotiationAgentRemote.acknowledgeAgreement(envelope);
 				if (null==ack){
-					JOptionPane.showMessageDialog(null, "ack is null");
+					this.userFeedback.showNotification("Negotiation error: Did not receive acknowledgement for receiving Negotiation Agreement from service or CIS");
+					//JOptionPane.showMessageDialog(null, "ack is null");
 				}
 				this.acknowledgeAgreement(requestor, envelope, ack.get());
 			}else{

@@ -57,6 +57,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
@@ -78,7 +80,11 @@ public class TestCheckPermission {
 	ICommManager commsManager = Mockito.mock(ICommManager.class);
 	IIdentityManager identityManager = Mockito.mock(IIdentityManager.class);
 	PrivacyPreferenceManager privPrefMgr = new PrivacyPreferenceManager();
+	IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
+	
 	IIdentity userId;
+	
+	
 	CtxEntity userCtxEntity;
 	CtxAssociation hasPrivacyPreferences;
 	CtxEntity privacyPreferenceEntity;
@@ -87,6 +93,7 @@ public class TestCheckPermission {
 	private CtxAttribute ppnp_2_CtxAttribute;
 	MessageBox myMsgBox = Mockito.mock(MessageBox.class);
 	
+	
 	@Before
 	public void setUp(){
 		Mockito.when(commsManager.getIdManager()).thenReturn(identityManager);
@@ -94,7 +101,7 @@ public class TestCheckPermission {
 		privPrefMgr.setCommsMgr(commsManager);
 		privPrefMgr.setprivacyDataManagerInternal(privacyDataManager);
 		privPrefMgr.setTrustBroker(trustBroker);
-		privPrefMgr.setMyMessageBox(myMsgBox);
+		privPrefMgr.setUserFeedback(userFeedback);
 		this.setupContext();
 		//Mockito setup
 		try {
@@ -103,16 +110,23 @@ public class TestCheckPermission {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			
 			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(userCtxEntity.getId());
-
 			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
+			Mockito.when(ctxBroker.retrieveIndividualEntity(this.userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 			Mockito.when(ctxBroker.createAssociation(CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(this.hasPrivacyPreferences));
 			Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
 			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), "ppnp_preference_1")).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
 			Mockito.when(ctxBroker.createAttribute(userCtxEntity.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
 			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), "ppnp_preference_2")).thenReturn(new AsyncResult<CtxAttribute>(ppnp_2_CtxAttribute));
+			String allow  = "Allow";
+			String deny = "Deny";
+			List<String> response = new ArrayList<String>();
+			response.add(allow);
+			Mockito.when(userFeedback.getExplicitFB(Mockito.anyInt(), new ExpProposalContent(Mockito.anyString(), new String[]{allow,deny}))).thenReturn(new AsyncResult<List<String>>(response));
 			//Mockito.when(JOptionPane.showConfirmDialog(null, Mockito.eq(Mockito.anyString()),Mockito.eq(Mockito.anyString()), JOptionPane.YES_NO_OPTION )).thenReturn(JOptionPane.YES_OPTION);
 			//Mockito.doReturn(JOptionPane.showConfirmDialog(null, Mockito.eq(Mockito.anyString()),Mockito.eq(Mockito.anyString()), JOptionPane.YES_NO_OPTION ));
-			Mockito.when(myMsgBox.showConfirmDialog(Mockito.anyString(),Mockito.anyString(), Mockito.eq(JOptionPane.YES_NO_OPTION))).thenReturn(JOptionPane.YES_OPTION);
+			
+			
+			
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block

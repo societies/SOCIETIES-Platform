@@ -228,6 +228,7 @@ var SocietiesLogin = {
 		
 		function failure(data) {
 			alert("successfulCSSCloudLogin - failure: " + data);
+			success(data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.loginCSS(success, failure);

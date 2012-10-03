@@ -29,27 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * 
  * @namespace SocietiesCISProfileService
  */
-
+ 
 var	SocietiesCISProfileService = {
 			
-		/**
-		 * @methodOf SocietiesCISProfileService#
-		 * @description update the CIS data on community_profile.html 
-		 * @param {Object} successCallback The callback which will be called when result is successful
-		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns CIS record
-		 */
-		populateCISProfilepage: function(data) {
-			//var status = ["Available for Use", "Unavailable", "Not active but on alert"];
-			//var type = ["Android based client", "Cloud Node", "JVM based client"];
+	/**
+	 * @methodOf SocietiesCISProfileService#
+	 * @description update the CIS data on community_profile.html 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns CIS record
+	 */
+	populateCISProfilepage: function(data) {
+		if ( data ) {
+			//VALID COMMUNITY OBJECT
+			var markup = "<h1>" + data.communityName + "</h1>" + 
+						 "<p>Type: " + data.communityType + "</p>" + 
+						 "<p>" + data.description + "</p>" + 
+						 "<p>Owner: " + data.ownerJid + "</p>";
+			//INJECT
+			$("#community_profile_info").html( markup );
 			
-			console.log("populate called with cis name" + data.cisName);
-			
-			jQuery("#comProfCisName").val(data.cisName);
-			jQuery("#comProfCisCategory").val(data.cisType);
-			jQuery("#comProfCisJid").val(data.cisJid);
-			jQuery("#comProfCisDesc").val(data.cisDescription);
-			jQuery("#comProfCisowner").val(data.cisOwner);
+			try {//REFRESH FORMATTING
+				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
+				$('ul#community_details').listview('refresh');
+			}
+			catch(err) {}
+			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 		}
+	}
 }
-

@@ -54,6 +54,7 @@ public class TestCase1266 extends IntegrationTestCase {
 		// and test case classes to run
 		super(1266, new Class[]{PrivacyDataManagerTest.class, CisDataAccessControlTest.class});
 		PrivacyDataManagerTest.testCaseNumber = this.testCaseNumber;
+		CisDataAccessControlTest.testCaseNumber = this.testCaseNumber;
 	}
 	
 	

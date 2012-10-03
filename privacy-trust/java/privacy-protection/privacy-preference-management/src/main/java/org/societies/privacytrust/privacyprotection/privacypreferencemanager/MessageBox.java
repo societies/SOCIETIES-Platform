@@ -40,7 +40,9 @@ import org.societies.api.context.model.CtxIdentifier;
  */
 public class MessageBox {
 
-	public int showConfirmDialog(String message, String title, int messageType){
+	
+/*	public int showConfirmDialog(String message, String title, int messageType){
+		
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 		} catch (ClassNotFoundException e) {
@@ -100,7 +102,7 @@ public class MessageBox {
 		String str =  (String) JOptionPane.showInputDialog(null, message, title, questionMessage, null, array, string);
 		return str;
 	}
-	
+	*/
 	
 	 
 }

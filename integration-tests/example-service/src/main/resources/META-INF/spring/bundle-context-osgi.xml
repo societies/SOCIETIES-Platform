@@ -15,6 +15,7 @@
 			<entry key="TargetPlatform" value="SOCIETIES" />
 			<entry key="ServiceProvider" value="ICT-SOCIETIES" />			
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
+			<entry key="ServiceClient" value="http://societies.local/client.jar" />
 		</osgi:service-properties>
 	</osgi:service>
 
@@ -23,6 +24,8 @@
 		<property name="authorSignature" value="integrator" />
 		<property name="serviceDescription" value="Example Service to test Integration" />
 		<property name="serviceName" value="IntegrationExample" />
+		<property name="serviceType" value="THIRD_PARTY_SERVER" />
+		<property name="privacyPolicy" value="http://societies.local/local_file" />		
 	</bean>
 
 </beans>
