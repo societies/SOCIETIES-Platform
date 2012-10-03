@@ -48,8 +48,10 @@
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxModelObjectBean"
 					nillable="false" minOccurs="0" />
-				<xs:element name="retrieveIndividualEntityIdBeanResult" type="tns:ctxIdentifierBean"
-					minOccurs="0" />
+				
+				<xs:element name="ctxBrokerRetrieveIndividualEntityIdBeanResult" type="tns:ctxEntityIdentifierBean"
+				minOccurs="0" />
+				
 				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxModelObjectBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerUpdateAttributeBeanResult"

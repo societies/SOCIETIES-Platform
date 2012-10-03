@@ -59,7 +59,7 @@ var ServiceManagementService = {
 	 */
 	disconnectService: function(successCallback, failureCallback) {
 
-		console.log("Call CoreServiceMonitorService - disconnectService");
+		console.log("Call ServiceManagementService - disconnectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -75,10 +75,8 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active services
 	 */
-	getServices: function(successCallback, failureCallback) {
-		console.log("Call CoreServiceMonitorService - activeServices");
-
-		var identity = "john.societies.local";
+	getServices: function(identity, successCallback, failureCallback) {
+		console.log("Call ServiceManagementService - activeServices");
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -95,7 +93,7 @@ var ServiceManagementService = {
 	 * @returns List of active apps
 	 */
 	getMyServices: function(successCallback, failureCallback) {
-		console.log("Call CoreServiceMonitorService - activeTasks");
+		console.log("Call ServiceManagementService - activeTasks");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error

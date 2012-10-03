@@ -64,6 +64,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -87,7 +88,8 @@ public class TestEvaluation {
 	IIdentityManager identityManager = Mockito.mock(IIdentityManager.class);
 	PrivacyPreferenceManager privPrefMgr = new PrivacyPreferenceManager();
 	IIdentity userId;
-	MessageBox myMsgBox = Mockito.mock(MessageBox.class);
+	IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
+	
 	private CtxEntity userCtxEntity;
 	private CtxAssociation hasPrivacyPreferences;
 	private CtxEntity privacyPreferenceEntity;
@@ -110,7 +112,7 @@ public class TestEvaluation {
 		privPrefMgr.setCommsMgr(commsManager);
 		privPrefMgr.setprivacyDataManagerInternal(privacyDataManager);
 		privPrefMgr.setTrustBroker(trustBroker);
-		privPrefMgr.setMyMessageBox(myMsgBox);
+		privPrefMgr.setUserFeedback(userFeedback);
 		
 		try {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
@@ -118,13 +120,14 @@ public class TestEvaluation {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(userCtxEntity.getId());
 			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
+			Mockito.when(ctxBroker.retrieveIndividualEntity(this.userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 			
 			Mockito.when(ctxBroker.createAssociation(CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(this.hasPrivacyPreferences));
 			Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
 			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), "ppnp_preference_1")).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
 			Mockito.when(ctxBroker.createAttribute(userCtxEntity.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
 			
-			Mockito.when(myMsgBox.showConfirmDialog(Mockito.anyString(),Mockito.anyString(), Mockito.eq(JOptionPane.YES_NO_OPTION))).thenReturn(JOptionPane.YES_OPTION);		
+			//Mockito.when(myMsgBox.showConfirmDialog(Mockito.anyString(),Mockito.anyString(), Mockito.eq(JOptionPane.YES_NO_OPTION))).thenReturn(JOptionPane.YES_OPTION);		
 			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(ppnp_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
 
 			

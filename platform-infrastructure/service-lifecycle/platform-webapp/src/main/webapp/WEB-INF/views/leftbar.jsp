@@ -33,7 +33,7 @@
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Settings</b></td></tr>
-	  <tr><td align="right">Profile</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotcssprofile.html"> Profile</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">Link My Social Networks</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>

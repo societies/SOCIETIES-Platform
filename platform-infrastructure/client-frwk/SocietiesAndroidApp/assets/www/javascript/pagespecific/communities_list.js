@@ -32,53 +32,138 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 var	SocietiesCISListService = {
 		
-		mCommunitities: {}, //USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
+	mCommunitities: {}, //USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
+	
+	/**
+	 * @methodOf SocietiesCISListService#
+	 * @description update the CIS data on communities_list.html 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns none
+	 */
+	populateCISListpage: function(data) {
 		
-		/**
-		 * @methodOf SocietiesCISListService#
-		 * @description update the CIS data on communities_list.html 
-		 * @param {Object} successCallback The callback which will be called when result is successful
-		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns none
-		 */
-		populateCISListpage: function(data) {
-			
-			mCommunitities = data;
-			//EMPTY TABLE - NEED TO LEAVE THE HEADER
-			while( $('ul#CommunitiesListDiv').children().length >1 )
-				$('ul#CommunitiesListDiv li:last').remove();
-			
-			//DISPLAY COMMUNTIES
-			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
-								 '<h2>' + data[i].communityName + '</h2>' + 
-								 '<p>' + data[i].communityType + '</p>' + 
-								 '</a></li>';
-				jQuery('ul#CommunitiesListDiv').append(tableEntry);
-			}
-			$('#CommunitiesListDiv').listview('refresh');
-		},
+		mCommunitities = data;
+		//EMPTY TABLE - NEED TO LEAVE THE HEADER
+		while( $('ul#CommunitiesListDiv').children().length >1 )
+			$('ul#CommunitiesListDiv li:last').remove();
 		
-		showCISDetails: function (cisPos) {
-			// GET SERVICE FROM ARRAY AT POSITION
-			var communityObj = mCommunitities[ cisPos ];
-			if ( communityObj ) {
-				//VALID SERVICE OBJECT
-				var markup = "<h1>" + communityObj.communityName + "</h1>" + 
-							 "<p>Type: " + communityObj.communityType + "</p>" + 
-							 "<p>" + communityObj.description + "</p>" + 
-							 "<p>Owner: " + communityObj.ownerJid + "</p>";
-				//INJECT
-				$("#community_profile_info").html( markup );
-				
-				//var members = "";
-				try {//REFRESH FORMATTING
-					//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
-					$('ul#community_details').listview('refresh');
-				}
-				catch(err) {}
-				$.mobile.changePage($("#community-details-page"), {transition: "fade"});
-			}
+		//DISPLAY COMMUNTIES
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+							 '<h2>' + data[i].communityName + '</h2>' + 
+							 '<p>' + data[i].communityType + '</p>' + 
+							 '</a></li>';
+			$('ul#CommunitiesListDiv').append(tableEntry);
 		}
-}
+		$('#CommunitiesListDiv').listview('refresh');
+	},
+	
+	showCISDetails: function (cisPos) {
+		// GET SERVICE FROM ARRAY AT POSITION
+		var communityObj = mCommunitities[ cisPos ];
+		if ( communityObj ) {
+			//VALID SERVICE OBJECT
+			var markup = "<h1>" + communityObj.communityName + "</h1>" + 
+						 "<p>Type: " + communityObj.communityType + "</p>" + 
+						 "<p>" + communityObj.description + "</p>" + 
+						 "<p>Owner: " + communityObj.ownerJid + "</p>";
+			//INJECT
+			$("#community_profile_info").html( markup );
+			
+			try {//REFRESH FORMATTING
+				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
+				$('ul#community_details').listview('refresh');
+			}
+			catch(err) {}
+			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
+			
+			SocietiesCISListService.showCISActivities(communityObj.communityJid);
+			SocietiesCISListService.showCISMembers(communityObj.communityJid);
+			ServiceManagementServiceHelper.connectToServiceManagement(function() {
+								SocietiesCISListService.showCISServices(communityObj.communityJid); }
+								)
+		}
+	},
+	
+	showCISActivities: function (cisId) {
+		function success(data) {
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#cis_activity_feed').children().length >0 )
+				$('ul#cis_activity_feed li:last').remove();
+			
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = "<li>"+ data[i].actor + " " + 
+					 	 		 data[i].verb  + " " + 
+					 	 		 data[i].object + "</li>";
+				$('ul#cis_activity_feed').append(tableEntry);
+			}
+			$('ul#cis_activity_feed').listview('refresh');
+			if (data.length <3)
+				$('ul#cis_activity_feed').trigger( "expand" );
+		}
+		function failure(data) {
+			alert("showCISActivities - failure: " + data); //console.log
+		}
+		
+		window.plugins.SocietiesLocalCISManager.getActivityFeed(cisId, success, failure);
+	},
+	
+	showCISMembers: function (cisId) {
+		
+		function success(data) {
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#cis_members').children().length >0 )
+				$('ul#cis_members li:last').remove();
+			
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = "<li><h2>"+ data[i].jid + "</h2>" + 
+									 "<p>" + data[i].role  + "</p></li>";
+				$('ul#cis_members').append(tableEntry);
+			}
+			$('ul#cis_members').listview('refresh');
+			
+			//AUTO EXPAND IF ROW COUNT IS SMALL 
+			if (data.length <3)
+				$('ul#cis_members').trigger( "expand" );
+		}
+		
+		function failure(data) {
+			alert("showCISActivities - failure: " + data); //console.log
+		}
+		
+		window.plugins.SocietiesLocalCISManager.getMembers(cisId, success, failure);
+	},
+	
+	/**
+	 * @methodOf SocietiesCISListService#
+	 * @description retrieves list of services from a CIS 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns none
+	 */
+	showCISServices: function(cisId) {
 
+		function success(data) {
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#cis_shared_apps').children().length >0 )
+				$('ul#cis_shared_apps li:last').remove();
+
+			//DISPLAY SERVICES
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+					'<h2>' + data[i].serviceName + '</h2>' + 
+					'<p>' + data[i].serviceDescription + '</p>' + 
+					'</a></li>';
+				$('ul#cis_shared_apps').append(tableEntry);
+			}
+			$('#cis_shared_apps').listview('refresh');
+		}
+		
+		function failure(data) {
+			alert("showCISServices - failure: " + data);
+		}
+		
+		window.plugins.ServiceManagementService.getServices(cisId, success, failure);
+	}
+}
