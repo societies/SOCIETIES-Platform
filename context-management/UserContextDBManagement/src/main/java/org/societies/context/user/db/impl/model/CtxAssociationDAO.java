@@ -55,7 +55,7 @@ import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierTyp
 	@NamedQuery(
 			name = "getCtxAssociationIdsByType",
 			query = "select association.ctxId from CtxAssociationDAO as association where association.ctxId.type = :type"
-	),
+	)
 })
 @Entity
 @org.hibernate.annotations.Entity(

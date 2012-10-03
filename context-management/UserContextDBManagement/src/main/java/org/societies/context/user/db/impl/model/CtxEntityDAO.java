@@ -96,7 +96,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 			name = "getCtxAssociationIdsByEntity",
 			query = "select distinct association.ctxId from CtxAssociationDAO as association inner join association.childEntities as childEntity " +
 					"where childEntity = :entId "
-	),
+	)
 })
 @Entity
 @org.hibernate.annotations.Entity(
