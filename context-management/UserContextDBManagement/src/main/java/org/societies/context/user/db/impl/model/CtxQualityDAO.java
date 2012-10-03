@@ -22,70 +22,86 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.model;
+package org.societies.context.user.db.impl.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.CtxQuality;
+
 /**
- * This class is used to represent the quality characteristics of context
- * attribute values. This information is known as Quality of Context (QoC) and
- * contains the following properties:
- * <ul>
- * <li><b>Freshness</b>: Specifies the age of context information. This is
- * derived from the time that particular piece of context information was last
- * updated.</li>
- * <li><b>Origin</b>: Denotes whether a context attribute value was
- * {@link CtxOriginType#MANUALLY_SET manually set}, {@link CtxOriginType#SENSED
- * sensed}, {@link CtxOriginType#INFERRED inferred}, or 
- * {@link CtxOriginType#INHERITED inherited}.</li>
- * <li><b>Precision:</b> Denotes the quality of coherence or reproducibility of
- * measured context attribute values. It is usually expressed in terms of the
- * standard deviation of the extended set of measurement results from a well
- * defined measurement process. The standard deviation of the conceptual
- * population is approximated by the standard deviation of an extended set of
- * actual context attribute value measurements. For directly sensed context
- * information this parameter is identical to the precision of the sensor used,
- * e.g. the precision of a GPS device.</li>
- * <li><b>Update Frequency</b>: Defines how often a piece of context information
- * is updated. For directly sensed context information this parameter is
- * identical to the sample rate of the sensor used.</li>
- * </ul>
- * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @see CtxAttribute
- * @see CtxOriginType
- * @since 0.0.1
+ * @see CtxQuality
+ * @since 0.5
  */
-public class CtxQuality implements Serializable {
+@Entity
+@org.hibernate.annotations.Entity(
+		dynamicUpdate=true
+)
+@Table(
+		name = "org_societies_context_quality"
+)
+public class CtxQualityDAO implements Serializable {
 
-	private static final long serialVersionUID = 2596329083367854427L;
+	private static final long serialVersionUID = -7378122470812617379L;
 
+	@Id
+	@Column(name="attribute_id")
+	private String attributeId;
+	
 	/** The context attribute this QoC information refers to. */
-	private final CtxAttribute attribute;
+	@OneToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(
+			name = "attribute_id",
+			nullable = false,
+			updatable = false
+	)
+	private CtxAttributeDAO attribute;
 	
 	/** The time the current context attribute value was last updated. */
+	@Column(name = "last_updated", nullable = true, updatable = true)
 	private Date lastUpdated;
 	
 	/** The origin type of the current context attribute value. */
+	@Column(name = "origin_type", nullable = true, updatable = true)
 	private CtxOriginType originType;
 	
 	/** The precision of the current context attribute value. */
+	@Column(name = "precision", nullable = true, updatable = true)
 	private Double precision;
 	
 	/** The update frequency of the current context attribute value. */
+	@Column(name = "update_frequency", nullable = true, updatable = true)
 	private Double updateFrequency;
 	
+	CtxQualityDAO() { }
+	
 	/**
-	 * Constructs a <code>CtxQuality</code> object for the specified context
+	 * Constructs a <code>CtxQualityDAO</code> object for the specified context
 	 * attribute.
 	 * 
 	 * @param attribute
 	 * the context attribute to associate with this QoC information.
-	 */
-	CtxQuality(CtxAttribute attribute) {
-		
+	 *
+	CtxQualityDAO(CtxAttributeDAO attribute) {
+	
+		this.attributeId = attribute.getId().toString();
 		this.attribute = attribute;
+	}*/
+	
+	public CtxQualityDAO(CtxAttributeIdentifier ctxId) {
+		
+		this.attributeId = ctxId.toString();
 	}
 	
 	/**
@@ -93,22 +109,17 @@ public class CtxQuality implements Serializable {
 	 * 
 	 * @return the context attribute associated to this QoC information.
 	 */
-	public CtxAttribute getAttribute() {
+	public CtxAttributeDAO getAttribute() {
 		
 		return this.attribute;
 	}
 	
-	/**
-	 * Returns the time in milliseconds since the last update of the current
-	 * context attribute value.
-     * 
-     * @return the time in milliseconds since the last update of the current
-     * context attribute value.
-     * @see #getLastUpdated()
-	 */
-	public long getFreshness() {
+	public void setAttribute(CtxAttributeDAO attribute) {
 		
-		return new Date().getTime() - this.getLastUpdated().getTime();
+		this.attribute = attribute;
+		
+		if (this.equals(attribute.getQuality()))
+			attribute.setQuality(this);
 	}
 	
 	/**
@@ -119,9 +130,7 @@ public class CtxQuality implements Serializable {
      */
 	public Date getLastUpdated() {
 		
-		return (this.lastUpdated != null) 
-				? new Date(this.lastUpdated.getTime())
-				: new Date(this.attribute.getLastModified().getTime());
+		return this.lastUpdated;
 	}
 	
 	/**
@@ -129,10 +138,11 @@ public class CtxQuality implements Serializable {
 	 * 
 	 * @param lastUpdated
 	 *            the time when the current context attribute value was last updated
+	 * @throws NullPointerException if the specified last update time is <code>null</code>
 	 */
 	void setLastUpdated(Date lastUpdated) {
 		
-		this.lastUpdated = new Date(lastUpdated.getTime());
+		this.lastUpdated = lastUpdated;
 	}
 	
 	/**
@@ -153,6 +163,7 @@ public class CtxQuality implements Serializable {
      * 
      * @param originType
      *            the origin type of the current context attribute value to set
+     * @throws NullPointerException if the specified origin type is <code>null</code>.
      * @see CtxOriginType
 	 */
 	public void setOriginType(CtxOriginType originType) {
@@ -169,7 +180,7 @@ public class CtxQuality implements Serializable {
 	 */
 	public Double getPrecision() {
 		
-		return (this.precision != null) ? new Double(this.precision) : null;
+		return this.precision;
 	}
 
 	/**
@@ -177,10 +188,11 @@ public class CtxQuality implements Serializable {
      * 
      * @param precision
      *            the precision of the current context attribute value to set.
+     * @throws NullPointerException if the specified precision is <code>null</code>.
 	 */
 	public void setPrecision(Double precision){
 		
-		this.precision = (precision != null) ? new Double(precision) : null;
+		this.precision = precision;
 	}
 	
 	/**
@@ -193,7 +205,7 @@ public class CtxQuality implements Serializable {
 	 */
 	public Double getUpdateFrequency() {
 		
-		return (this.updateFrequency != null) ? new Double(this.updateFrequency) : null;
+		return this.updateFrequency;
 	}
 	
 	/**
@@ -204,7 +216,7 @@ public class CtxQuality implements Serializable {
 	 */
 	public void setUpdateFrequency(Double updateFrequency) {
 		
-		this.updateFrequency = (updateFrequency != null) ? new Double(updateFrequency) : null;
+		this.updateFrequency = updateFrequency;
 	}
 
 	/**
@@ -215,7 +227,7 @@ public class CtxQuality implements Serializable {
 	 *
 	public String toString() {
 	}*/
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
 	 * @since 0.0.2
@@ -234,7 +246,6 @@ public class CtxQuality implements Serializable {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * @since 0.0.2
 	 */
 	@Override
 	public boolean equals(Object that) {
@@ -246,7 +257,7 @@ public class CtxQuality implements Serializable {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxQuality other = (CtxQuality) that;
+		CtxQualityDAO other = (CtxQualityDAO) that;
 		if (this.attribute == null) {
 			if (other.attribute != null)
 				return false;

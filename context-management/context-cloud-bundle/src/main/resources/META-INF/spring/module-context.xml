@@ -2,18 +2,75 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="http://www.springframework.org/schema/osgi 
     http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
     http://www.springframework.org/schema/beans 
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.springframework.org/schema/context 
-    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/jdbc 
+    http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
   <!-- regular spring configuration file defining the beans for this
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-       
+
 	<context:component-scan base-package="org.societies.context" />
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO</value>
+				<value>org.societies.context.user.db.impl.model.CtxModelObjectDAO</value>
+				<value>org.societies.context.user.db.impl.model.CtxEntityDAO</value>
+				<value>org.societies.context.user.db.impl.model.IndividualCtxEntityDAO</value>
+				<value>org.societies.context.user.db.impl.model.CtxAttributeDAO</value>
+				<value>org.societies.context.user.db.impl.model.CtxAssociationDAO</value>
+				<value>org.societies.context.user.db.impl.model.CtxQualityDAO</value>
+			</list>
+		</property>
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.context.user.db.impl.model</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_ddl">true</prop>
+				<prop key="hibernate.show_sql">${show_sql}</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+			</props>
+		</property>
+	</bean>
 	
+	<!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+<!-- 	<bean id="userCtxDBMgr"
+		class="org.societies.context.user.db.impl.UserCtxDBMgr">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean> -->
 </beans>

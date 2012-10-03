@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,118 +22,141 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.model;
+package org.societies.context.user.db.impl.model;
 
-import java.io.Serializable;
-import java.util.Date;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 
 /**
- * This class is used to represent context attributes which describe the
- * properties of a {@link CtxEntity}. Multiple <code>CtxAttribute</code>
- * objects can be assigned to an entity. For example, concepts such as the name,
- * the age, and the location of a person entity are described by different
- * attributes. Similarly, attributes describing a device's properties might be
- * the identity, the voltage, and the operational status of the device.
- * Essentially, CtxAttribute objects are used to identify an entity's status in
- * terms of its static and dynamic properties and therefore, capture all context
- * information items that characterise the situation of the owner entity. Note
- * that the containing entity is called the attribute's scope.
- * <p>
- * The value of a <code>CtxAttribute</code> can be set and retrieved using the
- * appropriate setter and getter method. The following value types are supported:
- * <dl>
- * <dt><code>String</code></dt>
- * <dd>Text value.</dd>
- * <dt><code>Integer</code></dt>
- * <dd>Integer value.</dd>
- * <dt><code>Double</code></dt>
- * <dd>Double-precision floating point numeric value.</dd>
- * <dt><code>byte[]</code></dt>
- * <dd>Binary value.</dd>
- * </dl> 
- * The following is an example of a context attribute holding a
- * <code>String</code> value:
- * <pre>
- * // Assuming we have obtained a reference to the context attribute 
- * CtxAttribute nameAttr;
- * // Initialise or update its value 
- * nameAttr.setStringValue(&quot;Sakis Rouvas&quot;);
- * // Retrieve its value 
- * String name = nameAttr.getStringValue();
- * </pre>
- * <p>
- * The <code>CtxAttribute</code> class also provides access to the history flag
- * which controls whether the represented attribute is maintained in the
- * historic context database.
- * 
- * @see CtxAttributeIdentifier
- * @see CtxEntity
+ * Describe your class here...
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.4
  */
-public class CtxAttribute extends CtxModelObject {
+@NamedQueries({
+	@NamedQuery(
+			name = "getCtxAttributeIdsByType",
+			query = "select attribute.ctxId from CtxAttributeDAO as attribute where attribute.ctxId.type = :type"
+	),
+})
+@Entity
+@org.hibernate.annotations.Entity(
+		dynamicUpdate=true
+)
+@Table(
+		name = "org_societies_context_attributes", 
+		uniqueConstraints = { @UniqueConstraint(columnNames = {
+				"scope", "type", "object_number" }) }
+)
+public class CtxAttributeDAO extends CtxModelObjectDAO {
 
-	private static final long serialVersionUID = 2885099443175534995L;
+	private static final long serialVersionUID = -2191470401169466190L;
+
+	/** The identifier of this attribute. */
+	@Columns(columns = {
+			@Column(name = "scope", nullable = false, updatable = false, length = 255),
+			@Column(name = "type", nullable = false, updatable = false, length = 63),
+			@Column(name = "object_number", nullable = false, updatable = false)
+	})
+	@Type(type="org.societies.context.user.db.impl.model.hibernate.CtxAttributeIdentifierCompositeType")
+	private CtxAttributeIdentifier ctxId;
+	
+	@ManyToOne(
+			fetch = FetchType.EAGER,
+			targetEntity = CtxEntityDAO.class
+	)
+	@JoinColumn(
+			name = "entity_id",
+			nullable = false,
+			updatable = false
+	)
+	private CtxEntityDAO entity;
 	
 	/** The text value of this context attribute. */
+	@Column(name = "string_value", length = 255, nullable = true, updatable = true)
 	private String stringValue;
 	
 	/** The integer value of this context attribute. */
+	@Column(name = "integer_value", nullable = true, updatable = true)
 	private Integer integerValue;
 	
 	/** The double-precision floating point numeric value of this context attribute.*/
+	@Column(name = "double_value", nullable = true, updatable = true)
 	private Double doubleValue;
 	
 	/** The binary value of this context attribute. */
+	@Column(name = "binary_value", nullable = true, updatable = true)
+	@Lob
 	private byte[] binaryValue;
 	
 	/** The value type of this context attribute */
+	@Column(name = "value_type", nullable = false, updatable = true)
 	private CtxAttributeValueType valueType = CtxAttributeValueType.EMPTY;
 	
+	@Column(name = "value_metric", length = 63)
 	/** The metric for the current context attribute value */
 	private String valueMetric;
 	
 	/** The QoC meta-data. */
-	private final CtxQuality quality = new CtxQuality(this);
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "attribute"/*, orphanRemoval = true*/)
+	private CtxQualityDAO quality;
 	
 	/** The identifier of the context source for the current attribute value. */
+	@Column(name = "source_id", length = 255, nullable = true, updatable = true)
 	private String sourceId;
 	
 	/** The history flag of this context attribute. */
+	@Column(name = "history_recorded", nullable = false, updatable = true)
 	private boolean historyRecorded;
-	
-	/**
-	 * Constructs a CtxAttribute with the specified identifier.
-	 * 
-	 * @param id
-	 *            the identifier of the newly created context attribute
-	 */
-	public CtxAttribute(CtxAttributeIdentifier id) {
+
+	CtxAttributeDAO() {
 		
-		super(id);
+		super(null);
 	}
 	
-	/**
-	 * Returns the identifier of this context attribute.
-	 * 
-	 * @return the identifier of this context attribute.
+	public CtxAttributeDAO(CtxAttributeIdentifier ctxId) {
+		
+		super(ctxId.toString());
+		this.ctxId = ctxId;
+	}
+	
+	/*
+	 * @see org.societies.context.user.db.impl.model.CtxModelObjectDAO#getId()
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {
 		
-		return (CtxAttributeIdentifier) super.getId();
+		return this.ctxId;
 	}
 	
-	/**
-	 * Returns the identifier of the context entity containing this attribute
-	 * 
-	 * @return the identifier of the context entity containing this attribute
-	 */
-	public CtxEntityIdentifier getScope() {
+	public CtxEntityDAO getEntity() {
 		
-		return this.getId().getScope();
+		return this.entity;
 	}
-
+	
+	public void setEntity(CtxEntityDAO entity) {
+		
+		if (!entity.getAttributes().contains(this))
+			entity.addAttribute(this);
+		
+		this.entity = entity;
+	}
+	
 	/**
 	 * Returns the value of this context attribute or <code>null</code>
 	 * if the value is not a String.
@@ -161,11 +184,6 @@ public class CtxAttribute extends CtxModelObject {
 	public void setStringValue(String value) {
 		
 		this.stringValue = value;
-		this.integerValue = null;
-		this.doubleValue = null;
-		this.binaryValue = null;
-		// Update the last update time
-		this.quality.setLastUpdated(new Date());
 	}
 
 	/**
@@ -194,12 +212,7 @@ public class CtxAttribute extends CtxModelObject {
 	 */
 	public void setIntegerValue(Integer value) {
 		
-		this.stringValue = null;
 		this.integerValue = value;
-		this.doubleValue = null;
-		this.binaryValue = null;
-		// Update the last update time
-		this.quality.setLastUpdated(new Date());
 	}
 	
 	/**
@@ -228,12 +241,7 @@ public class CtxAttribute extends CtxModelObject {
 	 */
 	public void setDoubleValue(Double value) {
 		
-		this.stringValue = null;
-		this.integerValue = null;
 		this.doubleValue = value;
-		this.binaryValue = null;
-		// Update the last update time
-		this.quality.setLastUpdated(new Date());
 	}
 	
 	/**
@@ -262,61 +270,8 @@ public class CtxAttribute extends CtxModelObject {
 	 */
 	public void setBinaryValue(byte[] value) {
 		
-		this.stringValue = null;
-		this.integerValue = null;
-		this.doubleValue = null;
 		this.binaryValue = value;
-		// Update the last update time
-		this.quality.setLastUpdated(new Date());
 	}
-	
-	Serializable getValue() {
-		
-        if (this.stringValue != null)
-            return this.stringValue;
-        else if (this.integerValue != null)
-            return this.integerValue;
-        else if (this.doubleValue != null)
-            return this.doubleValue;
-        else if (this.binaryValue != null)
-            return this.binaryValue;
-        else
-            return null;
-    }
-
-	/**
-	 * 
-	 * @param value
-	 * @throws IllegalArgumentException if <code>value</code> is not of type
-	 *         <code>String</code>, <code>Integer</code>, <code>Double</code>,
-	 *         or <code>byte[]</code> 
-	 */
-    void setValue(Serializable value) {
-    	
-        if (value == null || value instanceof String) {
-            this.stringValue = (String) value;
-            this.integerValue = null;
-            this.doubleValue = null;
-            this.binaryValue = null;
-        } else if (value instanceof Integer) {
-        	this.stringValue = null;
-            this.integerValue = (Integer) value;
-            this.doubleValue = null;
-            this.binaryValue = null;
-        } else if (value instanceof Double) {
-        	this.stringValue = null;
-        	this.integerValue = null;
-            this.doubleValue= (Double) value;
-            this.binaryValue = null;
-    	} else if (value instanceof byte[]) {
-    		this.stringValue = null;
-        	this.integerValue = null;
-        	this.doubleValue = null;
-            this.binaryValue = (byte[]) value;
-    	} else {
-            throw new IllegalArgumentException("invalid value type " + value.getClass().getName());
-    	}
-    }
 	
 	/**
 	 * Returns the value type of this context attribute
@@ -365,13 +320,21 @@ public class CtxAttribute extends CtxModelObject {
 	 * Returns the Quality of Context (QoC) information associated to this context
 	 * attribute.
 	 * 
-	 * @return the <code>CtxQuality</code> associated to this context
+	 * @return the <code>CtxQualityDAO</code> associated to this context
 	 *         attribute.
-	 * @see CtxQuality
+	 * @see CtxQualityDAO
 	 */
-	public CtxQuality getQuality() {
+	public CtxQualityDAO getQuality() {
 		
 		return this.quality;
+	}
+	
+	public void setQuality(CtxQualityDAO quality) {
+		
+		this.quality = quality;
+		
+		if (!this.equals(quality.getAttribute()))
+			quality.setAttribute(this);
 	}
 	
 	/**
