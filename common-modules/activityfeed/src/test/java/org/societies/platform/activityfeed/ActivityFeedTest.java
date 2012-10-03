@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,7 +210,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 //		ActivityFeed queryFeed = ActivityFeed.startUp("0");
 //		assert(queryFeed != null);
 //	}
-	//@Ignore
+	@Ignore
 	@Test
 	@Rollback(false)
 	public void testSNImporter(){
