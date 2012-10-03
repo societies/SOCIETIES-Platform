@@ -51,7 +51,7 @@ public class DataAccessAnalyzer {
 		this.privacyLog = privacyLog;
 	}
 
-	private List<DataAccessLogEntry> getDataAccess(IIdentity requestor, Date start, Date end) {
+	public List<DataAccessLogEntry> getDataAccess(IIdentity requestor, Date start, Date end) {
 		
 		List<DataAccessLogEntry> matchedEntries = new ArrayList<DataAccessLogEntry>();
 		String requestorJid;
@@ -63,7 +63,7 @@ public class DataAccessAnalyzer {
 		
 		requestorJid = requestor.getJid();
 		for (DataAccessLogEntry da : privacyLog.getDataAccess()) {
-			if (requestorJid.equals(da.getRequestor()) &&
+			if (requestorJid.equals(da.getRequestor().getJid()) &&
 					da.getTime().after(start) && da.getTime().before(end)) {
 				matchedEntries.add(da);
 			}
@@ -71,7 +71,7 @@ public class DataAccessAnalyzer {
 		return matchedEntries;
 	}
 	
-	private List<DataAccessLogEntry> getDataAccess(String requestor, Date start, Date end) {
+	public List<DataAccessLogEntry> getDataAccess(String requestor, Date start, Date end) {
 		
 		List<DataAccessLogEntry> matchedEntries = new ArrayList<DataAccessLogEntry>();
 
