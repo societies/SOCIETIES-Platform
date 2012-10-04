@@ -29,6 +29,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -108,7 +109,13 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 	public ServiceNegotiationResult getResult() {
 		try {
 			//return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
-			return resultList.take();
+			ServiceNegotiationResult result = resultList.take();
+			
+			if(Log.isDebugEnabled())
+				Log.debug("getResult: " + result);
+			
+			return result;
+			
 		} catch (InterruptedException e) {
 			logger.error("Error getting result in List");
 			e.printStackTrace();
@@ -152,6 +159,11 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 		
 		public String getAgreementKey(){
 			return agreementKey;
+		}
+		
+		@Override
+		public String toString(){
+			return "" + success + serviceUri + agreementKey;
 		}
 		
 	}
