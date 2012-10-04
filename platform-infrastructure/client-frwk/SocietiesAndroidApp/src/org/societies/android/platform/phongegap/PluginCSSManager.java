@@ -417,7 +417,7 @@ public class PluginCSSManager extends Plugin {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
 		//CSS RECORDS
-		} else if (LocalCSSManagerService.GET_ANDROID_CSS_RECORD == intent.getAction() || LocalCSSManagerService.READ_PROFILE_REMOTE == intent.getAction()) {
+		} else  {
 			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 		}
 		
