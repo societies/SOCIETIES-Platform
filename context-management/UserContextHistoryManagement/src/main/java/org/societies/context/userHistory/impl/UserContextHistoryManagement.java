@@ -25,87 +25,158 @@
 package org.societies.context.userHistory.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
+import org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO;
+import org.societies.context.userHistory.impl.model.UserCtxHistoryDAOTranslator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
+	
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(UserContextHistoryManagement.class);
 
+	@Autowired
+	private SessionFactory sessionFactory;
 
-	// Long is a key, allows to store hocAttrs with same values
-	// List<Serializable> contains 3 values: hocID,hocObj, ts
-	// add type for faster retrievals
-	private final ConcurrentMap<Long,List<Serializable>> hocObjects;
-
-	public UserContextHistoryManagement(){
-		this.hocObjects =  new ConcurrentHashMap<Long,List<Serializable>>();
-
+	public UserContextHistoryManagement() {
+		
+		LOG.info(this.getClass().getName() + " instantiated");
 	}
 
+	// TODO throw UserCtxHistoryMgrException
 	@Override
-	public CtxHistoryAttribute createHistoryAttribute(CtxAttribute ctxAttribute){
+	public CtxHistoryAttribute createHistoryAttribute(
+			final CtxAttribute attribute) {
 
-		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
-		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute,i) ;
-
-		List<Serializable> hocObject = new ArrayList<Serializable>();
-		hocObject.add(0,hocAttr.getId());
-		hocObject.add(1,hocAttr);
-		//this can changed to long (ts) in order to have smaller volume of data
-		hocObject.add(2,hocAttr.getLastModified());
-		this.hocObjects.put(i,hocObject);	
-
-		return hocAttr;
+		if (attribute == null)
+			throw new NullPointerException("attribute can't be null");
+		
+		CtxHistoryAttribute result = null;
+		
+		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
+				.fromCtxAttribute(attribute);
+		
+		final Session session = this.sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			final Serializable historyRecordId = session.save(dao);
+			tx.commit();
+			dao = (UserCtxHistoryAttributeDAO) session.load(
+					UserCtxHistoryAttributeDAO.class, historyRecordId);
+			result = UserCtxHistoryDAOTranslator.getInstance()
+					.fromUserCtxHistoryAttributeDAO(dao);
+			
+		} catch (Exception e) {
+			tx.rollback();
+			throw new IllegalStateException("Could not create history for attribute "
+					+ attribute + ": " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return result;
 	}
 
+	// TODO throw UserCtxHistoryMgrException
 	@Override
-	public CtxHistoryAttribute createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType){
-		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
-		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(attID,date,value,valueType,i);
-
-		List<Serializable> hocObject = new ArrayList<Serializable>();
-		hocObject.add(0,hocAttr.getId());
-		hocObject.add(1,hocAttr);
-		//this can changed to long (ts) in order to have smaller volume of data
-		hocObject.add(2,hocAttr.getLastModified());
-		this.hocObjects.put(i,hocObject);	
-
-		return hocAttr;
+	public CtxHistoryAttribute createHistoryAttribute(
+			final CtxAttributeIdentifier attrId, final Date date, 
+			final Serializable value, final CtxAttributeValueType valueType) {
+		
+		// TODO null checks??
+		
+		CtxHistoryAttribute result = null;
+		
+		final String stringValue;
+		final Integer integerValue;
+		final Double doubleValue;
+		final byte[] binaryValue;
+		
+		if (valueType.equals(CtxAttributeValueType.STRING)) {
+			
+			stringValue = (String) value;
+			integerValue = null;
+			doubleValue = null;
+			binaryValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.INTEGER)) {
+			
+			stringValue = null;
+			integerValue = (Integer) value;
+			doubleValue = null;
+			binaryValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.DOUBLE)) {
+			
+			stringValue = null;
+			integerValue = null;
+			doubleValue = (Double) value;
+			binaryValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.BINARY)) {
+			
+			stringValue = null;
+			integerValue = null;
+			doubleValue = null;
+			binaryValue = (byte[]) value;
+		} else {
+			
+			stringValue = null;
+			integerValue = null;
+			doubleValue = null;
+			binaryValue = null;
+		}
+		
+		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
+				.fromCtxAttributeProperties(attrId, date, date, stringValue, 
+						integerValue, doubleValue, binaryValue, valueType, null);
+		
+		final Session session = this.sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			final Serializable historyRecordId = session.save(dao);
+			tx.commit();
+			dao = (UserCtxHistoryAttributeDAO) session.load(
+					UserCtxHistoryAttributeDAO.class, historyRecordId);
+			result = UserCtxHistoryDAOTranslator.getInstance()
+					.fromUserCtxHistoryAttributeDAO(dao);
+			
+		} catch (Exception e) {
+			tx.rollback();
+			throw new IllegalStateException("Could not create history for attribute "
+					+ attrId + ": " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return result;
 	}
 
+	// TODO deprecate
 	@Override
 	public void storeHoCAttribute(CtxAttribute ctxAttribute){
 
-		List<Serializable> hocObject = new ArrayList<Serializable>();
-		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
-		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute,i);
-
-		hocObject.add(0,hocAttr.getId());
-		hocObject.add(1,hocAttr);
-		//this can changed to long (ts) in order to have smaller volume of data
-		hocObject.add(2,hocAttr.getLastModified());
-		this.hocObjects.put(i,hocObject);	
+		this.createHistoryAttribute(ctxAttribute);	
 	}
 
 
@@ -126,48 +197,43 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	}
 
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) {
+	// TODO throws UserCtxHistoryException
+	@Override
+	public List<CtxHistoryAttribute> retrieveHistory(final CtxAttributeIdentifier attrId) {
+		
+		if (attrId == null)
+			throw new NullPointerException("attrId can't be null");
 
-		List<CtxHistoryAttribute> results = new LinkedList<CtxHistoryAttribute>();
-
-
-		TreeMap<Long,CtxHistoryAttribute> tempHocDataTreeMap = new TreeMap<Long,CtxHistoryAttribute>();
-
-		for(Long l : this.hocObjects.keySet()){
-			List<Serializable> tempRes = this.hocObjects.get(l);
-			CtxAttributeIdentifier ctxAttrid = (CtxAttributeIdentifier) tempRes.get(0);
-			if (ctxAttrid.equals(attrId)){
-				tempHocDataTreeMap.put(l,(CtxHistoryAttribute) tempRes.get(1));
-			}
-		}
-		for(Long key :tempHocDataTreeMap.keySet()){
-			CtxHistoryAttribute keyHocAttr = tempHocDataTreeMap.get(key);
-			results.add(keyHocAttr);
+		final List<CtxHistoryAttribute> results = new LinkedList<CtxHistoryAttribute>();
+		try {
+			final List<UserCtxHistoryAttributeDAO> historyDAOs = this.retrieve(attrId, null, null);
+			for (final UserCtxHistoryAttributeDAO historyDAO : historyDAOs)
+				results.add(UserCtxHistoryDAOTranslator.getInstance()
+						.fromUserCtxHistoryAttributeDAO(historyDAO));
+		} catch (Exception e) {
+			// TODO throw new UserCtxHistoryMgrException
+			throw new IllegalStateException("Could not retrieve history of context attribute "
+					+ attrId + ": " + e.getLocalizedMessage(), e);
 		}
 		return results;
 	}
 
-	/*
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) {
-
-		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
-		for(CtxHistoryAttribute ctxHistoryAttribute : this.hocObjects.keySet()){
-			if (ctxHistoryAttribute.getId().equals(attrId)){
-				results.add(ctxHistoryAttribute);
-			}
-		}
-
-		return results;
-	}
-	 */
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId,
-			Date startDate, Date endDate) {
-
-		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
-		results = retrieveHistory(attrId);
-
-		//callback.historyRetrievedDate(results);
+			final Date startDate, final Date endDate) {
+		
+		final List<CtxHistoryAttribute> results = new LinkedList<CtxHistoryAttribute>();
+		
+		try {
+			final List<UserCtxHistoryAttributeDAO> historyDAOs = this.retrieve(attrId, startDate, endDate);
+			for (final UserCtxHistoryAttributeDAO historyDAO : historyDAOs)
+				results.add(UserCtxHistoryDAOTranslator.getInstance()
+						.fromUserCtxHistoryAttributeDAO(historyDAO));
+		} catch (Exception e) {
+			// TODO throw new UserCtxHistoryMgrException
+			throw new IllegalStateException("Could not retrieve history of context attribute "
+					+ attrId + ": " + e.getLocalizedMessage(), e);
+		}
 		return results;
 	}
 
@@ -240,30 +306,48 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public void printHocDB(){
 
-		/*
-		 * List<Serializable> hocObject = new ArrayList<Serializable>();
-		hocObject.add(0,hocAttr.getId());
-		hocObject.add(1,hocAttr);
-		//this can changed to long (ts) in order to have smaller volume of data
-		hocObject.add(2,hocAttr.getLastModified());
-		this.hocObjects.put(i,hocObject);	
+		try {
+			final List<UserCtxHistoryAttributeDAO> daos = this.retrieve(null, null, null);
+			System.out.println("key |      attr.getId                                                 |  valueSt     | Time ");
+			for (final UserCtxHistoryAttributeDAO dao : daos) {
 
-		 */
-		//final LinkedHashMap<Long,List<Serializable>> hocObjects;
-		System.out.println("key |      attr.getId                                                 |  valueSt     | Time ");
-		for(Long key : hocObjects.keySet()){
-
-			//System.out.println(key);
-			List<Serializable> ls = hocObjects.get(key);
-			CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) ls.get(0);
-			CtxHistoryAttribute attr = (CtxHistoryAttribute) ls.get(1);
-			String valueSt =  attr.getStringValue();
-			Date date = (Date) ls.get(2);
-			System.out.println(key+" | "+attr.getId()+" | "+valueSt+" | "+date.getTime());
+				final String valueSt =  dao.getStringValue();
+				final Date date = (Date) dao.getLastUpdated();
+				System.out.println(dao.getHistoryRecordId()+" | "+dao.getId()+" | "+valueSt+" | "+date.getTime());
+			}
+		} catch (Exception e) {
+			
+			throw new IllegalStateException("Could not print history of context: "
+					+ e.getLocalizedMessage(), e);
 		}
-
-
-
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	private List<UserCtxHistoryAttributeDAO> retrieve(
+			final CtxAttributeIdentifier ctxId,	final Date startDate,
+			final Date endDate) throws Exception {
+		
+		final List<UserCtxHistoryAttributeDAO> result= new LinkedList<UserCtxHistoryAttributeDAO>();
+		
+		final Session session = sessionFactory.openSession();
+		final Criteria criteria = session.createCriteria(UserCtxHistoryAttributeDAO.class);
+		
+		if (ctxId != null)
+			criteria.add(Restrictions.eq("ctxId", ctxId));
+		
+		if (startDate != null) 
+			criteria.add(Restrictions.ge("lastUpdated", startDate));
+		
+		if (endDate != null)
+			criteria.add(Restrictions.le("lastUpdated", endDate));
+	
+		try {
+			result.addAll(criteria.list());
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return result;
+	}
 }

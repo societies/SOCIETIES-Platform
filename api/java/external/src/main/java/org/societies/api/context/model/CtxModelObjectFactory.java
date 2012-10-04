@@ -88,6 +88,32 @@ public final class CtxModelObjectFactory {
 		return result;
 	}
 	
+	public CtxHistoryAttribute createHistoryAttribute(
+			final CtxAttributeIdentifier id, final Date lastModified,
+			final Date lastUpdated,	final String stringValue,
+			final Integer integerValue,	final Double doubleValue, 
+			final byte[] binaryValue, final CtxAttributeValueType valueType,
+			final String valueMetric) {
+		
+		return new CtxHistoryAttribute(id,
+				lastModified, lastUpdated, stringValue, integerValue,
+				doubleValue, binaryValue, valueType, valueMetric);
+	}
+	
+	public CtxHistoryAttribute createHistoryAttribute(
+			final CtxAttribute attribute) {
+		
+		return new CtxHistoryAttribute(attribute.getId(),
+				attribute.getLastModified(), 
+				attribute.getQuality().getLastUpdated(), 
+				attribute.getStringValue(), 
+				attribute.getIntegerValue(),
+				attribute.getDoubleValue(), 
+				attribute.getBinaryValue(), 
+				attribute.getValueType(),
+				attribute.getValueMetric());
+	}
+	
 	public CtxAssociation createAssociation(final CtxAssociationIdentifier id, 
 			final Date lastModified, final CtxEntityIdentifier parentEntity,
 			final Set<CtxEntityIdentifier> childEntities) {
