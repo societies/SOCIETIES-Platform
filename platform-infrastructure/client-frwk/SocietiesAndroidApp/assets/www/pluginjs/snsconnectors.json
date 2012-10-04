@@ -10,19 +10,22 @@
 	                    "id": "xyz123",
     					"identity": "john@facebook.com",
     					"name": "facebook",
-    					"token": "xyz123" 
+    					"token": "xyz123",
+    					"expires": "1 Jan 2012"
 						},
 						{
 	                    "id": "xyz123",
     					"identity": "john@twitter.com",
     					"name": "twitter",
-    					"token": "xyz123" 
+    					"token": "xyz123",
+    					"expires": "1 Jan 2012" 
 						},
 						{
 	                    "id": "xyz123",
     					"identity": "john@foursquare.com",
     					"name": "foursquare",
-    					"token": "xyz123" 
+    					"token": "xyz123",
+    					"expires": "1 Jan 2012"
 						} ],
 		"addSocialConnector": "xyz123",
 		"removeSocialConnector": "true"
