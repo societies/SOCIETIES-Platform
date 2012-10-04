@@ -233,14 +233,16 @@ public class CommsServer implements IFeatureServer {
 			switch (bean.getMethod())
 			{
 			case SEND_CSS_FRIEND_REQUEST:
+				LOG.debug("Intercepting remote method invocation SEND_CSS_FRIEND_REQUEST");
+				
 				IIdentity receivedID = stanza.getFrom();
 				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
 				String receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
-				LOG.info("<<<<<<<<<<>>>>>>>>>>>>> receivedIDcloud result is : " +receivedIDcloud);
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info("UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(CssRequestStatusType.PENDING);
 				request.setOrigin(CssRequestOrigin.REMOTE);
@@ -252,11 +254,11 @@ public class CommsServer implements IFeatureServer {
 				receivedID = stanza.getFrom();
 				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
 				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
-				LOG.info("<<<<<<<<<<>>>>>>>>>>>>> receivedIDcloud result is : " +receivedIDcloud);
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info("UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
@@ -267,11 +269,11 @@ public class CommsServer implements IFeatureServer {
 				receivedID = stanza.getFrom();
 				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
 				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
-				LOG.info("<<<<<<<<<<>>>>>>>>>>>>> receivedIDcloud result is : " +receivedIDcloud);
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info("UPDATE_CSS_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
@@ -282,11 +284,11 @@ public class CommsServer implements IFeatureServer {
 				receivedID = stanza.getFrom();
 				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
 				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
-				LOG.info("<<<<<<<<<<>>>>>>>>>>>>> receivedIDcloud result is : " +receivedIDcloud);
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> ACCEPT_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info("ACCEPT_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);

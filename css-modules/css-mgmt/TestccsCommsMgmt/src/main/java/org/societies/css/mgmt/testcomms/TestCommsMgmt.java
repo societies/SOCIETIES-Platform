@@ -57,6 +57,7 @@ public class TestCommsMgmt {
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 	
 	public static final String TEST_CSS_NAME = "Liam Marshall";
+	public static final String TEST_CSS_JID = "alan.societies.bespoke";
 	
 //	data required for Friends testing
 //	insert into societiesdb.CssFriendEntry (friendIdentity, requestStatus) values ("liam@sligo.xmpp", "accepted"), ("maria@intel.xmpp", "accepted"), ("midge@home.com", "accepted");
@@ -225,6 +226,9 @@ public class TestCommsMgmt {
 				LOG.info("Number of suggested friends: " + resultBean.getResultAdvertList().size());
 			}
 		});
+		
+		LOG.info("Calling remote CSSManager server for method sendCssFriendRequest");
+		this.remoteCSSManager.sendCssFriendRequest(TEST_CSS_JID);
 
 		LOG.info("Calling remote CSSDirectory server for method findAllCssAdvertisementRecords");
 		this.remoteCSSDirectory.findAllCssAdvertisementRecords(new ICssDirectoryCallback() {

@@ -742,14 +742,33 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 
 	@Override
 	public Future<List<CssRequest>> findAllCssRequests() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
-	public void sendCssFriendRequest(String arg0) {
-		// TODO Auto-generated method stub
+	public void sendCssFriendRequest(String cssIdentity) {
+		Dbc.require("Friend request CSS identity must be specified", null != cssIdentity && cssIdentity.length() > 0);
+		
+		LOG.debug("Remote call on sendCssFriendRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(cssIdentity));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 	}
 }
