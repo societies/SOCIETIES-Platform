@@ -172,9 +172,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		
 		this.binder = new LocalBinder();
 
-		//This should replaced with persisted value if available
 		this.cssRecord = null;
-		this.ccm = new ClientCommunicationMgr(this);
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -303,10 +301,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-
+		this.ccm = new ClientCommunicationMgr(this);
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
-
 		
 		DomainLogin domainLogin = new DomainLogin();
 		
@@ -797,6 +794,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
 				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
+				LocalCSSManagerService.this.ccm = null;
 				
 				results[0] = params[0];
 			}

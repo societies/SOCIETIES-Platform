@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.css.mgmt.comms;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
@@ -545,7 +547,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	}
 
 	// @Override
-	public void sendCssFriendRequest(String cssFriendId) {
+	public void sendCssFriendRequest(String cssFriendId, ICSSManagerCallback callback) {
 
 		LOG.debug("Remote call on sendCssFriendRequest");
 
@@ -684,7 +686,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 
-		messageBean.setMethod(MethodType.FIND_ALL_CSS_FRIEND_REQUESTS);
+		messageBean.setMethod(MethodType.GET_FRIEND_REQUESTS);
 		CommsClientCallback commsCallback = new CommsClientCallback(
 				stanza.getId(), callback);
 
@@ -721,6 +723,33 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+	}
+
+
+
+	@Override
+	public Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CssRequest>> findAllCssFriendRequests() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CssRequest>> findAllCssRequests() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void sendCssFriendRequest(String arg0) {
+		// TODO Auto-generated method stub
 		
 	}
 }

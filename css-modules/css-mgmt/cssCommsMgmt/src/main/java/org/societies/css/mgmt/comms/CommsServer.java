@@ -176,6 +176,7 @@ public class CommsServer implements IFeatureServer {
 				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
 				break;
 			default:
+				LOG.error("Bean method does not exist: " + bean.getMethod());
 				break;
 			}
 			
@@ -186,9 +187,12 @@ public class CommsServer implements IFeatureServer {
 					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
 					break;
 				case SUGGESTED_FRIENDS:
-				case GET_FRIEND_REQUESTS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
 					LOG.debug("Number of suggested friends: " + friendsAdsResult.size());
+					break;
+				case GET_FRIEND_REQUESTS:
+					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of friend requests: " + friendsAdsResult.size());
 					break;
 				default:
 					// Since everything else seems to use this!!
@@ -289,14 +293,8 @@ public class CommsServer implements IFeatureServer {
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.acceptCssFriendRequest(request);
 			break;
-			
-			
-				
-				
 			}
-			
 		}
-		
 	}
 
 	@Override
