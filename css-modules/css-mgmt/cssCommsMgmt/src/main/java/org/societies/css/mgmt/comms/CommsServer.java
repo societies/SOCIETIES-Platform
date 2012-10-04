@@ -112,7 +112,8 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
-			
+			Future<List<CssRequest>> asyncRequestResult = null;
+			List<CssRequest> RequestResult = null;
 			
 			Future<List<CssAdvertisementRecord>> asyncFriendsAdsResult = null;
 			List<CssAdvertisementRecord> friendsAdsResult = null;
@@ -175,6 +176,12 @@ public class CommsServer implements IFeatureServer {
 			case GET_FRIEND_REQUESTS:
 				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
 				break;
+			case FIND_ALL_CSS_REQUESTS:
+				asyncRequestResult = this.cssManager.findAllCssRequests(); 
+				break;
+			case FIND_ALL_CSS_FRIEND_REQUESTS:
+				asyncRequestResult = this.cssManager.findAllCssFriendRequests(); 
+				break;
 			default:
 				LOG.error("Bean method does not exist: " + bean.getMethod());
 				break;
@@ -194,6 +201,10 @@ public class CommsServer implements IFeatureServer {
 					friendsAdsResult = asyncFriendsAdsResult.get();
 					LOG.debug("Number of friend requests: " + friendsAdsResult.size());
 					break;
+				case FIND_ALL_CSS_FRIEND_REQUESTS:
+				case FIND_ALL_CSS_REQUESTS:
+					RequestResult = asyncRequestResult.get();
+					break;
 				default:
 					// Since everything else seems to use this!!
 					result = asyncResult.get();
@@ -211,6 +222,7 @@ public class CommsServer implements IFeatureServer {
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultAdvertList(friendsAdsResult);
+			resultBean.setResultCssRequestList(RequestResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

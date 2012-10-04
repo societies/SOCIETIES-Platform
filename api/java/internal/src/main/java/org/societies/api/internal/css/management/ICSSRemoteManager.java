@@ -174,38 +174,87 @@ public interface ICSSRemoteManager {
 	/**
 	 * Return a list of people who I have asked to my friend
 	 * 
-	 * @return
+	 * @return List CssRequest
 	 */
 	Future<List<CssRequest>> findAllCssFriendRequests();
 
 	/**
 	 * Return list of requests to be my friend
 	 * 
-	 * @return
+	 * @return List CssRequest
 	 */
 	Future<List<CssRequest>> findAllCssRequests();
 
+	/** 
+	 * send a request to remote CSS to retrieve CSSAdvertisement records 
+	 * 
+	 * @return List CssAdvertisementRecordDetailed
+	 */
 	Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull();
 
-	/* send a request to remote css to join */
+	/** 
+	 * send a request to remote CSS to become "Friends"
+	 * 
+	 * @param friendCssId
+	 */
 	void sendCssFriendRequest(String friendCssId);
 
-	/* Called by remote css is response t your request to join */
+	/**
+	 * Update the status of a CSS Friend Request
+	 * 
+	 * @param CssRequest
+	 */
 	void updateCssFriendRequest(CssRequest request);
 
-	/* Called by remote css is response t your request to join */
+	/** 
+	 * Called by remote CSS in response to your request to join
+	 * 
+	 * @param callback	 
+	 */
 	void updateCssRequest(CssRequest request);
 
-	/* Get a list of Friend Css's from cloud Css Manger */
+	/** 
+	 * Get a list of Friend Css's from cloud Css Manger 
+	 * 
+	 * @param callback
+	 */
 	void getCssFriends(ICSSManagerCallback callback);
 
-	/* Get a list of suggested Friends from cloud Css Manger */
+	/** 
+	 * Get a list of suggested Friends from cloud Css Manger
+	 * 
+	 * @param callback
+	 */
 	void suggestedFriends(ICSSManagerCallback callback);
 
-	/* Get a list of Pending CSS Friend Requests */
+	/** 
+	 * Get a list of Pending CSS Friend Requests
+	 * 
+	 * @param callback
+	 */
 	void getFriendRequests(ICSSManagerCallback callback);
 
-	/* accept/reject a CSS Friend Requests */
+	/**
+	 * accept/reject a CSS Friend Requests 
+	 * 
+	 * @param CssRequest
+	 */
 	void acceptCssFriendRequest(CssRequest request);
+	
+	/**
+	 * Get a list of all CSS Friend Requests
+	 * 
+	 * 
+	 * @param callback
+	 */
+	 void findAllCssFriendRequests(ICSSManagerCallback callback);
+	 
+	 /**
+	 * Get a list of all CSS Requests
+	 * 
+	 * 
+	 * @param callback
+	 */
+	 void findAllCssRequests(ICSSManagerCallback callback);	 
 
 }
