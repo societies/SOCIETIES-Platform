@@ -18,7 +18,7 @@
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Communities</b></td></tr>
-	  <tr><td align="right">My Communities</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotmycommunities.html">My Communities</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/createnewcis.html">Create New Community</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">Suggested Communities</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
@@ -29,7 +29,7 @@
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Settings</b></td></tr>
-	  <tr><td align="right">Profile</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotcssprofile.html"> Profile</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">Link My Social Networks</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>

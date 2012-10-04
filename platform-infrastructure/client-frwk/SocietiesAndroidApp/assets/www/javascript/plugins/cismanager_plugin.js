@@ -131,6 +131,28 @@ var	SocietiesLocalCISManager = {
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'Join',          //Telling the plugin, which action we want to perform
 				[client, cisAdvert]);        //Passing a list of arguments to the plugin
+	},
+	
+	getActivityFeed: function(cis_id, successCallback, failureCallback) {
+		console.log("getActivityFeed: " + cis_id);
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'getActivityFeed',          //Telling the plugin, which action we want to perform
+				[client, cis_id]);        //Passing a list of arguments to the plugin
+	},
+	
+	getMembers: function(cis_id, successCallback, failureCallback) {
+		console.log("getMembers desktop invoked");
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'getMembers',          //Telling the plugin, which action we want to perform
+				[client, cis_id]);        //Passing a list of arguments to the plugin
 	}
 	
 };

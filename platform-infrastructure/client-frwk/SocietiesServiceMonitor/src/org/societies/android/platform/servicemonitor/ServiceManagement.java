@@ -155,7 +155,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 		
 		//MESSAGE BEAN
 		ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
-		messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
+		messageBean.setMethod(MethodName.GET_SERVICE);
 
 		//COMMS STUFF
 		ICommCallback discoCallback = new ServiceLifecycleCallback(client, GET_SERVICES); 

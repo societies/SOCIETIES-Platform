@@ -12,6 +12,7 @@
 	<antcall target="clean-virgo-jars"></antcall>  
 	<antcall target="clean-virgo-wars"></antcall>  
 	<antcall target="clean-virgo-libd"></antcall>  
+	<antcall target="update-virgo-plans"></antcall>  
   </target>
 
   <target name="clean-maven-repo">
@@ -51,5 +52,14 @@
 	</delete>
   </target>
 
+  <target name="update-virgo-plans">
+	<echo message="copy Societies Virgo deployment plans ${spring.osgi.deploy.dir}"/>
+
+	<copy todir="${spring.osgi.deploy.dir}" overwrite="yes">
+    		<fileset dir="../virgo-plans">
+      			<include name="*.plan"/>
+    		</fileset>
+  	</copy>
+  </target>
 </project>
 

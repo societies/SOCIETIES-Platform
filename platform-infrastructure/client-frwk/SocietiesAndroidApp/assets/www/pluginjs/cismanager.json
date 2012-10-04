@@ -177,6 +177,25 @@
 	                    "description": "Where to go if you want help developing Societies services",
 	                    "communityJid" : "developers.societies.local"
 					     }
-					}
+					},
+					
+		"ActivityFeed": [{
+     				"actor": "john.societies.local",
+     				"verb": "created",
+	                "object": "cis-1234",
+	                "target" : "n/a"
+					},
+					{
+     				"actor": "jane.societies.local",
+     				"verb": "joined",
+	                "object": "cis-1234",
+	                "target" : "n/a"
+					},
+					{
+     				"actor": "john.societies.local",
+     				"verb": "shared",
+	                "object": "service-1234",
+	                "target" : "n/a"
+					}]
 	}
 }

@@ -24,8 +24,12 @@
  */
 package org.societies.android.platform.cis;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
@@ -470,6 +474,22 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 
 		//GETFEED OBJECT
 		GetActivities getFeed = new GetActivities();
+		
+		//TODO: HARDCODED RANGE DATE
+		String str_date="20100101";
+		DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		Date date = null;
+		try {
+			date = (Date)formatter.parse(str_date);
+		} catch (ParseException e2) {
+			e2.printStackTrace();
+		} 
+		long longFrom=date.getTime();
+
+		Date now = new Date();
+		long longNow = now.getTime();
+		getFeed.setTimePeriod(longFrom + " " + longNow);
+		
 		//CREATE MESSAGE BEAN
 		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
 		messageBean.setGetActivities(getFeed);

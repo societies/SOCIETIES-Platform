@@ -42,6 +42,11 @@ public class CtxAttributeTypes {
      */
     public static final String ACTION = "action";
     
+    /**
+     *  @since 0.0.8
+     */
+    public static final String AGE = "age";
+    
 	/**
      * 
      * @since 0.0.8
@@ -130,6 +135,11 @@ public class CtxAttributeTypes {
      */
     public static final String FAVOURITE_QUOTES = "favoriteQuotes";
         
+    /**
+     * @since 0.0.8
+     */
+    public static final String FRIENDS = "friends";
+    
 	/**
      * @since 0.0.8
      */
