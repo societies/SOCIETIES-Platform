@@ -380,7 +380,7 @@ public class ServiceControlController {
 				asynchResult = this.getSCService().installService(serviceToInstall);
 				//scresult = asynchResult.get();
 				
-				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				//if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
 				
 				/*
 				//GET REMOTE SERVICES
