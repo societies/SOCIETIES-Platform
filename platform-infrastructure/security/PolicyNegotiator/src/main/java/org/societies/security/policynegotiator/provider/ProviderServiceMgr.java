@@ -94,32 +94,32 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		String signature;
 		String dataToSign;
 		String strippedFilePath;
-
-		dataToSign = serviceId.getIdentifier().toASCIIString();
-
-		for (int k = 0; k < files.size(); k++) {
-			if (files.get(k).startsWith("/")) {
-				strippedFilePath = files.get(k).replaceFirst("/", "");
-				files.set(k, strippedFilePath);
-			}
-			dataToSign += files.get(k);
-		}
-
-		try {
-			signature = signatureMgr.sign(dataToSign, provider);
-		} catch (DigsigException e) {
-			throw new NegotiationException(e);
-		}
-		IClientJarServerCallback cb = new ClientJarServerCallback(callback);
-		//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
-		this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-				serviceId.getIdentifier(), provider, signature, files, cb);
-		
-		
 		String clientJar = "";
+
 		if (files != null && files.size() > 0) {
+			dataToSign = serviceId.getIdentifier().toASCIIString();
+	
+			for (int k = 0; k < files.size(); k++) {
+				if (files.get(k).startsWith("/")) {
+					strippedFilePath = files.get(k).replaceFirst("/", "");
+					files.set(k, strippedFilePath);
+				}
+				dataToSign += files.get(k);
+			}
+	
+			try {
+				signature = signatureMgr.sign(dataToSign, provider);
+			} catch (DigsigException e) {
+				throw new NegotiationException(e);
+			}
+			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
+			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
+			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
+					serviceId.getIdentifier(), provider, signature, files, cb);
+
 			clientJar = files.get(0);  // FIXME
 		}
+		
 		String idStr = serviceId.getIdentifier().toString();
 		Service s = new Service(idStr, slaXml, clientJarServer, clientJar, null);
 		
