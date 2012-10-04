@@ -150,6 +150,7 @@ public class SnapshotManager implements CtxChangeEventListener{
 				CtxAttribute newAttribute = futureAttribute.get();
 				byte[] blobRegistry = SerialisationHelper.serialise(retrievedReg);
 				newAttribute.setBinaryValue(blobRegistry);
+				ctxBroker.update(newAttribute);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
