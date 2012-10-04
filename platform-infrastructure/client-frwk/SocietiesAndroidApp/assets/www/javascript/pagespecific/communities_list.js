@@ -83,6 +83,7 @@ var	SocietiesCISListService = {
 			ServiceManagementServiceHelper.connectToServiceManagement(function() {
 								SocietiesCISListService.showCISServices(communityObj.communityJid); }
 								)
+			//SocietiesCISListService.createSelectServices();
 		}
 	},
 	
@@ -165,5 +166,51 @@ var	SocietiesCISListService = {
 		}
 		
 		window.plugins.ServiceManagementService.getServices(cisId, success, failure);
+	},
+	
+	/**
+	 * Shares a service from the select list to a community
+	 */
+	shareService: function() {
+		var service = $('select#selShareService').attr('value');
+		
+		if (connectorType != "0") { //"Select a Connector"
+			alert("Sharing service:" + service);
+		}
+	},
+	
+	createSelectServices: function() {
+		
+		function success(data) {
+			//$('select#selShareService option').each(function() { 
+			//	$(this).remove();
+			//});
+			//$("#myselect2").removeOption(0);
+			
+			//$('select#selShareService')
+			//	.empty()
+			//	.append('<option selected="selected" value="0">Select an application</option>');
+			
+			var count = $('select#selShareService option').length;
+			for (j=1; j<count; j++) {
+				$("select#selShareService").children().slice(j).detach(); 
+			}
+			
+			for (i = 0; i < data.length; i++) {
+				$('select#selShareService')
+					.append($("<option></option>")
+					.attr("value", data[i].serviceIdentifier.identifier)
+					.text(data[i].serviceName));
+			}
+			$('select#selShareService').attr('selectedIndex', 0); 
+			$('select#selShareService').selectmenu();
+		}
+		
+		function failure(data) {
+			
+		}
+		
+		window.plugins.ServiceManagementService.getMyServices(success, failure);
 	}
+	
 }
