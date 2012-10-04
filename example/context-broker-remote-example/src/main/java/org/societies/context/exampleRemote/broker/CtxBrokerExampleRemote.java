@@ -65,25 +65,30 @@ public class CtxBrokerExampleRemote 	{
 		LOG.info("*** CtxBrokerExampleRemote instantiation broker service: "+this.ctxBroker);
 						
 		this.commMgrService = commMgr;
-
-		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
-		LOG.info("*** remoteEntity id : "+ remoteEntity.getId());
-
-		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
-		LOG.info("*** remoteAttribute id : "+ remoteAttribute.getId());		
 		
-		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
+		LOG.info("*** create remoteEntity");
+		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
+		LOG.info("*** remoteEntity created,  id : "+ remoteEntity.getId());
 
+		LOG.info("*** create remoteAttribute");
+		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
+		LOG.info("*** remoteAttribute created,  id : "+ remoteAttribute.getId());		
+		
+		LOG.info("*** register for context updates");
+		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
+		LOG.info("*** registration for updates performed");
+		
 		remoteAttribute.setStringValue("CarnabyStreet12");
 		
-		LOG.info("*** perform updated ");
+		LOG.info("*** update attribute");
 		CtxAttribute updatedAttr = (CtxAttribute) this.ca3pService.updateCtxModelObject(remoteAttribute);
-		LOG.info("*** updated remoteAttribute id : "+ updatedAttr.getId());	
-		LOG.info("*** updated remoteAttribute value : "+ updatedAttr.getStringValue());
+		LOG.info("*** updated performed,  remoteAttribute id : "+ updatedAttr.getId());	
+		LOG.info("*** updated performed, remoteAttribute value : "+ updatedAttr.getStringValue());
 		
+		LOG.info("*** lookup attributes");
 		List<CtxIdentifier> lookupResults = this.ca3pService.lookupRemoteCtxAttribute(CtxAttributeTypes.ADDRESS_HOME_CITY);
 		
-		LOG.info("remote lookup results size "+ lookupResults.size());
+		LOG.info("remote lookup performed,  results size "+ lookupResults.size());
 
 		for(CtxIdentifier id : lookupResults ){
 			LOG.info("remote lookup results id "+ id);
@@ -95,9 +100,9 @@ public class CtxBrokerExampleRemote 	{
 	
 	
 		
-		LOG.info("remote retrieve of indi entity ");
+		LOG.info("remote retrieve of individual entity ");
 		this.ca3pService.retrieveRemoteIndiEntity();
-		
+		LOG.info("remote retrieve of individual entity performed");
 		
 		
 	}

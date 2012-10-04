@@ -35,6 +35,8 @@ import java.util.concurrent.Future;
 import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.community.*;
@@ -64,6 +66,9 @@ public class CisDirectoryController {
 	@Autowired
 	private ICssDirectoryRemote cssDirectoryRemote;
 	
+	@Autowired
+	private ICisManager cisManager;
+	
 	
 	public ICisDirectoryRemote getCisDirectoryRemote() {
 		return cisDirectoryRemote;
@@ -81,6 +86,14 @@ public class CisDirectoryController {
 		this.cssDirectoryRemote = cssDirectoryRemote;
 	}
 
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+	}
+
+	
 	@RequestMapping(value = "/oldcisdirectory.html", method = RequestMethod.GET)
 	public ModelAndView CISDirectoryold() {
 
@@ -227,6 +240,8 @@ public class CisDirectoryController {
 					
 		if ((adverts != null) && (adverts.size() > 0))
 		{
+			
+	
 			for ( int i = 0; i < adverts.size(); i++)
 			{
 				cssIds.add(new String(adverts.get(i).getCssownerid()));
@@ -239,15 +254,25 @@ public class CisDirectoryController {
 			getCssDirectoryRemote().searchByID(cssIds, cssDirCallback);
 			cssDetails = cssDirCallback.getResultList();
 						
+		
 			
 			// now we have two lists, we have to 
 			for ( int i = 0; i < adverts.size(); i++)
 			{
-				CisDirectoryCombinedDetails niceDets = new  CisDirectoryCombinedDetails();
-				niceDets.setAdrecord(adverts.get(i));
 				
-				if ((cssDetails != null) && (cssDetails.size() > 0))
+				// don't want to show the one's that were create by this user, or one's we are already a member of
+				
+				ICis checkcis = this.getCisManager().getCis(adverts.get(i).getId());
+				
+				if (checkcis == null) // we are not a member so we should show it
 				{
+				
+				
+					CisDirectoryCombinedDetails niceDets = new  CisDirectoryCombinedDetails();
+					niceDets.setAdrecord(adverts.get(i));
+				
+					if ((cssDetails != null) && (cssDetails.size() > 0))
+					{
 				
 					// list is returned in order we sent, so only have to check as far as 'i'
 					for ( int j = 0; ((j <= i) && (j < cssDetails.size())); j++)
@@ -270,8 +295,9 @@ public class CisDirectoryController {
 					}
 						
 					
+					}
+					cssNiceDetails.add(niceDets);
 				}
-				cssNiceDetails.add(niceDets);
 			}
 		}
 		

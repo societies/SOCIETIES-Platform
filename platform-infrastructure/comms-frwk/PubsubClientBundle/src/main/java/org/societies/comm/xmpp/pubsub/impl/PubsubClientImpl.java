@@ -1,5 +1,6 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.io.ByteArrayInputStream;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -23,6 +24,12 @@ import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
+import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -43,6 +50,10 @@ import org.societies.api.identity.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 
 @Component
 public class PubsubClientImpl implements PubsubClient, ICommCallback {
@@ -75,12 +86,19 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	private String packagesContextPath;
 	private IIdentity localIdentity;
+	private Map<String,Class<?>> elementToClass;
+	private Serializer serializer;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
 		responses = new HashMap<String, Object>();
 		responseTimeout = new HashMap<String, Long>();
 		subscribers = new HashMap<Subscription, List<Subscriber>>();
+		elementToClass = new HashMap<String, Class<?>>();
+		
+		Strategy strategy = new AnnotationStrategy();
+		serializer = new Persister(strategy);
+		
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
 		try {
@@ -131,10 +149,25 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 			
+			//CONVERT THE .getAny() OBJECT TO XML
+			ElementNSImpl eventBean =  (ElementNSImpl) i.getAny();
+			DOMImplementationLS domImplLS = (DOMImplementationLS) eventBean.getOwnerDocument().getImplementation(); 
+			LSSerializer domSerializer = domImplLS.createLSSerializer(); 
+			String eventBeanXML = domSerializer.writeToString(eventBean); 
+			
+			//SERIALISE OBJECT
+			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
+			Class<?> c = elementToClass.get(elementID);
+			Object bean = null;
+			try {
+				bean = serializer.read(c, eventBeanXML);
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+			//POST EVENT
 			List<Subscriber> subscriberList = subscribers.get(sub);
 			for (Subscriber subscriber : subscriberList)
-				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), i.getAny());
-		
+				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
 		}
 	}
 	// TODO subId
@@ -554,8 +587,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void addSimpleClasses(List<String> classList)
-			throws ClassNotFoundException {
-		// TODO Auto-generated method stub
+	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
+		for (String c : classList) {
+			Class<?> clazz = Class.forName(c);
+			Root rootAnnotation = clazz.getAnnotation(Root.class);
+			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+			}
+		}
 	}
 }
