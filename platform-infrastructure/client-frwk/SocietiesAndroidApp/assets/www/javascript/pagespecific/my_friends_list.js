@@ -52,7 +52,7 @@ var CSSFriendsServices = {
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			alert("Error displaying friend details);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.readRemoteCSSProfile(css_id, success, failure);

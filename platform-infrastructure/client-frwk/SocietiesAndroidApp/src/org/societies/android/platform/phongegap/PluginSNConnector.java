@@ -309,7 +309,7 @@ public class PluginSNConnector extends Plugin {
 				if (methodCallbackId != null) {
 					
 					//UNMARSHALL THE boolean
-					boolean parcel =  intent.getParcelableExtra(ISocialData.INTENT_RETURN_KEY);
+					boolean parcel =  intent.getBooleanExtra(ISocialData.INTENT_RETURN_KEY, true);
 					PluginResult result = new PluginResult(PluginResult.Status.OK, parcel);
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);
