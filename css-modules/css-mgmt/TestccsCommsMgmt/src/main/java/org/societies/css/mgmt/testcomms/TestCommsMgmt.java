@@ -1,6 +1,7 @@
 package org.societies.css.mgmt.testcomms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -50,10 +51,14 @@ public class TestCommsMgmt {
 	public static final String TEST_PASSWORD = "androidpass";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private static final String THIS_NODE = "XCManager.societies.local";
+	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+    private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
+
 
 	public void testPubSub() {
-        this.idManager = commManager.getIdManager();
+		LOG.info("Testing Login/Pubsub");
+		
+		this.idManager = commManager.getIdManager();
 
 //        try {
 //			pubsubID = idManager.fromJid(THIS_NODE);
@@ -66,16 +71,7 @@ public class TestCommsMgmt {
         
         List<String> listTopics;
 		try {
-            List<String> packageList = new ArrayList<String>();
-
-            packageList.add("org.societies.api.schema.cssmanagement");
-            try {
-				pubSubManager.addJaxbPackages(packageList);
-			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+    		
 	        LOG.info("Subscribing to pubsub");
 	        //try internal class
 	        pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.ADD_CSS_NODE, new pubsubReceiver());
@@ -88,14 +84,22 @@ public class TestCommsMgmt {
 	        	LOG.info("Node: " + s);
 	        }
 	        
-	        this.remoteCSSManager.suggestedFriends(new ICSSManagerCallback()  {
+	        this.remoteCSSManager.loginCSS(createCSSRecord(), new ICSSManagerCallback() {
 				
+				@Override
 				public void receiveResult(CssInterfaceResult result) {
 					LOG.info("Received result from remote call");
-					//LOG.info("Result Status: " + result.isResultStatus());
+					LOG.info("Result Status: " + result.isResultStatus());
 					
 				}
 			});
+				
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		
 		} catch (XMPPError e) {
@@ -248,15 +252,11 @@ public class TestCommsMgmt {
 		@Override
 		public void pubsubEvent(IIdentity identity, String node, String itemId,
 				Object payload) {
-			LOG.debug("Received Pubsub event: " + node + " itemId: " + itemId);
+			LOG.debug("Received Pubsub event: " + node + " itemId: " + itemId + " payload class: " + payload.getClass().getName());
 
 			if (payload instanceof CssEvent) {
 				LOG.debug("Received event is :" + ((CssEvent) payload).getType());
 			}
 		}
-		
 	}
-	
-
-
 }
