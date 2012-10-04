@@ -107,7 +107,8 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 
 	public ServiceNegotiationResult getResult() {
 		try {
-			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+			//return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+			return resultList.take();
 		} catch (InterruptedException e) {
 			logger.error("Error getting result in List");
 			e.printStackTrace();
