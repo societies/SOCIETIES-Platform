@@ -41,6 +41,7 @@ function ValidateForm(frm) {
 
 <div align="center"> 
 
+
 <form:form method="POST" action="pilot.html" commandName="loginForm">
 	<input type="hidden" name="method" value="login" >
 	<table bgcolor="#BDBDBD">
