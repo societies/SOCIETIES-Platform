@@ -185,6 +185,9 @@ public class SocialData extends Service implements ISocialData {
 					else if(action.equals(GET_SOCIAL_CONNECTORS)) {
 						intent.putExtra(INTENT_RETURN_KEY, convertConnectorsListToAConnectorBeanArray(resultBean.getConnectorsList()));
 					}
+					else if(action.equals(REMOVE_SOCIAL_CONNECTOR)) {
+						intent.putExtra(INTENT_RETURN_KEY, true);
+					}
 					
 					intent.setPackage(client);
 					context.sendBroadcast(intent);					
