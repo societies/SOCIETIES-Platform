@@ -27,7 +27,6 @@
  */
 package org.societies.webapp.models;
 
-import org.societies.api.context.model.CtxModelType;
 
 
 /**
@@ -39,13 +38,10 @@ import org.societies.api.context.model.CtxModelType;
 public class ContextForm {
 
 	private String method;
-	private String lookupModel;
-	private String lookupType;
+	private String type;
     private String model;
-    private String id;
+    private String ctxID;
     private String value;
-    
-    
     
     
 	public String getMethod() {
@@ -54,17 +50,11 @@ public class ContextForm {
 	public void setMethod(String method) {
 		this.method = method;
 	}
-	public String getLookupModel() {
-		return lookupModel;
+	public String getType() {
+		return type;
 	}
-	public void setLookupModel(String lookupModel) {
-		this.lookupModel = lookupModel;
-	}
-	public String getLookupType() {
-		return lookupType;
-	}
-	public void setLookupType(String lookupType) {
-		this.lookupType = lookupType;
+	public void setType(String type) {
+		this.type = type;
 	}
 	public String getModel() {
 		return model;
@@ -72,11 +62,11 @@ public class ContextForm {
 	public void setModel(String model) {
 		this.model = model;
 	}
-	public String getId() {
-		return id;
+	public String getCtxID() {
+		return ctxID;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setCtxID(String ctxID) {
+		this.ctxID = ctxID;
 	}
 	public String getValue() {
 		return value;
@@ -85,9 +75,6 @@ public class ContextForm {
 		this.value = value;
 	}
     
-    
-	
-
 
 
 		

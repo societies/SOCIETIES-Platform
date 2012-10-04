@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -51,9 +52,11 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.CtxUIElement;
 import org.societies.webapp.models.ContextForm;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -96,7 +99,7 @@ public class ContextController {
 		 List<String> results = new ArrayList<String>();
 		 for (Field field: fields){
 			 results.add(field.getName().toLowerCase());
-			 logger.info("add fields "+field.getName());
+			 //logger.info("add fields "+field.getName());
 		 }
 		 return results;
 	}
@@ -106,7 +109,7 @@ public class ContextController {
 	@RequestMapping(value = "/context.html", method = RequestMethod.GET)
 	public ModelAndView ContextService() {
 
-		
+		   logger.info("====== CONTEXT GUI --> GET");
 			
 			//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 			Map<String, Object> model = new HashMap<String, Object>();
@@ -118,7 +121,7 @@ public class ContextController {
 			model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
 			model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
 			model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
-			model.put("results", lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.PERSON));
+			model.put("results", getAllCtxEntityData());
 			
 			
 
@@ -128,44 +131,96 @@ public class ContextController {
 	
 	
 	
+	private List<CtxUIElement> getAllCtxEntityData() {
+		List<CtxUIElement> results = lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.PERSON);
+		
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.COMMUNITY));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.CSS_NODE));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.DEVICE));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.ORGANISATION));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.PRIVACY_POLICY));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.SERVICE));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.PRIVACY_PREFERENCE));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.SERVICE_PARAMETER));
+		results.addAll(lookup(CtxModelType.ENTITY.toString(), CtxEntityTypes.SOCIAL_NETWORK));
+		
+		return results;
+	}
+
+
 	private List<CtxUIElement> retreive(String ctxID){
+		
+		
 		logger.info("Retrieve id:"+ctxID);
 		List<CtxUIElement> results = new ArrayList<CtxUIElement>();
-			
-			try {
-				
+		
+		
+
+		try {
+
+			if (ctxID.length()>0){
 				CtxIdentifier ctxIdentifier = CtxIdentifierFactory.getInstance().fromString(ctxID);
-				List<CtxModelObject> list = (List<CtxModelObject>) internalCtxBroker.retrieve(ctxIdentifier).get();
-				
-				// Entities
-				for (CtxModelObject elm: list){
-					
-					
-					CtxUIElement ctxBean = new CtxUIElement();
-					
-					ctxBean.setId(elm.getId().toString());
-					ctxBean.setType(elm.getType());
-					
-					if (elm.getModelType().equals(CtxModelType.ENTITY)){
-						ctxBean.setModel(CtxModelType.ENTITY.toString());
-						//CtxEntity entity = (CtxEntity) elm;
-						ctxBean.setValue("");
+
+
+				CtxModelObject  ctxModel = internalCtxBroker.retrieve(ctxIdentifier).get();
+				if (ctxModel.getModelType().equals(CtxModelType.ENTITY)) {
+
+					CtxEntity entity = (CtxEntity)ctxModel;
+					List<CtxModelObject> details = new ArrayList<CtxModelObject>();
+
+					details.addAll(entity.getAttributes());
+					Set<CtxAssociationIdentifier> associations = entity.getAssociations();
+					for(CtxAssociationIdentifier aId: associations){
+						details.add(internalCtxBroker.remove(aId).get());
 					}
-					else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
-						ctxBean.setModel(CtxModelType.ATTRIBUTE.toString());
-						CtxAttribute attr = (CtxAttribute) elm;
-						ctxBean.setValue(attr.getStringValue());
+
+
+					// Entities
+					for (CtxModelObject elm: details){
+
+
+						CtxUIElement ctxBean = new CtxUIElement();
+
+						String ctxValue =  elm.getId().toString().replace("context://", "");
+						String info[] = ctxValue.split("/");
+						ctxBean.setSource(info[0]);   // android.societies.local;
+						
+						logger.info("Source:"+info[0]);
+						logger.info("Model:"+info[1]);
+						logger.info("Type:"+info[2]);
+						logger.info("ID:"+info[3]);
+						
+						
+						
+						ctxBean.setId(elm.getId().toString());
+						ctxBean.setType(elm.getType());
+						ctxBean.setDiplayId(info[5]);
+						
+						
+
+						if (elm.getModelType().equals(CtxModelType.ENTITY)){
+							ctxBean.setModel(CtxModelType.ENTITY.toString());
+							//CtxEntity entity = (CtxEntity) elm;
+							ctxBean.setValue("");
+						}
+						else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+							ctxBean.setModel(CtxModelType.ATTRIBUTE.toString());
+							CtxAttribute attr = (CtxAttribute) elm;
+							ctxBean.setValue(attr.getStringValue());
+						}
+						else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+							ctxBean.setModel(CtxModelType.ASSOCIATION.toString());
+							//CtxAssociation assoc = (CtxAssociation) elm;
+							ctxBean.setValue("");
+						}
+						results.add(ctxBean);	
+
 					}
-					else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
-						ctxBean.setModel(CtxModelType.ASSOCIATION.toString());
-						//CtxAssociation assoc = (CtxAssociation) elm;
-						ctxBean.setValue("");
-					}
-					results.add(ctxBean);					
-					
-				
-					
 				}
+
+			}else logger.info("Context ID is null! --> retreive aborted");
+				
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -208,9 +263,24 @@ public class ContextController {
 				
 				CtxUIElement ctxBean = new CtxUIElement();
 				
-				ctxBean.setId(elm.getId().toString());
+
+				String ctxValue =  elm.getId().toString().replace("context://", "");
+				String info[] = ctxValue.split("/");
 				
+				logger.info("FULL ID:"+elm.getId().toString());
+				logger.info("Source:"+info[0]);
+				logger.info("Model:"+info[1]);
+				logger.info("Type:"+info[2]);
+				logger.info("ID:"+info[3]);
+				
+				
+				
+				ctxBean.setId(elm.getId().toString());
 				ctxBean.setType(elm.getType());
+				ctxBean.setDiplayId(info[3]);
+				ctxBean.setId(elm.getId().toString());
+				ctxBean.setSource(info[0]);   // android.societies.local;
+				
 				
 				if (elm.getModelType().equals(CtxModelType.ENTITY)){
 					ctxBean.setModel(CtxModelType.ENTITY.toString());
@@ -221,11 +291,13 @@ public class ContextController {
 					ctxBean.setModel(CtxModelType.ATTRIBUTE.toString());
 					CtxAttribute attr = (CtxAttribute) elm;
 					ctxBean.setValue(attr.getStringValue());
+					
+					
 				}
-				else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+				else if (elm.getModelType().equals(CtxModelType.ASSOCIATION)){
 					ctxBean.setModel(CtxModelType.ASSOCIATION.toString());
 					CtxAssociation assoc = (CtxAssociation) elm;
-					ctxBean.setValue("");
+					ctxBean.setValue("owner:" +assoc.getOwnerId());
 				}
 				
 				logger.info("Element Model:"+ctxBean.getModel() + " type:"+ctxBean.getType() + " value:"+ctxBean.getValue());
@@ -251,40 +323,59 @@ public class ContextController {
 	@RequestMapping(value = "/context.html", method = RequestMethod.POST)
 	public ModelAndView serviceDiscovery(@Valid ContextForm ctxForm, BindingResult result, Map model) {
 
+		logger.info("====== CONTEXT GUI --> POST");
 		
 		
 		
-		
+		model.put("models", getTypesList(CtxModelType.class));
+		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
+		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
+		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+		model.put("ctxForm", ctxForm);
 		
 		if (result.hasErrors()) {
-			model.put("result", "ContextError");
+			
+			logger.info("====== CONTEXT GUI --> result Errors :"+ result.getErrorCount());
+			String errorMessage ="<ul>";
+			for (ObjectError error :result.getAllErrors()){
+				
+				errorMessage += "<li> Code:"+error.getCode() + " - "+error.getDefaultMessage() +"["+error.getObjectName()+"]</li>";
+				
+				logger.info("====== CtxGUI ===> ERROR <====");
+				logger.info("====== CtxGUI --> Error code:" + error.getCode());
+				logger.info("====== CtxGUI --> Error Msg :" + error.getDefaultMessage());
+				logger.info("====== CtxGUI --> Error Obj :" + error.getObjectName());
+				logger.info("====== CtxGUI --> Error [ALL] :" + error.toString());
+				
+				
+			}
+			errorMessage ="</ul>";
+			
+			model.put("error", errorMessage);
 			return new ModelAndView("context", model);
 		}
 
-
-
+     	String method 	 = ctxForm.getMethod();
+     	String id		 = ctxForm.getCtxID();
+     	
+     	logger.info("Method:"+ method +"Passed Ctx ID:"+id);
+     
 		
-		String method 	= ctxForm.getMethod();
-		String res		 = "This method is not handled yet";
-		String content	 = " --- ";
-		
-		
-		logger.info("Method:"+method + " model="+ctxForm.getLookupModel()+ " type="+ctxForm.getLookupType());
 		
 	
 		if (ACTION_LOOKUP.equalsIgnoreCase(method)){
-			model.put("results", lookup(ctxForm.getLookupModel(), ctxForm.getLookupType()));
-			logger.info("Made lookup: "+ ctxForm.getLookupModel());
+			
+			logger.info("Lookup (model: "  +  ctxForm.getModel() + ", type:"+ctxForm.getType()+")");
+			model.put("results", lookup(ctxForm.getModel(), ctxForm.getType()));
+			
 		}
 		else if(ACTION_RETREIVE.equalsIgnoreCase(method)){
-			model.put("results", retreive(ctxForm.getId()));
+			
+			logger.info("Retreive ID: "  + id);
+			model.put("results", retreive(ctxForm.getCtxID()));
 		}
 		
 
-		
-		
-		
-		
 		return new ModelAndView("context", model);
 		
 

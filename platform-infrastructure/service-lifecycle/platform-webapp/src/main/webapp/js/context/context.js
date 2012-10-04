@@ -10,12 +10,13 @@ var query = {};
 // Execute
 function exe(){
    
-	 $('input[name="lookupType"]').val(query.type);
-	 $('input[name="lookupModel"]').val(query.model);
-	 $('input[name="value"]').val(query.value);
-	 $('input[name="id"]').val(query.id);
-	 $('input[name="method"]').val(query.method);
-	 document.ctx.submit();
+	document.forms["ctxForm"]["type"].value = query.type;
+	document.forms["ctxForm"]["value"].value = query.id;
+	document.forms["ctxForm"]["ctxID"].value = query.id;
+	document.forms["ctxForm"]["method"].value = query.method;
+	document.forms["ctxForm"]["model"].value = query.model;
+	document.forms["ctxForm"].submit();
+	
 }
 
 
@@ -25,6 +26,16 @@ function exeQuery(value){
     $("#retrieve").val(value);
     $("#retrieve").show();
  
+}
+
+function retrieve(id){
+
+	query.type="";
+	query.id=id;
+	query.model="";
+	query.method="retreive";
+	exe();
+	
 }
 
 //Query

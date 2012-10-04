@@ -82,7 +82,7 @@
 
 
 
-					<select context="type" id="entity" style="display: none">
+				<select context="type" id="entity" style="display: none">
 						<option value="NONE" label="--- Select Entity Type---" />
 						<xc:forEach var="type" items="${entityTypes}">
 							<option value="${type}" label="${type}" />
@@ -103,23 +103,16 @@
 						<xc:forEach var="type" items="${associationTypes}">
 							<option value="${type}" label="${type}" />
 						</xc:forEach>
-				</select>
+					</select>
+					
+				
 				
 				<input style="display:none" size="50"	id="retrieve" />
 
-
-					<form:form method="POST" action="context.html" 		    commandName="ctxForm" name="ctx">
-						<form:input name="lookupType" style="display:none"  path="lookupType" />
-						<form:input name="lookupModel" style="display:none" path="lookupModel" />
-						<form:input name="method" style="display:none"      path="method" />
-						<form:input name="retrieve" style="display:none"    path="id" />
-						<form:input name="value" style="display:none" 		path="value" />
-					</form:form>
-
-
-					<input type="button" value=" Exectute " id="executeQuery" style="display: none" />
+				<input type="button" value=" Exectute " id="executeQuery" style="display: none" />
 		</div>
 
+		<div class="errorBlock">${error}</div>
 
 		<!--  RESULT SECTION -->
 
@@ -130,9 +123,11 @@
 
 			<thead>
 				<tr>
-					<th scope="col" id="ctx-id">ID</th>
-					<th scope="col" id="ctx-model">Model</th>
-					<th scope="col" id="ctx-type">Type</th>
+				   
+				    <th scope="col" id="ctx-model">Model</th>
+				    <th scope="col" id="ctx-type">Type</th>
+					<th scope="col" id="ctx-type">Source</th>
+					<th scope="col" id="ctx-id">id</th>
 					<th scope="col" id="ctx-value">Value</th>
 					<th scope="col" id="ctx-action">Actions</th>
 
@@ -153,15 +148,19 @@
 
 			<!-- Table body -->
 			<tbody>
-				<xc:forEach var="elmement" items="${results}">
-					<tr id="${elmement.id}">
-						<td><a href="#" onclick="exeQuery(${element.id});">${elmement.id}</a></td>
-						<td>${elmement.model}</td>
-						<td>${elmement.type}</td>
-						<td>${elmement.value}</td>
+				<xc:forEach var="element" items="${results}">
+					<tr id="${element.id}">
+					    <td  name="model">${element.model}</td>
+					    <td  name="type">${element.type}</td>
+					    <td>${element.source}</td>
+						<td><a href="#" onclick="retrieve('${element.id}');">${element.diplayId}</a></td>
+						<td>${element.value}</td>
 						<td>
-							<button onclick="edit(${elmement.id})">Edit</button>
-							<button onclick="del(${elmement.id})">Delete</button>
+						
+						    <button onclick="retrieve('${element.id}')"> Retrieve </button>
+							<button onclick="edit('${element.id}')">Edit</button>
+							<button onclick="del('${element.id}')">Delete</button>
+							
 						</td>
 
 					</tr>
@@ -171,13 +170,20 @@
 		</table>
 
 
-
+		<form:form method="POST" action="context.html"  commandName="ctxForm" name="ctxForm">
+				<form:input style="display:none"    name="method" path="method" value="" />
+				<form:input style="display:none"    name="ctxID"  path="ctxID" value="" />
+				<form:input style="display:none"    name="type"   path="type" value="" />
+				<form:input style="display:none"    name="model"  path="model" value="" />
+				<form:input style="display:none"    name="value"  path="value" value="" />
+	     </form:form>
 
 
 
 
 	</div>
 
+	
 
 
 
