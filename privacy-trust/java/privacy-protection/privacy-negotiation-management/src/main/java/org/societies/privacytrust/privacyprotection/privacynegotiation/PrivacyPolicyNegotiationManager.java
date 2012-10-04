@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -489,7 +490,10 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		this.userFeedback = userFeedback;
 	}
 
-
+	public void bindNegotiationAgentRemote(INegotiationAgentRemote negAgent, Dictionary<Object,Object> props){
+		this.logging.debug("NegotiationComms bound");
+		this.negotiationAgentRemote = negAgent;
+	}
 	
 	
 	
