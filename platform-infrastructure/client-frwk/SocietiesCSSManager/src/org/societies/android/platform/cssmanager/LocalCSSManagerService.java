@@ -135,6 +135,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
 	public static final String FIND_ALL_CSS_ADVERTISEMENT_RECORDS = "org.societies.android.platform.cssmanager.FIND_ALL_CSS_ADVERTISEMENT_RECORDS";
 	public static final String FIND_FOR_ALL_CSS = "org.societies.android.platform.cssmanager.FIND_FOR_ALL_CSS";
+	public static final String READ_PROFILE_REMOTE = "org.societies.android.platform.cssmanager.READ_PROFILE_REMOTE";
+	public static final String SEND_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.SEND_FRIEND_REQUEST";
 	
     private IIdentity cloudNodeIdentity = null;
     private IIdentity domainNodeIdentity = null;
@@ -566,6 +568,21 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
 		Log.d(LOG_TAG, "AndroidCSSRecord called with client: " + client);
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.GET_CSS_RECORD);
+		try {
+			Stanza stanza = new Stanza(ccm.getIdManager().fromJid(cssId));
+			ICommCallback callback = new CSSManagerCallback(client, READ_PROFILE_REMOTE);
+			
+			ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Sent stanza");
+		} catch (InvalidFormatException ex) {
+			Log.e(this.getClass().getName(), "Error getting record from: " + cssId, ex);
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 		
 		return null;
 	}
 
@@ -573,7 +590,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
 		Log.d(LOG_TAG, "sendFriendRequest called with client: " + client);
-		
+
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
+
+		Stanza stanza = new Stanza(cloudNodeIdentity);		
+		ICommCallback callback = new CSSManagerCallback(client, SEND_FRIEND_REQUEST);
+        try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendMessage(stanza, messageBean);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        }
 	}
 
 	/**
@@ -887,22 +916,16 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
 					
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, advertArray);
-				} else {
-
+				} 
+				else if (READ_PROFILE_REMOTE == this.returnIntent || GET_ANDROID_CSS_RECORD == this.returnIntent) {
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-
 					AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
-					
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-
 					this.updateLocalPersistence(aRecord);
 				}
 				intent.setPackage(client);
-
 				LocalCSSManagerService.this.sendBroadcast(intent);
-
 				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
-				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 			}
 		}
