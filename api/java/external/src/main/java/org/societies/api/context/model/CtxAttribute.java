@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -24,6 +24,7 @@
  */
 package org.societies.api.context.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -268,6 +269,54 @@ public class CtxAttribute extends CtxModelObject {
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
 	}
+	
+	Serializable getValue() {
+		
+        if (this.stringValue != null)
+            return this.stringValue;
+        else if (this.integerValue != null)
+            return this.integerValue;
+        else if (this.doubleValue != null)
+            return this.doubleValue;
+        else if (this.binaryValue != null)
+            return this.binaryValue;
+        else
+            return null;
+    }
+
+	/**
+	 * 
+	 * @param value
+	 * @throws IllegalArgumentException if <code>value</code> is not of type
+	 *         <code>String</code>, <code>Integer</code>, <code>Double</code>,
+	 *         or <code>byte[]</code> 
+	 */
+    void setValue(Serializable value) {
+    	
+        if (value == null || value instanceof String) {
+            this.stringValue = (String) value;
+            this.integerValue = null;
+            this.doubleValue = null;
+            this.binaryValue = null;
+        } else if (value instanceof Integer) {
+        	this.stringValue = null;
+            this.integerValue = (Integer) value;
+            this.doubleValue = null;
+            this.binaryValue = null;
+        } else if (value instanceof Double) {
+        	this.stringValue = null;
+        	this.integerValue = null;
+            this.doubleValue= (Double) value;
+            this.binaryValue = null;
+    	} else if (value instanceof byte[]) {
+    		this.stringValue = null;
+        	this.integerValue = null;
+        	this.doubleValue = null;
+            this.binaryValue = (byte[]) value;
+    	} else {
+            throw new IllegalArgumentException("invalid value type " + value.getClass().getName());
+    	}
+    }
 	
 	/**
 	 * Returns the value type of this context attribute

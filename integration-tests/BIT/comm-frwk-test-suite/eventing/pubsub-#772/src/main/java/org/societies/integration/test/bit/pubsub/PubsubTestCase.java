@@ -85,12 +85,18 @@ public class PubsubTestCase {
 		
 		//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
 		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.test");
+		//packageList.add("org.societies.test");
+		packageList.add("org.societies.api.schema.examples.calculatorbean.CalcBeanResult");
 		try {
-			TestCase772.pubSubManager.addJaxbPackages(packageList);
-		} catch (JAXBException e) {
-			fail("Exception adding JAXB test package: " + e.getMessage());
+			TestCase772.pubSubManager.addSimpleClasses(packageList);
+		} catch (ClassNotFoundException e) {
+			fail("Exception adding SimplXML test class: " + e.getMessage());
 		}
+		//try {
+		//	TestCase772.pubSubManager.addJaxbPackages(packageList);
+		//} catch (JAXBException e) {
+		//	fail("Exception adding JAXB test package: " + e.getMessage());
+		//}
 		
 		//CREATE A PUB-SUB NODE
 		LOG.info("### Creating PubsubNode");
@@ -162,7 +168,8 @@ public class PubsubTestCase {
 		}
 
 		// if the method times out, fail
-		assertNotNull("Timed out", callback.getEventObject());
+		if (callback.getEventObject() == null)
+			fail("Timed out waiting on result");
 				
 		// otherwise, check the result
 		String result = callback.getEventObject().getText();

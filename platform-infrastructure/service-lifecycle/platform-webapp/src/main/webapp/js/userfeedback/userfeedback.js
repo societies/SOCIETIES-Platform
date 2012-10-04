@@ -301,6 +301,8 @@ var userFeedback = (function () {
 				console.log("Complete", textStatus);
 				// Remove loader
 				loader.hide('slow');
+				// Relaunch
+				retrieveNotification();
 			}
 		});
 	}
