@@ -44,7 +44,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceNegotiationCallback.class);
 
-	private final long TIMEOUT = 5;
+	private final long TIMEOUT = 150;
 	private BlockingQueue<ServiceNegotiationResult> resultList;
 	
 	/**
