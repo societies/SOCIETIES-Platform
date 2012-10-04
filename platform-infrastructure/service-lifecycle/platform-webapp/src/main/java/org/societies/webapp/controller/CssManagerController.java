@@ -310,15 +310,17 @@ public class CssManagerController {
 
 			CssAdvertisementRecord cssAdOld = new CssAdvertisementRecord();
 			CssAdvertisementRecord cssAdNew = new CssAdvertisementRecord();
-			cssAdOld.setId(cmControllerLoginForm.getCssAdId());
+			cssAdOld.setId(this.getCommManager().getIdManager()
+					.getThisNetworkNode().getBareJid());
 			cssAdOld.setName(cmControllerLoginForm.getCssAdName());
 			cssAdOld.setUri(cmControllerLoginForm.getCssAdUri());
 			// We are only displaying the name, so only read that from webpage
-			cssAdNew.setId(cmControllerLoginForm.getCssAdId());
+			cssAdNew.setId(this.getCommManager().getIdManager()
+					.getThisNetworkNode().getBareJid());
 			cssAdNew.setName(cmLoginForm.getCssAdName());
 			cssAdNew.setUri(cmControllerLoginForm.getCssAdUri());
 
-			getCssLocalManager().updateAdvertisementRecord(cssAdOld, cssAdNew);
+			getCssDirectoryRemote().updateCssAdvertisementRecord(cssAdOld, cssAdNew);
 
 			
 			cmControllerLoginForm.setCssAdName(cmLoginForm.getCssAdName());
