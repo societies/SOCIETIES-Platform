@@ -25,14 +25,11 @@
 package org.societies.context.user.db.impl.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.Table;
 
 /**
@@ -41,46 +38,25 @@ import javax.persistence.Table;
  * @author Pavlos Kosmides
  *
  */
-/*@NamedNativeQueries({
-	@NamedNativeQuery(
-	name = "getLastModelObjectNumber",
-	query = "select * from object_numbers obNumber where obNumber.next_value = (select max(obNumber.next_value) from object_numbers)"
-	)
-})*/
 @Entity
-@Table(name = "object_numbers")
+@Table(name = "org_societies_context_object_numbers")
 public class UserCtxModelObjectNumberDAO implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = -6546182709191977813L;
+	
+	@Id
+	@org.hibernate.annotations.GenericGenerator(name = "hilo-strategy", strategy = "hilo")
+	@GeneratedValue(generator = "hilo-strategy")
+	@Column(name="next_value")
 	private long nextValue;
 
 	/**
-	 * @param nextValue
+	 * Empty constructor required by Hibernate 
 	 */
-	public UserCtxModelObjectNumberDAO(long nextValue) {
-		super();
-		
-		this.nextValue = nextValue;
-	}
+	public UserCtxModelObjectNumberDAO() {}
 
-	/**
-	 * 
-	 */
-	public UserCtxModelObjectNumberDAO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	@Id
-//	@GeneratedValue(generator="hilo")
-	@Column(name="next_value")
 	public long getNextValue() {
-		return nextValue;
+		
+		return this.nextValue;
 	}
-
-	public void setNextValue(long nextValue) {
-		this.nextValue = nextValue;
-	}
-	
 }

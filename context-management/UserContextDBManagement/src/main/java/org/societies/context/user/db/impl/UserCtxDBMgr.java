@@ -120,25 +120,20 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		long modelObjectNumber = CtxModelObjectNumberGenerator.getNextValue();
-
-		final CtxAssociationIdentifier identifier = new CtxAssociationIdentifier(
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
 				this.privateId,	type, modelObjectNumber);
-		
-		final CtxAssociationDAO associationDAO = new CtxAssociationDAO(identifier);
+		final CtxAssociationDAO associationDAO = new CtxAssociationDAO(id);
 
 		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-
+		Transaction tx = null;
 		try{
-			UserCtxModelObjectNumberDAO objectNumber = new UserCtxModelObjectNumberDAO();
-			objectNumber.setNextValue(modelObjectNumber);
-			session.save(objectNumber);			
-
+			tx = session.beginTransaction();
 			session.save(associationDAO);
-			t.commit();
+			tx.commit();
 		}
 		catch (Exception e) {
+			tx.rollback();
 			throw new UserCtxDBMgrException("Could not create association of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -147,7 +142,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		}
 
 		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(identifier), 
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
@@ -156,7 +151,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 					+ "ICtxEventMgr service is not available");
 		}
 		
-		return (CtxAssociation) this.retrieve(identifier);
+		return (CtxAssociation) this.retrieve(id);
 	}
 	
 	/*
@@ -182,28 +177,22 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': Scope not found: " + scope);
 
-		long modelObjectNumber = CtxModelObjectNumberGenerator.getNextValue();
-
-		CtxAttributeIdentifier id =	
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxAttributeIdentifier id =	
 				new CtxAttributeIdentifier(scope, type, modelObjectNumber);
 		final CtxAttributeDAO attributeDAO = new CtxAttributeDAO(id);
 		final CtxQualityDAO qualityDAO = new CtxQualityDAO(id);
 		attributeDAO.setQuality(qualityDAO);
 		entityDAO.addAttribute(attributeDAO);
 		
-		//with hibernate
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
 		try {
-			UserCtxModelObjectNumberDAO objectNumber = new UserCtxModelObjectNumberDAO();
-			objectNumber.setNextValue(modelObjectNumber);
-			session.save(objectNumber);
-
+			tx = session.beginTransaction();
 			session.save(attributeDAO);
-			session.flush();
-			t.commit();				
+			tx.commit();				
 		} catch (Exception e) {
+			tx.rollback();
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -230,36 +219,29 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public CtxEntity createEntity(String type) throws CtxException {
 
-		long modelObjectNumber = CtxModelObjectNumberGenerator.getNextValue();
-		
-		final CtxEntityIdentifier identifier = 
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxEntityIdentifier id = 
 				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);		
-
-		// hibernate
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-
+		final CtxEntityDAO entityDAO = new CtxEntityDAO(id);
+		
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
 		try{
-
-			UserCtxModelObjectNumberDAO objectNumber = new UserCtxModelObjectNumberDAO();
-			objectNumber.setNextValue(modelObjectNumber);
-			session.save(objectNumber);
-	
-			// Prepare CtxEntityDAO
-			CtxEntityDAO entityDB = new CtxEntityDAO(identifier);
-			session.save(entityDB);
-			t.commit();
+			tx = session.beginTransaction();
+			session.save(entityDAO);
+			tx.commit();
 		}
 		catch (Exception e) {
-			throw new UserCtxDBMgrException("Could not create entity: " 
-					+ e.getLocalizedMessage(), e);
+			tx.rollback();
+			throw new UserCtxDBMgrException("Could not create entity of type '" 
+					+ "': " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
 		}
 	
 		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(identifier), 
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
@@ -268,7 +250,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 					+ "ICtxEventMgr service is not available");
 		}
 		
-		return (CtxEntity) this.retrieve(identifier);
+		return (CtxEntity) this.retrieve(id);
 	}
 	
 	/*
@@ -277,30 +259,22 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
 
-		long modelObjectNumber = CtxModelObjectNumberGenerator.getNextValue();
-		
+		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
-				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);		
+				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);
+		final IndividualCtxEntityDAO entityDAO = new IndividualCtxEntityDAO(id);
 
-		// hibernate
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
 		try{
-
-			UserCtxModelObjectNumberDAO objectNumber = new UserCtxModelObjectNumberDAO();
-			objectNumber.setNextValue(modelObjectNumber);
-			session.save(objectNumber);
-	
-			// Prepare CtxEntityDAO
-			IndividualCtxEntityDAO entityDB = new IndividualCtxEntityDAO(id);
-			session.save(entityDB);
-			t.commit();
+			tx = session.beginTransaction();
+			session.save(entityDAO);
+			tx.commit();
 		}
 		catch (Exception e) {
-			t.rollback();
-			throw new UserCtxDBMgrException("Could not create individual entity: " 
-					+ e.getLocalizedMessage(), e);
+			tx.rollback();
+			throw new UserCtxDBMgrException("Could not create individual entity of type '" 
+					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -618,5 +592,28 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		}
 			
 		return result;
+	}
+	
+	private Long generateNextObjectNumber() throws UserCtxDBMgrException {
+		
+		final UserCtxModelObjectNumberDAO objectNumberDAO =
+				new UserCtxModelObjectNumberDAO();
+		
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.save(objectNumberDAO);
+			tx.commit();
+		} catch (Exception e) {
+			tx.rollback();
+			throw new UserCtxDBMgrException(
+					"Could not generate next context model object number");
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return objectNumberDAO.getNextValue();
 	}
 }
