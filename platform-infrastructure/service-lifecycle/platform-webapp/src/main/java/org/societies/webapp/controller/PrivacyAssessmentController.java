@@ -130,6 +130,50 @@ public class PrivacyAssessmentController {
 		}
 	}
 	
+	public class PlotData {
+		
+		private double[] data;
+		private String[] labels;
+		
+		public PlotData(double[] data, Object[] labels) {
+			this.data = data;
+			this.labels = obj2str(labels);
+		}
+		
+		private String[] obj2str(Object[] obj) {
+			
+			Class clazz;
+			
+			if (obj.length == 0) {
+				return new String[0];
+			}
+			clazz = obj[0].getClass();
+			
+			if (clazz.isAssignableFrom(String.class)) {
+				return (String[]) obj;
+			}
+			else if (clazz.isAssignableFrom(IIdentity.class)) {
+				String[] labelsStr = new String[obj.length];
+				for (int k = 0; k < obj.length; k++) {
+					labelsStr[k] = ((IIdentity) obj[k]).getJid();
+				}
+				return labelsStr;
+			}
+			else {
+				LOG.warn("Unsupported class: {}", clazz.getName());
+				return new String[0];
+			}
+		}
+
+		public double[] getData() {
+			return data;
+		}
+
+		public String[] getLabels() {
+			return labels;
+		}
+	}
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -207,13 +251,19 @@ public class PrivacyAssessmentController {
 			
 			String chartFileName = "chart-1.png";
 			String chart2Filename = "chart-2.png";
-			double[][] data;
+			double[][] data1;
+			double[][] data2;
+			
+			data2 = new double[][] {  // TODO
+					{210, 300, 320, 265, 299},
+					{200, 304, 201, 201, 340}
+					};
 			
 			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
 				assValues = assResult.values();
-				data = new double[][] {  // TODO
+				data1 = new double[][] {  // TODO
 						{210, 300, 320, 265, 299},
 						{200, 304, 201, 201, 340}
 						};
@@ -223,7 +273,7 @@ public class PrivacyAssessmentController {
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
 				assValues = assResult.values();
-				data = new double[][] {  // TODO
+				data1 = new double[][] {  // TODO
 						{210, 300, 320, 265, 299},
 						{200, 304, 201, 201, 340}
 						};
@@ -232,7 +282,7 @@ public class PrivacyAssessmentController {
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
 				assValues = assResult.values();
-				data = new double[][] {  // TODO
+				data1 = new double[][] {  // TODO
 						{210, 300, 320, 265, 299},
 						{200, 304, 201, 201, 340}
 						};
@@ -241,12 +291,13 @@ public class PrivacyAssessmentController {
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
 				Map<IIdentity, Integer> dataAccessIdentities;
 				Map<String, Integer> dataAccessClasses;
+				PlotData data;
 				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
-				data = new double[][] {
-						//(Integer[]) dataAccessIdentities.values().toArray()
-						{100, 200, 300}
-						};
+				data = mapToArrays(dataAccessIdentities);
+				data1 = new double[][] {data.getData()};
+				data = mapToArrays(dataAccessClasses);
+				data2 = new double[][] {data.getData()};
 			}
 			else {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
@@ -256,12 +307,12 @@ public class PrivacyAssessmentController {
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject("Subject 1");
-			createBarchart(null, "Class", "Packets per month", data, chartFileName);
+			createBarchart(null, "Class", "Packets per month", data1, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
 			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
 			form2.setAssessmentSubject("Subject 2");
-			createBarchart(null, "Identity", "Correlation with data access by same identity", data, chart2Filename);
+			createBarchart(null, "Identity", "Correlation with data access by same identity", data2, chart2Filename);
 			form2.setChart(chart2Filename);
 			charts.add(form2);
 			model.put("assessmentResults", charts);
@@ -282,6 +333,20 @@ public class PrivacyAssessmentController {
 			LOG.warn("Unexpected {}: {}", Presentation.Format.class.getSimpleName(), presentationFormat);
 			return privacyAssessment();
 		}
+	}
+	
+	private PlotData mapToArrays(Map map) {
+		
+		Object[] labels = new Object[map.keySet().size()];
+		double[] data = new double[map.keySet().size()];
+		int k = 0;
+		
+		for (Object key : map.keySet()) {
+			labels[k] = key;
+			data[k] = (Double) map.get(key);
+		}
+		
+		return new PlotData(data, labels);
 	}
 
 	/**
