@@ -166,18 +166,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext()");
 		
 		String invokerClass = getInvokerClass();
-		IIdentity requestorId;
-		
-		if (requestor == null) {
-			requestorId = null;
-		}
-		else {
-			requestorId = requestor.getRequestorId();
-		}
-		
-		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestorId, invokerClass, owner, -1);
-		privacyLog.getDataAccess().add(logEntry);
+
+		logContext(requestor, owner, -1, invokerClass);
 	}
 
 	@Override
@@ -186,6 +176,12 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext({})", dataSize);
 
 		String invokerClass = getInvokerClass();
+
+		logContext(requestor, owner, dataSize, invokerClass);
+	}
+	
+	private void logContext(Requestor requestor, IIdentity owner, int dataSize, String invokerClass) {
+
 		IIdentity requestorId;
 		
 		if (requestor == null) {

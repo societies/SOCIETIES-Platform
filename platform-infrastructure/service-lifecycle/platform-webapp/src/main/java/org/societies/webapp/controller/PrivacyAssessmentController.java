@@ -75,7 +75,7 @@ public class PrivacyAssessmentController {
 
 	// FIXME: The path should not depend on Virgo version, etc.
 	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-			"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
+			"global/bundle/societies-webapp/0.3.0/societies-webapp.war/";
 
 	/**
 	 * URL parts without prefix and suffix
@@ -142,20 +142,27 @@ public class PrivacyAssessmentController {
 		
 		private String[] obj2str(Object[] obj) {
 			
-			Class clazz;
+			Class<? extends Object> clazz;
 			
 			if (obj.length == 0) {
 				return new String[0];
 			}
 			clazz = obj[0].getClass();
 			
-			if (clazz.isAssignableFrom(String.class)) {
-				return (String[]) obj;
-			}
-			else if (clazz.isAssignableFrom(IIdentity.class)) {
+			if (String.class.isAssignableFrom(clazz)) {
+				//return (String[]) obj;
 				String[] labelsStr = new String[obj.length];
 				for (int k = 0; k < obj.length; k++) {
-					labelsStr[k] = ((IIdentity) obj[k]).getJid();
+					LOG.debug("obj2str: obj[{}] = {}", k, obj[k]);
+					labelsStr[k] = (String) obj[k];
+				}
+				return labelsStr;
+			}
+			else if (IIdentity.class.isAssignableFrom(clazz)) {
+				String[] labelsStr = new String[obj.length];
+				for (int k = 0; k < obj.length; k++) {
+					LOG.debug("obj2str: obj[{}] = {}", k, obj[k]);
+					labelsStr[k] = obj[k] == null ? null : ((IIdentity) obj[k]).getJid();
 				}
 				return labelsStr;
 			}
@@ -166,10 +173,16 @@ public class PrivacyAssessmentController {
 		}
 
 		public double[] getData() {
+			for (double d : data) {
+				LOG.debug("getData(): {}", d);
+			}
 			return data;
 		}
 
 		public String[] getLabels() {
+			for (String s : labels) {
+				LOG.debug("getLabels(): {}", s);
+			}
 			return labels;
 		}
 	}
@@ -293,7 +306,9 @@ public class PrivacyAssessmentController {
 				Map<String, Integer> dataAccessClasses;
 				PlotData data;
 				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
+				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 				data = mapToArrays(dataAccessIdentities);
 				data1 = new double[][] {data.getData()};
 				data = mapToArrays(dataAccessClasses);
@@ -307,12 +322,12 @@ public class PrivacyAssessmentController {
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject("Subject 1");
-			createBarchart(null, "Class", "Packets per month", data1, chartFileName);
+			createBarchart(null, "Identity", "Packets per month", data1, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
 			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
 			form2.setAssessmentSubject("Subject 2");
-			createBarchart(null, "Identity", "Correlation with data access by same identity", data2, chart2Filename);
+			createBarchart(null, "Class", "Correlation with data access by same identity", data2, chart2Filename);
 			form2.setChart(chart2Filename);
 			charts.add(form2);
 			model.put("assessmentResults", charts);
@@ -335,15 +350,21 @@ public class PrivacyAssessmentController {
 		}
 	}
 	
+	/**
+	 * @param map Map<String, Integer> or Map<IIdentity, Integer>
+	 * @return
+	 */
 	private PlotData mapToArrays(Map map) {
 		
 		Object[] labels = new Object[map.keySet().size()];
 		double[] data = new double[map.keySet().size()];
-		int k = 0;
+		int k;
 		
+		k = 0;
 		for (Object key : map.keySet()) {
 			labels[k] = key;
-			data[k] = (Double) map.get(key);
+			data[k] = (Integer) map.get(key);
+			++k;
 		}
 		
 		return new PlotData(data, labels);

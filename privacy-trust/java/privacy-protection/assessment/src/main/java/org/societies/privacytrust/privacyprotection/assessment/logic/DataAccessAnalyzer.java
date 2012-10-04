@@ -56,6 +56,7 @@ public class DataAccessAnalyzer {
 		
 		List<DataAccessLogEntry> matchedEntries = new ArrayList<DataAccessLogEntry>();
 		String requestorJid;
+		IIdentity identity;
 		
 		if (requestor == null || requestor.getJid() == null) {
 			LOG.warn("getDataAccess({}): requestor or requestor JID is null", requestor);
@@ -64,7 +65,11 @@ public class DataAccessAnalyzer {
 		
 		requestorJid = requestor.getJid();
 		for (DataAccessLogEntry da : dataAccess) {
-			if (requestorJid.equals(da.getRequestor().getJid()) &&
+			identity = da.getRequestor();
+			if (identity == null) {
+				continue;
+			}
+			if (requestorJid.equals(identity.getJid()) &&
 					da.getTime().after(start) && da.getTime().before(end)) {
 				matchedEntries.add(da);
 			}
@@ -123,7 +128,8 @@ public class DataAccessAnalyzer {
 		
 		for (DataAccessLogEntry da : dataAccess) {
 			requestor = da.getRequestor();
-			if (!matches.contains(requestor)) {
+			if (!matches.contains(requestor) && requestor != null) {
+				LOG.debug("getDataAccessRequestors(): Adding identity {}", requestor);
 				matches.add(requestor);
 			}
 		}
@@ -137,7 +143,8 @@ public class DataAccessAnalyzer {
 		
 		for (DataAccessLogEntry da : dataAccess) {
 			requestor = da.getRequestorClass();
-			if (!matches.contains(requestor)) {
+			if (!matches.contains(requestor) && requestor != null) {
+				LOG.debug("getDataAccessRequestorClasses(): Adding class {}", requestor);
 				matches.add(requestor);
 			}
 		}

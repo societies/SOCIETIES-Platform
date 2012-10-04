@@ -93,10 +93,18 @@ public class Correlation {
 				
 				corr = correlation(size2 - size1, time2 - time1);
 				corrByAll += corr;
-				if (ac.getRequestor().getJid().equals(tr.getSender().getJid())) {
+				
+				if (ac.getRequestor() == null || tr.getSender() == null) {
+					//LOG.warn("Requestor or sender is null");
+				}
+				else if (ac.getRequestor().getJid().equals(tr.getSender().getJid())) {
 					corrBySender += corr;
 				}
-				if (ac.getRequestorClass().equals(tr.getSenderClass())) {
+				
+				if (ac.getRequestorClass() == null || tr.getSenderClass() == null) {
+					//LOG.warn("Requestor or sender class is null");
+				}
+				else if (ac.getRequestorClass().equals(tr.getSenderClass())) {
 					corrBySenderClass += corr;
 				}
 			}
