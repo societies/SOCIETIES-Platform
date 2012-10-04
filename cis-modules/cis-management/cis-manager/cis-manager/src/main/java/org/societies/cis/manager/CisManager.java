@@ -1438,7 +1438,20 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		@Override
 		public void onNegotiationError(String msg) {
+			this.returnFail();
+			
+		}
+		
+		private void returnFail(){
 			LOG.debug("privacy negotiation error");
+			CommunityMethods result = new CommunityMethods();		
+			Community com = new Community();
+			com.setCommunityJid(targetJid);
+			JoinResponse jr = new JoinResponse();
+			jr.setResult(false);
+			jr.setCommunity(com);
+			result.setJoinResponse(jr);			
+			callback.receiveResult(result);
 		}
 
 		@Override
@@ -1467,6 +1480,9 @@ public class JoinCallBack implements ICisManagerCallback{
 					LOG.info("Problem with the input jid when trying to send the join");
 					e1.printStackTrace();
 				}
+			}
+			else{
+				this.returnFail();
 			}
 				
 		}
