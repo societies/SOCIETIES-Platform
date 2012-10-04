@@ -106,7 +106,8 @@
 
 	<bean name="privacyPolicyNegotiationManager"
 		class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
-		init-method="initialisePrivacyPolicyNegotiationManager">
+		init-method="initialisePrivacyPolicyNegotiationManager" 
+		depends-on="ctxBroker,eventManager,commManager,,privacyDataManagerInternal,privacyAgreementManagerInternal,negotiationAgentRemote,privacyPreferenceManager,identitySelection,privacyPolicyManager,UserFeedbackGUI">
 		<property name="ctxBroker" ref="ctxBroker" />
 		<property name="eventMgr" ref="eventManager" />
 		<property name="commsMgr" ref="commManager" />
