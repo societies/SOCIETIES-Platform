@@ -8,7 +8,6 @@
 	<version>${version.cm}</version>
 	<dependencies>
 
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -16,7 +15,12 @@
 			<scope>provided</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
@@ -34,9 +38,7 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-
-
+		
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
@@ -44,14 +46,40 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<dependency>
+    		<groupId>org.slf4j</groupId>
+    		<artifactId>slf4j-simple</artifactId>
+    		<version>${slf4j.version}</version>
+    		<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
 
-	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+				
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
+		</dependency>
+			
 	</dependencies>
 
 	<parent>
@@ -60,8 +88,27 @@
 		<version>RELEASE</version>
 	</parent>
 
-
-
+	<build>
+	    <plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>contextdb</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes>
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
 	<!-- More Project Information -->
 	<name>User Context DB Mgmt</name>
 	<developers>
