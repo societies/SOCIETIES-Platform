@@ -86,6 +86,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
 	@Override
 	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content){
+		LOG.debug("Received request for explicit feedback");
 		List<String> result = null;
 		//create feedback form
 		FeedbackForm fbForm = generateExpFeedbackForm(type, content);
@@ -108,6 +109,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		}
 		//set result and remove id from hashmap
 		result = this.expResults.get(fbForm.getID());
+
+		//remove request from queue
+		if(requestMgr.removeRequest(fbForm.getID())){
+			LOG.error("Could not find specified request in queue");
+		}
+
+		//remove from result list
 		this.expResults.remove(fbForm.getID());
 
 		return new AsyncResult<List<String>>(result);
@@ -115,6 +123,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
 	@Override
 	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
+		LOG.debug("Received request for implicit feedback");
 		Boolean result = false;
 		//create feedback form
 		FeedbackForm fbForm = generateImpFeedbackForm(type, content);
@@ -136,6 +145,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		}
 		//set result and remove id from hashmap
 		result = this.impResults.get(fbForm.getID());
+
+		//remove request from queue
+		if(requestMgr.removeRequest(fbForm.getID())){
+			LOG.error("Could not find specified request in queue");
+		}
+
+		//remove from result list
 		this.impResults.remove(fbForm.getID());
 
 		return new AsyncResult<Boolean>(result);
@@ -162,6 +178,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
 			}
 		}
+		//remove request from queue
+		if(requestMgr.removeRequest(fbForm.getID())){
+			LOG.error("Could not find specified request in queue");
+		}
+
 		//remove id from hashmap
 		this.impResults.remove(fbForm.getID());		
 	}
@@ -185,10 +206,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 			this.expResults.put(requestId, result);
 			this.expResults.notifyAll();
 		}
-		//remove request from queue
-		if(requestMgr.removeRequest(requestId)){
-			LOG.error("Could not find specified request in queue");
-		}
 	}
 
 	@Override
@@ -197,10 +214,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		synchronized(impResults){
 			this.impResults.put(requestId, result);
 			this.impResults.notifyAll();
-		}
-		//remove request from queue
-		if(requestMgr.removeRequest(requestId)){
-			LOG.error("Could not find specified request in queue");
 		}
 	}
 
