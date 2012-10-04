@@ -44,7 +44,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceNegotiationCallback.class);
 
-	private final long TIMEOUT = 5;
+	private final long TIMEOUT = 150;
 	private BlockingQueue<ServiceNegotiationResult> resultList;
 	
 	/**
@@ -107,7 +107,8 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 
 	public ServiceNegotiationResult getResult() {
 		try {
-			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+			//return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+			return resultList.take();
 		} catch (InterruptedException e) {
 			logger.error("Error getting result in List");
 			e.printStackTrace();
