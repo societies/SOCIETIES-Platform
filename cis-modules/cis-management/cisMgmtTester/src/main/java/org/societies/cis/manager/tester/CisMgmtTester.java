@@ -113,7 +113,7 @@ public class CisMgmtTester implements Subscriber{
 	
 	private String targetCSSId = "xcmanager.societies.local";
 	
-	private String targetCIS = "cis-f2b6798c-e2a8-4532-9d64-504f0062f227.societies.local";
+	private String targetCIS = "cis-0f2a3155-92a3-4cca-b668-d849a1cd5dd1.societies.local";
 	
 	int join = 0;
 	
@@ -211,9 +211,9 @@ public class CisMgmtTester implements Subscriber{
 
 
 		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.api.schema.activity");
+		packageList.add("org.societies.api.schema.activity.Activity");
 		try {
-			pubsubClient.addJaxbPackages(packageList);
+			pubsubClient.addSimpleClasses(packageList);
 		} catch (Exception e) {
 			LOG.warn("Jaxb exception when trying to add packages to pubsub");
 			e.printStackTrace();
