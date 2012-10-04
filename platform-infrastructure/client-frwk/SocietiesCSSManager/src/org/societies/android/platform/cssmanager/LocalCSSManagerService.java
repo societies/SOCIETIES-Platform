@@ -909,20 +909,22 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				Intent intent = new Intent(returnIntent);
 				
 				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
-
+				//cssAdvertisementRecords
 				if (SUGGESTED_FRIENDS == this.returnIntent || GET_CSS_FRIENDS == this.returnIntent) {
 					ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultAdvertList());
 					
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
 					
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, advertArray);
-				} 
-				else if (READ_PROFILE_REMOTE == this.returnIntent || GET_ANDROID_CSS_RECORD == this.returnIntent) {
+				}
+				//cssRecords
+				else { 
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
 					AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
 					this.updateLocalPersistence(aRecord);
 				}
+				
 				intent.setPackage(client);
 				LocalCSSManagerService.this.sendBroadcast(intent);
 				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
