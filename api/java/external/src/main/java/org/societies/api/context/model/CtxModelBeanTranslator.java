@@ -144,33 +144,37 @@ public final class CtxModelBeanTranslator {
 		return bean;
 	}
 
-	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean attrBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
+	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean bean) 
+			throws DatatypeConfigurationException, MalformedCtxIdentifierException {
 
-		CtxAttribute attribute = new CtxAttribute(
-				(CtxAttributeIdentifier) fromCtxIdentifierBean(attrBean.getId()));
-		attribute.setLastModified(XMLGregorianCalendarToDate(attrBean.getLastModified()));
+		final CtxAttribute object = new CtxAttribute(
+				(CtxAttributeIdentifier) fromCtxIdentifierBean(bean.getId()));
+		object.setLastModified(XMLGregorianCalendarToDate(bean.getLastModified()));
 		// Handle value
-		attribute.setBinaryValue(attrBean.getBinaryValue());
-		attribute.setDoubleValue(attrBean.getDoubleValue());
-		attribute.setIntegerValue(attrBean.getIntegerValue());
-		attribute.setStringValue(attrBean.getStringValue());
+		if (bean.getStringValue() != null)
+			object.setValue(bean.getStringValue());
+		else if (bean.getIntegerValue() != null)
+			object.setValue(bean.getIntegerValue());
+		else if (bean.getDoubleValue() != null)
+			object.setValue(bean.getDoubleValue());
+		else if (bean.getBinaryValue() != null)
+			object.setValue(bean.getBinaryValue());
 		// Handle value meta-data
-		attribute.setValueType(fromCtxAttributeValueTypeBean(attrBean.getValueType()));
-		attribute.setValueMetric(attrBean.getValueMetric());
+		object.setValueType(fromCtxAttributeValueTypeBean(bean.getValueType()));
+		object.setValueMetric(bean.getValueMetric());
 		// Handle other params
-		attribute.setHistoryRecorded(attrBean.isHistoryRecorded());
-		attribute.setSourceId(attrBean.getSourceId());
+		object.setHistoryRecorded(bean.isHistoryRecorded());
+		object.setSourceId(bean.getSourceId());
 		// Handle QoC
-		attribute.getQuality().setLastUpdated(
-				XMLGregorianCalendarToDate(attrBean.getQuality().getLastUpdated()));
-		
-		if(attrBean.getQuality().getOriginType() != null ){
-			attribute.getQuality().setOriginType(fromCtxOriginTypeBean(attrBean.getQuality().getOriginType()));
+		object.getQuality().setLastUpdated(
+				XMLGregorianCalendarToDate(bean.getQuality().getLastUpdated()));
+		if(bean.getQuality().getOriginType() != null ){
+			object.getQuality().setOriginType(fromCtxOriginTypeBean(bean.getQuality().getOriginType()));
 		}
-		attribute.getQuality().setPrecision(attrBean.getQuality().getPrecision());
-		attribute.getQuality().setUpdateFrequency(attrBean.getQuality().getUpdateFrequency());
+		object.getQuality().setPrecision(bean.getQuality().getPrecision());
+		object.getQuality().setUpdateFrequency(bean.getQuality().getUpdateFrequency());
 
-		return attribute;
+		return object;
 	}
 
 	public CtxAssociationBean fromCtxAssociation(CtxAssociation object) throws DatatypeConfigurationException {
