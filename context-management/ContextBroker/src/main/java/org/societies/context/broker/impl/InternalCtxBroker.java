@@ -40,6 +40,8 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.CtxAccessControlException;
@@ -107,6 +109,9 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+
+	/** Performance logging. */
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 
 	/** The privacy logging facility. */
 	@Autowired(required=false)
@@ -318,6 +323,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
 
+		
+		
 		List<CtxEntityIdentifier> entityList = new ArrayList<CtxEntityIdentifier>(); 
 		try {
 			for(CtxEntityIdentifier entityId :ctxEntityIDList){
@@ -1814,6 +1821,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxModelObject> retrieve(Requestor requestor,
 			CtxIdentifier identifier) throws CtxException {
 
+		long timestamp = System.nanoTime();
 
 		CtxModelObject objectResult = null ;
 
@@ -1871,6 +1879,17 @@ public class InternalCtxBroker implements ICtxBroker {
 							"Platform context broker failed to retrieve context model object with id " 
 									+ identifier + ": " +  e.getLocalizedMessage(), e);
 				}
+				//Performance Logging
+				IPerformanceMessage m = new PerformanceMessage();
+				m.setTestContext("ConteBroker_Delay_CIS");
+				m.setSourceComponent(this.getClass()+"");
+				m.setPerformanceType(IPerformanceMessage.Delay);
+				m.setOperationType("RetrieveCIS");
+				m.setD82TestTableName("S10");
+				m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
+
+				PERF_LOG.trace(m.toString());
+
 				return new AsyncResult<CtxModelObject>(objectResult);
 
 			} else {
@@ -1890,8 +1909,20 @@ public class InternalCtxBroker implements ICtxBroker {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 					}
-				}											
+				}
+				//Performance Logging
+				IPerformanceMessage m = new PerformanceMessage();
+				m.setTestContext("ConteBroker_Delay_CSS");
+				m.setSourceComponent(this.getClass()+"");
+				m.setPerformanceType(IPerformanceMessage.Delay);
+				m.setOperationType("RetrieveCSS");
+				m.setD82TestTableName("S11");
+				m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
+
+				PERF_LOG.trace(m.toString());
+
 			}//end of remote code
+
 		}
 		LOG.info("RETRIEVE context data identifier: " +objectResult.getId().toString());
 
