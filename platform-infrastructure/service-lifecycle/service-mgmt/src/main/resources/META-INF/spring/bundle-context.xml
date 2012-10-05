@@ -40,6 +40,7 @@
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 		<property name="policyNegotiation" ref="policyNegotiatorRef" />
 		<property name="deviceMngr" ref="deviceMngrRef" />
+		<property name="userFeedback" ref="userFeedbackRef" />
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >
