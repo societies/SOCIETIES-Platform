@@ -31,69 +31,69 @@ package org.societies.webapp.models.privacy;
  */
 public class CisCtxAttributeTypes {
 
-	/**
-     *  @since 0.0.8
-     */
-    public static final String ABOUT = "aboutMe";
-	 
-	/**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_HOME_CITY = "addressHomeCity";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_HOME_COUNTRY = "addressHomeCountry";
-	
-	/**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_HOME_STREET_NAME = "addressHomeStreetName";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_HOME_STREET_NUMBER = "addressHomeStreetNumber";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_WORK_CITY = "addressWorkCity";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
-	
-	/**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_WORK_STREET_NAME = "addressWorkStreetName";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
-	
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String BOOKS = "books";
-   
-    /**
-     * @since 0.0.8
-     */
-    public static final String EMAIL = "email";
+//	/**
+//     *  @since 0.0.8
+//     */
+//    public static final String ABOUT = "aboutMe";
+//	 
+//	/**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_HOME_CITY = "addressHomeCity";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_HOME_COUNTRY = "addressHomeCountry";
+//	
+//	/**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_HOME_STREET_NAME = "addressHomeStreetName";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_HOME_STREET_NUMBER = "addressHomeStreetNumber";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_WORK_CITY = "addressWorkCity";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
+//	
+//	/**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_WORK_STREET_NAME = "addressWorkStreetName";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
+//	
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String BOOKS = "books";
+//   
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String EMAIL = "email";
     
     /**
      * @since 0.0.8
@@ -111,14 +111,14 @@ public class CisCtxAttributeTypes {
     public static final String LANGUAGES = "languages";
 
     
-    /**
-     * @since 0.0.8
-     */
-    public static final String LAST_ACTION = "lastAction";
-    /**
-     * @since 0.0.8
-     */
-    public static final String ACTION = "action";
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String LAST_ACTION = "lastAction";
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String ACTION = "action";
     
     /**
      * @since 0.0.8
@@ -141,61 +141,61 @@ public class CisCtxAttributeTypes {
      */
     public static final String MUSIC = "music";
     
-    /**
-     * @since 0.0.8
-     */
-    public static final String NAME = "name";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String NAME_FIRST = "nameFirst";
-    
-    /**
-     * 
-     * @since 0.0.8
-     */
-    public static final String NAME_LAST = "nameLast";
-    
-    /**
-     * @since 0.0.8
-     */
-    public static final String OCCUPATION = "occupation";
-    
-    
-    /**
-     * @since 0.0.8
-     */
-    public static final String POLITICAL_VIEWS = "politicalViews";
- 
-    /**
-     * @since 0.0.8
-     */
-    public static final String RELIGIOUS_VIEWS = "religiouslViews";
- 
-    /**
-     * @since 0.0.8
-     */
-    public static final String SEX = "sex";
-  
-    /**
-     * @since 0.0.8
-     */
-    public static final String STATUS = "status";
-    
-    /**
-     * @since 0.0.8
-     */
-    public static final String SKILLS = "skills";
-    
-    /**
-     * @since 0.0.8
-     */
-    public static final String TEMPERATURE = "temperature";
-   
-    /**
-     * @since 0.0.8
-     */
-    public static final String WEIGHT = "weight";
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String NAME = "name";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String NAME_FIRST = "nameFirst";
+//    
+//    /**
+//     * 
+//     * @since 0.0.8
+//     */
+//    public static final String NAME_LAST = "nameLast";
+//    
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String OCCUPATION = "occupation";
+//    
+//    
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String POLITICAL_VIEWS = "politicalViews";
+// 
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String RELIGIOUS_VIEWS = "religiouslViews";
+// 
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String SEX = "sex";
+//  
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String STATUS = "status";
+//    
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String SKILLS = "skills";
+//    
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String TEMPERATURE = "temperature";
+//   
+//    /**
+//     * @since 0.0.8
+//     */
+//    public static final String WEIGHT = "weight";
 }

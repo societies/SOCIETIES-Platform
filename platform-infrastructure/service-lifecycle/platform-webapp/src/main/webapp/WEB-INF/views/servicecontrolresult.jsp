@@ -18,11 +18,15 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
+<!--  
 <h4>${result}</h4>
 <br/>
 <br/>
 <h4>${serviceResult}</h4>
 <br/>
+-->
+
+<h4>Waiting...</h4>
 
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

@@ -46,6 +46,7 @@ import org.societies.webapp.models.CisManagerForm;
 import org.societies.webapp.models.PrivacyActionForm;
 import org.societies.webapp.models.PrivacyConditionForm;
 import org.societies.webapp.models.PrivacyPolicyResourceForm;
+import org.societies.webapp.models.WebAppParticipant;
 import org.societies.webapp.models.privacy.CisCtxAttributeHumanTypes;
 import org.societies.webapp.models.privacy.CisCtxAttributeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,9 @@ public class CisManagerController {
 	private static String[] resourceList;
 	private static String[] resourceHumanList;
 	private static String[] resourceSchemeList;
+	
+	
+	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
 
 	// store the interfaces of remote and local CISs
 	//private ArrayList<ICis> remoteCISs;
@@ -373,9 +377,27 @@ public class CisManagerController {
 						res = cisForm.getCisJid().trim();
 						remoteCIS.getListOfMembers(icall);
 						res = "After getList";
+						
+						Thread.sleep(5000);
+						List<WebAppParticipant> membersDetails = new ArrayList<WebAppParticipant>();
+						if (m_remoteMemberRecords != null)
+						{
+							for ( int memberIndex  = 0; memberIndex < m_remoteMemberRecords.size(); memberIndex++)
+							{
+								WebAppParticipant memberDetail = new WebAppParticipant();
+								memberDetail.setMembersJid(m_remoteMemberRecords.get(memberIndex).getJid());
+								memberDetail.setMembershipType(m_remoteMemberRecords.get(memberIndex).getRole());
+								
+								membersDetails.add(memberDetail);
+								
+							}
+						}
+						model.put("memberRecords", membersDetails);
+						
 					}
 					cisForm.setMethod("GetMemberListRemote");
 					model.put("methodcalled", "GetMemberListRemote");
+					model.put("method", "GetMemberListRemote");
 					res = "CIS==null: " + cisForm.getMethod();
 				} else {
 					Set<ICisParticipant> records = thisCis.getMemberList().get();
@@ -385,6 +407,7 @@ public class CisManagerController {
 
 			} else if (method.equalsIgnoreCase("GetMemberListRemote")) {
 				model.put("methodcalled", "GetMemberListRemote");
+				model.put("method", "GetMemberListRemote");
 				model.put("cisid", cisForm.getCisJid());
 				//CALL REMOTE
 				res += cisForm.getCisJid();
@@ -758,8 +781,8 @@ public class CisManagerController {
 					LOG.debug("### " + communityResultObject.getWhoResponse().getParticipant().size());
 
 					m_session.setAttribute("community", remoteCommunity);
-					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWhoResponse().getParticipant();					
-					m_session.setAttribute("remoteMemberRecords", l);
+					m_remoteMemberRecords = communityResultObject.getWhoResponse().getParticipant();					
+					m_session.setAttribute("remoteMemberRecords", m_remoteMemberRecords);
 				}
 
 			}
