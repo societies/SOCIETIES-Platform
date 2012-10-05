@@ -122,9 +122,11 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD);
         intentFilter.addAction(LocalCSSManagerService.SUGGESTED_FRIENDS);
         intentFilter.addAction(LocalCSSManagerService.GET_CSS_FRIENDS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
         
-        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
-    	
+        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);    	
     }
     
     /**
@@ -335,7 +337,31 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16))) {
+				try {
+					this.localCSSManager.findAllCssAdvertisementRecords(data.getString(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15))) {
+				try {
+					this.localCSSManager.findForAllCss(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19))) {
+				try {
+					this.localCSSManager.readProfileRemote(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 20))) {
+				try {
+					this.localCSSManager.sendFriendRequest(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} 
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -382,19 +408,19 @@ public class PluginCSSManager extends Plugin {
 			for (int i  = 0; i < parcelable.length; i++) {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
+		//ADVERTISEMENT RECORDS	
 		} else if (LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS == intent.getAction() || LocalCSSManagerService.FIND_FOR_ALL_CSS == intent.getAction()) {
 			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 			advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			
 			Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
-			
 			for (int i  = 0; i < parcelable.length; i++) {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
-
-		} else {
+		//CSS RECORDS
+		} else  {
 			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 		}
+		
 		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
 		
 		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
@@ -412,14 +438,12 @@ public class PluginCSSManager extends Plugin {
 			result.setKeepCallback(false);
 			this.error(result, methodCallbackId);
 		}
-			
 		
 		//remove callback ID for given method invocation
 		PluginCSSManager.this.methodCallbacks.remove(key);
 
 		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 		return retValue;
-		
 	}
 	
     /**
@@ -632,6 +656,13 @@ public class PluginCSSManager extends Plugin {
 				}
 			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_FOR_ALL_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.READ_PROFILE_REMOTE)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

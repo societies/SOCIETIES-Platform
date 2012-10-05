@@ -52,7 +52,7 @@ var CSSFriendsServices = {
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			alert("Error displaying friend details");
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.readRemoteCSSProfile(css_id, success, failure);
@@ -109,8 +109,8 @@ var CSSFriendsServices = {
 	sendFriendRequest: function(name, css_id) {
 		
 		function success(data) {
-			CSSFriendsServices.showFriendDetailPage(data);
-			$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+			//CSSFriendsServices.showFriendDetailPage(data);
+			//$.mobile.changePage($("#friend-profile"), {transition: "fade"});
 		}
 		
 		function failure(data) {

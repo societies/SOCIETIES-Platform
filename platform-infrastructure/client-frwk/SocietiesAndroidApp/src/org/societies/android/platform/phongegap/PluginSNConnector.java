@@ -260,6 +260,8 @@ public class PluginSNConnector extends Plugin {
 					//UNMARSHALL RETURN VALUES
 					String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
 					String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
+					String strSN = intent.getStringExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
+					SocialNetwork sn = SocialNetwork.valueOf(strSN);
 					
 					PluginResult result = new PluginResult(PluginResult.Status.OK, expires);
 					result.setKeepCallback(false);
@@ -268,11 +270,20 @@ public class PluginSNConnector extends Plugin {
 					//remove callback ID for given method invocation
 					PluginSNConnector.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+					
+					//SEND DATA TO CLOUD
+					if (!snServiceConnected)
+						initialiseServiceBinding();
+					long lnExpires = 0;
+					try {
+						lnExpires = Long.parseLong(expires);
+					} catch (Exception ex) { }
+					snService.addSocialConnector("org.societies.android.platform.phongegap", sn, token, lnExpires);
 				}
 			} 
 			//>>>>>>>>>  ISocialData METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (intent.getAction().equals(ISocialData.GET_SOCIAL_CONNECTORS)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(ISocialData.methodsArray, 0);
+				String mapKey = ServiceMethodTranslator.getMethodName(ISocialData.methodsArray, 2);
 				
 				String methodCallbackId = PluginSNConnector.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -284,6 +295,22 @@ public class PluginSNConnector extends Plugin {
 						connectors[i] = (AConnectorBean) parcels[i];
 					}
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAConnectorBeanToJSONArray(connectors));
+					result.setKeepCallback(false);
+					PluginSNConnector.this.success(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginSNConnector.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} 
+			else if (intent.getAction().equals(ISocialData.REMOVE_SOCIAL_CONNECTOR)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ISocialData.methodsArray, 1);
+				
+				String methodCallbackId = PluginSNConnector.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL THE boolean
+					boolean parcel =  intent.getBooleanExtra(ISocialData.INTENT_RETURN_KEY, true);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, parcel);
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation

@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.css.mgmt.comms;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
@@ -545,7 +547,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	}
 
 	// @Override
-	public void sendCssFriendRequest(String cssFriendId) {
+	public void sendCssFriendRequest(String cssFriendId, ICSSManagerCallback callback) {
 
 		LOG.debug("Remote call on sendCssFriendRequest");
 
@@ -684,7 +686,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 
-		messageBean.setMethod(MethodType.FIND_ALL_CSS_FRIEND_REQUESTS);
+		messageBean.setMethod(MethodType.GET_FRIEND_REQUESTS);
 		CommsClientCallback commsCallback = new CommsClientCallback(
 				stanza.getId(), callback);
 
@@ -722,5 +724,92 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 		
+	}
+
+
+
+	@Override
+	public Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CssRequest>> findAllCssFriendRequests() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CssRequest>> findAllCssRequests() {
+		return null;
+	}
+
+
+	@Override
+	public void sendCssFriendRequest(String cssIdentity) {
+		Dbc.require("Friend request CSS identity must be specified", null != cssIdentity && cssIdentity.length() > 0);
+		
+		LOG.debug("Remote call on sendCssFriendRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(cssIdentity));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
+	
+	public void findAllCssFriendRequests(ICSSManagerCallback callback)
+	{
+		
+		LOG.debug("Remote call on findAllCssFriendRequests");
+
+		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+		messageBean.setMethod(MethodType.FIND_ALL_CSS_FRIEND_REQUESTS);
+		CommsClientCallback commsCallback = new CommsClientCallback(
+				stanza.getId(), callback);
+
+		try {
+			this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
+	
+	/* Get a list of Friend Css's from cloud Css Manger */
+	public void findAllCssRequests(ICSSManagerCallback callback)
+	{
+		
+		LOG.debug("Remote call on findAllCssFriendRequests");
+
+		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+		messageBean.setMethod(MethodType.FIND_ALL_CSS_REQUESTS);
+		CommsClientCallback commsCallback = new CommsClientCallback(
+				stanza.getId(), callback);
+
+		try {
+			this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

@@ -193,7 +193,6 @@ public class CssDirectory implements ICssDirectory {
 	public Future<List<CssAdvertisementRecord>> findForAllCss(
 			CssAdvertisementRecord filterCss) {
 		
-	//TODO : Need to add filter . for now it returns everything	
 		Session session = sessionFactory.openSession();
 		List<CssAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CssAdvertisementRecordEntry>();
 		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
@@ -205,13 +204,14 @@ public class CssDirectory implements ICssDirectory {
 					CssAdvertisementRecordEntry.class).list();
 
 			for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
-				record = new CssAdvertisementRecord();
-				record.setName(entry.getName());
-				record.setId(entry.getId());
-				record.setUri(entry.getUri());
+				if (entry.getName().contains(filterCss.getName())) {
+					record = new CssAdvertisementRecord();
+					record.setName(entry.getName());
+					record.setId(entry.getId());
+					record.setUri(entry.getUri());
 
-				returnList.add(record);
-
+					returnList.add(record);
+				}
 			}
 
 		} catch (Exception e) {
