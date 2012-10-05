@@ -19,3 +19,18 @@
 	color: #039;
 	
 }
+
+.navigator{
+	margin-left: 45px;
+	margin-top: -20px;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 15px;
+	background: #fff;
+	color: #039;
+	
+}
+
+.navigator a{
+	margin-left: 10px;
+	
+}

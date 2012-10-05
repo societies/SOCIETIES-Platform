@@ -22,10 +22,6 @@
 
 </head>
 
-
-
-
-
 <body>
 
 
@@ -51,70 +47,89 @@
 
 
 
-			<label> Action: </label>
-			
-			 <select id="method">
+			<label> Action: </label> <select id="method">
 				<option value="NONE" label="--- Select Operation ---" />
 				<option value="lookup" label="Lookup" />
 				<option value="retrieve" label="Retrieve" />
+				<!-- 
 				<option value="create" label="Create" />
+				 -->
 			</select> 
+			
 			
 			<select id="lookup" style="display: none">
 				<option value="NONE" label="--- Select Model Type---" />
+
+				<!-- 
 				<option value="attribute">attribute</option>
 				<option value="entity">entity</option>
 				<option value="association">association</option>
+ 				-->
 
 				<xc:forEach var="type" items="${models}">
 					<option value="${type}" label="${type}" />
 				</xc:forEach>
-				<select>
+			</select> 
+			
+			
+			<select id="create" style="display: none">
+				<option value="NONE" label="--- Select Model Type---" />
+				<options items="${models}" />
+				<option value="attribute" label="Attribute" />
+				<option value="entity" label="entity" />
+				<option value="association" label="association" />
+			</select> 
+			
+			
+			<select context="type" id="entity" style="display: none">
+				<option value="NONE" label="--- Select Entity Type---" />
+				<xc:forEach var="type" items="${entityTypes}">
+					<option value="${type}" label="${type}" />
+				</xc:forEach>
+			</select> 
+			
+			<select context="type" id="attribute"
+				style="display: none">
+				<option value="NONE" label="--- Select Attribute Type --- " />
 
-					<select id="create" style="display: none">
-						<option value="NONE" label="--- Select Model Type---" />
-						<options items="${models}" />
-						<option value="attribute" label="Attribute" />
-						<option value="entity" label="entity" />
-						<option value="association" label="association" />
-				</select>
+				<xc:forEach var="type" items="${attributeTypes}">
+					<option value="${type}">${type}</option>
+				</xc:forEach>
+			
+			</select>
+			
+			
+			 <select context="type" id="association"
+				style="display: none">
+				<option value="NONE" label="--- Select Association Type---" />
+				<xc:forEach var="type" items="${associationTypes}">
+					<option value="${type}" label="${type}" />
+				</xc:forEach>
+			</select> 
+			
+			
+			<input style="display:none" size="50"	id="retrieve" />
 
-
-
-
-				<select context="type" id="entity" style="display: none">
-						<option value="NONE" label="--- Select Entity Type---" />
-						<xc:forEach var="type" items="${entityTypes}">
-							<option value="${type}" label="${type}" />
+				<select style="display:none" id="idList">
+						<option value="NONE" label="--- Select context id ---" />
+						<xc:forEach var="ctxId" items="${idList}">
+							<option value="${ctxId}" label="${ctxId}" />
 						</xc:forEach>
 				</select>
-
-					<select context="type" id="attribute" style="display: none">
-						<option value="NONE" label="--- Select Attribute Type --- " />
-
-						<xc:forEach var="type" items="${attributeTypes}">
-							<option value="${type}"> ${type} </option>
-						</xc:forEach>
-				</select>
-
-
-					<select context="type" id="association" style="display: none">
-						<option value="NONE" label="--- Select Association Type---" />
-						<xc:forEach var="type" items="${associationTypes}">
-							<option value="${type}" label="${type}" />
-						</xc:forEach>
-					</select>
-					
 				
-				
-				<input style="display:none" size="50"	id="retrieve" />
-
 				<input type="button" value=" Exectute " id="executeQuery" style="display: none" />
 		</div>
 
+
 		<div class="errorBlock">${error}</div>
 
+		<div class="navigator">
+		   <label> Context Path:</label>
+	 	 	${parent} 
+		</div>
+
 		<!--  RESULT SECTION -->
+
 
 		<!-- Table markup-->
 		<table id="newspaper-a">
@@ -129,21 +144,16 @@
 					<th scope="col" id="ctx-type">Source</th>
 					<th scope="col" id="ctx-id">id</th>
 					<th scope="col" id="ctx-value">Value</th>
+					<th scope="col" id="ctx-quality">Quality</th>
 					<th scope="col" id="ctx-action">Actions</th>
-
 
 				</tr>
 			</thead>
 
 			<!-- Table footer -->
-
+		
 			<tfoot>
-				<!--tr>
-	              <td>valore1</td>
-	              <td>valore1</td>
-	              <td>valore1</td>
-	              <td>valore1</td>
-	        </tr-->
+				
 			</tfoot>
 
 			<!-- Table body -->
@@ -155,11 +165,14 @@
 					    <td>${element.source}</td>
 						<td><a href="#" onclick="retrieve('${element.id}');">${element.diplayId}</a></td>
 						<td>${element.value}</td>
+						<td>${element.quality}</td>
 						<td>
 						
 						    <button onclick="retrieve('${element.id}')"> Retrieve </button>
+							<!-- 
 							<button onclick="edit('${element.id}')">Edit</button>
-							<button onclick="del('${element.id}')">Delete</button>
+							<button onclick="del('${element.id}')">Delete</button> 
+							-->
 							
 						</td>
 

@@ -20,6 +20,15 @@ function exe(){
 }
 
 
+function lookup(ctxmodel, ctxtype){
+	query.type = ctxtype;
+	query.id="";
+	query.model = ctxmodel;
+	query.method="lookup";
+	exe();
+}
+
+
 //Query
 function exeQuery(value){
     $('#method').val("retrieve");
@@ -29,7 +38,6 @@ function exeQuery(value){
 }
 
 function retrieve(id){
-
 	query.type="";
 	query.id=id;
 	query.model="";
@@ -60,6 +68,7 @@ function hideMethodOptions(){
 	$("#retrieve").hide();
 	$("#create").hide()
 	$('#executeQuery').hide();
+	$('#idList').hide();
 }
 
 (function($) {
@@ -70,6 +79,10 @@ function hideMethodOptions(){
   				hideMethodOptions();
   				hideModelOptions();
   				$("#"+$(this).val()).show("fast");
+  				if ($(this).val() == "retrieve") {
+  					$("#idList").show();
+  					$('#executeQuery').show();
+  				}
   				
   	    });
        
@@ -99,6 +112,13 @@ function hideMethodOptions(){
   				$("#"+$(this).val()).show("fast");
   				
   	    });
+        
+        $('#idList').change(function(){
+        	$('#retrieve').val($(this).val());
+        	query.id=$(this).val();
+        	query.id=$(this).val();
+        	query.method= "retreive";
+        });
        
      				
        $('select[context="type"]').change(function() {
