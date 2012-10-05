@@ -111,8 +111,8 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 			//return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
 			ServiceNegotiationResult result = resultList.take();
 			
-			if(Log.isDebugEnabled())
-				Log.debug("getResult: " + result);
+			if(logger.isDebugEnabled())
+				logger.debug("getResult: " + result);
 			
 			return result;
 			

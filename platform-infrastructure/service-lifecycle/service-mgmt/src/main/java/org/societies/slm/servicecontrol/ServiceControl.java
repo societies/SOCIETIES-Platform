@@ -60,8 +60,10 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -82,7 +84,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private INegotiation policyNegotiation;
 	private ICisManager cisManager;
 	private IDeviceManager deviceMngr;
-	
+	private IUserFeedback userFeedback;
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	
@@ -138,6 +140,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return serviceControlRemote;
 	}
 	
+	public IUserFeedback getUserFeedback(){
+		return userFeedback;
+	}
+	
+	public void setUserFeedback(IUserFeedback userFeedback){
+		this.userFeedback = userFeedback;
+	}
+	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
 		
@@ -147,6 +157,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	
+	@Async
 	@Override
 	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
@@ -265,6 +276,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> stopService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
@@ -374,6 +386,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
+	@Async
+	@Override
 	public Future<ServiceControlResult> installService(Service serviceToInstall) 
 			throws ServiceControlException {
 		
@@ -416,6 +430,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled()) 
 						logger.debug("Problem installing device!");
 					returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
 				} else{
@@ -423,6 +439,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Device installed with id: " + deviceId);
 					returnResult.setServiceId(ServiceModelUtils.generateServiceResourceIdentifierForDevice(serviceToInstall, deviceId));
 					returnResult.setMessage(ResultMessage.SUCCESS);
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				}
 				
@@ -449,6 +467,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
+				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			} 
 			
@@ -457,6 +477,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("Negotiation was not successful!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_FAILED);
+				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}	
 			
@@ -481,7 +503,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
-			
+				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+
 			} else{
 									
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
@@ -498,6 +521,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Error with installation! ");
 						
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				} 
 					
@@ -516,10 +541,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					logger.info("Installed shared third-party service client!");
 					returnResult.setServiceId(result.getServiceId());
 					returnResult.setMessage(result.getMessage());
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Installation of client was not successful");
 					returnResult.setMessage(result.getMessage());
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + result.getMessage());
+
 				}
 	
 			}
@@ -585,6 +614,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 	}
 	
+	@Async
 	@Override
 	public Future<ServiceControlResult> installService(URL bundleLocation)
 			throws ServiceControlException {
@@ -658,6 +688,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node)
 			throws ServiceControlException {
@@ -728,6 +759,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> installService(URL bundleLocation, String nodeJid)
 			throws ServiceControlException {
@@ -757,6 +789,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 	
 	
+	@Async
 	@Override
 	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
@@ -950,6 +983,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		queue.add(newService);
 	}
 	
+	@Async
 	@Override
 	public Future<ServiceControlResult> shareService(Service service, String nodeJid)
 			throws ServiceControlException {
@@ -978,6 +1012,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> shareService(Service service, IIdentity node) throws ServiceControlException {
 		
@@ -1076,6 +1111,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 	}
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> unshareService(Service service, String nodeJid) throws ServiceControlException {
 		
@@ -1102,6 +1138,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 
+	@Async
 	@Override
 	public Future<ServiceControlResult> unshareService(Service service, IIdentity node) throws ServiceControlException {
 

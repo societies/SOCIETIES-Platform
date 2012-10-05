@@ -241,10 +241,10 @@ public class ServiceModelUtils {
 		
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
-		ServiceReference<?>[] registeredService = serviceBundle.getRegisteredServices();
+		ServiceReference[] registeredService = serviceBundle.getRegisteredServices();
 		Service ourService = null;
 		for(int i = 0; i < registeredService.length; i++){
-			ServiceReference<?> regiServ = registeredService[i];
+			ServiceReference regiServ = registeredService[i];
 			String property = (String) regiServ.getProperty("TargetPlatform");
 			if(property != null && property.equals("SOCIETIES")){
 				ourService = (Service) regiServ.getProperty("ServiceMetaModel");

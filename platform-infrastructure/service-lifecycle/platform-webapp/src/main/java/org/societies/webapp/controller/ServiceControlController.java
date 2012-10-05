@@ -378,6 +378,8 @@ public class ServiceControlController {
 
 				//SHARE SERVICE
 				asynchResult = this.getSCService().installService(serviceToInstall);
+				
+				if(logger.isDebugEnabled()) logger.debug("Called it, now should continue!");
 				//scresult = asynchResult.get();
 				
 				//if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
