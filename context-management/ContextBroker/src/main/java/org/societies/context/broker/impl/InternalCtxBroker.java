@@ -69,6 +69,8 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
@@ -107,7 +109,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
-
+	
+	/** to define a dedicated Logger for Performance Testing */
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
+	
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
@@ -1843,7 +1848,9 @@ public class InternalCtxBroker implements ICtxBroker {
 				return new AsyncResult<CtxModelObject>(objectResult);
 
 			} else {
-
+				// needed for performanse test
+				long initTimestamp = System.nanoTime();
+				
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
 				LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
 				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
@@ -1855,15 +1862,35 @@ public class InternalCtxBroker implements ICtxBroker {
 						callback.wait();
 						objectResult = callback.getResult();
 						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
+						IPerformanceMessage m = new PerformanceMessage();
+						m.setTestContext("ContextBroker_Delay_RemoteContextRetrieval");
+						m.setSourceComponent(this.getClass()+"");
+						m.setPerformanceType(IPerformanceMessage.Delay);
+						m.setOperationType("RemoteCSS_ContextRetrieval");
+						m.setD82TestTableName("S11");
+						long delay = System.nanoTime()-initTimestamp;
+						m.setPerformanceNameValue("Delay="+(delay));
+
+						PERF_LOG.trace(m.toString());
+						LOG.info("time needed for remote context retrieval :"+ delay);
+					
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 					}
 				}											
+			
+
+
+			
+			
 			}//end of remote code
 		}
 		LOG.info("RETRIEVE context data identifier: " +objectResult.getId().toString());
 
+		
+		
+		
 		return new AsyncResult<CtxModelObject>(objectResult);
 	}
 
