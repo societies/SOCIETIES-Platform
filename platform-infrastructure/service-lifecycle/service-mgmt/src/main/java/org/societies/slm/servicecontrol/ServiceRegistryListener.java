@@ -135,7 +135,66 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("Service RegistryListener Bean Instantiated");
 	}
 
+	public void cleanServices(){
+		if(log.isDebugEnabled()) 
+			log.debug("Checking database and cleaning services that are no longer intalled");
+		
+		String fullJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+		
+		if(log.isDebugEnabled()) 
+			log.debug("The JID of this node is: " + fullJid);
+		
+		try{
+		 	List<Service> oldServices = getServiceReg().retrieveServicesSharedByCSS(fullJid);
+			List<Service> deleteServices = new ArrayList<Service>();
+					
+			for(int i = 0; i < oldServices.size(); i++){
+				Service oldService = oldServices.get(i);
+				
+				if(log.isDebugEnabled())
+					log.debug("Checking if Service " + oldService.getServiceName() + " exists!");
+			
+				if(!oldService.getServiceType().equals(ServiceType.DEVICE) && !oldService.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
+					
+					Long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(oldService.getServiceIdentifier());
+					
+					if(log.isDebugEnabled())
+						log.debug("Checking if Bundle Id: " + bundleId + " exists in OSGI...");
+					
+					Bundle thisBundle = this.bctx.getBundle(bundleId);
+
+					if(thisBundle == null){
+						if(log.isDebugEnabled())
+							log.debug("Bundle doesn't exist, so we delete the service!");
+						
+						deleteServices.add(oldService);
+					} else{
+						if(!(thisBundle.getSymbolicName().equals(oldService.getServiceInstance().getServiceImpl().getServiceNameSpace()))){
+							if(log.isDebugEnabled())
+								log.debug("Bundle exists but isn't our service, removing the service!");
+							
+							deleteServices.add(oldService);
+						}
+					}
+				}
+					
+			}
+			
+			getServiceReg().unregisterServiceList(deleteServices);
+			
+			
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			log.error("Exception while cleaning database: " + ex);
+		}
+		
+	}
+	
 	public void registerListener() {
+		
+		cleanServices();
+		
 		Filter fltr = null;
 		
 		if(log.isDebugEnabled()) 
@@ -152,6 +211,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		log.info("Bundle Listener Registered");
 		this.bctx.addBundleListener(this);
+		
+		
 	}
 
 	public void unRegisterListener() {
@@ -233,8 +294,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
 		}
+		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
+		
 		if(service.getServiceType().equals(ServiceType.DEVICE))
 			servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
 		else
@@ -323,7 +386,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						URI clientJar = new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+						URI clientJar;
+						
+						if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
+							clientJar= new URI("http://www.societies.org/webapp/webservice.test");
+						else
+							clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+						
 						URI clientHost;
 						if(clientJar.getPort()!= -1)
 							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());

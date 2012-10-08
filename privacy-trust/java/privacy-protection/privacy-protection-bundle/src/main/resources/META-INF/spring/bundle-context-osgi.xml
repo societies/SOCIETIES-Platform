@@ -36,7 +36,7 @@
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager" />
 
 	<osgi:service ref="negotiationAgent"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent" />
+		interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent"/>
 		
 
 	<!-- Privacy Preference Manager Configuration -->
@@ -69,8 +69,9 @@
 		cardinality="0..1" />
 	
 	<osgi:reference id="negotiationAgentRemote"
-	    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote"
-	    cardinality="0..1"/>
+	    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote" cardinality="0..1">
+	    <osgi:listener bind-method="bindNegotiationAgentRemote" ref="privacyPolicyNegotiationManager"></osgi:listener>
+	   </osgi:reference>
 	
 	<osgi:reference id="UserFeedbackGUI"
 	    interface="org.societies.api.internal.useragent.feedback.IUserFeedback"
