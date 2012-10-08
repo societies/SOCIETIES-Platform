@@ -2,6 +2,7 @@ package org.societies.css.mgmt;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -80,8 +81,9 @@ public class CSSManager implements ICSSLocalManager {
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
 	private static final String THIS_NODE = "XCManager.societies.local";
-	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
-	
+	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+    private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
+
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
 	private IServiceDiscovery serviceDiscovery;
@@ -107,6 +109,10 @@ public class CSSManager implements ICSSLocalManager {
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
         this.randomGenerator = new Random();
+        
+		this.createPubSubNodes();
+        this.subscribeToPubSubNodes();
+
 	}
 
 	/**
@@ -131,9 +137,7 @@ public class CSSManager implements ICSSLocalManager {
 
             try {
             	
-                List<String> packageList = new ArrayList<String>();
-                packageList.add(CSS_MGMT_PACKAGE);
-    			pubSubManager.addJaxbPackages(packageList);
+    			pubSubManager.addSimpleClasses(cssPubsubClassList);
 
     			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
     	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
@@ -141,8 +145,6 @@ public class CSSManager implements ICSSLocalManager {
     		} catch (XMPPError e) {
     			e.printStackTrace();
     		} catch (CommunicationException e) {
-    			e.printStackTrace();
-    		} catch (JAXBException e) {
     			e.printStackTrace();
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -292,9 +294,6 @@ public class CSSManager implements ICSSLocalManager {
 
 		Dbc.require("CssRecord parameter cannot be null", profile != null);
 
-		//delay creating punsub nodes until the first login by a non-cloud node
-		this.createPubSubNodes();
-        this.subscribeToPubSubNodes();
 
         CssInterfaceResult result = new CssInterfaceResult();
 		result.setProfile(profile);

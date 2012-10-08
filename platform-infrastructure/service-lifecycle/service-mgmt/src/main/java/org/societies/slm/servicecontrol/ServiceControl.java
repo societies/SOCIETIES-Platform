@@ -485,6 +485,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled())
 					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
 			
+			getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' : negotiation success!");
+
 			// Now install the client!
 			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
 				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
@@ -558,9 +560,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 		
 		} catch (Exception ex) {
+			getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' : Problems!");
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
 			ex.printStackTrace();
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
+
 		}
 		
 	}

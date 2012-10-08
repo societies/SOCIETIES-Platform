@@ -104,7 +104,7 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	
 	private void sendReturnValue(String client, SocialNetwork socialNetwork, String token, String expires) {
 		Intent intent = new Intent(GET_TOKEN);
-		intent.putExtra(SOCIAL_NETWORK_KEY, socialNetwork);
+		intent.putExtra(SOCIAL_NETWORK_KEY, socialNetwork.toString());
 		intent.putExtra(INTENT_RETURN_KEY, token);
 		intent.putExtra(EXTRA_EXPIRES, expires);
 		intent.setPackage(client);

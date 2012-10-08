@@ -39,11 +39,14 @@ var SocialNetworksConnectors = {
 		console.log("Refreshing SN Connectors");
 
 		function success(data) {
-				
+			
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#listSNSconnectors').children().length >1 )
 				$('ul#listSNSconnectors li:last').remove();
 
+			//RESET THE CONNECTOR SELECT BOX
+			$("select#connectorType").val('0');
+			
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var imageSource = SocialNetworksConnectors.getSNimage(data[i].name);
@@ -55,6 +58,8 @@ var SocialNetworksConnectors = {
 				jQuery('ul#listSNSconnectors').append(tableEntry);
 			}
 			$('ul#listSNSconnectors').listview('refresh');
+			//CHANGE TO THE SETTINGS PAGE
+			$.mobile.changePage($("#settings"), {transition: "slideup"});
 		}
 		
 		function failure(data) {

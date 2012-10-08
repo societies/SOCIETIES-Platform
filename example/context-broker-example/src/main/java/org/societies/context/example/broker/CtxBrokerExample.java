@@ -741,8 +741,8 @@ public class CtxBrokerExample implements Subscriber{
 			// Create the attribute to be tested
 			primaryAttribute = (CtxAttribute) internalCtxBroker.createAttribute(ctxEntity.getId(), "primaryAttribute").get();
 			primaryAttribute.setHistoryRecorded(true);
-			primaryAttribute.setStringValue("fistValue");
-			internalCtxBroker.update(primaryAttribute);
+			primaryAttribute.setStringValue("firstValue");
+			primaryAttribute = (CtxAttribute) internalCtxBroker.update(primaryAttribute).get();
 
 			escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(ctxEntity.getId(), "escortingAttribute1").get();
 			escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(ctxEntity.getId(), "escortingAttribute2").get();
@@ -756,18 +756,24 @@ public class CtxBrokerExample implements Subscriber{
 			internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get();	
 
 			//this update stores also the attributes in tuples
-			internalCtxBroker.update(primaryAttribute);
+			primaryAttribute = (CtxAttribute) internalCtxBroker.update(primaryAttribute).get();
 
 			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_secondValue").get();
 			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_secondValue").get();
 			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
-
+			LOG.info("Store first set of hoc attribute tuples");
+			
 			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_thirdValue").get();
 			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_thirdValue").get();
 			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"thirdValue").get();
-
+			LOG.info("Store second set of hoc attribute tuples");
+			
 			//primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
+			LOG.info("primary id "+primaryAttribute.getId());
+			LOG.info("listOfEscortingAttributeIds id "+listOfEscortingAttributeIds);
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
+			
+			System.out.println("printHocTuples");
 			printHocTuples(tupleResults);
 			System.out.println("add new attribute in an existing tuple");
 
@@ -809,6 +815,7 @@ public class CtxBrokerExample implements Subscriber{
 	protected void printHocTuples(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults){
 
 		int i = 0;
+		System.out.println("printing hoc data "+ tupleResults.size());
 		for (CtxHistoryAttribute primary : tupleResults.keySet()){
 			String primaryValue = null;
 			if (primary.getStringValue() != null) primaryValue =primary.getStringValue();
@@ -817,6 +824,7 @@ public class CtxBrokerExample implements Subscriber{
 				String escValue = "";
 				if (escortingAttr.getStringValue() != null )  escValue =escortingAttr.getStringValue();	
 				escValueTotal = escValueTotal+" "+escValue; 
+				//System.out.println("escValueTotal "+escValueTotal); 
 			}
 			System.out.println(i+ " primaryValue: "+primaryValue+ " escValues: "+escValueTotal);
 			i++;
