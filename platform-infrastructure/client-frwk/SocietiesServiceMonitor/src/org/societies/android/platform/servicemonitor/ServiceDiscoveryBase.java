@@ -195,7 +195,6 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
 					//CONVERT TO PARCEL BEANS
 					int i=0;
-					//AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
 					Parcelable serviceArray[] = new Parcelable[serviceList.size()];
 					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
 						serviceArray[i] = AService.convertService(tmpService);
@@ -311,7 +310,7 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 			}
 			Stanza stanza = new Stanza(toID);
 	        try {
-	        	//commMgr.register(ELEMENT_NAMES, discoCallback);
+	        	commMgr.register(ELEMENT_NAMES, discoCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 				Log.d(LOG_TAG, "Sending stanza");
 			} catch (Exception e) {
