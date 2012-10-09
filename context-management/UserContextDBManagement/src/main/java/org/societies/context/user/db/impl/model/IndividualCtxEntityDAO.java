@@ -42,7 +42,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 		dynamicUpdate=true
 )
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("INDIVIDUAL")
+@DiscriminatorValue("IndividualCtxEntity")
 public class IndividualCtxEntityDAO extends CtxEntityDAO {
 	
 	private static final long serialVersionUID = -3743724709912125536L;
