@@ -37,64 +37,126 @@ import java.util.Date;
 public class CtxHistoryAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = -1908778456166623132L;
-
-	/** The numeric id of this context history attribute in the database. */
-	private final Long historyRecordId;
+	
+	private final Date lastUpdated;
 	
 	/** The text value of this context history attribute. */
-	private String stringValue;
+	private final String stringValue;
 	
 	/** The integer value of this context history attribute. */
-	private  Integer integerValue;
+	private final Integer integerValue;
 	
 	/** The double-precision floating point numeric value of this context history attribute. */
-	private  Double doubleValue;
+	private final Double doubleValue;
 	
 	/** The binary value of this context history attribute. */
-	private  byte[] binaryValue;
+	private final byte[] binaryValue;
+	
+	private final CtxAttributeValueType valueType;
+	
+	private final String valueMetric;
 
-	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
-		super(ctxAttribute.getId());
-		super.setLastModified(ctxAttribute.getQuality().getLastUpdated());
-		this.historyRecordId = historyRecordId;
-		this.stringValue = ctxAttribute.getStringValue();
-		this.integerValue = ctxAttribute.getIntegerValue();
-		this.doubleValue = ctxAttribute.getDoubleValue();
-		this.binaryValue = ctxAttribute.getBinaryValue();
+	/**
+	 * 
+	 * @param attrId
+	 * @param lastModified
+	 * @param lastUpdated
+	 * @param stringValue
+	 * @param integerValue
+	 * @param doubleValue
+	 * @param binaryValue
+	 * @param valueType
+	 * @param valueMetric
+	 * 
+	 * @since 0.4
+	 */
+	CtxHistoryAttribute(final CtxAttributeIdentifier attrId, 
+			final Date lastModified, final Date lastUpdated,
+			final String stringValue, final Integer integerValue,
+			final Double doubleValue, final byte[] binaryValue,
+			final CtxAttributeValueType valueType, final String valueMetric) {
+		
+		super(attrId);
+		super.setLastModified(lastModified);
+		this.lastUpdated = lastUpdated;
+		this.stringValue = stringValue;
+		this.integerValue = integerValue;
+		this.doubleValue = doubleValue;
+		this.binaryValue = binaryValue;
+		this.valueType = valueType;
+		this.valueMetric = valueMetric;
+	}
+	
+	/**
+	 * 
+	 * @param attribute
+	 * @param historyRecordId
+	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(CtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)} 
+	 */
+	@Deprecated
+	public CtxHistoryAttribute(CtxAttribute attribute, Long historyRecordId) {
+		
+		super(attribute.getId());
+		super.setLastModified(attribute.getLastModified());
+		this.lastUpdated = attribute.getQuality().getLastUpdated();
+		this.stringValue = attribute.getStringValue();
+		this.integerValue = attribute.getIntegerValue();
+		this.doubleValue = attribute.getDoubleValue();
+		this.binaryValue = attribute.getBinaryValue();
+		this.valueType = attribute.getValueType();
+		this.valueMetric = attribute.getValueMetric();
 	}
 
-	public CtxHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType, Long historyRecordId) {
-		super(attID);
-		super.setLastModified(date);
-		this.historyRecordId = historyRecordId;
+	/**
+	 * 
+	 * @param attrId
+	 * @param date
+	 * @param value
+	 * @param valueType
+	 * @param historyRecordId
+	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(CtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)}
+	 */
+	@Deprecated
+	public CtxHistoryAttribute(CtxAttributeIdentifier attrId, Date date, Serializable value, 
+			CtxAttributeValueType valueType, Long historyRecordId) {
 		
-		if (valueType.equals(CtxAttributeValueType.DOUBLE)){
-			this.doubleValue = (Double) value;
-			this.stringValue = null;
-			this.integerValue = null;
-			this.binaryValue = null;
-		}else if (valueType.equals(CtxAttributeValueType.INTEGER)){
-			this.doubleValue = null;
-			this.stringValue = null;
-			this.integerValue = (Integer) value;
-			this.binaryValue = null;
-		}else if (valueType.equals(CtxAttributeValueType.STRING)){
-			this.doubleValue = null;
+		super(attrId);
+		super.setLastModified(date);
+		this.lastUpdated = date;
+		if (valueType.equals(CtxAttributeValueType.STRING)) {
+			
 			this.stringValue = (String) value;
 			this.integerValue = null;
-			this.binaryValue = null;
-		}else if (valueType.equals(CtxAttributeValueType.BINARY)){
-			this.binaryValue =   (byte[]) value;
 			this.doubleValue = null;
+			this.binaryValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.INTEGER)) {
+			
+			this.stringValue = null;
+			this.integerValue = (Integer) value;
+			this.doubleValue = null;
+			this.binaryValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.DOUBLE)) {
+			
 			this.stringValue = null;
 			this.integerValue = null;
-		}else if (valueType.equals(CtxAttributeValueType.EMPTY)){
+			this.doubleValue = (Double) value;
 			this.binaryValue = null;
-			this.doubleValue = null;
+		} else if (valueType.equals(CtxAttributeValueType.BINARY)) {
+			
 			this.stringValue = null;
 			this.integerValue = null;
+			this.doubleValue = null;
+			this.binaryValue = (byte[]) value;
+		} else {
+			
+			this.stringValue = null;
+			this.integerValue = null;
+			this.doubleValue = null;
+			this.binaryValue = null;
 		}
-}
+		this.valueType = valueType;
+		this.valueMetric = null;
+	}
 	
 	/**
 	 * Returns the identifier of this historic context attribute.
@@ -105,6 +167,16 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	public CtxAttributeIdentifier getId() {
 		
 		return (CtxAttributeIdentifier) super.getId();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.4
+	 */
+	public Date getLastUpdated() {
+		
+		return this.lastUpdated;
 	}
 	
 	/**
@@ -148,6 +220,26 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	}
 	
 	/**
+	 * 
+	 * @return
+	 * @since 0.4
+	 */
+	public CtxAttributeValueType getValueType() {
+		
+		return this.valueType;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.4
+	 */
+	public String getValueMetric() {
+		
+		return this.valueMetric;
+	}
+	
+	/**
 	 * TODO
 	 * Returns a String representation of this historic context attribute.
 	 * 
@@ -159,25 +251,23 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		return getId().toString(); 
 	}
 
-	/**
+	/*
 	 * @see java.lang.Object#hashCode()
-	 * @since 0.0.2
 	 */
 	@Override
 	public int hashCode() {
 		
 		final int prime = 31;
-		int result = super.hashCode();
 		
+		int result = super.hashCode();
 		result = prime * result
-				+ ((this.historyRecordId == null) ? 0 : this.historyRecordId.hashCode());
+				+ ((this.lastUpdated == null) ? 0 : this.lastUpdated.hashCode());
 		
 		return result;
 	}
 
-	/**
+	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * @since 0.0.2
 	 */
 	@Override
 	public boolean equals(Object that) {
@@ -190,11 +280,12 @@ public class CtxHistoryAttribute extends CtxModelObject {
 			return false;
 		
 		CtxHistoryAttribute other = (CtxHistoryAttribute) that;
-		if (this.historyRecordId == null) {
-			if (other.historyRecordId != null)
+		if (this.lastUpdated == null) {
+			if (other.lastUpdated != null)
 				return false;
-		} else if (!this.historyRecordId.equals(other.historyRecordId))
+		} else if (!this.lastUpdated.equals(other.lastUpdated))
 			return false;
+		
 		return true;
 	}
 }

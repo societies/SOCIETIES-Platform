@@ -875,6 +875,49 @@ public class CisManagerController {
 		return new ModelAndView("pilotmycommunities", model);
 	}
 
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/mycisappspilot.html", method = RequestMethod.GET)
+	public ModelAndView myCommumityApps()
+
+	{
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		
+		model.put("message", "Welcome to the CIS Apps Page");
+		// cismanager result page seems to want this for some reason!??
+		CisManagerForm cisForm = new CisManagerForm();
+		cisForm.setMethod("GetCisList");
+		model.put("cisForm", cisForm);
+		List<String> methodList = new ArrayList<String>();
+		methodList.add(new String("GetCisList"));
+		model.put("method", methodList);
+		model.put("methodcalled", "GetCisList");
+
+		if (getCisManager() == null) {
+			model.put("errormsg", "CIS Manager Service reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+		String res = "Starting...";
+		
+
+		try {
+			
+				//ICisRecord searchRecord = null;
+				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
+				List<ICis> records = this.getCisManager().getCisList();
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
+				model.put("cisrecords", records);
+				model.put("currentNodeId", currentNodeId);
+
+		} catch (Exception ex) {
+			LOG.error("Error when managing CIS", ex);
+			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
+		}
+
+		model.put("res", res);
+		
+		return new ModelAndView("mycisappspilot", model);
+	}
 
 
 }

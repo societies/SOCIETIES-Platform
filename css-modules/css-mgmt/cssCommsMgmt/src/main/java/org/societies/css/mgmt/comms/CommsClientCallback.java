@@ -86,7 +86,7 @@ public class CommsClientCallback implements ICommCallback {
 		if (result instanceof CssManagerResultBean) {
 			LOG.debug("Callback with result");
 			CssManagerResultBean resultBean = (CssManagerResultBean) result;
-			this.sourceCallback.receiveResult(resultBean.getResult());
+			this.sourceCallback.receiveResult(resultBean);
 		}
 	}
 
