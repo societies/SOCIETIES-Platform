@@ -57,14 +57,7 @@ public class PersistenceManager implements Runnable{
 	}
 
 	@Override
-	public void run() {
-		//sleep for 5 minutes
-		try {
-			Thread.sleep(50000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
+	public void run() {		
 		//store diannes to context
 		HashMap<IIdentity, Network> d_nets = dianne.getDNets();
 		Iterator<IIdentity> d_nets_it = d_nets.keySet().iterator();
@@ -72,6 +65,13 @@ public class PersistenceManager implements Runnable{
 			IIdentity nextId = d_nets_it.next();
 			Network nextNet = d_nets.get(nextId);
 			storeToContext(nextId, nextNet);
+		}
+
+		//sleep for 5 minutes
+		try {
+			Thread.sleep(50000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
