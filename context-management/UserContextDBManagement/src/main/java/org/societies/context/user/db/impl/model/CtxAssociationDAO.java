@@ -84,7 +84,7 @@ public class CtxAssociationDAO extends CtxModelObjectDAO {
 	private CtxEntityIdentifier parentEntity;
 	
 	@CollectionOfElements(fetch = FetchType.EAGER, targetElement = CtxEntityIdentifierType.class)
-	@JoinTable(name="assoc_entities", joinColumns = @JoinColumn(name="association_id"))
+	@JoinTable(name="org_societies_context_assoc_entities", joinColumns = @JoinColumn(name="association_id"))
 	@Column(name="ctx_ent_id")
 	private Set<CtxEntityIdentifier> childEntities = new HashSet<CtxEntityIdentifier>();
 
