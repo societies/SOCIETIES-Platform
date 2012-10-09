@@ -132,18 +132,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		
 		List<String> files = new ArrayList<String>();
 		files.add(clientJarFilePath);
-		addService(serviceId, slaXml, clientJarServer, files, null);
-	}
-	
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath) throws NegotiationException {
-		
-		LOG.warn("Obsolete version of INegotiationProviderServiceMgmt.addService() is being called.");
-		
-		List<String> files = new ArrayList<String>();
-		files.add(clientJarFilePath);
-		addService(serviceId, slaXml, clientJarServer, files, null);
+		addService(serviceId, slaXml, clientJarServer, files, callback);
 	}
 	
 	@Override
