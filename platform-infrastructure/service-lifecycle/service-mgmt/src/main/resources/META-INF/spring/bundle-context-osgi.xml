@@ -17,12 +17,15 @@
 <osgi:service ref="serviceManagement" interface="org.societies.api.services.IServices"/>
 
 <osgi:reference id="serviceRegRef" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
-<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
+<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+<osgi:reference id="deviceMngrRef" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" cardinality="0..1"/>
 <osgi:reference id="cisManagerRef" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1"/>
 <osgi:reference id="serviceDiscoveryRemoteRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote" cardinality="0..1" />
 <osgi:reference id="serviceControlRemoteRef" interface="org.societies.api.internal.servicelifecycle.IServiceControlRemote" cardinality="0..1" />
 <osgi:reference id="privacyManagerProviderRef" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1" />
 <osgi:reference id="policyNegotiatorRef" interface="org.societies.api.internal.security.policynegotiator.INegotiation" cardinality="0..1" />
 <osgi:reference id="negotiationProviderRef" interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" cardinality="0..1" />
+<osgi:reference id="userFeedbackRef" interface="org.societies.api.internal.useragent.feedback.IUserFeedback" cardinality="0..1" />
+	 
 	  
 </beans>

@@ -41,7 +41,7 @@ var ServiceManagementService = {
 	 */
 	connectService: function(successCallback, failureCallback) {
 
-		console.log("Call CoreServiceMonitorService - connectService");
+		console.log("Call ServiceManagementService - connectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -59,7 +59,7 @@ var ServiceManagementService = {
 	 */
 	disconnectService: function(successCallback, failureCallback) {
 
-		console.log("Call CoreServiceMonitorService - disconnectService");
+		console.log("Call ServiceManagementService - disconnectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -75,10 +75,8 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active services
 	 */
-	getServices: function(successCallback, failureCallback) {
-		console.log("Call CoreServiceMonitorService - activeServices");
-
-		var identity = "john.societies.local";
+	getServices: function(identity, successCallback, failureCallback) {
+		console.log("Call ServiceManagementService - activeServices");
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -95,9 +93,7 @@ var ServiceManagementService = {
 	 * @returns List of active apps
 	 */
 	getMyServices: function(successCallback, failureCallback) {
-		var clientPackage = "org.societies.android.platform.gui";
-
-		console.log("Call CoreServiceMonitorService - activeTasks");
+		console.log("Call ServiceManagementService - activeTasks");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -105,7 +101,7 @@ var ServiceManagementService = {
 		'getMyServices',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 	}
-}
+};
 
 /**
  * Provides a Helper API to the Service Monitor service
@@ -115,22 +111,22 @@ var ServiceManagementService = {
 
 var ServiceManagementServiceHelper = {
 	/**
-	 * @methodOf SocietiesCoreServiceMonitorHelper#
-	 * @description Connect to Service Monitor native service
+	 * @methodOf ServiceManagementServiceHelper#
+	 * @description Connect to Service Management native service
 	 * @param {Object} function to be executed if connection successful
 	 * @returns null
 	 */
 
-	connectToCoreServiceMonitor: function(actionFunction) {
-		console.log("Connect to CoreServiceMonitor");
+	connectToServiceManagement: function(actionFunction) {
+		console.log("ServiceManagementServiceHelper.connectToServiceManagement()");
 			
 		function success(data) {
 			actionFunction();
 		}
 		
 		function failure(data) {
-			alert("connectToCoreServiceMonitor - failure: " + data);
+			alert("connectToServiceManagement - failure: " + data);
 		}
 	    window.plugins.ServiceManagementService.connectService(success, failure);
 	}
-}
+};

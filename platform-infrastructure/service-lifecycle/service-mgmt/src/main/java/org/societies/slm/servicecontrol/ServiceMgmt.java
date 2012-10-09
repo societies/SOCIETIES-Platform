@@ -139,7 +139,7 @@ public class ServiceMgmt implements IServices {
 		
 		} catch(Exception ex){
 			ex.printStackTrace();
-			logger.error("Exceptioon occured: " + ex.getMessage());
+			logger.error("Exception occured: " + ex.getMessage());
 			return null;
 		}
 	}
@@ -164,6 +164,42 @@ public class ServiceMgmt implements IServices {
 			return null;
 		}
 		
+	}
+
+	@Override
+	public ServiceResourceIdentifier getServerServiceIdentifier(
+			ServiceResourceIdentifier serviceId) {
+
+		try{
+			
+			// First we get the calling Bundle
+			Future<Service> serviceAsync = getServiceDiscovery().getService(serviceId);
+			Service myService = serviceAsync.get();
+			
+			if(logger.isDebugEnabled())
+				logger.debug("myService Parent Id is" + myService.getServiceInstance().getParentIdentifier());
+		
+			return myService.getServiceInstance().getParentIdentifier();
+		
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Exception occured: " + ex.getMessage());
+			return null;
+		}
+
+	}
+
+	@Override
+	public boolean compare(ServiceResourceIdentifier serviceId,
+			ServiceResourceIdentifier otherServiceId) {
+		
+		if(serviceId == null || otherServiceId == null)
+			return false;
+		
+		if(serviceId.getIdentifier().equals(otherServiceId.getIdentifier()) && serviceId.getServiceInstanceIdentifier().equals(otherServiceId.getServiceInstanceIdentifier()))
+			return true;
+		else
+			return false;
 	}
 
 }

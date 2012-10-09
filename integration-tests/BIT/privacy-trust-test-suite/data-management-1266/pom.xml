@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -56,22 +56,22 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.1</version>
+			<version>4.1</version><!--$NO-MVN-MAN-VER$-->
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.util</groupId>
 			<artifactId>commonmock</artifactId>
 			<version>1.0</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Tools -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Logs -->
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
@@ -130,7 +130,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

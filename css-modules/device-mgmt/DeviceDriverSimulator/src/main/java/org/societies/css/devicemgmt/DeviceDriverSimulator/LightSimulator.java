@@ -25,6 +25,9 @@
 
 package org.societies.css.devicemgmt.DeviceDriverSimulator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 public class LightSimulator extends Thread {
@@ -36,9 +39,11 @@ public class LightSimulator extends Thread {
 	private long delay;
 	private int lsId;
 
+	private static Logger LOG = LoggerFactory.getLogger(LightSimulator.class);
+	
 	public LightSimulator (Object d, int id)
 	{
-		System.out.println("start Light Simul");
+		LOG.info("start Light Simul");
 		lightSensor = (LightSensor) d;
 		lsId=id;
 		delay = id * 6000;
@@ -46,7 +51,7 @@ public class LightSimulator extends Thread {
 	}
 	public synchronized void stopSimul ()
 	{
-		System.out.println ("Stop Light Simul");
+		LOG.info ("Stop Light Simul");
 		run = false;
 	}
 	
@@ -59,23 +64,23 @@ public class LightSimulator extends Thread {
 			try {
 				Thread.sleep(delay);
 			}catch(Exception e){
-				System.out.println("Erreur Thread:"+e);
+				LOG.info("Erreur Thread:"+e);
 				}
 			
 			lightSensor.setLightLevel();
 
-			System.out.println ("**************************************************");
-			System.out.println ("<-- Driver : New Light received : "+Double.toString(lightSensor.getLightValue()) + " from sensor number " + lsId);
-			System.out.println ("**************************************************\n\n");
+			LOG.info("**************************************************");
+			LOG.info ("<-- Driver : New Light received : "+Double.toString(lightSensor.getLightValue()) + " from sensor number " + lsId);
+			LOG.info ("**************************************************\n\n");
 			
 			try {
 				Thread.sleep(10000);
 			}catch(Exception e){
-				System.out.println("Erreur Thread:"+e);
+				LOG.info("Erreur Thread:"+e);
 				}
 		}
 	}
 	public void startSimul() {
-		System.out.println ("Start Simul");
+		LOG.info ("Start Simul");
 	}
 }

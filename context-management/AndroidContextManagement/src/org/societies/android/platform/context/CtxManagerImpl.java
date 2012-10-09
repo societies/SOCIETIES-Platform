@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.android.api.context.broker.ICtxClientBroker;
+import org.societies.android.api.internal.context.broker.ICtxClientBroker;
 
 /// allaksa se kanoniko api
 import org.societies.api.context.CtxException;

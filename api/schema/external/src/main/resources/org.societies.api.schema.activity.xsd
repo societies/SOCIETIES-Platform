@@ -47,9 +47,9 @@ for that reason, Im defining a simpler version here initially.
             <!--<xs:element ref='ActivityContext' />-->
             <xs:element  name="published" type="xs:string" />
             <!--<xs:element name="source" type="xs:string" />-->
-            <xs:element name="verb" type="xs:string" />
-            <xs:element name="object" type="xs:string" />
-            <xs:element name="target" type="xs:string" />
+            <xs:element name="verb" type="xs:string" minOccurs='0' maxOccurs='1'/>
+            <xs:element name="object" type="xs:string" minOccurs='0' maxOccurs='1'/>
+            <xs:element name="target" type="xs:string" minOccurs='0' maxOccurs='1'/>
         </xs:sequence>
     </xs:complexType>
      </xs:element>

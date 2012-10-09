@@ -36,8 +36,12 @@ public class DisplayEvent implements Serializable{
 
 	private DisplayEventConstants status;
 
-	public DisplayEvent(DisplayEventConstants status){
+	private final String IPAddress;
+	
+	public DisplayEvent(String IPAddress, DisplayEventConstants status){
+		this.IPAddress = IPAddress;
 		this.status = status;
+		
 	}
 	
 	/**
@@ -48,5 +52,12 @@ public class DisplayEvent implements Serializable{
 	 */
 	public DisplayEventConstants getDisplayStatus(){
 		return this.status;
+	}
+
+	/**
+	 * @return the iPAddress of the screen that the user has just connected to. 
+	 */
+	public String getIPAddress() {
+		return IPAddress;
 	}
 }

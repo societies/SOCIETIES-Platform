@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <string name="app_name">Personalisation</string>
-    
-
-
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Preferences</string>
+	<string name="edit_message">Edit your message</string>
+	<string name="button_Send">Send</string>
+	<string name="display_message">Display message</string>
 </resources>

@@ -77,9 +77,9 @@ public class ExternalCtxBrokerExample 	{
 	private static final Logger LOG = LoggerFactory.getLogger(ExternalCtxBrokerExample.class);
 
 	/** The 3P Context Broker service reference. */
-	private ICtxBroker externalCtxBroker;
+	//private org.societies.api.context.broker.ICtxBroker externalCtxBroker;
 	private ICommManager commMgrService;
-	private org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
+	//private org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
 	private ICisOwned cisOwned  = null;
@@ -109,14 +109,14 @@ public class ExternalCtxBrokerExample 	{
 
 
 	@Autowired(required=true)
-	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker,org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker , ICommManager commMgr,ICisManager cisManager, IContextAware3pService ca3pService) throws InvalidFormatException {
+	public ExternalCtxBrokerExample(ICommManager commMgr,ICisManager cisManager, IContextAware3pService ca3pService) throws InvalidFormatException {
 
 		LOG.info("*** " + this.getClass() + " instantiated");
 
 		LOG.info("*** ca3pService : " + this.ca3pService + " instantiated");
 
-		this.externalCtxBroker = externalCtxBroker;
-		this.internalCtxBroker = internalCtxBroker;
+		//this.externalCtxBroker = externalCtxBroker;
+		//this.internalCtxBroker = internalCtxBroker;
 		this.commMgrService = commMgr;
 		this.ca3pService = ca3pService;
 
@@ -132,6 +132,8 @@ public class ExternalCtxBrokerExample 	{
 		LOG.info("*** requestor = " + this.requestor);
 
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+		
+		
 		try {
 			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
 		} catch (InterruptedException e) {
@@ -152,26 +154,27 @@ public class ExternalCtxBrokerExample 	{
 		ca3pService.retrieveIndividualEntityId();
 		ca3pService.createCtxEntityWithCtxAttributes();
 		
-		//access control is not working for entities yet
-		//ca3pService.retrieveCtxAttributeBasedOnEntity();
+		ca3pService.retrieveCtxAttributeBasedOnEntity();
 
 		ca3pService.lookupAndRetrieveCtxAttributes();
 
 
-		LOG.info("*** Starting community context examples...");
+		//LOG.info("*** Starting community context examples...");
 		// creation of communities is only allowed by platform services
-		this.createCommunityCtxEnt();
+		//this.createCommunityCtxEnt();
 		
-		ca3pService.retrievceLookupCommunityEntAttributes(this.cisID);
+//		ca3pService.retrievceLookupCommunityEntAttributes(this.cisID);
 	}
 
 
+	/*
 	private void createCommunityCtxEnt(){
 
 		CommunityCtxEntity communityEntity;
 		try {
+			
 			communityEntity = internalCtxBroker.createCommunityEntity(this.cisID).get();
-			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local ");
+			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local");
 			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
@@ -230,17 +233,7 @@ public class ExternalCtxBrokerExample 	{
 			e.printStackTrace();
 		}
 
-
-
 	}
-
-	
-
-
-	
-	
-	
-
-	
+*/
 	
 }

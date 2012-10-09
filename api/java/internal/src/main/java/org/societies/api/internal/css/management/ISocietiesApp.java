@@ -26,7 +26,7 @@
 package org.societies.api.internal.css.management;
 
 
-import org.societies.api.internal.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssDirectory;
 
 /**
  * This is the base client interface for T4.5/SOCIETIES. This interface is implemented

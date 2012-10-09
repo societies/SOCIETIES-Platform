@@ -31,7 +31,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- Setup the identity of this builder -->
@@ -53,5 +53,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>ContextSourceManagement</module>
 		<module>UserContextInferenceManagement</module>
 		<module>CommunityContextInferenceManagement</module>
+		<module>css-context-monitor</module>
+		<module>ContextSimilarityEvaluation</module>
+		<module>CommunityContextEstimation</module>
+		<module>context-data-init</module>
+		<module>context-performance-tests</module>
 	</modules>
 </project>

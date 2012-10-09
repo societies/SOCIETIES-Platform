@@ -28,6 +28,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
+    <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
     
     <application
         android:icon="@drawable/ic_launcher"
@@ -54,19 +56,29 @@
 			android:label="@string/app_name">
 		</activity>
 		
-         <service
-        	android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor"
-        	>
-        </service>
+		<service android:name="org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal" />
+		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
+		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
+        <service android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService" />
+        <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
+        <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
+        <service android:name="org.societies.android.platform.socialdata.SocialData" />
+        <service android:name="org.societies.android.platform.cis.CommunityManagement" />
+        <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" />
         
-         <service
-        	android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService"
-        	>
-        </service>
+        <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         
-        <service 
-            android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService"
-        ></service>
+          <!-- this needs to be copied manualy  -->
+    <!--provider
+        android:name="org.societies.android.platform.SocialProvider"
+        android:authorities="@string/provider_authority"
+        android:exported="true"
+        android:syncable="true"
+        android:enabled="true"
+        android:readPermission="org.societies.android.SocialProvider.READ"
+        android:writePermission="org.societies.android.SocialProvider.WRITE">
+    </provider-->
         
     </application>
 

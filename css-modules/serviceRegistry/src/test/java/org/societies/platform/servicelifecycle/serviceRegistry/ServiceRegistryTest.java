@@ -290,11 +290,12 @@ public class ServiceRegistryTest extends
 				si.setFullJid("fullJid"+i);
 				si.setCssJid("cssJid"+i);
 				si.setXMPPNode("XMPPNode"+i);
+				si.setParentIdentifier(sid);
 				servImpl = new ServiceImplementation();
 				servImpl.setServiceNameSpace("net.calendar");
 				servImpl.setServiceProvider("net.soluta");
 				servImpl.setServiceVersion("1.0");
-				servImpl.setServiceClient(new URI("societies","the/path/of/the/service/client"+1,null));
+				servImpl.setServiceClient("the/path/of/the/service/client"+i);
 				si.setServiceImpl(servImpl);
 				result.setServiceInstance(si);
 				returnedServiceList.add(result);

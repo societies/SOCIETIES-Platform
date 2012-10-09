@@ -25,6 +25,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.api.internal.cssmanager;
 
+import java.util.List;
+
+import org.societies.api.css.directory.ACssAdvertisementRecord;
+
+
 /**
  * 
  * This interface forms the basis of the CSSManager, a component that will exist on all nodes. Its main tasks are:
@@ -58,7 +63,14 @@ public interface IAndroidCSSManager {
 			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",
 			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)",
 			"synchProfile(String client, AndroidCSSRecord profile)",
-			"setPresenceStatus(String client, AndroidCSSRecord profile)"};
+			"setPresenceStatus(String client, AndroidCSSRecord profile)",
+			"findForAllCss(String client, String searchTerm)",
+			"findAllCssAdvertisementRecords(String client)",
+			"getCssFriends(String client)",
+			"getSuggestedFriends(String client)",
+			"readProfileRemote(String client, String cssId)",
+			"sendFriendRequest(String client, String cssId)",
+	};
 	/**
 	 * Register with chosen Domain Server
 	 * 
@@ -190,4 +202,49 @@ public interface IAndroidCSSManager {
 	 * @return AndroidCSSRecord
 	 */
 	AndroidCSSRecord setPresenceStatus(String client, AndroidCSSRecord profile);
+	
+	/**
+	 * Search for a CSS(s) using a filter
+	 * @param client
+	 * @param searchTerm
+	 * @return List of CssAdvertisementRecord
+	 */
+	List<ACssAdvertisementRecord> findForAllCss(String client, String searchTerm);
+
+	/**
+	 * Find all CSS advertisements
+	 * 
+	 * @param client
+	 * @return List of CssAdvertisementRecord
+	 */
+	List<ACssAdvertisementRecord> findAllCssAdvertisementRecords(String client);
+	
+	/**
+	 * Get friend CSS(s) advertisements
+	 * @param client
+	 * @return
+	 */
+	List<ACssAdvertisementRecord> getCssFriends(String client);
+
+	/**
+	 * Get friend CSS(s) advertisements
+	 * @param client
+	 * @return
+	 */
+	List<ACssAdvertisementRecord> getSuggestedFriends(String client);
+	/**
+	 * Get a friend's CSS profile
+	 * 
+	 * @param client
+	 * @param cssId
+	 * @return AndroidCSSRecord profile
+	 */
+	AndroidCSSRecord readProfileRemote(String client, String cssId);
+
+	/**
+	 * TODO: what is return type ?
+	 * @param client
+	 * @param cssId
+	 */
+	void sendFriendRequest(String client, String cssId);
 }

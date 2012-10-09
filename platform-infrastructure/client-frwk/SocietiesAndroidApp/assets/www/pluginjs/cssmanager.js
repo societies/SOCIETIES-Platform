@@ -57,6 +57,70 @@ window.plugins.SocietiesLocalCSSManager = {
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'logoutXMPPServer'));
 		}
+	},
+	readProfile: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+		}
+	},
+	modifyAndroidCSSRecord: function(successCallback, errorCallback, data){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'modifyAndroidCSSRecord'));
+		}
+	},
+	getMyFriendsList: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'getMyFriends'));
+		}
+	},
+	readRemoteCSSProfile: function(css_id, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+		}
+	},
+	getSuggestedFriends: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
+	},
+	sendFriendRequest: function(css_id, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+		}
+	},
+	findForAllCss: function(searchTerm, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
+	},
+	findAllCssAdvertisementRecords: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
 	}
 }
 
@@ -96,7 +160,6 @@ var	SocietiesLocalCSSManagerHelper = {
 		console.log("Connect to LocalCSSManager");
 			
 		function success(data) {
-			console.log(data);
 			actionFunction();
 		}
 		

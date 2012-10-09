@@ -6,8 +6,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
@@ -22,7 +21,7 @@
 			<name>Nicolas Liampotis</name>
 			<email>nicolas.liampotis@cn.ntua.gr</email>
 			<organization>ICCS</organization>
-      		<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
 				<role>owner</role>
 				<role>developer</role>
@@ -44,25 +43,32 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
+		<dependency>
+     		<groupId>org.springframework</groupId>
+     		<artifactId>org.springframework.spring-library</artifactId>
+     		<type>libd</type>
+     		<version>${spring.version}</version>
+     		<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
+
 
 		<!-- CONTEXT MANAGEMENT COMPONENTS: -->
 		<dependency>
@@ -112,6 +118,13 @@
 			<version>${version.cm}</version>
 		</dependency>
 
+		<!-- dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-performance-test</artifactId>
+			<version>${version.cm}</version>
+		</dependency> -->
+		
+		
 	</dependencies>
 
 	<build>
@@ -126,15 +139,13 @@
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 
-						<Embed-Dependency>
-							*;scope=compile|runtime,
-							
-						</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime,</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 
-						<Export-Package>
-							org.societies.context-management.**
-						</Export-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						
+						<Export-Package />
+						
 					</instructions>
 				</configuration>
 			</plugin>

@@ -58,7 +58,7 @@ public class CtxBrokerUtils {
     public static String attributeValueAsString(Serializable attributeValue) {
 
         if (null == attributeValue) {
-            return null;
+            return "null";
         }
 
         if (attributeValue instanceof String || attributeValue instanceof Integer || attributeValue instanceof Double) {
@@ -128,7 +128,7 @@ public class CtxBrokerUtils {
 		if (value instanceof String ) {
 			if (attribute.getStringValue()!=null) {
 				String valueStr = attribute.getStringValue();
-				if(valueStr.equals(value.toString())) return true;             			
+				if(valueStr.equalsIgnoreCase(value.toString())) return true;             			
 			}
 		} else if (value instanceof Integer) {
 			if(attribute.getIntegerValue()!=null) {

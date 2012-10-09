@@ -1,7 +1,6 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -10,13 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-//import javax.xml.bind.JAXBContext;
-//import javax.xml.bind.JAXBException;
-//import javax.xml.bind.Marshaller;
-//import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
+import javax.servlet.UnavailableException;
 
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
@@ -30,6 +24,8 @@ import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
+import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -37,6 +33,7 @@ import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -53,12 +50,16 @@ import org.societies.api.identity.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
-import org.dom4j.io.SAXReader;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 
 @Component
 public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
-	public static final int TIMEOUT = 10000;
+	public static final int WAIT_TIMEOUT = 10000;
+	public static final long REQUEST_TIMEOUT = 20000;
 	
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub#event",
@@ -78,19 +79,26 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 	private ICommManager endpoint;
 	private Map<String,Object> responses;
+	private Map<String,Long> responseTimeout;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
-	//private Marshaller contentMarshaller;
-	//private Unmarshaller contentUnmarshaller;
 	
 	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	private String packagesContextPath;
 	private IIdentity localIdentity;
+	private Map<String,Class<?>> elementToClass;
+	private Serializer serializer;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
 		responses = new HashMap<String, Object>();
+		responseTimeout = new HashMap<String, Long>();
 		subscribers = new HashMap<Subscription, List<Subscriber>>();
+		elementToClass = new HashMap<String, Class<?>>();
+		
+		Strategy strategy = new AnnotationStrategy();
+		serializer = new Persister(strategy);
+		
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
 		try {
@@ -99,14 +107,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			else
 				throw new CommunicationException("Injected endpoint is not connected!");
 			packagesContextPath = "";
-			//JAXBContext jc = JAXBContext.newInstance();
-			//contentUnmarshaller = jc.createUnmarshaller();
-			//contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
+			
 		} catch (CommunicationException e) {
-			LOG.error(e.getMessage());
-		//} catch (JAXBException e) {
-		//	LOG.error(e.getMessage());
+			LOG.error(e.getMessage(),e);
 		}
 	}
 	
@@ -145,10 +149,25 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 			
+			//CONVERT THE .getAny() OBJECT TO XML
+			ElementNSImpl eventBean =  (ElementNSImpl) i.getAny();
+			DOMImplementationLS domImplLS = (DOMImplementationLS) eventBean.getOwnerDocument().getImplementation(); 
+			LSSerializer domSerializer = domImplLS.createLSSerializer(); 
+			String eventBeanXML = domSerializer.writeToString(eventBean); 
+			
+			//SERIALISE OBJECT
+			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
+			Class<?> c = elementToClass.get(elementID);
+			Object bean = null;
+			try {
+				bean = serializer.read(c, eventBeanXML);
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+			//POST EVENT
 			List<Subscriber> subscriberList = subscribers.get(sub);
 			for (Subscriber subscriber : subscriberList)
-				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), i.getAny());
-		
+				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
 		}
 	}
 	// TODO subId
@@ -168,7 +187,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
 		synchronized (responses) {
-			LOG.info("receiveResult 4 id "+stanza.getId());
+//			LOG.info("receiveResult 4 id "+stanza.getId());
 			responses.put(stanza.getId(), payload);
 			responses.notifyAll();
 		}
@@ -177,7 +196,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
 		synchronized (responses) {
-			LOG.info("receiveError 4 id "+stanza.getId());
+//			LOG.info("receiveError 4 id "+stanza.getId());
 			responses.put(stanza.getId(), error);
 			responses.notifyAll();
 		}
@@ -193,7 +212,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	public void receiveItems(Stanza stanza, String node, List<String> items) {
 		SimpleEntry<String, List<String>> mapSimpleEntry = new AbstractMap.SimpleEntry<String, List<String>>(node, items);
 		synchronized (responses) {
-			LOG.info("receiveItems 4 id "+stanza.getId());
+//			LOG.info("receiveItems 4 id "+stanza.getId());
 			responses.put(stanza.getId(), mapSimpleEntry);
 			responses.notifyAll();
 		}
@@ -209,23 +228,36 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 	
 	private Object waitForResponse(String id) throws XMPPError {
-		Object response = null;
-		synchronized (responses) {				
-			while (!responses.containsKey(id)) {
-				try {
-					LOG.info("waiting response 4 id "+id);
-					responses.wait(TIMEOUT);
-				} catch (InterruptedException e) {
-					LOG.info(e.getMessage());
+		
+		synchronized (responseTimeout) {
+			responseTimeout.put(id, REQUEST_TIMEOUT);
+			
+			Object response = null;
+			synchronized (responses) {
+				while (!responses.containsKey(id)) {
+					long cycleStart = System.currentTimeMillis();
+					try {
+//						LOG.info("waiting response 4 id "+id);
+						responses.wait(WAIT_TIMEOUT);
+					} catch (InterruptedException e) {
+						LOG.info(e.getMessage(),e);
+					}
+//					LOG.info("checking response 4 id "+id+" in "+Arrays.toString(responses.keySet().toArray()));
+					long timeLeft = responseTimeout.get(id)-System.currentTimeMillis()+cycleStart;
+					if (timeLeft>0)
+						responseTimeout.put(id,timeLeft);
+					else {
+						LOG.warn("Result for request with id='"+id+"' timed out...");
+						throw new XMPPError(StanzaError.remote_server_timeout);
+					}
 				}
-				LOG.info("checking response 4 id "+id+" in "+Arrays.toString(responses.keySet().toArray()));
+				response = responses.remove(id);
+//				LOG.info("got response 4 id "+id);
 			}
-			response = responses.remove(id);
-			LOG.info("got response 4 id "+id);
+			if (response instanceof XMPPError)
+				throw (XMPPError)response;
+			return response;
 		}
-		if (response instanceof XMPPError)
-			throw (XMPPError)response;
-		return response;
 	}
 
 	@Override
@@ -555,8 +587,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void addSimpleClasses(List<String> classList)
-			throws ClassNotFoundException {
-		// TODO Auto-generated method stub
+	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
+		for (String c : classList) {
+			Class<?> clazz = Class.forName(c);
+			Root rootAnnotation = clazz.getAnnotation(Root.class);
+			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+			}
+		}
 	}
 }

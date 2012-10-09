@@ -1,11 +1,12 @@
 package org.societies.api.internal.sns;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
 
+public interface ISocialConnector extends Serializable {
 
-public interface ISocialConnector {
 	
 	public final static String FACEBOOK_CONN 		= "facebook";
 	public final static String TWITTER_CONN  		= "twitter";
@@ -18,7 +19,18 @@ public interface ISocialConnector {
 		Foursquare,
 		twitter,
 		linkedin,
-		googleplus
+		googleplus;
+		
+		private final String value = "";
+		
+		public static SocialNetwork fromValue(String v) {
+	        for (SocialNetwork c: SocialNetwork.values()) {
+	            if (c.value.equals(v)) {
+	                return c;
+	            }
+	        }
+	        throw new IllegalArgumentException(v);
+	    }
 	}
 	
 	

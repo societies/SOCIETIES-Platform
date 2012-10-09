@@ -44,9 +44,6 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagement.DmEvent;
-import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.event.PubsubEventFactory;
-import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.springframework.context.ApplicationListener;
 
 

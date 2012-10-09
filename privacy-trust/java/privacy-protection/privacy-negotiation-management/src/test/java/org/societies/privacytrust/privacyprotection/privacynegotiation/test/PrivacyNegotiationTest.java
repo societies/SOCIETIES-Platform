@@ -28,14 +28,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JOptionPane;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +39,6 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -57,7 +51,6 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -76,6 +69,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -109,7 +104,7 @@ public class PrivacyNegotiationTest {
 	private PrivacyPolicyNegotiationManager negotiationMgr;
 	private IPrivacyDataManagerInternal privacyDataManager = Mockito.mock(IPrivacyDataManagerInternal.class);
 	private IPrivacyAgreementManagerInternal policyAgreementMgr = Mockito.mock(IPrivacyAgreementManagerInternal.class);
-	private INegotiationAgent negAgent = Mockito.mock(INegotiationAgent.class);
+	private INegotiationAgentRemote negAgent = Mockito.mock(INegotiationAgentRemote.class);
 	private IIdentitySelection ids = Mockito.mock(IIdentitySelection.class);
 	private IPrivacyPolicyManager privacyPolicyManager = Mockito.mock(IPrivacyPolicyManager.class);
 	private RequestorService requestorService;
@@ -132,7 +127,7 @@ public class PrivacyNegotiationTest {
 	private PPNPOutcome statusOutcomeForCis;
 	private PPNegotiationEvent successfulEvent;
 	private FailedNegotiationEvent failedEvent;
-	
+	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 
 	@Before
 	public void setUp(){
@@ -153,9 +148,10 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setPrefMgr(prefMgr);
 		this.negotiationMgr.setPrivacyDataManagerInternal(privacyDataManager);
 		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
-		this.negotiationMgr.setNegotiationAgent(negAgent);
+		this.negotiationMgr.setNegotiationAgentRemote(negAgent);
 		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
 		this.negotiationMgr.setPrivacyPolicyManager(privacyPolicyManager);
+		this.negotiationMgr.setUserFeedback(userFeedback);
 		this.setupMockito();
 		
 		this.negotiationMgr.initialisePrivacyPolicyNegotiationManager();

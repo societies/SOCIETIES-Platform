@@ -54,13 +54,13 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class ActivityFeed implements IActivityFeed, Subscriber {
+public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	/**
 	 * 
 	 */
 
 
-    protected String id;
+    protected String id;// represents the CIS which owns the activity feed
     protected
 	Set<Activity> list;
 	public ActivityFeed()
@@ -283,14 +283,6 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	{
 		LOG.info("in activityfeed close");
 	}
-	@Override
-	synchronized public void pubsubEvent(IIdentity pubsubService, String node,
-			String itemId, Object item) {
-		if(item.getClass().equals(Activity.class)){
-			Activity act = (Activity)item;
-			this.addActivity(act);
-		}
-	}
 
 	synchronized public List<IActivity> getActivities(String CssId, String query,
 			String timePeriod) {
@@ -396,21 +388,32 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	
 	// TODO: perhaps change to static
 	
-	public void iactivToMarshActv(List<IActivity> iActivityList, List<org.societies.api.schema.activity.Activity> marshalledActivList){
+
+	public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.Activity> marshalledActivList){
 		
 		Iterator<IActivity> it = iActivityList.iterator();
 		
 		while(it.hasNext()){
 			IActivity element = it.next();
-			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
-			a.setActor(element.getActor());
-			a.setObject(element.getObject());
-			a.setPublished(element.getPublished());
-			a.setVerb(element.getVerb());
-            a.setTarget(element.getTarget());
-			marshalledActivList.add(a);
+			marshalledActivList.add(iactivToMarshActiv(element));
 	     }
 	}
+	
+
+	public org.societies.api.schema.activity.Activity iactivToMarshActiv(IActivity iActivity){
+		org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+		a.setActor(iActivity.getActor());
+		a.setVerb(iActivity.getVerb());
+		if(iActivity.getObject()!=null && iActivity.getObject().isEmpty() == false )
+			a.setObject(iActivity.getObject());
+		if(iActivity.getPublished()!=null && iActivity.getPublished().isEmpty() == false )
+			a.setPublished(iActivity.getPublished());
+		
+		if(iActivity.getTarget()!=null && iActivity.getTarget().isEmpty() == false )
+			a.setTarget(iActivity.getTarget());
+		return a;
+	}
+	
 	
 	
 	@Override
@@ -424,7 +427,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 
 		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
 		
-		this.iactivToMarshActv(iActivityList, marshalledActivList);
+		this.iactivToMarshActvList(iActivityList, marshalledActivList);
 
 		g.setActivity(marshalledActivList);
 		
@@ -444,7 +447,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 
 		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
 		
-		this.iactivToMarshActv(iActivityList, marshalledActivList);
+		this.iactivToMarshActvList(iActivityList, marshalledActivList);
 
 		g.setActivity(marshalledActivList);
 		

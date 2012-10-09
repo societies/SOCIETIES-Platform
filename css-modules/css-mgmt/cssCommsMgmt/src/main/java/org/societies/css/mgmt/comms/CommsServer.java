@@ -39,6 +39,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
@@ -47,11 +48,14 @@ import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.utilities.DBC.Dbc;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 
 public class CommsServer implements IFeatureServer {
 	private ICommManager commManager;
 	private ICSSLocalManager cssManager;
-	
+	private IIdentityManager idMgr;
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/cssmanagement"));
@@ -72,6 +76,7 @@ public class CommsServer implements IFeatureServer {
 		try {
 			LOG.debug("Initialise with Communication Manager");
 			this.commManager.register(this);
+			idMgr = commManager.getIdManager();
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -107,8 +112,11 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
-			Future<List<String>> asyncGetFriendsResult = null;
-			List<String> getFriendsResult = null;
+			Future<List<CssRequest>> asyncRequestResult = null;
+			List<CssRequest> RequestResult = null;
+			
+			Future<List<CssAdvertisementRecord>> asyncFriendsAdsResult = null;
+			List<CssAdvertisementRecord> friendsAdsResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
@@ -156,17 +164,46 @@ public class CommsServer implements IFeatureServer {
 			case REGISTER_CSS_NODE:
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
+			case MODIFY_CSS_RECORD:
+				asyncResult = this.cssManager.modifyCssRecord((CssRecord) bean.getProfile());
+				break;	
 			case GET_CSS_FRIENDS:
-				asyncGetFriendsResult = this.cssManager.getCssFriends();
+				asyncFriendsAdsResult = this.cssManager.getCssFriends();
+				break;
+			case SUGGESTED_FRIENDS:
+				asyncFriendsAdsResult = this.cssManager.suggestedFriends();
+				break;
+			case GET_FRIEND_REQUESTS:
+				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
+				break;
+			case FIND_ALL_CSS_REQUESTS:
+				asyncRequestResult = this.cssManager.findAllCssRequests(); 
+				break;
+			case FIND_ALL_CSS_FRIEND_REQUESTS:
+				asyncRequestResult = this.cssManager.findAllCssFriendRequests(); 
 				break;
 			default:
+				LOG.error("Bean method does not exist: " + bean.getMethod());
 				break;
 			}
 			
 			try {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
-					getFriendsResult = asyncGetFriendsResult.get();
+					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
+					break;
+				case SUGGESTED_FRIENDS:
+					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of suggested friends: " + friendsAdsResult.size());
+					break;
+				case GET_FRIEND_REQUESTS:
+					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of friend requests: " + friendsAdsResult.size());
+					break;
+				case FIND_ALL_CSS_FRIEND_REQUESTS:
+				case FIND_ALL_CSS_REQUESTS:
+					RequestResult = asyncRequestResult.get();
 					break;
 				default:
 					// Since everything else seems to use this!!
@@ -184,7 +221,8 @@ public class CommsServer implements IFeatureServer {
 
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
-			resultBean.setResultCssFriendList(getFriendsResult);
+			resultBean.setResultAdvertList(friendsAdsResult);
+			resultBean.setResultCssRequestList(RequestResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;
@@ -207,8 +245,17 @@ public class CommsServer implements IFeatureServer {
 			switch (bean.getMethod())
 			{
 			case SEND_CSS_FRIEND_REQUEST:
-
-				request.setCssIdentity(stanza.getFrom().getJid());
+				LOG.debug("Intercepting remote method invocation SEND_CSS_FRIEND_REQUEST");
+				
+				IIdentity receivedID = stanza.getFrom();
+				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
+				String receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
+				
+				//SAVE receivedIDcloud TO DATABASE INSTEAD
+				request.setCssIdentity(receivedIDcloud);
+				LOG.info("UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(CssRequestStatusType.PENDING);
 				request.setOrigin(CssRequestOrigin.REMOTE);
 				
@@ -216,29 +263,52 @@ public class CommsServer implements IFeatureServer {
 				break;
 
 			case UPDATE_CSS_FRIEND_REQUEST:
-
-				request.setCssIdentity(stanza.getFrom().getJid());
+				receivedID = stanza.getFrom();
+				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
+				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
+				
+				//SAVE receivedIDcloud TO DATABASE INSTEAD
+				request.setCssIdentity(receivedIDcloud);
+				LOG.info("UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssFriendRequest(request);
 			break;
 			case UPDATE_CSS_REQUEST:
-
-				request.setCssIdentity(stanza.getFrom().getJid());
+				receivedID = stanza.getFrom();
+				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
+				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
+				
+				//SAVE receivedIDcloud TO DATABASE INSTEAD
+				request.setCssIdentity(receivedIDcloud);
+				LOG.info("UPDATE_CSS_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssRequest(request);
 			break;
-			
-			
+			case ACCEPT_CSS_FRIEND_REQUEST:
+				receivedID = stanza.getFrom();
+				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
+				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
+				LOG.info("receivedIDcloud result is : " +receivedIDcloud);
 				
-				
+				//SAVE receivedIDcloud TO DATABASE INSTEAD
+				request.setCssIdentity(receivedIDcloud);
+				LOG.info("ACCEPT_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				//request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.acceptCssFriendRequest(request);
+			break;
 			}
-			
 		}
-		
 	}
 
 	@Override

@@ -44,13 +44,24 @@ import org.societies.api.cis.management.*;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
@@ -60,6 +71,7 @@ import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +117,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IEventMgr mockEventMgr;
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
+	private IPrivacyDataManager mockIPrivacyDataManager;
 	private ICtxBroker mockContextBroker;
 	private INegotiation mockNegotiation;
+	
+	private PubsubClient mockPubSubClient;
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
@@ -241,7 +256,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockPrivacyPolicyManager = mock(IPrivacyPolicyManager.class);		
 		mockEventMgr = mock(IEventMgr.class);
 		mockNegotiation = mock(INegotiation.class);
+		mockIPrivacyDataManager = mock(IPrivacyDataManager.class);
 		
+		mockPubSubClient = mock(PubsubClient.class);
 		
 		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);
@@ -261,6 +278,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
 		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
 		
+		when(mockIPrivacyDataManager.checkPermission(any(Requestor.class), any(DataIdentifier.class), any(Action.class))).
+		thenReturn(new ResponseItem(new RequestItem(null, null, null, true),Decision.PERMIT));
+		
 		doNothing().when(mockEventMgr).publishInternalEvent(any(org.societies.api.osgi.event.InternalEvent.class));
 		
 		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
@@ -268,6 +288,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		//doNothing().when(mockICisDirRemote2).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		//doNothing().when(mockICisDirRemote3).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		
+		//pubsub mocking
+		doNothing().when(mockPubSubClient).addJaxbPackages(anyListOf(String.class));
+		doNothing().when(mockPubSubClient).ownerCreate(any(org.societies.api.identity.IIdentity.class),anyString());
+		when(mockPubSubClient.publisherPublish(any(org.societies.api.identity.IIdentity.class)
+				, anyString(), anyString(), anyObject())).thenReturn("");
 		
 		
 		// creating a NetworkNordImpl for each Identity Manager		
@@ -872,7 +898,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					return;
 				}
 				else{
-					List<Participant> l = communityResultObject.getWho().getParticipant();
+					List<Participant> l = communityResultObject.getWhoResponse().getParticipant();
 					int[] memberCheck = {0,0,0};
 					
 					Iterator<Participant> it = l.iterator();
@@ -905,9 +931,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// end of callback
 		
-
-		// call and wait for callback
-		Iciss.getListOfMembers(new GetListCallBack(cisJid));
+		Iciss.getListOfMembers(new Requestor(testCisManagerId)
+				 ,new GetListCallBack(cisJid));
 
 	
 	
@@ -1092,7 +1117,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
+		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setPubsubClient(mockPubSubClient);
+		cisManagerUnderTest.setPrivacyDataManager(mockIPrivacyDataManager);
 		cisManagerUnderTest.init();
+		
 	}
 	
 

@@ -68,6 +68,14 @@ public interface ICssRegistry {
 	 */
 	public CssRecord getCssRecord() throws CssRegistrationException; 
 
+	/**
+	 * Description: Test if a CssRecord exists
+	 * 
+	 * @return boolean true id record exists
+	 * @throws CssRegistrationException
+	 */
+	public boolean cssRecordExists() throws CssRegistrationException;
+	
 	
 	List<CssRequest>  getCssFriendRequests()
 			throws CssRegistrationException;

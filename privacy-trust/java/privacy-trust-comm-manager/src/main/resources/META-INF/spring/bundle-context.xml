@@ -133,9 +133,9 @@
 
 	<bean name="PrivacyNegotiationManagerCommServer"
 		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer"
-		depends-on="commManager, privacyNegotiationAgent">
+		depends-on="commManager, privacyNegotiationAgentLocalService">
 		<property name="commManager" ref="commManager" />
-		<property name="negAgent" ref="privacyNegotiationAgent" />
+		<property name="negAgent" ref="privacyNegotiationAgentLocalService" />
 	</bean>
 
 

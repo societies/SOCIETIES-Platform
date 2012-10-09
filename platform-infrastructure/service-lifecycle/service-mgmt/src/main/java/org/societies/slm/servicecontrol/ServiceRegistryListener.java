@@ -48,6 +48,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -134,7 +135,66 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("Service RegistryListener Bean Instantiated");
 	}
 
+	public void cleanServices(){
+		if(log.isDebugEnabled()) 
+			log.debug("Checking database and cleaning services that are no longer intalled");
+		
+		String fullJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+		
+		if(log.isDebugEnabled()) 
+			log.debug("The JID of this node is: " + fullJid);
+		
+		try{
+		 	List<Service> oldServices = getServiceReg().retrieveServicesSharedByCSS(fullJid);
+			List<Service> deleteServices = new ArrayList<Service>();
+					
+			for(int i = 0; i < oldServices.size(); i++){
+				Service oldService = oldServices.get(i);
+				
+				if(log.isDebugEnabled())
+					log.debug("Checking if Service " + oldService.getServiceName() + " exists!");
+			
+				if(!oldService.getServiceType().equals(ServiceType.DEVICE) && !oldService.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
+					
+					Long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(oldService.getServiceIdentifier());
+					
+					if(log.isDebugEnabled())
+						log.debug("Checking if Bundle Id: " + bundleId + " exists in OSGI...");
+					
+					Bundle thisBundle = this.bctx.getBundle(bundleId);
+
+					if(thisBundle == null){
+						if(log.isDebugEnabled())
+							log.debug("Bundle doesn't exist, so we delete the service!");
+						
+						deleteServices.add(oldService);
+					} else{
+						if(!(thisBundle.getSymbolicName().equals(oldService.getServiceInstance().getServiceImpl().getServiceNameSpace()))){
+							if(log.isDebugEnabled())
+								log.debug("Bundle exists but isn't our service, removing the service!");
+							
+							deleteServices.add(oldService);
+						}
+					}
+				}
+					
+			}
+			
+			getServiceReg().unregisterServiceList(deleteServices);
+			
+			
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			log.error("Exception while cleaning database: " + ex);
+		}
+		
+	}
+	
 	public void registerListener() {
+		
+		cleanServices();
+		
 		Filter fltr = null;
 		
 		if(log.isDebugEnabled()) 
@@ -151,6 +211,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		log.info("Bundle Listener Registered");
 		this.bctx.addBundleListener(this);
+		
+		
 	}
 
 	public void unRegisterListener() {
@@ -232,27 +294,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
 		}
+		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
+		
 		if(service.getServiceType().equals(ServiceType.DEVICE))
 			servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
 		else
 			servImpl.setServiceNameSpace(serBndl.getSymbolicName());
 		
 		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
-		try {
-			String serviceClient = (String) event.getServiceReference().getProperty("ServiceClient");
-			if(serviceClient != null){
-				if(log.isDebugEnabled()) log.debug("There's a service client!");
-				servImpl.setServiceClient(new URI(serviceClient));
-			} else
-			{
-				servImpl.setServiceClient(null);
-			}
-		} catch (URISyntaxException e1) {
-			log.warn("Problem with service client!");
-			e1.printStackTrace();
-		}
+		servImpl.setServiceClient((String) event.getServiceReference().getProperty("ServiceClient"));
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
@@ -289,6 +341,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 		else
 			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierForDevice(service, deviceId));
+		
+		si.setParentIdentifier(service.getServiceIdentifier());
+		service.setServiceInstance(si);
 		
 		List<Service> serviceList = new ArrayList<Service>();
 		switch (event.getType()) {
@@ -331,7 +386,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
+						URI clientJar;
+						
+						if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
+							clientJar= new URI("http://www.societies.org/webapp/webservice.test");
+						else
+							clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+						
 						URI clientHost;
 						if(clientJar.getPort()!= -1)
 							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
@@ -340,12 +401,19 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 						if(log.isDebugEnabled())
 							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-						//getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath());
+						INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
+						
+						String privacyLocation;
+						if(serBndl.getLocation().endsWith("/"))
+							privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
+						else
+							privacyLocation = serBndl.getLocation() + "/privacy-policy.xml";
 						
 						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Policy Manager!");
-						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
-						
+							log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
+
 						int index = privacyLocation.indexOf('@');	
 						String privacyPath = privacyLocation.substring(index+1);
 						
@@ -354,7 +422,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
 						
-						
 						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
 						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
 					
@@ -362,17 +429,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
 						
 					}
-					
-					//The service is now registered, so we update the hashmap
-					if(ServiceControl.installingBundle(serBndl.getBundleId())){
-						if(log.isDebugEnabled())
-							log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
-						ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
-					}
-					
+										
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
+				}
+				
+				//The service is now registered, so we update the hashmap
+				if(ServiceControl.installingBundle(serBndl.getBundleId())){
+					if(log.isDebugEnabled())
+						log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
+					ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
 				}
 				
 			} catch (Exception e) {
@@ -482,7 +549,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			
 			if(log.isDebugEnabled())
 					log.debug("Removing the shared service from the policy provider!");
-			//getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
+			getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
 			
 			
 			if(log.isDebugEnabled())

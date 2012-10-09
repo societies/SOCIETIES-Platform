@@ -27,7 +27,7 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<!-- Persistance Configuration -->
+	<!-- Persistence Configuration -->
 	<context:annotation-config />
 
 	<tx:annotation-driven />
@@ -106,17 +106,18 @@
 
 	<bean name="privacyPolicyNegotiationManager"
 		class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
-		init-method="initialisePrivacyPolicyNegotiationManager">
+		init-method="initialisePrivacyPolicyNegotiationManager" 
+		depends-on="ctxBroker,eventManager,commManager,,privacyDataManagerInternal,privacyAgreementManagerInternal,negotiationAgentRemote,privacyPreferenceManager,identitySelection,privacyPolicyManager,UserFeedbackGUI">
 		<property name="ctxBroker" ref="ctxBroker" />
 		<property name="eventMgr" ref="eventManager" />
 		<property name="commsMgr" ref="commManager" />
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal" />
-		<!-- <property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
-		<property name="negotiationAgent" ref="negotiationAgent" />
+		<property name="negotiationAgentRemote" ref="negotiationAgentRemote" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
 	<!-- this is the bean for the NegotiationAgent of the current CSS (not the 
@@ -139,6 +140,7 @@
 		<property name="commsMgr" ref="commManager"></property>
 		<property name="trustBroker" ref="trustBroker"></property>
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
 

@@ -39,31 +39,22 @@
 			</div>
 		</form>
 		<br/>
-		<ul data-role="listview" data-theme="d" data-divider-theme="b">
+		<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listSNSconnectors" >
 			<li data-role="list-divider">Social Network Connectors</li>
+			<!--  ADD LIST OF CONNECTORS HERE -->
 		</ul>
-		<br/>
+		<br/><br/>
 		<form id="form1">
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Facebook:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
-			</div>
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Twitter:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
-			</div>
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Foursquare:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
+			<div data-role="controlgroup" > <!-- data-type="horizontal">  -->
+				<label for="connectorType" class="select">Add Connector:</label>
+				<select id="connectorType" onChange="SocialNetworksConnectors.addConnector()">
+					<option value="0">Select a connection</option>
+					<option value="Facebook">facebook</option>
+					<option value="twitter">twitter</option>
+					<option value="Foursquare">foursquare</option>
+					<option value="linkedin">linkedin</option>
+					<option value="googleplus">googleplus</option>
+				</select> 
 			</div>
 		</form>
 		<br/>
@@ -120,26 +111,23 @@
 	<!-- /content -->
 	<br/><br/>
 	<!-- footer -->
-	<div class="footer_fixed" data-role="footer" data-position="fixed">
+     <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
-			<li class="btn-home"><a href="landing.html">
-			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
-			</a>
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="../images/icons/home_logo.png"  data-role="none"/>
 			</li>
-			<li class="btn-profile"><a href="myProfile.html">
-			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
-			</a>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="../images/icons/my_profile.png"  data-role="none"/>	
 			</li>
-			<li class="btn-settings"><a href="settings.html">
-			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
-			</a>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="../images/icons/settings.png"  data-role="none"/>	
 			</li>
-			<li class="btn-about"><a href="about.html">
-			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
-			</a>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="../images/icons/about.png"  data-role="none"/>	
 			</li>
-		</ul>
-	</div>
+
+		</ul><!-- /global navbar -->
+	</div><!-- /footer -->
 	<!-- end footer -->
 </div>
 </body>

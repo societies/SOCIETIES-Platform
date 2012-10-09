@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.integration.test.bit</groupId>
 	<artifactId>bit-1096-cpa</artifactId>
-	<name>#1055 Collaboration Pattern Analyzer</name>
+	<name>#1096 Integration Test: Collaboration Pattern Analyzer</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>
@@ -28,6 +28,11 @@
 	</parent>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>common-ext-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
 	    <dependency>
 			<groupId>org.societies.integration.test.util</groupId>
 			<artifactId>integrationtestutil</artifactId>
@@ -40,11 +45,6 @@
 			<type>libd</type>
 			<version>${spring.version}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>com.springsource.org.apache.derby</artifactId>
-			<version>10.5.1000001.764942</version>
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -59,74 +59,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>com.springsource.javax.persistence</artifactId>
-			<version>2.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>com.springsource.javax.transaction</artifactId>
-			<version>1.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>com.springsource.org.hibernate</artifactId>
-			<version>3.3.2.GA</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>com.springsource.org.hibernate.annotations</artifactId>
-			<version>3.4.0.GA-A</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
-			<version>3.3.0.ga</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>data-source</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>hibernate_classes</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
 			<artifactId>PubsubClientBundle</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
-        <dependency>
-            <groupId>org.societies.orchestration.api</groupId>
-            <artifactId>intelligent-community-orchestration-api</artifactId>
-            <version>${version.ico}</version>
-            <scope>provided</scope>
-        </dependency>
-
+		</dependency>-->
     </dependencies>
 	
 	<build>
@@ -141,16 +88,10 @@
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
-							junit;scope=compile|runtime, 
-							integrationtestutil;scope=compile|runtime, 
-						</Embed-Dependency>
+                            integrationtestutil, junit;scope=compile|runtime,
+                        </Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
-							org.slf4j.*,
-							org.junit.*,
-							org.springframework.beans.factory.annotation;version="0",
-							org.springframework.stereotype;version="0",
-							javax.annotation;version="0",**;resolution:=optional
+						<Import-Package>*;resolution:=optional
 						</Import-Package>
 
 					</instructions>
@@ -205,7 +146,7 @@
 							<version>${project.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

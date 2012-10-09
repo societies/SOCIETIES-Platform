@@ -29,12 +29,12 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
-import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
-import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.privacytrust.trust.event.TrustEvent;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EMSException;

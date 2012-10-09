@@ -36,10 +36,15 @@ import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
+import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
+import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
+import org.societies.api.css.directory.ACssAdvertisementRecord;
 import org.societies.utilities.DBC.Dbc;
 
+import android.app.Notification;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -47,9 +52,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.phonegap.api.LOG;
+
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
 import org.apache.cordova.api.PluginResult.Status;
@@ -111,9 +119,14 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
         intentFilter.addAction(LocalCSSManagerService.LOGIN_XMPP_SERVER);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD);
+        intentFilter.addAction(LocalCSSManagerService.SUGGESTED_FRIENDS);
+        intentFilter.addAction(LocalCSSManagerService.GET_CSS_FRIENDS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
+        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
         
-        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
-    	
+        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);    	
     }
     
     /**
@@ -205,12 +218,12 @@ public class PluginCSSManager extends Plugin {
 					e1.printStackTrace();
 				}
 
-				try {
-					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+//				try {
+//					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+//				} catch (JSONException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 
 				try {
 					this.localCSSManager.loginCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
@@ -253,9 +266,8 @@ public class PluginCSSManager extends Plugin {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
 					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
-					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
-					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
+					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 				} catch (JSONException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -281,7 +293,75 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					Log.d(LOG_TAG, "parameter 2 - forename: " + data.getJSONObject(1).getString("foreName"));
+					Log.d(LOG_TAG, "parameter 3 - name: " + data.getJSONObject(1).getString("name"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
+					this.localCSSManager.modifyAndroidCSSRecord(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
+					this.localCSSManager.getCssFriends(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
+					this.localCSSManager.getSuggestedFriends(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16))) {
+				try {
+					this.localCSSManager.findAllCssAdvertisementRecords(data.getString(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15))) {
+				try {
+					this.localCSSManager.findForAllCss(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19))) {
+				try {
+					this.localCSSManager.readProfileRemote(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 20))) {
+				try {
+					this.localCSSManager.sendFriendRequest(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} 
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -314,30 +394,81 @@ public class PluginCSSManager extends Plugin {
 	private boolean sendJavascriptResult(String methodCallbackId, Intent intent, String key) {
 		boolean retValue = false;
 		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
+		AndroidCSSRecord cssRecord = null;
+		ACssAdvertisementRecord advertRecord [] = null;
+		PluginResult result = null;
 		
-		AndroidCSSRecord cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		if (LocalCSSManagerService.GET_CSS_FRIENDS == intent.getAction() || LocalCSSManagerService.SUGGESTED_FRIENDS == intent.getAction()) {
+			
+			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+			advertRecord = new ACssAdvertisementRecord[parcelable.length];
+			
+			Log.d(LOG_TAG, "Number of friends: " + parcelable.length);
+			
+			for (int i  = 0; i < parcelable.length; i++) {
+				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
+			}
+		//ADVERTISEMENT RECORDS	
+		} else if (LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS == intent.getAction() || LocalCSSManagerService.FIND_FOR_ALL_CSS == intent.getAction()) {
+			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+			advertRecord = new ACssAdvertisementRecord[parcelable.length];
+			Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
+			for (int i  = 0; i < parcelable.length; i++) {
+				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
+			}
+		//CSS RECORDS
+		} else  {
+			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		}
+		
 		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
 		
 		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
 		
 		if (resultStatus) {
-			PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
+			if (LocalCSSManagerService.GET_CSS_FRIENDS == intent.getAction() || LocalCSSManagerService.SUGGESTED_FRIENDS == intent.getAction()) {
+				result = new PluginResult(PluginResult.Status.OK, convertACssAdvertisements(advertRecord));
+			} else {
+				result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
+			}
 			result.setKeepCallback(false);
 			this.success(result, methodCallbackId);
 		} else {
-			PluginResult result = new PluginResult(PluginResult.Status.ERROR);
+			result = new PluginResult(PluginResult.Status.ERROR);
 			result.setKeepCallback(false);
 			this.error(result, methodCallbackId);
 		}
-			
 		
 		//remove callback ID for given method invocation
 		PluginCSSManager.this.methodCallbacks.remove(key);
 
 		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 		return retValue;
-		
 	}
+	
+    /**
+     * Creates a JSONObject for a given {@link ACssAdvertisementRecord}
+     * 
+     * @param node
+     * @return JSONObject 
+     */
+    private JSONArray convertACssAdvertisements(ACssAdvertisementRecord adverts []) {
+        JSONArray jArray = null;
+		Gson gson = new Gson();
+		try {
+//			jArray =  (JSONArray) new JSONTokener(gson.toJson(adverts)).nextValue();
+			jArray =  new JSONArray (new JSONTokener(gson.toJson(adverts)));
+			
+			LOG.d(LOG_TAG, gson.toJson(adverts));
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return jArray;
+    }
+
 	
     /**
      * Creates a JSONObject for a given AndroidCSSNode
@@ -360,7 +491,7 @@ public class PluginCSSManager extends Plugin {
     }
 
     /**
-     * Creates a JSONObject for a given AndroidCSSNode
+     * Creates a JSONObject for a given AndroidCSSRecord
      * 
      * @param record
      * @return JSONObject
@@ -457,6 +588,14 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
+				
+				//Create Android Notification
+				int notifierflags [] = new int [1];
+				notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+				AndroidNotifier notifier = new AndroidNotifier(PluginCSSManager.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
+
+				notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
+
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
 				
@@ -487,7 +626,49 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			}
+			} else if (intent.getAction().equals(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.GET_CSS_FRIENDS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.SUGGESTED_FRIENDS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_FOR_ALL_CSS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.READ_PROFILE_REMOTE)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} 
 		}
 	};
     /**

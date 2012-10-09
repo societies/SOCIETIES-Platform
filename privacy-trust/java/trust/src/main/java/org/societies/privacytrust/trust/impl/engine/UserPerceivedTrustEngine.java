@@ -29,11 +29,11 @@ import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;

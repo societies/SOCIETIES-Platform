@@ -33,21 +33,103 @@ import org.hibernate.criterion.Restrictions;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
-public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed, Subscriber {
+public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed{//, Subscriber {
+	
+	
+	private PubsubClient pubSubcli;
+	private IIdentity ownerCSS;
+
+	public IIdentity getOwnerCSS() {
+		return ownerCSS;
+	}
+	public void setOwnerCSS(IIdentity ownerCSS) {
+		this.ownerCSS = ownerCSS;
+	}
+	public PubsubClient getPubSubcli() {
+		return pubSubcli;
+	}
+	public void setPubSubcli(PubsubClient pubSubcli) {
+		this.pubSubcli = pubSubcli;
+	}
+	
+	private final static List<String> classList = Collections 
+			.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
+	
 	@Override
     synchronized public void startUp(SessionFactory sessionFactory, String id){
         this.sessionFactory = sessionFactory;
         this.id = id;
     }
 
+	// version with PubSub
+    synchronized public void startUp(SessionFactory sessionFactory, String id, PubsubClient pubSubcli, IIdentity ownerCSS){
+        this.sessionFactory = sessionFactory;
+        this.id = id;
+        this.pubSubcli = pubSubcli;
+        this.ownerCSS = ownerCSS;
+        
+        // pubsub code
+        if(null != pubSubcli && null != ownerCSS){
+        	try {
+				pubSubcli.addSimpleClasses(classList);
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			List<String> l = null;
+			try {
+				l = pubSubcli.discoItems(ownerCSS, null);
+			} catch (XMPPError e) {
+				LOG.warn("XMPPError at activityfeed pubsub");
+				e.printStackTrace();
+				return;
+			} catch (CommunicationException e) {
+				LOG.warn("Com at activityfeed pubsub");
+				e.printStackTrace();
+				return;
+			}
+			boolean nodeExists = false;
+			if(l.size() == 0)
+				LOG.warn("empty disco item list");
+			
+			if(l != null && l.size()>0){
+				for(String temp : l){
+					LOG.warn("Existing node is " + temp);
+					if (temp.equals(this.id))
+						nodeExists=true;
+				}
+				
+			}
+			if(false == nodeExists){
+				try {
+					LOG.warn("going to create a pubsub node");
+					pubSubcli.ownerCreate(ownerCSS, this.id);
+				} catch (XMPPError e) {
+					LOG.warn("XMPPError at activityfeed pubsub");
+					e.printStackTrace();
+				} catch (CommunicationException e) {
+					LOG.warn("Com at activityfeed pubsub");
+					e.printStackTrace();
+				}
+			}else{
+				LOG.warn("node exists");
+			}
+        }
+    }
 
     /**
 	 * 
@@ -117,23 +199,41 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	@Override
 	public void addActivity(IActivity activity) {
 //        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
-        Session session = this.sessionFactory.openSession();
+        boolean err = false;
+		Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		Activity newAct = new Activity(activity);
+		newAct.setPublished(Long.toString(new Date().getTime())); // NOTICE THAT THE TIME IS BEING SET IN THE SERVER
         LOG.info("adding activity with id: "+this.id);
         newAct.setOwnerId(this.id);
+        long actv_id = 0;
 		try{
-			session.save(newAct);
+			actv_id = (Long) session.save(newAct);
 			t.commit();
 		}catch(Exception e){
 			e.printStackTrace();
 			t.rollback();
 			LOG.warn("Saving activity failed, rolling back");
 			e.printStackTrace();
+			err = true;
 		}finally{
             session.close();
 
-		}		
+		}
+		// SUBSCRIBING TO PUBSUB
+		if(false == err && pubSubcli !=null){
+			try {
+				LOG.info("going to call pubsub");
+				pubSubcli.publisherPublish(this.ownerCSS, this.id, Long.toString(actv_id), iactivToMarshActiv(newAct));
+			} catch (XMPPError e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 
@@ -164,14 +264,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	{
 		LOG.info("in activityfeed close");
 	}
-	@Override
-	synchronized public void pubsubEvent(IIdentity pubsubService, String node,
-			String itemId, Object item) {
-		if(item.getClass().equals(Activity.class)){
-			Activity act = (Activity)item;
-			this.addActivity(act);
-		}
-	}
+
 	@Override
 	synchronized public List<IActivity> getActivities(String CssId, String query,
 			String timePeriod) {

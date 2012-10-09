@@ -32,7 +32,7 @@
 	<artifactId>privacypolicymanagement</artifactId>
 	<name>Privacy Policy Management</name>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -53,35 +53,41 @@
 	</parent>
 
 	<dependencies>
-		<!-- Societies -->
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
+	
+	
+
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>org.springframework.spring-library</artifactId>
+	<type>libd</type>
+	<scope>provided</scope>
+</dependency>
+
+
+<dependency>
+	<groupId>org.societies</groupId>
+	<artifactId>common-ext-libs</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>org.societies.api.internal</groupId>
+	<artifactId>societies-api-internal</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<scope>provided</scope>
+</dependency>
+
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
-		<!-- Tools -->
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>common-ext-libs</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- <dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.3.2</version>
-		</dependency> -->
+	
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -119,25 +125,7 @@
 			<version>${version.pt}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Logging -->
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency> -->
-<!-- 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-		</dependency> -->
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
+	
 	</dependencies>
 
 	<build>

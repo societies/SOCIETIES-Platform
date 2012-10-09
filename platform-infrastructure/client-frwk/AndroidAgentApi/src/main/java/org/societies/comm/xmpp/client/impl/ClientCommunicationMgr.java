@@ -114,6 +114,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendMessage type: " + type.name());
 		
 		if (payload == null) {
@@ -132,6 +133,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendMessage stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
 		
 		sendMessage(stanza, null, payload);
@@ -139,6 +141,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			ICommCallback callback) throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
 		try {
 			String xml = marshaller.marshallIQ(stanza, type, payload);

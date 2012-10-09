@@ -58,10 +58,10 @@
 
         <property name="hibernateProperties" >
             <props>
-                <prop key="hibernate.show_sql" >true</prop>
-                <prop key="hibernate.cache.use_second_level_cache" >false</prop>
-                <prop key="hibernate.hbm2ddl.auto" >update</prop>
-                <prop key="hibernate.format_sql" >true</prop>
+                <prop key="hibernate.show_sql" >${show_sql}</prop>
+                <prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
+                <prop key="hibernate.format_sql">${format_sql}</prop>
                 <prop key="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
 
             </props>
@@ -75,6 +75,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
+        depends-on="NegotiationRequester"
     destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
@@ -83,12 +84,13 @@
         <property name="iServDiscRemote" ref="servDiscRemote"/>
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
+        <property name="privacyDataManager" ref="PrivacyDataManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
-        <!-- <property name="negotiator" ref="NegotiationRequester"/>
-       <property name="iServDiscLocal" ref="serviceDiscovery"/>
+       <property name="negotiator" ref="NegotiationRequester"/>
+        <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
-                
+         <property name="pubsubClient" ref="PubsubClient"/>       
         
         
     </bean>

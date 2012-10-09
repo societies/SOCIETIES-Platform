@@ -26,7 +26,7 @@ package org.societies.privacytrust.trust.api.repo;
 
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 public interface ITrustRepository {

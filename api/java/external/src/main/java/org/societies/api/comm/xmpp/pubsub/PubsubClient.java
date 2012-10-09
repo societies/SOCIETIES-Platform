@@ -63,6 +63,7 @@ public interface PubsubClient {
 	 * @param packageList List of package names
 	 * @throws JAXBException the JAXB exception
 	 */
+	@Deprecated
 	public void addJaxbPackages(List<String> packageList) throws JAXBException;
 	
 	

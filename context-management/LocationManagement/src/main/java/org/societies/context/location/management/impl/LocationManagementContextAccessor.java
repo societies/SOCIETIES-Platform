@@ -205,6 +205,22 @@ public class LocationManagementContextAccessor {
 	
 	private void createInferredLocationAttribute(CtxEntity ctxEntity){
 		try {
+			/*
+			CtxAttribute ctxAttribute=null;
+			CtxIdentifier ctxIdentifier = ctxEntity.getId();
+			Future<CtxModelObject> futureCtxModelObject;
+			futureCtxModelObject = contextBroker.retrieve(ctxIdentifier);
+			ctxAttribute = (CtxAttribute)futureCtxModelObject.get();
+			CtxEntityIdentifier ctxEntityIdentifier = ctxAttribute.getScope();
+			*/
+			Future<List<CtxIdentifier>> futureAttributeIds = contextBroker.lookup(ctxEntity.getId(), CtxModelType.ATTRIBUTE, LOCATION_TYPE_FUSED);
+			List<CtxIdentifier> attributeIds = futureAttributeIds.get();
+			
+			if (attributeIds.size() > 0){
+				log.info("no need to create LOCATION_TYPE_FUSED attribute as it already exists");
+				return;
+			}
+			
 			CtxAttribute deviceTempAttr = contextBroker.createAttribute(ctxEntity.getId(),LOCATION_TYPE_FUSED).get();
 			deviceTempAttr.setValueType(CtxAttributeValueType.STRING);
 			deviceTempAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
@@ -254,7 +270,6 @@ public class LocationManagementContextAccessor {
 				futureCtxModelObject = contextBroker.retrieve(ctxIdentifier);
 				ctxAttribute = (CtxAttribute)futureCtxModelObject.get();
 				CtxEntityIdentifier ctxEntityIdentifier = ctxAttribute.getScope();
-				//Future<List<CtxIdentifier>> futureAttributeIds = contextBroker.lookup(ctxEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_COORDINATES);
 				
 				Future<List<CtxIdentifier>> futureAttributeIds = contextBroker.lookup(ctxEntityIdentifier, CtxModelType.ATTRIBUTE, LOCATION_TYPE_FUSED);
 				List<CtxIdentifier> attributeIds = futureAttributeIds.get();

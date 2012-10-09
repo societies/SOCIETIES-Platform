@@ -23,66 +23,75 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.societies.android.api.cis.management;
+
+import java.util.List;
+
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
+
 /**
  * @author Babak.Farshchian@sintef.no
- *
+ * Implemented by the CommunityManager APKLib service
  */
-@Deprecated
 public interface ICisManager {
+	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
+							 		"deleteCis(String client, String cisId)",
+							 		"getCisList(String client, String query)",
+							 		"removeMember(String client, String cisId, String memberJid)",
+							 		"Join(String client, String cisId)",
+							 		"Leave(String client, String cisId)"
+	};
+	
 	/**
-	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
-	 * same as the CSS password.
-	 * After this method is called a CIS is created with mode set to mode.
-	 * 
-	 * The CSS who creates the CIS will be the owner. Ownership can be changed
+	 * Create a new CIS. The Hosting CSS who creates the CIS will be the owner. Ownership can be changed
 	 * later.
 	 * 
-	 * TODO: define what values mode can have and what each means.
-	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
-	 *  
-	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
-	 * @param mode membership type, e.g 1= read-only.
-	 * TODO define mode better.
-	 * @return link to the {@link ICisEditor} representing the new CIS, or 
-	 * null if the CIS was not created.
+	 * @param description More detailed info
+	 * @param cisCriteria hashtable of {@link membershipCriteria} objects
+	 * @param privacyPolicy privacy policy info 
 	 */
-	ICisOwned createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	public ACommunity createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy);
+	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
 	 * will delete only one CIS with the ID passed as cisId.
 	 * 
-	 * TODO: Need to give a more meaningful return.
-	 * 
-	 * @param cssId and cssPassword of the owner of the CIS.
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
-	Boolean deleteCis(String cssId, String cssPassword, String cisId);
-	/**
-	 * Get a CIS Record with the ID cisId.
-	 * 
-	 * TODO: Check the return value. Should be something more meaningful.
-	 * 
-	 * @param cisId The ID (jabber ID) of the CIS to get.
-	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
-	 */
-	ICisRecord getCis(String cssId, String cisId);
+	public Boolean deleteCis(String client, String cisId);
 	
 	/**
 	 * Return an array of all the CISs that match the query. 
-	 * 
-	 * TODO: need to refine this to something better. I am not sure how the query will be created.
-	 * 
-	 * @param cssId The ID of the owner CSS
+
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	ICisRecord[] getCisList(ICisRecord query);
+	public ACommunity[] getCisList(String client, String query);
 	
-	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
-		String newOwnerCssId, String cisId);
-
+	/**
+	 * Remove a member from this CIS
+	 * @param cisId
+	 * @param memberJid
+	 */
+	public void removeMember(String client, String cisId, String memberJid);
+	
+	/**
+	 * Join a community
+	 * @param client
+	 * @param targetCis
+	 * @param qualifications
+	 * @return
+	 */
+	public String Join(String client, ACisAdvertisementRecord targetCis);
+	
+	/**
+	 * Leave a Community
+	 * @param client
+	 * @param cisId
+	 * @return
+	 */
+	public String Leave(String client, String cisId);
 }

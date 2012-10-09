@@ -26,11 +26,9 @@
 package org.societies.context.broker.impl.comm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Future;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +50,6 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -72,6 +69,7 @@ import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRetrieveBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
@@ -135,46 +133,45 @@ public class CtxBrokerClient implements ICommCallback {
 	//createEntity(final Requestor requestor,final IIdentity targetCss, final String type)
 	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback) throws CtxException{
 
-		// creating the identity of the CtxBroker that will be contacted
-
-		// add local identity for testing (instead of targetCSS)
-		//IIdentity toIdentity = targetCss;
-
 		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
 		final String cssOwnerStr = cssNodeId.getBareJid();
 
 		IIdentity toIdentity;
+
 		try {
-			//!!!!!!!
-			//TODO this should be removed and substituted by the real target address
-			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
-			// currently creates everything in local CM system
+			//to be removed
+			//toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+			//LOG.error(" toIdentity " + toIdentity);
+
+			toIdentity = targetCss;
+			LOG.info("toIdentity " + toIdentity);
 
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
-			LOG.error("SKATA stanza " + stanza.getTo());
+			//		LOG.error("SKATA stanza " + stanza.getTo());
 			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 			// use the create entity method : createCtxEntity(String type)
-			
+			//	LOG.error("SKATA 1 " );
 			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
-			// add the signatures of the method
-			// TODO ctxBrokerCreateEntityBean.setTargetCss(targetCss.toString());
-			ctxBrokerCreateEntityBean.setTargetCss(cssOwnerStr);
-			ctxBrokerCreateEntityBean.setType(type);
-
+			//LOG.error("SKATA 2 " );
 			RequestorBean requestorBean = createRequestorBean(requestor);
-			// TODO ctxBrokerCreateEntityBean.setRequestor(requestorBean);
-
+			//			LOG.error("SKATA 3 " );
+			ctxBrokerCreateEntityBean.setRequestor(requestorBean);
+			//		LOG.error("SKATA 4 " );
+			ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
+			//	LOG.error("SKATA 5 " );
+			ctxBrokerCreateEntityBean.setType(type);
+			//LOG.info("SKATA 6 before ");
 			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
+			//	LOG.info("SKATA 7 before sendIQGet"+ctxBrokerCreateEntityBean);
+
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			//	LOG.info("SKATA 8 before addRequestingClient "+stanza.getId());
 
-			LOG.info("SKATA 3 before sendIQGet");
-			//send the message
-			
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+			//	LOG.info("SKATA 7 CreateEntity send  ");
 
-			//this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
 		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not create remote entity: "
@@ -185,47 +182,46 @@ public class CtxBrokerClient implements ICommCallback {
 	public void createRemoteAttribute(Requestor requestor, IIdentity targetCss, CtxEntityIdentifier scope, String type, ICtxCallback callback) throws CtxBrokerException{
 
 		IIdentity toIdentity ;
-
-		// TODO remove following lines 
 		// creating the identity of the local CtxBroker that will be contacted
-		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
-		final String cssOwnerStr = cssNodeId.getBareJid();
-	
-		// this line is the correct 
-		// toIdentity = targetCss;
-		
+		//INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
+		//final String cssOwnerStr = cssNodeId.getBareJid();
+		//toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+
 		try {
-			//!!!!!!!
-			//TODO this should be removed and substituted by the real target address
-			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
-			// currently creates everything in local CM system
+
+			toIdentity = targetCss;
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
 
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
-			
-			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-			
-			cbPacket.setMethod(BrokerMethodBean.CREATE_ATTRIBUTE);
-				
-			// use the method : createAttribute(CtxEntityIdentifier scope, String type)
-			CtxBrokerCreateAttributeBean ctxBrokerCreateAttributeBean = new CtxBrokerCreateAttributeBean();
-			// add the signatures of the method
 
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+
+			cbPacket.setMethod(BrokerMethodBean.CREATE_ATTRIBUTE);
+
+			CtxBrokerCreateAttributeBean ctxBrokerCreateAttributeBean = new CtxBrokerCreateAttributeBean();
+			// createAttribute(final Requestor requestor,final CtxEntityIdentifier scope, final String type)
+			// add the signatures of the method (3 params)
+
+			//1. set requestorBean
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			ctxBrokerCreateAttributeBean.setRequestor(requestorBean);
-			
-			//create the bean
+
+			//2. set scope
 			CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
 			ctxEntIdBean.setString(scope.toString());
 			ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
 
+			//3. set type
 			ctxBrokerCreateAttributeBean.setType(type);
+
+
 			cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
-			LOG.info("1 ctxBrokerCreateAttributeBean ready "+ctxBrokerCreateAttributeBean.toString());
-			
+			//LOG.info("1 ctxBrokerCreateAttributeBean ready "+ctxBrokerCreateAttributeBean.toString());
+
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-			LOG.info("2 before sendIQGet");
-						
+			//LOG.info("2 before sendIQGet");
+
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 
 		} catch (Exception e) {
@@ -234,42 +230,181 @@ public class CtxBrokerClient implements ICommCallback {
 					+ e.getLocalizedMessage(), e);
 		} 
 
-		/*
-		//create the message to be sent
-		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-		// use the method : createAttribute(CtxEntityIdentifier scope, String type)
-		CtxBrokerCreateAttributeBean ctxBrokerCreateAttributeBean = new CtxBrokerCreateAttributeBean();
-		// add the signatures of the method
+	}
 
-		RequestorBean requestorBean = createRequestorBean(requestor);
-		ctxBrokerCreateAttributeBean.setRequestor(requestorBean);
+	public void lookupRemote(Requestor requestor, IIdentity targetCss, CtxModelType modelType, String type, ICtxCallback callback) throws CtxBrokerException {
 
-		//ctxBrokerCreateAttributeBean.setRequester("FOO");
-		//create the bean
-		CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
-		ctxEntIdBean.setString(scope.toString());
-		ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
+		// creating the identity of the CtxBroker that will be contacted
+		IIdentity toIdentity = null;
 
-		ctxBrokerCreateAttributeBean.setType(type);
-		cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
-
-		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
-			//this.commManager.sendMessage(stanza, ctxBrokerCreateAttributeBean);
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
+			toIdentity = targetCss;
+
+			//create the message to be sent
+			Stanza stanza = new Stanza(toIdentity);
+
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+
+			cbPacket.setMethod(BrokerMethodBean.LOOKUP);
+			CtxBrokerLookupBean ctxBrokerLookupBean = new CtxBrokerLookupBean();
+			//lookup(final Requestor requestor,final IIdentity target, final CtxModelType modelType,final String type)
+			// four params 
+
+			//1.requestor
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			ctxBrokerLookupBean.setRequestor(requestorBean);
+
+			//2. target id
+			ctxBrokerLookupBean.setTargetCss(toIdentity.getBareJid());
+			//LOG.info("2 CtxBrokerLookupBean toIdentity.getBareJid() "+toIdentity.getBareJid());
+
+			//3. model type
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			CtxModelTypeBean modelTypeBeanValue = ctxBeanTranslator.CtxModelTypeBeanFromCtxModelType(modelType);
+			ctxBrokerLookupBean.setModelType(modelTypeBeanValue);
+
+			// 4 . type
+			ctxBrokerLookupBean.setType(type);
+			//LOG.info("1 CtxBrokerLookupBean type "+type);
+
+			//	LOG.info("CtxBrokerLookupBean ready "+cbPacket.getLookup());
+			cbPacket.setLookup(ctxBrokerLookupBean);
+
+			//LOG.info("3 CtxBrokerLookupBean before sendIQGet");
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			//	LOG.info("4 CtxBrokerLookupBean before sendIQGet stanza.getId() "+stanza.getId());
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+			//		LOG.info("5  IQGet send");
+		} catch (Exception e) {
+			throw new CtxBrokerException("Could not perform remote lookup: "
+					+ e.getLocalizedMessage(), e);
+		} 
+	}
+
+	public void retrieveRemoteIndividualEntId(Requestor requestor, IIdentity targetCss, ICtxCallback callback) throws CtxBrokerException {
+
+		IIdentity toIdentity = null;
+
+		try {
+			toIdentity = targetCss;
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+
+			RetrieveIndividualEntityIdBean retrieveIndEntBean = new RetrieveIndividualEntityIdBean();
+
+			//1.requestor
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			retrieveIndEntBean.setRequestor(requestorBean);
+
+			//2. target id
+			retrieveIndEntBean.setTargetCss(toIdentity.getJid());
+
+			cbPacket.setRetrieveIndividualEntityId(retrieveIndEntBean);
+			
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+		} catch (CommunicationException e) {
+			
+			throw new CtxBrokerException("Could not retrieve remote individual ctx entity : "
+					+ e.getLocalizedMessage(), e);
+		}
+
+	}
+
+
+	public void retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback) throws CtxBrokerException  {
+
+		// creating the identity of the CtxBroker that will be contacted
+		IIdentity toIdentity = null;
+		//comment after testing
+		try {
+			//real code
+			toIdentity = this.commManager.getIdManager().fromJid(identifier.getOwnerId());
+
+			//testing code
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+
+		try {		
+			//create the message to be sent
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE);
+
+			// use the method : retrieve
+			CtxBrokerRetrieveBean ctxBrokerRetrieveBean = new CtxBrokerRetrieveBean();
+
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			// add the signatures of the method
+			CtxIdentifierBean ctxIdBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
+			ctxBrokerRetrieveBean.setId(ctxIdBean);
+
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			ctxBrokerRetrieveBean.setRequestor(requestorBean);
+
+			cbPacket.setRetrieve(ctxBrokerRetrieveBean);
+			//	LOG.info("ctxBrokerRetrieveBean ready "+cbPacket.getRetrieve());
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+		} catch (CommunicationException e1) {
+			throw new CtxBrokerException("Could not retrieve remote ctx model object : "
+					+ e1.getLocalizedMessage(), e1);
+		}
+	}
+
+	public void updateRemote(Requestor requestor, CtxModelObject object, ICtxCallback callback){
+
+		IIdentity toIdentity = null;
+		try {
+			//real code
+			toIdentity = this.commManager.getIdManager().fromJid(object.getOwnerId());
+			//testing code
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			//create the message to be sent
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.UPDATE);
+
+			CtxBrokerUpdateBean ctxBrokerUpdateBean = new CtxBrokerUpdateBean();
+
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			ctxBrokerUpdateBean.setRequestor(requestorBean);
+
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			CtxModelObjectBean objectBean = ctxBeanTranslator.fromCtxModelObject(object);
+
+			//		LOG.info("updateRemote 1 ctxBrokerUpdateBean  "+objectBean.getId());
+			ctxBrokerUpdateBean.setCtxModelOject(objectBean);
+
+			//	LOG.info("updateRemote 2 ctxBrokerUpdateBean  "+objectBean.getId());
+			cbPacket.setUpdate(ctxBrokerUpdateBean);
+
+			//		LOG.info("updateRemote 3 ctxBrokerUpdateBean  "+cbPacket.getUpdate());
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 */
-		//return new AsyncResult<CtxAttribute>(attribute);
 	}
 
 
-	public void /*Future<CtxAssociation>*/ createRemoteAssociation(Requestor requestor, String type, ICtxCallback callback){
+	public void createRemoteAssociation(Requestor requestor, String type, ICtxCallback callback){
 
 		final CtxAssociation association = null;
 
@@ -308,7 +443,7 @@ public class CtxBrokerClient implements ICommCallback {
 		//return new AsyncResult<CtxAssociation>(association);
 	}
 
-	public void /*Future<CtxModelObject>*/ removeRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback){
+	public void removeRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback){
 		//remove(Identity requester, CtxIdentifier identifier)
 		final CtxModelObject model = null;
 
@@ -352,65 +487,7 @@ public class CtxBrokerClient implements ICommCallback {
 		//return new AsyncResult<CtxModelObject>(model);
 	}
 
-	public void /*Future<CtxModelObject>*/ updateRemote(Requestor requestor, CtxModelObject object, ICtxCallback callback){
-		//update(Identity requester, CtxModelObject object)
-
-		final CtxModelObject model = null;
-
-		// creating the identity of the CtxBroker that will be contacted
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-
-		//create the message to be sent
-		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-		// use the method : update
-		CtxBrokerUpdateBean ctxBrokerUpdateBean = new CtxBrokerUpdateBean();
-		// add the signatures of the method
-		RequestorBean requestorBean = createRequestorBean(requestor);
-		ctxBrokerUpdateBean.setRequestor(requestorBean);
-
-
-		//		ctxBrokerUpdateBean.setRequester("FOO");
-
-		CtxIdentifierBean ctxIdBean = null;
-		CtxModelObjectBean ctxModelBean = null;
-		if (object.getModelType().equals(CtxModelType.ENTITY)) {
-			ctxModelBean = new CtxEntityBean();
-			ctxIdBean = new CtxEntityIdentifierBean();
-		}
-		else if (object.getModelType().equals(CtxModelType.ATTRIBUTE)) {
-			ctxModelBean = new CtxAttributeBean();
-			ctxIdBean = new CtxAttributeIdentifierBean();
-		}
-		else if (object.getModelType().equals(CtxModelType.ASSOCIATION)) {
-			//ctxModelBean = new CtxAssociationBean();
-		}
-
-		ctxIdBean.setString(object.getId().toString());
-		ctxModelBean.setId(ctxIdBean);
-		ctxBrokerUpdateBean.setId(ctxModelBean);
-
-		cbPacket.setUpdate(ctxBrokerUpdateBean);
-
-		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//send the message
-		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerUpdateBean, this);
-			//this.commManager.sendMessage(stanza, ctxBrokerUpdateBean);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//return new AsyncResult<CtxModelObject>(model);
-	}
-
-	public void /*Future<CtxModelObject>*/ updateRemoteAttribute(Requestor requestor, CtxAttributeIdentifier attributeId, Serializable value, ICtxCallback callback){
+	public void updateRemoteAttribute(Requestor requestor, CtxAttributeIdentifier attributeId, Serializable value, ICtxCallback callback){
 		//updateAttribute(CtxAttributeIdentifier attributeId, Serializable value)
 
 		final CtxModelObject model = null;
@@ -437,12 +514,12 @@ public class CtxBrokerClient implements ICommCallback {
 		RequestorBean requestorBean = createRequestorBean(requestor);
 		ctxBrokerUpdateAttributeBean.setRequestor(requestorBean);
 
-
 		ctxBrokerUpdateAttributeBean.setValue((byte[]) value);
 		cbPacket.setUpdateAttribute(ctxBrokerUpdateAttributeBean);
 
 		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerUpdateAttributeBean, this);
@@ -453,94 +530,6 @@ public class CtxBrokerClient implements ICommCallback {
 		}
 		//return new AsyncResult<CtxModelObject>(model);
 	}
-
-
-
-	public void /*Future<CtxModelObject>*/ retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback){
-		//retrieve(CtxIdentifier identifier)
-
-		final CtxModelObject model = null;
-
-		// creating the identity of the CtxBroker that will be contacted
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-
-		//create the message to be sent
-		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-		// use the method : retrieve
-		CtxBrokerRetrieveBean ctxBrokerRetrieveBean = new CtxBrokerRetrieveBean();
-		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-		// add the signatures of the method
-		CtxIdentifierBean ctxIdBean=ctxBeanTranslator.fromCtxIdentifier(identifier);
-
-		ctxIdBean.setString(identifier.toString());
-		ctxBrokerRetrieveBean.setId(ctxIdBean);
-		//ctxBrokerRetrieveBean.setRequester("FOO");
-		RequestorBean requestorBean = createRequestorBean(requestor);
-		ctxBrokerRetrieveBean.setRequestor(requestorBean);
-
-		cbPacket.setRetrieve(ctxBrokerRetrieveBean);
-		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//this. commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-
-		//send the message
-		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerRetrieveBean, this);
-			//this.commManager.sendMessage(stanza, ctxBrokerRetrieveBean);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//return new AsyncResult<CtxModelObject>(model);
-	}
-
-	public void /*Future<List<CtxIdentifier>>*/ lookupRemote(Requestor requestor, CtxModelType modelType, String type, ICtxCallback callback){
-		//Future<List<CtxIdentifier>> lookup(CtxModelType modelType, String type)
-
-		final List<CtxIdentifier> listOfIdentifiers= new ArrayList<CtxIdentifier>();
-
-		// creating the identity of the CtxBroker that will be contacted
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-
-		//create the message to be sent
-		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-		// use the method : lookup
-		CtxBrokerLookupBean ctxBrokerLookupBean = new CtxBrokerLookupBean();
-		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-		// add the signatures of the method
-		ctxBrokerLookupBean.setModelType(ctxBeanTranslator.CtxModelTypeBeanFromCtxModelType(modelType));
-		ctxBrokerLookupBean.setType(type);
-		RequestorBean requestorBean = createRequestorBean(requestor);
-		ctxBrokerLookupBean.setRequestor(requestorBean);
-
-
-		//	ctxBrokerLookupBean.setRequester("FOO");
-		cbPacket.setLookup(ctxBrokerLookupBean);
-
-		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//send the message
-		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerLookupBean, this);
-			//this.commManager.sendMessage(stanza, ctxBrokerLookupBean);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//return new AsyncResult<List<CtxIdentifier>>(listOfIdentifiers);
-	}
-
 
 	private RequestorBean createRequestorBean(Requestor requestor){
 		if (requestor instanceof RequestorCis){
@@ -559,8 +548,6 @@ public class CtxBrokerClient implements ICommCallback {
 			return requestorBean;
 		}
 	}
-
-
 
 	@Override
 	public List<String> getJavaPackages() {

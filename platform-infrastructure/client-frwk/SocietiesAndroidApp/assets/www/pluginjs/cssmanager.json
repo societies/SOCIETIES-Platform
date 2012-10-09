@@ -117,27 +117,85 @@
 	                    "socialURI": null,
 	                    "status": 0
 						},
-		"logoutXMPPServer" : {
+		"readProfile" : {
 						"archiveCSSNodes": [],
 	                    "cssIdentity": "android@chosendomain.org",
 	                    "cssInactivation": null,
-	                    "cssNodes": [],
+	                    "cssNodes": [
+	                    	{
+	                        "identity": "android@something",
+	                        "status": 0,
+	                        "type": 2},
+	                    	{
+	                        "identity": "node11",
+	                        "status": 0,
+	                        "type": 2},
+	                        {
+	                        "identity": "node22",
+	                        "status": 2,
+	                        "type": 0
+	                        }
+	                        ],
 	                    "cssRegistration": null,
 	                    "cssHostingLocation" : null,
 	                    "domainServer" : "chosendomain.org",
 	                    "cssUpTime": 0,
-	                    "emailID": null,
+	                    "emailID": "frank@hotmail.com",
 	                    "entity": 0,
-	                    "foreName": null,
-	                    "homeLocation": null,
-	                    "identityName": null,
-	                    "imID": null,
-	                    "name": null,
-	                    "password": "secretpassword",
+	                    "foreName": "frank",
+	                    "homeLocation": "Dublin",
+	                    "identityName": "The Frankster",
+	                    "imID": "im@imo",
+	                    "name": "The Gangster",
+	                    "password": null,
 	                    "presence": 0,
 	                    "sex": 1,
-	                    "socialURI": null,
+	                    "socialURI": "frank@fondlebook.com",
 	                    "status": 0
-						}
+						},
+		"modifyAndroidCSSRecord" : {
+						"archiveCSSNodes": [],
+	                    "cssIdentity": "android@anotherchosendomain.org",
+	                    "cssInactivation": null,
+	                    "cssNodes": [],
+	                    "cssRegistration": null,
+	                    "cssHostingLocation" : null,
+	                    "domainServer" : "anotherchosendomain.org",
+	                    "cssUpTime": 0,
+	                    "emailID": "changed_frank@hotmail.com",
+	                    "entity": 1,
+	                    "foreName": "changed_frank",
+	                    "homeLocation": "changed_Dublin",
+	                    "identityName": "changed_The Frankster",
+	                    "imID": "changed_im@imo",
+	                    "name": "changed_The Gangster",
+	                    "password": null,
+	                    "presence": 0,
+	                    "sex": 1,
+	                    "socialURI": "changed_frank@fondlebook.com",
+	                    "status": 0
+						},
+		"getMyFriends": [{"id": "john.societies.local",
+						  "name": "John Dough",
+						  "uri": "john.societies.local"
+						 },
+						 {"id": "jane.societies.local",
+						  "name": "Jane Smith",
+						  "uri": "jane.societies.local"
+						 },
+						 {"id": "tom.societies.local",
+						  "name": "Tom Cruise",
+						  "uri": "tom.societies.local"
+						 }],
+		"listAdvertisementRecords": [{
+						"name" : "John Dough",
+						"id": "john.societies.local" },
+						{
+						"name" : "Jane Smith",
+						"id": "jane.societies.local" },
+						{
+						"name" : "Bob Jones",
+						"id": "bob.societies.local" }
+					]
 	}
 }

@@ -328,5 +328,40 @@ public class CssDirectoryClient implements ICssDirectoryRemote, ICommCallback {
 		;
 
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.api.css.directory.ICssDirectoryRemote#
+	 * findAllCssAdvertisementRecords
+	 * (org.societies.api.css.directory.ICssDirectoryCallback)
+	 */
+	@Override
+	public void searchByID(
+			List<String> cssIdList,
+			ICssDirectoryCallback cssDirCallback) {
+		// We want to sent all messages for CssDirectory to the domain authority Node
+		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
+		Stanza stanza = new Stanza(toIdentity);
+
+		// SETUP CssDirectory CLIENT RETURN STUFF
+		CssDirectoryClientCallback callback = new CssDirectoryClientCallback(stanza.getId(),
+				cssDirCallback);
+
+		// CREATE MESSAGE BEAN
+		CssDirectoryBean cssDirBean = new CssDirectoryBean();
+		cssDirBean.setCssIdList(cssIdList);
+		
+		cssDirBean.setMethod(MethodType.SEARCH_BY_ID);
+		try {
+			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
+			// "callback.RecieveMessage()"
+			commManager.sendIQGet(stanza, cssDirBean, callback);
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		}
+		;
+	}
+
 
 }

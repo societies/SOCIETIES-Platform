@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:orientation="horizontal">
+
+    <EditText android:id="@+id/edit_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_message" 
+        android:layout_weight="1"/> <!-- weight = 1 gives textbox the remaining space on the screen -->
+    
+    <Button android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_Send"/>
+    
+    <EditText android:id="@+id/display_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/display_message" 
+        android:layout_weight="1"/> <!-- weight = 1 gives textbox the remaining space on the screen -->
+    
+</LinearLayout>

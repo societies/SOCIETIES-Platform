@@ -36,8 +36,12 @@
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 				xmlns:tns="http://societies.org/api/schema/cis/manager" 
 	xmlns="http://societies.org/api/schema/cis/manager"
-	xmlns:ins="http://societies.org/api/schema/cis/community">
+	xmlns:ins="http://societies.org/api/schema/cis/community"
+	xmlns:ads="http://societies.org/api/schema/cis/directory">
 
+<xs:import namespace="http://societies.org/api/schema/cis/directory" 
+           schemaLocation="org.societies.api.schema.cis.directory.xsd"/>
+           
 <xs:import namespace="http://societies.org/api/schema/cis/community" 
            schemaLocation="org.societies.api.schema.cis.community.xsd"/>
 
@@ -76,6 +80,11 @@
 			  <xs:element ref='list'/>
 			  <xs:element ref='listResponse'/>
 			  <xs:element ref='searchCis'/>
+			  <xs:element ref='askCisManagerForJoin'/>
+			  <xs:element ref='askCisManagerForJoinResponse'/>
+			  <xs:element ref='askCisManagerForLeave'/>
+			  <xs:element ref='askCisManagerForLeaveResponse'/>
+			 <!--  <xs:element ref='ins:joinResponse'/>  -->
 			  <xs:element ref='configure'/>
 			  <xs:element ref='notification'/>
 	      </xs:choice>
@@ -83,6 +92,32 @@
 	</xs:element>
 	
 
+    <xs:element name='askCisManagerForJoinResponse'>
+    <xs:complexType>
+          <xs:attribute name='status' type='xs:string'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
+
+    <xs:element name='askCisManagerForLeaveResponse'>
+    <xs:complexType>
+          <xs:attribute name='status' type='xs:string'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
+
+    <xs:element name='askCisManagerForLeave'>
+    <xs:complexType>
+          <xs:attribute name='targetCisJid' type='xs:string' use='required'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
+
+
+   <xs:element name='askCisManagerForJoin'>
+	    <xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element name="cisAdv" type="ads:cisAdvertisementRecord"/>
+			</xs:sequence>
+	    </xs:complexType>
+	</xs:element>
 
 	
 	<xs:element name='create'>
@@ -115,7 +150,7 @@
   	<xs:simpleType name="listCrit">
  		 <xs:restriction base="xs:string">
 		      <xs:enumeration value="owned"/>
-		      <xs:enumeration value=" subscribed"/>
+		      <xs:enumeration value="subscribed"/>
 		      <xs:enumeration value="all"/>
 		 </xs:restriction>
 	</xs:simpleType>

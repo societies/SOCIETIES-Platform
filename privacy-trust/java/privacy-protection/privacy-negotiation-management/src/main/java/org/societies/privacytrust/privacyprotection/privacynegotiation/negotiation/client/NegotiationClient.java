@@ -25,13 +25,11 @@
 package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,29 +37,18 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
@@ -69,7 +56,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -100,7 +88,7 @@ import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGen
 public class NegotiationClient implements INegotiationClient {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private final INegotiationAgent negotiationAgent;
+	private final INegotiationAgentRemote negotiationAgentRemote;
 	private RequestPolicy requestPolicy;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
@@ -114,9 +102,9 @@ public class NegotiationClient implements INegotiationClient {
 	private IPrivacyPreferenceManager privPrefMgr;
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
-	
-	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
-		this.negotiationAgent = negotiationAgent;
+	private IUserFeedback userFeedback;
+	public NegotiationClient(INegotiationAgentRemote negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
+		this.negotiationAgentRemote = negotiationAgent;
 		this.policyMgr = privacyPolicyNegotiationManager;
 		this.privacyPolicyManager = privacyPolicyNegotiationManager.getPrivacyPolicyManager();
 		this.ctxBroker = privacyPolicyNegotiationManager.getCtxBroker();
@@ -129,7 +117,7 @@ public class NegotiationClient implements INegotiationClient {
 		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
 		this.agreements = new Hashtable<Requestor, IAgreement>();
 		this.userIdentity = idm.getThisNetworkNode();
-		
+		this.userFeedback = privacyPolicyNegotiationManager.getUserFeedback();
 		
 	}
 	
@@ -156,7 +144,8 @@ public class NegotiationClient implements INegotiationClient {
 		}
 		if (notFoundTypes.size()>0){
 			log("Service requires these contextTypes\n"+str+"which don't exist");
-			JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
+			this.userFeedback.showNotification("Error starting service\n Service requires these data types\n"+str+"which don't exist in your profile");
+			//JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
 				this.eventMgr.publishInternalEvent(evt);
@@ -169,7 +158,7 @@ public class NegotiationClient implements INegotiationClient {
 		ClientResponsePolicyGenerator policyGen = new ClientResponsePolicyGenerator(this.policyMgr);
 		ResponsePolicy response = policyGen.generatePolicy(policy); 
 
-		Future<ResponsePolicy> responsePolicy = this.negotiationAgent.negotiate(policy.getRequestor(), response);
+		Future<ResponsePolicy> responsePolicy = this.negotiationAgentRemote.negotiate(policy.getRequestor(), response);
 		this.myPolicies.put(response.getRequestor(), response);
 		try {
 			
@@ -192,8 +181,16 @@ public class NegotiationClient implements INegotiationClient {
 		log("Received response policy from Provider!");
 		log(policy.toString());
 		if (policy.getStatus().equals(NegotiationStatus.FAILED)){
-			JOptionPane.showMessageDialog(null, "Negotiation Status: "+NegotiationStatus.FAILED+"\n"
-					+"Provider did not accept my terms & conditions");
+			String requestorStr = "";
+			if (policy.getRequestor() instanceof RequestorCis){
+				requestorStr = "Cis administrator";
+			}else{
+				requestorStr = "Service Provider";
+			}
+			this.userFeedback.showNotification("Negotiation Status: "+NegotiationStatus.FAILED+"\n"
+					+requestorStr+" did not accept your privacy terms & conditions");
+/*			JOptionPane.showMessageDialog(null, "Negotiation Status: "+NegotiationStatus.FAILED+"\n"
+					+"Provider did not accept my terms & conditions");*/
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
 				this.eventMgr.publishInternalEvent(evt);
@@ -296,9 +293,10 @@ public class NegotiationClient implements INegotiationClient {
 				Key publicKey = finaliser.getPublicKey();
 				AgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
 				
-				Future<Boolean> ack = this.negotiationAgent.acknowledgeAgreement(envelope);
+				Future<Boolean> ack = this.negotiationAgentRemote.acknowledgeAgreement(envelope);
 				if (null==ack){
-					JOptionPane.showMessageDialog(null, "ack is null");
+					this.userFeedback.showNotification("Negotiation error: Did not receive acknowledgement for receiving Negotiation Agreement from service or CIS");
+					//JOptionPane.showMessageDialog(null, "ack is null");
 				}
 				this.acknowledgeAgreement(requestor, envelope, ack.get());
 			}else{
@@ -373,7 +371,7 @@ public class NegotiationClient implements INegotiationClient {
 		
 		log("Starting negotiation with: "+requestor.toString());
 		try {
-			this.receiveProviderPolicy(this.negotiationAgent.getPolicy(requestor).get());
+			this.receiveProviderPolicy(this.negotiationAgentRemote.getPolicy(requestor).get());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

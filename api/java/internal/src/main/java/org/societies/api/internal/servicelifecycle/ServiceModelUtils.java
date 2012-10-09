@@ -148,6 +148,45 @@ public class ServiceModelUtils {
 	}
 	
 	/**
+	 * This method is used to obtain the Service that is exposed by given Bundle
+	 * 
+	 * @param The ServiceInstance of this service
+	 * @param A reference to IServiceDiscovery
+	 * @return The Service object 
+	 */
+	public static Service getServiceFromServiceInstance(String serviceInstance, IServiceDiscovery serviceDiscovery) {
+			
+		// Preparing the search filter
+		Service filter = generateEmptyFilter();
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(serviceInstance);
+		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
+		
+		List<Service> listServices = null;
+		
+		try {
+			Future<List<Service>> asyncListServices = serviceDiscovery.searchServices(filter);
+			listServices = asyncListServices.get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if(listServices == null || listServices.isEmpty())
+			return null; 
+		
+		Service result = null;
+
+		for(Service service: listServices){
+			
+			if(service.getServiceIdentifier().getServiceInstanceIdentifier().equals(serviceInstance)){
+				result = service;
+				break;
+			}
+		}
+		
+		return result;
+	}	
+	
+	/**
 	 * This method returns the Jid of the node where the service exists
 	 * 
 	 * @param serviceId
@@ -155,7 +194,9 @@ public class ServiceModelUtils {
 	 */
 	public static String getJidFromServiceIdentifier(ServiceResourceIdentifier serviceId){
 		
-		return serviceId.getIdentifier().toString();
+		String identifier = serviceId.getIdentifier().toString();
+		int lastIndex = identifier.lastIndexOf('/');
+		return identifier.substring(0, lastIndex);
 	}
 	
 	/**
@@ -200,10 +241,20 @@ public class ServiceModelUtils {
 		
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
+		ServiceReference[] registeredService = serviceBundle.getRegisteredServices();
+		Service ourService = null;
+		for(int i = 0; i < registeredService.length; i++){
+			ServiceReference regiServ = registeredService[i];
+			String property = (String) regiServ.getProperty("TargetPlatform");
+			if(property != null && property.equals("SOCIETIES")){
+				ourService = (Service) regiServ.getProperty("ServiceMetaModel");
+				break;
+			}
+		}
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
 		try {
-			result.setIdentifier(new URI(identity.getJid()));
+			result.setIdentifier(new URI(identity.getJid()+'/'+ourService.getServiceName().replace(' ', '_')));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -228,7 +279,7 @@ public class ServiceModelUtils {
 		// then pass return this object
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()+'/'+ service.getServiceName().replace(' ', '_')));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
 		} catch (URISyntaxException e) {
@@ -250,7 +301,7 @@ public class ServiceModelUtils {
 	public static boolean isServiceOurs(Service service, ICommManager commManager) throws InvalidFormatException{
 		
 		IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
-		IIdentity serviceNode = commManager.getIdManager().fromFullJid(service.getServiceInstance().getFullJid());
+		IIdentity serviceNode = commManager.getIdManager().fromFullJid(getJidFromServiceIdentifier(service.getServiceIdentifier()));
 			
 		return ourNode.equals(serviceNode);
 
@@ -262,7 +313,7 @@ public class ServiceModelUtils {
 		
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()+"/"+ service.getServiceName().replace(' ', '_')));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(deviceId);
 		} catch (URISyntaxException e) {

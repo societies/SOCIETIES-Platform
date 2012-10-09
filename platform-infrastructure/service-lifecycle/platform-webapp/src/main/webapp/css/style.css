@@ -1,0 +1,64 @@
+body{
+	text-align: center;
+}
+#userfeedback h1 {
+	margin: 0 auto;
+	padding: 0;
+	font-size: 0.9em;
+	float: left;
+}
+#ufeedbackNotifications{
+	clear: both;
+}
+#userfeedback{
+	min-height: 20px;
+	width: 25%;
+	min-width: 200px;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	margin: 20px auto;
+	padding: 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+	text-align: left;
+	background-color: white;
+}
+.ufeedbackRefreshHandler, .ufeedbackPoolingRefresh, .ufeedbackPoolingStartStop{
+	cursor: pointer;
+}
+
+.ufeedbackLoader, .ufeedbackResult, .ufeedbackPoolingRefresh, .ufeedbackPoolingStartStop{
+	display: inline-block;
+	float: right;
+	margin: 0 2px;
+}
+
+.ufeedbackPoolingRefresh{
+	background: url(../images/refresh_web_16x16.png) no-repeat top left;
+	text-indent: -2500px;
+	width: 16px;
+	height: 16px;
+}
+.ufeedbackPoolingStartStop{
+	background: url(../images/pause_16x16.png) no-repeat top left;
+	text-indent: -2500px;
+	width: 16px;
+	height: 16px;
+}
+#userfeedback .stop{
+	background-image: url(../images/pause_16x16.png);
+}
+#userfeedback .start{
+	background-image: url(../images/play_16x16.png);
+}
+
+#userfeedback .notificationText{
+	display: block;
+	margin: 4px auto;
+}
+#userfeedback ul.list{
+	margin: 4px auto;
+	padding: 0;
+	list-style: none;
+}

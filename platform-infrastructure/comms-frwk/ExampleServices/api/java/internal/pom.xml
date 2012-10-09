@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- change the artifactid to your project artifactid -->
@@ -13,7 +13,7 @@
 	<artifactId>internalAPI</artifactId>
 	<name>Example Service Internal API</name>
 	<packaging>bundle</packaging>
-	<version>0.1</version>
+	<version>${release.version}</version>
 	<developers>
 		<developer>
 			<id>Github ID</id>

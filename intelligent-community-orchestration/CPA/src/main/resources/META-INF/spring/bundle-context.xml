@@ -16,8 +16,8 @@
 		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-			 	<value>classpath:/derby_database.properties</value>
-				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
+<!--			 	<value>classpath:/derby_database.properties</value>-->
+                <value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
 	</bean>
@@ -52,10 +52,10 @@
 				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 				<prop key="hibernate.jdbc.batch_size">0</prop> 
 				-->
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-				<prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.show_sql">${show_sql}</prop>
+                <prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
+                <prop key="hibernate.format_sql">${format_sql}</prop>
 			</props>
 		</property>
 	</bean>
@@ -72,15 +72,10 @@
        for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPA" 
+   <bean id="cpa" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="cisDataCollector"
    init-method="init">
-   <!-- depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, IIdentity, ICommManager"  -->
-<!--    <property name="linkedCss" ref="IIdentity"></property> -->
-<!--    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property> -->
-<!--    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property> -->
-<!--    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property> -->
-<!--    <property name="commManager" ref="ICommManager"></property> -->
-<!--    <property name="deviceManager" ref="IDeviceManager"></property> -->
+       <property name="collector" ref="cisDataCollector" />
+       <property name="eventMgr" ref="eventMgr"/>
    </bean>
    
    <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 

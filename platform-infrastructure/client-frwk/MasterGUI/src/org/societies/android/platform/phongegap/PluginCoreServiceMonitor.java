@@ -235,17 +235,17 @@ public class PluginCoreServiceMonitor extends Plugin {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
-				try {
-					this.serviceDisco.getService(data.getString(0), (AServiceResourceIdentifier) data.get(1), data.getString(2));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					this.serviceDisco.getService(data.getString(0), (AServiceResourceIdentifier) data.get(1), data.getString(2));
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 2))) {
-				try {
-					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
 			}
 			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			//TODO

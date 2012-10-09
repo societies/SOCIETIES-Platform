@@ -34,6 +34,9 @@ package org.societies.api.osgi.event;
 
 public class EventTypes {
 
+	/** Used to notify peers that the CSS Record has been modified */
+	public static final String CSS_RECORD_EVENT = "org/societies/css/record";
+	
 	/** User to notify peers of a css event */
 	public static final String CSS_ADV_EVENT = "org/societies/css/advert";	
 	
@@ -81,6 +84,12 @@ public class EventTypes {
 	
 	/**	Published by the RFIDDriver to notify a change in the location of an RFID tag */
 	public static final String RFID_UPDATE_EVENT = "org/societies/css/device/rfidUpdate";
+	
+	/** Used by CSS DataCollector to forward messages  	 */
+	public static final String CSSDC_EVENT = "org/societies/orchestration/CSSDC";
+	
+	/** Used by ICO for recommendation messages  	 */
+	public static final String ICO_RECOMMENDTION_EVENT = "org/societies/orchestration/ICO";
 	
 	// CIS RELATED EVENTS
 	

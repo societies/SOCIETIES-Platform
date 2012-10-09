@@ -7,10 +7,11 @@
 	 
 	<bean id="ClientTest" 
   		class="org.societies.css.mgmt.testcomms.TestCommsMgmt"
-  		init-method="testPubSub"
+  		init-method="testFriendsFunctionality"
   		>
   		<property name="remoteCSSManager" ref="CSSRemoteManagerBundle"/>
-	  	<property name="pubSubManager" ref="PubsubClient"/>
+ 		<property name="remoteCSSDirectory" ref="CSSRemoteDirectoryBundle"/>
+  		<property name="pubSubManager" ref="PubsubClient"/>
 	  	<property name="commManager" ref="CommManager"/>
 	</bean>
 	

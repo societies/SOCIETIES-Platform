@@ -17,48 +17,38 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		
-		<input type="search" name="search" id="search-basic" value="Search Communities" data-theme="b"/>
-		<br/><br/>
+		<form id="formCISDirSearch" >
+			<input type="search" id="search-communities" value="Search Communities" data-theme="b" />
+		</form>
+		<br />
 		
 		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
-			<li data-theme="d">
-			
-			<a data-role="button" id="listCommunities" >
-			<h2>Your Communities</h2>
-			<p>
-				A list of your communities <span class="ui-li-count">15</span>
-			</p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="manage_communities.html">
-			<h2>Manage your Communities</h2>
-			<p>
-				Edit profile details and settings <span class="ui-li-count">5</span>
-			</p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="create_community.html">
-			<h2>Create a new Community</h2>
-			<p>
-				Setup a new Community
-			</p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="your_suggested_communities_list.html">
-			<h2>Suggested Communities</h2>
-			<p>
-				Some communities we think you might <br/>be interested in joining <span class="ui-li-count">4</span>
-			</p>
-			<p>
-			</p>
-			</a></li>
+			<li><a href="#" id="createCommunity">
+				<h2>Create a new Community</h2>
+				<p>Setup a new Community</p>
+				<p>
+				</p>
+				</a></li>
+			<li><a href="#" id="listCommunities" >
+				<h2>My Communities</h2>
+				<p>A list of your communities <span class="ui-li-count">15</span></p>
+				<p>
+				</p>
+				</a></li>
+			<li><a href="#" id="suggestedCommunities">
+				<h2>Suggested Communities</h2>
+				<p>Some communities we think you might <br/>be interested in joining <span class="ui-li-count">4</span></p>
+				<p>
+				</p>
+				</a></li>
+			<!-- <li><a href="manage_communities.html">
+				<h2>Manage your Communities</h2>
+				<p>Edit profile details and settings <span class="ui-li-count">5</span></p>
+				<p>
+				</p>
+				</a></li> -->
 		</ul>
 		<br/><br/>
-		<a href="communities_list.html" data-prefetch />
 		<div class="terms">
 			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
 		</div>
@@ -66,25 +56,21 @@
 	<!-- /content -->
 	<br/><br/>
  <!-- footer -->
-	<div class="footer_fixed" data-role="footer" data-position="fixed">
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
-			<li class="btn-home"><a href="landing.html">
-			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
-			</a>
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="../images/icons/home_logo.png"  data-role="none"/>
 			</li>
-			<li class="btn-profile"><a href="myProfile.html">
-			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
-			</a>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="../images/icons/my_profile.png"  data-role="none"/>	
 			</li>
-			<li class="btn-settings"><a href="settings.html">
-			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
-			</a>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="../images/icons/settings.png"  data-role="none"/>	
 			</li>
-			<li class="btn-about"><a href="about.html">
-			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
-			</a>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="../images/icons/about.png"  data-role="none"/>	
 			</li>
-		</ul>
+		</ul><!-- /global navbar -->
 	</div>
 	<!-- end footer -->
 </div>

@@ -23,8 +23,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -74,13 +73,7 @@
 			<version>1.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<dependency>
-		    <groupId>org.societies.privacytrust.privacyprotection</groupId>
-		    <artifactId>api</artifactId>
-		    <version>${version.pt}</version>
-		    <scope>provided</scope>
-		</dependency>
+	
 	</dependencies>
 
 
@@ -137,7 +130,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

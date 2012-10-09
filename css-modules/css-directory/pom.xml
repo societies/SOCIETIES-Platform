@@ -10,15 +10,15 @@
 	<groupId>org.societies.css</groupId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
-	
+
 	<developers>
-	    <developer>
-	      <name>Maria Mannion</name>
-	      <email>mariax.mannion@intel.com</email>
-	      <roles>
-	        <role>Developer</role>
-	      </roles>
-	    </developer>
+		<developer>
+			<name>Maria Mannion</name>
+			<email>mariax.mannion@intel.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 
@@ -31,20 +31,20 @@
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -57,7 +57,7 @@
 			<version>3.0.5.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -83,7 +83,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		
+
 
 		<!-- Communication Manager -->
 		<dependency>
@@ -92,21 +92,32 @@
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
-	
+
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
-	<plugins>
+		<plugins>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>

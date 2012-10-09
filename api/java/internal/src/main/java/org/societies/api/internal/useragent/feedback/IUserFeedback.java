@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 
 /**
  * 
@@ -41,4 +42,12 @@ public interface IUserFeedback
 	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
 	
 	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
+	
+	public void showNotification(String notificationText);
+	
+	public FeedbackForm getNextRequest();
+	
+	public void submitExplicitResponse(String id, List<String> result);
+	
+	public void submitImplicitResponse(String id, Boolean result);
 }

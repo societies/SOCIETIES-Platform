@@ -24,9 +24,9 @@
  */
 package org.societies.api.internal.privacytrust.trust.remote;
 
-import org.societies.api.internal.privacytrust.trust.TrustException;
 //import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * This interface provides access to the trust values associated with individuals,

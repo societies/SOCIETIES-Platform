@@ -1,36 +1,45 @@
 <!-- PAGE TABLE -->
 <tr><td align="left" valign="top" width="15%" background="${pageContext.request.contextPath}/images/societies-background.png">
-
+	<div id="userfeedback">
+		<h1>
+			Notification box
+		</h1>
+		<a href="#" class="ufeedbackPoolingRefresh" title="Check now if there is new notification">Refresh</a>
+		<a class="ufeedbackPoolingStartStop stop" title="Start / Stop notification pooling">Stop</a>
+		<div id="ufeedbackNotifications"></div>
+	</div>
 	<table border="0" >
 	  <tr><td align="left"><a href="default.html"><img src="${pageContext.request.contextPath}/images/societies_xsmall.png" alt="Home" border="0"/></a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
-	  <tr><td><b>CSS Management</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cssmanager.html">CSS Management</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cssnodemgmt.html">CSS Node Mgmt</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/suggestedfriends.html">CSS Friends</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/devicemgmt.html">Device Management</a></td></tr>
+	  <tr><td><b>Friends</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/friendspilot.html">My Friends</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/suggestedfriendspilot.html">Suggested Friends</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
-	  <tr><td><b>CIS Management</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cismanager.html">CIS Management</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">CIS Directory</a></td></tr>
+	  <tr><td><b>Communities</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotmycommunities.html">My Communities</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/createnewcis.html">Create New Community</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">Suggested Communities</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
-	   <tr><td><b>Social Network Data</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">SocialData</a></td></tr>
+	   <tr><td><b>Apps</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/servdiscpilot.html">My Apps</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/mycisappspilot.html">Communities Apps</a></td></tr>
+	  <tr><td>&nbsp;</td></tr>
+	  
+	  <tr><td><b>My Context</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/context.html">Context Management</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
-	  <tr><td><b>Privacy and Trust</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-assessment.html">Privacy Assessment</a></td></tr>
+	  <tr><td><b>Settings</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotcssprofile.html"> Profile</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">Link My Social Networks</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
+	   <tr><td><b>Account</b></td></tr>
+	  <tr><td align="right"><a href="http://localhost:8080/domain-authority/">Log Out</a></td></tr>
 
-	  <tr><td><b>Service Lifecycle</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/servicediscovery.html">Service Browser</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/servicecontrol.html">Service Control</a></td></tr>
-	  <tr><td>&nbsp;</td></tr>
-	 
 	  <!-- SPACERS -->	  
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>

@@ -1,6 +1,7 @@
 package org.societies.css.mgmt.testcomms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -13,13 +14,17 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.css.directory.ICssDirectoryCallback;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
@@ -30,6 +35,7 @@ public class TestCommsMgmt {
     private IIdentityManager idManager;
     private ICommManager commManager;
     private IIdentity pubsubID;
+    private ICssDirectoryRemote remoteCSSDirectory;
 
 	
 	private static Logger LOG = LoggerFactory.getLogger(TestCommsMgmt.class);
@@ -49,11 +55,32 @@ public class TestCommsMgmt {
 	public static final String TEST_NAME = "The CSS";
 	public static final String TEST_PASSWORD = "androidpass";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+	
+	public static final String TEST_CSS_NAME = "Liam Marshall";
+	public static final String TEST_CSS_JID = "alan.societies.bespoke";
+	
+//	data required for Friends testing
+//	insert into societiesdb.CssFriendEntry (friendIdentity, requestStatus) values ("liam@sligo.xmpp", "accepted"), ("maria@intel.xmpp", "accepted"), ("midge@home.com", "accepted");
+//
+//	insert into societiesdb.CssRequestEntry (cssIdentity, requestStatus) values ("eliza@hwu.xmpp", "pending"), ("sarah@hwu.org", "pending"), ("korbinian@dlr.de", "pending");
+//
+//
+//	insert into societiesdb.CssAdvertisementRecordEntry (ID, Name, Uri) values ("liam@sligo.xmpp", "Liam Marshall", "liam@fb.com"), 
+//	("maria@intel.xmpp", "Maria Mannion", "mmouse@twitter.ie"),
+//	 ("midge@home.com", "Midge Baldwin", "midge@fb.co.uk"),
+//	 ("eliza@hwu.xmpp", "Eliza Doolittle", "edoo@linkedin.com"),
+//	 ("sarah@hwu.org", "Sarah G", "sg@myspace.com"),
+//	 ("korbinian@dlr.de" , "Korby Frank", "kb@fb.de");
 
-	private static final String THIS_NODE = "XCManager.societies.local";
+	
+	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+    private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
+
 
 	public void testPubSub() {
-        this.idManager = commManager.getIdManager();
+		LOG.info("Testing Login/Pubsub");
+		
+		this.idManager = commManager.getIdManager();
 
 //        try {
 //			pubsubID = idManager.fromJid(THIS_NODE);
@@ -66,16 +93,7 @@ public class TestCommsMgmt {
         
         List<String> listTopics;
 		try {
-            List<String> packageList = new ArrayList<String>();
-
-            packageList.add("org.societies.api.schema.cssmanagement");
-            try {
-				pubSubManager.addJaxbPackages(packageList);
-			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+    		
 	        LOG.info("Subscribing to pubsub");
 	        //try internal class
 	        pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.ADD_CSS_NODE, new pubsubReceiver());
@@ -87,6 +105,23 @@ public class TestCommsMgmt {
 	        for (String s: listTopics) {
 	        	LOG.info("Node: " + s);
 	        }
+	        
+	        this.remoteCSSManager.loginCSS(createCSSRecord(), new ICSSManagerCallback() {
+				
+				@Override
+				public void receiveResult(CssManagerResultBean resultBean) {
+					LOG.info("Received result from remote call");
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
+				}
+
+			});
+				
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		
 		} catch (XMPPError e) {
@@ -105,9 +140,9 @@ public class TestCommsMgmt {
 //			this.remoteCSSManager.registerXMPPServer(new CssRecord(), new ICSSManagerCallback() {
 			this.remoteCSSManager.loginCSS(createCSSRecord(), new ICSSManagerCallback() {
 				
-				public void receiveResult(CssInterfaceResult result) {
+				public void receiveResult(CssManagerResultBean resultBean) {
 					LOG.info("Received result from remote call");
-					LOG.info("Result Status: " + result.isResultStatus());
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
 					
 				}
 			});
@@ -121,13 +156,108 @@ public class TestCommsMgmt {
 			
 			this.remoteCSSManager.logoutCSS(createCSSRecord(), new ICSSManagerCallback() {
 				
-				public void receiveResult(CssInterfaceResult result) {
+				public void receiveResult(CssManagerResultBean resultBean) {
 					LOG.info("Received result from remote call");
-					LOG.info("Result Status: " + result.isResultStatus());
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
 					
 				}
 			});
 			
+			
+			
+		}
+	}
+	/**
+	 * Test get CSSRecord
+	 */
+	public void testGetCssRecord() {
+		LOG.info("Testing testGetCssRecord");
+		this.remoteCSSManager.getCssRecord(new ICSSManagerCallback() {
+		public void receiveResult(CssManagerResultBean resultBean) {
+				LOG.info("Received result from remote call");
+				LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
+				
+				List<CssNode> nodes = resultBean.getResult().getProfile().getCssNodes();
+				for (CssNode node: nodes) {
+					LOG.info("Received node: " + node.getIdentity() + " status: " + node.getStatus() + " type: " + node.getType());
+				}
+			}
+		});
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+	
+	
+	/**
+	 * Test friends specific CSS methods
+	 */
+	public void testFriendsFunctionality() {
+		LOG.info("Calling remote CSSManager server for method getCssFriends");
+			
+		this.remoteCSSManager.getCssFriends(new ICSSManagerCallback() {
+			
+			public void receiveResult(CssManagerResultBean resultBean) {
+				LOG.info("Received result from remote call for getCssFriends");
+				LOG.info("Number of friends: " + resultBean.getResultAdvertList().size());
+			}
+		});
+
+		LOG.info("Calling remote CSSManager server for method getFriendRequests");
+		this.remoteCSSManager.getFriendRequests(new ICSSManagerCallback() {
+			
+			public void receiveResult(CssManagerResultBean resultBean) {
+				LOG.info("Received result from remote call for getFriendRequests");
+				LOG.info("Number of friend requests: " + resultBean.getResultCssRequestList().size());
+			}
+		});
+
+		LOG.info("Calling remote CSSManager server for method suggestedFriends");
+		this.remoteCSSManager.suggestedFriends(new ICSSManagerCallback() {
+			
+			public void receiveResult(CssManagerResultBean resultBean) {
+				LOG.info("Received result from remote call for suggestedFriends");
+				LOG.info("Number of suggested friends: " + resultBean.getResultAdvertList().size());
+			}
+		});
+		
+		LOG.info("Calling remote CSSManager server for method sendCssFriendRequest");
+		this.remoteCSSManager.sendCssFriendRequest(TEST_CSS_JID);
+
+		LOG.info("Calling remote CSSDirectory server for method findAllCssAdvertisementRecords");
+		this.remoteCSSDirectory.findAllCssAdvertisementRecords(new ICssDirectoryCallback() {
+			
+			@Override
+			public void getResult(List<CssAdvertisementRecord> adverts) {
+				LOG.info("Received result from remote call for findAllCssAdvertisementRecords");
+				LOG.info("Number of CSSs: " + adverts.size());
+				
+			}
+		});
+
+		LOG.info("Calling remote CSSDirectory server for method findForAllCss");
+		this.remoteCSSDirectory.findForAllCss(createCssAdvertisement(), new ICssDirectoryCallback() {
+			
+			@Override
+			public void getResult(List<CssAdvertisementRecord> adverts) {
+				LOG.info("Received result from remote call for findForAllCss");
+				LOG.info("Number of filtered CSSs: " + adverts.size());
+				
+			}
+		});
+
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -181,7 +311,12 @@ public class TestCommsMgmt {
 		return cssProfile;
 	}
 
-
+	private CssAdvertisementRecord createCssAdvertisement() {
+		CssAdvertisementRecord advert = new CssAdvertisementRecord();
+		
+		advert.setName(TEST_CSS_NAME);
+		return advert;
+	}
 	//Spring injection methods
 
 	public ICSSRemoteManager getRemoteCSSManager() {
@@ -212,15 +347,19 @@ public class TestCommsMgmt {
 		@Override
 		public void pubsubEvent(IIdentity identity, String node, String itemId,
 				Object payload) {
-			LOG.debug("Received Pubsub event: " + node + " itemId: " + itemId);
+			LOG.debug("Received Pubsub event: " + node + " itemId: " + itemId + " payload class: " + payload.getClass().getName());
 
 			if (payload instanceof CssEvent) {
 				LOG.debug("Received event is :" + ((CssEvent) payload).getType());
 			}
 		}
-		
 	}
-	
 
+	public ICssDirectoryRemote getRemoteCSSDirectory() {
+		return remoteCSSDirectory;
+	}
 
+	public void setRemoteCSSDirectory(ICssDirectoryRemote remoteCSSDirectory) {
+		this.remoteCSSDirectory = remoteCSSDirectory;
+	}
 }

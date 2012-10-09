@@ -33,14 +33,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * N.B. this event is fired once per page load
  * @returns null
  */
+
 $(document).bind('pageinit',function(){
 
-	console.log("create Community pageinit action(s)");
-	
 	 $('#createCISbutton').off('click').on('click', function() {
-		  SocietiesCISManagerService.CreateCIS();
-		 });
-	
+		 SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.CreateCIS);
 	 });
-
-
+	
+});

@@ -25,6 +25,9 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
+import org.societies.android.api.servicelifecycle.AService;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+
 /**
  *  Each method requires a callback to receive the result
 
@@ -32,6 +35,14 @@ package org.societies.android.api.internal.servicelifecycle;
  *
  */
 public interface IServiceDiscovery {
+	
+    //SERVICE LIFECYCLE INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicediscovery.ReturnValue";
+	public static final String GET_SERVICE     = "org.societies.android.platform.servicediscovery.GET_SERVICE";
+	public static final String GET_SERVICES    = "org.societies.android.platform.servicediscovery.GET_SERVICES";
+	public static final String GET_MY_SERVICES     = "org.societies.android.platform.servicediscovery.GET_MY_SERVICES";
+	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
+
 
 	public String methodsArray[] = {"getServices(String client, String identity)",
 							 		"getService(String client, ServiceResourceIdentifier serviceId, String identity)",

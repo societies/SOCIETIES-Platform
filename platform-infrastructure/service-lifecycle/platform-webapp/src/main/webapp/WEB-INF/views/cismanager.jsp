@@ -33,72 +33,6 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
-
-<script type="text/javascript">
- 
-$(document).ready(function(){
-	//startup functionality
-	
- $("#msgid").html("This is Hello World by JQuery");
- $("#removeCriteria").hide();
- 
- var i = 0;
-
- document.getElementById('subBut').onclick = function() {
-	 document.cisManagerForm.submit();
-	 };
- 
-// function subButton(){
-//	                 document.cisManagerForm.submit();
-//	             }
- 
- document.getElementById("logC").onclick = function logArray(){
-	 
-	 var data = Array();
-	 $("#existingCriteria tr").each(function(i, v){
-		     $(this).children('td').each(function(ii, vv){
-		         data[i] = $(this).text();
-		     }); 
-		 });
-	 alert(data);
-	 
-	};
- 
-
- 
- document.getElementById("addCriteria").onclick = function() {
-	 
-	 // test log string
-	 $("#msgid").html( "" + $('#attributeValue').val() + $('#operatorValue').val() + 
-			 $('#criteriaValue').val() );// end of  $("#msgid").html( "" +
-	if(i>9){
-		alert("max of 10 criteria")	
-	}
-	else{
-		i++;
-		
-		// add the row
-		var row = $('<tr/>', {class: "critRow"}).appendTo("#existingCriteria");
-		// column 
-		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
-		// button
-		var f = function () {row.remove();};
-		var b = $('<button/>',{		  text: "Delete", type: "button", 
-			  click: f
-		}).appendTo(column);
-		
-	}
-
-	
- 
-};// end of document.getElementById("addCriteria").onclick = function() {
-
-});// end of $(document).ready(function()
-	 
-</script>
-
-
 <div id="msgid">
 </div>
 
@@ -129,7 +63,7 @@ $(document).ready(function(){
 				<td>CsS ID:</td>
 				<td><form:input path="cssId" /></td>
 				<td><form:errors path="cssId" cssClass="error" /></td>
-				<td>Users CSS jid eg: paul@societies.com  -- Used for Add member, Remove Member</td>
+				<td>Users CSS jid eg: paul@societies.com  -- Used for Join remote CIS, Add member, Remove Member</td>
 			</tr>
 			<tr>
 				<td>password:</td>
@@ -205,6 +139,68 @@ $(document).ready(function(){
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />
 	<!-- END FOOTER -->
+	<script type="text/javascript">
+ 
+$(document).ready(function(){
+	//startup functionality
+	
+ $("#msgid").html("This is Hello World by JQuery");
+ $("#removeCriteria").hide();
+ 
+ var i = 0;
+
+ document.getElementById('subBut').onclick = function() {
+	 document.cisManagerForm.submit();
+	 };
+ 
+// function subButton(){
+//	                 document.cisManagerForm.submit();
+//	             }
+ 
+ document.getElementById("logC").onclick = function logArray(){
+	 
+	 var data = Array();
+	 $("#existingCriteria tr").each(function(i, v){
+		     $(this).children('td').each(function(ii, vv){
+		         data[i] = $(this).text();
+		     }); 
+		 });
+	 alert(data);
+	 
+	};
+ 
+
+ 
+ document.getElementById("addCriteria").onclick = function() {
+	 
+	 // test log string
+	 $("#msgid").html( "" + $('#attributeValue').val() + $('#operatorValue').val() + 
+			 $('#criteriaValue').val() );// end of  $("#msgid").html( "" +
+	if(i>9){
+		alert("max of 10 criteria")	
+	}
+	else{
+		i++;
+		
+		// add the row
+		var row = $('<tr/>', {class: "critRow"}).appendTo("#existingCriteria");
+		// column 
+		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
+		// button
+		var f = function () {row.remove();};
+		var b = $('<button/>',{		  text: "Delete", type: "button", 
+			  click: f
+		}).appendTo(column);
+		
+	}
+
+	
+ 
+};// end of document.getElementById("addCriteria").onclick = function() {
+
+});// end of $(document).ready(function()
+	 
+</script>
 </body>
 </html>
 

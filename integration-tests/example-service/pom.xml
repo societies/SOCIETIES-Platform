@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.integration.example.service</groupId>
 	<artifactId>IntegrationTestService</artifactId>
-	<version>${release.version}</version>
+	<version>0.1</version>
 	<packaging>bundle</packaging>
 	
 	<developers>
@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>

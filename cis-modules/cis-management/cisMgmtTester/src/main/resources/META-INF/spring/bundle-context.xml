@@ -13,11 +13,13 @@
        
        	 
 	<bean id="CisMgmtClientTest" 
-  		class="org.societies.cis.manager.tester.CisMgmtTester">
-  		 <!-- <constructor-arg ref="CisManagementBundle"/>-->
-  		 <constructor-arg ref="xcCommunication"/>
-        <constructor-arg value="${targetCisId}"/>
+  		class="org.societies.cis.manager.tester.CisMgmtTester"
+  		depends-on="xcCommunication PubsubClient"
+  		init-method="StartTest">
+  		 <property name="cisClient" ref="CisManagementBundle"/>
+  		 <property name="iCommMgr" ref="xcCommunication"/>
+  		 <property name="pubsubClient"  ref="PubsubClient"/>
 	</bean>
        
-     <context:property-placeholder properties-ref="componentConfig"/>  
+ 
 </beans>

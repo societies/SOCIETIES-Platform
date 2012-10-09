@@ -1,5 +1,3 @@
-
-
 /**
 Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
 
@@ -43,21 +41,29 @@ var	SocietiesCISManagerService = {
 		 */
 	CreateCIS: function() {
 		console.log("create CIS");
-		//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
 
 		function success(data) {
-			
 			console.log("create CIS where data has name = " + data.cisName);
-			$.mobile.changePage("community_profile.html", { transition: "slideup"} );
 			SocietiesCISProfileService.populateCISProfilepage(data);
-			
 		}
 		
 		function failure(data) {
 			alert("createCIS - failure: " + data);
 		}
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
+		
+		var cisName = jQuery("#cisNameOnCisCreate").val(),
+            cisType = jQuery("#cisCategoryOnCisCreate").val(),
+            cisCriteria = [{
+                    "attrib": "age",
+                    "operator": "greater than",
+                    "value1": "18",
+                    "value2": "18",
+                    "rank": "1"}],
+             cisCriteriaEmpty = [],
+             cisDescription = jQuery("#cisDescOnCisCreate").val(),
+             privacyPolicy = "<RequestPolicy />";
 
+		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteriaEmpty, privacyPolicy);
 	},
 
 	/**
@@ -68,22 +74,63 @@ var	SocietiesCISManagerService = {
 	 * @returns CIS records
 	 */
 	ListCIS: function() {
-	console.log("list CISs");
-	//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
-	
-	function success(data) {
+		console.log("list CISs");
 		
-		console.log("List CISs where  = TODO");
-		$.mobile.changePage("communities_list.html", { transition: "slideup"} );
-		SocietiesCISListService.populateCISListpage(data);
+		function success(data) {
+			console.log("List CISs where  = TODO");
+			SocietiesCISListService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
+		}
 		
-	}
+		function failure(data) {
+			alert("ListCIS - failure: " + data);
+		}
+		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+				window.plugins.SocietiesLocalCISManager.listCIS(success, failure); } );
+	}, 
 	
-	function failure(data) {
-		alert("createCIS - failure: " + data);
-	}
-	window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
+	searchCisDirectory: function(searchTerm) {
+		console.log("Search CIS Dir for " + searchTerm);
+		
+		function success(data) {
+			SocietiesCisDirService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+				window.plugins.SocietiesLocalCISManager.findForAllCis(searchTerm, success, failure); } );
+	},
 	
+	getAllCisDirAds: function() {
+		console.log("getAllCisDirAds");
+		
+		function success(data) {
+			SocietiesCisDirService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+				window.plugins.SocietiesLocalCISManager.findAllCisAdvertisementRecords(success, failure); } );
+	},
+	
+	getJoinResponse: function(cisAdvert) {
+		console.log("getAllCisDirAds");
+		
+		function success(data) {
+			SocietiesCisDirService.showJoinResponse(data);
+			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
+		}
+		
+		function failure(data) {
+			alert("getJoinResponse - failure: " + data);
+		}
+		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+					window.plugins.SocietiesLocalCISManager.joinCis(cisAdvert, success, failure); } );
 	}
-
 }

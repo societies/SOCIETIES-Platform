@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.jivesoftware.smack.packet.IQ;
@@ -31,6 +33,7 @@ import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -56,6 +59,13 @@ public class PacketMarshaller {
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+			Log.i(LOG_TAG, "Registered class '"+exampleElementImpl.getClass()+"' as ElementImpl");
+			
+			// http://stackoverflow.com/questions/7918466/cant-use-xmlgregoriancalendar-in-android-even-if-it-is-documented
+//			XMLGregorianCalendar gregorianCalendarImpl = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+//			registry.bind(gregorianCalendarImpl.getClass(), XMLGregorianCalendarConverter.class);
+//			Log.i(LOG_TAG, "Registered class '"+gregorianCalendarImpl.getClass()+"' as XMLGregorianCalendarImpl");
+			
 			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
@@ -65,7 +75,7 @@ public class PacketMarshaller {
 		} catch (ParserConfigurationException e) {
 			Log.e(LOG_TAG, "ParserConfigurationException trying to get runtime ElementImpl");
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception trying to register runtime ElementImpl in SimpleXML");
+			Log.e(LOG_TAG, "Exception trying to register runtime ElementImpl or XMLGregorianCalendarImpl in SimpleXML",e);
 		}
 		
 		s = new Persister(strategy);

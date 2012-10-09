@@ -1,6 +1,9 @@
 package org.societies.css.mgmt;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -46,14 +49,15 @@ import org.societies.utilities.DBC.Dbc;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
 //import org.societies.platform.socialdata.SocialData;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 
 public class CSSManager implements ICSSLocalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
@@ -77,8 +81,9 @@ public class CSSManager implements ICSSLocalManager {
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
 	private static final String THIS_NODE = "XCManager.societies.local";
-	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
-	
+	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+    private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
+
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
 	private IServiceDiscovery serviceDiscovery;
@@ -90,29 +95,23 @@ public class CSSManager implements ICSSLocalManager {
     
     private Random randomGenerator;
     
-	private CssRecord cssRecord;
+	private boolean pubsubInitialised = false;
+	
+	private IEventMgr eventMgr = null;
 	
 	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
-		this.cssRecord = createCSSRecord();
 		
-        
         this.idManager = commManager.getIdManager();
         
-//        
-//        try {
-//			pubsubID = idManager.fromJid(THIS_NODE);
-//		} catch (InvalidFormatException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		  Supposedly, the correct way to obtain the identity
         this.pubsubID = idManager.getThisNetworkNode();
         
-        this.createPubSubNodes();
-        this.subscribeToPubSubNodes();
+		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
         this.randomGenerator = new Random();
+        
+		this.createPubSubNodes();
+        this.subscribeToPubSubNodes();
 
 	}
 
@@ -132,88 +131,129 @@ public class CSSManager implements ICSSLocalManager {
 	 * 2. What happens if these PubSub nodes already exist ?
 	 */
 	private void createPubSubNodes() {
-        LOG.debug("Creating PubsubNode(s) for CSSManager");
         
-        try {
-        	
-            List<String> packageList = new ArrayList<String>();
-            packageList.add(CSS_MGMT_PACKAGE);
-			pubSubManager.addJaxbPackages(packageList);
+        if (!this.pubsubInitialised) {
+            LOG.debug("Creating PubsubNode(s) for CSSManager");
 
-			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
-	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
-	        
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + " PubsubNode created for CSSManager");
-	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + " PubsubNode created for CSSManager");
-		}
+            try {
+            	
+    			pubSubManager.addSimpleClasses(cssPubsubClassList);
+
+    			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
+    	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+    	        
+    		} catch (XMPPError e) {
+    			e.printStackTrace();
+    		} catch (CommunicationException e) {
+    			e.printStackTrace();
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		} finally {
+    	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + " PubsubNode created for CSSManager");
+    	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + " PubsubNode created for CSSManager");
+    	        this.pubsubInitialised = true;
+    		}
+        }
 	}
 
 	/**
-	 * Create a default CSSrecord
-	 * This is a temporary measure until genuine CSSs can be created
+	 * 	 
+	 * Create minimal CSSRecord and register it to the database
 	 * 
-	 * @return CssRecord
+	 * @param identity
 	 */
-	private CssRecord createCSSRecord() {
+	private void createMinimalCSSRecord(String identity) {
+		LOG.debug("Creating minimal CSSRecord");
 		
-    	CssNode cssNode_1, cssNode_2;
-    	CssNode archCSSNode_1, archCSSNode_2;
-    	
-		cssNode_1 = new CssNode();
-		cssNode_1.setIdentity(TEST_IDENTITY_1);
-		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
-		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
-
-		cssNode_2 = new CssNode();
-		cssNode_2.setIdentity(TEST_IDENTITY_2);
-		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
-		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
-
-		archCSSNode_1 = new CssNode();
-		archCSSNode_1.setIdentity(TEST_ARCHIVED_IDENTITY_1);
-		archCSSNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
-		archCSSNode_1.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
-
-		archCSSNode_2 = new CssNode();
-		archCSSNode_2.setIdentity(TEST_ARCHIVED_IDENTITY_2);
-		archCSSNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
-		archCSSNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+		//cloud node details
+		CssNode cssNode = new CssNode();
 		
+		cssNode.setIdentity(identity);
+		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
 
-		CssRecord cssProfile = new CssRecord();
-		cssProfile.getCssNodes().add(cssNode_1);
-		cssProfile.getCssNodes().add(cssNode_2);
-		cssProfile.getArchiveCSSNodes().add(archCSSNode_1);
-		cssProfile.getArchiveCSSNodes().add(archCSSNode_2);
-		
-		cssProfile.setCssIdentity(TEST_IDENTITY);
-		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		cssProfile.setCssUpTime(TEST_UPTIME);
-		cssProfile.setEmailID(TEST_EMAIL);
-		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
-		cssProfile.setForeName(TEST_FORENAME);
-		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
-		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
-		cssProfile.setImID(TEST_IM_ID);
-		cssProfile.setName(TEST_NAME);
-		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
-		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+		try {
+			//if CssRecord does not exist create new CssRecord in persistance layer
+			
+			if (!this.cssRegistry.cssRecordExists()) {
 
-		
-		return cssProfile;
+				//Minimal CSS details
+				CssRecord cssProfile = new CssRecord();
+				cssProfile.getCssNodes().add(cssNode);
+				cssProfile.setCssIdentity(identity);
+				cssProfile.setCssInactivation("0");
+				
+				cssProfile.setCssRegistration(this.getDate());
+
+				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+				cssProfile.setCssUpTime(0);
+				cssProfile.setEmailID("");
+				cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+				cssProfile.setForeName("");
+				cssProfile.setHomeLocation("");
+				cssProfile.setIdentityName("");
+				cssProfile.setImID("");
+				cssProfile.setName("");
+				cssProfile.setPassword("");
+				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+				cssProfile.setSocialURI("");
+
+				try {
+					this.cssRegistry.registerCss(cssProfile);
+					LOG.debug("Registering CSS with local database");
+				} catch (CssRegistrationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// internal eventing
+				LOG.info("Generating CSS_Record_Event to notify Record has been created");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record Created", this.idManager.getThisNetworkNode().toString(), cssProfile);
+					try {
+						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish SUBS CIS event");
+					}
+				}
+			} else {
+				// if CssRecord already persisted remove all nodes and add cloud node
+				
+				CssRecord cssRecord  = this.cssRegistry.getCssRecord();
+				
+				cssRecord.getCssNodes().clear();
+				
+				cssRecord.getCssNodes().add(cssNode);
+				
+				this.updateCssRegistry(cssRecord);
+				
+			}
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Workaround for existing problem with database
+	 * 
+	 * @param update
+	 * TODO : use normal CssRegistry update method when working
+	 */
+	private void updateCssRegistry(CssRecord update) {
+		CssRecord existing;
+		try {
+			existing = this.cssRegistry.getCssRecord();
+			if (null != existing) {
+					this.cssRegistry.unregisterCss(existing);
+					this.cssRegistry.registerCss(update);
+			}
+		} catch (CssRegistrationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile) {
@@ -225,60 +265,23 @@ public class CSSManager implements ICSSLocalManager {
 	public Future<CssInterfaceResult> getCssRecord() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		
-		LOG.info("CSS Manager getCssRecord Called");
+		LOG.debug("CSS Manager getCssRecord Called");
 		
 		try {
-			CssRecord currentCssRecord = cssRegistry.getCssRecord();
-			result.setProfile(currentCssRecord);
-			LOG.info("CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
-			result.setResultStatus(true);
+			if (this.cssRegistry.cssRecordExists()) {
+				CssRecord currentCssRecord = this.cssRegistry.getCssRecord();
+				result.setProfile(currentCssRecord);
+				LOG.debug("Number of Css nodes: " + currentCssRecord.getCssNodes().size());
+				result.setResultStatus(true);
+			} else {
+				LOG.error("Unable to find CssRecord");
+			}
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
-//	@Override
-//	/**
-//	 * Requires that CssRecord parameter has one node in its collection and that 
-//	 * the node corresponds to the node being logged in. The CSS identity and password
-//	 * must also be set to appropriate values
-//	 */
-//	public Future<CssInterfaceResult> loginCSS(CssRecord profile) {
-//		LOG.debug("Calling loginCSS");
-//
-//		Dbc.require("CssRecord parameter cannot be null", profile != null);
-//		Dbc.require("Cssrecord parameter must contain CSS identity",
-//				profile.getCssIdentity() != null
-//						&& profile.getCssIdentity().length() > 0);
-//		Dbc.require("Cssrecord parameter must contain CSS password",
-//				profile.getPassword() != null
-//						&& profile.getPassword().length() > 0);
-//
-//		CssInterfaceResult result = new CssInterfaceResult();
-//		result.setProfile(profile);
-//		result.setResultStatus(false);
-//
-//		CssRecord record;
-//		try {
-//			record = this.cssRegistry.getCssRecord();
-//			if (profile.getCssIdentity().equals(record.getCssIdentity())
-//					&& profile.getPassword().equals(record.getPassword())) {
-//				// add new node to login to cloud CssRecord
-//				record.getCssNodes().add(profile.getCssNodes().get(0));
-//				// update the CSS registry
-//				this.cssRegistry.updateCssRecord(record);
-//
-//				result.setProfile(record);
-//				result.setResultStatus(true);
-//			}
-//		} catch (CssRegistrationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return new AsyncResult<CssInterfaceResult>(result);
-//	}
-//
 	@Override
 	/**
 	 * There is now no longer any validation of a node contacting a
@@ -290,35 +293,41 @@ public class CSSManager implements ICSSLocalManager {
 		LOG.debug("Calling loginCSS");
 
 		Dbc.require("CssRecord parameter cannot be null", profile != null);
-		Dbc.require("Cssrecord parameter must contain CSS identity",
-				profile.getCssIdentity() != null
-						&& profile.getCssIdentity().length() > 0);
-		Dbc.require("Cssrecord parameter must contain CSS password",
-				profile.getPassword() != null
-						&& profile.getPassword().length() > 0);
 
-		CssInterfaceResult result = new CssInterfaceResult();
+
+        CssInterfaceResult result = new CssInterfaceResult();
 		result.setProfile(profile);
 		result.setResultStatus(false);
+		
+		CssRecord cssRecord = null;
+		
+		try{
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// add new node to login to cloud CssRecord
+				cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
-		// add new node to login to cloud CssRecord
-		this.cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
+				this.updateCssRegistry(cssRecord);
+				LOG.debug("Updating CSS with local database");
+				
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+				
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.ADD_CSS_NODE);
+				event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
+				
+				this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				
+			} else {
+				LOG.error("CSS record does not exist");
+			}
 
-		try {
-			this.cssRegistry.registerCss(cssRecord);
-			LOG.debug("Registering CSS with local database");
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		result.setProfile(this.cssRecord);
-		result.setResultStatus(true);
-		CssEvent event = new CssEvent();
-		event.setType(CSSManagerEnums.ADD_CSS_NODE);
-		event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-		
-		this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -344,92 +353,50 @@ public class CSSManager implements ICSSLocalManager {
 		CssInterfaceResult result = new CssInterfaceResult();
 		result.setProfile(profile);
 		result.setResultStatus(false);
+		CssRecord cssRecord = null;
+		
+		try{
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// remove new node to login to cloud CssRecord
+				for (Iterator<CssNode> iter = cssRecord.getCssNodes().iterator(); iter
+						.hasNext();) {
+					CssNode node = (CssNode) iter.next();
+					CssNode logoutNode = profile.getCssNodes().get(0);
+					if (node.getIdentity().equals(logoutNode.getIdentity())
+							&& node.getType() == logoutNode.getType()) {
+						iter.remove();
+						break;
+					}
+				}
 
-
-		// remove new node to login to cloud CssRecord
-		for (Iterator<CssNode> iter = this.cssRecord.getCssNodes().iterator(); iter
-				.hasNext();) {
-			CssNode node = (CssNode) iter.next();
-			CssNode logoutNode = profile.getCssNodes().get(0);
-			if (node.getIdentity().equals(logoutNode.getIdentity())
-					&& node.getType() == logoutNode.getType()) {
-				iter.remove();
-				break;
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+				
+				this.updateCssRegistry(cssRecord);
+				
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
+				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+				
+				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+				
+			} else {
+				LOG.error("Css Record does not exist");
 			}
+
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		result.setProfile(this.cssRecord);
-		result.setResultStatus(true);
-		
-		try {
-			this.cssRegistry.updateCssRecord(cssRecord);
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			this.cssRegistry.updateCssRecord(cssRecord);
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		CssEvent event = new CssEvent();
-		event.setType(CSSManagerEnums.DEPART_CSS_NODE);
-		event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
-		
-		this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+
 
 	
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
-//	@Override
-//	/**
-//	 * Requires that CssRecord parameter has one node in its collection and that 
-//	 * the node corresponds to the node being logged out.
-//	 */
-//	public Future<CssInterfaceResult> logoutCSS(CssRecord profile) {
-//		LOG.debug("Calling logoutCSS");
-//
-//		Dbc.require("CssRecord parameter cannot be null", profile != null);
-//		Dbc.require("Cssrecord parameter must contain CSS identity",
-//				profile.getCssIdentity() != null
-//						&& profile.getCssIdentity().length() > 0);
-//
-//		CssInterfaceResult result = new CssInterfaceResult();
-//		result.setProfile(profile);
-//		result.setResultStatus(false);
-//
-//		CssRecord record;
-//		try {
-//			record = this.cssRegistry.getCssRecord();
-//
-//			if (profile.getCssIdentity().equals(record.getCssIdentity())) {
-//				// remove new node to login to cloud CssRecord
-//				for (Iterator<CssNode> iter = record.getCssNodes().iterator(); iter
-//						.hasNext();) {
-//					CssNode node = (CssNode) iter.next();
-//					CssNode logoutNode = profile.getCssNodes().get(0);
-//					if (node.getIdentity().equals(logoutNode.getIdentity())
-//							&& node.getType() == logoutNode.getType()) {
-//						iter.remove();
-//						break;
-//					}
-//				}
-//				// update the CSS registry
-//				this.cssRegistry.updateCssRecord(record);
-//
-//				result.setProfile(record);
-//				result.setResultStatus(true);
-//			}
-//		} catch (CssRegistrationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return new AsyncResult<CssInterfaceResult>(result);
-//	}
 
 	@Override
 	public Future<CssInterfaceResult> logoutXMPPServer(CssRecord profile) {
@@ -439,18 +406,61 @@ public class CSSManager implements ICSSLocalManager {
 
 	@Override
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
-		CssInterfaceResult result = new CssInterfaceResult();
-		LOG.info("CSS Manager modifyCSSrecord Called");
-		LOG.info("CSS Manager cssrecord Size is : " +profile.getCssNodes().size());
+		LOG.debug("Calling modifyCssRecord");
+
+		Dbc.require("CssRecord parameter cannot be null", profile != null);
+
+        CssInterfaceResult result = new CssInterfaceResult();
+		result.setProfile(profile);
+		result.setResultStatus(false);
 		
-		try {
-			cssRegistry.unregisterCss(profile);
-			result = cssRegistry.registerCss(profile);
+		CssRecord cssRecord = null;
+		
+		try{
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// update profile information
+				cssRecord.setEntity(profile.getEntity());
+				cssRecord.setForeName(profile.getForeName());
+				cssRecord.setName(profile.getName());
+				cssRecord.setEmailID(profile.getEmailID());
+				cssRecord.setImID(profile.getImID());
+				cssRecord.setSocialURI(profile.getSocialURI());
+				cssRecord.setSex(profile.getSex());
+				cssRecord.setHomeLocation(profile.getHomeLocation());
+				cssRecord.setIdentityName(profile.getIdentityName());
+				
+				// internal eventing
+				LOG.info("Generating CSS_Record_Event to notify Record has changed");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
+					try {
+						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish SUBS CIS event");
+					}
+				}
+
+				this.updateCssRegistry(cssRecord);
+				LOG.debug("Updating CSS with local database");
+
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+
+			} else {
+				LOG.equals("Css record does not exist");
+			}
+			
+
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
@@ -839,6 +849,14 @@ public class CSSManager implements ICSSLocalManager {
 	public void setCssManagerRemote(ICSSRemoteManager cssManagerRemote) {
 		this.cssManagerRemote = cssManagerRemote;
 	}
+	
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
 
 
 
@@ -989,7 +1007,7 @@ public class CSSManager implements ICSSLocalManager {
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
 		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
-		LOG.info("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
+		LOG.info("sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
 	}
 	
@@ -1048,17 +1066,30 @@ public class CSSManager implements ICSSLocalManager {
 	}
 	
 		@Override
-	public Future<List<String>> getCssFriends() {
+	public Future<List<CssAdvertisementRecord>> getCssFriends() {
 		List<String> friendList = new ArrayList<String>();
+		List<CssAdvertisementRecord> friendAdList = new ArrayList<CssAdvertisementRecord>();
 		
 		try {
 				friendList = cssRegistry.getCssFriends();
+				
+				// Only go searching the directory is theor is something to search for
+				if ((friendList != null) && (friendList.size() > 0))
+				{	
+				
+					//first get all the cssdirectory records
+					CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+					getCssDirectoryRemote().searchByID(friendList, callback);
+					friendAdList = callback.getResultList();
+				}
+				
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		return new AsyncResult<List<String>>(friendList);
+		return new AsyncResult<List<CssAdvertisementRecord>>(friendAdList);
 		
 	}
 	
@@ -1085,10 +1116,10 @@ public class CSSManager implements ICSSLocalManager {
 		if (currentCssRecord.getCssNodes() != null) {
 			for (CssNode cssNode : currentCssRecord.getCssNodes()) {
 				cssNode.getIdentity();
-				LOG.info("[][][][][] cssNode.getIdentity is returning   [][][][][]: " +cssNode.getIdentity());
-				LOG.info("[][][][][] nodeid is returning   [][][][][]: " +nodeid);
+				LOG.info("cssNode.getIdentity is returning: " +cssNode.getIdentity());
+				LOG.info("nodeid is returning: " +nodeid);
 				if (nodeid.equalsIgnoreCase(cssNode.getIdentity())){
-					LOG.info("[][][][][] cssNode.getType() is returning   [][][][][]: " +cssNode.getType());
+					LOG.info("cssNode.getType() is returning: " +cssNode.getType());
 					if (CSSManagerEnums.nodeType.Android.ordinal() == (cssNode.getType())) {
 						Type = "Android";
 					} else if (CSSManagerEnums.nodeType.Rich.ordinal() == (cssNode.getType())) {
@@ -1099,7 +1130,7 @@ public class CSSManager implements ICSSLocalManager {
 				}
 			}
 		}
-		LOG.info("[][][][][] getthisNodeType is returning   [][][][][]: " +Type);
+		LOG.info("getthisNodeType is returning: " +Type);
 		return new AsyncResult<String>(Type);
 	}
 
@@ -1219,7 +1250,7 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 	}
 
 @SuppressWarnings("unchecked")
-public List<CssAdvertisementRecord> suggestedFriends( ) {
+public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	
 	ISocialData socialData = null;
 	
@@ -1230,7 +1261,7 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
 	List<CssAdvertisementRecord> commonFriends = new ArrayList<CssAdvertisementRecord>();
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
-	LOG.info("@#@#@#@#@#@# ==== MyId contains " +MyId);
+	LOG.info("MyId contains " +MyId);
 	
 	LOG.info("CSSManager getFriends method called ");
 	
@@ -1243,9 +1274,9 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
 	recordList = callback.getResultList();
 	
 	for (CssAdvertisementRecord cssAdd : recordList) {
-		LOG.info("@#@#@#@#@#@# ==== Comparing Id contains " +cssAdd.getId());
+		LOG.info("Comparing Id contains " +cssAdd.getId());
 		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
-			LOG.info("This is my OWN ID not adding it #########  ");
+			LOG.info("This is my OWN ID not adding it");
 		}else {
 			cssFriends.add((cssAdd));
 		}
@@ -1258,7 +1289,7 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
 	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
 	
 	LOG.info("Contacting SN Connector to get list");
-	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ getSocialData() returns " +getSocialData());
+	LOG.info("getSocialData() returns " +getSocialData());
 	
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
@@ -1267,7 +1298,7 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
 	while (it.hasNext()){
 	  ISocialConnector conn = it.next();
   	  
-	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ SocialNetwork connector contains " +conn.getConnectorName());
+	LOG.info("SocialNetwork connector contains " +conn.getConnectorName());
 	
 	//socialdata.updateSocialData();
 	}
@@ -1318,10 +1349,10 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
    // for (int index =0; index < cssFriends.size(); index++)
    // {
     for (CssAdvertisementRecord friend : cssFriends) {
-    	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
+    	LOG.info("CSS Friends iterator List contains " +friend);
         if (socialFriends.contains(friend.getName())) {
         	if (commonFriends.contains(friend)){
-        		LOG.info("This friend is already added to the list @@@@@@@@@@  " +friend);	
+        		LOG.info("This friend is already added to the list:" +friend);	
         	}else {
         		commonFriends.add(friend);
         	}
@@ -1331,10 +1362,97 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
     }
     //}
     LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
-	return commonFriends;
+	//return commonFriends;
+	return new AsyncResult<List<CssAdvertisementRecord>>(commonFriends);
 
 	}
 
+	/**
+	 * Get today's date
+	 * 
+	 * @return String today's date
+	 */
+	private String getDate() {
+		Calendar today = Calendar.getInstance();
+		
+		StringBuffer date = new StringBuffer();
+		
+		date.append(Integer.toString(today.get(Calendar.YEAR)));
+		date.append(Integer.toString(today.get(Calendar.MONTH)));
+		date.append(Integer.toString(today.get(Calendar.DAY_OF_MONTH)));
+		
+		return date.toString();
+	}
+
+	@Override
+	public Future<List<CssAdvertisementRecord>> getFriendRequests() {
+		List<CssRequest> pendingfriendList = new ArrayList<CssRequest>();
+		List<CssAdvertisementRecord> friendReqList = new ArrayList<CssAdvertisementRecord>();
+		List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+		List<String> pendingList = new ArrayList<String>();	
+		
+		
+		try {
+			//pendingfriendList = cssRegistry.getCssFriendRequests();
+			pendingfriendList = cssRegistry.getCssRequests();
+			
+			for (CssRequest cssrequest : pendingfriendList) {
+		    	LOG.info("CSS FriendRequest iterator List contains " +pendingfriendList);
+		    	LOG.info("cssrequest status is: " +cssrequest.getRequestStatus());
+		        if (cssrequest.getRequestStatus().value().equalsIgnoreCase("pending")) {
+		        	//cssrequest.getCssIdentity();
+		        	pendingList.add(cssrequest.getCssIdentity());
+		        	LOG.info("pendingList size is now: " +pendingfriendList.size());
+		        	LOG.info("pendingList entry is: " +cssrequest.getCssIdentity());
+		        		
+		        	}
+		        	
+		        }	
+				
+			
+			// Only go searching the directory is theor is something to search for
+			if ((pendingList != null) && (pendingList.size() > 0))
+			{	
+			
+				//first get all the cssdirectory records
+				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+				getCssDirectoryRemote().searchByID(pendingList, callback);
+				friendReqList = callback.getResultList();
+			}
+				
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return new AsyncResult<List<CssAdvertisementRecord>>(friendReqList);
+	}
 	
+	public void acceptCssFriendRequest(CssRequest request) {
+		
+		//TODO: This is called either locally or remotle
+		//Locally, we can cancel pending request, or leave css's
+		// remotely, it will be an accepted of the request we sent
+			try {
+				cssRegistry.updateCssFriendRequestRecord(request);
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+			// If this was initiated locally then inform remote css
+			// We only want to sent messages to remote Css's for this function if we initiated the call locally
+			if (request.getOrigin() == CssRequestOrigin.LOCAL)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					cssManagerRemote.acceptCssFriendRequest(request); 
+			}
+		}
 }
 

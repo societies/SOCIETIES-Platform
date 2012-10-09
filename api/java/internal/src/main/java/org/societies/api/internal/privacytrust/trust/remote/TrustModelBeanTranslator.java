@@ -24,11 +24,11 @@
  */
 package org.societies.api.internal.privacytrust.trust.remote;
 
-import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.internal.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.internal.schema.privacytrust.trust.model.TrustedEntityTypeBean;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 public final class TrustModelBeanTranslator {
 	

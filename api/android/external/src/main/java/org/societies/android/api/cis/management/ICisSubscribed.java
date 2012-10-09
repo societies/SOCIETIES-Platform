@@ -24,15 +24,63 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 
 /**
- * This interfacerepresents CISs that are not owned by this CSS but that this
+ * This interface represents CISs that are not owned by this CSS but that this
  * CIS subscribes to (is a member of).
  * 
  * @author Babak.Farshchian@sintef.no
- *
+ * Implemented by the CommunityManager APKLib service
  */
-@Deprecated
-public interface ICisSubscribed extends ICisRecord {
+public interface ICisSubscribed {
+	public String methodsArray[] = {"getMembers(String client, String cisId)",
+							 		"getCisInformation(String client, String cisId)",
+							 		"getActivityFeed(String client, String cisId)",
+							 		"addActivity(String client, String cisId, AActivity activity)",
+							 		"deleteActivity(String client, String cisId, AActivity activity)",
+							 		"cleanActivityFeed(String client, String cisId)"
+								};
+	
+	/**
+	 * Get the list of members for this community
+	 * @param client
+	 * @param cisId
+	 * @return
+	 */
+	public String[] getMembers(String client, String cisId);
+	
+	/**
+	 * Get info for this community
+	 * @param client
+	 * @param cisId
+	 * @return
+	 */
+	public ACommunity getCisInformation(String client, String cisId);
 
+	/**
+	 * Get the list of activities for this community
+	 * @param client
+	 * @param cisId
+	 * @return
+	 */
+	public Activity[] getActivityFeed(String client, String cisId);
+	
+	/**
+	 * Add an activity to this community
+	 * @param activity
+	 * @return
+	 */
+	public Boolean addActivity(String client, String cisId, AActivity activity);
+	
+	/**
+	 * Deletes the relevant activty from the feed
+	 */
+	public Boolean deleteActivity(String client, String cisId, AActivity activity);
+	/**
+	 * Clean up the activity feed for this community
+	 * @return
+	 */
+	public CleanUpActivityFeedResponse cleanActivityFeed(String client, String cisId);
 }

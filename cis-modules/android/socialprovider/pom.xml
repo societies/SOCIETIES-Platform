@@ -14,7 +14,7 @@
    <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>SocialProvider</name>
-   <packaging>apklib</packaging>
+   <packaging>apk</packaging>
 
    <developers>
 	    <developer>
@@ -32,11 +32,23 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
+           	<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-    	<dependency>
+        <dependency>
+            <groupId>org.societies.android.api.external</groupId>
+            <artifactId>societies-android-api</artifactId>
+            <version>${release.version}</version>
+		</dependency>
+       	<!-- <dependency>
 			<groupId>org.asmack</groupId>
 	        <artifactId>asmack</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>

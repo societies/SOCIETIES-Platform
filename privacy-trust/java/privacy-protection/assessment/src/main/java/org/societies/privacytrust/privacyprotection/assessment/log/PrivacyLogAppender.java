@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.assessment.log;
 
 import java.util.Date;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -88,15 +89,24 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	
 	private void logStack() {
 
-		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-		LOG.debug("stackTrace length = {}", stackTrace.length);
-		if (stackTrace != null) {
-			for (StackTraceElement st : stackTrace) {
-				LOG.debug(" ");
-				LOG.debug("  ClassName : {}", st.getClassName());
-				LOG.debug("  FileName  : {}", st.getFileName());
-				LOG.debug("  MethodName: {}", st.getMethodName());
-			}
+		//StackTraceElement[] stack = (new Exception()).getStackTrace();
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int k = 0; k < stack.length; k++) {
+			
+			// Full class name
+			Log.info("STACK[" + k + "]: " + stack[k].getClassName());
+			
+			// Java file name without path
+			Log.info("STACK[" + k + "]: " + stack[k].getFileName());
+			
+			// Method name without class name or parameters
+			Log.info("STACK[" + k + "]: " + stack[k].getMethodName());
+			
+			// Full class name + method + file name + line number
+			Log.info("STACK[" + k + "]: " + stack[k].toString());
+			
+			// false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
+			Log.info("STACK[" + k + "]: " + stack[k].isNativeMethod());
 		}
 	}
 
@@ -139,6 +149,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
+		//logStack();
+		
 		String dataType;
 		String invokerClass = "";  // FIXME
 		
@@ -165,8 +177,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
-		LOG.debug("logContext()");
+		LOG.info("logContext()");
 		
+		//logStack();
+
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
 		
@@ -185,8 +199,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
-		LOG.debug("logContext({})", dataSize);
+		LOG.info("logContext({})", dataSize);
 		
+		//logStack();
+
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
 		

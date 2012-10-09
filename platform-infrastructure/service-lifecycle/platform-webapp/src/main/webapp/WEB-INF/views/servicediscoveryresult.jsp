@@ -7,6 +7,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies Service Discovery Result</title>
+<style>
+.privacy-policy-handler{
+	display: inline-block;
+	padding: 1px 4px;
+	border: 1px solid gray;
+	border-radius: 2px;
+	background-color: #D3D3D3;
+	color: black;
+	text-decoration: none;
+	font-family: arial;
+	font-size: 0.9em;
+}
+</style>
 </head>
 <body>
 	<!-- HEADER -->
@@ -25,7 +38,7 @@ String[] methodCalledArr = (String[]) model.get("method");
 String methodCalled = methodCalledArr[0];
 
 String node = "";
-if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")) {
+if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 	String[] nodeArr = (String[]) model.get("node");
 	node = nodeArr[0];
 }
@@ -59,18 +72,22 @@ function updateForm(serviceID, toDo) {
         	<td>${service.serviceName}</td>
          	<td>${service.serviceDescription}</td>
             <td>${service.authorSignature}</td>
-            <td>${service.serviceStatus}</td>
+            <td>${service.serviceStatus}</td>      
             <td>
             <%
-			if (methodCalled.equals("GetServicesCis")) {
+			if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 			%>
 				<input type="button" value="share" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'ShareService')" >
+				<input type="button" value="unshare" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UnshareService')" >
 			<%
 			} else {
 			%>
+			<xc:if test="${service.serviceType != 'DEVICE'}">
+				<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
 				<input type="button" value="start" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StartService')" >
 				<input type="button" value="stop" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StopService')" >
-				<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" >
+	<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
+			</xc:if>
 			<%
 			}
             %>
@@ -81,7 +98,7 @@ function updateForm(serviceID, toDo) {
 	</table>
 <%
 //DISPLAY LIST OF SERVICES FROM CIS
-if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")) {
+if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 %>
 	<p>&nbsp;</p>
     <p><b>Community Services: <%= node %></b></p>	
@@ -98,7 +115,14 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
          	<td>${service.serviceDescription}</td>
             <td>${service.authorSignature}</td>
             <td>${service.serviceStatus}</td>
-            <td><input type="button" value="install" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'Install3PService')" >
+            <td>
+            <xc:if test="${service.serviceType != 'DEVICE'}">
+				<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
+			</xc:if>
+			 <xc:if test="${service.serviceType == 'DEVICE'}">
+			 	Device
+			</xc:if>
+            <input type="button" value="install" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'Install3PService')" >
 			</td>
         </tr>
     </xc:forEach>

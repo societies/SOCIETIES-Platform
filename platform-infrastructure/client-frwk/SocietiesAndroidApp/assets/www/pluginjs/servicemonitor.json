@@ -20,7 +20,7 @@
 							{"className" : "app3",
 							 "numRunningActivities" : 9}
 							],
-		"getInstalledApps" : [ {
+		"getInstalledApplications" : [ {
 	                "applicationName": "Foursquare",
 					"packageName": "org.foursquare.client",
 					"versionName ": "Icecream Sandwich",

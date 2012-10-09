@@ -4,114 +4,68 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-
-
 </head>
 <body>
 
-
-<!-- Start of first page: #friends -->
-<div data-role="page" id="community-profile">
+<!-- community page -->
+<div data-role="page" id="community-details-page">
 	<div data-role="header" data-position="fixed">
-		<img class="logo" src="../images/societies_header.png" alt="logo" />
+		<img class="logo" src="images/societies_header.png" alt="logo" />
 		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
 		<!-- /header -->
 	</div>
 	<div data-role="content">
-		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b" id="community_details">
 			<li data-role="list-divider">General Information</li>
 			<li>
-			<div class="profile_pic">
-				<img src="../images/community_profile_img.png" alt="logo" />
-			</div>
-			
-			<div class="community_profile_txt">
-
-				<div data-role="fieldcontain" >
-			    	<label for="comProfCisName">Name: </label>
-			    	<input type="text" id="comProfCisName" readOnly="true"/>
+				<div class="profile_pic">
+					<img src="../images/community_profile_img.png" alt="logo" />
 				</div>
-	
-				<div data-role="fieldcontain">
-			    	<label for="comProfCisCategory">Category: </label>
-			    	<input type="text" id="comProfCisCategory" value="" />
+				<div id="community_profile_info" class="profile_txt" >
+					<h1>ICT</h1>
+					<p>Category: ICT</p>
+					<p>Location:Dublin, Ireland</p>
+					<p>Admin: Sara Weber</p>
 				</div>
-	
-				<div data-role="fieldcontain">
-			    	<label for="comProfCisJid">Jid: </label>
-			    	<input type="text" id="comProfCisJid"  disabled="true"/>
-				</div>
-				
-				<div data-role="fieldcontain">
-			    	<label for="comProfCisDesc">Description: </label>
-			    	<input type="text" id="comProfCisDesc"  disabled="true"/>
-				</div>
-				
-				<div data-role="fieldcontain">
-			    	<label for="comProfCisowner">Owner: </label>
-			    	<input type="text" id="comProfCisowner"  disabled="true"/>
-				</div>
-
-			
-<!--  				<h1>ICT</h1>
-				<p>
-					Category: ICT
-				</p>
-				<p>
-					Location:Dublin, Ireland
-				</p>
-				<p>
-					Admin: Sara Weber
-				</p>-->
-			</div>
-			<p>
-				<a href="invite_member_friends_list.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Invite </a>
-			</p>
+				<p><a href="invite_member_friends_list.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Invite </a></p>
 			</li>
-<!-- 			<li data-role="list-divider">Additional Info</li>
-			<li>
-			<br/>
-			<p>
-				Societies ICT Community
-			</p>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a nulla nunc. Cras elit nulla, varius vitae blandit sed, hendrerit vel nibh. Curabitur commodo vulputate dolor, sit amet lacinia felis ullamcorper ut.
-			</p>
-			</li>
-			<li data-role="list-divider">Popular Apps within this Community</li>
-			<li>
-			<h3>HP Colour Printer</h3>
-			<p>
-				HP SmartPrint Z200a
-			</p>
-			<p class="ui-li-aside">
-				<a href="#" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a>
-			</p>
-			<br/>
-			</li>
-			<li data-role="list-divider">Community Stats</li>
-			<li>
-			<br/>
-			<p>
-				90% of users in this community have installed <br/>the "HP Printer z200" app
-			</p>
-			</li>
-			<li data-role="list-divider">Activity Feed</li>
-			<li>
-			<h3>Heading 1</h3>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-			</p>
-			<h3>Heading 2</h3>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-			</p>
-			<h3>Heading 3</h3>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-			</p>
-			</li>-->
 		</ul>
+		<br />
+		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
+			<h3>Community Members</h3>
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_members">
+			<!-- ADD MEMBERS HERE -->
+		   
+			</ul>
+		</div>
+
+		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
+			<h3>Shared Apps</h3>
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_shared_apps">
+			<!-- ADD SHARED APPS HERE -->
+				<li>
+					<h3>HP Colour Printer</h3>
+					<p>HP SmartPrint Z200a</p>
+					<p class="ui-li-aside"><a href="#" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a></p>
+				</li>
+		   </ul>
+		   <br/></br/>
+		   <form id="frmShareService">
+				<div data-role="controlgroup" > <!-- data-type="horizontal"> -->
+					<label for="connectorType" class="select">Share an application to this community:</label>
+					<select id="selShareService" onChange="SocietiesCISListService.shareService()">
+						<option selected="selected" value="0">Select a service</option>
+					</select> 
+				</div>
+			</form>
+		</div>
+
+		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
+			<h3>Activity Feed</h3>
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_activity_feed">
+			<!-- ADD ACTIVITIES HERE -->
+			</ul>
+		</div>
 	</div>
 	<!-- /content -->
 	<br/><br/>

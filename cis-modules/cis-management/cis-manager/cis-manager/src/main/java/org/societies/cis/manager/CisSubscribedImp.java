@@ -62,6 +62,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.Community;
 //import org.societies.api.schema.cis.community.GetInfo;
@@ -71,8 +73,9 @@ import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.SetInfo;
+import org.societies.api.schema.cis.community.WhoRequest;
 //import org.societies.api.schema.cis.community.SetInfo;
-import org.societies.api.schema.cis.community.Who;
+import org.societies.api.schema.identity.RequestorBean;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -215,35 +218,26 @@ public class CisSubscribedImp implements ICis {
 	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
-		
 		LOG.info("client call to get list of members from a RemoteCIS");
 
+		CommunityMethods c = new CommunityMethods();
+		WhoRequest w = new WhoRequest();
+		c.setWhoRequest(w);
+		RequestorBean reqB = new RequestorBean();
+		reqB.setRequestorId(this.cisManag.iCommMgr.getIdManager().getThisNetworkNode().getBareJid());
+		this.sendXmpp(c, callback);		
+	}
+	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
+		LOG.info("client call to get list of members from a RemoteCIS");
 
-		IIdentity toIdentity;
-		try {
-			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
-			LOG.info("identity ok");
-			Stanza stanza = new Stanza(toIdentity);
-			LOG.info("stanza done");
-			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
-					stanza.getId(), callback, this.cisManag);
-
-			LOG.info("callback");
-			CommunityMethods c = new CommunityMethods();
-			Who w = new Who();
-			c.setWho(w);
-			try {
-				LOG.info("Sending stanza with who");
-				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the who");
-			e1.printStackTrace();
-		}	
-
+		CommunityMethods c = new CommunityMethods();
+		
+		WhoRequest w = new WhoRequest();
+		c.setWhoRequest(w);
+		RequestorBean reqB = Util.createRequestorBean(req);
+		w.setRequestor(reqB);
+		
+		this.sendXmpp(c, callback);	
 	}
 
 	
@@ -278,7 +272,7 @@ public class CisSubscribedImp implements ICis {
 	
 	
 	
-	private void sendXmpp(Community c,ICisManagerCallback callback){
+	private void sendXmpp(CommunityMethods c,ICisManagerCallback callback){
 		IIdentity toIdentity;
 		try {
 			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());

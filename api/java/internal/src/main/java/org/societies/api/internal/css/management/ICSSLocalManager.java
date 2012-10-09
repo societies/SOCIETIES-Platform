@@ -178,7 +178,7 @@ public interface ICSSLocalManager {
 			CssAdvertisementRecord updatedRecord);
 
 	/**
-	 * retrusn all advertisement records in CssDirectory
+	 * returns all advertisement records in CssDirectory
 	 * 
 	 * @return Future<List<CssAdvertisementRecord>>
 	 */
@@ -193,9 +193,15 @@ public interface ICSSLocalManager {
 	Future<List<Service>> findAllCssServiceDetails(
 			List<CssAdvertisementRecord> listCssAds);
 	
-	/* get list of css's and status that you have asked to join/jined */
+	/**
+	 * Return a list of people who I have asked to my friend
+	 * @return
+	 */
 	Future<List<CssRequest>> findAllCssFriendRequests();
-	/* get lost of requests from people that have asked to join/joined your css */
+	/**
+	 * Return list of requests to be my friend
+	 * @return
+	 */
 	Future<List<CssRequest>> findAllCssRequests();
 	/* Add update a reuest sent to join your css */
 	void updateCssRequest(CssRequest request);
@@ -204,27 +210,41 @@ public interface ICSSLocalManager {
 	/* Called by remote css is response t your request to join*/
 	void updateCssFriendRequest(CssRequest request);
 	
- Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull() ;
- 
- 
- /**
-	 * Returns the current Node Type
-	 * i.e. "CSS_CLOUD", "CSS_RICH" or "CSS_LIGHT"
-	 * 
-	 * @return Future<String>
-	 */
- Future<String> getthisNodeType(String nodeId);
- 
- public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssNodeMAC, String interactable);
- 
- public void removeNode(CssRecord cssrecord, String nodeId);
-
- /**
-  * Returns a list of Css id's of people who we have accepted/have accepted friend requests
-  */
- public Future<List<String>> getCssFriends();
- 
- public List<CssAdvertisementRecord> suggestedFriends();
- 
+	 Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull() ;
+	 
+	 
+	 /**
+		 * Returns the current Node Type
+		 * i.e. "CSS_CLOUD", "CSS_RICH" or "CSS_LIGHT"
+		 * 
+		 * @return Future<String>
+		 */
+	 Future<String> getthisNodeType(String nodeId);
+	 
+	 public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssNodeMAC, String interactable);
+	 
+	 public void removeNode(CssRecord cssrecord, String nodeId);
+	
+	 /**
+	  * Returns a list of Css id's of people who we have accepted/have accepted friend requests
+	  */
+	 public Future<List<CssAdvertisementRecord>> getCssFriends();
+	 /**
+	  * Return a list of SNS inspired friends
+	  * @return
+	  */
+	 public Future<List<CssAdvertisementRecord>> suggestedFriends();
+	 /**
+	  * 
+	  * @return
+	  */
+	 public Future<List<CssAdvertisementRecord>> getFriendRequests();
+	 
+	 /**
+	  * Accept 
+	  * @param request
+	  */
+	 public void acceptCssFriendRequest(CssRequest request);
+	 
  
 }

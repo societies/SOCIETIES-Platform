@@ -44,6 +44,9 @@
 		<module>../distributions/virgo-baseline.xml</module>
 		<module>../distributions/virgo-cloud-node.xml</module>
 		<module>../distributions/virgo-da-node.xml</module>
+		
+		<!-- moved from baseline build -->
+		<module>../../platform-infrastructure/comms-frwk/RichCommsBundle</module>
 
 		<!-- include here automated integration test modules and other modules which are not to be included in the above distributions -->
 
@@ -58,5 +61,7 @@
 		<module>../../intelligent-community-orchestration/CPA</module>
 		-->
 		
+		<!-- Integration tests -->
+		<module>../../integration-tests/builder/virgo-integration/virgo-integration-tests.xml</module>		
 	</modules>
 </project>

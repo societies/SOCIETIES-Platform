@@ -26,7 +26,7 @@ package org.societies.privacytrust.trust.api.model;
 
 import java.util.Set;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
