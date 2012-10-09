@@ -71,9 +71,9 @@ public class UserFeedbackController {
 		this.userFeedback = userFeedback;
 	}
 	
-
+	//TODO : Quick fix for pilot
 	@RequestMapping(value = "/{cssId}/get_form.html", method = RequestMethod.GET)
-	public ModelAndView getForm(){
+	public ModelAndView getFormwithid(){
 		//retrieve next request from UF service
 		String returnString = "";
 		FeedbackForm form = userFeedback.getNextRequest();
@@ -88,6 +88,22 @@ public class UserFeedbackController {
 		return new ModelAndView("data", model);
 	}
 
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
+	public ModelAndView getForm(){
+		//retrieve next request from UF service
+		String returnString = "";
+		FeedbackForm form = userFeedback.getNextRequest();
+		if(form != null){
+			returnString = gsonMgr.toJson(form);
+		}else{
+			returnString = gsonMgr.toJson(new FeedbackForm().generateEmptyFeedbackForm());
+		}
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("data", returnString);
+		return new ModelAndView("data", model);
+	}
+	
 	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
 	public ModelAndView submitResponse(@RequestParam("data") String jsonString){
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -147,4 +163,66 @@ public class UserFeedbackController {
 		model.put("data", returnString);
 		return new ModelAndView("data", model);
 	}
+	
+	//TODO : Quick fix for pilot
+	@RequestMapping(value = "/{cssId}/get_form.html", method = RequestMethod.POST)
+	public ModelAndView submitResponseWithId(@RequestParam("data") String jsonString){
+		Map<String, Object> model = new HashMap<String, Object>();
+		LOG.info("[Submit response]"+jsonString);
+		
+		//convert json string back to Java types
+		FeedbackForm responseForm; 
+		try{
+			responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
+		}catch(Exception e){
+			LOG.error("Submitted response - incorrect format");
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
+			model.put("data", returnString);
+			return new ModelAndView("data", model);
+		}
+
+		//respond back to UF service
+		String type = responseForm.getType();
+		if(type.equalsIgnoreCase(RADIO)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(CHECK)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(ACK)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(ABORT)){
+			String[] data = responseForm.getData();
+			if(data[0].equalsIgnoreCase("true")){
+				userFeedback.submitImplicitResponse(responseForm.getID(), true);
+			}else{
+				userFeedback.submitImplicitResponse(responseForm.getID(), false);
+			}
+		}else if(type.equalsIgnoreCase(NOTIFICATION)){
+			userFeedback.submitImplicitResponse(responseForm.getID(), true);
+		}else{
+			LOG.error("Did not recognise response form type from AJAX");
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
+			model.put("data", returnString);
+			return new ModelAndView("data", model);
+		}
+		
+		String returnString = gsonMgr.toJson((new FeedbackForm().generateSuccessFeedbackResultForm()));
+		model.put("data", returnString);
+		return new ModelAndView("data", model);
+	}
+	
 }

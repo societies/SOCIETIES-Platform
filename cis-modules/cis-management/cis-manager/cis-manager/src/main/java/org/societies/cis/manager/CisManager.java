@@ -80,6 +80,8 @@ import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -146,7 +148,11 @@ import org.societies.api.schema.identity.RequestorBean;
 public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback{
 
 	
-
+	int nbOfCreatedCIS = 0;
+	int nbOfSubscribedCIS = 0;
+	int nbOfUnsubscribedCIS = 0;
+	int nbOfDeletedCIS = 0;
+	
 	List<Cis> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
@@ -166,7 +172,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	private PubsubClient pubsubClient;
 	//Autowiring gets and sets
-	
 	
 	
 	
@@ -307,6 +312,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManager.class);
+	
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 
 	public CisManager() {
 			this.ownedCISs = new ArrayList<Cis>();	
@@ -426,6 +433,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					e.printStackTrace();
 					LOG.error("error trying to internally publish CIS DELETE event");
 				}
+				
+				// performance log of the delete
+				IPerformanceMessage perMess= new PerformanceMessage();
+				perMess.setSourceComponent(this.getClass()+"");
+				perMess.setD82TestTableName("S50");
+				perMess.setTestContext("CISManagement.CisDeletion.Counter");
+				perMess.setOperationType("Delete CIS " + cis.getCisId());
+				perMess.setPerformanceType(IPerformanceMessage.Quanitative);
+				perMess.setPerformanceNameValue((++nbOfDeletedCIS)+"");
+				PERF_LOG.trace(perMess.toString());
 
 			}
 		}
@@ -525,6 +542,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
+
+			
+			IPerformanceMessage perMess= new PerformanceMessage();
+			perMess.setSourceComponent(this.getClass()+"");
+			perMess.setD82TestTableName("S48");
+			perMess.setTestContext("CISManagement.CisCreation.Counter");
+			perMess.setOperationType("Create CIS " + cis.getCisId());
+			perMess.setPerformanceType(IPerformanceMessage.Quanitative);
+			perMess.setPerformanceNameValue((++nbOfCreatedCIS)+"");
+			PERF_LOG.trace(perMess.toString());
 			return i;
 		}else{
 			return null;
@@ -541,6 +568,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
+			
+			IPerformanceMessage perMess= new PerformanceMessage();
+			perMess.setSourceComponent(this.getClass()+"");
+			perMess.setD82TestTableName("S49");
+			perMess.setTestContext("CISManagement.CisSubscription.Counter");
+			perMess.setOperationType("Subscribed in CIS " + i.getCisJID());
+			perMess.setPerformanceType(IPerformanceMessage.Quanitative);
+			perMess.setPerformanceNameValue((++nbOfSubscribedCIS)+"");
+			PERF_LOG.trace(perMess.toString());
+			
 			
 			// internal eventing
 			if(this.getEventMgr() != null){
@@ -578,6 +615,15 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			
 			if(this.subscribedCISs.remove(temp)) {// removing it from the list
 				this.deletePersisted(temp); // removing it from the database
+				
+				IPerformanceMessage perMess= new PerformanceMessage();
+				perMess.setSourceComponent(this.getClass()+"");
+				perMess.setD82TestTableName("S53");
+				perMess.setTestContext("CISManagement.CisUnSubscription.Counter");
+				perMess.setOperationType("UnSubscribed in CIS " + c.getCommunityJid());
+				perMess.setPerformanceType(IPerformanceMessage.Quanitative);
+				perMess.setPerformanceNameValue((++nbOfUnsubscribedCIS)+"");
+				PERF_LOG.trace(perMess.toString());
 				
 				//send the local event
 				if(this.getEventMgr() != null){
@@ -1392,7 +1438,20 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		@Override
 		public void onNegotiationError(String msg) {
+			this.returnFail();
+			
+		}
+		
+		private void returnFail(){
 			LOG.debug("privacy negotiation error");
+			CommunityMethods result = new CommunityMethods();		
+			Community com = new Community();
+			com.setCommunityJid(targetJid);
+			JoinResponse jr = new JoinResponse();
+			jr.setResult(false);
+			jr.setCommunity(com);
+			result.setJoinResponse(jr);			
+			callback.receiveResult(result);
 		}
 
 		@Override
@@ -1421,6 +1480,9 @@ public class JoinCallBack implements ICisManagerCallback{
 					LOG.info("Problem with the input jid when trying to send the join");
 					e1.printStackTrace();
 				}
+			}
+			else{
+				this.returnFail();
 			}
 				
 		}

@@ -42,6 +42,8 @@ import org.societies.api.identity.IIdentity;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -62,7 +64,10 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	}
 	public void setPubSubcli(PubsubClient pubSubcli) {
 		this.pubSubcli = pubSubcli;
-	}	
+	}
+	
+	private final static List<String> classList = Collections 
+			.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
 	
 	@Override
     synchronized public void startUp(SessionFactory sessionFactory, String id){
@@ -79,6 +84,12 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
         
         // pubsub code
         if(null != pubSubcli && null != ownerCSS){
+        	try {
+				pubSubcli.addSimpleClasses(classList);
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			List<String> l = null;
 			try {
 				l = pubSubcli.discoItems(ownerCSS, null);

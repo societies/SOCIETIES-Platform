@@ -194,7 +194,9 @@ public class ServiceModelUtils {
 	 */
 	public static String getJidFromServiceIdentifier(ServiceResourceIdentifier serviceId){
 		
-		return serviceId.getIdentifier().toString();
+		String identifier = serviceId.getIdentifier().toString();
+		int lastIndex = identifier.lastIndexOf('/');
+		return identifier.substring(0, lastIndex);
 	}
 	
 	/**
@@ -239,10 +241,20 @@ public class ServiceModelUtils {
 		
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
+		ServiceReference[] registeredService = serviceBundle.getRegisteredServices();
+		Service ourService = null;
+		for(int i = 0; i < registeredService.length; i++){
+			ServiceReference regiServ = registeredService[i];
+			String property = (String) regiServ.getProperty("TargetPlatform");
+			if(property != null && property.equals("SOCIETIES")){
+				ourService = (Service) regiServ.getProperty("ServiceMetaModel");
+				break;
+			}
+		}
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
 		try {
-			result.setIdentifier(new URI(identity.getJid()));
+			result.setIdentifier(new URI(identity.getJid()+'/'+ourService.getServiceName().replace(' ', '_')));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -267,7 +279,7 @@ public class ServiceModelUtils {
 		// then pass return this object
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()+'/'+ service.getServiceName().replace(' ', '_')));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
 		} catch (URISyntaxException e) {
@@ -289,7 +301,7 @@ public class ServiceModelUtils {
 	public static boolean isServiceOurs(Service service, ICommManager commManager) throws InvalidFormatException{
 		
 		IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
-		IIdentity serviceNode = commManager.getIdManager().fromFullJid(service.getServiceInstance().getFullJid());
+		IIdentity serviceNode = commManager.getIdManager().fromFullJid(getJidFromServiceIdentifier(service.getServiceIdentifier()));
 			
 		return ourNode.equals(serviceNode);
 
@@ -301,7 +313,7 @@ public class ServiceModelUtils {
 		
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()+"/"+ service.getServiceName().replace(' ', '_')));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(deviceId);
 		} catch (URISyntaxException e) {

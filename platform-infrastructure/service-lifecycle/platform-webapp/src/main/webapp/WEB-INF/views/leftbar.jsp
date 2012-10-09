@@ -18,14 +18,14 @@
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Communities</b></td></tr>
-	  <tr><td align="right">My Communities</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/pilotmycommunities.html">My Communities</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/createnewcis.html">Create New Community</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">Suggested Communities</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
 	   <tr><td><b>Apps</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/servdiscpilot.html">My Apps</a></td></tr>
-	  <tr><td align="right">Communities Apps</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/mycisappspilot.html">Communities Apps</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
 	  <tr><td><b>My Context</b></td></tr>

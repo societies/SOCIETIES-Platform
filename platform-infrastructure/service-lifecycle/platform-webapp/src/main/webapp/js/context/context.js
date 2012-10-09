@@ -10,12 +10,22 @@ var query = {};
 // Execute
 function exe(){
    
-	 $('input[name="lookupType"]').val(query.type);
-	 $('input[name="lookupModel"]').val(query.model);
-	 $('input[name="value"]').val(query.value);
-	 $('input[name="id"]').val(query.id);
-	 $('input[name="method"]').val(query.method);
-	 document.ctx.submit();
+	document.forms["ctxForm"]["type"].value = query.type;
+	document.forms["ctxForm"]["value"].value = query.id;
+	document.forms["ctxForm"]["ctxID"].value = query.id;
+	document.forms["ctxForm"]["method"].value = query.method;
+	document.forms["ctxForm"]["model"].value = query.model;
+	document.forms["ctxForm"].submit();
+	
+}
+
+
+function lookup(ctxmodel, ctxtype){
+	query.type = ctxtype;
+	query.id="";
+	query.model = ctxmodel;
+	query.method="lookup";
+	exe();
 }
 
 
@@ -25,6 +35,15 @@ function exeQuery(value){
     $("#retrieve").val(value);
     $("#retrieve").show();
  
+}
+
+function retrieve(id){
+	query.type="";
+	query.id=id;
+	query.model="";
+	query.method="retreive";
+	exe();
+	
 }
 
 //Query
@@ -49,6 +68,7 @@ function hideMethodOptions(){
 	$("#retrieve").hide();
 	$("#create").hide()
 	$('#executeQuery').hide();
+	$('#idList').hide();
 }
 
 (function($) {
@@ -59,6 +79,10 @@ function hideMethodOptions(){
   				hideMethodOptions();
   				hideModelOptions();
   				$("#"+$(this).val()).show("fast");
+  				if ($(this).val() == "retrieve") {
+  					$("#idList").show();
+  					$('#executeQuery').show();
+  				}
   				
   	    });
        
@@ -88,6 +112,13 @@ function hideMethodOptions(){
   				$("#"+$(this).val()).show("fast");
   				
   	    });
+        
+        $('#idList').change(function(){
+        	$('#retrieve').val($(this).val());
+        	query.id=$(this).val();
+        	query.id=$(this).val();
+        	query.method= "retreive";
+        });
        
      				
        $('select[context="type"]').change(function() {

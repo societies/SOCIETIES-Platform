@@ -134,7 +134,7 @@ public class PrivacyPolicyController {
 	public ModelAndView showCisAction(@RequestParam(value="cisOwnerId", required=false) String cisOwnerId,
 			@RequestParam(value="cisId", required=true) String cisId,
 			@RequestParam(value="test", required=false, defaultValue="false") boolean test,
-			@RequestParam(value="allowRemoteCall", required=false, defaultValue="false") boolean allowRemoteCall) {
+			@RequestParam(value="allowRemoteCall", required=false, defaultValue="true") boolean allowRemoteCall) {
 		LOG.debug("Show CIS privacy policy: "+cisId+" "+cisOwnerId);
 		StringBuffer infoMsg = new StringBuffer();
 		StringBuffer errorMsg = new StringBuffer();

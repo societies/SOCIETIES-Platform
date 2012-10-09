@@ -46,6 +46,7 @@ import org.societies.webapp.models.CisManagerForm;
 import org.societies.webapp.models.PrivacyActionForm;
 import org.societies.webapp.models.PrivacyConditionForm;
 import org.societies.webapp.models.PrivacyPolicyResourceForm;
+import org.societies.webapp.models.WebAppParticipant;
 import org.societies.webapp.models.privacy.CisCtxAttributeHumanTypes;
 import org.societies.webapp.models.privacy.CisCtxAttributeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
@@ -96,12 +98,17 @@ public class CisManagerController {
 	private IPrivacyPolicyManager privacyPolicyManager;
 	@Autowired
 	private ICommManager commMngrRef;
+	@Autowired
+	private IUserFeedback userFeedback;
 	
 
 	// -- Data for the Privacy Policy Form
 	private static String[] resourceList;
 	private static String[] resourceHumanList;
 	private static String[] resourceSchemeList;
+	
+	
+	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
 
 	// store the interfaces of remote and local CISs
 	//private ArrayList<ICis> remoteCISs;
@@ -327,12 +334,12 @@ public class CisManagerController {
 
 				this.getCisManager().joinRemoteCIS(ad, icall);
 
-				Thread.sleep(5 * 1000);
-				model.put("joinStatus", resultCallback);
-				if(!resultCallback.startsWith("Failure") ){
+				//Thread.sleep(5 * 1000);
+				model.put("joinStatus", "pending");//resultCallback);
+				/*if(!resultCallback.startsWith("Failure") ){
 					ICis i = getCisManager().getCis(cisForm.getCisJid());
 					model.put("cis", i);
-				}
+				}*/
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
 				model.put("methodcalled", "LeaveRemoteCIS");
@@ -370,9 +377,27 @@ public class CisManagerController {
 						res = cisForm.getCisJid().trim();
 						remoteCIS.getListOfMembers(icall);
 						res = "After getList";
+						
+						Thread.sleep(5000);
+						List<WebAppParticipant> membersDetails = new ArrayList<WebAppParticipant>();
+						if (m_remoteMemberRecords != null)
+						{
+							for ( int memberIndex  = 0; memberIndex < m_remoteMemberRecords.size(); memberIndex++)
+							{
+								WebAppParticipant memberDetail = new WebAppParticipant();
+								memberDetail.setMembersJid(m_remoteMemberRecords.get(memberIndex).getJid());
+								memberDetail.setMembershipType(m_remoteMemberRecords.get(memberIndex).getRole());
+								
+								membersDetails.add(memberDetail);
+								
+							}
+						}
+						model.put("memberRecords", membersDetails);
+						
 					}
 					cisForm.setMethod("GetMemberListRemote");
 					model.put("methodcalled", "GetMemberListRemote");
+					model.put("method", "GetMemberListRemote");
 					res = "CIS==null: " + cisForm.getMethod();
 				} else {
 					Set<ICisParticipant> records = thisCis.getMemberList().get();
@@ -382,6 +407,7 @@ public class CisManagerController {
 
 			} else if (method.equalsIgnoreCase("GetMemberListRemote")) {
 				model.put("methodcalled", "GetMemberListRemote");
+				model.put("method", "GetMemberListRemote");
 				model.put("cisid", cisForm.getCisJid());
 				//CALL REMOTE
 				res += cisForm.getCisJid();
@@ -721,8 +747,18 @@ public class CisManagerController {
 	}
 
 	// callback
-	ICisManagerCallback icall = new ICisManagerCallback(){
+	WebAppCISCallback icall = new WebAppCISCallback(this.userFeedback);
 
+	
+	public class WebAppCISCallback implements ICisManagerCallback{
+		public WebAppCISCallback(IUserFeedback userFeedback){
+			super();
+			this.userFeedback = userFeedback;
+		}
+		
+		IUserFeedback userFeedback;
+		
+		
 
 		public void receiveResult(CommunityMethods communityResultObject) {
 			if(communityResultObject == null){
@@ -732,11 +768,12 @@ public class CisManagerController {
 				if(communityResultObject.getJoinResponse() != null){
 					if(communityResultObject.getJoinResponse().isResult()){
 						resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
-
+						this.userFeedback.showNotification("Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 						remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
 						m_session.setAttribute("community", remoteCommunity);
 					}else{
 						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
+						this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 					}
 
 				}
@@ -744,14 +781,14 @@ public class CisManagerController {
 					LOG.debug("### " + communityResultObject.getWhoResponse().getParticipant().size());
 
 					m_session.setAttribute("community", remoteCommunity);
-					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWhoResponse().getParticipant();					
-					m_session.setAttribute("remoteMemberRecords", l);
+					m_remoteMemberRecords = communityResultObject.getWhoResponse().getParticipant();					
+					m_session.setAttribute("remoteMemberRecords", m_remoteMemberRecords);
 				}
 
 			}
 		}
-	};
-
+	}
+	
 	// -- Dependency Injection
 	private boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);
@@ -793,5 +830,94 @@ public class CisManagerController {
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/pilotmycommunities.html", method = RequestMethod.GET)
+	public ModelAndView myCommumities()
+
+	{
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		
+		model.put("message", "Welcome to the CIS Manager Page");
+		// cismanager result page seems to want this for some reason!??
+		CisManagerForm cisForm = new CisManagerForm();
+		cisForm.setMethod("GetCisList");
+		model.put("cisForm", cisForm);
+		List<String> methodList = new ArrayList<String>();
+		methodList.add(new String("GetCisList"));
+		model.put("method", methodList);
+		model.put("methodcalled", "GetCisList");
+
+		if (getCisManager() == null) {
+			model.put("errormsg", "CIS Manager Service reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+		String res = "Starting...";
+		
+
+		try {
+			
+				//ICisRecord searchRecord = null;
+				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
+				List<ICis> records = this.getCisManager().getCisList();
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
+				model.put("cisrecords", records);
+				model.put("currentNodeId", currentNodeId);
+
+		} catch (Exception ex) {
+			LOG.error("Error when managing CIS", ex);
+			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
+		}
+
+		model.put("res", res);
+		
+		return new ModelAndView("pilotmycommunities", model);
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/mycisappspilot.html", method = RequestMethod.GET)
+	public ModelAndView myCommumityApps()
+
+	{
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		
+		model.put("message", "Welcome to the CIS Apps Page");
+		// cismanager result page seems to want this for some reason!??
+		CisManagerForm cisForm = new CisManagerForm();
+		cisForm.setMethod("GetCisList");
+		model.put("cisForm", cisForm);
+		List<String> methodList = new ArrayList<String>();
+		methodList.add(new String("GetCisList"));
+		model.put("method", methodList);
+		model.put("methodcalled", "GetCisList");
+
+		if (getCisManager() == null) {
+			model.put("errormsg", "CIS Manager Service reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+		String res = "Starting...";
+		
+
+		try {
+			
+				//ICisRecord searchRecord = null;
+				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
+				List<ICis> records = this.getCisManager().getCisList();
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
+				model.put("cisrecords", records);
+				model.put("currentNodeId", currentNodeId);
+
+		} catch (Exception ex) {
+			LOG.error("Error when managing CIS", ex);
+			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
+		}
+
+		model.put("res", res);
+		
+		return new ModelAndView("mycisappspilot", model);
+	}
+
 
 }

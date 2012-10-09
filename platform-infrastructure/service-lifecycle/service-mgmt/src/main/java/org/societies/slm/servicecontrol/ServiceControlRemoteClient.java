@@ -43,7 +43,7 @@ public class ServiceControlRemoteClient implements IServiceControlCallback {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceControlRemoteClient.class);
 
-	private final long TIMEOUT = 5;
+	private final long TIMEOUT = 30;
 	
 	private ServiceControlResult result;
 	private BlockingQueue<ServiceControlResult> resultList;

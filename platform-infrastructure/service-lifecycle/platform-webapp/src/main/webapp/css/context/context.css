@@ -1,4 +1,5 @@
 .error {
+	
 	color: #ff0000;
 }
  
@@ -7,7 +8,7 @@
 	background-color: #ffEEEE;
 	border: 3px solid #ff0000;
 	padding: 8px;
-	margin: 16px;
+	margin: 45spx;
 }
 
 .query{
@@ -16,5 +17,20 @@
 	font-size: 18px;
 	background: #fff;
 	color: #039;
+	
+}
+
+.navigator{
+	margin-left: 45px;
+	margin-top: -20px;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 15px;
+	background: #fff;
+	color: #039;
+	
+}
+
+.navigator a{
+	margin-left: 10px;
 	
 }
