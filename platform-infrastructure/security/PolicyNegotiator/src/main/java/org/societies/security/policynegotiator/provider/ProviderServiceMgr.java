@@ -88,35 +88,51 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
+			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
 		String dataToSign;
+		String strippedFilePath;
+		String clientJar = "";
 
-		if (clientJarFilePath.startsWith("/")) {
-			clientJarFilePath = clientJarFilePath.replaceFirst("/", "");
+		if (files != null && files.size() > 0) {
+			dataToSign = serviceId.getIdentifier().toASCIIString();
+	
+			for (int k = 0; k < files.size(); k++) {
+				if (files.get(k).startsWith("/")) {
+					strippedFilePath = files.get(k).replaceFirst("/", "");
+					files.set(k, strippedFilePath);
+				}
+				dataToSign += files.get(k);
+			}
+	
+			try {
+				signature = signatureMgr.sign(dataToSign, provider);
+			} catch (DigsigException e) {
+				throw new NegotiationException(e);
+			}
+			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
+			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
+			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
+					serviceId.getIdentifier(), provider, signature, files, cb);
+
+			clientJar = files.get(0);  // FIXME
 		}
-
-		dataToSign = serviceId.getIdentifier().toASCIIString();
-		dataToSign += clientJarFilePath;
-
-		try {
-			signature = signatureMgr.sign(dataToSign, provider);
-		} catch (DigsigException e) {
-			throw new NegotiationException(e);
-		}
-		List<String> files = new ArrayList<String>();
-		files.add(clientJarFilePath);
-		IClientJarServerCallback cb = new ClientJarServerCallback(callback);
-		//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
-		this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-				serviceId.getIdentifier(), provider, signature, files, cb);
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJarServer, clientJarFilePath, null);
+		Service s = new Service(idStr, slaXml, clientJarServer, clientJar, null);
 		
 		services.put(idStr, s);
+	}
+
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
+		
+		List<String> files = new ArrayList<String>();
+		files.add(clientJarFilePath);
+		addService(serviceId, slaXml, clientJarServer, files, null);
 	}
 	
 	@Override
@@ -124,7 +140,10 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			String clientJarFilePath) throws NegotiationException {
 		
 		LOG.warn("Obsolete version of INegotiationProviderServiceMgmt.addService() is being called.");
-		addService(serviceId, slaXml, clientJarServer, clientJarFilePath, null);
+		
+		List<String> files = new ArrayList<String>();
+		files.add(clientJarFilePath);
+		addService(serviceId, slaXml, clientJarServer, files, null);
 	}
 	
 	@Override
