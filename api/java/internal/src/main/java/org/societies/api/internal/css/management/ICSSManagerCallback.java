@@ -25,12 +25,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 
 /**
  * Callback interface for CSS Manager
  *
  */
 public interface ICSSManagerCallback {
-	void receiveResult(CssInterfaceResult result); 
+	void receiveResult(CssManagerResultBean resultBean); 
 }

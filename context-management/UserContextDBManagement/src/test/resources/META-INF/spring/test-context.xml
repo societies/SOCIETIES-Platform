@@ -26,7 +26,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:META-INF/spring/derby.properties</value>
-				<!-- <value>classpath:META-INF/spring/mysql_database.properties</value>	 -->
+				<!-- <value>classpath:META-INF/spring/mysql.properties</value>	 -->
 			</list>
 		</property>	
 	</bean>

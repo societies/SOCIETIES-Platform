@@ -386,7 +386,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						URI clientJar = new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+						URI clientJar;
+						
+						if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
+							clientJar= new URI("http://www.societies.org/webapp/webservice.test");
+						else
+							clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+						
 						URI clientHost;
 						if(clientJar.getPort()!= -1)
 							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());

@@ -95,7 +95,7 @@
 				<configuration>
 					<filesets>
 						<fileset>
-							<directory>contextdb</directory>
+							<directory>userctxdb</directory>
 						</fileset>
 						<fileset>
 							<directory>.</directory>

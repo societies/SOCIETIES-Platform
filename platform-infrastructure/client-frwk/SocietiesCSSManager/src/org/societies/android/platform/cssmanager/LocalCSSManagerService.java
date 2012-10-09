@@ -28,6 +28,7 @@ package org.societies.android.platform.cssmanager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Collections;
 
@@ -134,6 +135,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
 	public static final String FIND_ALL_CSS_ADVERTISEMENT_RECORDS = "org.societies.android.platform.cssmanager.FIND_ALL_CSS_ADVERTISEMENT_RECORDS";
 	public static final String FIND_FOR_ALL_CSS = "org.societies.android.platform.cssmanager.FIND_FOR_ALL_CSS";
+	public static final String READ_PROFILE_REMOTE = "org.societies.android.platform.cssmanager.READ_PROFILE_REMOTE";
+	public static final String SEND_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.SEND_FRIEND_REQUEST";
 	
     private IIdentity cloudNodeIdentity = null;
     private IIdentity domainNodeIdentity = null;
@@ -149,7 +152,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private String cloudCommsDestination = DEFAULT_DESTINATION;
 	private String domainCommsDestination = null;
 	
-	PubsubClientAndroid pubsubClient = null;
+	private PubsubClientAndroid pubsubClient = null;
+	
+	private HashMap<String, Subscriber> pubsubSubscribes = new HashMap<String, Subscriber>();
 
 	
 	
@@ -169,9 +174,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		
 		this.binder = new LocalBinder();
 
-		//This should replaced with persisted value if available
 		this.cssRecord = null;
-		this.ccm = new ClientCommunicationMgr(this);
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -300,10 +303,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-
+		this.ccm = new ClientCommunicationMgr(this);
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
-
 		
 		DomainLogin domainLogin = new DomainLogin();
 		
@@ -566,6 +568,21 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
 		Log.d(LOG_TAG, "AndroidCSSRecord called with client: " + client);
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.GET_CSS_RECORD);
+		try {
+			Stanza stanza = new Stanza(ccm.getIdManager().fromJid(cssId));
+			ICommCallback callback = new CSSManagerCallback(client, READ_PROFILE_REMOTE);
+			
+			ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Sent stanza");
+		} catch (InvalidFormatException ex) {
+			Log.e(this.getClass().getName(), "Error getting record from: " + cssId, ex);
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 		
 		return null;
 	}
 
@@ -573,7 +590,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
 		Log.d(LOG_TAG, "sendFriendRequest called with client: " + client);
-		
+
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
+
+		Stanza stanza = new Stanza(cloudNodeIdentity);		
+		ICommCallback callback = new CSSManagerCallback(client, SEND_FRIEND_REQUEST);
+        try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendMessage(stanza, messageBean);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        }
 	}
 
 	/**
@@ -793,6 +822,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
+				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
 				LocalCSSManagerService.this.ccm = null;
 				
 				results[0] = params[0];
@@ -879,29 +909,25 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				Intent intent = new Intent(returnIntent);
 				
 				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
-
+				//cssAdvertisementRecords
 				if (SUGGESTED_FRIENDS == this.returnIntent || GET_CSS_FRIENDS == this.returnIntent) {
 					ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultAdvertList());
 					
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
 					
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, advertArray);
-				} else {
-
+				}
+				//cssRecords
+				else { 
 					intent.putExtra(INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-
 					AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
-					
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-
 					this.updateLocalPersistence(aRecord);
 				}
-				intent.setPackage(client);
-
-				LocalCSSManagerService.this.sendBroadcast(intent);
-
-				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
 				
+				intent.setPackage(client);
+				LocalCSSManagerService.this.sendBroadcast(intent);
+				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 			}
 		}
@@ -995,6 +1021,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		if (null != this.pubsubClient) {
 			UnSubscribeFromPubsub unSubPubSub = new UnSubscribeFromPubsub(); 
 			unSubPubSub.execute(this.pubsubClient);
+			
 		}
 	}
 	
@@ -1006,11 +1033,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
 		
 		this.pubsubClient = new PubsubClientAndroid(this);
-
+		
             try {
                 this.pubsubClient.addSimpleClasses(classList);
-                
-    	        Log.d(LOG_TAG, "Subscribing to pubsub");
+
+                Log.d(LOG_TAG, "Subscribing to pubsub");
     	        
     	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
     	    	subPubSub.execute(this.pubsubClient);
@@ -1019,27 +1046,38 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	        }
 	}
 	
-
-	private Subscriber subscriber = new Subscriber() {
+	/**
+	 * Create a new Subscriber object for Pubsub
+	 * @return Subscriber
+	 */
+	private Subscriber createSubscriber() {
+		Subscriber subscriber = new Subscriber() {
 		
-		public void pubsubEvent(IIdentity identity, String node, String itemId,
-				Object payload) {
-			Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
-			if (payload instanceof CssEvent) {
-				CssEvent event = (CssEvent) payload;
-				Log.d(LOG_TAG, "Received event is :" + event.getType());
-				
-				//Create Android Notification
-				int flags [] = new int [1];
-				flags[0] = Notification.FLAG_AUTO_CANCEL;
+			public void pubsubEvent(IIdentity identity, String node, String itemId,
+					Object payload) {
+				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
+				if (payload instanceof CssEvent) {
+					CssEvent event = (CssEvent) payload;
+					Log.d(LOG_TAG, "Received event is :" + event.getType());
+					
+					//Create Android Notification
+					int flags [] = new int [1];
+					flags[0] = Notification.FLAG_AUTO_CANCEL;
 
-//				AndroidNotifier notifier = new AndroidNotifier(LocalCSSManagerService.this.getApplicationContext(), Notification.DEFAULT_SOUND, flags);
-//
-//				notifier.notifyEvent(event, event.getType());
+					//Create Android Notification
+					int notifierflags [] = new int [1];
+					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+					AndroidNotifier notifier = new AndroidNotifier(LocalCSSManagerService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
+
+					notifier.notifyMessage(event.getDescription(), event.getType(), LocalCSSManagerService.class);
+				}
 			}
-		}
-    };
-    /**
+		};
+		return subscriber;
+
+	}
+
+	/**
      * 
      * Async task to un-register for CSSManager Pubsub events
      *
@@ -1062,11 +1100,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //    		}
 
     		try {
-    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
-    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+     			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
+       			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
+
+       			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
+    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
+
     			Log.d(LOG_TAG, "Pubsub un-subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub un-registration: " + System.currentTimeMillis());
-
 
     			
 			} catch (Exception e) {
@@ -1081,6 +1122,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     /**
      * 
      * Async task to register for CSSManager Pubsub events
+     * Note: The Subscriber objects used to subscribe to the relevant Pubsub nodes
+     * are required to be used when un-registering - hence the use of the Map to store them.
      *
      */
     private class SubscribeToPubsub extends AsyncTask<PubsubClientAndroid, Void, Boolean> {
@@ -1092,17 +1135,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
     		IIdentity pubsubService = null;
     		
-//    		try {
-//	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.cloudCommsDestination);
 			pubsubService = LocalCSSManagerService.this.cloudNodeIdentity;
-//		} catch (InvalidFormatException e) {
-//			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
-//			this.resultStatus = false;
-//		}
 
     		try {
-    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
-    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
+    			
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
+    			LocalCSSManagerService.this.pubsubSubscribes.clear();
+    			
     			Log.d(LOG_TAG, "Pubsub subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub registration: " + System.currentTimeMillis());
 

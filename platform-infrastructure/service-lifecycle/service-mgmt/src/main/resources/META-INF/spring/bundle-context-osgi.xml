@@ -25,5 +25,7 @@
 <osgi:reference id="privacyManagerProviderRef" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1" />
 <osgi:reference id="policyNegotiatorRef" interface="org.societies.api.internal.security.policynegotiator.INegotiation" cardinality="0..1" />
 <osgi:reference id="negotiationProviderRef" interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" cardinality="0..1" />
+<osgi:reference id="userFeedbackRef" interface="org.societies.api.internal.useragent.feedback.IUserFeedback" cardinality="0..1" />
+	 
 	  
 </beans>

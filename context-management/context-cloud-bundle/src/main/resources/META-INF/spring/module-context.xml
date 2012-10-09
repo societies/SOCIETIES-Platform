@@ -43,11 +43,13 @@
 				<value>org.societies.context.user.db.impl.model.CtxAttributeDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxAssociationDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxQualityDAO</value>
+				<value>org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO</value>
 			</list>
 		</property>
 		<property name="annotatedPackages">
 			<list>
 				<value>org.societies.context.user.db.impl.model</value>
+				<value>org.societies.context.userHistory.impl.model</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

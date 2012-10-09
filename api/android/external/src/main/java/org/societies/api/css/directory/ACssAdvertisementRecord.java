@@ -68,7 +68,7 @@ public class ACssAdvertisementRecord extends CssAdvertisementRecord implements P
 		ACssAdvertisementRecord androidArray [] = new ACssAdvertisementRecord [schemaList.size()];
 		
 		for (int i = 0; i < schemaList.size(); i++) {
-			androidArray[0] = (ConvertCssAdvertisementRecord(schemaList.get(i)));
+			androidArray[i] = (ConvertCssAdvertisementRecord(schemaList.get(i)));
 		}
 		return androidArray;
 	}

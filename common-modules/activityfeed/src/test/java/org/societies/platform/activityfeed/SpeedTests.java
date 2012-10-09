@@ -70,8 +70,8 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 //			session = sessionFactory.openSession();
 //			actFeed.setSession(session);
 //		}
-		if(!session.isOpen())
-			session = sessionFactory.openSession();
+//		if(!session.isOpen())
+//			session = sessionFactory.openSession();
 		LOG.info("i startup ");
 		
 	}
@@ -79,7 +79,7 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 	public void tearDownAfter() throws Exception {
 		
 		actFeed.clear();
-		session.close();
+//		session.close();
 		actFeed = null;
 	}
 	@Test

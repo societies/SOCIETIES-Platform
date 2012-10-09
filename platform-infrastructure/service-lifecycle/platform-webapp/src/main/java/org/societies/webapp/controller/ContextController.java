@@ -23,8 +23,9 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,17 +33,29 @@ import java.util.concurrent.ExecutionException;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.schema.context.model.CtxUIElement;
 import org.societies.webapp.models.ContextForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,6 +64,32 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ContextController {
 
+	
+	private static final Logger logger = LoggerFactory.getLogger(ContextController.class);
+	
+	private static final String CTX_MODELS			 = "models";
+	private static final String ATTRIBUTE_TYPES 	 = "attributeTypes";
+	private static final String ASSOCITATION_TYPES 	 = "associationTypes";
+	private static final String ENTITY_TYPES		 = "entityTypes";
+	
+	private static final String ACTION_LOOKUP		 = "lookup";
+	private static final String ACTION_RETREIVE		 = "retreive";
+	private static final String ACTIONS				 = "actions";
+	
+	private static final String[] ACTION_LIST = {ACTION_LOOKUP, ACTION_RETREIVE};
+	
+	
+	/** Not implemented right now **/
+	private static final String ACTION_EDIT			= "edit";
+	private static final String ACTION_DELETE		= "delete";
+	
+	
+	private static final String CTX_FORM			= "ctxForm";
+	private static final String CTX_RESULTS			= "results";
+	private static final String CTX_AVAILABLE_ID	= "idList";
+	
+	private static final String PARENT				= "parent";
+	
 	@Autowired
 	private ICtxBroker internalCtxBroker;
 	
@@ -62,344 +101,376 @@ public class ContextController {
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 		this.internalCtxBroker = internalCtxBroker;
 	}
-
-
-
-
-	private static final String ACTION_ADD_ENTITY	= "add_entity";
-	private static final String ACTION_QUERY_ENTITY	= "query_entity";
-	private static final String ACTION_LOOKUP_ENIT	= "query_entity";
 	
 	
-	
-	
+	/** 
+	 * Get the list of the enumeration type of a class as  STRINGs list
+	 * @param name Input Enumeration Class
+	 * @return List of Strings that compose the enumeration class.
+	 */
+	private List<String> getTypesList(Class name) {
+		 Field[] 	fields = name.getDeclaredFields();
+		 List<String> results = new ArrayList<String>();
+		 for (Field field: fields){
+			 results.add(field.getName().toLowerCase());
+			 //logger.info("add fields "+field.getName());
+		 }
+		 return results;
+	}
 	
 	
 
 	@RequestMapping(value = "/context.html", method = RequestMethod.GET)
-	public ModelAndView ContextForm() {
+	public ModelAndView ContextService() {
 
-//		try {
-//			List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON).get();
-//		
-//			// Entities
-//			CtxIdentifier id = list.iterator().next();
-//			CtxEntity model = (CtxEntity) internalCtxBroker.retrieve(id).get();
-//		    Set<CtxAttribute> setAttr = model.getAttributes();
-//			Iterator it = setAttr.iterator();
-//			while (it.hasNext()){
-//				// TODO: print something...
-//				CtxAttribute attr = (CtxAttribute)it.next();
-//				System.out.println("type:" +attr.getType() + " : " + attr.getStringValue());
-//				// TODO: get the type of attribute to use attr.getValueType()
-//				attr.setStringValue("the new value");
-//			    internalCtxBroker.update(attr);
-//			}
-//			
-//			String modelType="entity";
-//			if (CtxModelType.ENTITY.equals(modelType)){
-//				CtxEntity newEntity = internalCtxBroker.createEntity(CtxEntityTypes.PERSON).get();
-//				//newEntity.getId();
-//			}
-//			
-//			
-//		
-//		} 
-//		catch (CtxException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (ExecutionException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		
+		logger.info("====== CONTEXT GUI --> GET");
+
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
-		//model.put("message", "Select a Social Newtork");
-		
-//		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
-		//SocialDataForm sdForm = new SocialDataForm();
-//		model.put("sdForm", sdForm);
-//		
-//		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-//		Map<String, String> methods = new LinkedHashMap<String, String>();
-//		methods.put(ADD, 		ADD);
-//		methods.put(REMOVE, 	REMOVE);
-//		methods.put(FRIENDS,    FRIENDS);
-//		methods.put(PROFILES,   PROFILES);
-//		methods.put(ACTIVITIES, ACTIVITIES);
-//		methods.put(GROUPS, 	GROUPS);
-//		methods.put(LIST, 	  	LIST);
-//		
-//		model.put("methods",  methods);
-//		
-//		Map<String, String> snName = new LinkedHashMap<String, String>();
-//		snName.put("FB", "Facebook");
-//		snName.put("TW", "Twitter");
-//		snName.put("FQ", "Foursquare");
-//		model.put(SNNAME, snName);
-//		model.put(TOKEN,  "");
-//		model.put(ID, 	"");
-		
-//		Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
-//		String connLI="";
-//		
-//		while (it.hasNext()){
-//			ISocialConnector conn = it.next();
-//		    
-//		    String image="";
-//			if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
-//			else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
-//			else image="images/Foursquare.png";
-//			connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
-//			 
-//		}
-//		
-//		model.put("connectors", connLI);
+		model.put(CTX_FORM, new ContextForm());
+		model.put(CTX_MODELS, getTypesList(CtxModelType.class));
+		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
+		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
+		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+		model.put(CTX_RESULTS, getAllCtxEntityData());
+		model.put(CTX_AVAILABLE_ID, getAllIDs());			
+		model.put(PARENT, "<a href='#' onclick='javascript:location.href=\"context.html\"'> ROOT </a>");
+		model.put(ACTIONS, ACTION_LIST);
+
+
 		return new ModelAndView("context", model);
+	}
+
+	
+	
+	/**
+	 * Retreive all ENTITY Values in the internalCtxBroker
+	 * @return List<CtxUIElement> that provide the serialized obj to be rendered in the GUI
+	 */
+	private List<CtxUIElement> getAllCtxEntityData() {
+		
+		List<CtxUIElement> results  = new ArrayList<CtxUIElement>();
+        
+		for (String type: getTypesList(CtxEntityTypes.class)){
+        	results.addAll(lookup(CtxModelType.ENTITY.toString() , type));
+        }
+		
+        return results;
+	}
+
+	
+	
+	
+	
+	
+
+	private List<CtxUIElement> retreive(String ctxID){
+
+		logger.info("ContextGUI ACTION:Retrieve    [id] => "+ctxID);
+		List<CtxUIElement> results = new ArrayList<CtxUIElement>();
+		if (ctxID.length()==0){
+			logger.warn("Context ID is empty");
+			return results;
+		}
+
+
+
+		try {
+
+
+
+			CtxIdentifier 			ctxIdentifier 	= CtxIdentifierFactory.getInstance().fromString(ctxID);
+			CtxModelObject  		ctxModel 		= internalCtxBroker.retrieve(ctxIdentifier).get();
+			List<CtxModelObject> 	details			= new ArrayList<CtxModelObject>();
+
+			if (ctxModel.getModelType().equals(CtxModelType.ENTITY)) {
+
+				CtxEntity entity = (CtxEntity)ctxModel;
+				details.addAll(entity.getAttributes());
+				Set<CtxAssociationIdentifier> associations = entity.getAssociations();
+				for(CtxAssociationIdentifier aId: associations){
+					details.add(internalCtxBroker.retrieve(aId).get());
+				}
+			}
+			else if (ctxModel.getModelType().equals(CtxModelType.ASSOCIATION)){
+				CtxAssociation association = (CtxAssociation)ctxModel;
+				// ADD PARENT
+				details.add(internalCtxBroker.retrieve(association.parentEntity).get());
+				
+				// ADD CHILDREN
+				for(CtxEntityIdentifier aId:  association.getChildEntities()){
+					details.add(internalCtxBroker.retrieve(aId).get());
+				}
+			}
+			else if (ctxModel.getModelType().equals(CtxModelType.ATTRIBUTE)){
+				CtxAttribute attribute = (CtxAttribute)ctxModel;
+				details.add(ctxModel);
+			}
+
+			// ADD Serialize Entities
+			for (CtxModelObject elm: details){
+				results.add( serliazeCtxModel(elm));
+			}
+
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			logger.error("Error in Ctx Retrieve :" +e);
+			e.printStackTrace();
+		}		
+		return results;
+	}
+
+
+
+		
+	
+	
+	private CtxModelType string2Model(String value){
+		if (CtxModelType.ASSOCIATION.toString().equalsIgnoreCase(value)) return CtxModelType.ASSOCIATION;
+		if (CtxModelType.ATTRIBUTE.toString().equalsIgnoreCase(value)) return CtxModelType.ATTRIBUTE;
+		return CtxModelType.ENTITY;
 	}
 	
 	
 	
+	
+	/**
+	 * Get List of Ctx ID Avaliable in the internal Cxt Broker
+	 * @param model   Context Model	
+	 * @param type	  Context Model type
+	 * @return	List<String> that contains the ID of each CtxModel + type element
+	 */
+	private List<String> getContextIDs(String model, String type){
+		//logger.info("Get ContextID for "+model + " - " + type);
+		List<String> result = new ArrayList<String>(); 
+		try {
+			List<CtxIdentifier> list = internalCtxBroker.lookup(string2Model(model), type).get();
+			for(CtxIdentifier ctxId : list){
+				result.add(ctxId.getUri());
+				//logger.info("Add ID:"+ctxId.getUri());
+			}
+		} 
+		catch (CtxException e) {
+			logger.error("CtxException:"+e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	
+	private List<String> getAllIDs(){
+		
+		//logger.info("Get All ctxIDs");
+		List<String> result = new ArrayList<String>(); 
+		
+		for(String type : getTypesList(CtxAssociationTypes.class)){
+			result.addAll(getContextIDs(CtxModelType.ASSOCIATION.toString(), type));
+		}
+		for(String type : getTypesList(CtxAttributeTypes.class)){
+			result.addAll(getContextIDs(CtxModelType.ATTRIBUTE.toString(), type));
+		}
+		for(String type : getTypesList(CtxEntityTypes.class)){
+			result.addAll(getContextIDs(CtxModelType.ENTITY.toString(), type));
+		}
+		return result;
+	}
+	
+	/**
+	 * LookUp Action of the context Broker
+	 * @param model	Context Model
+	 * @param type  Context Model type	
+	 * @return Serialized list of element to be displaied
+	 */
+	private List<CtxUIElement> lookup(String model, String type){
+		
+		
+		logger.info("Lookup for model:"+model + ", type:"+type);
+		List<CtxUIElement> results = new ArrayList<CtxUIElement>();
+			
+			
+			List<CtxIdentifier> list;
+			try {
+				list = internalCtxBroker.lookup(string2Model(model), type).get();
+				for (CtxIdentifier id: list){
+					CtxUIElement ctxBean = serliazeCtxModel(internalCtxBroker.retrieve(id).get());
+					results.add(ctxBean);					
+				}
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
+			//logger.info("Elements:"+results.size());
+		return results;
+	}
+			
+	
+	
 
+	private CtxUIElement serliazeCtxModel(CtxModelObject elm){
+		
+		
+		CtxUIElement ctxBean = new CtxUIElement();
+		String ctxValue =  elm.getId().toString().replace("context://", "");
+		String info[] = ctxValue.split("/");
+
+		// Log info
+		logger.info("====> Found new Element ");
+		logger.info("FULL ID:"+elm.getId().toString());
+		logger.info("Source:"+info[0]);
+		logger.info("Model:"+info[1]);
+		logger.info("Type:"+info[2]);
+		logger.info("ID:"+info[info.length-1]);
+		logger.info("==== ");
+
+
+		ctxBean.setId(elm.getId().toString());
+		ctxBean.setType(elm.getType());
+		ctxBean.setDiplayId(info[info.length-1]);
+		ctxBean.setId(elm.getId().toString());
+		ctxBean.setSource(info[0]);   // android.societies.local;
+		ctxBean.setQuality("");
+		ctxBean.setModel(elm.getModelType().toString());
+		
+		if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+			
+			CtxAttribute attr = (CtxAttribute) elm;
+			logger.info("Ctx Attribute value Metric"+ attr.getValueMetric());
+			ctxBean.setValue(" -- ");
+			if (attr.getValueType() == CtxAttributeValueType.STRING){
+				ctxBean.setValue( attr.getStringValue());
+			}
+			else if (attr.getValueType() == CtxAttributeValueType.DOUBLE){
+				ctxBean.setValue(""+attr.getDoubleValue());
+			}
+			else if (attr.getValueType() == CtxAttributeValueType.INTEGER){
+				ctxBean.setValue(""+attr.getIntegerValue());
+			}
+			else if (attr.getValueType() == CtxAttributeValueType.BINARY){
+				ctxBean.setValue("Binary Obj[" + attr.getBinaryValue().length+"bytes]");
+			}
+			if (attr.getQuality().getPrecision()!=null)
+				ctxBean.setQuality("Precision:" +attr.getQuality().getPrecision());
+			
+		}
+		else if (elm.getModelType().equals(CtxModelType.ASSOCIATION)){
+			CtxAssociation assoc = (CtxAssociation) elm;
+			String childs = "";
+			for(CtxEntityIdentifier assocID: assoc.getChildEntities()){
+				if (childs.length()>0) childs +=",";
+				childs += assocID.getUri();
+			}
+			ctxBean.setValue("owner:" +assoc.getOwnerId() + "-->" +childs);
+			
+		}
+		return ctxBean;
+		
+	}	
+
+	private String generateParent(String id){
+		
+		if (id==null) return "<a href='#' onclick='javascript:location.href=context.html'>  - Reload -  </a>";
+		String filteredID = id.replace("context://", "");
+		String info[] = filteredID.split("/");
+		for(String s: info) logger.debug("path:"+s);
+
+		String path = "";
+		try{
+			path ="<a href='#' onclick='javascript:location.href=\"context.html\"'> "+info[0]+" </a>";
+			path+="<a href='#' onclick='lookup(\""+info[1]+"\", \""+ info[2] +"\");'>"+info[1] +" /  "+info[2] + "</a>";
+			path+="<a href='#' onclick='retrieve(\"context://"+info[0]+"/"+info[1] +"/" + info[2]+"/" + info[3]+ "\");'>"+info[3]+"</a>";
+			if (info.length>4){
+				path+="<a href='#' onclick='lookup(\""+info[4]+", "+info[5] +"\");'>"+info[4] +" / "+info[5] + "</a>";
+				path+="<a href='#' onclick='retrieve(\""+ id +"\");'>"+info[6]+"</a>";
+			}
+		}catch(Exception e){
+			logger.error("Unexpected error:"+e);
+			e.printStackTrace();
+		}
+		return path;
+		
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/context.html", method = RequestMethod.POST)
 	public ModelAndView serviceDiscovery(@Valid ContextForm ctxForm, BindingResult result, Map model) {
 
+		logger.info("====== CONTEXT GUI --> POST");
+		
+		model.put(CTX_MODELS, getTypesList(CtxModelType.class));
+		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
+		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
+		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+		model.put(CTX_AVAILABLE_ID, getAllIDs());
+		
+		
+		
+		model.put(PARENT, generateParent(ctxForm.getCtxID()));
+		
+		
+		
+		
+		
 		if (result.hasErrors()) {
-			model.put("result", "ContextError");
+			
+			logger.info("====== CONTEXT GUI --> result Errors :"+ result.getErrorCount());
+			String errorMessage ="<ul>";
+			for (ObjectError error :result.getAllErrors()){
+				
+				errorMessage += "<li> Code:"+error.getCode() + " - "+error.getDefaultMessage() +"["+error.getObjectName()+"]</li>";
+				
+				logger.info("====== CtxGUI ===> ERROR <====");
+				logger.info("====== CtxGUI --> Error code:" + error.getCode());
+				logger.info("====== CtxGUI --> Error Msg :" + error.getDefaultMessage());
+				logger.info("====== CtxGUI --> Error Obj :" + error.getObjectName());
+				logger.info("====== CtxGUI --> Error [ALL] :" + error.toString());
+				
+				
+			}
+			errorMessage ="</ul>";
+			model.put("ctxForm", ctxForm);
+			model.put("error", errorMessage);
 			return new ModelAndView("context", model);
 		}
 
-//		if (getSocialData() == null) {
-//			model.put("errormsg", "Social Data reference not avaiable");
-//			return new ModelAndView("error", model);
-//		}
-
-		
-		String method = ctxForm.getMethod();
-		String res		 = "This method is not handled yet";
-		String content	 = " --- ";
-		
-//		
-//			if (ADD.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "[" + method+"] new Social Connector ";
-//				HashMap <String, String> params = new HashMap<String, String>();
-//				params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
-//				
-//				String error="no error";
-//				try {
-//					error= "unable to create connector";
-//					ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
-//					error ="unable to add connector:"+con.getConnectorName();
-//					socialdata.addSocialConnector(con);
-//					socialdata.updateSocialData();
-//					content   = "<b>Connector</b> ID:"+sdForm.getId() + " for " + sdForm.getSnName() +" with token: "+ sdForm.getToken() + "<br>";
-//					
-//					
-//					
-////					
-//					model.put("sdForm", sdForm);
-//					Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
-//					String connLI="";
-//					
-//					while (it.hasNext()){
-//						ISocialConnector conn = it.next();
-//					    
-//					    String image="";
-//						if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
-//						else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
-//						else image="images/Foursquare.png";
-//						connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
-//						 
-//					}
-//					
-//					model.put("connectors", connLI);
-//					return new ModelAndView("socialdata", model);
-//				}
-//				
-//				catch (Exception e) {
-//					res       = "Internal Error";
-//					content  = "<p> Unable to generate a connecotor with those parameters <p>";
-//					content  +="Error type is "+error + " trace: "+e.getMessage();
-//					content  += "<ul><li> Social Network:"+sdForm.getSnName()+"</li>";
-//					content  += "<li> Method:"+sdForm.getMethod() + "</li>";
-//					Iterator<String>  it = params.keySet().iterator();
-//					while(it.hasNext()){
-//						String k = it.next();
-//						content  += "<li>"+ k +": " +params.get(k)+"</li>";		
-//					}
-//					content  += "</ul>";
-//					e.printStackTrace();
-//				}
-//				
-//				
-//					
-//			}
-//			else if (LIST.equalsIgnoreCase(method)) {
-//					
-//					// DO add Connectore HERE
-//					res       = "<h4>Connector List  </h4>";
-//					Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
-//					
-//					content   = "<ul>";
-//					while (it.hasNext()){
-//					  ISocialConnector conn = it.next();
-//				  	  content   +="<li>" +conn.getConnectorName() +"- ID: "+conn.getID()+"</li>";
-//				  	  
-//					}
-//				    content+= "<br>";
-//						
-//			}
-//			else if (REMOVE.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "<h2> Removed Connector </h2>";
-//				if ("null".equals(sdForm.getId())){
-//					content = "<p> Please set a valid Connector ID</p>";
-//				}
-//				else {
-//					try {
-//						socialdata.removeSocialConnector(sdForm.getId());
-//						content   += "<p> Connector ID:"+sdForm.getId()+  "has been removed correctly</p>";
-//					} catch (Exception e) {
-//						res       = "Internal Error";
-//						content = "<p> Unable to remove this connector due to:</p>";
-//						content +="<h1>"+e.getMessage()+"</h1>";
-//						e.printStackTrace();
-//					}
-//					
-//				}
-//			}
-//			else if (FRIENDS.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "Social Friends";
-//				
-//				List<Person>friends = (List<Person>)socialdata.getSocialPeople();
-//				
-//				Iterator<Person> it = friends.iterator();
-//				content ="<h4> My Social Friends </h4>";
-//				content +="<ul>";
-//				while(it.hasNext()){
-//					
-//					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-//					Person p= it.next();
-//					String[] id = p.getId().split(":");
-//					String name = "";
-//					try{
-//					
-//						if (p.getName()!=null){
-//							if (p.getName().getFormatted()!=null)
-//								name = p.getName().getFormatted();
-//							else {
-//								if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
-//								if(p.getName().getGivenName()!=null){
-//									if (name.length()>0)  name+=" ";
-//									name +=p.getName().getGivenName();
-//								}
-//									  
-//							
-//							}
-//								
-//						}
-//					}catch(Exception ex){name = "- NOT AVAILABLE -";}
-//					
-//					content +="<li>[" + id[0] +"] " + name + " id:"+ id[1] + "</li>" ;
-//					
-//					
-//				}
-//				content   += "</ul>";
-//					
-//			}
-//			else if (PROFILES.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "Social Profiles";
-//				
-//				
-//				List<Person> list = (List<Person>)socialdata.getSocialProfiles();
-//				Iterator<Person> it = list.iterator();
-//				content ="<h4> My Social Profiles </h4>";
-//				content +="<ul>";
-//				while(it.hasNext()){
-//					
-//					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-//					Person p = it.next();
-//					String[] id = p.getId().split(":");
-//					content +="<li> [" + id[0] +" Profile] " + p.getName().getFormatted()  + "</li>" ;
-//				}
-//				content   += "</ul>";
-//					
-//			}
-//			else if (GROUPS.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "Social Groups";
-//				
-//				List<Group>list = (List<Group>)socialdata.getSocialGroups();
-//				
-//				Iterator<Group> it = list.iterator();
-//				content ="<h4> My Social Groups </h4>";
-//				content +="<ul>";
-//				while(it.hasNext()){
-//					
-//					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-//					Group g= it.next();
-//					String[] id = g.getId().getGroupId().split(":");
-//					content +="<li> "+id[0]+"] ID:" + id[1] +" Title:"+ g.getDescription() + "</li>" ;
-//				}
-//				content   += "</ul>";
-//					
-//			}
-//			else if (ACTIVITIES.equalsIgnoreCase(method)) {
-//				
-//				// DO add Connectore HERE
-//				res       = "Social Activities";
-//				
-//				List<ActivityEntry>list = (List<ActivityEntry>)socialdata.getSocialActivity();
-//				content ="<h4> My Social Activities </h4>";
-//				content +="<ul>";
-//				Iterator<ActivityEntry> it = list.iterator();
-//				
-//				while(it.hasNext()){
-//					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-//					ActivityEntry entry= it.next();
-//					try{
-//						String id[] = entry.getId().split(":");
-////						if (id[0]!=null) 
-////							content +="<li> <img src='"+getIcon(entry.getId())+"'>"+ entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-////						else
-// 							content +="<li> <img width='20px' src='"+getIcon(entry.getId().toLowerCase())+"'>" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-//						    //content +="<li> ["+entry.getId()+"]" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-//						
-//					}
-//					catch(Exception ex){
-//						content +="<li> " + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-//						
-//					}
-//				}
-//				content   += "</ul>";
-//			}
-//			else {
-//				content = "<p> Request method:"+method+ " that is not yet implmented [TBD]</p>";
-//			}
-
-		
-			model.put("result_title", 	res);
-			model.put("result_content", content);
-			
+     	String method 	 = ctxForm.getMethod();
+     	String id		 = ctxForm.getCtxID();
+     	
+     	logger.info("Method:"+ method +"Passed Ctx ID:"+id);
+     
 		
 		
-		
-		
-		return new ModelAndView("contextresult", model);
+	
+		if (ACTION_LOOKUP.equalsIgnoreCase(method)){
+			logger.info("Lookup (model: "  +  ctxForm.getModel() + ", type:"+ctxForm.getType()+")");
+			model.put(CTX_RESULTS, lookup(ctxForm.getModel(), ctxForm.getType()));
+		}
+		else if(ACTION_RETREIVE.equalsIgnoreCase(method)){
+			logger.info("Retreive ID: "  + id);
+			model.put(CTX_RESULTS, retreive(ctxForm.getCtxID()));
+		}
+		model.put(CTX_FORM, ctxForm);
+		return new ModelAndView("context", model);
 		
 
 	}

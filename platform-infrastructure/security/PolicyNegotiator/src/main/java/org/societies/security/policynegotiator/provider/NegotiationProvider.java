@@ -171,12 +171,16 @@ public class NegotiationProvider implements INegotiationProvider {
 		if (session != null && signatureMgr.verifyXml(signedPolicyOption)) {
 			
 			sla.setSla(finalSla);
-			serviceId = session.getServiceId();
-			try {
-				jarUri = providerServiceMgr.getClientJarUri(serviceId);
-				sla.setJarUrl(jarUri.toString());
-			} catch (NegotiationException e) {
-				LOG.warn("acceptPolicyAndGetSla()", e);
+			
+			// FIXME: only in case of service negotiation, not in case of CIS negotiation
+			if (true) {
+				serviceId = session.getServiceId();
+				try {
+					jarUri = providerServiceMgr.getClientJarUri(serviceId);
+					sla.setJarUrl(jarUri.toString());
+				} catch (NegotiationException e) {
+					LOG.warn("acceptPolicyAndGetSla()", e);
+				}
 			}
 
 			sla.setSuccess(true);

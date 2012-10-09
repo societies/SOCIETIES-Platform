@@ -27,6 +27,8 @@
  */
 package org.societies.webapp.models;
 
+
+
 /**
  * 
  * @author Luca Lamorte
@@ -36,16 +38,46 @@ package org.societies.webapp.models;
 public class ContextForm {
 
 	private String method;
-
-
+	private String type;
+    private String model;
+    private String ctxID;
+    private String value;
+    
+    
 	public String getMethod() {
 		return method;
 	}
-
 	public void setMethod(String method) {
 		this.method = method;
 	}
-	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
+	}
+	public String getCtxID() {
+		return ctxID;
+	}
+	public void setCtxID(String ctxID) {
+		this.ctxID = ctxID;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+    
+
+
+		
 	
 
 }

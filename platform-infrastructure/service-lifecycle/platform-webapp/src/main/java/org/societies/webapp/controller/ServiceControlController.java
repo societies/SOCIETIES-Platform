@@ -378,17 +378,21 @@ public class ServiceControlController {
 
 				//SHARE SERVICE
 				asynchResult = this.getSCService().installService(serviceToInstall);
-				scresult = asynchResult.get();
 				
-				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				if(logger.isDebugEnabled()) logger.debug("Called it, now should continue!");
+				//scresult = asynchResult.get();
 				
+				//if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
+				/*
 				//GET REMOTE SERVICES
 				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
 				List<Service> cisServices = asynchServices.get();
 				model.put("cisservices", cisServices);
-
-				res = scresult.getMessage().toString();
-				returnPage = "servicediscoveryresult";
+				 */
+				//res = scresult.getMessage().toString();
+				res = "Waiting...";
+				returnPage = "servicecontrolresult";
 	
 			} else {
 				res="error unknown metod";

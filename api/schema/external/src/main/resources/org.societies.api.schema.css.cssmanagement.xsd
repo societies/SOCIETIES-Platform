@@ -146,6 +146,7 @@
 			<xs:enumeration value="pending" />
 			<xs:enumeration value="cancelled" />
 			<xs:enumeration value="notrequested" />
+			<xs:enumeration value="needsresp" />
 		</xs:restriction>
 	</xs:simpleType>
 	
