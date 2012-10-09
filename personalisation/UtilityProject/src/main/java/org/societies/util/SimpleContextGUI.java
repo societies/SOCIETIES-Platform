@@ -318,7 +318,7 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 			this.LOG.debug("BtnSymlocUpdate clicked");
 			String value = this.txtSymLoc.getText();
 			
-			if (this.symlocAttributes.isEmpty()){
+			
 				this.LOG.debug("Retrieving symloc attributes");
 				try {
 					Future<IndividualCtxEntity> retrieveIndividualEntity = this.getCtxBroker().retrieveIndividualEntity(this.userIdentity);
@@ -337,12 +337,15 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}
+			
 			this.LOG.debug("Updating symLoc attributes to: "+value);
 				for (CtxAttribute ctxAttribute : this.symlocAttributes){
 					ctxAttribute.setStringValue(value);
+					
 					try {
+						
 						ctxAttribute = (CtxAttribute) ctxBroker.update(ctxAttribute).get();
+						this.LOG.debug("Updated symloc attribute: "+ctxAttribute.getId().toString()+" with value: "+ctxAttribute.getStringValue());
 					} catch (CtxException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
