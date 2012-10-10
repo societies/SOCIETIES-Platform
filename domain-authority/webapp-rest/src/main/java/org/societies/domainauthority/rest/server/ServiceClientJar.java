@@ -65,7 +65,8 @@ public class ServiceClientJar {
      * Error 401 if file or key not valid.
      * Error 500 on server error.
      */
-	@Path("{name}.jar")
+	//@Path("{name}.jar")
+	@Path("{name}")
     @GET
     @Produces("application/java-archive")
     public byte[] getJar(@PathParam("name") String name,
@@ -100,27 +101,27 @@ public class ServiceClientJar {
 	/**
      * Method processing HTTP POST requests.
      */
-//	@Path("{name}.jar")
-//    @POST
-//    public void postIt(@PathParam("name") String name,
-//    		InputStream is,
-//    		@Context HttpServletRequest request,
-//    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-//    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
-//
-//		LOG.debug("HTTP POST: name = {}, service ID = {}, signature = " + signature, name, serviceId);
-//		
-//		String path = name + ".jar";
-//		
-//		// TODO: verify signature, authorization
-//		
-//		try {
-//			//Files.writeFile(is, request.getContentLength(), path);
-//			Files.writeFile(is, path);
-//		} catch (IOException e) {
-//			LOG.warn("Could not write to file {}", path, e);
-//			// Return HTTP status code 500 - Internal Server Error
-//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
-//    }
+	//@Path("{name}.jar")
+	@Path("{name}")
+    @POST
+    public void postIt(@PathParam("name") String name,
+    		InputStream is,
+    		@Context HttpServletRequest request,
+    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
+
+		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		
+		// TODO: verify signature, authorization
+		
+		try {
+			//Files.writeFile(is, request.getContentLength(), path);
+			Files.writeFile(is, path);
+		} catch (IOException e) {
+			LOG.warn("Could not write to file {}", path, e);
+			// Return HTTP status code 500 - Internal Server Error
+			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+    }
 }

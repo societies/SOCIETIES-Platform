@@ -187,7 +187,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				LOG.error("Failed to sign file " + filePath.get(k) + " of service " + serviceId, e);
 				throw new NegotiationException(e);
 			}
-			uriStr = host + UrlPath.BASE + UrlPath.PATH + "/client.jar" +
+			uriStr = host + UrlPath.BASE + UrlPath.PATH + "/" + filePath.get(k).replaceAll(".*/", "") +
 					"?" + UrlPath.URL_PARAM_FILE + "=" + filePath.get(k) +
 					"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
 					"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
