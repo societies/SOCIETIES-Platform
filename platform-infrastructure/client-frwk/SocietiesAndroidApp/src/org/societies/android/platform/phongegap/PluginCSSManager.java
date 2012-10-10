@@ -38,13 +38,11 @@ import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
-import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
-import org.societies.api.css.directory.ACssAdvertisementRecord;
+import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.Notification;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -60,7 +58,6 @@ import com.phonegap.api.LOG;
 
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
-import org.apache.cordova.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to allow the CSSManager service to be used by HTML web views.

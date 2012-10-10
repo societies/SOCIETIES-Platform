@@ -25,10 +25,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.phongegap;
 
+import java.net.URI;
 import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.servicelifecycle.AService;
@@ -40,7 +42,7 @@ import org.societies.android.api.internal.servicemonitor.AndroidActiveTasks;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
-import org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal;
+import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -49,6 +51,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -88,7 +91,9 @@ public class PluginCoreServiceMonitor extends Plugin {
     
     private IServiceDiscovery serviceDisco;
     private boolean serviceDiscoConnected = false;
+    
     private IServiceControl serviceControl;
+    private boolean serviceControlConnected;
 
     /**
      * Constructor
@@ -127,11 +132,33 @@ public class PluginCoreServiceMonitor extends Plugin {
         	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
 
         	//GET LOCAL BINDER
-        	ServiceDiscoveryLocal.LocalBinder binder = (ServiceDiscoveryLocal.LocalBinder) service;
+        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
 
             //OBTAIN SERVICE DISCOVERY API
             serviceDisco = (IServiceDiscovery) binder.getService();
             serviceDiscoConnected = true;
+        }
+        
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from ServiceDiscovery service");
+        	serviceDiscoConnected = false;
+        }
+    };
+
+    /**
+     * IServiceControl service connection
+     */
+    private ServiceConnection serviceControlConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to IServiceControl service");
+
+        	//GET LOCAL BINDER
+        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
+
+            //OBTAIN SERVICE CONTROL API
+            serviceControl = (IServiceControl) binder.getService();
+            serviceControlConnected = true;
         }
         
         public void onServiceDisconnected(ComponentName name) {
@@ -146,11 +173,13 @@ public class PluginCoreServiceMonitor extends Plugin {
     private void initialiseServiceBinding() {
     	//CREATE INTENT FOR EACH SERVICE
     	Intent intentServiceMon = new Intent(this.ctx.getContext(), CoreServiceMonitor.class);
-    	Intent intentServiceDisco = new Intent(this.ctx.getContext(), ServiceDiscoveryLocal.class);
+    	Intent intentServiceDisco = new Intent(this.ctx.getContext(), ServiceManagementLocal.class);
+    	Intent intentServiceControl = new Intent(this.ctx.getContext(), ServiceManagementLocal.class);
     	
     	//BIND TO SERVICES
     	this.ctx.getContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
     	this.ctx.getContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intentServiceControl, serviceControlConnection, Context.BIND_AUTO_CREATE);
     	
     	//REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
@@ -164,6 +193,11 @@ public class PluginCoreServiceMonitor extends Plugin {
         intentFilter.addAction(IServiceDiscovery.GET_SERVICES);
         intentFilter.addAction(IServiceDiscovery.GET_SERVICE);
         intentFilter.addAction(IServiceDiscovery.SEARCH_SERVICES);
+        
+        intentFilter.addAction(IServiceControl.START_SERVICE);
+        intentFilter.addAction(IServiceControl.STOP_SERVICE);
+        intentFilter.addAction(IServiceControl.SHARE_SERVICE);
+        intentFilter.addAction(IServiceControl.UNSHARE_SERVICE);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     }
@@ -200,7 +234,7 @@ public class PluginCoreServiceMonitor extends Plugin {
             result = new PluginResult(PluginResult.Status.OK, "disconnected");
             result.setKeepCallback(false);
             return result;
-		} 
+		}
 		
 		if (this.validRemoteCall(action) && connectedtoCoreMonitor) {
 			try {
@@ -247,7 +281,8 @@ public class PluginCoreServiceMonitor extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
 				try {
-					this.serviceDisco.getService(data.getString(0), (AServiceResourceIdentifier) data.get(1), data.getString(2));
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceDisco.getService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -265,7 +300,35 @@ public class PluginCoreServiceMonitor extends Plugin {
 				}
 			}
 			//>>>>>>>>>  IServiceControl METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			//TODO
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 0))) {
+				try {	//START SERVICE
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceControl.startService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 1))) {
+				try {	//STOP SERVICE
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceControl.stopService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 4))) {
+				try {	//SHARE SERVICE
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceControl.shareService(data.getString(0), AService.createFromJSON(jObj), data.getString(2));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 5))) {
+				try {	//UN-SHARE SERVICE
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceControl.unshareService(data.getString(0), AService.createFromJSON(jObj), data.getString(2));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
 			
             // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -411,9 +474,83 @@ public class PluginCoreServiceMonitor extends Plugin {
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			}
+			//>>>>>>>>>  IServiceControl METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
+			else if (intent.getAction().equals(IServiceControl.START_SERVICE)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 0);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL RESULT
+					String controlResult =  intent.getStringExtra(IServiceControl.INTENT_RETURN_VALUE);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, controlResult);
+					result.setKeepCallback(false);
+					if (controlResult.equals("SUCCESS"))
+						PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					else
+						PluginCoreServiceMonitor.this.error(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(IServiceControl.STOP_SERVICE)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 1);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL RESULT
+					String controlResult =  intent.getStringExtra(IServiceControl.INTENT_RETURN_VALUE);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, controlResult);
+					result.setKeepCallback(false);
+					if (controlResult.equals("SUCCESS"))
+						PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					else
+						PluginCoreServiceMonitor.this.error(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(IServiceControl.SHARE_SERVICE)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 4);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL RESULT
+					String controlResult =  intent.getStringExtra(IServiceControl.INTENT_RETURN_VALUE);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, controlResult);
+					result.setKeepCallback(false);
+					if (controlResult.equals("SUCCESS"))
+						PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					else
+						PluginCoreServiceMonitor.this.error(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(IServiceControl.UNSHARE_SERVICE)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 5);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL RESULT
+					String controlResult =  intent.getStringExtra(IServiceControl.INTENT_RETURN_VALUE);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, controlResult);
+					result.setKeepCallback(false);
+					if (controlResult.equals("SUCCESS"))
+						PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					else
+						PluginCoreServiceMonitor.this.error(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			}
 		}
 	};
-	
+		
 	/**
 	 * Create an Active services model for the GUI
 	 * @param services

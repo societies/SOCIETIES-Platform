@@ -38,12 +38,39 @@ window.plugins.ServiceManagementService = {
 		}
 	},
 	
-	shareMyService: function(successCallback, errorCallback){
+	shareMyService: function(jid, serviceObj, successCallback, errorCallback) {
 		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('ServiceManagementService', 'getServices'));
+			successCallback(true);
+		}
+	},
+	
+	unshareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(true);
+		}
+	},
+	
+	startService: function(serviceId, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(true);
+		}
+	},
+	
+	stopService: function(serviceId, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(true);
 		}
 	}
 	

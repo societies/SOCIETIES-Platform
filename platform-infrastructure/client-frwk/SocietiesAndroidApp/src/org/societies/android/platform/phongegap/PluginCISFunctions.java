@@ -269,7 +269,7 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 4))) {
 				try { //JOIN A CIS
-					this.serviceCISManager.Join(data.getString(0), CreateACISAdvRecFromJSON(data.getJSONObject(1)));
+					this.serviceCISManager.Join(data.getString(0), ACisAdvertisementRecord.createFromJSON(data.getJSONObject(1)));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -296,7 +296,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3))) {
 				try { //ADD AN ACTIVITY TO THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					AActivity activity = CreateActivity(jObj); 
+					AActivity activity = AActivity.CreateFromJSON(jObj); 
 					this.serviceCISsubscribe.addActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -304,7 +304,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4))) {
 				try { //DELETE AN ACTIVITY FROM THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					AActivity activity = CreateActivity(jObj); 
+					AActivity activity = AActivity.CreateFromJSON(jObj); 
 					this.serviceCISsubscribe.deleteActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -346,42 +346,6 @@ public class PluginCISFunctions extends Plugin {
 		}
 		return result;	
 	}
-
-	/**
-	 * Creates an AActivity from a JSON object
-	 * @param jObj
-	 * @return
-	 * @throws JSONException
-	 */
-	private AActivity CreateActivity(JSONObject jObj) throws JSONException {
-		AActivity act = new AActivity();
-		act.setActor(jObj.getString("actor"));
-		act.setObject(jObj.getString("object"));
-		act.setPublished(jObj.getString("published"));
-		act.setTarget(jObj.getString("target"));
-		act.setVerb(jObj.getString("verb"));
-		
-		return act;
-	}
-	
-	/**
-	 * Creates an ACisAdvertisementRecord from a JSON object
-	 * @param jObj
-	 * @return
-	 * @throws JSONException
-	 */
-	private ACisAdvertisementRecord CreateACISAdvRecFromJSON(JSONObject jObj) throws JSONException {
-		ACisAdvertisementRecord advert = new ACisAdvertisementRecord();
-		advert.setId(jObj.getString("id"));
-		advert.setCssownerid(jObj.getString("cssownerid"));
-		advert.setName(jObj.getString("name"));
-		advert.setType(jObj.getString("type"));
-		//advert.setPassword(jObj.getString("password"));
-		//crit.setACriteria(CreateCriteriaList(jObj.getJSONArray("criteria")));
-		//advert.setMembershipCrit(crit);
-		
-		return advert;
-	}
 	
 	/** Convert a JSON Array of ACriteria objects to a List<ACriteria>
 	 * @param jArray
@@ -392,29 +356,13 @@ public class PluginCISFunctions extends Plugin {
 		List<ACriteria> criteriaList = new ArrayList<ACriteria>();
 		for(int i=0; i< jArray.length(); i++) {
 			try {
-				ACriteria crit = CreateCriteria(jArray.getJSONObject(i));
+				ACriteria crit = ACriteria.createFromJSON(jArray.getJSONObject(i));
 				criteriaList.add(crit);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 		return criteriaList;
-	}
-
-	/**Creates an ACriteria from a JSON object
-	 * @param jCriteria
-	 * @return
-	 * @throws JSONException
-	 */
-	private ACriteria CreateCriteria(JSONObject jCriteria) throws JSONException {
-		ACriteria aCrit = new ACriteria();
-		aCrit.setAttrib(jCriteria.getString("attrib"));
-		aCrit.setOperator(jCriteria.getString("operator"));
-		aCrit.setRank(jCriteria.getInt("rank"));
-		aCrit.setValue1(jCriteria.getString("value1"));
-		aCrit.setValue2(jCriteria.getString("value2"));
-		
-		return aCrit;
 	}
 	
 	/**

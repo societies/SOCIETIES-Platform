@@ -76,7 +76,7 @@ var ServiceManagementService = {
 	 * @returns List of active services
 	 */
 	getServices: function(identity, successCallback, failureCallback) {
-		console.log("Call ServiceManagementService - activeServices");
+		console.log("Call ServiceManagementService - getServices");
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -93,14 +93,91 @@ var ServiceManagementService = {
 	 * @returns List of active apps
 	 */
 	getMyServices: function(successCallback, failureCallback) {
-		console.log("Call ServiceManagementService - activeTasks");
+		console.log("Call ServiceManagementService - getMyServices");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
 		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 		'getMyServices',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesCoreServiceMonitor#
+	 * @description Shares a service with a target identity
+	 * @param jid target identity
+	 * @param serviceObj service to be shared 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns List of active apps
+	 */
+	shareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+		console.log("Call ServiceManagementService - shareMyService");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+		'shareService',              //Telling the plugin, which action we want to perform
+		["org.societies.android.platform.gui", serviceObj, jid]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesCoreServiceMonitor#
+	 * @description un- shares a service with a target identity
+	 * @param jid target identity
+	 * @param serviceObj service to be shared 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns List of active apps
+	 */
+	unshareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+		console.log("Call ServiceManagementService - unshareMyService");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+		'unshareService',              //Telling the plugin, which action we want to perform
+		["org.societies.android.platform.gui", serviceObj, jid]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesCoreServiceMonitor#
+	 * @description un- shares a service with a target identity
+	 * @param jid target identity
+	 * @param serviceObj service to be shared 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns List of active apps
+	 */
+	startService: function(serviceId, successCallback, errorCallback) {
+		console.log("Call ServiceManagementService - startService");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+		'startService',              //Telling the plugin, which action we want to perform
+		["org.societies.android.platform.gui", serviceId]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesCoreServiceMonitor#
+	 * @description un- shares a service with a target identity
+	 * @param jid target identity
+	 * @param serviceObj service to be shared 
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns List of active apps
+	 */
+	stopService: function(serviceId, successCallback, errorCallback) {
+		console.log("Call ServiceManagementService - stopService");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+		'stopService',              //Telling the plugin, which action we want to perform
+		["org.societies.android.platform.gui", serviceId]);        //Passing a list of arguments to the plugin
 	}
+	
 };
 
 /**

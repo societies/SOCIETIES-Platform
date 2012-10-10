@@ -33,6 +33,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 var	SocietiesCISListService = {
 		
 	mCommunitities: {}, //USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
+	mCisServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
+	mMyServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
+	mCis_id: "",
 	
 	/**
 	 * @methodOf SocietiesCISListService#
@@ -64,6 +67,7 @@ var	SocietiesCISListService = {
 		var communityObj = mCommunitities[ cisPos ];
 		if ( communityObj ) {
 			//VALID SERVICE OBJECT
+			mCis_id = communityObj.communityJid;
 			var markup = "<h1>" + communityObj.communityName + "</h1>" + 
 						 "<p>Type: " + communityObj.communityType + "</p>" + 
 						 "<p>" + communityObj.description + "</p>" + 
@@ -83,7 +87,7 @@ var	SocietiesCISListService = {
 			ServiceManagementServiceHelper.connectToServiceManagement(function() {
 								SocietiesCISListService.showCISServices(communityObj.communityJid); }
 								)
-			//SocietiesCISListService.createSelectServices();
+			SocietiesCISListService.createSelectServices();
 		}
 	},
 	
@@ -146,6 +150,8 @@ var	SocietiesCISListService = {
 	showCISServices: function(cisId) {
 
 		function success(data) {
+			mCisServices = data;
+			
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_shared_apps').children().length >0 )
 				$('ul#cis_shared_apps li:last').remove();
@@ -172,34 +178,55 @@ var	SocietiesCISListService = {
 	 * Shares a service from the select list to a community
 	 */
 	shareService: function() {
-		var service = $('select#selShareService').attr('value');
 		
-		if (connectorType != "0") { //"Select a Connector"
-			alert("Sharing service:" + service);
+		function success(data) {
+			//ADD SERVICE TO LIST OF SHARED SERVICES
+			mCisServices.push(serviceObj);
+
+			var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + (mCisServices.length - 1) + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+				'<h2>' + serviceObj.serviceName + '</h2>' + 
+				'<p>' + serviceObj.serviceDescription + '</p>' + 
+				'</a></li>';
+			$('ul#cis_shared_apps').append(tableEntry);
+			$('ul#cis_shared_apps').listview('refresh');
+		}
+		
+		function failure(data) {
+			
+		}
+		
+		var servicePos = $('select#selShareService').attr('value'),
+			serviceName = $("select#selShareService option:selected").text();
+
+		if (servicePos != "0000") { //"Select a Service"
+			var serviceObj = mMyServices[servicePos];
+			if (confirm("Share service: " + serviceName + " to this community?"))
+				window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
+			else
+				$('select#selShareService').attr('selectedIndex', 0);
+
+			$('select#selShareService').selectmenu();
 		}
 	},
-	
+
+	/**
+	 * Populates the select control with users services	 * 
+	 */
 	createSelectServices: function() {
 		
 		function success(data) {
-			//$('select#selShareService option').each(function() { 
-			//	$(this).remove();
-			//});
-			//$("#myselect2").removeOption(0);
-			
-			//$('select#selShareService')
-			//	.empty()
-			//	.append('<option selected="selected" value="0">Select an application</option>');
-			
+			mMyServices = data;
+
+			//REMOVE ALL SERVICE EXCEPT "SELECT SERVICE"
 			var count = $('select#selShareService option').length;
 			for (j=1; j<count; j++) {
 				$("select#selShareService").children().slice(j).detach(); 
 			}
-			
+			//POPULATE SERVICES
 			for (i = 0; i < data.length; i++) {
 				$('select#selShareService')
 					.append($("<option></option>")
-					.attr("value", data[i].serviceIdentifier.identifier)
+					.attr("value", i) //data[i].serviceIdentifier.identifier)
 					.text(data[i].serviceName));
 			}
 			$('select#selShareService').attr('selectedIndex', 0); 
@@ -211,6 +238,31 @@ var	SocietiesCISListService = {
 		}
 		
 		window.plugins.ServiceManagementService.getMyServices(success, failure);
+	},
+	
+	/**
+	 * Shares a service from the select list to a community
+	 */
+	installService: function() {
+		
+		function success(data) {
+			var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+				'<h2>' + data[i].serviceName + '</h2>' + 
+				'<p>' + data[i].serviceDescription + '</p>' + 
+				'</a></li>';
+			$('ul#cis_shared_apps').append(tableEntry);
+		}
+		
+		function failure(data) {
+			
+		}
+		
+		var service = $('select#selShareService').attr('value');
+		if (connectorType != "0") { //"Select a Connector"
+			if (confirm("Install service: " + service + "?")) {
+				window.plugins.ServiceManagementService.installService(success, failure);
+			}
+		}
 	}
 	
 }
