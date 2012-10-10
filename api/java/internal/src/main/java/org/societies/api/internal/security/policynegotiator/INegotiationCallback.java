@@ -50,8 +50,12 @@ public interface INegotiationCallback {
 	 * the client jar in case of a service that provides a client,
 	 * any videos, images and other resources that the service may want to
 	 * download during runtime.
+	 * The URIs are in same order as when passed to
+	 * {@link INegotiationProviderServiceMgmt#addService(
+	 * org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier,
+	 * String, URI, List, INegotiationProviderSLMCallback)}.
 	 * The parameter should be null or empty if not applicable, e.g.,
-	 * in case of a CIS, or
+	 * in case of a CIS negotiation, or
 	 * in case of a service that does not provide a client, nor have any resource files.
 	 */
 	public void onNegotiationComplete(String agreementKey, List<URI> fileUris);
