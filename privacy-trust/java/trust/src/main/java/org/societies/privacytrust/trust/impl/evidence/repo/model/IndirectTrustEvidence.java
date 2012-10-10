@@ -32,6 +32,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Type;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
@@ -55,7 +56,8 @@ public class IndirectTrustEvidence extends TrustEvidence implements
 	
 	/** The source of this evidence. */
 	@Column(name = "source", nullable = false, updatable = false)
-	private final String source;
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
+	private final TrustedEntityId source;
 
 	/* Empty constructor required by Hibernate */
 	private IndirectTrustEvidence() {
@@ -65,7 +67,7 @@ public class IndirectTrustEvidence extends TrustEvidence implements
 	}
 	
 	public IndirectTrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info, final String source) {
+			final Date timestamp, final Serializable info, final TrustedEntityId source) {
 		
 		super(teid, type, timestamp, info);
 		this.source = source;
@@ -75,7 +77,7 @@ public class IndirectTrustEvidence extends TrustEvidence implements
 	 * @see org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence#getSource()
 	 */
 	@Override
-	public String getSource() {
+	public TrustedEntityId getSource() {
 		
 		return this.source;
 	}

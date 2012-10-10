@@ -48,7 +48,7 @@ import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdCompositeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -297,7 +297,7 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			hqlDelete += " and ec.timestamp <= :endDate";
 		
 		final Query deleteQuery = session.createQuery(hqlDelete)
-				.setParameter("teid", teid, Hibernate.custom(TrustedEntityIdUserType.class));
+				.setParameter("teid", teid, Hibernate.custom(TrustedEntityIdCompositeType.class));
 		
 		if (type != null)
 			deleteQuery.setParameter("type", type);

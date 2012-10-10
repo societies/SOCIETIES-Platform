@@ -291,17 +291,24 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		// TEID2
 		final TrustedEntityId teid2 = new TrustedEntityId(
 				TRUSTOR_ID2, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
+		// SOURCE1
+		final TrustedEntityId source1 = new TrustedEntityId(
+				SOURCE_ID, TrustedEntityType.CSS, TRUSTED_CIS_ID);
+		// SOURCE2
+		final TrustedEntityId source2 = new TrustedEntityId(
+				SOURCE_ID, TrustedEntityType.CSS, TRUSTED_SERVICE_ID);
+		
 		// startDate
 		final Date startDate = new Date();
 		// endDate
 		final Date endDate = new Date(startDate.getTime() + 1000);
 		
 		final IIndirectTrustEvidence evidence1 = new IndirectTrustEvidence(
-				teid1, TrustEvidenceType.RATED, startDate, new Double(0.5d), SOURCE_ID);
+				teid1, TrustEvidenceType.RATED, startDate, new Double(0.5d), source1);
 		final IIndirectTrustEvidence evidence2 = new IndirectTrustEvidence(
-				teid2, TrustEvidenceType.RATED, startDate, new Double(0.5d), SOURCE_ID); 
+				teid2, TrustEvidenceType.RATED, startDate, new Double(0.5d), source2); 
 		final IIndirectTrustEvidence evidence3 = new IndirectTrustEvidence(
-				teid1, TrustEvidenceType.RATED, endDate, new Double(1.0d), SOURCE_ID); 
+				teid1, TrustEvidenceType.RATED, endDate, new Double(1.0d), source1); 
 		
 		Set<IIndirectTrustEvidence> indirectEvidence;
 		

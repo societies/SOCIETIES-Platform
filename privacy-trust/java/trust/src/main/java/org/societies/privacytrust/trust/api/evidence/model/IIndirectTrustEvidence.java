@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.evidence.model;
 
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+
 /**
  * Describe your class here...
  *
@@ -35,6 +37,7 @@ public interface IIndirectTrustEvidence extends ITrustEvidence {
 	/**
 	 * 
 	 * @return
+	 * @since 0.5
 	 */
-	public String getSource();
+	public TrustedEntityId getSource();
 }

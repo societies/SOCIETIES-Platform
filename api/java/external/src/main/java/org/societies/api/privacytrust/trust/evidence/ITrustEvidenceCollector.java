@@ -44,12 +44,17 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * assigned to a single trusted entity. Moreover, the {@link TrustEvidenceType}
  * is used to characterise the type of evidence. Joining or leaving a
  * community, using a service, interacting with another individual are some
- * examples of trust evidence types.
-
-As already described, we distinguish between direct and indirect trust in an entity. Likewise, Trust\-Evidence is classified as \texttt{Direct\-Trust\-Evidence} or \texttt{Indirect\-Trust\-Evidence}. The former are related to data which are locally collected by the trustor regarding their direct interactions with individuals, communities, or services, while the latter include information originating from other Trusted\-Entities. Thus, every piece of Indirect\-Trust\-Evidence is coupled with a Trusted\-Entity\-Id which references the \emph{source} of this information.
+ * examples of trust evidence types. In addition, we distinguish between direct
+ * and indirect trust in an entity. Likewise, trust evidence is classified as 
+ * <em>direct</em> or <em>indirect</em> trust evidence. The former are related to
+ * data which are locally collected by the trustor regarding their direct
+ * interactions with individuals, communities, or services, while the latter
+ * include information originating from other trusted entities. Thus, every
+ * piece of indirect trust evidence is coupled with a <code>TrustedEntityId</code>
+ * which references the <em>source</em> of this information.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.4
+ * @since 0.5
  */
 public interface ITrustEvidenceCollector {
 	
@@ -75,7 +80,6 @@ public interface ITrustEvidenceCollector {
 	 * @throws NullPointerException
 	 *            if any of the teid, type or timestamp parameter is
 	 *            <code>null</code>
-	 * @since 0.3
 	 */
 	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
 			final Date timestamp, final Serializable info) throws TrustException;
@@ -104,10 +108,10 @@ public interface ITrustEvidenceCollector {
 	 * @throws NullPointerException
 	 *            if any of the source, teid, type or timestamp parameter is
 	 *            <code>null</code>
-	 * @since 0.3
 	 */
-	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
-			final TrustEvidenceType type, final Date timestamp, final Serializable info)
+	public void addIndirectEvidence(final TrustedEntityId source, 
+			final TrustedEntityId teid,	final TrustEvidenceType type, 
+			final Date timestamp, final Serializable info) 
 					throws TrustException;
 	
 	/**

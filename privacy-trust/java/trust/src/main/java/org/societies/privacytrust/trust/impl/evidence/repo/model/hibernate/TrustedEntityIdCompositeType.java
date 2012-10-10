@@ -44,7 +44,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.6
  */
-public class TrustedEntityIdUserType implements CompositeUserType {
+public class TrustedEntityIdCompositeType implements CompositeUserType {
 	
 	private static final Class<TrustedEntityId> TRUSTED_ENTITY_ID_CLASS = TrustedEntityId.class;
 	
@@ -101,7 +101,7 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	@Override
 	public String[] getPropertyNames() {
 		
-		return TrustedEntityIdUserType.PROPERTY_NAMES;
+		return TrustedEntityIdCompositeType.PROPERTY_NAMES;
 	}
 	
 	/*
@@ -110,7 +110,7 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	@Override
 	public Type[] getPropertyTypes() {
 		
-		return TrustedEntityIdUserType.PROPERTY_TYPES;
+		return TrustedEntityIdCompositeType.PROPERTY_TYPES;
 	}
 	
 	/*
@@ -216,7 +216,7 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	@Override
 	public Class<?> returnedClass() {
 		
-		return TrustedEntityIdUserType.TRUSTED_ENTITY_ID_CLASS;
+		return TrustedEntityIdCompositeType.TRUSTED_ENTITY_ID_CLASS;
 	}
 
 	/* (non-Javadoc)
