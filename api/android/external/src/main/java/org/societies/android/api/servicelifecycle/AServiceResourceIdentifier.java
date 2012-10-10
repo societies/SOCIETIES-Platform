@@ -27,6 +27,8 @@ package org.societies.android.api.servicelifecycle;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.os.Parcel;
@@ -80,6 +82,30 @@ public class AServiceResourceIdentifier extends ServiceResourceIdentifier implem
 		AServiceResourceIdentifier asri = new AServiceResourceIdentifier();
 		asri.setIdentifier(sri.getIdentifier());
 		asri.setServiceInstanceIdentifier(sri.getServiceInstanceIdentifier());
+		
+		return asri;
+	}
+	
+	public static ServiceResourceIdentifier convertAServiceResourceIdentifier(AServiceResourceIdentifier asri) {
+		if (asri==null) return new ServiceResourceIdentifier();
+		
+		ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
+		sri.setIdentifier(asri.getIdentifier());
+		sri.setServiceInstanceIdentifier(asri.getServiceInstanceIdentifier());
+		
+		return sri;
+	}
+	
+	/**
+	 * Creates a AServiceResourceIdentifier from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	public static AServiceResourceIdentifier createFromJSON(JSONObject jObj) throws JSONException {
+		AServiceResourceIdentifier asri = new AServiceResourceIdentifier();
+		asri.setServiceInstanceIdentifier(jObj.getString("serviceIdentifier"));
+		asri.setIdentifier(URI.create(jObj.getString("identifier")));
 		
 		return asri;
 	}

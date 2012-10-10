@@ -26,9 +26,8 @@ package org.societies.android.api.internal.servicelifecycle;
 
 import java.net.URL;
 
-import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.android.api.servicelifecycle.AService;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 
 /**
  * The interface class for remote calls to the Service Control component. It permits a caller to tell the SLM to
@@ -39,11 +38,21 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlRe
  */
 public interface IServiceControl {
 
-	public String methodsArray[] = {"startService(String client, ServiceResourceIdentifier serviceId, String identity)", 
-								    "stopService(String client, ServiceResourceIdentifier serviceId, String identity)",
+	//SERVICE LIFECYCLE INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicecontrol.ReturnValue";
+	public static final String START_SERVICE       = "org.societies.android.platform.servicecontrol.START_SERVICE";
+	public static final String STOP_SERVICE        = "org.societies.android.platform.servicecontrol.STOP_SERVICE";
+	public static final String INSTALL_SERVICE     = "org.societies.android.platform.servicecontrol.INSTALL_SERVICE";
+	public static final String UNINSTALL_SERVICE   = "org.societies.android.platform.servicecontrol.UNINSTALL_SERVICE";
+	public static final String SHARE_SERVICE       = "org.societies.android.platform.servicecontrol.SHARE_SERVICE";
+	public static final String UNSHARE_SERVICE     = "org.societies.android.platform.servicecontrol.UNSHARE_SERVICE";
+		
+	public String methodsArray[] = {"startService(String client, AServiceResourceIdentifier serviceId)", 
+								    "stopService(String client, AServiceResourceIdentifier serviceId)",
 								    "installService(String client, URL bundleLocation, String identity)",
-								    "shareService(String client, Service service, String identity)",
-								    "unshareService(String client, Service service, String identity)"
+								    "uninstallService(String client, URL bundleLocation, String identity)",
+								    "shareService(String client, AService service, String identity)",
+								    "unshareService(String client, AService service, String identity)"
 								   };
 	
 	/**
@@ -52,65 +61,46 @@ public interface IServiceControl {
 	 * @param serviceId unique service identifier
 	 * @param identity The target node where service is installed
 	 */
-	
-	public ServiceControlResult startService(String client, ServiceResourceIdentifier serviceId, String identity);
-
+	public String startService(String client, AServiceResourceIdentifier serviceId);
 	
 	/**
 	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
+	 * Returns resultMessage
 	 * @param serviceId unique service identifier
 	 * @param identity The target node where service is installed
 	 */
-	public ServiceControlResult stopService(String client, ServiceResourceIdentifier serviceId, String identity);
+	public String stopService(String client, AServiceResourceIdentifier serviceId);
 	
 	/**
 	 * This method install a new service into the container
-	 * 
+	 * Returns resultMessage
 	 * @param bundleLocation the URL of the bundle to install
 	 * @param identity The target node where service is to be installed
 	 */
-	public ServiceControlResult installService(String client, URL bundleLocation, String identity);
-
-	
-	/**
-	 * This method installs a shared service into the container
-	 * 
-	 * @param service the Service to install
-	 * @param callback The callback object
-	 */
-	//public void installService(String client, Service service, IIdentity node);
+	public String installService(String client, URL bundleLocation, String identity);
 
 	/**
 	 * This method removes a service from the container.
-	 * 
+	 * Returns resultMessage
 	 * @param serviceId unique service identifier
 	 * @param callback The callback object
 	 */
-	//public void uninstallService(String client, ServiceResourceIdentifier serviceId, IIdentity node);
-
+	public String uninstallService(String client, AServiceResourceIdentifier serviceId, String identity);
 
 	/**
 	 * This method shares a service with a given CSS or CIS
-	 * 
+	 * Returns resultMessage
 	 * @param service the Service to share
 	 * @param identity The target node where service is to be shared
 	 */
-	public ServiceControlResult shareService(String client, Service service, String identity);
+	public String shareService(String client, AService service, String identity);
 
 	/**
 	 * This method removes the sharing of a service with a given CSS or CIS
-	 * 
+	 * Returns resultMessage
 	 * @param service the Service to share
 	 * @param identity The target node where service is to be unshared
 	 */
-	public ServiceControlResult unshareService(String client, Service service, String identity);
+	public String unshareService(String client, AService service, String identity);
 	
-	/**
-	 * This method is used to register a new CIS Endpoint with Service Control. It will allow service control to receive
-	 * meant for a particular CIS
-	 * 
-	 * @param endpoint
-	 */
-	//public void registerCISEndpoint(ICommManager endpoint);	
 }

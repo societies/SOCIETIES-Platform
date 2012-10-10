@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.cis.community.Criteria;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -95,5 +97,21 @@ public class ACriteria extends Criteria implements Parcelable {
 		criteria.setRank(acriteria.getRank());
 		
 		return criteria;
+	}
+	
+	/**Creates an ACriteria from a JSON object
+	 * @param jCriteria
+	 * @return
+	 * @throws JSONException
+	 */
+	public static ACriteria createFromJSON(JSONObject jCriteria) throws JSONException {
+		ACriteria aCrit = new ACriteria();
+		aCrit.setAttrib(jCriteria.getString("attrib"));
+		aCrit.setOperator(jCriteria.getString("operator"));
+		aCrit.setRank(jCriteria.getInt("rank"));
+		aCrit.setValue1(jCriteria.getString("value1"));
+		aCrit.setValue2(jCriteria.getString("value2"));
+		
+		return aCrit;
 	}
 }

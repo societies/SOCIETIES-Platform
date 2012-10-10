@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.servicelifecycle;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -92,11 +94,41 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	public static AServiceInstance convertServiceInstance(ServiceInstance servIns) {
 		AServiceInstance aservIns = new AServiceInstance();
 		aservIns.setCssJid(servIns.getCssJid());
-		aservIns.setCssJid(servIns.getCssJid());
+		aservIns.setFullJid(servIns.getFullJid());
 		aservIns.setParentJid(servIns.getParentJid());
 		aservIns.setXMPPNode(servIns.getXMPPNode());
 		aservIns.setServiceImpl(AServiceImplementation.convertServiceImplementation(servIns.getServiceImpl()));
 		aservIns.setParentIdentifier(AServiceResourceIdentifier.convertServiceResourceIdentifier(servIns.getParentIdentifier())); 
+		
+		return aservIns;
+	}
+	
+	public static ServiceInstance convertAServiceInstance(AServiceInstance aservIns) {
+		ServiceInstance servIns = new ServiceInstance();
+		servIns.setCssJid(aservIns.getCssJid());
+		servIns.setFullJid(aservIns.getFullJid());
+		servIns.setParentJid(aservIns.getParentJid());
+		servIns.setXMPPNode(aservIns.getXMPPNode());
+		servIns.setServiceImpl(AServiceImplementation.convertAServiceImplementation(aservIns.getServiceImpl()));
+		servIns.setParentIdentifier(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aservIns.getParentIdentifier())); 
+		
+		return servIns;
+	}
+	
+	/**
+	 * Creates a AServiceInstance instance from a JSON Object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException 
+	 */
+	public static AServiceInstance createFromJSON(JSONObject jObj) throws JSONException {
+		AServiceInstance aservIns = new AServiceInstance();
+		aservIns.setCssJid(jObj.getString("cssJid"));
+		aservIns.setFullJid(jObj.getString("fullJid"));
+		aservIns.setParentJid(jObj.getString("parentJid"));
+		aservIns.setXMPPNode(jObj.getString("xmppNode"));
+		aservIns.setServiceImpl(AServiceImplementation.createFromJSON(jObj.getJSONObject("serviceImpl")));
+		aservIns.setParentIdentifier(AServiceResourceIdentifier.createFromJSON(jObj.getJSONObject("serviceImpl")));
 		
 		return aservIns;
 	}

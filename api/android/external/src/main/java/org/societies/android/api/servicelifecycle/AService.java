@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.servicelifecycle;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
@@ -123,6 +125,51 @@ public class AService extends Service implements Parcelable {
 		aservice.setServiceName(service.getServiceName());
 		aservice.setServiceStatus(service.getServiceStatus());
 		aservice.setServiceType(service.getServiceType());
+		
+		return aservice;
+	}
+	
+	public static Service convertAService(AService aservice) {
+		Service service = new Service();
+		
+		service.setAuthorSignature(aservice.getAuthorSignature());
+		service.setContextSource(aservice.getContextSource());
+		service.setPrivacyPolicy(aservice.getPrivacyPolicy());
+		service.setSecurityPolicy(aservice.getSecurityPolicy());
+		service.setServiceCategory(aservice.getServiceCategory());
+		service.setServiceDescription(aservice.getServiceDescription());
+		service.setServiceEndpoint(aservice.getServiceEndpoint());
+		service.setServiceIdentifier(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aservice.getServiceIdentifier()));
+		service.setServiceInstance(AServiceInstance.convertAServiceInstance(aservice.getServiceInstance()));
+		service.setServiceLocation(aservice.getServiceLocation());
+		service.setServiceName(aservice.getServiceName());
+		service.setServiceStatus(aservice.getServiceStatus());
+		service.setServiceType(aservice.getServiceType());
+		
+		return service;
+	}
+	
+	/**
+	 * Creates a AService from a JSON Object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	public static AService createFromJSON(JSONObject jObj) throws JSONException {
+		AService aservice = new AService();
+		aservice.setAuthorSignature(jObj.getString("authorSignature"));
+		aservice.setContextSource(jObj.getString("contextSource"));
+		aservice.setPrivacyPolicy(jObj.getString("privacyPolicy"));
+		aservice.setSecurityPolicy(jObj.getString("securityPolicy"));
+		aservice.setServiceCategory(jObj.getString("serviceCategory"));
+		aservice.setServiceDescription(jObj.getString("serviceDescription"));
+		aservice.setServiceEndpoint(jObj.getString("serviceEndpoint"));
+		aservice.setServiceIdentifier(AServiceResourceIdentifier.createFromJSON(jObj.getJSONObject("serviceIdentifier")));
+		aservice.setServiceInstance(AServiceInstance.createFromJSON(jObj.getJSONObject("serviceInstance")));
+		aservice.setServiceLocation(jObj.getString("serviceLocation"));
+		aservice.setServiceName(jObj.getString("serviceName"));
+		aservice.setServiceStatus(ServiceStatus.fromValue(jObj.getString("serviceStatus")));
+		aservice.setServiceType(ServiceType.fromValue(jObj.getString("serviceType")));
 		
 		return aservice;
 	}
