@@ -87,14 +87,16 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	}
 
 	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
 		String dataToSign;
 		String strippedFilePath;
-		String clientJar = "";
+		
+		String idStr = serviceId.getIdentifier().toString();
+		Service s = new Service(idStr, slaXml, fileServer, files);
 
 		if (files != null && files.size() > 0) {
 			dataToSign = serviceId.getIdentifier().toASCIIString();
@@ -116,14 +118,12 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
 					serviceId.getIdentifier(), provider, signature, files, cb);
-
-			clientJar = files.get(0);  // FIXME
+			services.put(idStr, s);
 		}
-		
-		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJarServer, clientJar, null);
-		
-		services.put(idStr, s);
+		else {
+			services.put(idStr, s);
+			callback.notifySuccess();
+		}
 	}
 
 	@Override
@@ -164,51 +164,41 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	 * @return
 	 * @throws NegotiationException When service is not found
 	 */
-	protected URI getClientJarUri(String serviceId) throws NegotiationException {
+	protected List<URI> getSignedUris(String serviceId) throws NegotiationException {
 
-		// TODO: remove when SLM calls addService()
-//		if (services.get(serviceId) == null) {
-//			LOG.warn("Temporal solution: adding service {}", serviceId);
-//			ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-//			try {
-//				id.setIdentifier(new URI(serviceId));
-//				addService(id, null, new URI("http://localhost:8080"), "Calculator.jar");
-//			} catch (URISyntaxException e) {
-//				LOG.warn("Could not add service \"{}\" to local registry", serviceId);
-//				throw new NegotiationException(e);
-//			}
-//		}
-		// End of temporal code to be removed when SLM calls addService()
-
-		URI uri;
+		List <URI> uri = new ArrayList<URI>();
+		String uriStr;
 		String host;
 		String sig;
-		String filePath;
+		List <String> filePath;
 		Service s = getService(serviceId);
 		
 		if (s == null) {
 			throw new NegotiationException("Service " + serviceId + " not found");
 		}
 
-		host = s.getClientJarHost().toString();
-		filePath = s.getClientJarFilePath();
-		try {
-			sig = signatureMgr.sign(filePath, groupMgr.getIdMgr().getThisNetworkNode());
-		} catch (DigsigException e) {
-			LOG.warn("Failed to sign service " + serviceId + " for client", e);
-			throw new NegotiationException(e);
-		}
-		String uriStr = host + UrlPath.BASE + UrlPath.PATH + "/client.jar" +
-				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
-				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+		host = s.getFileServerHost().toString();
+		filePath = s.getFiles();
 		
-		try {
-			uri = new URI(uriStr);
-			return uri;
-		} catch (URISyntaxException e) {
-			throw new NegotiationException(e);
+		for (int k = 0; k < filePath.size(); k++) {
+			try {
+				sig = signatureMgr.sign(filePath.get(k), groupMgr.getIdMgr().getThisNetworkNode());
+			} catch (DigsigException e) {
+				LOG.error("Failed to sign file " + filePath.get(k) + " of service " + serviceId, e);
+				throw new NegotiationException(e);
+			}
+			uriStr = host + UrlPath.BASE + UrlPath.PATH + "/client.jar" +
+					"?" + UrlPath.URL_PARAM_FILE + "=" + filePath.get(k) +
+					"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
+					"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+			
+			try {
+				uri.add(new URI(uriStr));
+			} catch (URISyntaxException e) {
+				throw new NegotiationException(e);
+			}
 		}
+		return uri;
 	}
 
 	/**

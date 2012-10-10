@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,7 +26,6 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -39,11 +40,17 @@ public class NominalTestCaseLowerTester {
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
 
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
+	
 	private static final String SERVICE_CLIENT_BASENAME = "Calculator.jar";
 	// External requirement: service client jar filename may start with "/"
 	private static final String SERVICE_CLIENT_FILENAME = "/3p-service/" + SERVICE_CLIENT_BASENAME;
+	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = "3p-service/" + "foo.bar";
+	
 	private static final String SERVER_HOSTNAME = "http://localhost:8080";
-	private static final String SERVICE_ID = "http://localhost/societies/services/service-1";
+	
+	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
+	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
+	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
 	
 	private static INegotiation negotiator;
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
@@ -62,7 +69,7 @@ public class NominalTestCaseLowerTester {
 	private boolean callbackInvokedCis = false;
 	private boolean callbackInvokedInvalid = false;
 
-	private URI serviceClient;
+	private List<URI> serviceFiles;
 	
 
 	public NominalTestCaseLowerTester() {
@@ -78,7 +85,7 @@ public class NominalTestCaseLowerTester {
 	 * @throws InterruptedException 
 	 */
 	@BeforeClass
-	public static void initialization() throws URISyntaxException, NegotiationException, InterruptedException {
+	public static void initialization() throws Exception {
 		
 		LOG.info("[#1001] Initialization");
 		LOG.info("[#1001] Prerequisite: The CSS is created");
@@ -90,15 +97,17 @@ public class NominalTestCaseLowerTester {
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
 		
-		LOG.info("Adding service {}", SERVICE_ID);
-		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-		id.setIdentifier(new URI(SERVICE_ID));
+		List<String> files0 = new ArrayList<String>();
+		invokeAddService(SERVICE_ID_1, files0);
 
-		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), SERVICE_CLIENT_FILENAME, callback);
-		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		assertTrue(callback.isInvoked());
-		assertTrue(callback.isSuccessful());
+		List<String> files1 = new ArrayList<String>();
+		files1.add(SERVICE_CLIENT_FILENAME);
+		invokeAddService(SERVICE_ID_2, files1);
+
+		List<String> files2 = new ArrayList<String>();
+		files2.add(SERVICE_CLIENT_FILENAME);
+		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
+		invokeAddService(SERVICE_ID_3, files2);
 	}
 
 	/**
@@ -118,6 +127,18 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1001] tearDown");
 	}
 
+	private static void invokeAddService(String serviceId, List<String> files) throws Exception {
+		
+		LOG.info("Adding service {}", serviceId);
+		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
+		id.setIdentifier(new URI(serviceId));
+
+		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
+		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		Thread.sleep(TIME_TO_WAIT_IN_MS);
+		assertTrue(callback.isInvoked());
+		assertTrue(callback.isSuccessful());
+	}
 
 	/**
 	 * Try to consume the service
@@ -126,27 +147,25 @@ public class NominalTestCaseLowerTester {
 	 * @throws URISyntaxException 
 	 */
 	@Test
-	public void testNegotiationService() throws InterruptedException, URISyntaxException {
+	public void testNegotiationServiceWith0Files() throws InterruptedException, URISyntaxException {
 		
-		LOG.info("[#1001] testNegotiationService()");
+		LOG.info("[#1001] testNegotiationServiceWith0Files()");
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setIdentifier(new URI(SERVICE_ID));
+		serviceId.setIdentifier(new URI(SERVICE_ID_1));
 		Requestor provider = new RequestorService(myId, serviceId);
+
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey, URI jar) {
-				LOG.info("onNegotiationComplete({}, {})", agreementKey, jar);
+			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
+				LOG.info("onNegotiationComplete({}, {})", agreementKey, fileUris);
 				assertNotNull(agreementKey);
-				assertTrue(jar.toString().contains(UrlPath.BASE + UrlPath.PATH));
-				assertTrue(jar.toString().contains(UrlPath.URL_PARAM_SERVICE_ID + "="));
-				assertTrue(!jar.toString().endsWith(UrlPath.URL_PARAM_SERVICE_ID + "="));
-				assertTrue(jar.toString().contains(UrlPath.URL_PARAM_SIGNATURE + "="));
-				assertTrue(!jar.toString().endsWith(UrlPath.URL_PARAM_SIGNATURE + "="));
+				assertNotNull(fileUris);
+				assertEquals(0, fileUris.size(), 0.0);
 				callbackInvokedService = true;
-				serviceClient = jar;
+				serviceFiles = fileUris;
 			}
 			@Override
 			public void onNegotiationError(String msg) {
@@ -154,12 +173,54 @@ public class NominalTestCaseLowerTester {
 			}
 		});
 		
-		LOG.debug("[#1001] testNegotiationService(): negotiation started");
+		LOG.debug("[#1001] testNegotiationServiceWith0Files(): negotiation started");
 
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationService(): checking if successful");
+		LOG.info("[#1001] testNegotiationServiceWith0Files(): checking if successful");
 		assertTrue(callbackInvokedService);
-		LOG.info("[#1001] testNegotiationService(): SUCCESS");
+		LOG.info("[#1001] testNegotiationServiceWith0Files(): SUCCESS");
+	}
+
+	@Test
+	public void testNegotiationServiceWith2Files() throws InterruptedException, URISyntaxException {
+		
+		LOG.info("[#1001] testNegotiationServiceWith2Files()");
+
+		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
+		IIdentity myId = idMgr.getThisNetworkNode();
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		serviceId.setIdentifier(new URI(SERVICE_ID_3));
+		Requestor provider = new RequestorService(myId, serviceId);
+
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
+			@Override
+			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
+				LOG.info("onNegotiationComplete({}, {})", agreementKey, fileUris);
+				assertNotNull(agreementKey);
+				assertNotNull(fileUris);
+				assertEquals(2, fileUris.size(), 0.0);
+				for (URI f : fileUris) {
+					assertTrue( f.toString().contains(UrlPath.BASE + UrlPath.PATH));
+					assertTrue( f.toString().contains(UrlPath.URL_PARAM_SERVICE_ID + "="));
+					assertFalse(f.toString().endsWith(UrlPath.URL_PARAM_SERVICE_ID + "="));
+					assertTrue( f.toString().contains(UrlPath.URL_PARAM_SIGNATURE + "="));
+					assertFalse(f.toString().endsWith(UrlPath.URL_PARAM_SIGNATURE + "="));
+				}
+				callbackInvokedService = true;
+				serviceFiles = fileUris;
+			}
+			@Override
+			public void onNegotiationError(String msg) {
+				fail();
+			}
+		});
+		
+		LOG.debug("[#1001] testNegotiationServiceWith2Files(): negotiation started");
+
+		Thread.sleep(TIME_TO_WAIT_IN_MS);
+		LOG.info("[#1001] testNegotiationServiceWith2Files(): checking if successful");
+		assertTrue(callbackInvokedService);
+		LOG.info("[#1001] testNegotiationServiceWith2Files(): SUCCESS");
 	}
 
 	/**
@@ -177,9 +238,12 @@ public class NominalTestCaseLowerTester {
 		Requestor provider = new RequestorCis(myId, cisId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey, URI jar) {
-				LOG.info("onNegotiationComplete({}, {})", agreementKey, jar);
+			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
+				LOG.info("onNegotiationComplete({}, {})", agreementKey, fileUris);
 				assertNotNull(agreementKey);
+				if (fileUris != null) {
+					assertEquals(0, fileUris.size(), 0.0);
+				}
 				callbackInvokedCis = true;
 			}
 			@Override
@@ -210,13 +274,13 @@ public class NominalTestCaseLowerTester {
 		Requestor provider = new Requestor(myId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey, URI jar) {
-				LOG.info("onNegotiationComplete({})", agreementKey);
-				assertNull(agreementKey);
+			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
+				LOG.error("onNegotiationComplete({})", agreementKey);
 				fail();
 			}
 			@Override
 			public void onNegotiationError(String msg) {
+				LOG.info("onNegotiationError({}): This error is supposed to happen", msg);
 				callbackInvokedInvalid = true;
 			}
 		});
@@ -247,7 +311,7 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1001] testServiceClientDownload()");
 		LOG.info("[#1001] *** Domain Authority Rest server is required for this test! ***");
 
-		testNegotiationService();
+		testNegotiationServiceWith2Files();
 
 		if (fileName.startsWith("/")) {
 			fileName = fileName.replaceFirst("/", "");
@@ -255,20 +319,30 @@ public class NominalTestCaseLowerTester {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
 		assertNotNull(is);
 		Files.writeFile(is, fileName);
+		is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
+		assertNotNull(is);
+		Files.writeFile(is, SERVICE_ADDITIONAL_RESOURCE_FILENAME);
 		
 		// URL with valid signature
-		urlStr = serviceClient.toString();
+		urlStr = serviceFiles.get(0).toString();
 		LOG.info("[#1001] testServiceClientDownload(): URL with valid signature: {}", urlStr);
+		httpCode = getHttpCode(new URL(urlStr));
+		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
+		
+		// URL 2 with valid signature
+		urlStr = serviceFiles.get(1).toString();
+		LOG.info("[#1001] testServiceClientDownload(): URL with valid signature: {}", urlStr);
+		assertFalse(serviceFiles.get(0).toString().equals(serviceFiles.get(1).toString()));
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
 		
 		// URL with invalid signature
 		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
-		int sigKeywordEnd = serviceClient.toString().indexOf(sigKeyword) + sigKeyword.length();
-		urlStr = serviceClient.toString().substring(0, sigKeywordEnd) + "123456789012345678901234567890";
-		urlStr += serviceClient.toString().substring(sigKeywordEnd + 30);
+		int sigKeywordEnd = serviceFiles.get(0).toString().indexOf(sigKeyword) + sigKeyword.length();
+		urlStr = serviceFiles.get(0).toString().substring(0, sigKeywordEnd) + "123456789012345678901234567890";
+		urlStr += serviceFiles.get(0).toString().substring(sigKeywordEnd + 30);
 		LOG.info("[#1001] testServiceClientDownload(): URL with invalid signature: {}", urlStr);
-		assertEquals(serviceClient.toString().length(), urlStr.length(), 0.0);
+		assertEquals(serviceFiles.get(0).toString().length(), urlStr.length(), 0.0);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
 	}

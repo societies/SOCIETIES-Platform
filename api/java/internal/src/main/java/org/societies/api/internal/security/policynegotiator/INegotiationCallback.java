@@ -25,6 +25,7 @@
 package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
+import java.util.List;
 
 import org.societies.api.internal.security.storage.ISecureStorage;
 
@@ -45,12 +46,13 @@ public interface INegotiationCallback {
 	 * {@link ISecureStorage}. If negotiation has not been successful, this
 	 * parameter is null.
 	 * 
-	 * @param jar Location of the client jar if applicable (e.g. in case of
-	 * a service that provides a client), or null if not applicable
-	 * (e.g. in case of a service that does not provide a client, or in case of
-	 * a CIS)
+	 * @param fileUris Locations any files associated with the service, e.g.,
+	 * the client jar in case of a service that provides a client.
+	 * Or null if not applicable, e.g.,
+	 * in case of a service that does not provide a client, or
+	 * in case of a CIS
 	 */
-	public void onNegotiationComplete(String agreementKey, URI jar);
+	public void onNegotiationComplete(String agreementKey, List<URI> fileUris);
 
 	/**
 	 * Async return for
