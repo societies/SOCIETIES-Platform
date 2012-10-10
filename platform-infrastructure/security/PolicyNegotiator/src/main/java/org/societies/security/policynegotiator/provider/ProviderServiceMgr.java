@@ -127,6 +127,23 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	}
 
 	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			URI[] fileUris, INegotiationProviderSLMCallback callback) throws NegotiationException {
+		
+		List<String> files = new ArrayList<String>();
+		
+		// TODO: upload the files to REST server
+		LOG.warn("Automatic file upload is not supported yet. You still have to manually place " +
+				"the files (e.g. service client jar) to the domain authority node.");
+		
+		for (URI f : fileUris) {
+			files.add(f.getPath());
+		}
+
+		addService(serviceId, slaXml, fileServer, files, callback);
+	}
+
+	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
 			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		

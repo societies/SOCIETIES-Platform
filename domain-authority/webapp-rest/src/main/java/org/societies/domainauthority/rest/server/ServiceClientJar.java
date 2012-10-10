@@ -69,7 +69,7 @@ public class ServiceClientJar {
 	@Path("{name}")
     @GET
     @Produces("application/java-archive")
-    public byte[] getJar(@PathParam("name") String name,
+    public byte[] getFile(@PathParam("name") String name,
     		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
     		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
