@@ -46,11 +46,13 @@ public interface INegotiationCallback {
 	 * {@link ISecureStorage}. If negotiation has not been successful, this
 	 * parameter is null.
 	 * 
-	 * @param fileUris Locations any files associated with the service, e.g.,
-	 * the client jar in case of a service that provides a client.
-	 * Or null if not applicable, e.g.,
-	 * in case of a service that does not provide a client, or
-	 * in case of a CIS
+	 * @param fileUris Locations of any files associated with the service, e.g.,
+	 * the client jar in case of a service that provides a client,
+	 * any videos, images and other resources that the service may want to
+	 * download during runtime.
+	 * The parameter should be null or empty if not applicable, e.g.,
+	 * in case of a CIS, or
+	 * in case of a service that does not provide a client, nor have any resource files.
 	 */
 	public void onNegotiationComplete(String agreementKey, List<URI> fileUris);
 
