@@ -43,11 +43,7 @@
 			<h3>Shared Apps</h3>
 			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_shared_apps">
 			<!-- ADD SHARED APPS HERE -->
-				<li>
-					<h3>HP Colour Printer</h3>
-					<p>HP SmartPrint Z200a</p>
-					<p class="ui-li-aside"><a href="#" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a></p>
-				</li>
+
 		   </ul>
 		   <br/></br/>
 		   <form id="frmShareService">
@@ -62,8 +58,14 @@
 
 		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
 			<h3>Activity Feed</h3>
+			<div data-role="fieldcontain">
+				<label for="activity_message">Message:</label>
+				<textarea id="activity_message"></textarea>
+			</div>
+			<p align="right"><input id="add_activity" type="button" value="Add" data-inline="true" data-theme="b" /></p>
 			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_activity_feed">
 			<!-- ADD ACTIVITIES HERE -->
+			
 			</ul>
 		</div>
 	</div>

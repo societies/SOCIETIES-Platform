@@ -108,10 +108,50 @@ var	SocietiesCISListService = {
 				$('ul#cis_activity_feed').trigger( "expand" );
 		}
 		function failure(data) {
-			alert("showCISActivities - failure: " + data); //console.log
+			var tableEntry = "<li><p>Error occurred retrieving activities: "+ data + "</p></li>";
+			$('ul#cis_activity_feed').append(tableEntry);
+			$('ul#cis_activity_feed').listview('refresh');
 		}
 		
 		window.plugins.SocietiesLocalCISManager.getActivityFeed(cisId, success, failure);
+	},
+	/*
+	  var lastdata = null;     
+	  var liCount = 0;     
+	  $(document).ready(function () { 
+	      $.get('live.ashx?' + Math.random(), function (data) {
+	      		if (lastdata != data) {                
+	      			$("#LiveTraffic").prepend(data).slideDown('slow');
+	               lastdata = data;        
+	               liCount += 1;           
+	           }        
+	      })
+	      if (liCount > 10) {
+	      		$('#LiveTraffic li:not(:first)').remove();
+	           liCount = 0;
+           }         
+           setTimeout(arguments.callee, 10000);     
+      }); 
+	 */
+	
+	addCISActivity: function () {
+		function success(data) {
+			var tableEntry = "<li>I " + activity.verb  + " '" + activity.object + "'</li>";
+			$('ul#cis_activity_feed').prepend(tableEntry).slideDown('slow');
+			$('ul#cis_activity_feed').listview('refresh');
+			$('textarea#activity_message').val('');
+		}
+		function failure(data) {
+			alert("Error occuring posting: " + data);
+		}
+		
+		var activity = {
+ 				"actor": "",
+ 				"verb": "posted",
+                "object": $('textarea#activity_message').val(),
+                "target": mCis_id
+				};
+		window.plugins.SocietiesLocalCISManager.addActivity(mCis_id, activity, success, failure);
 	},
 	
 	showCISMembers: function (cisId) {
@@ -134,7 +174,9 @@ var	SocietiesCISListService = {
 		}
 		
 		function failure(data) {
-			alert("showCISActivities - failure: " + data); //console.log
+			var tableEntry = "<li><p>Error occurred retrieving members: "+ data + "</p></li>";
+			$('ul#cis_members').append(tableEntry);
+			$('ul#cis_members').listview('refresh');
 		}
 		
 		window.plugins.SocietiesLocalCISManager.getMembers(cisId, success, failure);
@@ -158,17 +200,20 @@ var	SocietiesCISListService = {
 
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+				//var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+				var tableEntry = '<li><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
 					'<h2>' + data[i].serviceName + '</h2>' + 
 					'<p>' + data[i].serviceDescription + '</p>' + 
-					'</a></li>';
+					'</li>';
 				$('ul#cis_shared_apps').append(tableEntry);
 			}
-			$('#cis_shared_apps').listview('refresh');
+			$('ul#cis_shared_apps').listview('refresh');
 		}
 		
 		function failure(data) {
-			alert("showCISServices - failure: " + data);
+			var tableEntry = "<li><p>Error occurred retrieving services: "+ data + "</p></li>";
+			$('ul#cis_shared_apps').append(tableEntry);
+			$('ul#cis_shared_apps').listview('refresh');
 		}
 		
 		window.plugins.ServiceManagementService.getServices(cisId, success, failure);
@@ -183,16 +228,17 @@ var	SocietiesCISListService = {
 			//ADD SERVICE TO LIST OF SHARED SERVICES
 			mCisServices.push(serviceObj);
 
-			var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + (mCisServices.length - 1) + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+			//var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + (mCisServices.length - 1) + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+			var tableEntry = '<li><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
 				'<h2>' + serviceObj.serviceName + '</h2>' + 
 				'<p>' + serviceObj.serviceDescription + '</p>' + 
-				'</a></li>';
+				'</li>';
 			$('ul#cis_shared_apps').append(tableEntry);
 			$('ul#cis_shared_apps').listview('refresh');
 		}
 		
 		function failure(data) {
-			
+			alert("Error occurred sharing the service: " + data);
 		}
 		
 		var servicePos = $('select#selShareService').attr('value'),
@@ -205,7 +251,7 @@ var	SocietiesCISListService = {
 			else
 				$('select#selShareService').attr('selectedIndex', 0);
 
-			$('select#selShareService').selectmenu();
+			$('select#selShareService').selectmenu('refresh');
 		}
 	},
 
@@ -246,11 +292,7 @@ var	SocietiesCISListService = {
 	installService: function() {
 		
 		function success(data) {
-			var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
-				'<h2>' + data[i].serviceName + '</h2>' + 
-				'<p>' + data[i].serviceDescription + '</p>' + 
-				'</a></li>';
-			$('ul#cis_shared_apps').append(tableEntry);
+			
 		}
 		
 		function failure(data) {

@@ -384,6 +384,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		Log.d(LOG_TAG, "addActivity called by client: " + client);
 
 		//GETFEED OBJECT
+		activity.setActor(commMgr.getIdManager().getCloudNode().getJid());
 		AddActivity addAct = new AddActivity();
 		addAct.setActivity(AActivity.convertAActivity(activity));
 		//CREATE MESSAGE BEAN

@@ -43,7 +43,7 @@ window.plugins.ServiceManagementService = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(true);
+			successCallback("SUCCESS");
 		}
 	},
 	
@@ -52,7 +52,7 @@ window.plugins.ServiceManagementService = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(true);
+			successCallback("SUCCESS");
 		}
 	},
 	
@@ -61,7 +61,7 @@ window.plugins.ServiceManagementService = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(true);
+			successCallback("SUCCESS");
 		}
 	},
 	
@@ -70,7 +70,7 @@ window.plugins.ServiceManagementService = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(true);
+			successCallback("SUCCESS");
 		}
 	}
 	

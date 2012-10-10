@@ -67,4 +67,8 @@ $(document).bind('pageinit',function(){
 		return false;
 	});
 	
+	$('input#add_activity').off('click').on('click', function() {
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISListService.addCISActivity);
+	});
+	
 });
