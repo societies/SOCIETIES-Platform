@@ -39,26 +39,11 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public interface INegotiationProviderServiceMgmt {
 
 	/**
-	 * Tells Policy Negotiator that a new service is available for sharing to others.
-	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
-	 * 
-	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
-	 * 
-	 * @param fileServer Host and port of the server that should host any files related to the service,
-	 * e.g., the JAR file for service client.
-	 * If the service does not provide a client and no other files are to be made available for
-	 * service consumers to download, this parameter should be null.
-	 * 
-	 * @param clientJarFilePath Path of the JAR file for service client.
-	 * The path is relative on the server.
-	 * If the service does not provide a client, this parameter should be null.
-	 * Example: "Calculator.jar" if file path on the server is $VIRGO_HOME/Calculator.jar
-	 * 
-	 * @param callback The callback to be invoked after operation is finished.
-	 * 
-	 * @throws NegotiationException
+	 * Please use {@link #addService(ServiceResourceIdentifier, String, URI,
+	 * List, INegotiationProviderSLMCallback)
+	 * instead.
 	 */
+	@Deprecated
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			String clientJarFilePath, INegotiationProviderSLMCallback callback)
 			throws NegotiationException;
@@ -66,7 +51,7 @@ public interface INegotiationProviderServiceMgmt {
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 * @param serviceId ID of the service. The service instance need not exist at this point.
 	 * 
 	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
 	 * 
