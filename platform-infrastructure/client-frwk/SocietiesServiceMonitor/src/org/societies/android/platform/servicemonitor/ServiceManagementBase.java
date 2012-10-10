@@ -25,22 +25,23 @@
 
 package org.societies.android.platform.servicemonitor;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.servicelifecycle.AService;
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
-import org.societies.android.api.servicelifecycle.IServiceUtilities;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
@@ -51,7 +52,6 @@ import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.util.Log;
@@ -62,9 +62,9 @@ import android.util.Log;
  * 
  *
  */
-public class ServiceDiscoveryBase implements IServiceDiscovery {
+public class ServiceManagementBase implements IServiceDiscovery, IServiceControl {
 	//Logging tag
-    private static final String LOG_TAG = ServiceDiscoveryBase.class.getName();
+    private static final String LOG_TAG = ServiceManagementBase.class.getName();
     
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
@@ -81,7 +81,7 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
     /**
      * Default constructor
      */
-    public ServiceDiscoveryBase(Context androidContext) {
+    public ServiceManagementBase(Context androidContext) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.androidContext = androidContext;
@@ -95,34 +95,24 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 
     }
 
-
-    /**
-     * Implementation if IServiceDiscovery
-     */
-    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery methods >>>>>>>>>>>>>>>>>>>>>>>
     /* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
 	public AService[] getMyServices(String client) {
 		Log.d(LOG_TAG, "getMyServices called by client: " + client);
 		
 		AsyncGetMyServices methodAsync = new AsyncGetMyServices();
-		
 		String params [] = {client};
-
 		methodAsync.execute(params);
 		
         return null;
 	}
-
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
 	public AService[] getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
-		
 		AsynGetServices methodAsync = new AsynGetServices();
-		
 		String params [] = {client, identity};
-
 		methodAsync.execute(params);
 
         return null;
@@ -137,9 +127,63 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 	public AService[] searchService(String client, AService filter, String identity) {
 		return null;
 	}
-
 	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceControl methods >>>>>>>>>>>>>>>>>>>>>>>
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#installService(java.lang.String, java.net.URL, java.lang.String)*/
+	public String installService(String client, URL arg1, String identity) {
+		return null;
+	}
 
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#uninstallService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
+	public String uninstallService(String client, AServiceResourceIdentifier serviceId, String identity) {
+		return null;
+	}
+	
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#shareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
+	public String shareService(String client, AService service, String identity) {
+		Log.d(LOG_TAG, "shareService called by client: " + client);
+		
+		AsyncShareService methodAsync = new AsyncShareService();
+		Object params[] = {client, service, identity, IServiceControl.SHARE_SERVICE};
+		methodAsync.execute(params);
+		
+		return null;
+	}
+	
+	/*@see org.societies.android.api.internal.servicelifecycle.IServiceControl#unshareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
+	public String unshareService(String client, AService service, String identity) {
+		Log.d(LOG_TAG, "unshareService called by client: " + client);
+		
+		AsyncShareService methodAsync = new AsyncShareService();
+		Object params[] = {client, service, identity, IServiceControl.UNSHARE_SERVICE};
+		methodAsync.execute(params);
+		
+		return null;
+	}
+
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#startService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String) */
+	public String startService(String client, AServiceResourceIdentifier serviceId) {
+		Log.d(LOG_TAG, "startService called by client: " + client);
+		
+		AsyncControlService methodAsync = new AsyncControlService();
+		Object params[] = {client, serviceId, IServiceControl.START_SERVICE};
+		methodAsync.execute(params);
+		
+		return null;
+	}
+
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#stopService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
+	public String stopService(String client, AServiceResourceIdentifier serviceId) {
+		Log.d(LOG_TAG, "stopService called by client: " + client);
+		
+		AsyncControlService methodAsync = new AsyncControlService();
+		Object params[] = {client, serviceId, IServiceControl.STOP_SERVICE};
+		methodAsync.execute(params);
+		
+		return null;
+	}
+
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICommCallback methods >>>>>>>>>>>>>>>>>>>>>>>
 	/**
 	 * Callback required for Android Comms Manager to enable remote invocations to callback with returned information
 	 */
@@ -201,22 +245,22 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 						i++;
 					}
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, serviceArray); 
+					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray); 
 					intent.setPackage(client);
 				} 
 				// --------- Service Control Bean ---------
 				if(msgBean instanceof ServiceControlResultBean) {
 					Log.d(LOG_TAG, "ServiceControlBeanResult!");
 					ServiceControlResultBean controlResult = (ServiceControlResultBean)msgBean;
-					ServiceControlResult resultObj = controlResult.getControlResult();
-					Log.d(LOG_TAG, "ServiceControlBeanResult: " + resultObj.getMessage());
+					String result = controlResult.getControlResult().toString();
+					Log.d(LOG_TAG, "ServiceControlBeanResult: " + result);
 					
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) resultObj);
+					intent.putExtra(IServiceControl.INTENT_RETURN_VALUE, result);
 					intent.setPackage(client);
 				}
-				ServiceDiscoveryBase.this.androidContext.sendBroadcast(intent);
-				ServiceDiscoveryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
+				ServiceManagementBase.this.androidContext.sendBroadcast(intent);
+				ServiceManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}
@@ -330,4 +374,102 @@ public class ServiceDiscoveryBase implements IServiceDiscovery {
 	    }
 	}
 	
+	/**
+	 * This class carries out the Share and unShare Services methods call asynchronously
+	 */
+	private class AsyncShareService extends AsyncTask<Object, Void, String[]> {
+		
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected String[] doInBackground(Object... params) {
+			Dbc.require("At least two parameters must be supplied", params.length >= 2);
+			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
+			
+			//PARAMETERS
+			String client = (String)params[0];
+			AService service = (AService) params[1];
+			String identity = (String) params[2];
+			String method = (String) params[3];
+			//RETURN OBJECT
+			String results[] = new String[1];
+			results[0] = client;
+			//MESSAGE BEAN
+			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+			messageBean.setService(AService.convertAService(service));
+			messageBean.setShareJid(identity);
+			if (method.equals(IServiceControl.SHARE_SERVICE)) 
+				messageBean.setMethod(MethodType.SHARE_SERVICE);
+			else
+				messageBean.setMethod(MethodType.UNSHARE_SERVICE);
+			
+			//Communications configuration
+			ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.register(ELEMENT_NAMES, discoCallback);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (Exception e) {
+				Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
+	        }	 
+			return results;
+		}
+		
+		/**Handle the communication of the result*/
+		@Override
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+	    }
+	}
+
+	/**
+	 * This class carries out the Stop/Start Service method call asynchronously
+	 */
+	private class AsyncControlService extends AsyncTask<Object, Void, String[]> {
+		
+		@Override
+		/**Carry out compute task */
+		protected String[] doInBackground(Object... params) {
+			Dbc.require("At least two parameters must be supplied", params.length >= 2);
+			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
+			
+			//PARAMETERS
+			String client = (String)params[0];
+			AServiceResourceIdentifier serviceId = (AServiceResourceIdentifier) params[1];
+			String method = (String) params[2];
+			//RETURN OBJECT
+			String results[] = new String[1];
+			results[0] = client;
+			//MESSAGE BEAN
+			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+			messageBean.setServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(serviceId));
+			if (method.equals(IServiceControl.START_SERVICE)) 
+				messageBean.setMethod(MethodType.START_SERVICE);
+			else
+				messageBean.setMethod(MethodType.STOP_SERVICE);
+			
+			//Communications configuration
+			ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.register(ELEMENT_NAMES, discoCallback);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (Exception e) {
+				Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
+	        }	 
+			return results;
+		}
+		
+		/**Handle the communication of the result*/
+		@Override
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+	    }
+	}
+
 }
