@@ -1455,7 +1455,7 @@ public class JoinCallBack implements ICisManagerCallback{
 		}
 
 		@Override
-		public void onNegotiationComplete(String agreementKey, URI jar) {
+		public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
 			if(agreementKey!=null && !agreementKey.isEmpty()){
 				// -- Sending join
 				IIdentity toIdentity;

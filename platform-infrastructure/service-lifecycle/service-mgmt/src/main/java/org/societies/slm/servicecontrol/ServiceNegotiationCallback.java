@@ -25,6 +25,7 @@
 package org.societies.slm.servicecontrol;
 
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +76,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 
 
 	@Override
-	public void onNegotiationComplete(String agreementKey, URI jar) {
+	public void onNegotiationComplete(String agreementKey, List<URI> jars) {
 		if(logger.isDebugEnabled())
 			logger.debug("Service negotiation complete: agreementKey: " + agreementKey);
 		
@@ -84,7 +85,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 				logger.debug("AgreementKey came back null! This means that negotiation failed");
 			
 			try {
-				resultList.put(new ServiceNegotiationResult(false, jar, agreementKey));
+				resultList.put(new ServiceNegotiationResult(false, jars, agreementKey));
 			} catch (InterruptedException e) {
 				logger.error("Error putting result in List");
 				e.printStackTrace();
@@ -96,7 +97,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 				logger.debug("AgreementKey came back normal, so we proceed!");
 			
 			try {
-				resultList.put(new ServiceNegotiationResult(true, jar, agreementKey));
+				resultList.put(new ServiceNegotiationResult(true, jars, agreementKey));
 			} catch (InterruptedException e) {
 				logger.error("Error putting result in List");
 				e.printStackTrace();
@@ -126,18 +127,18 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 	public class ServiceNegotiationResult{
 		
 		boolean success;
-		URI serviceUri;
+		List<URI> serviceUri;
 		String agreementKey;
 		
 		public ServiceNegotiationResult(){}
 		
-		public ServiceNegotiationResult(boolean success, URI serviceUri, String agreementKey){
+		public ServiceNegotiationResult(boolean success, List<URI> serviceUri, String agreementKey){
 			this.success = success;
 			this.serviceUri = serviceUri;
 			this.agreementKey = agreementKey;
 		}
 		
-		public void setServiceUri(URI serviceUri){
+		public void setServiceUri(List<URI> serviceUri){
 			this.serviceUri = serviceUri;
 		}
 		
@@ -149,7 +150,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 			this.agreementKey = agreementKey;
 		}
 		
-		public URI getServiceUri(){
+		public List<URI> getServiceUri(){
 			return serviceUri;
 		}
 		
