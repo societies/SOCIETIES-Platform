@@ -125,12 +125,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
-			//LOG.info("2. Convert History Data");
+			LOG.info("2. Convert History Data");
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
-
-			//LOG.info("3. Generate Transition Dictionary");
-			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
-					
+						
+			LOG.info("3. Generate Transition Dictionary");
+			HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> currentActCtxDictionaryAll = generateTransitionsDictionary(mockData);
+			
+			// step 1 only
+			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = currentActCtxDictionaryAll.get(1);
+			
+			
 			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
@@ -196,56 +200,42 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	}
 	 */
 
-	public LinkedHashMap<List<String>,ActionDictObject> generateTransitionsDictionary(List<MockHistoryData> data) {
+	
+	/*
+	 * Set the size of the longest phrase 
+	 */
+	
+	public HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateTransitionsDictionary(List<MockHistoryData> data) {
 
-		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionaryAll = new LinkedHashMap<List<String>,ActionDictObject>();
-
-		actCtxDictionaryAll = populateActionCtxDictionary(data);
-		//this.setActiveDictionary(actCtxDictionary);
-		//printDictionary(actCtxDictionary);
-		//	LinkedHashMap<String,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob();	
-		//	printTransProbDictionary(trans3ProbDictionary);
-		//	TaskDiscovery taskDisc = new TaskDiscovery(actCtxDictionary);
-		//	taskDisc.populateTaskDictionary();
-
+		HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+				
+		for(int i=1; i<=3; i++){
+			actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+			actCtxDictionary = populateActionCtxDictionary(data, i);
+			actCtxDictionaryAll.put(i, actCtxDictionary);
+		}
+	
 		return actCtxDictionaryAll;
 	}
 
-	/*
-	public LinkedHashMap<List<String>,ActionDictObject> getDictionary(){
-		return this.actCtxDictionary;
-	}
+	
+	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData, Integer step){
 
-
-	public void setActiveDictionary(LinkedHashMap<List<String>,ActionDictObject> model){
-		this.actCtxDictionary = model;
-		//System.out.println("setActiveDictionary : ");
-	}
-
-
-	public void clearActiveDictionary(){
-		this.actCtxDictionary = null;
-		LOG.info("model cleared "+this.actCtxDictionary);
-	}
-*/
-
-
-
-	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData){
-
+		//HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionaryRepo = new HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
 		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		
 		int historySize = historyData.size();
 		LOG.debug("historySize "+historySize);
-
+	
 		List<String> currentActPhrase = null;
 		List<String> currentCtxPhraseLocation = null;
 		List<String> currentCtxPhraseStatus = null;
 		List<String> currentCtxPhraseTemperature = null;
 
 		// j is the step and the longest phrase has 3 actions
-		for (int j=1; j<4; j++) {
-
+		//for (int j=step; j<=step; j++) {
+		int j=step;
 			for (int i = 0; i < historySize ; i++) {
 				MockHistoryData currentHocData =  historyData.get(i);
 				List<String> actionNameObjTemp = new ArrayList<String>();
@@ -344,9 +334,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 						actCtxDictionary.put(currentActPhrase,newDictObj);
 					}
+					
 				}
+				
 			}
-		}
+		//}
 		return actCtxDictionary;
 	}
 
