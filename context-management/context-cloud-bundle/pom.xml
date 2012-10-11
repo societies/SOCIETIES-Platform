@@ -117,7 +117,16 @@
 			<artifactId>community-context-inference-mgmt</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>css-context-monitor</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>community-context-estimation</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
 		<!-- dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-performance-test</artifactId>
