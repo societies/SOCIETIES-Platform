@@ -113,10 +113,14 @@ var Societies3PServices = {
 		}
 		
 		var status = $('p#service_status').html();
-		if (status == "STARTED")
-			window.plugins.ServiceManagementService.startService(mServiceObj.serviceIdentifier, success, failure);
-		else
+		if (status == "STARTED") {
+			$('p#service_status').html("Stopping...");
 			window.plugins.ServiceManagementService.stopService(mServiceObj.serviceIdentifier, success, failure);
+		}
+		else {
+			$('p#service_status').html("Starting...");
+			window.plugins.ServiceManagementService.startService(mServiceObj.serviceIdentifier, success, failure);
+		}
 	},
 	
 	showDetails: function (servicePos) {

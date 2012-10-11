@@ -121,8 +121,10 @@ var	SocietiesCISListService = {
 				if (hours == 0)
 					hours = 12;
 				//BODY FORMATTING
+				var n=data[i].actor.indexOf(".");
+				var actorStr = data[i].actor.substring(0, n);
 				var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
-								 "<p>"+ data[i].actor + " " +
+								 "<p>"+ actorStr + " " +
 					 	 		 data[i].verb  + " " + 
 					 	 		 data[i].object + "</p></li>";
 				$('ul#cis_activity_feed').append(tableEntry);

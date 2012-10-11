@@ -176,19 +176,19 @@ public class PluginCISFunctions extends Plugin {
     	//REGISTER BROADCAST
     	//CIS MANAGER
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(CommunityManagement.CREATE_CIS);
-        intentFilter.addAction(CommunityManagement.DELETE_CIS);
-        intentFilter.addAction(CommunityManagement.GET_CIS_LIST);
-        intentFilter.addAction(CommunityManagement.REMOVE_MEMBER);
-        intentFilter.addAction(CommunityManagement.JOIN_CIS);
-        intentFilter.addAction(CommunityManagement.LEAVE_CIS);
+        intentFilter.addAction(ICisManager.CREATE_CIS);
+        intentFilter.addAction(ICisManager.DELETE_CIS);
+        intentFilter.addAction(ICisManager.GET_CIS_LIST);
+        intentFilter.addAction(ICisManager.REMOVE_MEMBER);
+        intentFilter.addAction(ICisManager.JOIN_CIS);
+        intentFilter.addAction(ICisManager.LEAVE_CIS);
         //CIS SUBSCRIBED
-        intentFilter.addAction(CommunityManagement.GET_MEMBERS);
-        intentFilter.addAction(CommunityManagement.GET_CIS_INFO);
-        intentFilter.addAction(CommunityManagement.GET_ACTIVITY_FEED);
-        intentFilter.addAction(CommunityManagement.ADD_ACTIVITY);
-        intentFilter.addAction(CommunityManagement.DELETE_ACTIVITY);
-        intentFilter.addAction(CommunityManagement.CLEAN_ACTIVITIES);
+        intentFilter.addAction(ICisSubscribed.GET_MEMBERS);
+        intentFilter.addAction(ICisSubscribed.GET_CIS_INFO);
+        intentFilter.addAction(ICisSubscribed.GET_ACTIVITY_FEED);
+        intentFilter.addAction(ICisSubscribed.ADD_ACTIVITY);
+        intentFilter.addAction(ICisSubscribed.DELETE_ACTIVITY);
+        intentFilter.addAction(ICisSubscribed.CLEAN_ACTIVITIES);
         //CIS DIRECTORY
         intentFilter.addAction(CisDirectoryRemote.FIND_ALL_CIS);
         intentFilter.addAction(CisDirectoryRemote.FILTER_CIS);
@@ -389,7 +389,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					ACommunity cis = (ACommunity) parcel;
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
@@ -408,7 +408,7 @@ public class PluginCISFunctions extends Plugin {
 					//unmarshall intent
 					//Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
 					//Boolean deleted = Boolean.parseBoolean(parcel.toString());
-					Boolean deleted = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_VALUE, true);
+					Boolean deleted = intent.getBooleanExtra(ICisManager.INTENT_RETURN_VALUE, true);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
 					result.setKeepCallback(false);
@@ -424,7 +424,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
 					ACommunity communities[] = new ACommunity[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						communities[i] = (ACommunity) parcels[i];
@@ -443,7 +443,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE RESPONSE FROM Parcel
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					AJoinResponse response = (AJoinResponse) parcel;
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createJoinResponseJSON(response));
@@ -462,7 +462,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					AParticipant members[] = new AParticipant[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						members[i] = (AParticipant) parcels[i];
@@ -481,7 +481,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITY FROM Parcel
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					ACommunity cis = (ACommunity) parcel;
 					//RETURN JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
@@ -497,7 +497,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE ACTIVITIES FROM Parcels
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					AActivity activities[] = new AActivity[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						activities[i] = (AActivity) parcels[i];
@@ -511,14 +511,12 @@ public class PluginCISFunctions extends Plugin {
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			} else if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3);
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					//Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-					//Boolean deleted = Boolean.parseBoolean(parcel.toString());
-					boolean deleted = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_VALUE, true);
+					boolean deleted = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_VALUE, true);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
 					result.setKeepCallback(false);
@@ -536,7 +534,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						adverts[i] = (ACisAdvertisementRecord) parcels[i];
@@ -555,7 +553,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						adverts[i] = (ACisAdvertisementRecord) parcels[i];
@@ -574,7 +572,7 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 					if (parcels.length > 0) {
 						ACommunity foundCIS = (ACommunity) parcels[0];
 						//RETURN JSON OBJECT - ASSUMED RESULT WAS IN POSTITION 0

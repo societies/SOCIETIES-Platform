@@ -111,7 +111,7 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active apps
 	 */
-	shareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+	shareMyService: function(jid, serviceObj, successCallback, failureCallback) {
 		console.log("Call ServiceManagementService - shareMyService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -130,7 +130,7 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active apps
 	 */
-	unshareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+	unshareMyService: function(jid, serviceObj, successCallback, failureCallback) {
 		console.log("Call ServiceManagementService - unshareMyService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -149,7 +149,7 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active apps
 	 */
-	startService: function(serviceId, successCallback, errorCallback) {
+	startService: function(serviceId, successCallback, failureCallback) {
 		console.log("Call ServiceManagementService - startService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -168,7 +168,7 @@ var ServiceManagementService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active apps
 	 */
-	stopService: function(serviceId, successCallback, errorCallback) {
+	stopService: function(serviceId, successCallback, failureCallback) {
 		console.log("Call ServiceManagementService - stopService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
