@@ -119,9 +119,9 @@ public class TrustEvidenceCollectorCommClient implements
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 3. timestamp
 			// TODO Uncomment once #1310 is resolved
-			//final GregorianCalendar gregCal = new GregorianCalendar();
-			//gregCal.setTime(timestamp);
-			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 4. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
@@ -143,12 +143,10 @@ public class TrustEvidenceCollectorCommClient implements
 					+ ": " + ce.getLocalizedMessage(), ce);
 			
 		// TODO Uncomment once #1310 is resolved
-/*			
 		} catch (DatatypeConfigurationException dce) {
 			
 			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
 					+ ": " + dce.getLocalizedMessage(), dce);
-*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
@@ -158,10 +156,10 @@ public class TrustEvidenceCollectorCommClient implements
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(java.lang.String, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
 	 */
 	@Override
-	public void addIndirectEvidence(final String source, 
+	public void addIndirectEvidence(final TrustedEntityId source, 
 			final TrustedEntityId teid,	final TrustEvidenceType type,
 			final Date timestamp, final Serializable info,
 			final ITrustEvidenceCollectorRemoteCallback callback) 
@@ -192,7 +190,8 @@ public class TrustEvidenceCollectorCommClient implements
 			
 			final AddIndirectEvidenceRequestBean addEvidenceBean = new AddIndirectEvidenceRequestBean();
 			// 1. source
-			addEvidenceBean.setSource(source);
+			addEvidenceBean.setSource(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(source));
 			// 2. teid
 			addEvidenceBean.setTeid(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));

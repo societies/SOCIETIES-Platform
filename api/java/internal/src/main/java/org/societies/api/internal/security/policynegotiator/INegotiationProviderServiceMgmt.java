@@ -25,6 +25,7 @@
 package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
+import java.util.List;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -38,50 +39,66 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public interface INegotiationProviderServiceMgmt {
 
 	/**
-	 * Tells Policy Negotiator that a new service is available for sharing to others.
-	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
-	 * 
-	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
-	 * 
-	 * @param clientJarServer Host and port of the server that hosts the JAR file for service client.
-	 * If the service does not provide a client, this parameter should be null.
-	 * 
-	 * @param clientJarFilePath Path of the JAR file for service client.
-	 * The path is relative on the server.
-	 * If the service does not provide a client, this parameter should be null.
-	 * Example: "Calculator.jar" if file path on the server is $VIRGO_HOME/Calculator.jar
-	 * 
-	 * @throws NegotiationException
+	 * Please use {@link #addService(ServiceResourceIdentifier, String, URI,
+	 * List, INegotiationProviderSLMCallback)
+	 * instead.
 	 */
 	@Deprecated
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath)
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			String clientJarFilePath, INegotiationProviderSLMCallback callback)
 			throws NegotiationException;
 
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 * @param serviceId ID of the service. The service instance need not exist at this point.
 	 * 
 	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
 	 * 
-	 * @param clientJarServer Host and port of the server that hosts the JAR file for service client.
-	 * If the service does not provide a client, this parameter should be null.
+	 * @param fileServer Host and port of the server that should host any files related to the service,
+	 * e.g., the JAR file for service client.
+	 * If the service does not provide a client and no other files are to be made available for
+	 * service consumers to download, this parameter should be null.
 	 * 
-	 * @param clientJarFilePath Path of the JAR file for service client.
-	 * The path is relative on the server.
-	 * If the service does not provide a client, this parameter should be null.
-	 * Example: "Calculator.jar" if file path on the server is $VIRGO_HOME/Calculator.jar
+	 * @param file Relative paths of any files to be associated with the service and shared on the
+	 * domain authority server.
+	 * The paths are relative on the server.
+	 * Example: "3p-service/Calculator.jar" if file path on the server is $VIRGO_HOME/3p-service/Calculator.jar
 	 * 
 	 * @param callback The callback to be invoked after operation is finished.
 	 * 
 	 * @throws NegotiationException
 	 */
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback)
+	@Deprecated
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			List<String> files, INegotiationProviderSLMCallback callback)
 			throws NegotiationException;
 
+	/**
+	 * Tells Policy Negotiator that a new service is available for sharing to others.
+	 * 
+	 * @param serviceId ID of the service. The service instance need not exist at this point.
+	 * 
+	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
+	 * 
+	 * @param fileServer Host and port of the server that should host any files related to the service,
+	 * e.g., the JAR file for service client.
+	 * If the service does not provide a client and no other files are to be made available for
+	 * service consumers to download, this parameter should be null.
+	 * 
+	 * @param fileUris URIs of any files to be associated with the service and shared on the
+	 * domain authority server.
+	 * The files will be automatically transferred to the server. On the server they will be stored
+	 * locally as $VIRGO_HOME/3p-service/$SERVICE_ID/$FILE_PATH.
+	 * 
+	 * @param callback The callback to be invoked after operation is finished.
+	 * 
+	 * @throws NegotiationException
+	 */
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			URI[] fileUris, INegotiationProviderSLMCallback callback)
+			throws NegotiationException;
+	
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 

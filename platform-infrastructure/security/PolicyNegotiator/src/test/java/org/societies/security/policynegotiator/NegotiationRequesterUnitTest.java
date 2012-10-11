@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -109,11 +110,11 @@ public class NegotiationRequesterUnitTest {
 
 		Requestor provider;
 		INegotiationCallback callback;
-		
+
 		provider = mock(Requestor.class);
 		callback = new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey, URI jar) {
+			public void onNegotiationComplete(String agreementKey, List <URI> fileUris) {
 				assertNull(agreementKey);
 			}
 			@Override

@@ -87,44 +87,69 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	}
 
 	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
 		String dataToSign;
-
-		if (clientJarFilePath.startsWith("/")) {
-			clientJarFilePath = clientJarFilePath.replaceFirst("/", "");
-		}
-
-		dataToSign = serviceId.getIdentifier().toASCIIString();
-		dataToSign += clientJarFilePath;
-
-		try {
-			signature = signatureMgr.sign(dataToSign, provider);
-		} catch (DigsigException e) {
-			throw new NegotiationException(e);
-		}
-		List<String> files = new ArrayList<String>();
-		files.add(clientJarFilePath);
-		IClientJarServerCallback cb = new ClientJarServerCallback(callback);
-		//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
-		this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-				serviceId.getIdentifier(), provider, signature, files, cb);
+		String strippedFilePath;
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJarServer, clientJarFilePath, null);
-		
-		services.put(idStr, s);
-	}
+		Service s = new Service(idStr, slaXml, fileServer, files);
+
+		if (files != null && files.size() > 0) {
+			dataToSign = serviceId.getIdentifier().toASCIIString();
 	
+			for (int k = 0; k < files.size(); k++) {
+				if (files.get(k).startsWith("/")) {
+					strippedFilePath = files.get(k).replaceFirst("/", "");
+					files.set(k, strippedFilePath);
+				}
+				dataToSign += files.get(k);
+			}
+	
+			try {
+				signature = signatureMgr.sign(dataToSign, provider);
+			} catch (DigsigException e) {
+				throw new NegotiationException(e);
+			}
+			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
+			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
+			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
+					serviceId.getIdentifier(), provider, signature, files, cb);
+			services.put(idStr, s);
+		}
+		else {
+			services.put(idStr, s);
+			callback.notifySuccess();
+		}
+	}
+
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+			URI[] fileUris, INegotiationProviderSLMCallback callback) throws NegotiationException {
+		
+		List<String> files = new ArrayList<String>();
+		
+		// TODO: upload the files to REST server
+		LOG.warn("Automatic file upload is not supported yet. You still have to manually place " +
+				"the files (e.g. service client jar) to the domain authority node.");
+		
+		for (URI f : fileUris) {
+			files.add(f.getPath());
+		}
+
+		addService(serviceId, slaXml, fileServer, files, callback);
+	}
+
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath) throws NegotiationException {
+			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
-		LOG.warn("Obsolete version of INegotiationProviderServiceMgmt.addService() is being called.");
-		addService(serviceId, slaXml, clientJarServer, clientJarFilePath, null);
+		List<String> files = new ArrayList<String>();
+		files.add(clientJarFilePath);
+		addService(serviceId, slaXml, clientJarServer, files, callback);
 	}
 	
 	@Override
@@ -156,51 +181,41 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	 * @return
 	 * @throws NegotiationException When service is not found
 	 */
-	protected URI getClientJarUri(String serviceId) throws NegotiationException {
+	protected List<URI> getSignedUris(String serviceId) throws NegotiationException {
 
-		// TODO: remove when SLM calls addService()
-//		if (services.get(serviceId) == null) {
-//			LOG.warn("Temporal solution: adding service {}", serviceId);
-//			ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-//			try {
-//				id.setIdentifier(new URI(serviceId));
-//				addService(id, null, new URI("http://localhost:8080"), "Calculator.jar");
-//			} catch (URISyntaxException e) {
-//				LOG.warn("Could not add service \"{}\" to local registry", serviceId);
-//				throw new NegotiationException(e);
-//			}
-//		}
-		// End of temporal code to be removed when SLM calls addService()
-
-		URI uri;
+		List <URI> uri = new ArrayList<URI>();
+		String uriStr;
 		String host;
 		String sig;
-		String filePath;
+		List <String> filePath;
 		Service s = getService(serviceId);
 		
 		if (s == null) {
 			throw new NegotiationException("Service " + serviceId + " not found");
 		}
 
-		host = s.getClientJarHost().toString();
-		filePath = s.getClientJarFilePath();
-		try {
-			sig = signatureMgr.sign(filePath, groupMgr.getIdMgr().getThisNetworkNode());
-		} catch (DigsigException e) {
-			LOG.warn("Failed to sign service " + serviceId + " for client", e);
-			throw new NegotiationException(e);
-		}
-		String uriStr = host + UrlPath.BASE + UrlPath.PATH + "/client.jar" +
-				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
-				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+		host = s.getFileServerHost().toString();
+		filePath = s.getFiles();
 		
-		try {
-			uri = new URI(uriStr);
-			return uri;
-		} catch (URISyntaxException e) {
-			throw new NegotiationException(e);
+		for (int k = 0; k < filePath.size(); k++) {
+			try {
+				sig = signatureMgr.sign(filePath.get(k), groupMgr.getIdMgr().getThisNetworkNode());
+			} catch (DigsigException e) {
+				LOG.error("Failed to sign file " + filePath.get(k) + " of service " + serviceId, e);
+				throw new NegotiationException(e);
+			}
+			uriStr = host + UrlPath.BASE + UrlPath.PATH + "/" + filePath.get(k).replaceAll(".*/", "") +
+					"?" + UrlPath.URL_PARAM_FILE + "=" + filePath.get(k) +
+					"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
+					"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+			
+			try {
+				uri.add(new URI(uriStr));
+			} catch (URISyntaxException e) {
+				throw new NegotiationException(e);
+			}
 		}
+		return uri;
 	}
 
 	/**

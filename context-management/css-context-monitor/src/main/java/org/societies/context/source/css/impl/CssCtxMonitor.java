@@ -31,10 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -104,8 +105,8 @@ public class CssCtxMonitor extends EventListener {
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
 		
-		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Received internal " + event.geteventType() + " event: " + event);
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received internal " + event.geteventType() + " event: " + event);
 		
 		if (!(event.geteventInfo() instanceof CssRecord)) {
 			
@@ -160,16 +161,20 @@ public class CssCtxMonitor extends EventListener {
 	private void updateCtxAttribute(CtxEntityIdentifier ownerCtxId, 
 			String type, String value) throws Exception {
 
-		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
 
 		final List<CtxIdentifier> ctxIds = 
 				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
-		if (!ctxIds.isEmpty()) {
-			this.ctxBroker.updateAttribute((CtxAttributeIdentifier) ctxIds.get(0), value);
-		} else {
-			final CtxAttribute attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
-			this.ctxBroker.updateAttribute(attr.getId(), value);
-		}
+		final CtxAttribute attr;
+		if (!ctxIds.isEmpty())
+			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0));
+		else
+			attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
+			
+		attr.setStringValue(value);
+		attr.setValueType(CtxAttributeValueType.STRING);
+		attr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		this.ctxBroker.update(attr);
 	}
 }

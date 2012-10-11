@@ -92,7 +92,7 @@ public interface ITrustEvidenceCollector {
 	 *            if any of the source, teid, type or timestamp parameter is
 	 *            <code>null</code>
 	 */
-	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
+	public void addIndirectEvidence(final TrustedEntityId source, final TrustedEntityId teid,
 			final TrustEvidenceType type, final Date timestamp, final Serializable info)
 					throws TrustException;
 	

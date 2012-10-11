@@ -25,10 +25,10 @@
 package org.societies.api.privacytrust.trust.evidence;
 
 /**
- * Describe your class here...
+ * The constants of this enumerated type specify the types of trust evidence.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.4
  */
 public enum TrustEvidenceType {
 
@@ -38,17 +38,17 @@ public enum TrustEvidenceType {
 	RATED,
 	
 	/**
-	 * 
+	 * The enum constant for joining communities.
 	 */
 	JOINED_COMMUNITY,
 	
 	/**
-	 * 
+	 * The enum constant for leaving communities.
 	 */
 	LEFT_COMMUNITY,
 	
 	/**
-	 * 
+	 * The enum constant for using services.
 	 */
 	USED_SERVICE,
 }

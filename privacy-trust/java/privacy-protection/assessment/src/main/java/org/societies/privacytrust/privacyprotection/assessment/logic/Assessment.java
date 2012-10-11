@@ -24,8 +24,10 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
@@ -55,6 +56,7 @@ public class Assessment implements IAssessment {
 
 	private PrivacyLog privacyLog;
 	private DataTransferAnalyzer dataTransferAnalyzer;
+	private DataAccessAnalyzer dataAccessAnalyzer; 
 	
 	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
 	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
@@ -78,6 +80,7 @@ public class Assessment implements IAssessment {
 	public void init() {
 		LOG.debug("init()");
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
+		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
 		assessAllNow();
 	}
 	
@@ -171,10 +174,32 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public List<DataAccessLogEntry> getDataAccessEvents() {
-		
-		LOG.info("getDataAccessEvents()");
-		
-		return privacyLog.getDataAccess();
+	public List<IIdentity> getDataAccessRequestors() {
+		return dataAccessAnalyzer.getDataAccessRequestors();
+	}
+	
+	@Override
+	public List<String> getDataAccessRequestorClasses() {
+		return dataAccessAnalyzer.getDataAccessRequestorClasses();
+	}
+
+	@Override
+	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEvents(requestor, start, end);
+	}
+
+	@Override
+	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEvents(requestorClass, start, end);
+	}
+	
+	@Override
+	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEventsForAllIdentities(start, end);
+	}
+	
+	@Override
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
 	}
 }

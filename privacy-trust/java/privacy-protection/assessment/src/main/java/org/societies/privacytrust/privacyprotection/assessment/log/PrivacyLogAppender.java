@@ -26,10 +26,9 @@ package org.societies.privacytrust.privacyprotection.assessment.log;
 
 import java.util.Date;
 
-import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+//import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -38,6 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
+import org.societies.privacytrust.privacyprotection.assessment.util.StackParser;
 
 /**
  * 
@@ -87,27 +87,15 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		logStack();
 	}
 	
-	private void logStack() {
+	private String getInvokerClass() {
 
 		//StackTraceElement[] stack = (new Exception()).getStackTrace();
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-		for (int k = 0; k < stack.length; k++) {
-			
-			// Full class name
-			Log.info("STACK[" + k + "]: " + stack[k].getClassName());
-			
-			// Java file name without path
-			Log.info("STACK[" + k + "]: " + stack[k].getFileName());
-			
-			// Method name without class name or parameters
-			Log.info("STACK[" + k + "]: " + stack[k].getMethodName());
-			
-			// Full class name + method + file name + line number
-			Log.info("STACK[" + k + "]: " + stack[k].toString());
-			
-			// false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
-			Log.info("STACK[" + k + "]: " + stack[k].isNativeMethod());
-		}
+		StackParser stackParser = new StackParser(stack);
+		String invoker = stackParser.getInvokerOfInvoker();
+		//LOG.debug("Context / Comms: {}", stackParser.getInvoker());  // Costly call, use for debugging only!
+		LOG.debug("Invoked by {}", invoker);
+		return invoker;
 	}
 
 	// Getters and setters for beans
@@ -149,10 +137,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
-		//logStack();
-		
 		String dataType;
-		String invokerClass = "";  // FIXME
+		String invokerClass = getInvokerClass();
 		
 		if (payload != null) {
 			dataType = payload.getClass().getSimpleName();
@@ -177,33 +163,25 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
-		LOG.info("logContext()");
+		LOG.debug("logContext()");
 		
-		//logStack();
+		String invokerClass = getInvokerClass();
 
-		String invokerClass = "";  // FIXME
-		IIdentity requestorId;
-		
-		if (requestor == null) {
-			requestorId = null;
-		}
-		else {
-			requestorId = requestor.getRequestorId();
-		}
-		
-		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestorId, invokerClass, owner, -1);
-		privacyLog.getDataAccess().add(logEntry);
+		logContext(requestor, owner, -1, invokerClass);
 	}
 
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
-		LOG.info("logContext({})", dataSize);
-		
-		//logStack();
+		LOG.debug("logContext({})", dataSize);
 
-		String invokerClass = "";  // FIXME
+		String invokerClass = getInvokerClass();
+
+		logContext(requestor, owner, dataSize, invokerClass);
+	}
+	
+	private void logContext(Requestor requestor, IIdentity owner, int dataSize, String invokerClass) {
+
 		IIdentity requestorId;
 		
 		if (requestor == null) {

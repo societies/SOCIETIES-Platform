@@ -24,6 +24,8 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.IClientJarServerCallback;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
@@ -36,9 +38,12 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
  */
 public class ClientJarServerCallback implements IClientJarServerCallback {
 
-	INegotiationProviderSLMCallback callback;
+	private static Logger LOG = LoggerFactory.getLogger(ClientJarServerCallback.class);
+	
+	private INegotiationProviderSLMCallback callback;
 	
 	public ClientJarServerCallback(INegotiationProviderSLMCallback callback) {
+		LOG.debug("ClientJarServerCallback({})", callback);
 		this.callback = callback;
 	}
 	
@@ -47,6 +52,12 @@ public class ClientJarServerCallback implements IClientJarServerCallback {
 	 */
 	@Override
 	public void receiveResult(UrlBean result) {
+		
+		if (callback == null) {
+			LOG.debug("receiveResult(): Callback is null. Success = {}", result.isSuccess());
+			return;
+		}
+		
 		if (result.isSuccess()) {
 			callback.notifySuccess();
 		}

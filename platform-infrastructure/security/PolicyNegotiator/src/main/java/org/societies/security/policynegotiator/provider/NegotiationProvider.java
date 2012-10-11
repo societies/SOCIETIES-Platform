@@ -26,6 +26,7 @@ package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -162,7 +163,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		Session session = sessions.get(sessionId);
 		SlaBean sla = new SlaBean();
 		String finalSla;
-		URI jarUri;
+		List<URI> signedUris;
 		String serviceId;
 		
 		sla.setSessionId(sessionId);
@@ -176,8 +177,8 @@ public class NegotiationProvider implements INegotiationProvider {
 			if (true) {
 				serviceId = session.getServiceId();
 				try {
-					jarUri = providerServiceMgr.getClientJarUri(serviceId);
-					sla.setJarUrl(jarUri.toString());
+					signedUris = providerServiceMgr.getSignedUris(serviceId);
+					sla.setFileUris(signedUris);
 				} catch (NegotiationException e) {
 					LOG.warn("acceptPolicyAndGetSla()", e);
 				}

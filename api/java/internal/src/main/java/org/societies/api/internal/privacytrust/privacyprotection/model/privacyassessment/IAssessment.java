@@ -24,8 +24,10 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.api.identity.IIdentity;
 
@@ -95,15 +97,55 @@ public interface IAssessment {
 	public long getNumDataTransmissionEvents();
 	
 	/**
-	 * Development only.
-	 * TODO: remove from API and implementation
-	 * 
+	 * @return All identities that have requested access to local data
+	 */
+	public List<IIdentity> getDataAccessRequestors();
+	
+	/**
+	 * @return Names of all classes that have requested access to local data
+	 */
+	public List<String> getDataAccessRequestorClasses();
+
+	/**
 	 * @return number of all recorded data access events
 	 */
 	public long getNumDataAccessEvents();
-	
+
 	/**
-	 * @return All recorded data access events
+	 * Get number of events in certain time period where given requestor accessed local data.
+	 * 
+	 * @param requestor Identity of the requestor (the one who requested data access)
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return All events where requestor matches
 	 */
-	public List<DataAccessLogEntry> getDataAccessEvents();
+	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end);
+
+	/**
+	 * Get number of events in certain time period where given requestor accessed local data.
+	 * 
+	 * @param requestorClass Class name of the requestor (the one who requested data access)
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return All events where requestor matches
+	 */
+	public int getNumDataAccessEvents(String requestorClass, Date start, Date end);
+
+	/**
+	 * Get number of local data access events in certain time period, grouped by requestor class name.
+	 * 
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return Number of data access events for each requestor class name
+	 */
+	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end);
+
+	/**
+	 * Get number of local data access events in certain time period, grouped by requestor identity.
+	 * 
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return Number of data access events for each requestor identity
+	 */
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
 }
