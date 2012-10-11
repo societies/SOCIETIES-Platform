@@ -104,7 +104,7 @@ public class AServiceResourceIdentifier extends ServiceResourceIdentifier implem
 	 */
 	public static AServiceResourceIdentifier createFromJSON(JSONObject jObj) throws JSONException {
 		AServiceResourceIdentifier asri = new AServiceResourceIdentifier();
-		asri.setServiceInstanceIdentifier(jObj.getString("serviceIdentifier"));
+		asri.setServiceInstanceIdentifier(jObj.getString("serviceInstanceIdentifier"));
 		asri.setIdentifier(URI.create(jObj.getString("identifier")));
 		
 		return asri;
