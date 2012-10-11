@@ -345,9 +345,9 @@ public class TrustEvidenceCollector extends Service
 	}
 
 	/*
-	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(java.lang.String, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
-	public void addIndirectEvidence(final String source, 
+	public void addIndirectEvidence(final TrustedEntityId source, 
 			final TrustedEntityId teid, final TrustEvidenceType type,
 			final Date timestamp, final Serializable info) 
 					throws TrustException {
@@ -379,7 +379,8 @@ public class TrustEvidenceCollector extends Service
 			final AddIndirectEvidenceRequestBean addEvidenceBean = 
 					new AddIndirectEvidenceRequestBean();
 			// 1. source
-			addEvidenceBean.setSource(source);
+			addEvidenceBean.setSource(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(source));
 			// 2. teid
 			addEvidenceBean.setTeid(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));

@@ -25,6 +25,7 @@
 package org.societies.security.policynegotiator.requester;
 
 import java.net.URI;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	
 	INegotiationCallback finalCallback;
 	String slaKey;
-	URI jar;
+	List<URI> fileUris;
 	
 	//private long timestamp;
 	
@@ -64,10 +65,10 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * @param slaKey The key to gather SLA from secure storage using
 	 * {@link ISecureStorage#getDocument(String)}
 	 */
-	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey, URI jar) {
+	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey, List<URI> fileUris) {
 		this.finalCallback = finalCallback;
 		this.slaKey = slaKey;
-		this.jar = jar;
+		this.fileUris = fileUris;
 		//this.timestamp = System.nanoTime();
 	}
 	
@@ -76,7 +77,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 
 		String type = event.geteventType();
 		
-		LOG.info("Internal event received: {}", type);    
+		LOG.info("Internal event received: {}", type);
 		LOG.debug("*** event name : " + event.geteventName());
 		LOG.debug("*** event source : " + event.geteventSource());
 		PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
@@ -110,7 +111,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	private void notifySuccess() {
 		if (finalCallback != null) {
 			LOG.debug("invoking final callback");
-			finalCallback.onNegotiationComplete(slaKey, jar);
+			finalCallback.onNegotiationComplete(slaKey, fileUris);
 			LOG.info("negotiation finished, final callback invoked");
 		}
 		else {

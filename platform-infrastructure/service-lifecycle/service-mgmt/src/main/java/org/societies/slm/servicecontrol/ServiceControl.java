@@ -24,6 +24,7 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -512,7 +513,20 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
 					
 				Future<ServiceControlResult> asyncResult = null;
-				URL bundleLocation = negotiationResult.getServiceUri().toURL();
+				
+				URL bundleLocation;
+				List<URI> urlList = negotiationResult.getServiceUri();
+				if(!urlList.isEmpty())
+					bundleLocation = negotiationResult.getServiceUri().get(0).toURL();
+				else
+				{
+					if(logger.isDebugEnabled())
+						logger.debug("No client url returned from negotiation!");
+					returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
+					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: No file to install returned!");
+					return new AsyncResult<ServiceControlResult>(returnResult);	
+
+				}
 				//URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
 
 				asyncResult = installService(bundleLocation);

@@ -186,7 +186,8 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 			
 			try {
 				// 1. source
-				final String source = addEvidenceRequestBean.getSource(); 
+				final TrustedEntityId source = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getSource()); 
 				// 2. teid
 				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
 						fromTrustedEntityIdBean(addEvidenceRequestBean.getTeid());
@@ -312,10 +313,19 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	private static Serializable deserialise(byte[] objectData,
 			ClassLoader classLoader) throws IOException, ClassNotFoundException {
 
-		final CustomObjectInputStream ois = new CustomObjectInputStream(
-				new ByteArrayInputStream(objectData), classLoader);
+		final Serializable result;
+		CustomObjectInputStream ois = null;
+		try {
+			ois = new CustomObjectInputStream(
+					new ByteArrayInputStream(objectData), classLoader);
 
-		return (Serializable) ois.readObject();
+			result = (Serializable) ois.readObject();
+		} finally {
+			if (ois != null)
+				ois.close();
+		}
+
+		return result;
 	}
 	
 	/**

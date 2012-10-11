@@ -53,7 +53,6 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	@SuppressWarnings("unused")
 	private long id;
 	
 	/** The identifier of the trusted entity this evidence refers to. */
@@ -62,7 +61,7 @@ public abstract class TrustEvidence implements ITrustEvidence {
 			@Column(name = "entity_type", nullable = false, updatable = false, length = 3),
 			@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
 	})
-	@Type(type = "org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdCompositeType")
 	private final TrustedEntityId teid;
 	
 	@Column(name = "type", nullable = false, updatable = false)

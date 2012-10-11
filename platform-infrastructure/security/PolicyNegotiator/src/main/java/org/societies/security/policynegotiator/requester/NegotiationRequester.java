@@ -65,20 +65,7 @@ public class NegotiationRequester implements INegotiation {
 	
 //	@PostConstruct
 	public void init() {
-		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
-		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
-
 		LOG.debug("init()");
-		
-		// Test: initialization of negotiation. Integration test is available to replace this.
-//		IIdentityManager idMgr = groupMgr.getIdMgr();
-//		IIdentity provider = idMgr.getThisNetworkNode();
-//		startNegotiation(provider, "service-123", new INegotiationCallback() {
-//			@Override
-//			public void onNegotiationComplete(String agreementKey) {
-//				LOG.info("onNegotiationComplete({})", agreementKey);
-//			}
-//		});
 	}
 
 	// Getters and setters for other OSGi services

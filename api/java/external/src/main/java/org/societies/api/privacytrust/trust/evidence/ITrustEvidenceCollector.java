@@ -22,22 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.evidence.remote;
+package org.societies.api.privacytrust.trust.evidence;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * Describe your class here...
+ * This interface is used to add trust evidence with regards to CSSs, CISs or
+ * services. Trust evidence data are the basis for evaluating direct and
+ * indirect trust in these entities. 
+ * <p>
+ * More specifically, each piece of trust evidence is associated with a 
+ * {@link TrustedEntityId} which identifies the trusted entity that particular
+ * piece of evidence refers to. Therefore, multiple trust evidence can be
+ * assigned to a single trusted entity. Moreover, the {@link TrustEvidenceType}
+ * is used to characterise the type of evidence. Joining or leaving a
+ * community, using a service, interacting with another individual are some
+ * examples of trust evidence types. In addition, we distinguish between direct
+ * and indirect trust in an entity. Likewise, trust evidence is classified as 
+ * <em>direct</em> or <em>indirect</em> trust evidence. The former are related to
+ * data which are locally collected by the trustor regarding their direct
+ * interactions with individuals, communities, or services, while the latter
+ * include information originating from other trusted entities. Thus, every
+ * piece of indirect trust evidence is coupled with a <code>TrustedEntityId</code>
+ * which references the <em>source</em> of this information.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
-public interface ITrustEvidenceCollectorRemote {
+public interface ITrustEvidenceCollector {
 	
 	/**
 	 * Adds the specified piece of direct trust evidence. The
@@ -55,9 +74,6 @@ public interface ITrustEvidenceCollectorRemote {
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
 	 *            otherwise
-	 * @param callback
-	 *            the callback to acknowledge the addition of the direct trust
-	 *            evidence
 	 * @throws TrustException
 	 *            if the specified piece of direct trust evidence cannot be 
 	 *            added
@@ -65,11 +81,8 @@ public interface ITrustEvidenceCollectorRemote {
 	 *            if any of the teid, type or timestamp parameter is
 	 *            <code>null</code>
 	 */
-	public void addDirectEvidence(final TrustedEntityId teid, 
-			final TrustEvidenceType type, final Date timestamp,
-			final Serializable info, 
-			final ITrustEvidenceCollectorRemoteCallback callback) 
-					throws TrustException;
+	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) throws TrustException;
 	
 	/**
 	 * Adds the specified piece of indirect trust evidence which originates
@@ -89,20 +102,71 @@ public interface ITrustEvidenceCollectorRemote {
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
 	 *            otherwise
-	 * @param callback
-	 *            the callback to acknowledge the addition of the indirect 
-	 *            trust evidence
 	 * @throws TrustException
 	 *            if the specified piece of indirect trust evidence cannot be 
 	 *            added
 	 * @throws NullPointerException
 	 *            if any of the source, teid, type or timestamp parameter is
 	 *            <code>null</code>
-	 * @since 0.5
 	 */
 	public void addIndirectEvidence(final TrustedEntityId source, 
-			final TrustedEntityId teid,	final TrustEvidenceType type,
-			final Date timestamp, final Serializable info,
-			final ITrustEvidenceCollectorRemoteCallback callback)
+			final TrustedEntityId teid,	final TrustEvidenceType type, 
+			final Date timestamp, final Serializable info) 
 					throws TrustException;
+	
+	/**
+	 * Assigns the specified trust rating to the identified trustee by the
+	 * supplied trustor. The identified trustee can be either a CSS or a CIS,
+	 * while the trustor must reference a CSS. The trust rating value should be
+	 * in the range of [0,1].
+	 * 
+	 * @param trustor 
+	 *            the CSS that assigns the trust rating
+	 * @param trustee
+	 *            the CSS or CIS to assign the rating to
+	 * @param rating
+	 *            the trust rating [0,1]
+	 * @param timestamp
+	 *            the timestamp of the given rating, or the current time if
+	 *            a <code>null</code> value is specified
+	 * @throws TrustException
+	 *            if the operation fails
+	 * @throws NullPointerException
+	 *            if any of the trustor or trustee parameters are
+	 *            <code>null</code>
+	 * @throws IllegalArgumentException
+	 *            if the trustor does not identify a CSS; the trustee does not
+	 *            identify a CSS or CIS; the trust rating is not in the range
+	 *            of [0,1] 
+	 */
+	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
+			final double rating, final Date timestamp) throws TrustException;
+
+	/**
+	 * Assigns the specified trust rating to the identified trustee by the
+	 * supplied trustor. The identified trustee is a service, while the trustor
+	 * must reference a CSS. The trust rating value should be in the range of
+	 * [0,1].
+	 * 
+	 * @param trustor 
+	 *            the CSS that assigns the trust rating
+	 * @param trustee
+	 *            the service to assign the rating to
+	 * @param rating
+	 *            the trust rating [0,1]
+	 * @param timestamp
+	 *            the timestamp of the given rating, or the current time if
+	 *            a <code>null</code> value is specified
+	 * @throws TrustException
+	 *            if the operation fails
+	 * @throws NullPointerException
+	 *            if any of the trustor or trustee parameters are
+	 *            <code>null</code>
+	 * @throws IllegalArgumentException
+	 *            if the trustor does not identify a CSS or the trust rating is
+	 *            not in the range of [0,1] 
+	 */
+	public void addTrustRating(final IIdentity trustor, 
+			final ServiceResourceIdentifier trustee, final double rating,
+			final Date timestamp) throws TrustException;
 }

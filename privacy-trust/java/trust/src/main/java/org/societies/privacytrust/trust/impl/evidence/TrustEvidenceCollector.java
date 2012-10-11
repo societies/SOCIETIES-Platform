@@ -182,10 +182,11 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(java.lang.String, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * (non-Javadoc)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
-	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
+	public void addIndirectEvidence(final TrustedEntityId source, final TrustedEntityId teid,
 			final TrustEvidenceType type, final Date timestamp, final Serializable info)
 			throws TrustException {
 		

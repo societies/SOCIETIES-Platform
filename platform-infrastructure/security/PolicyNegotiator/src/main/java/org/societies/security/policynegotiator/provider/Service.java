@@ -25,8 +25,10 @@
 package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
+import java.util.List;
 
-import org.societies.api.identity.IIdentity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -36,22 +38,21 @@ import org.societies.api.identity.IIdentity;
  */
 public class Service {
 	
+	private static Logger LOG = LoggerFactory.getLogger(Service.class);
+	
 	private String id;
 	private String slaXmlOptions;
-	private URI clientJarHost;
-	private String clientJarFilePath;
-	private IIdentity clientJarServer;
+	private URI fileServerHost;
+	private List<String> files;
 
-	public Service(String id, String slaXmlOptions, URI clientJarHost, String clientJarFilePath,
-			IIdentity clientJarServer) {
+	public Service(String id, String slaXmlOptions, URI fileServerHost, List<String> files) {
 		
 		this.id = id;
 		this.slaXmlOptions = slaXmlOptions;
-		this.clientJarHost = clientJarHost;
-		//this.clientJarHost = "http://localhost:8080";
-		this.clientJarFilePath = clientJarFilePath;
-		//this.clientJarFilePath = "Calculator.jar";
-		this.clientJarServer = clientJarServer;
+		this.fileServerHost = fileServerHost;
+		this.files = files;
+		
+		LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
 	}
 	
 	/**
@@ -69,24 +70,24 @@ public class Service {
 	}
 
 	/**
-	 * @return the clientJarHost
+	 * @return the fileServerHost
 	 */
-	public URI getClientJarHost() {
-		return clientJarHost;
+	public URI getFileServerHost() {
+		return fileServerHost;
 	}
 
 	/**
-	 * @return the clientJarFilePath
+	 * @return relative paths to files
 	 */
-	public String getClientJarFilePath() {
-		return clientJarFilePath;
+	public List<String> getFiles() {
+		return files;
 	}
 
 	/**
 	 * @return the clientJarServer
 	 */
-	@Deprecated
-	public IIdentity getClientJarServer() {
-		return clientJarServer;
-	}
+//	@Deprecated
+//	public IIdentity getFileServer() {
+//		return fileServer;
+//	}
 }
