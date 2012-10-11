@@ -217,7 +217,7 @@ public class CisManagerController {
 		//model.put("localCISsArray", localCISs);
 		//model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
-		return new ModelAndView("createnewcis", model);
+		return new ModelAndView("createNewCis", model);
 	}
 
 	
