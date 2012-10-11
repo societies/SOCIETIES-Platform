@@ -69,12 +69,14 @@ public class CertificateUpload {
 
 		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
 		
-		try {
-			Files.writeFile(is, path);
-		} catch (IOException e) {
-			LOG.warn("Could not write to file {}", path, e);
-			// Return HTTP status code 500 - Internal Server Error
-			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
+		// TODO
+		
+//		try {
+//			Files.writeFile(is, path);
+//		} catch (IOException e) {
+//			LOG.warn("Could not write to file {}", path, e);
+//			// Return HTTP status code 500 - Internal Server Error
+//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//		}
     }
 }

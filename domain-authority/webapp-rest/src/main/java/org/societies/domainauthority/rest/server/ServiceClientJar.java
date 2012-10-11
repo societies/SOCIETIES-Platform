@@ -113,15 +113,13 @@ public class ServiceClientJar {
 
 		LOG.debug("HTTP POST: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
 
-		// TODO
-		
-//		try {
-//			//Files.writeFile(is, path);
-//			Files.writeFile(request.getInputStream(), path);
-//		} catch (IOException e) {
-//			LOG.warn("Could not write to file {}", path, e);
-//			// Return HTTP status code 500 - Internal Server Error
-//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
+		try {
+			//Files.writeFile(is, path);
+			Files.writeFile(request.getInputStream(), path);
+		} catch (IOException e) {
+			LOG.warn("Could not write to file {}", path, e);
+			// Return HTTP status code 500 - Internal Server Error
+			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
     }
 }
