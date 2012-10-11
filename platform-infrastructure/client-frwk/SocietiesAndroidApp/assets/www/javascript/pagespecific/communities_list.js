@@ -36,6 +36,7 @@ var	SocietiesCISListService = {
 	mCisServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
 	mMyServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
 	mCis_id: "",
+	mLastDate: "",
 	
 	/**
 	 * @methodOf SocietiesCISListService#
@@ -93,20 +94,48 @@ var	SocietiesCISListService = {
 	
 	showCISActivities: function (cisId) {
 		function success(data) {
+			mLastDate="";
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_activity_feed').children().length >0 )
 				$('ul#cis_activity_feed li:last').remove();
 			
-			for (i  = 0; i < data.length; i++) {
-				var tableEntry = "<li>"+ data[i].actor + " " + 
+			for (i=data.length-1; i >= 0 ; i--) {
+				//HEADER
+				var d = new Date();
+				d.setTime(data[i].published); 
+				var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+				if (mLastDate != dateStr) {
+					mLastDate = dateStr;
+					$('ul#cis_activity_feed').append("<li data-role=\"list-divider\">" + dateStr + "</li>" );
+				}
+				//DATA
+				var hours = d.getHours(),
+				    minutes = d.getMinutes();
+				if (minutes < 10)
+					minutes = "0" + minutes	
+				var suffix = "AM";
+				if (hours >= 12) {
+					suffix = "PM";
+					hours = hours - 12;
+				}
+				if (hours == 0)
+					hours = 12;
+				//BODY FORMATTING
+				var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
+								 "<p>"+ data[i].actor + " " +
 					 	 		 data[i].verb  + " " + 
-					 	 		 data[i].object + "</li>";
+					 	 		 data[i].object + "</p></li>";
 				$('ul#cis_activity_feed').append(tableEntry);
 			}
 			$('ul#cis_activity_feed').listview('refresh');
 			if (data.length <3)
 				$('ul#cis_activity_feed').trigger( "expand" );
+			//STORE MOST RECENT DATE - HELPS ADDING
+			var recent = new Date();
+			recent.setTime(data[data.length-1].published);
+			mLastDate = recent.getFullYear() + "-" + (recent.getMonth()+1) + "-" + recent.getDate();
 		}
+		
 		function failure(data) {
 			var tableEntry = "<li><p>Error occurred retrieving activities: "+ data + "</p></li>";
 			$('ul#cis_activity_feed').append(tableEntry);
@@ -134,22 +163,48 @@ var	SocietiesCISListService = {
       }); 
 	 */
 	
-	addCISActivity: function () {
+	addCISActivity: function() {
 		function success(data) {
-			var tableEntry = "<li>I " + activity.verb  + " '" + activity.object + "'</li>";
-			$('ul#cis_activity_feed').prepend(tableEntry).slideDown('slow');
+			//HEADER
+			var currentDateTime = new Date(), 
+				headerText = currentDateTime.getFullYear() + "-" + (currentDateTime.getMonth()+1) + "-" + currentDateTime.getDate();
+			if (headerText != mLastDate) {
+				mLastDate = headerText;
+				var headerEntry = "<li data-role=\"list-divider\">" + headerText + "</li>";
+				$('ul#cis_activity_feed').prepend(headerEntry).slideDown('slow');
+			}
+			//DATA 
+			var hours = currentDateTime.getHours(),
+			    minutes = currentDateTime.getMinutes();
+			if (minutes < 10)
+				minutes = "0" + minutes
+
+			var suffix = "AM";
+			if (hours >= 12) {
+				suffix = "PM";
+				hours = hours - 12;
+			}
+			if (hours == 0)
+				hours = 12;
+			//BODY FORMATTING - INSERT AFTER HEADER
+			var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
+							 "<p>I " + activity.verb  + " '" + activity.object + "'</p></li>";
+			$("ul#cis_activity_feed li:eq(0)").after(tableEntry).slideDown('slow');
+			//$('ul#cis_activity_feed').prepend(tableEntry).slideDown('slow');
 			$('ul#cis_activity_feed').listview('refresh');
 			$('textarea#activity_message').val('');
 		}
+		
 		function failure(data) {
 			alert("Error occuring posting: " + data);
 		}
-		
+ 
 		var activity = {
  				"actor": "",
  				"verb": "posted",
                 "object": $('textarea#activity_message').val(),
-                "target": mCis_id
+                "target": mCis_id,
+                "published": $.now()
 				};
 		window.plugins.SocietiesLocalCISManager.addActivity(mCis_id, activity, success, failure);
 	},

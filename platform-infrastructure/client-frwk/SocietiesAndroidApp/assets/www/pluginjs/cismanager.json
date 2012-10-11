@@ -183,19 +183,22 @@
      				"actor": "john.societies.local",
      				"verb": "created",
 	                "object": "cis-1234",
-	                "target" : "n/a"
+	                "target" : "n/a",
+	                "published": "1332403882588"
 					},
 					{
      				"actor": "jane.societies.local",
      				"verb": "joined",
 	                "object": "cis-1234",
-	                "target" : "n/a"
+	                "target" : "n/a",
+	                "published": "1332413890000"
 					},
 					{
      				"actor": "john.societies.local",
      				"verb": "shared",
 	                "object": "service-1234",
-	                "target" : "n/a"
+	                "target" : "n/a",
+	                "published": "1332504090000"
 					}]
 	}
 }
