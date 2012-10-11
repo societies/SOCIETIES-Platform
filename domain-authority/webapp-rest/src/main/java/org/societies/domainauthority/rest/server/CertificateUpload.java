@@ -22,45 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.domainauthority.rest.server;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.domainauthority.rest.util.Files;
 
 /**
+ * Class for hosting jar files for clients of 3rd party services.
  * 
- *
  * @author Mitja Vardjan
- *
  */
-public class UrlPath {
+@Path(UrlPath.PATH_PUB_KEY)
+public class CertificateUpload {
+    
+	private static Logger LOG = LoggerFactory.getLogger(CertificateUpload.class);
+	
+	public CertificateUpload() {
+		LOG.info("Constructor");
+	}
+	
+	/**
+     * Method processing HTTP POST requests.
+     */
+	@Path("{name}.pub")
+    @POST
+    public void postIt(@PathParam("name") String name,
+    		InputStream is,
+    		@Context HttpServletRequest request,
+    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 
-	public static final String BASE = "/rest/webresources";
-	
-	/**
-	 * URL parameter. File name, including relative path.
-	 */
-	public static final String URL_PARAM_FILE = "file";
-	
-	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
-	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
+		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		
+		try {
+			Files.writeFile(is, path);
+		} catch (IOException e) {
+			LOG.warn("Could not write to file {}", path, e);
+			// Return HTTP status code 500 - Internal Server Error
+			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+    }
 }

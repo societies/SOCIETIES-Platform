@@ -49,7 +49,7 @@ import org.societies.domainauthority.rest.util.Files;
  * 
  * @author Mitja Vardjan
  */
-@Path(UrlPath.PATH)
+@Path(UrlPath.PATH_FILES)
 public class ServiceClientJar {
     
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
@@ -109,19 +109,19 @@ public class ServiceClientJar {
     		@Context HttpServletRequest request,
     		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
+    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
 
-		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		LOG.debug("HTTP POST: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+
+		// TODO
 		
-		// TODO: verify signature, authorization
-		
-		try {
-			//Files.writeFile(is, request.getContentLength(), path);
-			Files.writeFile(is, path);
-		} catch (IOException e) {
-			LOG.warn("Could not write to file {}", path, e);
-			// Return HTTP status code 500 - Internal Server Error
-			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
+//		try {
+//			//Files.writeFile(is, path);
+//			Files.writeFile(request.getInputStream(), path);
+//		} catch (IOException e) {
+//			LOG.warn("Could not write to file {}", path, e);
+//			// Return HTTP status code 500 - Internal Server Error
+//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//		}
     }
 }
