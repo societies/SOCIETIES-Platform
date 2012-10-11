@@ -6,7 +6,7 @@
 	<artifactId>bit-1055-assessment</artifactId>
 	<name>#1055 Privacy Assessment</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>
