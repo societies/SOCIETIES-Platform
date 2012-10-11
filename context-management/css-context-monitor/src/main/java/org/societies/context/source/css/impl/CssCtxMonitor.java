@@ -104,8 +104,8 @@ public class CssCtxMonitor extends EventListener {
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
 		
-		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Received internal " + event.geteventType() + " event: " + event);
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received internal " + event.geteventType() + " event: " + event);
 		
 		if (!(event.geteventInfo() instanceof CssRecord)) {
 			
@@ -160,8 +160,8 @@ public class CssCtxMonitor extends EventListener {
 	private void updateCtxAttribute(CtxEntityIdentifier ownerCtxId, 
 			String type, String value) throws Exception {
 
-		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
 
 		final List<CtxIdentifier> ctxIds = 
 				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
