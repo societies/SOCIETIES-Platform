@@ -148,11 +148,11 @@ var SocietiesCoreServiceMonitor = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns List of active apps
 	 */
-	startActivity: function(activity){
+	startActivity: function(activity, failureCallback){
 		console.log("Call CoreServiceMonitorService - startActivity");
 
 		return cordova.exec(null,    //Callback which will be called when plugin action is successful
-		null,     //Callback which will be called when plugin action encounters an error
+		failureCallback,     //Callback which will be called when plugin action encounters an error
 		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 		'startActivity',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui", activity]); //Passing a list of arguments to the plugin

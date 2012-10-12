@@ -27,7 +27,7 @@ package org.societies.android.api.internal.cssmanager;
 
 import java.util.List;
 
-import org.societies.api.css.directory.ACssAdvertisementRecord;
+import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 
 
 /**

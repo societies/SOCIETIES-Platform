@@ -65,9 +65,9 @@ public class AJoinResponse extends JoinResponse implements Parcelable {
 
 	/* @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)*/
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.isResult().toString());
-		dest.writeParcelable(this.getParticipant(), flags);
 		dest.writeParcelable(this.getCommunity(), flags);
+		dest.writeParcelable(this.getParticipant(), flags);
+		dest.writeString(this.isResult().toString());	
 	}
 
 	private AJoinResponse(Parcel in) {
