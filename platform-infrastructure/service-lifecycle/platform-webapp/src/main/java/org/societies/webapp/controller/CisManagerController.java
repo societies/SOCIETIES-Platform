@@ -317,7 +317,7 @@ public class CisManagerController {
 				model.put("currentNodeId", currentNodeId);
 
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
-				model.put("methodcalled", "Join Remote CIS in progress");
+				model.put("methodcalled", "JoinRemoteCIS");
 
 				// TODO: get a real advertisement
 				LOG.info("[CisManagerController] "+cisForm);
@@ -344,6 +344,8 @@ public class CisManagerController {
 					ICis i = getCisManager().getCis(cisForm.getCisJid());
 					model.put("cis", i);
 				}*/
+				res = "Join in progress...";
+				model.put("res", res);
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
 				model.put("methodcalled", "LeaveRemoteCIS");
@@ -473,6 +475,7 @@ public class CisManagerController {
 			}
 
 			//ALWAYS RETURN THE LIST OF CIS'S I OWN OR AM MEMBER OF
+			// UPDATE, not always
 			if(displayFormAtResult){
 				List<ICis> records = this.getCisManager().getCisList();
 				model.put("cisrecords", records);
