@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.servicelifecycle;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -33,7 +35,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	private static final long serialVersionUID = 8132643014462359734L;
 
 	public AServiceImplementation getServiceImpl() {
-		return (AServiceImplementation)super.getServiceImpl();
+		return AServiceImplementation.convertServiceImplementation(super.getServiceImpl());
 	}
 
 	public void setServiceImpl(AServiceImplementation aserviceImpl) {
@@ -41,7 +43,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	}
 	
 	public AServiceResourceIdentifier getParentIdentifier() {
-		return (AServiceResourceIdentifier)super.getParentIdentifier();
+		return AServiceResourceIdentifier.convertServiceResourceIdentifier(super.getParentIdentifier());
 	}
 
 	public void setParentIdentifier(AServiceResourceIdentifier aParentId) {
@@ -92,12 +94,24 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	public static AServiceInstance convertServiceInstance(ServiceInstance servIns) {
 		AServiceInstance aservIns = new AServiceInstance();
 		aservIns.setCssJid(servIns.getCssJid());
-		aservIns.setCssJid(servIns.getCssJid());
+		aservIns.setFullJid(servIns.getFullJid());
 		aservIns.setParentJid(servIns.getParentJid());
 		aservIns.setXMPPNode(servIns.getXMPPNode());
 		aservIns.setServiceImpl(AServiceImplementation.convertServiceImplementation(servIns.getServiceImpl()));
 		aservIns.setParentIdentifier(AServiceResourceIdentifier.convertServiceResourceIdentifier(servIns.getParentIdentifier())); 
 		
 		return aservIns;
+	}
+	
+	public static ServiceInstance convertAServiceInstance(AServiceInstance aservIns) {
+		ServiceInstance servIns = new ServiceInstance();
+		servIns.setCssJid(aservIns.getCssJid());
+		servIns.setFullJid(aservIns.getFullJid());
+		servIns.setParentJid(aservIns.getParentJid());
+		servIns.setXMPPNode(aservIns.getXMPPNode());
+		servIns.setServiceImpl(AServiceImplementation.convertAServiceImplementation(aservIns.getServiceImpl()));
+		servIns.setParentIdentifier(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aservIns.getParentIdentifier())); 
+		
+		return servIns;
 	}
 }
