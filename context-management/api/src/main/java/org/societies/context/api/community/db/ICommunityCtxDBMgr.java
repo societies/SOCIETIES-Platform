@@ -25,8 +25,10 @@
 package org.societies.context.api.community.db;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
@@ -36,6 +38,7 @@ import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 
 /**
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
@@ -45,6 +48,19 @@ import org.societies.api.identity.IIdentity;
  */
 public interface ICommunityCtxDBMgr {
 
+	/**
+	 * Creates a {@link CtxAssociation} with the specified owner id and type.
+	 * 
+	 * @param ownerId
+	 *            the owner id of the context association to create
+	 * @param type
+	 *            the type of the context association to create
+	 * @throws CtxException 
+	 * @since 0.5
+	 */
+	public CtxAssociation createAssociation(final String ownerId,
+			final String type) throws CtxException;
+	
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated
 	 * to the identified community context entity (scope). 
@@ -80,6 +96,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param modelType
 	 * @param type
 	 */
+	@Deprecated
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
@@ -119,11 +136,14 @@ public interface ICommunityCtxDBMgr {
 			throws CtxException;
 
 	/**
-	  * Updates a community Context Entity. 
+	  * Updates a community Context Entity.
+	  * 
 	  * @param entity
 	  * @throws CtxException 
 	  * @since 0.2
+	  * @deprecated As of 0.5, use {@link #update(CtxModelObject)}.
 	  */
+	@Deprecated
 	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity) throws CtxException;
 	
 	/**
@@ -131,16 +151,34 @@ public interface ICommunityCtxDBMgr {
 	  * @param entity
 	  * @throws CtxException 
 	  * @since 0.2
+	  * @deprecated As of 0.5, use {@link #update(CtxModelObject)}.
 	  */
+	@Deprecated
 	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute) throws CtxException;
 
 	/**
-	  * Removes the specidied community Context Entity. 
+	  * Removes the specidied context model object.
+	  *  
 	  * @param ctxId
 	  * @throws CtxException 
-	  * @since 0.2
+	  * @since 0.5
 	  */
-	public CommunityCtxEntity removeCommunityEntity(CtxEntityIdentifier ctxId) throws CtxException;
+	public CtxModelObject remove(CtxIdentifier ctxId) throws CtxException;
+	
+	/**
+	 * Updates the specified {@link CtxModelObject}.
+	 * 
+	 * @param object
+	 *             the {@link CtxModelObject} to update
+	 * @return the updated {@link CtxModelObject}
+	 * @throws CtxException 
+	 *             if there is a problem performing the update operation
+	 * @throws NullPointerException
+	 *             if the specified context model object is <code>null</code>
+	 * @since 0.5
+	 */
+	public CtxModelObject update(final CtxModelObject object)
+			throws CtxException;
 
 	/**
 	  * This method retrieves the CSS that is assigned with the community administration role.

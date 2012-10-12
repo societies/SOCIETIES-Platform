@@ -75,6 +75,24 @@ public final class CtxModelObjectFactory {
 		return result;
 	}
 	
+	public CommunityCtxEntity createCommunityEntity(final CtxEntityIdentifier id, 
+			final Date lastModified, final Set<CtxAttribute> attributes,
+			final Set<CtxAssociationIdentifier> associations) {
+		
+		final CommunityCtxEntity result = new CommunityCtxEntity(id);
+		result.setLastModified(lastModified);
+		
+		if (attributes != null)
+			for (final CtxAttribute attribute : attributes)
+				result.addAttribute(attribute);
+		
+		if (associations != null)
+			for (final CtxAssociationIdentifier association : associations)
+				result.addAssociation(association);
+				
+		return result;
+	}
+	
 	public CtxAttribute createAttribute(final CtxAttributeIdentifier id, 
 			final Date lastModified, final Date lastUpdated, 
 			final Serializable value) {

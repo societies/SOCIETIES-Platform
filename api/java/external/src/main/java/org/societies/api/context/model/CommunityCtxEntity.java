@@ -74,6 +74,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the new member of this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
+	@Deprecated
 	public void addMember(CtxEntityIdentifier member) {
 		
 		if (member == null)
@@ -89,6 +90,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the member to remove from this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
+	@Deprecated
 	public void removeMember(CtxEntityIdentifier member) {
 		
 		if (member == null)
