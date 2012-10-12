@@ -779,6 +779,7 @@ public class CisManagerController {
 						if(null != communityResultObject.getJoinResponse().getCommunity()  && null != communityResultObject.getJoinResponse().getCommunity().getCommunityJid()
 								&& communityResultObject.getJoinResponse().getCommunity().getCommunityJid().isEmpty() == false){							
 							String community = communityResultObject.getJoinResponse().getCommunity().getCommunityJid(); 
+							LOG.info("callback for join regarindg community " + community);
 							this.userFeedback.showNotification("Joined CIS: " + community);
 							resultCallback = "Joined CIS " + community;
 							remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
