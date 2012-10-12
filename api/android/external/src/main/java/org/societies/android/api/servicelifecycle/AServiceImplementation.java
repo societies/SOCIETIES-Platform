@@ -25,9 +25,6 @@
 
 package org.societies.android.api.servicelifecycle;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
@@ -107,21 +104,5 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 		servImpl.setServiceVersion(aserviceImpl.getServiceVersion());
 		
 		return servImpl;
-	}
-	
-	/**
-	 * Returns a AServiceImplementation from a JSON Object
-	 * @param jObj
-	 * @return
-	 * @throws JSONException
-	 */
-	public static AServiceImplementation createFromJSON(JSONObject jObj) throws JSONException {
-		AServiceImplementation asi = new AServiceImplementation();
-		asi.setServiceClient(jObj.getString("serviceClient"));
-		asi.setServiceNameSpace(jObj.getString("serviceNameSpace"));
-		asi.setServiceProvider(jObj.getString("serviceProvider"));
-		asi.setServiceVersion(jObj.getString("serviceVersion"));
-		
-		return asi;
 	}
 }

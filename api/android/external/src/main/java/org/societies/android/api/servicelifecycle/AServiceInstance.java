@@ -35,7 +35,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	private static final long serialVersionUID = 8132643014462359734L;
 
 	public AServiceImplementation getServiceImpl() {
-		return (AServiceImplementation)super.getServiceImpl();
+		return AServiceImplementation.convertServiceImplementation(super.getServiceImpl());
 	}
 
 	public void setServiceImpl(AServiceImplementation aserviceImpl) {
@@ -43,7 +43,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 	}
 	
 	public AServiceResourceIdentifier getParentIdentifier() {
-		return (AServiceResourceIdentifier)super.getParentIdentifier();
+		return AServiceResourceIdentifier.convertServiceResourceIdentifier(super.getParentIdentifier());
 	}
 
 	public void setParentIdentifier(AServiceResourceIdentifier aParentId) {
@@ -113,23 +113,5 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 		servIns.setParentIdentifier(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aservIns.getParentIdentifier())); 
 		
 		return servIns;
-	}
-	
-	/**
-	 * Creates a AServiceInstance instance from a JSON Object
-	 * @param jObj
-	 * @return
-	 * @throws JSONException 
-	 */
-	public static AServiceInstance createFromJSON(JSONObject jObj) throws JSONException {
-		AServiceInstance aservIns = new AServiceInstance();
-		aservIns.setCssJid(jObj.getString("cssJid"));
-		aservIns.setFullJid(jObj.getString("fullJid"));
-		aservIns.setParentJid(jObj.getString("parentJid"));
-		aservIns.setXMPPNode(jObj.getString("xmppNode"));
-		aservIns.setServiceImpl(AServiceImplementation.createFromJSON(jObj.getJSONObject("serviceImpl")));
-		aservIns.setParentIdentifier(AServiceResourceIdentifier.createFromJSON(jObj.getJSONObject("serviceImpl")));
-		
-		return aservIns;
 	}
 }
