@@ -515,9 +515,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient){
-		
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient,
+			IServiceControlRemote iServCtrlRemote, IPrivacyDataManager	privacyDataManager, IServiceDiscoveryRemote iServDiscRemote){
+				
 		this.psc = pubsubClient;
+		this.iServCtrlRemote = iServCtrlRemote;
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
