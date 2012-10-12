@@ -25,7 +25,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.phongegap;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -51,7 +50,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -282,7 +280,7 @@ public class PluginCoreServiceMonitor extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
 				try {
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceDisco.getService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj), data.getString(2));
+					this.serviceDisco.getService(data.getString(0), createASRIFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -303,28 +301,28 @@ public class PluginCoreServiceMonitor extends Plugin {
 			else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 0))) {
 				try {	//START SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.startService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj));
+					this.serviceControl.startService(data.getString(0), createASRIFromJSON(jObj));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 1))) {
 				try {	//STOP SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.stopService(data.getString(0), AServiceResourceIdentifier.createFromJSON(jObj));
+					this.serviceControl.stopService(data.getString(0), createASRIFromJSON(jObj));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 4))) {
 				try {	//SHARE SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.shareService(data.getString(0), AService.createFromJSON(jObj), data.getString(2));
+					this.serviceControl.shareService(data.getString(0), createAServiceFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 5))) {
 				try {	//UN-SHARE SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.unshareService(data.getString(0), AService.createFromJSON(jObj), data.getString(2));
+					this.serviceControl.unshareService(data.getString(0), createAServiceFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -609,6 +607,30 @@ public class PluginCoreServiceMonitor extends Plugin {
     }
     
     /**
+     * Creates an AService from a JSON object
+     * @param jObj
+     * @return
+     * @throws JSONException
+     */
+    private AServiceResourceIdentifier createASRIFromJSON(JSONObject jObj) throws JSONException {
+    	Gson gson = new Gson();
+    	AServiceResourceIdentifier asri = gson.fromJson(jObj.toString(), AServiceResourceIdentifier.class);
+    	return asri;
+    }
+    
+    /**
+     * Creates an AService from a JSON object
+     * @param jObj
+     * @return
+     * @throws JSONException
+     */
+    private AService createAServiceFromJSON(JSONObject jObj) throws JSONException {
+    	Gson gson = new Gson();
+    	AService aservice = gson.fromJson(jObj.toString(), AService.class);
+    	return aservice;
+    }
+    
+    /**
      * Creates a JSONArray for a given AService array
      * 
      * @param array of AService
@@ -687,6 +709,12 @@ public class PluginCoreServiceMonitor extends Plugin {
     	//CHECK ICoreServiceMonitor METHODS
     	for (int i = 0; i < ICoreServiceMonitor.methodsArray.length; i++) {
         	if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, i))) {
+        		return true;
+        	}
+    	}
+    	//CHECK IServiceControl METHODS
+    	for (int i = 0; i < IServiceControl.methodsArray.length; i++) {
+        	if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, i))) {
         		return true;
         	}
     	}

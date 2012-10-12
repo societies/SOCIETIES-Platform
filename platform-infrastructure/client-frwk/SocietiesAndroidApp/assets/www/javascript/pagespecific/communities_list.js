@@ -130,8 +130,9 @@ var	SocietiesCISListService = {
 				$('ul#cis_activity_feed').append(tableEntry);
 			}
 			$('ul#cis_activity_feed').listview('refresh');
-			if (data.length <3)
-				$('ul#cis_activity_feed').trigger( "expand" );
+			//EXPAND LIST IF SHORT
+			//if (data.length <3)
+			//	$('ul#cis_activity_feed').trigger( "expand" );
 			//STORE MOST RECENT DATE - HELPS ADDING
 			var recent = new Date();
 			recent.setTime(data[data.length-1].published);
@@ -226,8 +227,8 @@ var	SocietiesCISListService = {
 			$('ul#cis_members').listview('refresh');
 			
 			//AUTO EXPAND IF ROW COUNT IS SMALL 
-			if (data.length <3)
-				$('ul#cis_members').trigger( "expand" );
+			//if (data.length <3)
+			//	$('ul#cis_members').trigger( "expand" );
 		}
 		
 		function failure(data) {
@@ -299,17 +300,17 @@ var	SocietiesCISListService = {
 		}
 		
 		var servicePos = $('select#selShareService').attr('value'),
-			serviceName = $("select#selShareService option:selected").text();
-
+			serviceName = $("select#selShareService option:selected").text(),
+			serviceObj;
+		
 		if (servicePos != "0000") { //"Select a Service"
-			var serviceObj = mMyServices[servicePos];
+			serviceObj = mMyServices[servicePos];
 			if (confirm("Share service: " + serviceName + " to this community?"))
 				window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
 			else
 				$('select#selShareService').attr('selectedIndex', 0);
-
-			$('select#selShareService').selectmenu('refresh');
 		}
+		$('select#selShareService').selectmenu('refresh');
 	},
 
 	/**

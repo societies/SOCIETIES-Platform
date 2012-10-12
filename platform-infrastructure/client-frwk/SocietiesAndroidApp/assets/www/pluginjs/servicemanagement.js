@@ -1,4 +1,4 @@
-phonegapdesktop.internal.parseConfigFile("file:///C:/Users/aleckey/git/SOCIETIES-Platform/platform-infrastructure/client-frwk/SocietiesAndroidApp/assets/www/pluginjs/servicemanagement.json");
+phonegapdesktop.internal.parseConfigFile("pluginjs/servicemanagement.json");
 
 window.plugins.ServiceManagementService = {
 	connectService: function(successCallback, errorCallback){

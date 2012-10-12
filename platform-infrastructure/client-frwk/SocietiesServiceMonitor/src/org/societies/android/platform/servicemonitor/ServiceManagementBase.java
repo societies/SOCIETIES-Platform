@@ -42,7 +42,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
@@ -67,7 +66,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
     private static final String LOG_TAG = ServiceManagementBase.class.getName();
     
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean", "serviceControlMsgBean", "serviceControlResultBean");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery",
 															  	  "http://societies.org/api/schema/servicelifecycle/servicecontrol",
 															  	  "http://societies.org/api/schema/servicelifecycle/model");
@@ -252,7 +251,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 				if(msgBean instanceof ServiceControlResultBean) {
 					Log.d(LOG_TAG, "ServiceControlBeanResult!");
 					ServiceControlResultBean controlResult = (ServiceControlResultBean)msgBean;
-					String result = controlResult.getControlResult().toString();
+					String result = controlResult.getControlResult().getMessage().toString();
 					Log.d(LOG_TAG, "ServiceControlBeanResult: " + result);
 					
 					//NOTIFY CALLING CLIENT
