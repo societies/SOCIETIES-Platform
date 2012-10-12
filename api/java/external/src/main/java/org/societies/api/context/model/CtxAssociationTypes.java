@@ -54,6 +54,16 @@ public class CtxAssociationTypes {
 	public static final String ARE_WORK_COLLEAGUES = "areWorkColleagues";
 	
 	/**
+	 * Directed context association between a {@link CommunityCtxEntity} 
+	 * (parent entity) and the {@link CommunityMemberCtxEntity 
+	 * CommunityMemberCtxEntities} (child entities) which are members of this
+	 * community.
+	 * 
+	 *  @since 0.5
+	 */
+	public static final String HAS_MEMBERS = "hasMembers";
+	
+	/**
 	 * Directed context association.
 	 * 
 	 * @deprecated As of 0.0.8, use the {@link #HAS_PARAMETERS} type instead
@@ -72,6 +82,7 @@ public class CtxAssociationTypes {
 	 * Directed context association.
 	 */
 	public static final String HAS_PRIVACY_POLICIES = "hasPrivacyPolicies";
+	
 	/**
 	 * Has privacy policy agreement
 	 * To be moved to internal API
@@ -83,6 +94,15 @@ public class CtxAssociationTypes {
 	 * Directed context association.
 	 */
 	public static final String IS_CONNECTED_TO_SNS = "isConnectedToSns";
+	
+	/**
+	 * Directed context association between an {@link IndividualCtxEntity} 
+	 * (parent entity) and the {@link CommunityCtxEntity CommunityCtxEntities}
+	 * (child entities) this individual is member of.
+	 * 
+	 *  @since 0.5
+	 */
+	public static final String IS_MEMBER_OF = "isMemberOf";
 	
 	/**
 	 * Directed context association.
