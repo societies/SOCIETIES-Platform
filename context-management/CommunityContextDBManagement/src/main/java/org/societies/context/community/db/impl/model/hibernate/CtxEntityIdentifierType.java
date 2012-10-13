@@ -138,8 +138,7 @@ public class CtxEntityIdentifierType implements UserType {
     public void nullSafeSet(PreparedStatement st, Object value, int index)
             throws HibernateException, SQLException {
 
-		Hibernate.STRING.nullSafeSet(st, 
-				((CtxEntityIdentifier) value).toString(), index);
+		Hibernate.STRING.nullSafeSet(st, (value != null) ? value.toString() : null, index);
     }
 
     /*
