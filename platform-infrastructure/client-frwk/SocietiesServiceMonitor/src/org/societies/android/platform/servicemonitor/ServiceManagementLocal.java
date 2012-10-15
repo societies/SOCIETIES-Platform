@@ -35,9 +35,9 @@ import android.util.Log;
  * It uses the base service implementation {@link ServiceUtilitiesBase} provide the service functionality
  */
 
-public class ServiceDiscoveryLocal extends Service {
+public class ServiceManagementLocal extends Service {
 	
-    private static final String LOG_TAG = ServiceDiscoveryLocal.class.getName();
+    private static final String LOG_TAG = ServiceManagementLocal.class.getName();
     private IBinder binder = null;
     
     @Override
@@ -53,8 +53,8 @@ public class ServiceDiscoveryLocal extends Service {
 
 	/**Create Binder object for local service invocation */
 	public class LocalBinder extends Binder {
-		public ServiceDiscoveryBase getService() {
-			return new ServiceDiscoveryBase(ServiceDiscoveryLocal.this.getApplicationContext());
+		public ServiceManagementBase getService() {
+			return new ServiceManagementBase(ServiceManagementLocal.this.getApplicationContext());
 		}
 	}
 	

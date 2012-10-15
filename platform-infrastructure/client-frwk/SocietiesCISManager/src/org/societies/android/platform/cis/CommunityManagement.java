@@ -92,29 +92,6 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 													    	   "org.societies.api.schema.activityfeed",
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
-    
-    //SERVICE LIFECYCLE INTENTS
-	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
-	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
-
-	//CIS MANAGER INTENTS
-	public static final String CREATE_CIS     = "org.societies.android.platform.community.CREATE_CIS";
-	public static final String DELETE_CIS    = "org.societies.android.platform.community.DELETE_CIS";
-	public static final String GET_CIS_LIST     = "org.societies.android.platform.community.GET_CIS_LIST";
-	public static final String SUBSCRIBE_TO_CIS = "org.societies.android.platform.community.SUBSCRIBE_TO_CIS";
-	public static final String UNSUBSCRIBE_FROM_CIS = "org.societies.android.platform.community.UNSUBSCRIBE_FROM_CIS";
-	public static final String REMOVE_MEMBER = "org.societies.android.platform.community.REMOVE_MEMBER";
-	public static final String JOIN_CIS     = "org.societies.android.platform.community.JOIN_CIS";
-	public static final String LEAVE_CIS    = "org.societies.android.platform.community.LEAVE_CIS";
-	//CIS SUBSCRIBER INTENTS
-	public static final String GET_MEMBERS     = "org.societies.android.platform.community.GET_MEMBERS";
-	public static final String GET_ACTIVITY_FEED = "org.societies.android.platform.community.GET_ACTIVITY_FEED";
-	public static final String ADD_ACTIVITY = "org.societies.android.platform.community.ADD_ACTIVITY";
-	public static final String DELETE_ACTIVITY = "org.societies.android.platform.community.DELETE_ACTIVITY";
-	public static final String CLEAN_ACTIVITIES = "org.societies.android.platform.community.CLEAN_ACTIVITIES";
-	public static final String GET_CIS_INFO = "org.societies.android.platform.community.GET_CIS_INFO";
-	
-	
     private static final String LOG_TAG = CommunityManagement.class.getName();
     private IBinder binder = null;
     
@@ -384,6 +361,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		Log.d(LOG_TAG, "addActivity called by client: " + client);
 
 		//GETFEED OBJECT
+		activity.setActor(commMgr.getIdManager().getCloudNode().getJid());
 		AddActivity addAct = new AddActivity();
 		addAct.setActivity(AActivity.convertAActivity(activity));
 		//CREATE MESSAGE BEAN
@@ -625,7 +603,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						//CONVERT TO PARCEL BEAN
 						Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
 						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, joined);
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
 					}
 					
 				}
@@ -656,9 +634,9 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 							//CONVERT TO PARCEL BEAN
 							Parcelable pCis  = ACommunity.convertCommunity(cis);
 							//NOTIFY CALLING CLIENT
-							intent.putExtra(INTENT_RETURN_VALUE, pCis); 
+							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, pCis); 
 						}
-						intent.putExtra(INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
+						intent.putExtra(ICisManager.INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}
 					else if (communityResult.getListResponse() != null) {
 						//TODO: MOVE THE LIST RESPONSE TO HERE FROM BELOW BEAN CHANGED
@@ -682,7 +660,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
 					}
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+					intent.putExtra(ICisManager.INTENT_RETURN_VALUE, returnArray);
 				}
 				// --------- CIS SUBSCRIBED BEAN---------
 				else if(msgBean instanceof CommunityMethods) {
@@ -700,7 +678,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 							Log.d(LOG_TAG, "member: " + member.getJid());
 						}
 						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}
 				}
 				
@@ -720,14 +698,14 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 							Log.d(LOG_TAG, "publish: " + activity.getPublished());
 						}
 						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}
 					
 					//ADD ACTIVITY RESULT
 					else if (response.getAddActivityResponse() != null) {
 						Boolean published = response.getAddActivityResponse().isResult();
 						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, published);
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, published);
 					}
 				}
 				

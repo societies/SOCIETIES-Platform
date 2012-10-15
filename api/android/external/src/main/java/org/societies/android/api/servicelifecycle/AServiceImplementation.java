@@ -25,8 +25,8 @@
 
 package org.societies.android.api.servicelifecycle;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -72,6 +72,11 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 		}
 	};
 	
+	/**Converts ServiceImplementation to AServiceImplementation
+	 * 
+	 * @param serviceImpl
+	 * @return
+	 */
 	public static AServiceImplementation convertServiceImplementation(ServiceImplementation serviceImpl) {
 		if(serviceImpl == null) return new AServiceImplementation();
 
@@ -82,5 +87,22 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 		aservImpl.setServiceVersion(serviceImpl.getServiceVersion());
 		
 		return aservImpl;
+	}
+	
+	/**Converts AServiceImplementation to ServiceImplementation
+	 * 
+	 * @param serviceImpl
+	 * @return
+	 */
+	public static ServiceImplementation convertAServiceImplementation(AServiceImplementation aserviceImpl) {
+		if(aserviceImpl == null) return new ServiceImplementation();
+
+		ServiceImplementation servImpl = new ServiceImplementation();
+		servImpl.setServiceClient(aserviceImpl.getServiceClient());
+		servImpl.setServiceNameSpace(aserviceImpl.getServiceNameSpace());
+		servImpl.setServiceProvider(aserviceImpl.getServiceProvider());
+		servImpl.setServiceVersion(aserviceImpl.getServiceVersion());
+		
+		return servImpl;
 	}
 }

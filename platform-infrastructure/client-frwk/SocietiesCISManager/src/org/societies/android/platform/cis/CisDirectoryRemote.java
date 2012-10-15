@@ -62,13 +62,6 @@ public class CisDirectoryRemote extends Service implements ICisDirectory {
 	private static final List<String> NAME_SPACES = Collections.unmodifiableList(Arrays.asList("http://societies.org/api/schema/cis/directory"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(Arrays.asList("org.societies.api.schema.cis.directory"));
     private ClientCommunicationMgr commMgr;
-    
-    //CIS DIRECTORY INTENTS
-	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
-
-	public static final String FIND_ALL_CIS     = "org.societies.android.platform.community.FIND_ALL_CIS";
-	public static final String FILTER_CIS 		= "org.societies.android.platform.community.FILTER_CIS";
-	public static final String FIND_CIS_ID      = "org.societies.android.platform.community.FIND_CIS_ID";
 	
     private static final String LOG_TAG = CisDirectoryRemote.class.getName();
     private IBinder binder = null;
@@ -112,7 +105,7 @@ public class CisDirectoryRemote extends Service implements ICisDirectory {
 		messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, FIND_ALL_CIS); 
+		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_ALL_CIS); 
 		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
 		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
 		Stanza stanza = new Stanza(toID);
@@ -135,7 +128,7 @@ public class CisDirectoryRemote extends Service implements ICisDirectory {
 		messageBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, FILTER_CIS); 
+		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FILTER_CIS); 
 		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
 		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
 		Stanza stanza = new Stanza(toID);
@@ -158,7 +151,7 @@ public class CisDirectoryRemote extends Service implements ICisDirectory {
 		messageBean.setMethod(MethodType.SEARCH_BY_ID);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, FIND_CIS_ID); 
+		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_CIS_ID); 
 		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
 		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
 		Stanza stanza = new Stanza(toID);
@@ -236,7 +229,7 @@ public class CisDirectoryRemote extends Service implements ICisDirectory {
 						Log.d(LOG_TAG, "Added record: " + record.getId());
 					}
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+					intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
 						
 					intent.setPackage(client);
 					CisDirectoryRemote.this.sendBroadcast(intent);

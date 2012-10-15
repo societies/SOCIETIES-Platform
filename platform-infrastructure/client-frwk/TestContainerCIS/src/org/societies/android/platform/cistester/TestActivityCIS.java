@@ -286,13 +286,13 @@ public class TestActivityCIS extends Activity {
 			Log.d(LOG_TAG, intent.getAction());
 			
 			if (intent.getAction().equals(CommunityManagement.CREATE_CIS)) {
-				boolean result = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_BOOLEAN,false);
+				boolean result = intent.getBooleanExtra(ICisManager.INTENT_RETURN_BOOLEAN,false);
 				Log.d(LOG_TAG, ">>>>>CIS Creation RESULT:\n>>>>>: " + result);
 				if(true == result){
 	
 					
 					//UNMARSHALL THE COMMUNITY FROM Parcel BACK TO COMMUNITY
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					ACommunity cis =  (ACommunity) parcel;
 					Log.d(LOG_TAG, ">>>>>CREATE COMMUNITY  RESULT:\nCIS ID: " + cis.getCommunityJid());
 				}
@@ -303,7 +303,7 @@ public class TestActivityCIS extends Activity {
 			
 			if (intent.getAction().equals(CisDirectoryRemote.FIND_ALL_CIS)) {
 				//UNMARSHALL THE ADVERTS FROM THE RETURNED PARCELS
-				Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
+				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
 					ACommunity cis = (ACommunity) parcels[i];
 					Log.d(LOG_TAG, ">>>>>CIS DIRECTORY RESULTS:\nCIS ID: " + cis.getCommunityJid());
@@ -313,7 +313,7 @@ public class TestActivityCIS extends Activity {
 			
 			if (intent.getAction().equals(CommunityManagement.GET_CIS_LIST)) {
 				//UNMARSHALL THE ID FROM THE RETURNED PARCEL
-				Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
 					ACommunity cis = (ACommunity) parcels[i];
 					Log.d(LOG_TAG, ">>>>>GET CIS RESULTS:\nCIS ID: " + cis.getCommunityJid());
@@ -322,11 +322,11 @@ public class TestActivityCIS extends Activity {
 			
 			if (intent.getAction().equals(CommunityManagement.JOIN_CIS)) {
 				//UNMARSHALL THE result
-				boolean result = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_BOOLEAN,false);
+				boolean result = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN,false);
 				Log.d(LOG_TAG, ">>>>>CIS JOIN RESULT:\n>>>>>Allowed to join: " + result);
 				if(true == result){
 					//UNMARSHALL THE community FROM Parcel
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					ACommunity resp = (ACommunity) parcel;
 					Log.d(LOG_TAG, ">>>>>Community Joined: " + resp.getCommunityName() + "\n" + resp.getDescription());
 				}
@@ -334,7 +334,7 @@ public class TestActivityCIS extends Activity {
 			
 			if (intent.getAction().equals(CommunityManagement.GET_MEMBERS)) {
 				//UNMARSHALL THE PARTICIPANTS FROM THE RETURNED PARCELS
-				Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
 					AParticipant member = (AParticipant) parcels[i];
 					Log.d(LOG_TAG, ">>>>>CIS Member Listing RESULTS:\nMEMBER ID: " + member.getJid());
@@ -344,13 +344,13 @@ public class TestActivityCIS extends Activity {
 			
 			if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
 				//UNMARSHALL THE RESULT FROM Parcel 
-				Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+				Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				Log.d(LOG_TAG, ">>>>>ADD ACTIVIY RESULTS:\npublished: " + parcel.toString());
 			}
 			
 			if (intent.getAction().equals(CommunityManagement.GET_ACTIVITY_FEED)) {
 				//UNMARSHALL THE ACTIVITIES FROM Parcels 
-				Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
 					AActivity activity = (AActivity) parcels[i];
 					Log.d(LOG_TAG, ">>>>>GET ACTIVIY FEED RESULTS:\npublish: " + activity.getPublished());
