@@ -46,7 +46,6 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	private static final long serialVersionUID = -8564823052068362334L;
 	
 	/** The members of this CIS. */
-	//private Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
 	private Set<CtxEntityIdentifier> members = new HashSet<CtxEntityIdentifier>();
 	
 	/** The context bond of this CIS. */
@@ -65,6 +64,16 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	public Set<CtxEntityIdentifier> getMembers() {
 		
 		return new HashSet<CtxEntityIdentifier>(this.members);
+	}
+	
+	/**
+	 * 
+	 * @param members
+	 * @since 0.5
+	 */
+	void setMembers(Set<CtxEntityIdentifier> members) {
+		
+		this.members = members;
 	}
 	
 	/**

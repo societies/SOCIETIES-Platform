@@ -25,20 +25,17 @@
 package org.societies.context.api.community.db;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
 
 /**
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
@@ -47,19 +44,6 @@ import org.societies.api.identity.Requestor;
  * @since 0.0.2
  */
 public interface ICommunityCtxDBMgr {
-
-	/**
-	 * Creates a {@link CtxAssociation} with the specified owner id and type.
-	 * 
-	 * @param ownerId
-	 *            the owner id of the context association to create
-	 * @param type
-	 *            the type of the context association to create
-	 * @throws CtxException 
-	 * @since 0.5
-	 */
-	public CtxAssociation createAssociation(final String ownerId,
-			final String type) throws CtxException;
 	
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated
@@ -188,7 +172,6 @@ public interface ICommunityCtxDBMgr {
 	  */
 	public IndividualCtxEntity retrieveAdministratingCss(CtxEntityIdentifier communityId) throws CtxException;
 	
-	
 	/**
 	 * Retrieves the context attribute(s) that acts as a bond of the community of
 	 * entities specified by the CtxEntityIdentifier.
@@ -200,26 +183,6 @@ public interface ICommunityCtxDBMgr {
 	public CtxBond retrieveBonds(CtxEntityIdentifier community) throws CtxException;
 
 	/**
-	  * Retrieves the sub-communities of the specified community entity.
-	  *  
-	  * @param communityId
-	  * @throws CtxException 
-	  * @since 0.2
-	  */
-	public List<CtxEntityIdentifier> retrieveSubCommunities(CtxEntityIdentifier communityId) throws CtxException;
-
-	
-	/**
-	 * This applies for Community hierarchies. Retrieves the child communities
-	 * (subcommunities of CtxEntities) of the specified parent CtxEntity
-	 * 
-	 * @param community identifier
-	 * @throws CtxException
-	 * @since 0.0.1
-	 */
-	public List<CtxEntityIdentifier> retrieveChildCommunities(CtxEntityIdentifier community) throws CtxException;
-
-	/**
 	 * Retrieves a list of Individual Context Entities that are members of the
 	 * specified community Entity.
 	 * 
@@ -227,7 +190,7 @@ public interface ICommunityCtxDBMgr {
 	 * @throws CtxException
 	 * @since 0.0.1
 	 */
-	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
+	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier communityId) throws CtxException;
 
 	/**
 	 * Retrieves communities characterized as parent for the community specified by the Community CtxEntityIdentifier  
@@ -237,5 +200,4 @@ public interface ICommunityCtxDBMgr {
 	 * @since 0.0.1
 	 */
 	public List<CtxEntityIdentifier> retrieveParentCommunities(CtxEntityIdentifier community) throws CtxException;
-
 }

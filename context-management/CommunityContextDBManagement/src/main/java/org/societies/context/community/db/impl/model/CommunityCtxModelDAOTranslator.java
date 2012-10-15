@@ -71,7 +71,7 @@ public final class CommunityCtxModelDAOTranslator {
 		
 		final CommunityCtxEntity mo = CtxModelObjectFactory.getInstance()
 				.createCommunityEntity(dao.getId(), dao.getLastModified(), attributes,
-						dao.getAssociations());
+						dao.getAssociations(), dao.getCommunities(), dao.getMembers());
 
 		return mo;
 	}
