@@ -220,6 +220,7 @@ var SocietiesLogin = {
 			$.mobile.loadPage("html/my_friends_list.html");
 			$.mobile.loadPage("html/my_friends_details.html");
 			$.mobile.loadPage("html/suggested_societies_friends_list.html");
+			$.mobile.loadPage("html/friend_request_list.html");
 			//NAVIGATION PAGES
 			$.mobile.loadPage("html/settings.html");
 			

@@ -4,12 +4,12 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-
-
 </head>
 <body>
 
-<div data-role="page" id="friends-landing">
+
+<!-- Start of first page: #friends -->
+<div data-role="page" id="friend-requests-list">
 	<!-- header -->
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
@@ -17,30 +17,9 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		<!-- <p align="right"> -->
-		<form id="formCSSDirSearch" >
-			<input type="search" name="search" id="search-friends" value="Search Friends" data-theme="b"/>
-		</form>
-		<!-- <input id="btnSearchFriends" type="button" value="Search" data-inline="true" data-theme="b" />  
-		</p>-->
-		<br />
-		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
-			<li data-role="list-divider">Friends</li>
-				<li data-theme="d"><a href="#" id="MyFriendsListLink">
-				<h2>Your Friends</h2>
-				<p>A list of your Societies friends <span class="ui-li-count">10</span>
-				</p>
-				</a></li>
-			<li data-theme="d"><a href="#" id="SuggestFriendsLink">
-				<h2>Suggested Friends</h2>
-				<p>Some people we think you might like to be friends with <span class="ui-li-count">5</span>
-				</p>
-				</a></li>
-			<li data-theme="d"><a href="#" id="FriendRequestsLink">
-				<h2>Friend Requests</h2>
-				<p>People who are interested in being your friend<span class="ui-li-count">2</span>
-				</p>
-				</a></li>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="FriendRequestsListUL" data-filter="true" data-filter-placeholder="Filter Results..." >
+			<li data-role="list-divider">Societies Friend Requests</li>
+			<!-- //////////////////// LIST OF FRIEND REQUESTS /////////////////// -->
 		</ul>
 		<br/><br/>
 		<div class="terms">
@@ -48,7 +27,8 @@
 		</div>
 	</div>
 	<!-- /content -->
-	<!-- footer -->
+	<br/><br/>
+		<!-- footer -->
    <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
 			<li class="btn-home">

@@ -40,6 +40,7 @@ import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
 import org.societies.android.api.css.directory.ACssAdvertisementRecord;
+import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.Notification;
@@ -91,7 +92,8 @@ public class PluginCSSManager extends Plugin {
     private IAndroidCSSManager localCSSManager;
     private boolean connectedtoCSSManager = false;
 
-
+    private IAndroidCssDirectory serviceCssDir;
+    private boolean serviceCssDirConnected;
     /**
      * Constructor
      */
@@ -101,6 +103,59 @@ public class PluginCSSManager extends Plugin {
     }
 
     /**
+     * CSSManager service connection
+     * 
+     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back
+     * if service connection lost
+     */
+    private ServiceConnection ccsManagerConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from LocalCSSManager service");
+        	connectedtoCSSManager = false;
+
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
+        	//get a local binder
+            LocalBinder binder = (LocalBinder) service;
+            //obtain the service's API
+            localCSSManager = (IAndroidCSSManager) binder.getService();
+            connectedtoCSSManager = true;
+            
+			String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(CONNECT_SERVICE);
+
+			PluginResult result = new PluginResult(PluginResult.Status.OK, "connected");
+			result.setKeepCallback(false);
+			PluginCSSManager.this.success(result, methodCallbackId);
+
+        }
+    };
+
+    /**
+     * CssDirectory service connection
+     * 
+     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back if service connection lost
+     */
+    private ServiceConnection cssDirectoryConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from LocalCSSManager service");
+        	serviceCssDirConnected = false;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
+        	//GET LOCAL BINDER
+            LocalBinder binder = (LocalBinder) service;
+            //OBTAIN  ICssDirectory API
+            serviceCssDir = (IAndroidCssDirectory) binder.getService();
+            serviceCssDirConnected = true;
+        }
+    };
+    
+    /**
      * Bind to the target service
      */
     private void initialiseServiceBinding() {
@@ -108,20 +163,21 @@ public class PluginCSSManager extends Plugin {
     	Intent intent = new Intent(this.ctx.getContext(), LocalCSSManagerService.class);
     	//bind to the service
     	this.ctx.getContext().bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
 
     	//register broadcast receiver to receive CSSManager return values 
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
-        intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
-        intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
-        intentFilter.addAction(LocalCSSManagerService.LOGIN_XMPP_SERVER);
-        intentFilter.addAction(LocalCSSManagerService.LOGOUT_XMPP_SERVER);
-        intentFilter.addAction(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD);
-        intentFilter.addAction(LocalCSSManagerService.SUGGESTED_FRIENDS);
-        intentFilter.addAction(LocalCSSManagerService.GET_CSS_FRIENDS);
-        intentFilter.addAction(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
-        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
-        intentFilter.addAction(LocalCSSManagerService.FIND_FOR_ALL_CSS);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_CSS);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_CSS);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
+        intentFilter.addAction(IAndroidCSSManager.SUGGESTED_FRIENDS);
+        intentFilter.addAction(IAndroidCSSManager.GET_CSS_FRIENDS);
+        
+        intentFilter.addAction(IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+        intentFilter.addAction(IAndroidCssDirectory.FIND_FOR_ALL_CSS);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);    	
     }
@@ -135,18 +191,15 @@ public class PluginCSSManager extends Plugin {
     		this.ctx.getContext().unbindService(ccsManagerConnection);
     	}
     }
-
-
-	@Override
+	
 	/**
 	 * This method is the receiving side of the Javascript-Java bridge
 	 * This particular method variant caters for asynchronous method returns 
 	 * in situations where the result will be determined in some undefined future instance
 	 */
-	public PluginResult execute(String action, JSONArray data, String callbackId) {
+    @Override
+    public PluginResult execute(String action, JSONArray data, String callbackId) {
 		Log.d(LOG_TAG, "execute: " + action + " for callback: " + callbackId);
-
-
 		PluginResult result = null;
 
 		if (action.equals(CONNECT_SERVICE)) {
@@ -191,12 +244,10 @@ public class PluginCSSManager extends Plugin {
             result.setKeepCallback(false);
 
             return result;
-			
 		}
 		
 		//uses asynchronous calls
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
-
 			
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
@@ -210,19 +261,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 
-//				try {
-//					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
-//				} catch (JSONException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-
-				try {
 					this.localCSSManager.loginCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -235,12 +274,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 
-				try {
 					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -249,11 +283,6 @@ public class PluginCSSManager extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0))) {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				try {
 					this.localCSSManager.registerXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -265,12 +294,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 
-				try {
 					this.localCSSManager.loginXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -279,12 +303,6 @@ public class PluginCSSManager extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3))) {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				try {
 					this.localCSSManager.logoutXMPPServer(data.getString(0));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -295,71 +313,67 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
 					Log.d(LOG_TAG, "parameter 2 - forename: " + data.getJSONObject(1).getString("foreName"));
 					Log.d(LOG_TAG, "parameter 3 - name: " + data.getJSONObject(1).getString("name"));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				try {
 					this.localCSSManager.modifyAndroidCSSRecord(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17))) {
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15))) {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				try {
 					this.localCSSManager.getCssFriends(data.getString(0));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18))) {
-				try {
-					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				try {
-					this.localCSSManager.getSuggestedFriends(data.getString(0));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16))) {
 				try {
-					this.localCSSManager.findAllCssAdvertisementRecords(data.getString(0));
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					this.localCSSManager.getSuggestedFriends(data.getString(0));
 				} catch (Exception e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15))) {
-				try {
-					this.localCSSManager.findForAllCss(data.getString(0), data.getString(1));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19))) {
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17))) {
 				try {
 					this.localCSSManager.readProfileRemote(data.getString(0), data.getString(1));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 20))) {
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18))) {
 				try {
 					this.localCSSManager.sendFriendRequest(data.getString(0), data.getString(1));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19))) {
+				try {
+					this.localCSSManager.getFriendRequests(data.getString(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}  else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 20))) {
+				try {
+					this.localCSSManager.acceptFriendRequest(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}  
+			//>>>>>>>>>>>>>>>>>>>>>>>>IAndroidCisDirectory methods >>>>>>>>>>>>>>>>>>>>>>>
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 0))) {
+				try {
+					this.serviceCssDir.findForAllCss(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 1))) {
+				try {
+					this.serviceCssDir.findAllCssAdvertisementRecords(data.getString(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} 
-			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
@@ -395,35 +409,37 @@ public class PluginCSSManager extends Plugin {
 		ACssAdvertisementRecord advertRecord [] = null;
 		PluginResult result = null;
 		
-		if (LocalCSSManagerService.GET_CSS_FRIENDS == intent.getAction() || LocalCSSManagerService.SUGGESTED_FRIENDS == intent.getAction()) {
-			
-			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		//ADVERTISEMENT RECORDS	
+		if (IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() || IAndroidCSSManager.GET_CSS_FRIENDS==intent.getAction() || IAndroidCSSManager.SUGGESTED_FRIENDS==intent.getAction()) {
+			Parcelable parcelable[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
 			advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			
 			Log.d(LOG_TAG, "Number of friends: " + parcelable.length);
-			
 			for (int i  = 0; i < parcelable.length; i++) {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
-		//ADVERTISEMENT RECORDS	
-		} else if (LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS == intent.getAction() || LocalCSSManagerService.FIND_FOR_ALL_CSS == intent.getAction()) {
-			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		} 
+		else if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ) {
+			Parcelable parcelable[] = intent.getParcelableArrayExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY);
 			advertRecord = new ACssAdvertisementRecord[parcelable.length];
 			Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
 			for (int i  = 0; i < parcelable.length; i++) {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
-		//CSS RECORDS
-		} else  {
-			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		} 
+		//CSS RECORDS 
+		else  {
+			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
 		}
 		
 		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
-		
 		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
 		
 		if (resultStatus) {
-			if (LocalCSSManagerService.GET_CSS_FRIENDS == intent.getAction() || LocalCSSManagerService.SUGGESTED_FRIENDS == intent.getAction()) {
+			if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || 
+					   IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ||
+					   IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() ||
+					   IAndroidCSSManager.GET_CSS_FRIENDS == intent.getAction() || 
+					   IAndroidCSSManager.SUGGESTED_FRIENDS == intent.getAction()) {
 				result = new PluginResult(PluginResult.Status.OK, convertACssAdvertisements(advertRecord));
 			} else {
 				result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
@@ -453,11 +469,8 @@ public class PluginCSSManager extends Plugin {
         JSONArray jArray = null;
 		Gson gson = new Gson();
 		try {
-//			jArray =  (JSONArray) new JSONTokener(gson.toJson(adverts)).nextValue();
 			jArray =  new JSONArray (new JSONTokener(gson.toJson(adverts)));
-			
 			LOG.d(LOG_TAG, gson.toJson(adverts));
-			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -578,7 +591,7 @@ public class PluginCSSManager extends Plugin {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
-			if (intent.getAction().equals(LocalCSSManagerService.LOGIN_CSS)) {
+			if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
@@ -593,7 +606,7 @@ public class PluginCSSManager extends Plugin {
 
 				notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
 
-			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
@@ -601,7 +614,7 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 				
-			} else if (intent.getAction().equals(LocalCSSManagerService.REGISTER_XMPP_SERVER)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.REGISTER_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
@@ -609,57 +622,67 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 				
-			} else if (intent.getAction().equals(LocalCSSManagerService.LOGIN_XMPP_SERVER)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_XMPP_SERVER)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.GET_CSS_FRIENDS)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17);
-				
-				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
-				if (methodCallbackId != null) {
-					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
-				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.SUGGESTED_FRIENDS)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18);
-				
-				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
-				if (methodCallbackId != null) {
-					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
-				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.GET_CSS_FRIENDS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_FOR_ALL_CSS)) {
+			} else if (intent.getAction().equals(IAndroidCSSManager.SUGGESTED_FRIENDS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			} else if (intent.getAction().equals(LocalCSSManagerService.READ_PROFILE_REMOTE)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 19);
+			} else if (intent.getAction().equals(IAndroidCSSManager.READ_PROFILE_REMOTE)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 17);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(IAndroidCSSManager.GET_FRIEND_REQUESTS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} 
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IAndroidCssDirectory >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			else if (intent.getAction().equals(IAndroidCssDirectory.FIND_FOR_ALL_CSS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 0);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} 
+			else if (intent.getAction().equals(IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 1);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -668,36 +691,6 @@ public class PluginCSSManager extends Plugin {
 			} 
 		}
 	};
-    /**
-     * CSSManager service connection
-     * 
-     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back
-     * if service connection lost
-     */
-    private ServiceConnection ccsManagerConnection = new ServiceConnection() {
-
-        public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from LocalCSSManager service");
-        	connectedtoCSSManager = false;
-
-        }
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
-        	//get a local binder
-            LocalBinder binder = (LocalBinder) service;
-            //obtain the service's API
-            localCSSManager = (IAndroidCSSManager) binder.getService();
-            connectedtoCSSManager = true;
-            
-			String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(CONNECT_SERVICE);
-
-			PluginResult result = new PluginResult(PluginResult.Status.OK, "connected");
-			result.setKeepCallback(false);
-			PluginCSSManager.this.success(result, methodCallbackId);
-
-        }
-    };
 
     /**
      * Determine if the Javascript action is a valid.
@@ -712,13 +705,17 @@ public class PluginCSSManager extends Plugin {
     	boolean retValue = false;
     	for (int i = 0; i < IAndroidCSSManager.methodsArray.length; i++) {
         	if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, i))) {
-        		retValue = true;
+        		return true;
+        	}
+    	}
+    	for (int i = 0; i < IAndroidCssDirectory.methodsArray.length; i++) {
+        	if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, i))) {
+        		return true;
         	}
     	}
     	if (!retValue) {
     		Log.d(LOG_TAG, "Unable to find method name for given action: " + action);
     	}
-
     	return retValue;
     }
 }
