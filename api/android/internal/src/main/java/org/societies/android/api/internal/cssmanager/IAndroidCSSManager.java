@@ -49,27 +49,59 @@ import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 
 public interface IAndroidCSSManager {
 
-	String methodsArray [] = {"registerXMPPServer(String client, AndroidCSSRecord profile)",
-			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",
-			"loginXMPPServer(String client, AndroidCSSRecord profile)",
-			"logoutXMPPServer(String client)",
-			"loginCSS(String client, AndroidCSSRecord profile)", 
-			"logoutCSS(String client, AndroidCSSRecord profile)",
-			"registerCSS(String client, AndroidCSSRecord profile)",
-			"unregisterCSS(String client, AndroidCSSRecord profile)",
-			"registerCSSDevice(String client, AndroidCSSRecord profile)",
-			"unregisterCSSDevice(String client, AndroidCSSRecord profile)",
-			"getAndroidCSSRecord(String client)",
-			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",
-			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)",
-			"synchProfile(String client, AndroidCSSRecord profile)",
-			"setPresenceStatus(String client, AndroidCSSRecord profile)",
-			"findForAllCss(String client, String searchTerm)",
-			"findAllCssAdvertisementRecords(String client)",
-			"getCssFriends(String client)",
-			"getSuggestedFriends(String client)",
-			"readProfileRemote(String client, String cssId)",
-			"sendFriendRequest(String client, String cssId)",
+	/**
+	 * CSS Manager intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.cssmanager.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.cssmanager.ReturnStatus";
+
+	public static final String CHANGE_CSS_NODE_STATUS = "org.societies.android.platform.cssmanager.CHANGE_CSS_NODE_STATUS";
+	public static final String GET_ANDROID_CSS_RECORD = "org.societies.android.platform.cssmanager.GET_ANDROID_CSS_RECORD";
+	public static final String LOGIN_CSS = "org.societies.android.platform.cssmanager.LOGIN_CSS";
+	public static final String LOGIN_XMPP_SERVER = "org.societies.android.platform.cssmanager.LOGIN_XMPP_SERVER";
+	public static final String LOGOUT_CSS = "org.societies.android.platform.cssmanager.LOGOUT_CSS";
+	public static final String LOGOUT_XMPP_SERVER = "org.societies.android.platform.cssmanager.LOGOUT_XMPP_SERVER";
+	public static final String MODIFY_ANDROID_CSS_RECORD = "org.societies.android.platform.cssmanager.MODIFY_ANDROID_CSS_RECORD";
+	public static final String REGISTER_CSS = "org.societies.android.platform.cssmanager.REGISTER_CSS";
+	public static final String REGISTER_CSS_DEVICE = "org.societies.android.platform.cssmanager.REGISTER_CSS_DEVICE";
+	public static final String REGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.REGISTER_XMPP_SERVER";
+	public static final String SET_PRESENCE_STATUS = "org.societies.android.platform.cssmanager.SET_PRESENCE_STATUS";
+	public static final String SYNCH_PROFILE = "org.societies.android.platform.cssmanager.SYNCH_PROFILE";
+	public static final String UNREGISTER_CSS = "org.societies.android.platform.cssmanager.UNREGISTER_CSS";
+	public static final String UNREGISTER_CSS_DEVICE = "org.societies.android.platform.cssmanager.UNREGISTER_CSS_DEVICE";
+	public static final String UNREGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.UNREGISTER_XMPP_SERVER";
+
+	public static final String SUGGESTED_FRIENDS = "org.societies.android.platform.cssmanager.SUGGESTED_FRIENDS";
+	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
+	public static final String READ_PROFILE_REMOTE = "org.societies.android.platform.cssmanager.READ_PROFILE_REMOTE";
+	public static final String SEND_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.SEND_FRIEND_REQUEST";
+	public static final String GET_FRIEND_REQUESTS = "org.societies.android.platform.cssmanager.GET_FRIEND_REQUESTS";
+	public static final String ACCEPT_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.ACCEPT_FRIEND_REQUEST";
+
+	String methodsArray [] = {"registerXMPPServer(String client, AndroidCSSRecord profile)", //0
+			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",//1
+			"loginXMPPServer(String client, AndroidCSSRecord profile)",		//2
+			"logoutXMPPServer(String client)",								//3
+			"loginCSS(String client, AndroidCSSRecord profile)", 			//4
+			"logoutCSS(String client, AndroidCSSRecord profile)",			//5
+			"registerCSS(String client, AndroidCSSRecord profile)",			//6
+			"unregisterCSS(String client, AndroidCSSRecord profile)",		//7
+			"registerCSSDevice(String client, AndroidCSSRecord profile)",	//8
+			"unregisterCSSDevice(String client, AndroidCSSRecord profile)",	//9
+			"getAndroidCSSRecord(String client)",							//10
+			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",//11
+			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)", //12
+			"synchProfile(String client, AndroidCSSRecord profile)",		//13
+			"setPresenceStatus(String client, AndroidCSSRecord profile)",	//14
+			"getCssFriends(String client)",									//15
+			"getSuggestedFriends(String client)",							//16
+			"readProfileRemote(String client, String cssId)",				//17
+			"sendFriendRequest(String client, String cssId)",				//18
+			"getFriendRequests(String client)",								//19
+			"acceptFriendRequest(String client, String cssId)"				//20
 	};
 	/**
 	 * Register with chosen Domain Server
@@ -204,22 +236,6 @@ public interface IAndroidCSSManager {
 	AndroidCSSRecord setPresenceStatus(String client, AndroidCSSRecord profile);
 	
 	/**
-	 * Search for a CSS(s) using a filter
-	 * @param client
-	 * @param searchTerm
-	 * @return List of CssAdvertisementRecord
-	 */
-	List<ACssAdvertisementRecord> findForAllCss(String client, String searchTerm);
-
-	/**
-	 * Find all CSS advertisements
-	 * 
-	 * @param client
-	 * @return List of CssAdvertisementRecord
-	 */
-	List<ACssAdvertisementRecord> findAllCssAdvertisementRecords(String client);
-	
-	/**
 	 * Get friend CSS(s) advertisements
 	 * @param client
 	 * @return
@@ -247,4 +263,19 @@ public interface IAndroidCSSManager {
 	 * @param cssId
 	 */
 	void sendFriendRequest(String client, String cssId);
+	
+	/**
+	 * Returns a list of Friend requests
+	 * @param client
+	 * @return
+	 */
+	ACssAdvertisementRecord[] getFriendRequests(String client);
+	
+	/**
+	 * Accepts Friend request
+	 * @param client
+	 * @param cssId
+	 * @return
+	 */
+	void acceptFriendRequest(String client, String cssId);
 }
