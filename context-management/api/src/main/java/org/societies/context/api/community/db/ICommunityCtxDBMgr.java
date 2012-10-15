@@ -120,27 +120,6 @@ public interface ICommunityCtxDBMgr {
 			throws CtxException;
 
 	/**
-	  * Updates a community Context Entity.
-	  * 
-	  * @param entity
-	  * @throws CtxException 
-	  * @since 0.2
-	  * @deprecated As of 0.5, use {@link #update(CtxModelObject)}.
-	  */
-	@Deprecated
-	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity) throws CtxException;
-	
-	/**
-	  * Updates a community Context Entity. 
-	  * @param entity
-	  * @throws CtxException 
-	  * @since 0.2
-	  * @deprecated As of 0.5, use {@link #update(CtxModelObject)}.
-	  */
-	@Deprecated
-	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute) throws CtxException;
-
-	/**
 	  * Removes the specidied context model object.
 	  *  
 	  * @param ctxId

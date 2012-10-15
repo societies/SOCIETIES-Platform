@@ -361,26 +361,6 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#updateCommunityEntity(org.societies.api.context.model.CommunityCtxEntity)
-	 */
-	@Override
-	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity)
-			throws CtxException {
-					      
-		return (CommunityCtxEntity) this.update(entity);
-	}
-
-	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#updateCommunityAttribute(org.societies.api.context.model.CtxAttribute)
-	 */
-	@Override
-	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute)
-			throws CtxException {
-		
-		return (CtxAttribute) this.update(attribute);
-	}
-
-	/*
 	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
 	 */
 	@SuppressWarnings("unchecked")
