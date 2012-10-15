@@ -1436,6 +1436,19 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		// remotely, it will be an accepted of the request we sent
 			try {
 				cssRegistry.updateCssFriendRequestRecord(request);
+				// internal eventing for notifying of new Friend
+				LOG.info(" :) :) :) :) Generating CSS_Friended_Event to notify CSS Friend Request has been accepted");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CSS_FRIENDED_EVENT, "CSS Friend Request Accepted", this.idManager.getThisNetworkNode().toString(), request.getCssIdentity());
+					try {
+						LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish SUBS CIS event");
+					}
+				}
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
