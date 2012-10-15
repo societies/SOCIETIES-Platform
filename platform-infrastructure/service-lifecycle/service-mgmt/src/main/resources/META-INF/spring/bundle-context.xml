@@ -33,7 +33,8 @@
 		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />					
 	</bean>
 
-	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
+	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl"
+	init-method="cleanAfterRestart" depends-on="serListener" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
