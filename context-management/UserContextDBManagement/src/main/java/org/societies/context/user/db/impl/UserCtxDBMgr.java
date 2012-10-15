@@ -54,6 +54,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
@@ -280,6 +281,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 		
+		// create IS_MEMBER_OF association for new IndividualCtxEntity
+		final CtxAssociation isMemberOfAssoc = this.createAssociation(CtxAssociationTypes.IS_MEMBER_OF);
+		isMemberOfAssoc.setParentEntity(id);
+		this.update(isMemberOfAssoc);
+		
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
@@ -456,6 +462,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
         	
         	case ENTITY:            	
             	dao = this.retrieve(CtxEntityDAO.class, id);
+            	if (dao == null)
+            		break;
             	/////////// UGLY & QND HACK ALERT BEGIN //////////////////
             	final Session session = this.sessionFactory.openSession();
             	final Query query = session.createQuery("from CtxAssociationDAO");
