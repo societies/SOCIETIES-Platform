@@ -137,7 +137,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			
 			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
-			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
+			LinkedHashMap<List<String>,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
 			//printTransProbDictionary(trans2ProbDictionary);
 			//LOG.info("5. Assign context to actions");
 			

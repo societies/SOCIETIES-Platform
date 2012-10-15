@@ -89,7 +89,7 @@ public class CAUIDiscoveryLearningTest {
 		
 		// add context calculation in calcTrans2Prob
 		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
-		LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionaryRepo.get(2));	
+		LinkedHashMap<List<String>,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionaryRepo.get(2));	
 		printTransProbDictionary(trans2ProbDictionary);
 			
 		// test retrieveRecords method
@@ -143,11 +143,11 @@ public class CAUIDiscoveryLearningTest {
 	}
 
 
-	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
+	public void printTransProbDictionary (LinkedHashMap<List<String>,HashMap<String,Double>> transProbDictionary){
 		System.out.println("printing transition probabilites");
 		//System.out.println ("**** total number of entries:" + transProbDictionary.size());
-		for(String action : transProbDictionary.keySet()){
-			HashMap<String,Double> transTargets = transProbDictionary.get(action);
+		for(List<String> action : transProbDictionary.keySet()){
+			HashMap<String,Double> transTargets = transProbDictionary.get(action.get(0));
 			System.out.println("Action:"+action+ "| target: "+transTargets);
 		}
 	}

@@ -66,9 +66,9 @@ public class TransitionProbabilitiesCalc {
 	/*
 	 * The method returns a map of the form {A--> [B, 0.5],[A,0.4],[C,0.1]}
 	 */
-	public LinkedHashMap<String,HashMap<String,Double>> calcTrans2Prob(LinkedHashMap<List<String>,ActionDictObject> step2Dict){
+	public LinkedHashMap<List<String>,HashMap<String,Double>> calcTrans2Prob(LinkedHashMap<List<String>,ActionDictObject> step2Dict){
 
-		LinkedHashMap<String,HashMap<String,Double>> results = new  LinkedHashMap<String,HashMap<String,Double>>();
+		LinkedHashMap<List<String>,HashMap<String,Double>> results = new  LinkedHashMap<List<String>,HashMap<String,Double>>();
 
 		for (List<String> act : step2Dict.keySet()){
 			HashMap<String,Double> transResultsForAct = new HashMap<String,Double>();
@@ -99,9 +99,9 @@ public class TransitionProbabilitiesCalc {
 				double transProb = ((float)currentActOccurences/totalOtherOcc);
 				transResultsForAct.put(transAct,transProb);
 			}
-
-			results.put(currentfirstAct, transResultsForAct);
-
+			List<String> currentfirstActList = new ArrayList<String>();
+			currentfirstActList.add(currentfirstAct);
+			results.put(currentfirstActList, transResultsForAct);
 		}
 
 		return results;

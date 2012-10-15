@@ -49,12 +49,14 @@ public class ConstructUIModel {
 	}
 
 
-	public UserIntentModelData constructNewModel(LinkedHashMap<String,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
+	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
 
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
-		for (String actionTemp : transDictionaryAll.keySet()){
+		for (List<String> actionTempList : transDictionaryAll.keySet()){
+			String actionTemp  = actionTempList.get(0);
+			
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
 			//LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
@@ -91,8 +93,9 @@ public class ConstructUIModel {
 
 		// set links among actions
 		//	LOG.info("4 set links among actions");
-		for (String sourceActionConc : transDictionaryAll.keySet()){
-
+		for (List<String> sourceActionConcList : transDictionaryAll.keySet()){
+			
+			String sourceActionConc = sourceActionConcList.get(0);
 			String [] sourceAction = sourceActionConc.split("\\#");
 			
 			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
