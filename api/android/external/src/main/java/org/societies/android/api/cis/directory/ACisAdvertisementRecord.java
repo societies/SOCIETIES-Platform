@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.cis.directory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -111,5 +113,24 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		//	record.setMembershipCrit(AMembershipCrit.convertAMembershipCrit(arecord.getMembershipCrit()));
 		
 		return record;
+	}
+	
+	/**
+	 * Creates an ACisAdvertisementRecord from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	public static ACisAdvertisementRecord createFromJSON(JSONObject jObj) throws JSONException {
+		ACisAdvertisementRecord advert = new ACisAdvertisementRecord();
+		advert.setId(jObj.getString("id"));
+		advert.setCssownerid(jObj.getString("cssownerid"));
+		advert.setName(jObj.getString("name"));
+		advert.setType(jObj.getString("type"));
+		//advert.setPassword(jObj.getString("password"));
+		//crit.setACriteria(CreateCriteriaList(jObj.getJSONArray("criteria")));
+		//advert.setMembershipCrit(crit);
+		
+		return advert;
 	}
 }

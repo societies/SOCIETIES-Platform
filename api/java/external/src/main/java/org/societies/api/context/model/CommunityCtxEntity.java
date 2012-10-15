@@ -46,7 +46,6 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	private static final long serialVersionUID = -8564823052068362334L;
 	
 	/** The members of this CIS. */
-	//private Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
 	private Set<CtxEntityIdentifier> members = new HashSet<CtxEntityIdentifier>();
 	
 	/** The context bond of this CIS. */
@@ -68,12 +67,23 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	}
 	
 	/**
+	 * 
+	 * @param members
+	 * @since 0.5
+	 */
+	void setMembers(Set<CtxEntityIdentifier> members) {
+		
+		this.members = members;
+	}
+	
+	/**
 	 * Adds a member to this CIS.
 	 * 
 	 * @param member
 	 *            the new member of this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
+	@Deprecated
 	public void addMember(CtxEntityIdentifier member) {
 		
 		if (member == null)
@@ -89,6 +99,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the member to remove from this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
+	@Deprecated
 	public void removeMember(CtxEntityIdentifier member) {
 		
 		if (member == null)

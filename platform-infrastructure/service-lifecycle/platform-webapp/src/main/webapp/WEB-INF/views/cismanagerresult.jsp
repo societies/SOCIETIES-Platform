@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"
 	import="java.util.*" %>
 <%@ taglib prefix="c" uri="http://www.springframework.org/tags/form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %> 
+<%@taglib prefix="xc" uri="http://java.sun.com/jsp/jstl/core"  %> 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -61,13 +62,15 @@ function updateForm(cisId, toDo, where) {
 
 <h4>${res}</h4>
 <h4>Method: <%= methodCalled %></h4>
-<p><b>CIS's I own or am a member of </b></p>
+
 
 <form id="cmForm" name="cmForm" id="cmForm" method="post" action="cismanager.html">
 <input type="hidden" name="cisJid" id="cisJid">
 <input type="hidden" name="method" id="method">
 <input type="hidden" name="node" id="node">
 
+	<xc:if test="${fn:length(cisrecords) gt 0}">
+	<p><b>CIS's I own or am a member of </b></p>
 	<table>
 		<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
 		<xc:forEach var="record" items="${cisrecords}">
@@ -79,7 +82,9 @@ function updateForm(cisId, toDo, where) {
 	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServicesCis', 'servicediscovery.html')" ></td>
 	        </tr>
 	    </xc:forEach>
-	</table>	
+	</table>
+	</xc:if>
+	
 </form>
 <p>&nbsp;</p>
 <%

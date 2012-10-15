@@ -27,7 +27,9 @@ package org.societies.api.context.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -94,8 +96,10 @@ public final class CtxModelBeanTranslator {
 		for (CtxAttributeBean attrBean : entityBean.getAttributes())
 			entity.addAttribute(fromCtxAttributeBean(attrBean));
 		// Handle entity association IDs
+		final Set<CtxAssociationIdentifier> assocIds = new HashSet<CtxAssociationIdentifier>();
 		for (CtxAssociationIdentifierBean assocIdBean : entityBean.getAssociations())
-			entity.addAssociation((CtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
+			assocIds.add((CtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
+		entity.setAssociations(assocIds);
 
 		return entity;	
 	}

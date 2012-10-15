@@ -1,4 +1,4 @@
-phonegapdesktop.internal.parseConfigFile("file:///C:/Users/aleckey/git/SOCIETIES-Platform/platform-infrastructure/client-frwk/SocietiesAndroidApp/assets/www/pluginjs/servicemanagement.json");
+phonegapdesktop.internal.parseConfigFile("pluginjs/servicemanagement.json");
 
 window.plugins.ServiceManagementService = {
 	connectService: function(successCallback, errorCallback){
@@ -38,12 +38,39 @@ window.plugins.ServiceManagementService = {
 		}
 	},
 	
-	shareMyService: function(successCallback, errorCallback){
+	shareMyService: function(jid, serviceObj, successCallback, errorCallback) {
 		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('ServiceManagementService', 'getServices'));
+			successCallback("SUCCESS");
+		}
+	},
+	
+	unshareMyService: function(jid, serviceObj, successCallback, errorCallback) {
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback("SUCCESS");
+		}
+	},
+	
+	startService: function(serviceId, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback("SUCCESS");
+		}
+	},
+	
+	stopService: function(serviceId, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback("SUCCESS");
 		}
 	}
 	

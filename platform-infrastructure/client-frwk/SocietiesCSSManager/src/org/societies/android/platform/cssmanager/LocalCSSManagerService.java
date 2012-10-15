@@ -42,12 +42,11 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.css.directory.ACssAdvertisementRecord;
+import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssDirectoryBean;
 import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
 import org.societies.api.schema.cssmanagement.CssEvent;
@@ -63,7 +62,6 @@ import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -1100,11 +1098,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //    		}
 
     		try {
-     			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
        			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
 
-       			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
     			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
+    			LocalCSSManagerService.this.pubsubSubscribes.clear();
 
     			Log.d(LOG_TAG, "Pubsub un-subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub un-registration: " + System.currentTimeMillis());
@@ -1138,10 +1135,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			pubsubService = LocalCSSManagerService.this.cloudNodeIdentity;
 
     		try {
+     			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
     			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
     			
+       			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
     			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
-    			LocalCSSManagerService.this.pubsubSubscribes.clear();
     			
     			Log.d(LOG_TAG, "Pubsub subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub registration: " + System.currentTimeMillis());

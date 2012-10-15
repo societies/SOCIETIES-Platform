@@ -27,13 +27,13 @@ package org.societies.context.api.community.db;
 import java.util.List;
 
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 
@@ -44,7 +44,7 @@ import org.societies.api.identity.IIdentity;
  * @since 0.0.2
  */
 public interface ICommunityCtxDBMgr {
-
+	
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated
 	 * to the identified community context entity (scope). 
@@ -80,6 +80,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param modelType
 	 * @param type
 	 */
+	@Deprecated
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
@@ -119,28 +120,28 @@ public interface ICommunityCtxDBMgr {
 			throws CtxException;
 
 	/**
-	  * Updates a community Context Entity. 
-	  * @param entity
-	  * @throws CtxException 
-	  * @since 0.2
-	  */
-	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity) throws CtxException;
-	
-	/**
-	  * Updates a community Context Entity. 
-	  * @param entity
-	  * @throws CtxException 
-	  * @since 0.2
-	  */
-	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute) throws CtxException;
-
-	/**
-	  * Removes the specidied community Context Entity. 
+	  * Removes the specidied context model object.
+	  *  
 	  * @param ctxId
 	  * @throws CtxException 
-	  * @since 0.2
+	  * @since 0.5
 	  */
-	public CommunityCtxEntity removeCommunityEntity(CtxEntityIdentifier ctxId) throws CtxException;
+	public CtxModelObject remove(CtxIdentifier ctxId) throws CtxException;
+	
+	/**
+	 * Updates the specified {@link CtxModelObject}.
+	 * 
+	 * @param object
+	 *             the {@link CtxModelObject} to update
+	 * @return the updated {@link CtxModelObject}
+	 * @throws CtxException 
+	 *             if there is a problem performing the update operation
+	 * @throws NullPointerException
+	 *             if the specified context model object is <code>null</code>
+	 * @since 0.5
+	 */
+	public CtxModelObject update(final CtxModelObject object)
+			throws CtxException;
 
 	/**
 	  * This method retrieves the CSS that is assigned with the community administration role.
@@ -149,7 +150,6 @@ public interface ICommunityCtxDBMgr {
 	  * @since 0.2
 	  */
 	public IndividualCtxEntity retrieveAdministratingCss(CtxEntityIdentifier communityId) throws CtxException;
-	
 	
 	/**
 	 * Retrieves the context attribute(s) that acts as a bond of the community of
@@ -162,26 +162,6 @@ public interface ICommunityCtxDBMgr {
 	public CtxBond retrieveBonds(CtxEntityIdentifier community) throws CtxException;
 
 	/**
-	  * Retrieves the sub-communities of the specified community entity.
-	  *  
-	  * @param communityId
-	  * @throws CtxException 
-	  * @since 0.2
-	  */
-	public List<CtxEntityIdentifier> retrieveSubCommunities(CtxEntityIdentifier communityId) throws CtxException;
-
-	
-	/**
-	 * This applies for Community hierarchies. Retrieves the child communities
-	 * (subcommunities of CtxEntities) of the specified parent CtxEntity
-	 * 
-	 * @param community identifier
-	 * @throws CtxException
-	 * @since 0.0.1
-	 */
-	public List<CtxEntityIdentifier> retrieveChildCommunities(CtxEntityIdentifier community) throws CtxException;
-
-	/**
 	 * Retrieves a list of Individual Context Entities that are members of the
 	 * specified community Entity.
 	 * 
@@ -189,7 +169,7 @@ public interface ICommunityCtxDBMgr {
 	 * @throws CtxException
 	 * @since 0.0.1
 	 */
-	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
+	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier communityId) throws CtxException;
 
 	/**
 	 * Retrieves communities characterized as parent for the community specified by the Community CtxEntityIdentifier  
@@ -199,5 +179,4 @@ public interface ICommunityCtxDBMgr {
 	 * @since 0.0.1
 	 */
 	public List<CtxEntityIdentifier> retrieveParentCommunities(CtxEntityIdentifier community) throws CtxException;
-
 }

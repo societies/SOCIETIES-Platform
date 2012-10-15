@@ -51,8 +51,7 @@ public final class CtxModelObjectFactory {
 				result.addAttribute(attribute);
 		
 		if (associations != null)
-			for (final CtxAssociationIdentifier association : associations)
-				result.addAssociation(association);
+			result.setAssociations(associations);
 				
 		return result;
 	}
@@ -69,9 +68,33 @@ public final class CtxModelObjectFactory {
 				result.addAttribute(attribute);
 		
 		if (associations != null)
-			for (final CtxAssociationIdentifier association : associations)
-				result.addAssociation(association);
+			result.setAssociations(associations);
 				
+		return result;
+	}
+	
+	public CommunityCtxEntity createCommunityEntity(final CtxEntityIdentifier id, 
+			final Date lastModified, final Set<CtxAttribute> attributes,
+			final Set<CtxAssociationIdentifier> associations,
+			final Set<CtxEntityIdentifier> communities,
+			final Set<CtxEntityIdentifier> members) {
+		
+		final CommunityCtxEntity result = new CommunityCtxEntity(id);
+		result.setLastModified(lastModified);
+		
+		if (attributes != null)
+			for (final CtxAttribute attribute : attributes)
+				result.addAttribute(attribute);
+		
+		if (associations != null)
+			result.setAssociations(associations);
+		
+		if (communities != null)
+			result.setCommunities(communities);
+		
+		if (members != null)
+			result.setMembers(members);	
+			
 		return result;
 	}
 	

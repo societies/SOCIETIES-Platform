@@ -29,6 +29,11 @@ package org.societies.android.api.cis.directory;
  *
  */
 public interface ICisDirectory {
+    //CIS DIRECTORY INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
+	public static final String FIND_ALL_CIS     = "org.societies.android.platform.community.FIND_ALL_CIS";
+	public static final String FILTER_CIS 		= "org.societies.android.platform.community.FILTER_CIS";
+	public static final String FIND_CIS_ID      = "org.societies.android.platform.community.FIND_CIS_ID";
 	
 	public String methodsArray[] = {"findAllCisAdvertisementRecords(String client)",
 							 		"findForAllCis(String client, String filter)",

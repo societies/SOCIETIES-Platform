@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -40,6 +42,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
@@ -174,7 +177,13 @@ public class CisCtxMonitor extends EventListener {
 					
 				if (LOG.isInfoEnabled()) // TODO DEBUG
 					LOG.info("Adding member " + cisOwnerEntity.getId() + " to community " + cisEntity.getId());
-				cisEntity.addMember(cisOwnerEntity.getId());
+				final CtxAssociationIdentifier hasMembersAssocId = 
+						cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
+				final CtxAssociation hasMembersAssoc = 
+						(CtxAssociation) ctxBroker.retrieve(hasMembersAssocId).get();
+				hasMembersAssoc.addChildEntity(cisOwnerEntity.getId());
+				ctxBroker.update(hasMembersAssoc);
+				// TODO owning CSS ?
 				// TODO administrating CSS ?
 				// TODO membership criteria / bonds
 				

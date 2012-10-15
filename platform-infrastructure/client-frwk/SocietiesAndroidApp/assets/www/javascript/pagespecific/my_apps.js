@@ -6,6 +6,7 @@
 var Societies3PServices = {
 
 	mServices: {},
+	mServiceObj: {},  
 	
 	/**
 	 * @methodOf Societies3PServices#
@@ -85,42 +86,63 @@ var Societies3PServices = {
 		}
 		
 		function failure(data) {
-			window.alert("Failed to start application!");
+			window.alert("Failed to start application: " + data);
 		}
 		
 		if(window.confirm("Launch " + appName + "?"))
-			SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(success);
+			SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(success, failure);
 	},
 	
 	startStopService: function () {
-		Societies3PServices.startStopService();
-		$('#service_status').html( status );
-		//BUTTON TEXT
-		if (status == "started")
-			$('#start_stop').value="Stop";
-		else
-			$('#start_stop').value="Start";
+		function success(data) {
+			if (status == "STARTED") {
+				//$('input#start_stop').val("SStart Service");
+				$("input#start_stop").prop('value', 'Start Service'); 
+				$('p#service_status').html("STOPPED");
+			}
+			else {
+				//$('input#start_stop').val("SStop Service");
+				$("input#start_stop").prop('value', 'Stop Service');
+				$('p#service_status').html("STARTED");
+			}
+			$('input#start_stop').button('refresh');
+		}
+		
+		function failure(data) {
+			$('p#service_status').html( status + "Error occurred: " + data);
+		}
+		
+		var status = $('p#service_status').html();
+		if (status == "STARTED") {
+			$('p#service_status').html("Stopping...");
+			window.plugins.ServiceManagementService.stopService(mServiceObj.serviceIdentifier, success, failure);
+		}
+		else {
+			$('p#service_status').html("Starting...");
+			window.plugins.ServiceManagementService.startService(mServiceObj.serviceIdentifier, success, failure);
+		}
 	},
 	
 	showDetails: function (servicePos) {
 		// GET SERVICE FROM ARRAY AT POSITION
-		var serviceObj = mServices[ servicePos ];
-		if ( serviceObj ) {
+		mServiceObj = mServices[ servicePos ];
+		if ( mServiceObj ) {
 			//VALID SERVICE OBJECT
-			var markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
-						 "<p>" + serviceObj.serviceDescription + "</p>" +
-						 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p><br />"; 
+			var markup = "<h1>" + mServiceObj.serviceName + "</h1>" + 
+						 "<p>" + mServiceObj.serviceDescription + "</p>" +
+						 "<p>" + mServiceObj.serviceInstance.serviceImpl.serviceProvider + "</p><br />"; 
 			//INJECT
 			$('#app_detail').html( markup );
 			//SERVICE STATUS
-			var status = serviceObj.serviceStatus;
-			$('#service_status').html( status );
+			var status = mServiceObj.serviceStatus;
+			$('p#service_status').html( status );
 			//BUTTON TEXT
-			if (status == "started")
-				$('#start_stop').value="Stop";
+			if (status == "STARTED")
+				$('input#start_stop').val("Stop Service");
 			else
-				$('#start_stop').value="Start";
-						
+				$('input#start_stop').val("Start Service");
+			$('input#start_stop').button('refresh');
+			
 			try {//REFRESH FORMATTING
 				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
 				$('ul#app_details').listview('refresh');
@@ -140,7 +162,7 @@ var Societies3PServices = {
 $(document).bind('pageinit',function(){
 
 	$("input#start_stop").off('click').on('click', function(e){
-		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
+		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.startStopService);
 	});
 	
 });

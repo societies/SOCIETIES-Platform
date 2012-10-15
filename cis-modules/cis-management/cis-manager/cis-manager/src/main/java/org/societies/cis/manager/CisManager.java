@@ -281,10 +281,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient);
-			 element.setPrivacyDataManager(privacyDataManager);
-			 element.setiServCtrlRemote(this.iServCtrlRemote);
-			 element.setiServDiscRemote(this.iServDiscRemote);
+			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient,
+					 this.iServCtrlRemote, this.privacyDataManager,this.iServDiscRemote);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
