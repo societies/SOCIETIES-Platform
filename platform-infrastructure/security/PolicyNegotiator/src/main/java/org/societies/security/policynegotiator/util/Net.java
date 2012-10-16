@@ -35,6 +35,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -97,7 +98,7 @@ public class Net {
 	
 	public boolean post(String fileName, URI destination) {
 
-		LOG.debug("About to upload file {}", fileName);
+		LOG.debug("About to post file {}", fileName);
 
         HttpClient httpclient = new DefaultHttpClient();
 
@@ -124,6 +125,45 @@ public class Net {
             EntityUtils.consume(resEntity);
         } catch (IOException e) {
         	LOG.warn("post(): " + fileName, e);
+        	return false;
+        } finally {
+			try {
+				httpclient.getConnectionManager().shutdown();
+			} catch (Exception e) {
+			}
+        }
+        return true;
+	}
+	
+	public boolean put(String fileName, URI destination) {
+
+		LOG.debug("About to put file {}", fileName);
+
+        HttpClient httpclient = new DefaultHttpClient();
+
+        try {
+            HttpPut httpput = new HttpPut(destination);
+
+            FileBody bin = new FileBody(new File(fileName));
+            StringBody comment = new StringBody("A binary file of some kind");
+
+            MultipartEntity reqEntity = new MultipartEntity();
+            reqEntity.addPart("bin", bin);
+            reqEntity.addPart("comment", comment);
+
+            httpput.setEntity(reqEntity);
+
+            LOG.debug("Executing request {}", httpput.getRequestLine());
+            HttpResponse response = httpclient.execute(httpput);
+            HttpEntity resEntity = response.getEntity();
+
+            LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (resEntity != null) {
+            	LOG.debug("Response content length: " + resEntity.getContentLength());
+            }
+            EntityUtils.consume(resEntity);
+        } catch (IOException e) {
+        	LOG.warn("put(): " + fileName, e);
         	return false;
         } finally {
 			try {

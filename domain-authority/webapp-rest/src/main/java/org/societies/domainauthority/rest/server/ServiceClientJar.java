@@ -26,11 +26,14 @@ package org.societies.domainauthority.rest.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -38,6 +41,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.UrlPath;
@@ -76,7 +84,7 @@ public class ServiceClientJar {
 
 		//String path = name + ".jar";
 
-		LOG.debug("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		LOG.info("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
 		
 		byte[] file;
 		
@@ -101,7 +109,6 @@ public class ServiceClientJar {
 	/**
      * Method processing HTTP POST requests.
      */
-	//@Path("{name}.jar")
 	@Path("{name}")
     @POST
     public void postIt(@PathParam("name") String name,
@@ -111,15 +118,57 @@ public class ServiceClientJar {
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
     		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
 
-		LOG.debug("HTTP POST: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+		LOG.info("HTTP POST: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
+    }
 
+	/**
+     * Method processing HTTP PUT requests.
+     */
+	@Path("{name}")
+    @PUT
+    public void puIt(@PathParam("name") String name,
+    		InputStream is,
+    		@Context HttpServletRequest request,
+    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
+
+		LOG.info("HTTP PUT: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+
+		// Create a factory for disk-based file items
+		FileItemFactory factory = new DiskFileItemFactory();
+
+		// Create a new file upload handler
+		ServletFileUpload upload = new ServletFileUpload(factory);
+
+		// Parse the request
+		List<FileItem> items;
 		try {
-			//Files.writeFile(is, path);
-			Files.writeFile(request.getInputStream(), path);
-		} catch (IOException e) {
-			LOG.warn("Could not write to file {}", path, e);
-			// Return HTTP status code 500 - Internal Server Error
-			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			items = upload.parseRequest(request);
+		} catch (FileUploadException e) {
+			throw new WebApplicationException(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		
+		// Process the uploaded items
+		Iterator iter = items.iterator();
+		while (iter.hasNext()) {
+		    FileItem item = (FileItem) iter.next();
+
+		    if (item.isFormField()) {
+		        // Process FormField;
+		    } else {
+		        // Process Uploaded File
+		    	LOG.debug("Saving to file {}", path);
+				try {
+					//Files.writeFile(is, path);
+					Files.writeFile(item.getInputStream(), path);
+				} catch (IOException e) {
+					LOG.warn("Could not write to file {}", path, e);
+					// Return HTTP status code 500 - Internal Server Error
+					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
+		    }
 		}
     }
 }

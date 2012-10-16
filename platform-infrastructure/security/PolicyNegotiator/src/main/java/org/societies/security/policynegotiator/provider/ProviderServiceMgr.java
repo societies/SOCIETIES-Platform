@@ -92,6 +92,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
+		LOG.info("addService({}, ..., {}, List<String> files)", serviceId, fileServer);
+		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
 		String dataToSign;
@@ -132,12 +134,10 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			URL[] fileUrls, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
+		LOG.info("addService({}, ..., {}, URL[] files)", serviceId, fileServer);
+
 		List<String> files = new ArrayList<String>();
 		String tmpFile ="3p-service.tmp";
-		
-		// TODO: upload the files to REST server
-		LOG.warn("Automatic file upload is not supported yet. You still have to manually place " +
-				"the files (e.g. service client jar) to the domain authority node.");
 		
 		for (URL f : fileUrls) {
 			files.add(f.getPath());
@@ -156,19 +156,21 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				LOG.warn("Could not generate URI from {}", fileServer);
 				throw new NegotiationException(e);
 			}
-			net.post(tmpFile, server);
+			net.put(tmpFile, server);
 		}
 
 		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 
 	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
-		
+
+		LOG.info("addService({}, ..., {}, String file)", serviceId, fileServer);
+
 		List<String> files = new ArrayList<String>();
 		files.add(clientJarFilePath);
-		addService(serviceId, slaXml, clientJarServer, files, callback);
+		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 	
 	@Override
