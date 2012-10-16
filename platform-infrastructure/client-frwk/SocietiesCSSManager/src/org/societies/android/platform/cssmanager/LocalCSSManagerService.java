@@ -125,7 +125,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
-		this.binder = new LocalBinder();
+		this.binder = new LocalCSSManagerBinder();
 
 		this.cssRecord = null;
 		
@@ -142,7 +142,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	/**
 	 * Create Binder object for local service invocation
 	 */
-	 public class LocalBinder extends Binder {
+	 public class LocalCSSManagerBinder extends Binder {
 		 public LocalCSSManagerService getService() {
 	            return LocalCSSManagerService.this;
 	        }

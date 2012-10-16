@@ -38,7 +38,9 @@ import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
-import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
+import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalCSSManagerBinder;
+import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
+import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
 import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.utilities.DBC.Dbc;
@@ -119,7 +121,7 @@ public class PluginCSSManager extends Plugin {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
         	//get a local binder
-            LocalBinder binder = (LocalBinder) service;
+        	LocalCSSManagerBinder binder = (LocalCSSManagerBinder) service;
             //obtain the service's API
             localCSSManager = (IAndroidCSSManager) binder.getService();
             connectedtoCSSManager = true;
@@ -141,14 +143,14 @@ public class PluginCSSManager extends Plugin {
     private ServiceConnection cssDirectoryConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from LocalCSSManager service");
+        	Log.d(LOG_TAG, "Disconnecting from LocalCSSDirectory service");
         	serviceCssDirConnected = false;
         }
 
         public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
+        	Log.d(LOG_TAG, "Connecting to LocalCSSDirectory service");
         	//GET LOCAL BINDER
-            LocalBinder binder = (LocalBinder) service;
+        	LocalCssDirectoryBinder binder = (LocalCssDirectoryBinder) service;
             //OBTAIN  ICssDirectory API
             serviceCssDir = (IAndroidCssDirectory) binder.getService();
             serviceCssDirConnected = true;
@@ -159,11 +161,13 @@ public class PluginCSSManager extends Plugin {
      * Bind to the target service
      */
     private void initialiseServiceBinding() {
-    	//Create intent to select service to bind to
-    	Intent intent = new Intent(this.ctx.getContext(), LocalCSSManagerService.class);
-    	//bind to the service
-    	this.ctx.getContext().bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
-    	this.ctx.getContext().bindService(intent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
+    	//Create intent to bind to CSSManager
+    	Intent cssManagerintent = new Intent(this.ctx.getContext(), LocalCSSManagerService.class);
+    	this.ctx.getContext().bindService(cssManagerintent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
+
+    	//Create intent to bind to CSSDirectory
+    	Intent cssDirectoryintent = new Intent(this.ctx.getContext(), LocalCssDirectoryService.class);
+    	this.ctx.getContext().bindService(cssDirectoryintent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
 
     	//register broadcast receiver to receive CSSManager return values 
         IntentFilter intentFilter = new IntentFilter() ;
@@ -187,8 +191,13 @@ public class PluginCSSManager extends Plugin {
      */
     private void disconnectServiceBinding() {
     	if (connectedtoCSSManager) {
-    		Log.d(LOG_TAG,"Still connected - disconnecting service");
+    		Log.d(LOG_TAG,"Still connected - disconnecting CSSManager service");
     		this.ctx.getContext().unbindService(ccsManagerConnection);
+    	}
+    	
+    	if (serviceCssDirConnected) {
+    		Log.d(LOG_TAG,"Still connected - disconnecting CSSDirectory service");
+    		this.ctx.getContext().unbindService(cssDirectoryConnection);
     	}
     }
 	
