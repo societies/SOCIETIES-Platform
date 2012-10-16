@@ -67,6 +67,7 @@ import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.user.db.impl.model.CtxQualityDAO;
 import org.societies.context.user.db.impl.model.IndividualCtxEntityDAO;
 import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
+import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -451,6 +452,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public CtxModelObject retrieve(CtxIdentifier id) throws CtxException {
 
@@ -464,22 +466,26 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
             	dao = this.retrieve(CtxEntityDAO.class, id);
             	if (dao == null)
             		break;
-            	/////////// UGLY & QND HACK ALERT BEGIN //////////////////
             	final Session session = this.sessionFactory.openSession();
-            	final Query query = session.createQuery("from CtxAssociationDAO");
-            	try { 
-            		@SuppressWarnings("unchecked")
-            		final List<CtxAssociationDAO> associations = query.list();
-            		for (final CtxAssociationDAO association : associations)
-            			if (id.equals(association.getParentEntity()) 
-            					|| association.getChildEntities().contains(id))
-            					((CtxEntityDAO) dao).addAssociation(association.getId());
+            	try {
+            		final Set<CtxAssociationIdentifier> associationIds = 
+            				new HashSet<CtxAssociationIdentifier>();
+            		// Retrieve CtxAssociationIds where this entity is parent
+            		Query query = session.getNamedQuery("getCtxAssociationIdsByParentEntityId");
+            		query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
+            				Hibernate.custom(CtxEntityIdentifierType.class));
+            		associationIds.addAll(query.list());
+            		// Retrieve CtxAssociationIds where this entity is child
+            		query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
+            		query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
+            				Hibernate.custom(CtxEntityIdentifierType.class));
+            		associationIds.addAll(query.list());
+            		((CtxEntityDAO) dao).setAssociations(associationIds);
             					
             	} finally {
             		if (session != null)
             			session.close();
             	}
-            	/////////// UGLY & QND HACK ALERT END //////////////////
             	break;
             	
         	case ATTRIBUTE:	
