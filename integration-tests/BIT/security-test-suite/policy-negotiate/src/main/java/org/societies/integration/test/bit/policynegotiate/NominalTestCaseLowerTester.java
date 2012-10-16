@@ -99,17 +99,17 @@ public class NominalTestCaseLowerTester {
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
 		
-//		List<String> files0 = new ArrayList<String>();
-//		invokeAddService(SERVICE_ID_1, files0);
-//
-//		List<String> files1 = new ArrayList<String>();
-//		files1.add(SERVICE_CLIENT_FILENAME);
-//		invokeAddService(SERVICE_ID_2, files1);
-//
-//		List<String> files2 = new ArrayList<String>();
-//		files2.add(SERVICE_CLIENT_FILENAME);
-//		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
-//		invokeAddService(SERVICE_ID_3, files2);
+		List<String> files0 = new ArrayList<String>();
+		invokeAddService(SERVICE_ID_1, files0);
+
+		List<String> files1 = new ArrayList<String>();
+		files1.add(SERVICE_CLIENT_FILENAME);
+		invokeAddService(SERVICE_ID_2, files1);
+
+		List<String> files2 = new ArrayList<String>();
+		files2.add(SERVICE_CLIENT_FILENAME);
+		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
+		invokeAddService(SERVICE_ID_3, files2);
 		
 		URL[] filesUrl = new URL[1];
 		//filesUrl[0] = new URL("file:///home/mitjav/sw/OD_DRUGIH/virgo-tomcat-server-3.0.3.RELEASE/" + SERVICE_ADDITIONAL_RESOURCE_FILENAME);
@@ -153,14 +153,14 @@ public class NominalTestCaseLowerTester {
 		LOG.info("Adding service {}", serviceId);
 		
 		String directory = LocalPath.PATH_3P_SERVICES + File.separator +
-				removeUnsupportedChars(serviceId) + File.separator;
+				FileName.removeUnsupportedChars(serviceId) + File.separator;
 		File file;
 		String basename;
 		String[] fileNames = new String[files.length];
 		
 		for (int k = 0; k < files.length; k++) {
 		
-			basename = getBasename(files[k].getPath());
+			basename = FileName.getBasename(files[k].getPath());
 			LOG.debug("File basename: {}", basename);
 			fileNames[k] = directory + basename;
 
@@ -185,13 +185,11 @@ public class NominalTestCaseLowerTester {
 		}
 	}
 	
-	private static String getBasename(String path) {
-		return path.replaceAll(".*/", "").replaceAll(".*\\\\", "");
+	@Test
+	public void testFoo() {
+		// Empty test, so the integration test can run even if all tests are disabled and only initialization is performed
 	}
 	
-	private static String removeUnsupportedChars(String path) {
-		return path.replaceAll("[^a-zA-Z-_\\.\\\\ ,\\[\\]\\(\\)\\{\\}]", "_");
-	}
 
 	/**
 	 * Try to consume the service
@@ -353,7 +351,7 @@ public class NominalTestCaseLowerTester {
 	 * @throws IOException 
 	 * @throws MalformedURLException 
 	 */
-	//@Test
+	@Test
 	public void testServiceClientDownload() throws InterruptedException, URISyntaxException,
 			MalformedURLException, IOException {
 

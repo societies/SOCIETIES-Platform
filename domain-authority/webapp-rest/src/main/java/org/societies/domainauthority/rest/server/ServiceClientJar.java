@@ -24,6 +24,7 @@
  */
 package org.societies.domainauthority.rest.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -48,8 +49,10 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
+import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
 
 /**
@@ -95,7 +98,7 @@ public class ServiceClientJar {
 		}
 		
 		try {
-			file = Files.getBytesFromFile(path);
+			file = Files.getBytesFromFile(get3PServicePath(serviceId) + path);
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
 			// Return HTTP status code 500 - Internal Server Error
@@ -162,7 +165,7 @@ public class ServiceClientJar {
 		    	LOG.debug("Saving to file {}", path);
 				try {
 					//Files.writeFile(is, path);
-					Files.writeFile(item.getInputStream(), path);
+					Files.writeFile(item.getInputStream(), get3PServicePath(serviceId) + path);
 				} catch (IOException e) {
 					LOG.warn("Could not write to file {}", path, e);
 					// Return HTTP status code 500 - Internal Server Error
@@ -171,4 +174,11 @@ public class ServiceClientJar {
 		    }
 		}
     }
+	
+	private String get3PServicePath(String serviceId) {
+		
+		serviceId = FileName.removeUnsupportedChars(serviceId);
+		
+		return LocalPath.PATH_3P_SERVICES + File.separator + serviceId + File.separator;
+	}
 }

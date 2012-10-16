@@ -24,6 +24,7 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -44,6 +45,7 @@ import org.societies.api.internal.security.policynegotiator.NegotiationException
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
 
 /**
@@ -138,9 +140,11 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 		List<String> files = new ArrayList<String>();
 		String tmpFile ="3p-service.tmp";
+		String fileName;
 		
 		for (URL f : fileUrls) {
-			files.add(f.getPath());
+			fileName = FileName.getBasename(f.getPath());
+			files.add(fileName);
 			
 			Net net = new Net(f);
 			if (!net.download(tmpFile)) {
@@ -148,7 +152,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			}
 			URI server;
 			String uploadUri;
-			uploadUri = uriForFileUpload(fileServer.toASCIIString(), f.getPath().replaceFirst("^/", ""),
+			uploadUri = uriForFileUpload(fileServer.toASCIIString(), fileName,
 					serviceId.getIdentifier(), "FIXMEpublicKey");
 			try {
 				server = new URI(uploadUri);
@@ -157,6 +161,10 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				throw new NegotiationException(e);
 			}
 			net.put(tmpFile, server);
+		}
+		if (fileUrls != null && fileUrls.length > 0) {
+			File tmp = new File(tmpFile);
+			tmp.delete();
 		}
 
 		addService(serviceId, slaXml, fileServer, files, callback);

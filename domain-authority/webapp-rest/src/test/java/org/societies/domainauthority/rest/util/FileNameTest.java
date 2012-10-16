@@ -68,6 +68,10 @@ public class FileNameTest {
 	 */
 	@Test
 	public void testRemoveUnsupportedChars() {
-		assertEquals("aa_bb_cc.dd__ee", FileName.removeUnsupportedChars("aa/bb\\cc.dd/:ee"));
+		assertEquals("a1_bb.cc", FileName.removeUnsupportedChars("a1:bb.cc"));
+		assertEquals("a2_bb.cc", FileName.removeUnsupportedChars("a2/bb.cc"));
+		assertEquals("a3_bb.cc", FileName.removeUnsupportedChars("a3\\bb.cc"));
+		assertEquals("a4. ,[](){}bb.cc", FileName.removeUnsupportedChars("a4. ,[](){}bb.cc"));
+		assertEquals("a5_bb_cc.dd__ee", FileName.removeUnsupportedChars("a5/bb\\cc.dd/:ee"));
 	}
 }
