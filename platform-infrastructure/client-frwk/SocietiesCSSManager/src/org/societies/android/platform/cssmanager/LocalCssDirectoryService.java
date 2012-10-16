@@ -65,7 +65,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalBinder();
+		this.binder = new LocalCssDirectoryBinder();
 		
 		Log.d(LOG_TAG, "CssDirectory service starting");
 	}
@@ -78,7 +78,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 	/**
 	 * Create Binder object for local service invocation
 	 */
-	 public class LocalBinder extends Binder {
+	 public class LocalCssDirectoryBinder extends Binder {
 		 public LocalCssDirectoryService getService() {
 	            return LocalCssDirectoryService.this;
 	        }
