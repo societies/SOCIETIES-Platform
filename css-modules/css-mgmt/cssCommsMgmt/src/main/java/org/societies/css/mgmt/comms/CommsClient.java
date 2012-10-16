@@ -712,7 +712,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			
 			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
 			messageBean.setRequestStatus(request.getRequestStatus());
-			//messageBean.setTargetCssId(stanza.getFrom().toString());
+			messageBean.setTargetCssId(stanza.getFrom().toString());
 
 			try {
 				this.commManager.sendMessage(stanza, messageBean);
