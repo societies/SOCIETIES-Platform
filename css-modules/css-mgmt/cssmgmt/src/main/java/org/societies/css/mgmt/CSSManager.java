@@ -1466,6 +1466,16 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					request.setOrigin(CssRequestOrigin.REMOTE);
 					cssManagerRemote.acceptCssFriendRequest(request); 
 			}
+			if (request.getOrigin() == CssRequestOrigin.REMOTE)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					cssManagerRemote.updateCssFriendRequest(request); 
+			}
 		}
 }
 

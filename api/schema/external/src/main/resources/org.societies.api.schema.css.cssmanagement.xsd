@@ -30,6 +30,8 @@
 				<xs:element name="profile" type="tns:cssRecord"
 					minOccurs="0" />
 				<xs:element name="requestStatus" type="tns:cssRequestStatusType"
+					minOccurs="0" />
+				<xs:element name="targetCssId" type="xs:string"
 					minOccurs="0" />	
 			</xs:sequence>
 		</xs:complexType>
@@ -135,6 +137,7 @@
 			<xs:enumeration value="suggestedFriends" />
 			<xs:enumeration value="getFriendRequests" />
 			<xs:enumeration value="acceptCssFriendRequest" />
+			<xs:enumeration value="acceptCssFriendRequestInternal" />
 
 		</xs:restriction>
 	</xs:simpleType>
