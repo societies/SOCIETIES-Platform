@@ -146,8 +146,7 @@ jQuery(function() {
  * @returns null
  */
 
-
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#index', function(event) {
 
 	console.log("jQuery pageinit action(s) for mainpage");
 

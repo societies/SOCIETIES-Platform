@@ -110,7 +110,7 @@ var SocietiesActiveServices = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#activeServices', function(event) {
 
 	console.log("jQuery pageinit action(s) for activeservices");
 
@@ -131,51 +131,51 @@ $(document).bind('pageinit',function(){
  * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pagechange
  * @returns null
  */
-$(document).bind("pagechange", function(event, options) {
-	//$("div[data-role*='page'] [id='activeServices']")$(document).on('pagechange',function(){
-
-		console.log("jQuery pagechange action(s) for activeservices");
-		console.log("to page: " + options.toPage[0].id);
-//		if (options.toPage[0].id === "activeServices"){
-//			$('ul#activeServicesList').listview();
+//$(document).bind("pagechange", function(event, options) {
+//	//$("div[data-role*='page'] [id='activeServices']")$(document).on('pagechange',function(){
 //
-//		}
-});
+//		console.log("jQuery pagechange action(s) for activeservices");
+//		console.log("to page: " + options.toPage[0].id);
+////		if (options.toPage[0].id === "activeServices"){
+////			$('ul#activeServicesList').listview();
+////
+////		}
+//});
 
-$(document).bind("pagebeforechange", function(event, options) {
-
-	console.log("jQuery pagechange action(s) for activeservices");
-});
-
-$(document).bind("pagebeforeload", function(event, options) {
-
-	console.log("jQuery pagebeforeload action(s) for activeservices");
-});
-
-$(document).bind("pageload", function(event, options) {
-
-	console.log("jQuery pageload action(s) for activeservices");
-});
-
-$(document).bind("pagebeforeshow", function(event, options) {
-
-	console.log("jQuery pagebeforeshow action(s) for activeservices");
-});
-
-$(document).bind("pageshow", function(event, options) {
-
-	console.log("jQuery pageshow action(s) for activeservices");
-});
-
-$(document).bind("pagebeforecreate", function(event, options) {
-
-	console.log("jQuery pagebeforecreate action(s) for activeservices");
-});
-
-$(document).bind("pagecreate", function(event, options) {
-
-	console.log("jQuery pagecreate action(s) for activeservices");
-});
+//$(document).bind("pagebeforechange", function(event, options) {
+//
+//	console.log("jQuery pagechange action(s) for activeservices");
+//});
+//
+//$(document).bind("pagebeforeload", function(event, options) {
+//
+//	console.log("jQuery pagebeforeload action(s) for activeservices");
+//});
+//
+//$(document).bind("pageload", function(event, options) {
+//
+//	console.log("jQuery pageload action(s) for activeservices");
+//});
+//
+//$(document).bind("pagebeforeshow", function(event, options) {
+//
+//	console.log("jQuery pagebeforeshow action(s) for activeservices");
+//});
+//
+//$(document).bind("pageshow", function(event, options) {
+//
+//	console.log("jQuery pageshow action(s) for activeservices");
+//});
+//
+//$(document).bind("pagebeforecreate", function(event, options) {
+//
+//	console.log("jQuery pagebeforecreate action(s) for activeservices");
+//});
+//
+//$(document).bind("pagecreate", function(event, options) {
+//
+//	console.log("jQuery pagecreate action(s) for activeservices");
+//});
 
 
 

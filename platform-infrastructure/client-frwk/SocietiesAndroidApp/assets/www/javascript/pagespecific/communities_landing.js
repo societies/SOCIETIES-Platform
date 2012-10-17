@@ -33,7 +33,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @returns null
  */
 
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#communities-landing', function(event) {
 
 	console.log("communities landing pageinit action(s)");
 	

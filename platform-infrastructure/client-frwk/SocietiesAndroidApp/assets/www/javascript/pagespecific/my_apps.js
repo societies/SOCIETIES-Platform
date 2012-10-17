@@ -159,7 +159,7 @@ var Societies3PServices = {
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#my_apps', function(event) {
 
 	$("input#start_stop").off('click').on('click', function(e){
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.startStopService);
