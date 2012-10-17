@@ -224,7 +224,6 @@ $(document).on('pageinit', '#my-friends-list', function(event) {
 		}
 	});
 
-	/*
 	$("form#formCSSDirSearch").submit(function(e) {
 		var search = $("#search-friends").val();
 		if (search != "Search Friends" && search != "") 
@@ -234,5 +233,4 @@ $(document).on('pageinit', '#my-friends-list', function(event) {
 		e.preventDefault();
 		return false;
 	});
-	*/
 });
