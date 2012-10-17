@@ -467,21 +467,49 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
             	if (dao == null)
             		break;
             	final Session session = this.sessionFactory.openSession();
+            	Query query;
+            	// CtxAssociations where this entity is member of
+            	final Set<CtxAssociationIdentifier> associationIds = 
+    					new HashSet<CtxAssociationIdentifier>();
             	try {
-            		final Set<CtxAssociationIdentifier> associationIds = 
-            				new HashSet<CtxAssociationIdentifier>();
-            		// Retrieve CtxAssociationIds where this entity is parent
-            		Query query = session.getNamedQuery("getCtxAssociationIdsByParentEntityId");
-            		query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
-            				Hibernate.custom(CtxEntityIdentifierType.class));
-            		associationIds.addAll(query.list());
-            		// Retrieve CtxAssociationIds where this entity is child
-            		query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
-            		query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
-            				Hibernate.custom(CtxEntityIdentifierType.class));
-            		associationIds.addAll(query.list());
+            		if (dao instanceof IndividualCtxEntityDAO) {
+
+            			final Set<CtxEntityIdentifier> communityIds = 
+            					new HashSet<CtxEntityIdentifier>();
+            			// Retrieve CtxAssociations where this entity is parent
+            			query = session.getNamedQuery("getCtxAssociationsByParentEntityId");
+            			query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			final List<CtxAssociationDAO> associations = query.list();
+            			for (final CtxAssociationDAO association : associations) {
+            				associationIds.add(association.getId());
+            				if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
+            					communityIds.addAll(association.getChildEntities());
+            			}
+            			((IndividualCtxEntityDAO) dao).setCommunities(communityIds);
+            			
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			
+            		} else if (dao instanceof CtxEntityDAO) {
+
+            			// Retrieve CtxAssociationIds where this entity is parent
+            			query = session.getNamedQuery("getCtxAssociationIdsByParentEntityId");
+            			query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            		}
+            		
             		((CtxEntityDAO) dao).setAssociations(associationIds);
-            					
+            		
             	} finally {
             		if (session != null)
             			session.close();

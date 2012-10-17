@@ -91,7 +91,7 @@ public final class CtxModelDAOTranslator {
 		
 		final IndividualCtxEntity mo = CtxModelObjectFactory.getInstance()
 				.createIndividualEntity(dao.getId(), dao.getLastModified(),
-						attributes, dao.getAssociations());
+						attributes, dao.getAssociations(), dao.getCommunities());
 		
 		return mo;
 	}
