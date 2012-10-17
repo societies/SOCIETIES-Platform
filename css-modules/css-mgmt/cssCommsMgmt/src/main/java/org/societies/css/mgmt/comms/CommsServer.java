@@ -292,6 +292,17 @@ public class CommsServer implements IFeatureServer {
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssRequest(request);
 			break;
+			case ACCEPT_CSS_FRIEND_REQUEST_INTERNAL:
+				
+				String targetcssId = bean.getTargetCssId();
+				request.setCssIdentity(targetcssId);
+								
+				LOG.info("ACCEPT_CSS_FRIEND_REQUEST_INTERNAL COMMSServer targetcssId " +targetcssId);
+				
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				this.cssManager.acceptCssFriendRequest(request);
+			break;
 			case ACCEPT_CSS_FRIEND_REQUEST:
 				receivedID = stanza.getFrom();
 				//TODO: REPLACE WITH NEW IDENTITY FUNCTION

@@ -69,6 +69,7 @@ var	SocietiesCISListService = {
 		if ( communityObj ) {
 			//VALID SERVICE OBJECT
 			mCis_id = communityObj.communityJid;
+			$('input#cis_id').val(mCis_id);
 			var markup = "<h1>" + communityObj.communityName + "</h1>" + 
 						 "<p>Type: " + communityObj.communityType + "</p>" + 
 						 "<p>" + communityObj.description + "</p>" + 
@@ -87,7 +88,7 @@ var	SocietiesCISListService = {
 			SocietiesCISListService.showCISMembers(communityObj.communityJid);
 			ServiceManagementServiceHelper.connectToServiceManagement(function() {
 								SocietiesCISListService.showCISServices(communityObj.communityJid); }
-								)
+								);
 			SocietiesCISListService.createSelectServices();
 		}
 	},
@@ -99,44 +100,46 @@ var	SocietiesCISListService = {
 			while( $('ul#cis_activity_feed').children().length >0 )
 				$('ul#cis_activity_feed li:last').remove();
 			
-			for (i=data.length-1; i >= 0 ; i--) {
-				//HEADER
-				var d = new Date();
-				d.setTime(data[i].published); 
-				var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
-				if (mLastDate != dateStr) {
-					mLastDate = dateStr;
-					$('ul#cis_activity_feed').append("<li data-role=\"list-divider\">" + dateStr + "</li>" );
+			if(data.length > 0) {
+				for (i=data.length-1; i >= 0 ; i--) {
+					//HEADER
+					var d = new Date();
+					d.setTime(data[i].published); 
+					var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+					if (mLastDate != dateStr) {
+						mLastDate = dateStr;
+						$('ul#cis_activity_feed').append("<li data-role=\"list-divider\">" + dateStr + "</li>" );
+					}
+					//DATA
+					var hours = d.getHours(),
+					    minutes = d.getMinutes();
+					if (minutes < 10)
+						minutes = "0" + minutes	
+					var suffix = "AM";
+					if (hours >= 12) {
+						suffix = "PM";
+						hours = hours - 12;
+					}
+					if (hours == 0)
+						hours = 12;
+					//BODY FORMATTING
+					var n=data[i].actor.indexOf(".");
+					var actorStr = data[i].actor.substring(0, n);
+					var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
+									 "<p>"+ actorStr + " " +
+						 	 		 data[i].verb  + " " + 
+						 	 		 data[i].object + "</p></li>";
+					$('ul#cis_activity_feed').append(tableEntry);
 				}
-				//DATA
-				var hours = d.getHours(),
-				    minutes = d.getMinutes();
-				if (minutes < 10)
-					minutes = "0" + minutes	
-				var suffix = "AM";
-				if (hours >= 12) {
-					suffix = "PM";
-					hours = hours - 12;
-				}
-				if (hours == 0)
-					hours = 12;
-				//BODY FORMATTING
-				var n=data[i].actor.indexOf(".");
-				var actorStr = data[i].actor.substring(0, n);
-				var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
-								 "<p>"+ actorStr + " " +
-					 	 		 data[i].verb  + " " + 
-					 	 		 data[i].object + "</p></li>";
-				$('ul#cis_activity_feed').append(tableEntry);
+				//STORE MOST RECENT DATE - HELPS ADDING
+				var recent = new Date();
+				recent.setTime(data[data.length-1].published);
+				mLastDate = recent.getFullYear() + "-" + (recent.getMonth()+1) + "-" + recent.getDate();
 			}
 			$('ul#cis_activity_feed').listview('refresh');
 			//EXPAND LIST IF SHORT
 			//if (data.length <3)
 			//	$('ul#cis_activity_feed').trigger( "expand" );
-			//STORE MOST RECENT DATE - HELPS ADDING
-			var recent = new Date();
-			recent.setTime(data[data.length-1].published);
-			mLastDate = recent.getFullYear() + "-" + (recent.getMonth()+1) + "-" + recent.getDate();
 		}
 		
 		function failure(data) {
@@ -169,6 +172,7 @@ var	SocietiesCISListService = {
 	addCISActivity: function() {
 		function success(data) {
 			//HEADER
+			mLastDate = $('input#last_date').val();
 			var currentDateTime = new Date(), 
 				headerText = currentDateTime.getFullYear() + "-" + (currentDateTime.getMonth()+1) + "-" + currentDateTime.getDate();
 			if (headerText != mLastDate) {
@@ -202,6 +206,7 @@ var	SocietiesCISListService = {
 			alert("Error occuring posting: " + data);
 		}
  
+		mCis_id = $('input#cis_id').val();
 		var activity = {
  				"actor": "",
  				"verb": "posted",
@@ -283,9 +288,6 @@ var	SocietiesCISListService = {
 	shareService: function() {
 		
 		function success(data) {
-			//ADD SERVICE TO LIST OF SHARED SERVICES
-			mCisServices.push(serviceObj);
-
 			//var tableEntry = '<li><a href="#" onclick="Societies3PServices.installService(' + (mCisServices.length - 1) + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
 			var tableEntry = '<li><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
 				'<h2>' + serviceObj.serviceName + '</h2>' + 
@@ -304,9 +306,13 @@ var	SocietiesCISListService = {
 			serviceObj;
 		
 		if (servicePos != "0000") { //"Select a Service"
+			mCis_id = $('input#cis_id').val();
 			serviceObj = mMyServices[servicePos];
-			if (confirm("Share service: " + serviceName + " to this community?"))
+			if (confirm("Share service: " + serviceName + " to this community?")) {
 				window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
+				//ADD SERVICE TO LIST OF SHARED SERVICES
+				mCisServices.push(serviceObj);
+			}
 			else
 				$('select#selShareService').attr('selectedIndex', 0);
 		}
