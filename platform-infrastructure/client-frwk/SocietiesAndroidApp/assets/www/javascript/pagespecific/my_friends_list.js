@@ -192,7 +192,7 @@ var CSSFriendsServices = {
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#my-friends-list', function(event) {
 
 	console.log("pageinit: MyFriends jQuery calls");
 	
