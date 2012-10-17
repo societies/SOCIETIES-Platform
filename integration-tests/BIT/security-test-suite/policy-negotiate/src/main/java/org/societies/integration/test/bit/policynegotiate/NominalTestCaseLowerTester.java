@@ -2,6 +2,7 @@ package org.societies.integration.test.bit.policynegotiate;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -23,6 +24,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -42,15 +44,17 @@ public class NominalTestCaseLowerTester {
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
 	
 	private static final String SERVICE_CLIENT_BASENAME = "Calculator.jar";
+	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME2 = "META-INF/spring/bundle-context.xml";
 	// External requirement: service client jar filename may start with "/"
-	private static final String SERVICE_CLIENT_FILENAME = "/3p-service/" + SERVICE_CLIENT_BASENAME;
-	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = "3p-service/" + "foo.bar";
+	private static final String SERVICE_CLIENT_FILENAME = "/" + LocalPath.PATH_3P_SERVICES + SERVICE_CLIENT_BASENAME;
+//	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = LocalPath.PATH_3P_SERVICES + "/" + "foo.bar";
 	
 	private static final String SERVER_HOSTNAME = "http://localhost:8080";
 	
-	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
-	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
-	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
+//	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
+//	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
+//	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
+	private static final String SERVICE_ID_4 = "http://localhost/societies/services/service-4";
 	
 	private static INegotiation negotiator;
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
@@ -97,17 +101,23 @@ public class NominalTestCaseLowerTester {
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
 		
-		List<String> files0 = new ArrayList<String>();
-		invokeAddService(SERVICE_ID_1, files0);
-
-		List<String> files1 = new ArrayList<String>();
-		files1.add(SERVICE_CLIENT_FILENAME);
-		invokeAddService(SERVICE_ID_2, files1);
-
-		List<String> files2 = new ArrayList<String>();
-		files2.add(SERVICE_CLIENT_FILENAME);
-		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
-		invokeAddService(SERVICE_ID_3, files2);
+//		List<String> files0 = new ArrayList<String>();
+//		invokeAddService(SERVICE_ID_1, files0);
+//
+//		List<String> files1 = new ArrayList<String>();
+//		files1.add(SERVICE_CLIENT_FILENAME);
+//		invokeAddService(SERVICE_ID_2, files1);
+//
+//		List<String> files2 = new ArrayList<String>();
+//		files2.add(SERVICE_CLIENT_FILENAME);
+//		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
+//		invokeAddService(SERVICE_ID_3, files2);
+		
+		URL[] filesUrl = new URL[2];
+		filesUrl[0] = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_CLIENT_BASENAME);
+		filesUrl[1] = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_ADDITIONAL_RESOURCE_FILENAME2);
+		LOG.debug("URL = {}", filesUrl[0]);
+		invokeAddService(SERVICE_ID_4, filesUrl);
 	}
 
 	/**
@@ -129,7 +139,7 @@ public class NominalTestCaseLowerTester {
 
 	private static void invokeAddService(String serviceId, List<String> files) throws Exception {
 		
-		LOG.info("Adding service {}", serviceId);
+		LOG.info("invokeAddService({}, {})", serviceId, files);
 		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
 		id.setIdentifier(new URI(serviceId));
 
@@ -140,46 +150,89 @@ public class NominalTestCaseLowerTester {
 		assertTrue(callback.isSuccessful());
 	}
 
+	private static void invokeAddService(String serviceId, URL[] files) throws Exception {
+		
+		LOG.info("invokeAddService({}, {})", serviceId, files);
+		
+		String directory = LocalPath.PATH_3P_SERVICES + File.separator +
+				FileName.removeUnsupportedChars(serviceId) + File.separator;
+		File file;
+		String basename;
+		String[] fileNames = new String[files.length];
+		
+		for (int k = 0; k < files.length; k++) {
+		
+			basename = FileName.getBasename(files[k].getPath());
+			LOG.debug("File basename: {}", basename);
+			fileNames[k] = directory + basename;
+
+			file = new File(fileNames[k]);
+			if (file.exists()) {
+				assertTrue(file.delete());
+			}
+		}
+		
+		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
+		id.setIdentifier(new URI(serviceId));
+
+		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
+		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		Thread.sleep(TIME_TO_WAIT_IN_MS);
+		assertTrue(callback.isInvoked());
+		assertTrue(callback.isSuccessful());
+		
+		for (int k = 0; k < files.length; k++) {
+			file = new File(fileNames[k]);
+			assertTrue("File " + fileNames[k] + " not found", file.exists());
+		}
+	}
+	
+	@Test
+	public void testFoo() {
+		// Empty test, so the integration test can run even if all tests are disabled and only initialization is performed
+	}
+	
+
 	/**
 	 * Try to consume the service
 	 * Part 1: select the service and start it if necessary
 	 * @throws InterruptedException 
 	 * @throws URISyntaxException 
 	 */
-	@Test
-	public void testNegotiationServiceWith0Files() throws InterruptedException, URISyntaxException {
-		
-		LOG.info("[#1001] testNegotiationServiceWith0Files()");
-
-		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity myId = idMgr.getThisNetworkNode();
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setIdentifier(new URI(SERVICE_ID_1));
-		Requestor provider = new RequestorService(myId, serviceId);
-
-		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
-			@Override
-			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
-				LOG.info("onNegotiationComplete({}, {})", agreementKey, fileUris);
-				assertNotNull(agreementKey);
-				assertNotNull(fileUris);
-				assertEquals(0, fileUris.size(), 0.0);
-				callbackInvokedService = true;
-				serviceFiles = fileUris;
-			}
-			@Override
-			public void onNegotiationError(String msg) {
-				fail();
-			}
-		});
-		
-		LOG.debug("[#1001] testNegotiationServiceWith0Files(): negotiation started");
-
-		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationServiceWith0Files(): checking if successful");
-		assertTrue(callbackInvokedService);
-		LOG.info("[#1001] testNegotiationServiceWith0Files(): SUCCESS");
-	}
+//	@Test
+//	public void testNegotiationServiceWith0Files() throws InterruptedException, URISyntaxException {
+//		
+//		LOG.info("[#1001] testNegotiationServiceWith0Files()");
+//
+//		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
+//		IIdentity myId = idMgr.getThisNetworkNode();
+//		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+//		serviceId.setIdentifier(new URI(SERVICE_ID_1));
+//		Requestor provider = new RequestorService(myId, serviceId);
+//
+//		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
+//			@Override
+//			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
+//				LOG.info("onNegotiationComplete({}, {})", agreementKey, fileUris);
+//				assertNotNull(agreementKey);
+//				assertNotNull(fileUris);
+//				assertEquals(0, fileUris.size(), 0.0);
+//				callbackInvokedService = true;
+//				serviceFiles = fileUris;
+//			}
+//			@Override
+//			public void onNegotiationError(String msg) {
+//				fail();
+//			}
+//		});
+//		
+//		LOG.debug("[#1001] testNegotiationServiceWith0Files(): negotiation started");
+//
+//		Thread.sleep(TIME_TO_WAIT_IN_MS);
+//		LOG.info("[#1001] testNegotiationServiceWith0Files(): checking if successful");
+//		assertTrue(callbackInvokedService);
+//		LOG.info("[#1001] testNegotiationServiceWith0Files(): SUCCESS");
+//	}
 
 	@Test
 	public void testNegotiationServiceWith2Files() throws InterruptedException, URISyntaxException {
@@ -189,7 +242,7 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setIdentifier(new URI(SERVICE_ID_3));
+		serviceId.setIdentifier(new URI(SERVICE_ID_4));
 		Requestor provider = new RequestorService(myId, serviceId);
 
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
@@ -200,7 +253,7 @@ public class NominalTestCaseLowerTester {
 				assertNotNull(fileUris);
 				assertEquals(2, fileUris.size(), 0.0);
 				for (URI f : fileUris) {
-					assertTrue( f.toString().contains(UrlPath.BASE + UrlPath.PATH));
+					assertTrue( f.toString().contains(UrlPath.BASE + UrlPath.PATH_FILES));
 					assertTrue( f.toString().contains(UrlPath.URL_PARAM_SERVICE_ID + "="));
 					assertFalse(f.toString().endsWith(UrlPath.URL_PARAM_SERVICE_ID + "="));
 					assertTrue( f.toString().contains(UrlPath.URL_PARAM_SIGNATURE + "="));
@@ -313,15 +366,15 @@ public class NominalTestCaseLowerTester {
 
 		testNegotiationServiceWith2Files();
 
-		if (fileName.startsWith("/")) {
-			fileName = fileName.replaceFirst("/", "");
-		}
-		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
-		assertNotNull(is);
-		Files.writeFile(is, fileName);
-		is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
-		assertNotNull(is);
-		Files.writeFile(is, SERVICE_ADDITIONAL_RESOURCE_FILENAME);
+//		if (fileName.startsWith("/")) {
+//			fileName = fileName.replaceFirst("/", "");
+//		}
+//		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
+//		assertNotNull(is);
+//		Files.writeFile(is, fileName);
+//		is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
+//		assertNotNull(is);
+//		Files.writeFile(is, SERVICE_ADDITIONAL_RESOURCE_FILENAME);
 		
 		// URL with valid signature
 		urlStr = serviceFiles.get(0).toString();
