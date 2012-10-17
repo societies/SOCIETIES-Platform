@@ -84,7 +84,7 @@
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
         <xs:sequence>
-          <xs:element name="parentEntity" type="tns:ctxEntityIdentifierBean" nillable="true"/>
+          <xs:element name="parentEntity" type="tns:ctxEntityIdentifierBean" minOccurs="0"/>
           <xs:element name="childEntities" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
