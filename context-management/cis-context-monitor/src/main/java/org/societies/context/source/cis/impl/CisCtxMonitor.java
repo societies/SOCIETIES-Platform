@@ -154,11 +154,11 @@ public class CisCtxMonitor extends EventListener implements Subscriber {
 			String itemId, Object item) {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Received pubsub event: " + item);
+			LOG.info("Received CIS Activity Feed pubsub event: " + item);
 		
 		if (!(item instanceof Activity)) {
 			
-			LOG.error("Could not handle pubsub event: " 
+			LOG.error("Could not handle CIS Activity Feed pubsub event: " 
 					+ "Expected item of type " + Activity.class.getName()
 					+ " but was " + ((item != null) ? item.getClass() : "null"));
 			return;
@@ -167,15 +167,16 @@ public class CisCtxMonitor extends EventListener implements Subscriber {
 		final String cisIdStr = ((Activity) item).getObject();
 		final String cssIdStr = ((Activity) item).getActor();
 		final String verb = ((Activity) item).getVerb();
-		if (verb.equals(VERB_CSS_JOINED))
+		if (verb.equals(VERB_CSS_JOINED)) {
 			this.executorService.execute(
 					new CisMemberJoinedCtxHandler(cisIdStr, cssIdStr));
-		else if (verb.equals(VERB_CSS_LEFT))
+		} else if (verb.equals(VERB_CSS_LEFT)) {
 			this.executorService.execute(
 					new CisMemberLeftCtxHandler(cisIdStr, cssIdStr));
-		else
-			LOG.error("Could not handle pubsub event: " 
-					+ "Unsupported activity verb '" + verb + "'");
+		} else {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Ignoring CIS Activity Feed pubsub event with verb '" + verb + "'");
+		}
 	}
 	
 	private class CisCreationCtxHandler implements Runnable {
