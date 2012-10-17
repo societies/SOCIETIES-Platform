@@ -217,7 +217,7 @@ public class CisManagerController {
 		//model.put("localCISsArray", localCISs);
 		//model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
-		return new ModelAndView("createnewcis", model);
+		return new ModelAndView("createNewCis", model);
 	}
 
 	
@@ -225,6 +225,8 @@ public class CisManagerController {
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.POST)
 	public ModelAndView cssManager(@Valid CisManagerForm cisForm, BindingResult result, Map model, HttpSession session) {
 
+		boolean displayFormAtResult = true;
+		
 		m_session = session;
 		model.put("message", "Welcome to the CIS Manager Page");
 
@@ -324,22 +326,26 @@ public class CisManagerController {
 				LOG.info(" cisForm.getCssId() is " +  cisForm.getCssId());
 				ad.setCssownerid((null != cisForm.getCssId() && !"".equals(cisForm.getCssId())) ? cisForm.getCssId() : "university.societies.local");
 				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
-				MembershipCrit membershipCrit = new MembershipCrit();
-				List<Criteria> criteria = new ArrayList<Criteria>();
-				Criteria c1 = new Criteria();c1.setAttrib(CtxAttributeTypes.ADDRESS_HOME_CITY);c1.setOperator("equals");c1.setValue1("something");
-				Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.RELIGIOUS_VIEWS);c2.setOperator("equals");c2.setValue1("something");
-				criteria.add(c1);criteria.add(c2);membershipCrit.setCriteria(criteria);
-				ad.setMembershipCrit(membershipCrit);
+				//MembershipCrit membershipCrit = new MembershipCrit();
+				//List<Criteria> criteria = new ArrayList<Criteria>();
+				//Criteria c1 = new Criteria();c1.setAttrib(CtxAttributeTypes.ADDRESS_HOME_CITY);c1.setOperator("equals");c1.setValue1("something");
+				//Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.RELIGIOUS_VIEWS);c2.setOperator("equals");c2.setValue1("something");
+				//criteria.add(c1);criteria.add(c2);membershipCrit.setCriteria(criteria);
+				//ad.setMembershipCrit(membershipCrit);
 				// done setting membership crit
 
 				this.getCisManager().joinRemoteCIS(ad, icall);
 
+				displayFormAtResult = false;
+				
 				//Thread.sleep(5 * 1000);
-				model.put("joinStatus", "pending");//resultCallback);
+				//model.put("joinStatus", "pending");//resultCallback);
 				/*if(!resultCallback.startsWith("Failure") ){
 					ICis i = getCisManager().getCis(cisForm.getCisJid());
 					model.put("cis", i);
 				}*/
+				res = "Join in progress...";
+				model.put("res", res);
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
 				model.put("methodcalled", "LeaveRemoteCIS");
@@ -469,16 +475,21 @@ public class CisManagerController {
 			}
 
 			//ALWAYS RETURN THE LIST OF CIS'S I OWN OR AM MEMBER OF
-			List<ICis> records = this.getCisManager().getCisList();
-			model.put("cisrecords", records);
-
+			// UPDATE, not always
+			if(displayFormAtResult){
+				List<ICis> records = this.getCisManager().getCisList();
+				model.put("cisrecords", records);
+			}
 		} catch (Exception ex) {
 			LOG.error("Error when managing CIS", ex);
 			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
 		}
 
-		model.put("res", res);
-		model.put("cmForm", cisForm);
+		//model.put("res", res);
+		if(displayFormAtResult){
+			LOG.info("going to put form");
+			model.put("cmForm", cisForm);
+		}
 		return new ModelAndView("cismanagerresult", model);
 	}
 
@@ -767,10 +778,19 @@ public class CisManagerController {
 			else {
 				if(communityResultObject.getJoinResponse() != null){
 					if(communityResultObject.getJoinResponse().isResult()){
-						resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
-						this.userFeedback.showNotification("Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
-						remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
-						m_session.setAttribute("community", remoteCommunity);
+						
+						if(null != communityResultObject.getJoinResponse().getCommunity()  && null != communityResultObject.getJoinResponse().getCommunity().getCommunityJid()
+								&& communityResultObject.getJoinResponse().getCommunity().getCommunityJid().isEmpty() == false){							
+							String community = communityResultObject.getJoinResponse().getCommunity().getCommunityJid(); 
+							LOG.info("callback for join regarindg community " + community);
+							this.userFeedback.showNotification("Joined CIS: " + community);
+							resultCallback = "Joined CIS " + community;
+							remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
+							m_session.setAttribute("community", remoteCommunity);
+						}
+						else{
+							resultCallback = "Joined CIS work but community xsd was bogus ";
+						}
 					}else{
 						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
 						this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());

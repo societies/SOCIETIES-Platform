@@ -34,6 +34,9 @@ package org.societies.api.osgi.event;
 
 public class EventTypes {
 
+	/** Used to notify peers that the CSS friend request has been accepted */
+	public static final String CSS_FRIENDED_EVENT = "org/societies/css/friended";
+	
 	/** Used to notify peers that the CSS Record has been modified */
 	public static final String CSS_RECORD_EVENT = "org/societies/css/record";
 	

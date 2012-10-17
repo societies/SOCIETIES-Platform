@@ -34,7 +34,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @returns null
  */
 
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#community-create', function(event) {
 
 	 $('#createCISbutton').off('click').on('click', function() {
 		 SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.CreateCIS);

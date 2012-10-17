@@ -159,6 +159,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
 	@Override
 	public void showNotification(String notificationTxt) {
+		LOG.debug("Received request for notification");
 		//create feedback form
 		FeedbackForm fbForm = generateNotificationForm(notificationTxt);
 		//add new request to queue

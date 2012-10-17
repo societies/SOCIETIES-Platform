@@ -112,7 +112,7 @@ var	SocietiesLocalCISManager = {
 	},
 	
 	findAllCisAdvertisementRecords: function(successCallback, failureCallback) {
-		console.log("findAllCisAdvertisementRecords desktop invoked");
+		console.log("findAllCisAdvertisementRecords invoked");
 		var client = "org.societies.android.platform.gui";
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -123,7 +123,7 @@ var	SocietiesLocalCISManager = {
 	},
 	
 	joinCis: function(cisAdvert, successCallback, failureCallback) {
-		console.log("joinCis desktop invoked");
+		console.log("joinCis invoked");
 		var client = "org.societies.android.platform.gui";
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -145,7 +145,7 @@ var	SocietiesLocalCISManager = {
 	},
 	
 	getMembers: function(cis_id, successCallback, failureCallback) {
-		console.log("getMembers desktop invoked");
+		console.log("getMembers invoked");
 		var client = "org.societies.android.platform.gui";
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -153,6 +153,17 @@ var	SocietiesLocalCISManager = {
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'getMembers',          //Telling the plugin, which action we want to perform
 				[client, cis_id]);        //Passing a list of arguments to the plugin
+	},
+	
+	addActivity: function(cis_id, activity, successCallback, failureCallback) {
+		console.log("addActivity invoked");
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'addActivity',          //Telling the plugin, which action we want to perform
+				[client, cis_id, activity]);        //Passing a list of arguments to the plugin
 	}
 	
 };

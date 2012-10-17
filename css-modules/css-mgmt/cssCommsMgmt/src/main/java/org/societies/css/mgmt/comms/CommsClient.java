@@ -712,6 +712,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			
 			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
 			messageBean.setRequestStatus(request.getRequestStatus());
+			messageBean.setTargetCssId(stanza.getFrom().toString());
 
 			try {
 				this.commManager.sendMessage(stanza, messageBean);
@@ -811,5 +812,11 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void acceptCssFriendRequestInternal(CssRequest arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

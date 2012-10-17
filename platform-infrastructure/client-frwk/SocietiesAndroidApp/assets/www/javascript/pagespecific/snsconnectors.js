@@ -119,7 +119,7 @@ var SocialNetworksConnectors = {
 };
 
 /*
-$(document).bind('pageinit', function(){
+$(document).on('pageinit', '#???', function(event) {
 	console.log("jQuery pageinit action(s) for SNS Connectors");
 	
 	$('select#connectorType').change(function() {

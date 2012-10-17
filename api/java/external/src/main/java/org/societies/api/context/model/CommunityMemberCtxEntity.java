@@ -45,7 +45,7 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	private static final long serialVersionUID = 3614587369237968591L;
 	
 	/** The communities this entity is member of. */
-	private Set<CommunityCtxEntity> communities = new HashSet<CommunityCtxEntity>();
+	private Set<CtxEntityIdentifier> communities = new HashSet<CtxEntityIdentifier>();
 	
 	CommunityMemberCtxEntity(CtxEntityIdentifier id) {
 		
@@ -57,28 +57,18 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	 * 
 	 * @return set CommunityCtxEntity
 	 */
-	public Set<CommunityCtxEntity> getCommunities() {
+	public Set<CtxEntityIdentifier> getCommunities() {
 		
-		return new HashSet<CommunityCtxEntity>(this.communities);
+		return new HashSet<CtxEntityIdentifier>(this.communities);
 	}
 	
 	/**
-	 * Add a CommunityCtxEntity to the community
 	 * 
-	 * @param community
+	 * @param communities
+	 * @since 0.5
 	 */
-	public void addCommunity(CommunityCtxEntity community) {
+	void setCommunities(Set<CtxEntityIdentifier> communities) {
 		
-		this.communities.add(community);
-	}
-	
-	/**
-	 * Remove a CommunityCtxEntity from the community.
-	 * 
-	 * @param community
-	 */
-	public void removeCommunity(CommunityCtxEntity community) {
-		
-		this.communities.remove(community);
+		this.communities = communities;
 	}
 }

@@ -52,7 +52,7 @@ public class CtxEntity extends CtxModelObject {
 	
 	private final Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
 	
-	private final Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
+	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
 	
 	/**
 	 * Constructs a CtxEntity with the specified identifier
@@ -119,6 +119,10 @@ public class CtxEntity extends CtxModelObject {
 		return result;
 	}
 	
+	public void addAttribute(CtxAttribute attribute) {
+        attributes.add(attribute);
+    }
+	
 	/**
 	 * Returns a set containing all association identifiers this entity is
 	 * member of. The method returns an <i>empty</i> set if this entity is not
@@ -162,12 +166,9 @@ public class CtxEntity extends CtxModelObject {
 		return result;
 	}
 	
-	public void addAttribute(CtxAttribute attribute) {
-        attributes.add(attribute);
-    }
-	
-	void addAssociation(CtxAssociationIdentifier association) {
-        associations.add(association);
+	void setAssociations(Set<CtxAssociationIdentifier> associations) {
+        
+		this.associations = associations;
     }
 
 	/* TODO

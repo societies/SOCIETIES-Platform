@@ -36,6 +36,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
+				<!-- User Context DB -->
 				<value>org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxModelObjectDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxEntityDAO</value>
@@ -43,12 +44,21 @@
 				<value>org.societies.context.user.db.impl.model.CtxAttributeDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxAssociationDAO</value>
 				<value>org.societies.context.user.db.impl.model.CtxQualityDAO</value>
+				<!-- Community Context DB -->
+				<value>org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO</value>
+				<value>org.societies.context.community.db.impl.model.CtxModelObjectDAO</value>
+				<value>org.societies.context.community.db.impl.model.CommunityCtxEntityDAO</value>
+				<value>org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO</value>
+				<value>org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO</value>
+				<value>org.societies.context.community.db.impl.model.CommunityCtxQualityDAO</value>
+				<!-- User Context History DB -->
 				<value>org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO</value>
 			</list>
 		</property>
 		<property name="annotatedPackages">
 			<list>
 				<value>org.societies.context.user.db.impl.model</value>
+				<value>org.societies.context.community.db.impl.model</value>
 				<value>org.societies.context.userHistory.impl.model</value>
 			</list>
 		</property>

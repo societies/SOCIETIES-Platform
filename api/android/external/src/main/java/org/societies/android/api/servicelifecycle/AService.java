@@ -25,10 +25,8 @@
 package org.societies.android.api.servicelifecycle;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -43,14 +41,14 @@ public class AService extends Service implements Parcelable {
 	private static final long serialVersionUID = 7945457983909141117L;
 	
 	public AServiceInstance getServiceInstance() {
-		return (AServiceInstance)super.getServiceInstance();
+		return AServiceInstance.convertServiceInstance(super.getServiceInstance());
 	}
 	public void setServiceInstance(AServiceInstance aserviceInstance) {
 		super.setServiceInstance(aserviceInstance);
 	}
 	
 	public AServiceResourceIdentifier getServiceIdentifier() {
-		return (AServiceResourceIdentifier)super.getServiceIdentifier();
+		return AServiceResourceIdentifier.convertServiceResourceIdentifier(super.getServiceIdentifier());
 	}
 
 	public void setServiceIdentifier(AServiceResourceIdentifier aServiceResourceId) {
@@ -71,7 +69,8 @@ public class AService extends Service implements Parcelable {
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)*/
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.getAuthorSignature());
-	    dest.writeString(this.getPrivacyPolicy());
+		dest.writeString(this.getContextSource());
+		dest.writeString(this.getPrivacyPolicy());
 	    dest.writeString(this.getServiceDescription());
 	    dest.writeString(this.getServiceEndpoint());
 	    dest.writeParcelable(this.getServiceIdentifier(), flags);
@@ -86,6 +85,7 @@ public class AService extends Service implements Parcelable {
 	private AService(Parcel in) {
 		super();
 		this.setAuthorSignature(in.readString());
+		this.setContextSource(in.readString());
 	    this.setPrivacyPolicy(in.readString());
 	    this.setServiceDescription(in.readString());
 	    this.setServiceEndpoint(in.readString());
@@ -126,4 +126,24 @@ public class AService extends Service implements Parcelable {
 		
 		return aservice;
 	}
+	
+	public static Service convertAService(AService aservice) {
+		Service service = new Service();		
+		service.setAuthorSignature(aservice.getAuthorSignature());
+		service.setContextSource(aservice.getContextSource());
+		service.setPrivacyPolicy(aservice.getPrivacyPolicy());
+		service.setSecurityPolicy(aservice.getSecurityPolicy());
+		service.setServiceCategory(aservice.getServiceCategory());
+		service.setServiceDescription(aservice.getServiceDescription());
+		service.setServiceEndpoint(aservice.getServiceEndpoint());
+		service.setServiceIdentifier(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aservice.getServiceIdentifier()));
+		service.setServiceInstance(AServiceInstance.convertAServiceInstance(aservice.getServiceInstance()));
+		service.setServiceLocation(aservice.getServiceLocation());
+		service.setServiceName(aservice.getServiceName());
+		service.setServiceStatus(aservice.getServiceStatus());
+		service.setServiceType(aservice.getServiceType());
+		
+		return service;
+	}
+
 }

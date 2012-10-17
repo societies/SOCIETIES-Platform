@@ -17,12 +17,13 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		<p align="right">
+		<!-- <p align="right"> -->
 		<form id="formCSSDirSearch" >
 			<input type="search" name="search" id="search-friends" value="Search Friends" data-theme="b"/>
 		</form>
-		<input id="btnSearchFriends" type="button" value="Search" data-inline="true" data-theme="b" />
-		</p>
+		<!-- <input id="btnSearchFriends" type="button" value="Search" data-inline="true" data-theme="b" />  
+		</p>-->
+		<br />
 		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
 			<li data-role="list-divider">Friends</li>
 				<li data-theme="d"><a href="#" id="MyFriendsListLink">
@@ -32,7 +33,12 @@
 				</a></li>
 			<li data-theme="d"><a href="#" id="SuggestFriendsLink">
 				<h2>Suggested Friends</h2>
-				<p>Some people we think you might<br/>like to be friends with <span class="ui-li-count">10</span>
+				<p>Some people we think you might like to be friends with <span class="ui-li-count">5</span>
+				</p>
+				</a></li>
+			<li data-theme="d"><a href="#" id="FriendRequestsLink">
+				<h2>Friend Requests</h2>
+				<p>People who are interested in being your friend<span class="ui-li-count">2</span>
 				</p>
 				</a></li>
 		</ul>
