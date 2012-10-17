@@ -91,8 +91,18 @@ public class Files {
 	 */
 	public static void writeFile(InputStream is, String path) throws IOException {
 
+		File file;
+		File directory;
+		
+		file = new File(path);
+		directory = file.getParentFile();
+		
+		if (directory != null) {
+			directory.mkdirs();
+		}
+
 		// Create the byte array to hold the data
-		FileOutputStream os = new FileOutputStream(new File(path));
+		FileOutputStream os = new FileOutputStream(file);
 
 		// Read in the bytes and write on the fly
 		int numRead = 0;

@@ -25,6 +25,7 @@
 package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -86,7 +87,7 @@ public interface INegotiationProviderServiceMgmt {
 	 * If the service does not provide a client and no other files are to be made available for
 	 * service consumers to download, this parameter should be null.
 	 * 
-	 * @param fileUris URIs of any files to be associated with the service and shared on the
+	 * @param fileUrls URLs of any files to be associated with the service and shared on the
 	 * domain authority server.
 	 * The files will be automatically transferred to the server. On the server they will be stored
 	 * locally as $VIRGO_HOME/3p-service/$SERVICE_ID/$FILE_PATH.
@@ -96,7 +97,7 @@ public interface INegotiationProviderServiceMgmt {
 	 * @throws NegotiationException
 	 */
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			URI[] fileUris, INegotiationProviderSLMCallback callback)
+			URL[] fileUrls, INegotiationProviderSLMCallback callback)
 			throws NegotiationException;
 	
 	/**

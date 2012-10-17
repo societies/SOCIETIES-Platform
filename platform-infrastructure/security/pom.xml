@@ -6,9 +6,8 @@
 	<!-- All builder projects should inherit from version-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
-		<relativePath>../../parent/version.xml</relativePath>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- Identity of this builder -->
@@ -23,6 +22,7 @@
 		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>
 		<module>SecurityCommsMgr</module>
+		<module>../../domain-authority/webapp-rest</module>
 	</modules>
 
 </project>

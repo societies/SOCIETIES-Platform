@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.integration.test.bit.policynegotiate;
 
 /**
  * 
@@ -30,37 +30,14 @@ package org.societies.api.internal.domainauthority;
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
+public class FileName {
+	
+	public static String getBasename(String path) {
+		return path.replaceAll(".*/", "").replaceAll(".*\\\\", "");
+	}
+	
+	public static String removeUnsupportedChars(String path) {
+		return path.replaceAll("[^0-9a-zA-Z\\-_\\. ,\\[\\]\\(\\)\\{\\}]", "_");
+	}
 
-	public static final String BASE = "/rest/webresources";
-	
-	/**
-	 * URL parameter. File name, including relative path.
-	 */
-	public static final String URL_PARAM_FILE = "file";
-	
-	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
-	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
 }
