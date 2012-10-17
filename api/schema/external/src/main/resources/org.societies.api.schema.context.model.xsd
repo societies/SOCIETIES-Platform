@@ -95,7 +95,7 @@
     <xs:complexContent>
       <xs:extension base="tns:ctxEntityBean">
         <xs:sequence>
-          <xs:element name="communities" type="tns:communityCtxEntityBean" maxOccurs="unbounded"/>
+          <xs:element name="communities" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -113,7 +113,7 @@
     <xs:complexContent>
       <xs:extension base="tns:communityMemberCtxEntityBean">
         <xs:sequence>
-          <xs:element name="members" type="tns:communityMemberCtxEntityBean" maxOccurs="unbounded"/>
+          <xs:element name="members" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
           <xs:element name="bonds" type="tns:ctxBondBean" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
