@@ -31,6 +31,9 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -49,6 +52,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -62,12 +66,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Lazy(false)
-public class CisCtxMonitor extends EventListener {
+public class CisCtxMonitor extends EventListener implements Subscriber {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CisCtxMonitor.class);
 	
 	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION, EventTypes.CIS_DELETION };
+	
+	private static final String VERB_CSS_JOINED = "joined";
+	private static final String VERB_CSS_LEFT = "left";
 			
 	/** The internal Context Broker service. */
 	@Autowired(required=true)
@@ -75,6 +82,10 @@ public class CisCtxMonitor extends EventListener {
 	
 	/** The Event Mgr service reference. */
 	private IEventMgr eventMgr;
+	
+	/** The PubsubClient service reference. */
+	@Autowired
+	private PubsubClient pubsubClient;
 	
 	/** The Comm Mgr service reference. */
 	private ICommManager commMgr;
@@ -135,9 +146,41 @@ public class CisCtxMonitor extends EventListener {
 		}
 	}
 	
+	/*
+	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.identity.IIdentity, java.lang.String, java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node,
+			String itemId, Object item) {
+		
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Received pubsub event: " + item);
+		
+		if (!(item instanceof Activity)) {
+			
+			LOG.error("Could not handle pubsub event: " 
+					+ "Expected item of type " + Activity.class.getName()
+					+ " but was " + ((item != null) ? item.getClass() : "null"));
+			return;
+		}
+		
+		final String cisIdStr = ((Activity) item).getObject();
+		final String cssIdStr = ((Activity) item).getActor();
+		final String verb = ((Activity) item).getVerb();
+		if (verb.equals(VERB_CSS_JOINED))
+			this.executorService.execute(
+					new CisMemberJoinedCtxHandler(cisIdStr, cssIdStr));
+		else if (verb.equals(VERB_CSS_LEFT))
+			this.executorService.execute(
+					new CisMemberLeftCtxHandler(cisIdStr, cssIdStr));
+		else
+			LOG.error("Could not handle pubsub event: " 
+					+ "Unsupported activity verb '" + verb + "'");
+	}
+	
 	private class CisCreationCtxHandler implements Runnable {
 		
-		private Community cis;
+		private final Community cis;
 		
 		private CisCreationCtxHandler(Community cis) {
 			
@@ -175,7 +218,7 @@ public class CisCtxMonitor extends EventListener {
 					return;
 				}
 					
-				if (LOG.isInfoEnabled()) // TODO DEBUG
+				if (LOG.isInfoEnabled())
 					LOG.info("Adding member " + cisOwnerEntity.getId() + " to community " + cisEntity.getId());
 				final CtxAssociationIdentifier hasMembersAssocId = 
 						cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
@@ -186,14 +229,21 @@ public class CisCtxMonitor extends EventListener {
 				// TODO owning CSS ?
 				// TODO administrating CSS ?
 				// TODO membership criteria / bonds
+				if (LOG.isInfoEnabled())
+					LOG.info("Subscribing for the ActivityFeed of CIS " + cisIdStr);
+				pubsubClient.subscriberSubscribe(cisOwnerId, cisIdStr, CisCtxMonitor.this);
 				
 			} catch (InvalidFormatException ife) {
 				
 				LOG.error("Invalid IIdentity found in CIS record: " 
 						+ ife.getLocalizedMessage(), ife);
-			} catch (Exception e) {
+			} catch (CtxException ce) {
 				
 				LOG.error("Failed to access context data: " 
+						+ ce.getLocalizedMessage(), ce);
+			} catch (Exception e) {
+				
+				LOG.error("Failed to subscribe for CIS ActivityFeed: " 
 						+ e.getLocalizedMessage(), e);
 			}
 		}
@@ -202,7 +252,7 @@ public class CisCtxMonitor extends EventListener {
 	private class CisRemovalCtxHandler implements Runnable {
 		
 		@SuppressWarnings("unused")
-		private Community cis;
+		private final Community cis;
 		
 		private CisRemovalCtxHandler(Community cis) {
 			
@@ -216,6 +266,89 @@ public class CisCtxMonitor extends EventListener {
 		public void run() {
 			
 			// TODO Auto-generated method stub
+		}
+	}
+	
+	private class CisMemberJoinedCtxHandler implements Runnable {
+		
+		private final String cisIdStr;
+		private final String cssIdStr;
+		
+		private CisMemberJoinedCtxHandler(String cisIdStr, String cssIdStr) {
+			
+			this.cisIdStr = cisIdStr;
+			this.cssIdStr = cssIdStr;
+		}
+
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			/*
+			try {
+				final String cisIdStr = this.cis.getCommunityJid();
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				final CommunityCtxEntity cisEntity = ctxBroker.retrieveCommunityEntity (cisId).get();
+				
+				
+				final String cisOwnerIdStr = cis.getOwnerJid();
+				final IIdentity cisOwnerId = commMgr.getIdManager().fromJid(cisOwnerIdStr);
+				final IndividualCtxEntity cisOwnerEntity = ctxBroker.retrieveIndividualEntity(cisOwnerId).get();
+				if (cisOwnerEntity == null) {
+					LOG.error("Could not retrieve IndividualCtxEntity for CIS creator " + cisOwnerId);
+					return;
+				}
+					
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("Adding member " + cisOwnerEntity.getId() + " to community " + cisEntity.getId());
+				final CtxAssociationIdentifier hasMembersAssocId = 
+						cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
+				final CtxAssociation hasMembersAssoc = 
+						(CtxAssociation) ctxBroker.retrieve(hasMembersAssocId).get();
+				hasMembersAssoc.addChildEntity(cisOwnerEntity.getId());
+				ctxBroker.update(hasMembersAssoc);
+				// TODO owning CSS ?
+				// TODO administrating CSS ?
+				// TODO membership criteria / bonds
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("Subscribing for the ActivityFeed of CIS " + cisIdStr);
+				pubsubClient.subscriberSubscribe(cisOwnerId, cisIdStr, CisCtxMonitor.this);
+				
+			} catch (InvalidFormatException ife) {
+				
+				LOG.error("Invalid IIdentity found in CIS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (CtxException ce) {
+				
+				LOG.error("Failed to access context data: " 
+						+ ce.getLocalizedMessage(), ce);
+			} catch (Exception e) {
+				
+				LOG.error("Failed to subscribe for CIS ActivityFeed: " 
+						+ e.getLocalizedMessage(), e);
+			}*/
+		}
+	}
+	
+	private class CisMemberLeftCtxHandler implements Runnable {
+		
+		private final String cisIdStr;
+		private final String cssIdStr;
+		
+		private CisMemberLeftCtxHandler(String cisIdStr, String cssIdStr) {
+			
+			this.cisIdStr = cisIdStr;
+			this.cssIdStr = cssIdStr;
+		}
+
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			// TODO
 		}
 	}
 	
