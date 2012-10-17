@@ -94,7 +94,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
-		LOG.info("addService({}, ..., {}, List<String> files)", serviceId, fileServer);
+		LOG.info("addService({}, ..., {}, " + files + ")", serviceId, fileServer);
 		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
@@ -136,7 +136,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			URL[] fileUrls, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
-		LOG.info("addService({}, ..., {}, URL[] files)", serviceId, fileServer);
+		LOG.info("addService({}, ..., {}, " + fileUrls + ")", serviceId, fileServer);
 
 		List<String> files = new ArrayList<String>();
 		String tmpFile ="3p-service.tmp";
@@ -144,6 +144,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		
 		for (URL f : fileUrls) {
 			fileName = FileName.getBasename(f.getPath());
+			LOG.debug("addService(): Adding file: URL = {}, fileName = {}", f, fileName);
 			files.add(fileName);
 			
 			Net net = new Net(f);
@@ -248,21 +249,29 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		
 		String uriStr;
 		
+		LOG.debug("uriForFileDownload({}, {}, ...)", host, filePath);
+		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
 				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
 				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+
+		LOG.debug("uriForFileDownload(): uri = {}", uriStr);
 		return uriStr;
 	}
 	
 	private String uriForFileUpload(String host, String filePath, URI serviceId, String pubkey) {
 		
 		String uriStr;
-		
+
+		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
+
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
 				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString() +
 				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey;
+
+		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
 		return uriStr;
 	}
 

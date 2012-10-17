@@ -121,7 +121,8 @@ public class ServiceClientJar {
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
     		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
 
-		LOG.info("HTTP POST: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
+				request.getRemoteHost(), path);
 		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
     }
 
@@ -137,7 +138,8 @@ public class ServiceClientJar {
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
     		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
 
-		LOG.info("HTTP PUT: path = {}, service ID = {}, pubKey = " + pubKey, path, serviceId);
+		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
+				request.getRemoteHost(), path);
 
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
@@ -162,10 +164,11 @@ public class ServiceClientJar {
 		        // Process FormField;
 		    } else {
 		        // Process Uploaded File
+		    	//path = path.replaceAll("[/\\\\]", File.separator);
+		    	path = get3PServicePath(serviceId) + path;
 		    	LOG.debug("Saving to file {}", path);
 				try {
-					//Files.writeFile(is, path);
-					Files.writeFile(item.getInputStream(), get3PServicePath(serviceId) + path);
+					Files.writeFile(item.getInputStream(), path);
 				} catch (IOException e) {
 					LOG.warn("Could not write to file {}", path, e);
 					// Return HTTP status code 500 - Internal Server Error

@@ -62,7 +62,7 @@ public class Net {
 	
 	public boolean download(String fileName) {
 		
-		LOG.debug("About to download file {}", fileName);
+		LOG.debug("download({})", fileName);
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -98,7 +98,7 @@ public class Net {
 	
 	public boolean post(String fileName, URI destination) {
 
-		LOG.debug("About to post file {}", fileName);
+		LOG.debug("post({}, {})", fileName, destination);
 
         HttpClient httpclient = new DefaultHttpClient();
 
@@ -137,7 +137,7 @@ public class Net {
 	
 	public boolean put(String fileName, URI destination) {
 
-		LOG.debug("About to put file {}", fileName);
+		LOG.debug("put({}, {})", fileName, destination);
 
         HttpClient httpclient = new DefaultHttpClient();
 
