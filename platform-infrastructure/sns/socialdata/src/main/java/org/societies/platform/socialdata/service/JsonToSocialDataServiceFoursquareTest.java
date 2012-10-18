@@ -32,7 +32,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 			Person profile = parserP.load(dataPro);
 			System.out.println("profile:"
 					+"\n ID : " + profile.getId()
-					+"\n Name : " + profile.getName().getGivenName()+" "+profile.getName().getFamilyName()
+					+"\n Name : " + profile.getName().getFormatted()
 					+"\n Short description : "+profile.getAboutMe()
 					+"\n Gender : "+profile.getGender().toString()
 					+"\n home location : "+profile.getAddresses().get(0).getFormatted()
@@ -85,6 +85,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 						elm.getExtensions().get("position")+";"+
 						"said : "+ elm.getTitle()+";"+
 						"at : " + elm.getPublished());
+				System.out.println(elm.getId().toLowerCase()+"'>" + elm.getActor().getDisplayName() + " "+ elm.getVerb() + " --> "+elm.getContent());
 			}
 
 		} catch (Exception e) {
