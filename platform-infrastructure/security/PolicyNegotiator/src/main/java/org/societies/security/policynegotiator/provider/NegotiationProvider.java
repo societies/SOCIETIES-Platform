@@ -181,6 +181,7 @@ public class NegotiationProvider implements INegotiationProvider {
 					sla.setFileUris(signedUris);
 				} catch (NegotiationException e) {
 					LOG.warn("acceptPolicyAndGetSla()", e);
+					//sla.setSuccess(false);
 				}
 			}
 

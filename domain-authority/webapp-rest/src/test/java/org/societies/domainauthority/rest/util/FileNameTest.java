@@ -22,7 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.domainauthority.rest.util;
+
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * 
@@ -30,37 +36,42 @@ package org.societies.api.internal.domainauthority;
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
+public class FileNameTest {
+	
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+	}
 
-	public static final String BASE = "/rest/webresources";
-	
 	/**
-	 * URL parameter. File name, including relative path.
+	 * @throws java.lang.Exception
 	 */
-	public static final String URL_PARAM_FILE = "file";
-	
+	@After
+	public void tearDown() throws Exception {
+	}
+
 	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
+	 * Test method for
+	 * {@link org.societies.domainauthority.rest.util.FileName#getBasename(String)}.
 	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
+	@Test
+	public void testGetBasename() {
+		assertEquals("cc.dd", FileName.getBasename("aa/bb/cc.dd"));
+		assertEquals("cc.dd", FileName.getBasename("aa\\bb\\cc.dd"));
+	}
+
 	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
+	 * Test method for
+	 * {@link org.societies.domainauthority.rest.util.FileName#removeUnsupportedChars(String)}.
 	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
+	@Test
+	public void testRemoveUnsupportedChars() {
+		assertEquals("a1_bb.cc", FileName.removeUnsupportedChars("a1:bb.cc"));
+		assertEquals("a2_bb.cc", FileName.removeUnsupportedChars("a2/bb.cc"));
+		assertEquals("a3_bb.cc", FileName.removeUnsupportedChars("a3\\bb.cc"));
+		assertEquals("a4. ,[](){}bb.cc", FileName.removeUnsupportedChars("a4. ,[](){}bb.cc"));
+		assertEquals("a5_bb_cc.dd__ee", FileName.removeUnsupportedChars("a5/bb\\cc.dd/:ee"));
+	}
 }

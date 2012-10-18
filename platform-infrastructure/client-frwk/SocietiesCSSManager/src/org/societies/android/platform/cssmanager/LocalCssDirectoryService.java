@@ -66,7 +66,8 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
     @Override
 	public void onCreate () {
 		this.binder = new LocalCssDirectoryBinder();
-		
+	
+		this.ccm = new ClientCommunicationMgr(this);
 		Log.d(LOG_TAG, "CssDirectory service starting");
 	}
     
@@ -93,7 +94,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		Log.d(LOG_TAG, "findAllCssAdvertisementRecords called by client: " + client);
 		
 		AsyncSearchDirectory methodAsync = new AsyncSearchDirectory();
-		String params[] = {client, IAndroidCssDirectory.FIND_FOR_ALL_CSS};
+		String params[] = {client, IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS};
 		methodAsync.execute(params);
 		
 		return null;

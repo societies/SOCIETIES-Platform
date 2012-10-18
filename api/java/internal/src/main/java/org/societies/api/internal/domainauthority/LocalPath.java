@@ -30,37 +30,11 @@ package org.societies.api.internal.domainauthority;
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
-
-	public static final String BASE = "/rest/webresources";
+public class LocalPath {
 	
 	/**
-	 * URL parameter. File name, including relative path.
+	 * Relative path to folder with any files for various 3rd party services.
+	 * The path is relative from $VIRGO_HOME.
 	 */
-	public static final String URL_PARAM_FILE = "file";
-	
-	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
-	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
+	public static final String PATH_3P_SERVICES = "3p-service";
 }
