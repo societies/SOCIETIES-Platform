@@ -204,7 +204,8 @@ public final class CtxModelBeanTranslator {
 				(CtxAssociationIdentifier) fromCtxIdentifierBean(assocBean.getId()));
 		assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
 		// Handle parent entity
-		assoc.setParentEntity((CtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
+		if (assocBean.getParentEntity() != null)
+			assoc.setParentEntity((CtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
 		// Handle child entities
 		for (CtxEntityIdentifierBean childEntityIdBean : assocBean.getChildEntities())
 			assoc.addChildEntity((CtxEntityIdentifier) fromCtxIdentifierBean(childEntityIdBean));
