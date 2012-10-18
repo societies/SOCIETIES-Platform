@@ -48,20 +48,18 @@
 			<!-- CSS Name -->
 			<div data-role="fieldcontain" >
 		    	<label for="cssrecordidentity">CSS Name: </label>
-		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value=""/>
+		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value="" readonly/>
 			</div>
 
-			<div data-role="collapsible-set">
+			<!-- <div data-role="collapsible-set">  -->
 			
-				<div data-role="collapsible">
-					<h3>Contact Details</h3>
-					
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
+					<h3>Contact Details</h3>					
 					<!-- CSS e-mail Details-->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecordemaildetails">e-Mail: </label>
 				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
 					</div>
-					
 					<!-- CSS IM Details-->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecordimdetails">IM: </label>
@@ -74,7 +72,7 @@
 					</div>
 				</div>
 				
-				<div data-role="collapsible">
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
 					<h3>Personal Details</h3>
 					
 					<div data-role="fieldcontain" >
@@ -93,7 +91,7 @@
 					</div>
 					
 				</div>
-				<div data-role="collapsible">
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
 					<h3>Current CSS Nodes</h3>
 					
 					<table id="cssNodesTable" border="1">
@@ -114,7 +112,7 @@
 					</table>
 					
 				</div>
-			</div>
+			<!-- </div>  -->
 			<div class="sign_up">
 				<input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/> 
 			</div>

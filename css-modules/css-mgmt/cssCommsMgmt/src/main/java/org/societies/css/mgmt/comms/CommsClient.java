@@ -700,19 +700,30 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	
 	public void acceptCssFriendRequest(CssRequest request) {
 		// TODO Auto-generated method stub
-		LOG.debug("Remote call on AcceptCssFriendRequest");
+		LOG.info("Remote call on AcceptCssFriendRequest");
 
 		try {
 
 			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
 					request.getCssIdentity()));
+			IIdentity receivedID = stanza.getFrom();
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
-
+			
+			LOG.info("commManager.getIdManager().fromJid(request.getCssIdentity()) =  " +commManager.getIdManager().fromJid(
+					request.getCssIdentity()));
+			
+			LOG.info("(receivedID) = " +receivedID);
 			request.setOrigin(CssRequestOrigin.REMOTE);
 			
 			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
 			messageBean.setRequestStatus(request.getRequestStatus());
-			messageBean.setTargetCssId(stanza.getFrom().toString());
+			
+			if(receivedID == null) {
+				messageBean.setTargetCssId("");
+			} else {
+				messageBean.setTargetCssId(receivedID.getJid());
+			}
+					
 
 			try {
 				this.commManager.sendMessage(stanza, messageBean);
