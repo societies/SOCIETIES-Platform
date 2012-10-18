@@ -25,6 +25,7 @@
 package org.societies.domainauthority.rest.server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -99,6 +100,14 @@ public class ServiceClientJar {
 		
 		try {
 			file = Files.getBytesFromFile(get3PServicePath(serviceId) + path);
+		} catch (FileNotFoundException e) {
+			try {
+				file = Files.getBytesFromFile(path);
+			} catch (IOException e2) {
+				LOG.warn("Could not open file {}", path, e2);
+				// Return HTTP status code 500 - Internal Server Error
+				throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
 			// Return HTTP status code 500 - Internal Server Error
