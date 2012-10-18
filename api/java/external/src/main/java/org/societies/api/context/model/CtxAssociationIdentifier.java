@@ -170,7 +170,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 		
 		final String schemeStr = input.substring(0, ownerIdDelim);
 		try {
-			super.scheme = DataIdentifierScheme.valueOf(schemeStr);
+			super.scheme = DataIdentifierScheme.fromValue(schemeStr);
 		} catch (IllegalArgumentException iae) {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context identifier scheme: " + schemeStr, iae);

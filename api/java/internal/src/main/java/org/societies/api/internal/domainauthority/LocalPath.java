@@ -22,55 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.user.db.impl.model;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
-
-import org.societies.api.context.model.CtxEntityIdentifier;
+package org.societies.api.internal.domainauthority;
 
 /**
- * Describe your class here...
+ * 
  *
- * @author nlia
+ * @author Mitja Vardjan
  *
  */
-@Entity
-@org.hibernate.annotations.Entity(
-		dynamicUpdate=true
-)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("IndividualCtxEntity")
-public class IndividualCtxEntityDAO extends CtxEntityDAO {
+public class LocalPath {
 	
-	private static final long serialVersionUID = -3743724709912125536L;
-
-	IndividualCtxEntityDAO() {
-		
-		super();
-	}
-	
-	public IndividualCtxEntityDAO(CtxEntityIdentifier ctxId) {
-		
-		super(ctxId);
-	}
-	
-	@Transient
-	private Set<CtxEntityIdentifier> communities = new HashSet<CtxEntityIdentifier>();
-	
-	public Set<CtxEntityIdentifier> getCommunities() {
-		
-		return this.communities;
-	}
-	
-	public void setCommunities(Set<CtxEntityIdentifier> communities) {
-		
-		this.communities = communities;
-	}
+	/**
+	 * Relative path to folder with any files for various 3rd party services.
+	 * The path is relative from $VIRGO_HOME.
+	 */
+	public static final String PATH_3P_SERVICES = "3p-service";
 }

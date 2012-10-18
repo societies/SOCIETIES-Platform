@@ -506,30 +506,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	public void sendFriendRequest(String client, String cssId) {
-		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
-		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
-		Log.d(LOG_TAG, "sendFriendRequest called with client: " + client);
-
-		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
-
-		Stanza stanza = new Stanza(cloudNodeIdentity);		
-		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.SEND_FRIEND_REQUEST);
-        try {
-    		ccm.register(ELEMENT_NAMES, callback);
-			ccm.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Send stanza");
-		} catch (Exception e) {
-			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
-        }
+		Log.d(LOG_TAG, "sendFriendRequest called by client: " + client + " for: " + cssId);
+		
+		AsyncFriendRequests methodAsync = new AsyncFriendRequests();
+		String params[] = {client, cssId, IAndroidCSSManager.SEND_FRIEND_REQUEST};
+		methodAsync.execute(params);
 	}
 
 	/* @see org.societies.android.api.internal.cssmanager.IAndroidCSSManager#acceptFriendRequest(java.lang.String, java.lang.String)*/
 	public void acceptFriendRequest(String client, String cssId) {
 		Log.d(LOG_TAG, "shareService called by client: " + client);
 		
-		AsyncAcceptFriendRequests methodAsync = new AsyncAcceptFriendRequests();
-		String params[] = {client, cssId};
+		AsyncFriendRequests methodAsync = new AsyncFriendRequests();
+		String params[] = {client, cssId, IAndroidCSSManager.ACCEPT_FRIEND_REQUEST};
 		methodAsync.execute(params);
 	}
 
@@ -572,8 +561,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			messageBean.setMethod(MethodType.GET_FRIEND_REQUESTS);
 			//COMMS CONFIG
 			ICommCallback discoCallback = new CSSManagerCallback(params[0], IAndroidCSSManager.GET_FRIEND_REQUESTS); 
-			IIdentity toID = ccm.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
+			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
 	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
@@ -592,23 +580,32 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	/**
 	 * This class carries out the AcceptFriendRequests method call asynchronously
 	 */
-	private class AsyncAcceptFriendRequests extends AsyncTask<String, Void, String[]> {
+	private class AsyncFriendRequests extends AsyncTask<String, Void, String[]> {
 		
 		@Override
 		protected String[] doInBackground(String... params) {
 			Dbc.require("At least one parameter must be supplied", params.length >= 1);
-			Log.d(LOG_TAG, "GetFriendRequests - doInBackground");
-			String results [] = new String[1];
-			results[0] = params[0];
+			Log.d(LOG_TAG, "AsyncFriendRequests - doInBackground");
+			
+			//PARAMETERS
+			String client = params[0];
+			String targetCssId = params[1];
+			String method = params[2];
+			//RETURN OBJECT
+			String results[] = new String[1];
+			results[0] = client;
 			//MESSAGE BEAN
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
-			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
-			messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);
-			//messageBean.settargetCSSID to accept
+			messageBean.setTargetCssId(targetCssId);
+			if (method.equals(IAndroidCSSManager.SEND_FRIEND_REQUEST)) {
+				messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST_INTERNAL);
+			} else {
+				messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST_INTERNAL);
+				messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);	
+			}
 			//COMMS CONFIG
-			ICommCallback discoCallback = new CSSManagerCallback(params[0], IAndroidCSSManager.ACCEPT_FRIEND_REQUEST); 
-			IIdentity toID = ccm.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
+			ICommCallback discoCallback = new CSSManagerCallback(client, method);
+			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
 	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendMessage(stanza, messageBean);
@@ -620,7 +617,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 		@Override
 		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+			Log.d(LOG_TAG, "AsyncFriendRequests - onPostExecute");
 	    }
 	}
 	

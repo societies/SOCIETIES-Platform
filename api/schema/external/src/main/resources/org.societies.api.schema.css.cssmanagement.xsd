@@ -138,6 +138,7 @@
 			<xs:enumeration value="getFriendRequests" />
 			<xs:enumeration value="acceptCssFriendRequest" />
 			<xs:enumeration value="acceptCssFriendRequestInternal" />
+			<xs:enumeration value="sendCssFriendRequestInternal" />
 
 		</xs:restriction>
 	</xs:simpleType>

@@ -22,55 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.user.db.impl.model;
+package org.societies.domainauthority.rest.server;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.domainauthority.rest.util.Files;
 
 /**
- * Describe your class here...
- *
- * @author nlia
- *
+ * Class for hosting jar files for clients of 3rd party services.
+ * 
+ * @author Mitja Vardjan
  */
-@Entity
-@org.hibernate.annotations.Entity(
-		dynamicUpdate=true
-)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("IndividualCtxEntity")
-public class IndividualCtxEntityDAO extends CtxEntityDAO {
+@Path(UrlPath.PATH_PUB_KEY)
+public class CertificateUpload {
+    
+	private static Logger LOG = LoggerFactory.getLogger(CertificateUpload.class);
 	
-	private static final long serialVersionUID = -3743724709912125536L;
+	public CertificateUpload() {
+		LOG.info("Constructor");
+	}
+	
+	/**
+     * Method processing HTTP POST requests.
+     */
+	@Path("{name}.pub")
+    @POST
+    public void postIt(@PathParam("name") String name,
+    		InputStream is,
+    		@Context HttpServletRequest request,
+    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 
-	IndividualCtxEntityDAO() {
+		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
 		
-		super();
-	}
-	
-	public IndividualCtxEntityDAO(CtxEntityIdentifier ctxId) {
+		// TODO
 		
-		super(ctxId);
-	}
-	
-	@Transient
-	private Set<CtxEntityIdentifier> communities = new HashSet<CtxEntityIdentifier>();
-	
-	public Set<CtxEntityIdentifier> getCommunities() {
-		
-		return this.communities;
-	}
-	
-	public void setCommunities(Set<CtxEntityIdentifier> communities) {
-		
-		this.communities = communities;
-	}
+//		try {
+//			Files.writeFile(is, path);
+//		} catch (IOException e) {
+//			LOG.warn("Could not write to file {}", path, e);
+//			// Return HTTP status code 500 - Internal Server Error
+//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//		}
+    }
 }

@@ -50,7 +50,7 @@ public final class CtxModelObjectFactory {
 			for (final CtxAttribute attribute : attributes)
 				result.addAttribute(attribute);
 		
-		if (associations != null)
+		if (associations != null && !associations.isEmpty())
 			result.setAssociations(associations);
 				
 		return result;
@@ -58,17 +58,21 @@ public final class CtxModelObjectFactory {
 	
 	public IndividualCtxEntity createIndividualEntity(final CtxEntityIdentifier id, 
 			final Date lastModified, final Set<CtxAttribute> attributes,
-			final Set<CtxAssociationIdentifier> associations) {
+			final Set<CtxAssociationIdentifier> associations, 
+			final Set<CtxEntityIdentifier> communities) {
 		
 		final IndividualCtxEntity result = new IndividualCtxEntity(id);
 		result.setLastModified(lastModified);
 		
-		if (attributes != null)
+		if (attributes != null && !attributes.isEmpty())
 			for (final CtxAttribute attribute : attributes)
 				result.addAttribute(attribute);
 		
-		if (associations != null)
+		if (associations != null && !associations.isEmpty())
 			result.setAssociations(associations);
+		
+		if (communities != null && !communities.isEmpty())
+			result.setCommunities(communities);
 				
 		return result;
 	}

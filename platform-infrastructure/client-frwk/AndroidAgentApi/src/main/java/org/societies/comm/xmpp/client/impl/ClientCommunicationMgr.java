@@ -115,17 +115,14 @@ public class ClientCommunicationMgr {
 	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
 		stanza.setFrom(getIdManager().getThisNetworkNode());
-		Log.d(LOG_TAG, "sendMessage type: " + type.name());
-		
+		if (type==null) 
+			type = Message.Type.normal;
 		if (payload == null) {
 			throw new InvalidParameterException("Payload cannot be null");
 		}
 		try {
-			
 			String xml = marshaller.marshallMessage(stanza, type, payload);
-			
 			sendMessage(xml);
-			
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending message", e);
 		}				

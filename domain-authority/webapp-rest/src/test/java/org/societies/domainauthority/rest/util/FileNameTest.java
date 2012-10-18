@@ -22,55 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.user.db.impl.model;
+package org.societies.domainauthority.rest.util;
 
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.*;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
-
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Describe your class here...
+ * 
  *
- * @author nlia
+ * @author Mitja Vardjan
  *
  */
-@Entity
-@org.hibernate.annotations.Entity(
-		dynamicUpdate=true
-)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("IndividualCtxEntity")
-public class IndividualCtxEntityDAO extends CtxEntityDAO {
+public class FileNameTest {
 	
-	private static final long serialVersionUID = -3743724709912125536L;
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+	}
 
-	IndividualCtxEntityDAO() {
-		
-		super();
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
 	}
-	
-	public IndividualCtxEntityDAO(CtxEntityIdentifier ctxId) {
-		
-		super(ctxId);
+
+	/**
+	 * Test method for
+	 * {@link org.societies.domainauthority.rest.util.FileName#getBasename(String)}.
+	 */
+	@Test
+	public void testGetBasename() {
+		assertEquals("cc.dd", FileName.getBasename("aa/bb/cc.dd"));
+		assertEquals("cc.dd", FileName.getBasename("aa\\bb\\cc.dd"));
 	}
-	
-	@Transient
-	private Set<CtxEntityIdentifier> communities = new HashSet<CtxEntityIdentifier>();
-	
-	public Set<CtxEntityIdentifier> getCommunities() {
-		
-		return this.communities;
-	}
-	
-	public void setCommunities(Set<CtxEntityIdentifier> communities) {
-		
-		this.communities = communities;
+
+	/**
+	 * Test method for
+	 * {@link org.societies.domainauthority.rest.util.FileName#removeUnsupportedChars(String)}.
+	 */
+	@Test
+	public void testRemoveUnsupportedChars() {
+		assertEquals("a1_bb.cc", FileName.removeUnsupportedChars("a1:bb.cc"));
+		assertEquals("a2_bb.cc", FileName.removeUnsupportedChars("a2/bb.cc"));
+		assertEquals("a3_bb.cc", FileName.removeUnsupportedChars("a3\\bb.cc"));
+		assertEquals("a4. ,[](){}bb.cc", FileName.removeUnsupportedChars("a4. ,[](){}bb.cc"));
+		assertEquals("a5_bb_cc.dd__ee", FileName.removeUnsupportedChars("a5/bb\\cc.dd/:ee"));
 	}
 }
