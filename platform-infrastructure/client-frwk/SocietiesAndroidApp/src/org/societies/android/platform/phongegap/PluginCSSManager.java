@@ -383,6 +383,7 @@ public class PluginCSSManager extends Plugin {
 					e.printStackTrace();
 				}
 			} 
+			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);

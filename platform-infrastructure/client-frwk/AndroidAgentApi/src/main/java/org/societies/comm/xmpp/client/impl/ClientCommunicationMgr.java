@@ -228,7 +228,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void bindService(ServiceConnection connection) {
-		Log.d(LOG_TAG, "bindService");
+		Log.d(LOG_TAG, "bindService for: " + connection.toString());
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
         androidContext.bindService(intent, connection, BIND_AUTO_CREATE);

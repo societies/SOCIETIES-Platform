@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.cssmanager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
 
-	private IBinder binder = null;
+	private LocalCSSManagerBinder binder = null;
     
 //	private Messenger inMessenger;
 	private AndroidCSSRecord cssRecord;
@@ -126,6 +127,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
 		this.binder = new LocalCSSManagerBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(this);
 
 		this.cssRecord = null;
 		
@@ -141,16 +144,29 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	/**
 	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
 	 */
-	 public class LocalCSSManagerBinder extends Binder {
+	 public static class LocalCSSManagerBinder extends Binder {
+		 private WeakReference<LocalCSSManagerService> outerClassReference = null;
+		 
+		 public void addouterClassreference(LocalCSSManagerService instance) {
+			 this.outerClassReference = new WeakReference<LocalCSSManagerService>(instance);
+		 }
+		 
 		 public LocalCSSManagerService getService() {
-	            return LocalCSSManagerService.this;
+	            return outerClassReference.get();
 	        }
 	    }
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-//		return inMessenger.getBinder();
 		return this.binder;
 	}
 	
