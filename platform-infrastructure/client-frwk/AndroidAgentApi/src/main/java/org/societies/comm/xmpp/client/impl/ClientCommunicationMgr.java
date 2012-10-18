@@ -360,6 +360,58 @@ public class ClientCommunicationMgr {
 		return rv;
 	}	
 	
+	public void setDomainAuthorityNode(final String domainAuthorityNode) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setDomainAuthorityNode(domainAuthorityNode);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public void setPortNumber(final int port) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setPortNumber(port);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public void setResource(final String resource) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setResource(resource);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}		
+	}
+	
+	public void setDebug(final boolean enabled) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setDebug(enabled);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
 	private static IIdentityManager createIdentityManager(String thisNode, String daNode) throws InvalidFormatException {
 		IIdentityManager idm;
 		if(daNode == null)
@@ -367,5 +419,5 @@ public class ClientCommunicationMgr {
 		else
 			idm = new IdentityManagerImpl(thisNode, daNode);
 		return idm;
-	}
+	}	
 }
