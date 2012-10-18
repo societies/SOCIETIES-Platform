@@ -85,7 +85,17 @@ window.plugins.SocietiesLocalCISManager = {
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'getMembers'));
 		}
-	}
+	},
+	
+	addActivity: function(cis_id, activity, successCallback, failureCallback) {
+		console.log("addActivity desktop invoked");
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(true);
+		}
+	},
 }
 
 /**

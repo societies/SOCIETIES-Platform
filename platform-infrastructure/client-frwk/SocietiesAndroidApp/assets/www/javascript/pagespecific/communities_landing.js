@@ -33,7 +33,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @returns null
  */
 
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#communities-landing', function(event) {
 
 	console.log("communities landing pageinit action(s)");
 	
@@ -65,6 +65,10 @@ $(document).bind('pageinit',function(){
 			SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.getAllCisDirAds);
 		
 		return false;
+	});
+	
+	$('input#add_activity').off('click').on('click', function() {
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISListService.addCISActivity);
 	});
 	
 });

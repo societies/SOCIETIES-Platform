@@ -33,6 +33,18 @@ import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
  * Implemented by the CommunityManager APKLib service
  */
 public interface ICisManager {
+	//CIS MANAGER INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
+	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
+	public static final String CREATE_CIS     		= "org.societies.android.platform.community.CREATE_CIS";
+	public static final String DELETE_CIS    		= "org.societies.android.platform.community.DELETE_CIS";
+	public static final String GET_CIS_LIST     	= "org.societies.android.platform.community.GET_CIS_LIST";
+	public static final String SUBSCRIBE_TO_CIS 	= "org.societies.android.platform.community.SUBSCRIBE_TO_CIS";
+	public static final String UNSUBSCRIBE_FROM_CIS = "org.societies.android.platform.community.UNSUBSCRIBE_FROM_CIS";
+	public static final String REMOVE_MEMBER 		= "org.societies.android.platform.community.REMOVE_MEMBER";
+	public static final String JOIN_CIS      		= "org.societies.android.platform.community.JOIN_CIS";
+	public static final String LEAVE_CIS     		= "org.societies.android.platform.community.LEAVE_CIS";
+	
 	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
 							 		"deleteCis(String client, String cisId)",
 							 		"getCisList(String client, String query)",

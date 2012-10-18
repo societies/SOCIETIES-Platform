@@ -6,7 +6,7 @@
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#landing', function(event) {
 	console.log("pageinit: Landing jQuery calls");
 
 	$("a#friends_anchor").off('click').on('click', function(){

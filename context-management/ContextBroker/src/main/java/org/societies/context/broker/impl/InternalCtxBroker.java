@@ -1964,17 +1964,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		}else if (IdentityType.CIS.equals(target.getType())){
 
 			try {
-				if (ctxModelObj instanceof CommunityCtxEntity) {
-
-					CommunityCtxEntity commEntity = (CommunityCtxEntity) ctxModelObj;
-					updatedObjectResult = this.communityCtxDBMgr.updateCommunityEntity(commEntity);	
-					LOG.info("UPDATE Community Context object with id :"+updatedObjectResult.getId());
-				} else if(ctxModelObj instanceof CtxAttribute){
-
-					CtxAttribute ctxCommAttribute = (CtxAttribute) ctxModelObj;
-					updatedObjectResult = this.communityCtxDBMgr.updateCommunityAttribute(ctxCommAttribute);
-					LOG.info("UPDATE Community Context object with id :"+updatedObjectResult.getId());
-				}
+				updatedObjectResult = this.communityCtxDBMgr.update(ctxModelObj);					
+				LOG.info("UPDATE Community Context object with id : " + updatedObjectResult.getId());
 
 			} catch (Exception e) {
 				throw new CtxBrokerException(

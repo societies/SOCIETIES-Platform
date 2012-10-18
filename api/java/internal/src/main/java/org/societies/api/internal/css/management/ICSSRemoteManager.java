@@ -256,5 +256,12 @@ public interface ICSSRemoteManager {
 	 * @param callback
 	 */
 	 void findAllCssRequests(ICSSManagerCallback callback);	 
+	 
+	 /**
+		 * accept/reject a CSS Friend Requests 
+		 * 
+		 * @param CssRequest
+		 */
+		void acceptCssFriendRequestInternal(CssRequest request);
 
 }

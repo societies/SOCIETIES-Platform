@@ -25,9 +25,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 
 
-$(document).on("pageinit",$("div[data-role='page'] [class*='ui-page-active']"), function(){
+$(document).on("pagechange", function(){
 
-	console.log("slide menu page init");
 
 	$(":jqmData(slidemenu)").addClass('slidemenu_btn');
 	var sm = $($(":jqmData(slidemenu)").data('slidemenu'));
@@ -41,15 +40,17 @@ $(document).on("pageinit",$("div[data-role='page'] [class*='ui-page-active']"), 
 		console.log("slide menu swipe right");
 		slidemenu(sm);
 	});
-	$(document).on("click", $("#slidemenu"), function(event) {
+	$(document).on("click", $(".ui-page-active span[class='ui-btn-inner']"), function(event) {
 		console.log("slide menu click");
-		event.stopImmediatePropagation();
-		slidemenu(sm);
+		if (event.target.className === "ui-btn-inner") {
+			event.stopImmediatePropagation();
+			slidemenu(sm);
+		}
 	});
-	$(document).on("click", "a:not(:jqmData(slidemenu))", function(e) {
-		only_close = true;
-		slidemenu(sm, only_close);
-	});
+//	$(document).on("click", "a:not(:jqmData(slidemenu))", function(e) {
+//		only_close = true;
+//		slidemenu(sm, only_close);
+//	});
 
 	$(window).on('resize', function(){
 

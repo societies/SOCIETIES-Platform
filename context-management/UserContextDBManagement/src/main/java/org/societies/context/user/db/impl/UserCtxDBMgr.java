@@ -54,6 +54,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
@@ -66,6 +67,7 @@ import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.user.db.impl.model.CtxQualityDAO;
 import org.societies.context.user.db.impl.model.IndividualCtxEntityDAO;
 import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
+import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -280,6 +282,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 		
+		// create IS_MEMBER_OF association for new IndividualCtxEntity
+		final CtxAssociation isMemberOfAssoc = this.createAssociation(CtxAssociationTypes.IS_MEMBER_OF);
+		isMemberOfAssoc.setParentEntity(id);
+		this.update(isMemberOfAssoc);
+		
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
@@ -445,6 +452,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public CtxModelObject retrieve(CtxIdentifier id) throws CtxException {
 
@@ -456,22 +464,56 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
         	
         	case ENTITY:            	
             	dao = this.retrieve(CtxEntityDAO.class, id);
-            	/////////// UGLY & QND HACK ALERT BEGIN //////////////////
+            	if (dao == null)
+            		break;
             	final Session session = this.sessionFactory.openSession();
-            	final Query query = session.createQuery("from CtxAssociationDAO");
-            	try { 
-            		@SuppressWarnings("unchecked")
-            		final List<CtxAssociationDAO> associations = query.list();
-            		for (final CtxAssociationDAO association : associations)
-            			if (id.equals(association.getParentEntity()) 
-            					|| association.getChildEntities().contains(id))
-            					((CtxEntityDAO) dao).addAssociation(association.getId());
-            					
+            	Query query;
+            	// CtxAssociations where this entity is member of
+            	final Set<CtxAssociationIdentifier> associationIds = 
+    					new HashSet<CtxAssociationIdentifier>();
+            	try {
+            		if (dao instanceof IndividualCtxEntityDAO) {
+
+            			final Set<CtxEntityIdentifier> communityIds = 
+            					new HashSet<CtxEntityIdentifier>();
+            			// Retrieve CtxAssociations where this entity is parent
+            			query = session.getNamedQuery("getCtxAssociationsByParentEntityId");
+            			query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			final List<CtxAssociationDAO> associations = query.list();
+            			for (final CtxAssociationDAO association : associations) {
+            				associationIds.add(association.getId());
+            				if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
+            					communityIds.addAll(association.getChildEntities());
+            			}
+            			((IndividualCtxEntityDAO) dao).setCommunities(communityIds);
+            			
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			
+            		} else if (dao instanceof CtxEntityDAO) {
+
+            			// Retrieve CtxAssociationIds where this entity is parent
+            			query = session.getNamedQuery("getCtxAssociationIdsByParentEntityId");
+            			query.setParameter("parentEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            		}
+            		
+            		((CtxEntityDAO) dao).setAssociations(associationIds);
+            		
             	} finally {
             		if (session != null)
             			session.close();
             	}
-            	/////////// UGLY & QND HACK ALERT END //////////////////
             	break;
             	
         	case ATTRIBUTE:	

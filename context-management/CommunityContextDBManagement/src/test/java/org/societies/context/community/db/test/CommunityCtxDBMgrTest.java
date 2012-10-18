@@ -24,61 +24,86 @@
  */
 package org.societies.context.community.db.test;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.context.model.CommunityMemberCtxEntity;
-import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.context.community.db.impl.CommunityCtxDBMgr;
+import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.context.api.community.db.ICommunityCtxDBMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * 
  * 
- * @author
- * 
+ * @author Pavlos
+ *  
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class CommunityCtxDBMgrTest {
 
-	private static final String CIS_IIDENTITY_STRING = "myCIS.societies.local";
+	private static final String CIS_IIDENTITY_STRING0 = "myCIS0.societies.local";
+	private static final String CIS_IIDENTITY_STRING1 = "myCIS1.societies.local";
 	private static final String CIS_IIDENTITY_STRING2 = "myCIS2.societies.local";
+	private static final String CIS_IIDENTITY_STRING3 = "myCIS3.societies.local";
+	private static final String CIS_IIDENTITY_STRING4 = "myCIS4.societies.local";
+	private static final String CIS_IIDENTITY_STRING5 = "myCIS5.societies.local";
+	private static final String CIS_IIDENTITY_STRING6 = "myCIS6.societies.local";
+	private static final String CIS_IIDENTITY_STRING7 = "myCIS7.societies.local";
+	private static final String CIS_IIDENTITY_STRING8 = "myCIS8.societies.local";
 
-	private CommunityCtxDBMgr communityDB;
-	
-	CommunityCtxEntity entity;
-	CtxAttribute attribute;
-	CtxModelObject modObj;	
-	CommunityMemberCtxEntity member;
+	@Autowired
+	private ICommunityCtxDBMgr communityDB;
 
-	private static IIdentity mockCisIdentity = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity0 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity1 = mock(IIdentity.class);
 	private static IIdentity mockCisIdentity2 = mock(IIdentity.class);
-	
+	private static IIdentity mockCisIdentity3 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity4 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity5 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity6 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity7 = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity8 = mock(IIdentity.class);
+
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
-		when(mockCisIdentity.toString()).thenReturn(CIS_IIDENTITY_STRING);
+		when(mockCisIdentity0.toString()).thenReturn(CIS_IIDENTITY_STRING0);
+		when(mockCisIdentity1.toString()).thenReturn(CIS_IIDENTITY_STRING1);
 		when(mockCisIdentity2.toString()).thenReturn(CIS_IIDENTITY_STRING2);
-
+		when(mockCisIdentity3.toString()).thenReturn(CIS_IIDENTITY_STRING3);
+		when(mockCisIdentity4.toString()).thenReturn(CIS_IIDENTITY_STRING4);
+		when(mockCisIdentity5.toString()).thenReturn(CIS_IIDENTITY_STRING5);
+		when(mockCisIdentity6.toString()).thenReturn(CIS_IIDENTITY_STRING6);
+		when(mockCisIdentity7.toString()).thenReturn(CIS_IIDENTITY_STRING7);
+		when(mockCisIdentity8.toString()).thenReturn(CIS_IIDENTITY_STRING8);
 	}
 
 	/**
@@ -93,7 +118,6 @@ public class CommunityCtxDBMgrTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		communityDB = new CommunityCtxDBMgr();
 	}
 
 	/**
@@ -101,123 +125,128 @@ public class CommunityCtxDBMgrTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		communityDB = null;
 	}
 
 	@Test
- 	public void testCreateCommunityCtxEntity() throws CtxException{
-		System.out.println("---- testCreateCommunityCtxEntity");
+	public void testCreateCommunityEntity() throws CtxException {
 
-		entity = communityDB.createCommunityEntity(mockCisIdentity);
+		final CommunityCtxEntity entity = 
+				this.communityDB.createCommunityEntity(mockCisIdentity0);
 
 		assertNotNull(entity);
-		assertEquals(mockCisIdentity.toString(), entity.getOwnerId());
+		assertNotNull(entity.getId());
+		assertEquals(mockCisIdentity0.toString(), entity.getOwnerId());
+		assertEquals(CtxModelType.ENTITY, entity.getModelType());
+		assertEquals(CtxEntityTypes.COMMUNITY, entity.getType());
+		assertNotNull(entity.getObjectNumber());
+		assertNotNull(entity.getLastModified());
+		assertNotNull(entity.getAttributes());
+		assertTrue(entity.getAttributes().isEmpty());
+		assertNotNull(entity.getAssociations());
+		assertEquals(2, entity.getAssociations().size());
+	}
+
+	@Test
+	public void testCreateCommunityAttribute() throws CtxException {
+
+		final CommunityCtxEntity entity = 
+				this.communityDB.createCommunityEntity(mockCisIdentity1);
+		final CtxAttribute attribute = 
+				this.communityDB.createCommunityAttribute(entity.getId(), CtxAttributeTypes.NAME);
+
+		assertNotNull(attribute);
+		assertNotNull(attribute.getId());
+		assertEquals(entity.getId(), attribute.getScope());
+		assertEquals(mockCisIdentity1.toString(), attribute.getOwnerId());
+		assertEquals(CtxModelType.ATTRIBUTE, attribute.getModelType());
+		assertEquals(CtxAttributeTypes.NAME, attribute.getType());
+		assertNotNull(attribute.getLastModified());
+		assertTrue(!attribute.isHistoryRecorded());
+		assertEquals(CtxAttributeValueType.EMPTY, attribute.getValueType());
+		assertNull(attribute.getStringValue());
+		assertNull(attribute.getIntegerValue());
+		assertNull(attribute.getDoubleValue());
+		assertNull(attribute.getBinaryValue());
+		assertNull(attribute.getValueMetric());
+		assertNull(attribute.getSourceId());
+		assertNotNull(attribute.getQuality());
+		assertEquals(attribute, attribute.getQuality().getAttribute());
+		// TODO assertEquals(attribute.getLastModified(), attribute.getQuality().getLastUpdated());
+		assertNull(attribute.getQuality().getOriginType());
+		assertNull(attribute.getQuality().getPrecision());
+		assertNull(attribute.getQuality().getUpdateFrequency());
+	}
+
+	@Test
+	public void testUpdateCommunityAttribute() throws CtxException {
+
+		final CtxEntityIdentifier commEntityId = 
+				this.communityDB.createCommunityEntity(mockCisIdentity2).getId();
+		CtxAttribute attribute = this.communityDB.createCommunityAttribute(
+				commEntityId, CtxAttributeTypes.NAME);
+
+		attribute.setStringValue("Jane Do Fans");
+		attribute.setValueType(CtxAttributeValueType.STRING);
+		Date lastUpdated = attribute.getQuality().getLastUpdated();
+		// verify update
+		attribute = (CtxAttribute) this.communityDB.update(attribute);
+		assertEquals("Jane Do Fans", attribute.getStringValue());
+		assertNull(attribute.getIntegerValue());
+		assertNull(attribute.getDoubleValue());
+		assertNull(attribute.getBinaryValue());
+		assertEquals(CtxAttributeValueType.STRING, attribute.getValueType());
+		assertNull(attribute.getValueMetric());
+		assertNull(attribute.getSourceId());
+		//problem with Mysql when testing
+		//assertEquals(lastUpdated, attribute.getQuality().getLastUpdated());
+		assertNull(attribute.getQuality().getOriginType());
+		assertNull(attribute.getQuality().getPrecision());
+		assertNull(attribute.getQuality().getUpdateFrequency());
+		
+		CtxAttribute attribute2 = this.communityDB.createCommunityAttribute(
+				commEntityId, CtxAttributeTypes.TEMPERATURE);
+		attribute2.setHistoryRecorded(true);
+		attribute2 = (CtxAttribute) this.communityDB.update(attribute2);
+		assertTrue(attribute2.isHistoryRecorded());
+		
+		attribute2.setDoubleValue(25.5);
+		attribute2.setValueType(CtxAttributeValueType.DOUBLE);
+		attribute2.getQuality().setOriginType(CtxOriginType.SENSED);
+		attribute2 = (CtxAttribute) this.communityDB.update(attribute2);
+		assertEquals(CtxOriginType.SENSED, attribute2.getQuality().getOriginType());
+		final Date lastModified1 = attribute2.getLastModified();
+		final Date lastUpdated1 = attribute2.getQuality().getLastUpdated();
+		
+		attribute2.setDoubleValue(25.5);
+		attribute2.setValueType(CtxAttributeValueType.DOUBLE);
+		attribute2 = (CtxAttribute) this.communityDB.update(attribute2);
+		final Date lastModified2 = attribute2.getLastModified();
+		final Date lastUpdated2 = attribute2.getQuality().getLastUpdated();
+		assertEquals(lastModified1, lastModified2);
+		//problem with Mysql when testing
+		//assertTrue(lastUpdated2.compareTo(lastUpdated1) > 0);
 	}
 	
 	@Test
- 	public void testCreateCommunityCtxAttribute() throws CtxException{
-		System.out.println("---- testCreateCommunityCtxAttribute");
+	public void testRetrieveCommunityEntity() throws CtxException {
 
-		entity = communityDB.createCommunityEntity(mockCisIdentity);
-		attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
-		
-		assertNotNull(attribute);
-		assertEquals("name", attribute.getType());
+		final CommunityCtxEntity entity = 
+				this.communityDB.createCommunityEntity(mockCisIdentity3);
+		final CommunityCtxEntity entityFromDb = this.communityDB.retrieveCommunityEntity(mockCisIdentity3);
+
+		assertNotNull(entityFromDb);
+		assertEquals(entity.getId(), entityFromDb.getId());
+		assertEquals(entity.getOwnerId(), entityFromDb.getOwnerId());
+		assertEquals(entity.getModelType(), entityFromDb.getModelType());
+		assertEquals(entity.getType(), entityFromDb.getType());
+		assertEquals(entity.getObjectNumber(), entityFromDb.getObjectNumber());
+		assertEquals(entity.getLastModified(), entityFromDb.getLastModified());
+		assertNotNull(entityFromDb.getAttributes());
+		assertEquals(entity.getAttributes().size(), entityFromDb.getAttributes().size());
+		assertNotNull(entityFromDb.getAssociations());
+		assertEquals(entity.getAssociations().size(), entityFromDb.getAssociations().size());
 	}
-	
-   @Test
-   public void testUpdateEntity() throws CtxException{
-	   System.out.println("---- testUpdateEntity");
-
-	   entity = communityDB.createCommunityEntity(mockCisIdentity);
-	   System.out.println("entities attributes " + entity.getAttributes());
-	   System.out.println("entities members " + entity.getMembers());
-
-	   // Add CommunityMemberCtxEntity
-	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member.getId());
-	   
-	   communityDB.updateCommunityEntity(entity);
-	   System.out.println("updated entities members " + entity.getMembers());
-	   
-	   // Add Attribute
-	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
-	   entity.addAttribute(attribute);
-	   communityDB.updateCommunityEntity(entity);
-	   System.out.println("updated entities attributes " + entity.getAttributes());
-
-	   // Retrieve CommunityCtxEntity
-	   modObj = communityDB.retrieve(entity.getId());
-	   CommunityCtxEntity retrEntity = (CommunityCtxEntity) modObj;
-	   System.out.println("retrieved entity - " + retrEntity);
-	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
-	   System.out.println("retrieves members - " + retrEntity.getMembers());
-	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
-	   
-	   assertNotNull(entity);
-	   assertNotNull(retrEntity);
-	   assertEquals(entity.getAttributes(), retrEntity.getAttributes());
-	   assertEquals(entity.getMembers(), retrEntity.getMembers());
-	}
-   
-   @Test
-   public void testUpdateAttribute() throws CtxException{
-	   System.out.println("---- testUpdateAttribute");
-
-	   entity = communityDB.createCommunityEntity(mockCisIdentity);
-	   System.out.println("entities attributes " + entity.getAttributes());
-	   System.out.println("entities members " + entity.getMembers());
-
-	   // Add CommunityMemberCtxEntity
-	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member.getId());
-	   
-	   communityDB.updateCommunityEntity(entity);
-	   System.out.println("updated entities members " + entity.getMembers());
-	   
-	   // Add Attribute
-	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
-	   entity.addAttribute(attribute);
-	   communityDB.updateCommunityEntity(entity);
-	   System.out.println("updated entities attributes " + entity.getAttributes());
-	   
-	   // Retrieve CommunityCtxEntity
-	   modObj = communityDB.retrieve(entity.getId());
-	   CommunityCtxEntity retrEntity = (CommunityCtxEntity) modObj;
-	   System.out.println("retrieved entity - " + retrEntity);
-	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
-	   System.out.println("retrieves members - " + retrEntity.getMembers());
-	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
-	   
-	   // Update attribute
-	   attribute.setIntegerValue(5);
-	   communityDB.updateCommunityAttribute(attribute);
-	   System.out.println("updated attribute");
-	   
-	   modObj = communityDB.retrieve(attribute.getId());
-	   attribute = (CtxAttribute) modObj;
-
-	   System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
-
-	   assertNotNull(attribute);
-	   
-	   assertNotNull(entity);
-	   assertNotNull(retrEntity);
-	   assertEquals(entity.getAttributes(), retrEntity.getAttributes());
-	   assertEquals(entity.getMembers(), retrEntity.getMembers());
-	}
-
-   @Test
-   public void testRetrieveCommunityEntity() throws CtxException {
-
-	   entity = communityDB.createCommunityEntity(mockCisIdentity);
-
-	   CommunityCtxEntity retrEntity;
-	   retrEntity = communityDB.retrieveCommunityEntity(mockCisIdentity);
-	   assertNotNull(retrEntity);
-	   assertEquals(entity, retrEntity);
-   }
-   
+/*   
    @Test
    public void testRetrieve() throws CtxException {
 
@@ -274,7 +303,69 @@ public class CommunityCtxDBMgrTest {
        ids = communityDB.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME_LAST);
        assertTrue(ids.contains(attrId2));
        assertEquals(1, ids.size());
+	}*/
+   
+   @Test
+   public void testCommunityHierarchies() throws CtxException{
 
-              
-	}
+	   CtxAssociation association;
+	   
+	   CommunityCtxEntity entity = 
+			   this.communityDB.createCommunityEntity(mockCisIdentity4);
+	   assertTrue(entity.getCommunities().isEmpty());
+	   assertTrue(entity.getMembers().isEmpty());
+
+	   // Setup (parent) Super-community
+	   final CtxEntityIdentifier parentEntityId = 
+			   this.communityDB.createCommunityEntity(mockCisIdentity5).getId();
+	   association = (CtxAssociation) this.communityDB.retrieve(
+			   entity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next());
+	   association.addChildEntity(parentEntityId);
+	   association = (CtxAssociation) this.communityDB.update(association);
+	   assertEquals(1, association.getChildEntities().size());
+	   assertTrue(association.getChildEntities().contains(parentEntityId));
+	   // check association from the entity's side
+	   entity = (CommunityCtxEntity) this.communityDB.retrieve(entity.getId());
+	   assertTrue(entity.getCommunities().contains(parentEntityId));
+
+	   // Setup another Super-community
+	   final CtxEntityIdentifier parentEntityId2 = 
+			   this.communityDB.createCommunityEntity(mockCisIdentity6).getId();
+	   association.addChildEntity(parentEntityId2);
+	   association = (CtxAssociation) this.communityDB.update(association);
+	   assertEquals(2, association.getChildEntities().size());
+	   assertTrue(association.getChildEntities().contains(parentEntityId2));
+	   // check association from the entity's side
+	   entity = (CommunityCtxEntity) this.communityDB.retrieve(entity.getId());
+	   assertEquals(2, entity.getCommunities().size());
+	   assertTrue(entity.getCommunities().contains(parentEntityId));
+	   assertTrue(entity.getCommunities().contains(parentEntityId2));
+
+	   // Add (child) sub-communities
+	   final CtxEntityIdentifier childEntityId = 
+			   this.communityDB.createCommunityEntity(mockCisIdentity7).getId();
+	   association = (CtxAssociation) this.communityDB.retrieve(
+			   entity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next());
+	   association.addChildEntity(childEntityId);
+	   association = (CtxAssociation) this.communityDB.update(association);
+	   assertEquals(1, association.getChildEntities().size());
+	   assertTrue(association.getChildEntities().contains(childEntityId));
+	   // check association from the entity's side
+	   entity = (CommunityCtxEntity) this.communityDB.retrieve(entity.getId());
+	   assertEquals(1, entity.getMembers().size());
+	   assertTrue(entity.getMembers().contains(childEntityId));
+	   
+	   final CtxEntityIdentifier childEntityId2 = 
+			   this.communityDB.createCommunityEntity(mockCisIdentity8).getId();
+	   association.addChildEntity(childEntityId2);
+	   association = (CtxAssociation) this.communityDB.update(association);
+	   assertEquals(2, association.getChildEntities().size());
+	   assertTrue(association.getChildEntities().contains(childEntityId));
+	   assertTrue(association.getChildEntities().contains(childEntityId2));
+	   // check association from the entity's side
+	   entity = (CommunityCtxEntity) this.communityDB.retrieve(entity.getId());
+	   assertEquals(2, entity.getMembers().size());
+	   assertTrue(entity.getMembers().contains(childEntityId));
+	   assertTrue(entity.getMembers().contains(childEntityId2));
+   }
 }

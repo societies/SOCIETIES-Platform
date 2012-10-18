@@ -92,11 +92,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 					"where entity.ctxId.type = :entType " +
 					"and attribute.ctxId.type = :attrType " +
 					"and attribute.binaryValue = :minAttribValue"
-	),
-	@NamedQuery(
-			name = "getCtxAssociationIdsByEntity",
-			query = "select distinct association.ctxId from CtxAssociationDAO as association inner join association.childEntities as childEntity " +
-					"where childEntity = :entId "
 	)
 })
 @Entity
@@ -175,9 +170,8 @@ public class CtxEntityDAO extends CtxModelObjectDAO {
 		return this.associations;
 	}
 	
-	public void addAssociation(CtxAssociationIdentifier association) {
+	public void setAssociations(Set<CtxAssociationIdentifier> associations) {
 		
-		if (!this.associations.contains(association))
-			this.associations.add(association);
+		this.associations = associations;
 	}
 }

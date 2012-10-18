@@ -35,6 +35,16 @@ import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
  * Implemented by the CommunityManager APKLib service
  */
 public interface ICisSubscribed {
+	//CIS SUBSCRIBER INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
+	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
+	public static final String GET_MEMBERS     	= "org.societies.android.platform.community.GET_MEMBERS";
+	public static final String GET_ACTIVITY_FEED= "org.societies.android.platform.community.GET_ACTIVITY_FEED";
+	public static final String ADD_ACTIVITY 	= "org.societies.android.platform.community.ADD_ACTIVITY";
+	public static final String DELETE_ACTIVITY 	= "org.societies.android.platform.community.DELETE_ACTIVITY";
+	public static final String CLEAN_ACTIVITIES = "org.societies.android.platform.community.CLEAN_ACTIVITIES";
+	public static final String GET_CIS_INFO 	= "org.societies.android.platform.community.GET_CIS_INFO";
+	
 	public String methodsArray[] = {"getMembers(String client, String cisId)",
 							 		"getCisInformation(String client, String cisId)",
 							 		"getActivityFeed(String client, String cisId)",

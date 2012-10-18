@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.api.schema.activity.Activity;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -97,5 +99,21 @@ public class AActivity extends Activity implements Parcelable {
 		return act;
 	}
 
+	/**
+	 * Creates an AActivity from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	public static AActivity CreateFromJSON(JSONObject jObj) throws JSONException {
+		AActivity act = new AActivity();
+		act.setActor(jObj.getString("actor"));
+		act.setObject(jObj.getString("object"));
+		act.setPublished(jObj.getString("published"));
+		act.setTarget(jObj.getString("target"));
+		act.setVerb(jObj.getString("verb"));
+		
+		return act;
+	} 
 	
 }
