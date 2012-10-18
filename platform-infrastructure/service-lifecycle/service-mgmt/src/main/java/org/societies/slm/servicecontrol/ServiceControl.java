@@ -689,7 +689,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Now searching for the service installed by the new bundle");
 				
 				//TODO Something to assure the other function is called first...
-				Service service = idList.poll(TIMEOUT, TimeUnit.SECONDS);
+				Service service = idList.take();
+				//Service service = idList.poll(TIMEOUT, TimeUnit.SECONDS);
 				
 				synchronized(this){
 					installServiceMap.remove(bundleId);
@@ -1320,35 +1321,51 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			List<Service> thirdPartyClients = getServiceReg().findServices(filter);
 			
 			for(Service thirdPartyClient : thirdPartyClients){
-				if(logger.isDebugEnabled())
-					logger.debug("Attempting to reinstall 3p client: " + thirdPartyClient.getServiceName());
+
+				Long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(thirdPartyClient.getServiceIdentifier());
 				
-				String bundleLocation = thirdPartyClient.getServiceInstance().getServiceImpl().getServiceClient();
-	
-				Future<ServiceControlResult> asyncResult = installService(new URL(bundleLocation));
-				ServiceControlResult result = asyncResult.get();
+				if(logger.isDebugEnabled())
+					logger.debug("Checking if Bundle Id: " + bundleId + " exists in OSGI...");
+				
+				Bundle thisBundle = this.bundleContext.getBundle(bundleId);
+				
+				if(thisBundle == null || (thisBundle != null && !(thisBundle.getSymbolicName().equals(thirdPartyClient.getServiceInstance().getServiceImpl().getServiceNameSpace())))){
+					if(logger.isDebugEnabled()){
+						logger.debug("Bundle doesn't exist, or isn't our service! We need to install!");
+						logger.debug("Attempting to reinstall 3p client: " + thirdPartyClient.getServiceName());
+					}
 							
-				if(result.getMessage() == ResultMessage.SUCCESS){
+					String bundleLocation = thirdPartyClient.getServiceLocation();
+		
+					Future<ServiceControlResult> asyncResult = installService(new URL("file://"+bundleLocation));
+					ServiceControlResult result = asyncResult.get();
+								
+					if(result.getMessage() == ResultMessage.SUCCESS){
+							
+						// We get the service from the registry
+						Service newService = getServiceReg().retrieveService(result.getServiceId());
+							
+						ServiceInstance newServiceInstance = newService.getServiceInstance();
+						newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getFullJid());
+						newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
+						ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
+						newServImpl.setServiceClient(bundleLocation);
+						newServiceInstance.setServiceImpl(newServImpl);
+						newService.setServiceInstance(newServiceInstance);
+						getServiceReg().updateRegisteredService(newService);
+							
+						if(logger.isDebugEnabled())
+							logger.debug("Installed shared third-party service client for " + newService.getServiceName());
 						
-					// We get the service from the registry
-					Service newService = getServiceReg().retrieveService(result.getServiceId());
-						
-					ServiceInstance newServiceInstance = newService.getServiceInstance();
-					newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getFullJid());
-					newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
-					ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
-					newServImpl.setServiceClient(bundleLocation);
-					newServiceInstance.setServiceImpl(newServImpl);
-					newService.setServiceInstance(newServiceInstance);
-					getServiceReg().updateRegisteredService(newService);
-						
-					if(logger.isDebugEnabled())
-						logger.debug("Installed shared third-party service client for " + newService.getServiceName());
+					} else{
+						if(logger.isDebugEnabled())
+							logger.debug("Installation of client for "+ thirdPartyClient.getServiceName() +" was not successful");
+					}
 					
-				} else{
-					if(logger.isDebugEnabled())
-						logger.debug("Installation of client for "+ thirdPartyClient.getServiceName() +" was not successful");
-				}
+				} 
+				 
+				
+
 			}
 		} catch(Exception ex){
 			logger.error("Error on cleanAfterRestart, not able to restart installed 3rd party service clients");

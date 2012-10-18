@@ -99,7 +99,7 @@ public class ServiceDownloader {
 		file = new File(path);
 		directory = file.getParentFile();
 		
-		if (directory != null) {
+		if (!directory.isDirectory()) {
 			if(logger.isDebugEnabled())
 				logger.debug("folder " + directory + " doesn't exist yet, creating it...");
 			directory.mkdirs();
