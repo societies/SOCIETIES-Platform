@@ -1871,9 +1871,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				synchronized (callback) {
 					try {
-						LOG.info("RetrieveCtx remote call result received 1 ");
+						//LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
 						objectResult = callback.getResult();
+						
 						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
 						IPerformanceMessage m = new PerformanceMessage();
 						m.setTestContext("ContextBroker_Delay_RemoteContextRetrieval");
@@ -1894,15 +1895,9 @@ public class InternalCtxBroker implements ICtxBroker {
 				}											
 
 
-
-
-
 			}//end of remote code
 		}
 		LOG.info("RETRIEVE context data identifier: " +objectResult.getId().toString());
-
-
-
 
 		return new AsyncResult<CtxModelObject>(objectResult);
 	}
