@@ -15,6 +15,7 @@
 
 	<!-- External provided services -->
 	<osgi:service ref="externalTrustBroker" interface="org.societies.api.privacytrust.trust.ITrustBroker" />
+	<osgi:service ref="externalTrustEvidenceCollector" interface="org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector" />
 	
 	<!-- Internal provided services -->
 	<osgi:service ref="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
