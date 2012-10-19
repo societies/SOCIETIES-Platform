@@ -321,7 +321,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				CtxIdentifier ctxIdentifier = ctxBeanTranslator2.fromCtxIdentifierBean(ctxIdentRetrieveBean);
 
 				CtxModelObject retrievedObj = this.ctxbroker.retrieve(requestorRetrieve, ctxIdentifier).get();
-				//	LOG.info("retrieved object "+ retrievedObj.getId().toString());
+					LOG.info("it indi entity retrieved object? "+ retrievedObj.getId().toString());
 				// object retrieved locally 
 				// create response bean
 

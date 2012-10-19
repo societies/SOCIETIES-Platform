@@ -426,6 +426,10 @@ public class ContextAware3pService implements IContextAware3pService{
 			LOG.info("retrieve remote ctxAttribute id   "+attrNameRemote.getId());
 			LOG.info("retrieve remote ctxAttribute value   "+attrNameRemote.getStringValue());
 
+			LOG.info("retrieve remote indi entity 0");
+			IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.ctxBroker.retrieve(requestor, remoteEntityID).get();
+			LOG.info("retrieve remote indi entity 1 "+indiEnt.getId());  
+			
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
