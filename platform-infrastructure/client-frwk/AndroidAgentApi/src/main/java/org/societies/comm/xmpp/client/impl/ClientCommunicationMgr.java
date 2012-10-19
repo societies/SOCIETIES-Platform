@@ -33,7 +33,7 @@ public class ClientCommunicationMgr {
 	
 	private static final String LOG_TAG = ClientCommunicationMgr.class.getName();
 
-	private static final ComponentName serviceCN = new ComponentName("org.societies", "org.societies.AgentService"); // TODO
+	private static final ComponentName serviceCN = new ComponentName("org.societies.comms", "org.societies.comms.AgentService"); // TODO
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
