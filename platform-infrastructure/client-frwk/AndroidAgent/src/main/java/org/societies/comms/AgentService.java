@@ -1,4 +1,4 @@
-package org.societies;
+package org.societies.comms;
 
 import java.io.File;
 import java.io.FileInputStream;

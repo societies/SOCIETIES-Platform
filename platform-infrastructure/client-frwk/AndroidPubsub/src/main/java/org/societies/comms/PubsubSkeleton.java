@@ -1,4 +1,4 @@
-package org.societies.pubsub;
+package org.societies.comms;
 
 import java.util.List;
 
