@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -65,6 +66,12 @@ public class CreateAttributeCallback implements ICtxCallback {
 
 	@Override
 	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -168,7 +168,7 @@ public class CtxBrokerExample implements Subscriber{
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
 
 		try {
-			//cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
+			// the cis creation will also create a community ctx Entity
 			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
 			LOG.info("*** cisOwned " +cisOwned);
 			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
@@ -188,35 +188,7 @@ public class CtxBrokerExample implements Subscriber{
 		}
 		LOG.info("*** cisManager this.cisID " +this.cisID.toString());
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
-
-
-		// subscribe with activity feed		
-		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.api.schema.activity"); 
-
-		try {
-			this.pubsubClient.addJaxbPackages(packageList);
-
-		} catch (JAXBException e) {
-			LOG.warn("Jaxb exception when trying to add packages to pubsub");
-			e.printStackTrace();
-		}
-
-		try {
-			LOG.info("*** subscribe with cisManager");
-			this.pubsubClient.subscriberSubscribe(this.commMgrService.getIdManager().fromJid(cssOwnerStr), cisOwned.getCisId() , this);
-		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
+		
 		LOG.info("*** Starting  individual context examples...");
 		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
@@ -231,10 +203,11 @@ public class CtxBrokerExample implements Subscriber{
 
 		LOG.info("*** Starting community context examples...");
 		// community context tests
-		this.createCommunityEntity();
+	
 		this.createIndividualEntities();
 		// includes context bond tests
 		this.populateCommunityEntity();
+		
 		this.retrieveCommunityEntityBasedOnCisID();
 		this.lookupCommunityEntAttributes();
 	}
@@ -318,11 +291,31 @@ public class CtxBrokerExample implements Subscriber{
 	private void populateCommunityEntity(){
 		LOG.info("*** populateCommunityEntity");
 
+		
 		try {
-			this.communityEntity.addMember(this.indiEnt1.getId());
-			this.communityEntity.addMember(this.indiEnt2.getId());
-			this.communityEntity.addMember(this.indiEnt3.getId());
-
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
+			
+			this.communityEntity = (CommunityCtxEntity) this.internalCtxBroker.retrieve(ctxCommunityEntityIdentifier).get();
+			
+			Set<CtxAssociationIdentifier> assocIDSet = this.communityEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS);
+			CtxAssociation assocHasMembers = null;
+			if(assocIDSet.size()>0){
+				List<CtxAssociationIdentifier> assocIdList = new ArrayList<CtxAssociationIdentifier>(assocIDSet);
+				assocHasMembers = (CtxAssociation) this.internalCtxBroker.retrieve(assocIdList.get(0)).get();
+			}
+			
+			LOG.info("community members (before adding new members) "+ assocHasMembers.getChildEntities());
+			
+			//add new members
+			assocHasMembers.addChildEntity(this.indiEnt1.getId());
+			assocHasMembers.addChildEntity(this.indiEnt2.getId());
+			assocHasMembers.addChildEntity(this.indiEnt3.getId());
+			
+			assocHasMembers = (CtxAssociation) this.internalCtxBroker.update(assocHasMembers).get();
+			
+			LOG.info("community members (after adding new members) "+ assocHasMembers.getChildEntities());
+			
+			
 			LOG.info(" BEFORE UPDATE communityEnt.getID():  " +this.communityEntity.getId());
 			LOG.info(" BEFORE UPDATE communityEnt.getMembers():  " +this.communityEntity.getMembers());
 
@@ -345,11 +338,11 @@ public class CtxBrokerExample implements Subscriber{
 
 			this.internalCtxBroker.update(this.communityEntity).get();
 
-			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
-			LOG.info(" AFTER UPDATE communityEnt id :  " +communityEnt.getId());
-			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
+			//CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
+			//LOG.info(" AFTER UPDATE communityEnt id :  " +communityEnt.getId());
+			//LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
 
-			Set<CtxBond> retrievedBonds = communityEnt.getBonds();
+			Set<CtxBond> retrievedBonds = this.communityEntity.getBonds();
 			LOG.info(" retrievedBonds " +retrievedBonds);
 			for(CtxBond bond : retrievedBonds){
 				LOG.info(" bond type : " +bond.getType());
@@ -406,7 +399,7 @@ public class CtxBrokerExample implements Subscriber{
 		}
 	}
 
-
+/*
 	private void createCommunityEntity(){
 		LOG.info("*** createCommunityContext");
 
@@ -442,7 +435,7 @@ public class CtxBrokerExample implements Subscriber{
 		}
 	}
 
-
+*/
 
 
 

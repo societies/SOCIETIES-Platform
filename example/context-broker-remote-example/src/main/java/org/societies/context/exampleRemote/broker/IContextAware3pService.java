@@ -28,6 +28,7 @@ package org.societies.context.exampleRemote.broker;
 import java.util.List;
 
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
@@ -46,6 +47,8 @@ public interface IContextAware3pService {
 	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId, String type);
 	
 	public CtxEntity createRemoteCtxEntity(String type);
+	
+	public CtxAssociation createRemoteCtxAssociation(String type);
 	
 	public List<CtxIdentifier> lookupRemoteCtxAttribute(String type);
 	

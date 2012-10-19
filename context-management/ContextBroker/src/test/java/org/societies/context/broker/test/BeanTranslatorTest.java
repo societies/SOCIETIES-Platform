@@ -166,11 +166,7 @@ public class BeanTranslatorTest {
 		CtxModelObject ctxObj = ctxBeanTranslator.fromCtxModelObjectBean(ctxObjBean);
 		System.out.println("ctxObj "+ctxObj );
 		System.out.println("ctxObj  id "+ctxObj.getId().toString() );
-		
-		
-		
-		
-		
+				
 
 	}
 	

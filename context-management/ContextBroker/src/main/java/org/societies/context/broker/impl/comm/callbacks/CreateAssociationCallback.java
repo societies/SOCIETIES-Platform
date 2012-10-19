@@ -12,32 +12,34 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.broker.impl.comm.ICtxCallback;
 
-public class RetrieveIndividualEntCallback implements ICtxCallback{
+public class CreateAssociationCallback implements ICtxCallback {
 
-	
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(RetrieveCtxCallback.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CreateAssociationCallback.class);
 	
-	CtxEntityIdentifier entityId;
-	
-	
-	
+	private CtxAssociation ctxAssocResult =  null;
+
+	@Override
+	public void receiveCtxResult(Object retObject, String type) {
+
+	}
+
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
 	public void onCreatedAttribute(CtxAttribute retObject) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -51,34 +53,26 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+		// TODO Auto-generated method stub
 		
-		LOG.info("onRetrieveIndiEnt ctxId " +ctxId);
-		this.entityId = ctxId;
-		synchronized (this) {	            
-			notifyAll();	        
-		}
-		LOG.info("onRetrieveIndiEnt, notify all done");
-		
-	}
-
-	
-	public CtxEntityIdentifier getResult() {
-		return this.entityId;
 	}
 
 	@Override
 	public void onCreatedAssociation(CtxAssociation retObject) {
-		// TODO Auto-generated method stub
+		
+		LOG.info("onCreatedAssociation retObject " +retObject);
+		this.ctxAssocResult = retObject;
+		synchronized (this) {	            
+			notifyAll();	        
+		}
+		LOG.info("onCreatedAssociation, notify all done");
 		
 	}
 	
+	public CtxAssociation getResult() {
+		return this.ctxAssocResult;
+	}
 }
