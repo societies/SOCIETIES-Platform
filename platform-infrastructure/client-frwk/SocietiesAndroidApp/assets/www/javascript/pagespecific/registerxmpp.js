@@ -148,10 +148,6 @@ $(document).on('pageinit', '#new-identity', function(event) {
 		}
 	});
 	
-	$('#xmppRegistration').off('click').on('click', function(){
-		$.mobile.changePage("html/new_identity.html");
-	});
-
 });
 
 /**

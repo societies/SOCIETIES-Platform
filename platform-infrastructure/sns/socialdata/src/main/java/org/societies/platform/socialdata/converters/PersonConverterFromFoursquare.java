@@ -188,7 +188,9 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 		
 		if (getString(FIRSTNAME)!=null) name.setGivenName(getString(FIRSTNAME));
 		if (getString(LASTNAME) !=null) name.setFamilyName(getString(LASTNAME));
-		
+		if (name.getFormatted()=="")
+			name.setFormatted(name.getGivenName()+" "+ name.getFamilyName());
+			
 		
 		return name;
 	}

@@ -35,6 +35,8 @@ import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
@@ -73,6 +75,11 @@ public class CtxBrokerExampleRemote 	{
 		LOG.info("*** create remoteAttribute");
 		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
 		LOG.info("*** remoteAttribute created,  id : "+ remoteAttribute.getId());		
+		
+		LOG.info("*** create remoteAssociation");
+		CtxAssociation remoteAssociation = this.ca3pService.createRemoteCtxAssociation(CtxAssociationTypes.USES_DEVICES);
+		LOG.info("*** remoteAssociation created,  id : "+ remoteAssociation.getId());		
+		
 		
 		LOG.info("*** register for context updates");
 		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());

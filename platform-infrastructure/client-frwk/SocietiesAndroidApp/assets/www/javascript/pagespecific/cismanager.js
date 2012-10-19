@@ -134,7 +134,7 @@ var	SocietiesCISManagerService = {
 		
 		function success(data) {
 			console.log("List CISs where  = TODO");
-			SocietiesCISListService.populateCISListpage(data);
+			SocietiesCISListService.populateCISListpage(data, false);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
 		
@@ -142,8 +142,31 @@ var	SocietiesCISManagerService = {
 			alert("ListCIS - failure: " + data);
 		}
 		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
-				window.plugins.SocietiesLocalCISManager.listCIS(success, failure); } );
+				window.plugins.SocietiesLocalCISManager.listCIS(success, failure, "all"); } );
 	}, 
+	
+	/**
+	 * @methodOf SocietiesCISManagerService#
+	 * @description list CISs
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns CIS records
+	 */
+	manageCIS: function() {
+		console.log("list CISs");
+		
+		function success(data) {
+			console.log("List CISs where  = TODO");
+			SocietiesCISListService.populateCISListpage(data, true);
+			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("ListCIS - failure: " + data);
+		}
+		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+				window.plugins.SocietiesLocalCISManager.listCIS(success, failure, "owned"); } );
+	},
 	
 	searchCisDirectory: function(searchTerm) {
 		console.log("Search CIS Dir for " + searchTerm);

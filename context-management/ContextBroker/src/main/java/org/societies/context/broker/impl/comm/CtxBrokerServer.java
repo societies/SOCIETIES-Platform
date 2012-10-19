@@ -45,6 +45,7 @@ import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 
+import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
@@ -63,6 +64,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
@@ -138,25 +140,19 @@ public class CtxBrokerServer implements IFeatureServer{
 			RequestorBean reqBeanCreateEntity = cbPayload.getCreateEntity().getRequestor();
 			Requestor requestorCreateEntity = getRequestorFromBean(reqBeanCreateEntity);
 
-			//LOG.info("CREATE_ENTITY   brokerserver targetIdentityString: "+targetIdentityString);
 			IIdentity targetIdentity;
 			try {
 				targetIdentity = this.identMgr.fromJid(targetIdentityString);
 
 				CtxEntity newCtxEntity = ctxbroker.createEntity(requestorCreateEntity, targetIdentity, cbPayload.getCreateEntity().getType().toString()).get();
-				//LOG.info("CREATE_ENTITY  brokerserver id :" +newCtxEntity.getId());
-				//LOG.info("CREATE_ENTITY  brokerserver getLastModified :" +newCtxEntity.getLastModified());
-				//LOG.info("CREATE_ENTITY  brokerserver getLastModified :" +newCtxEntity.getOwnerId());
-				//LOG.info("CREATE_ENTITY  brokerserver newCtxEntity :" +newCtxEntity);
 
 				//create the response based on the created CtxEntity - the response should be a result bean
 				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-				CtxEntityBean ctxBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
-				//				LOG.info("CREATE_ENTITY  ctxBean created :" +ctxBean);
+				CtxEntityBean ctxEntityBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
+			
 				//setup the CtxEntityBean from CtxEntity				
-				beanResponse.setCtxBrokerCreateEntityBeanResult(ctxBean);
-				//			LOG.info("CREATE_ENTITY entity beanResponse:" +beanResponse);
-
+				beanResponse.setCtxBrokerCreateEntityBeanResult(ctxEntityBean);
+				
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -175,11 +171,52 @@ public class CtxBrokerServer implements IFeatureServer{
 			}
 			break;
 
+		case CREATE_ASSOCIATION:
+
+			beanResponse = new CtxBrokerResponseBean();
+			LOG.info("CREATE_ASSOCIATION");
+
+			String targetIdentityStringAssoc = cbPayload.getCreateAssociation().getTargetCss().toString();
+
+			RequestorBean reqBeanCreateAssoc = cbPayload.getCreateAssociation().getRequestor();
+			Requestor requestorCreateAssoc = getRequestorFromBean(reqBeanCreateAssoc);
+			String assocType = cbPayload.getCreateAssociation().getType();
+
+			IIdentity targetIdentityAssoc;
+
+			try {
+				targetIdentityAssoc = this.identMgr.fromJid(targetIdentityStringAssoc);
+				CtxAssociation association = ctxbroker.createAssociation(requestorCreateAssoc, targetIdentityAssoc, assocType).get();
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				CtxAssociationBean ctxAssocBean = ctxBeanTranslator.fromCtxAssociation(association);
+			
+				beanResponse.setCtxBrokerCreateAssociationBeanResult(ctxAssocBean);
+			
+			} catch (InvalidFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (DatatypeConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			break;
+
+
 		case CREATE_ATTRIBUTE:
 
 			LOG.info("CREATE_ATTRIBUTE");
-			//LOG.info(" beanResponse ready:" +beanResponse.getMethod().toString());
 			beanResponse = new CtxBrokerResponseBean();
+			
 			try {
 				String ctxEntityScopeBean =  cbPayload.getCreateAttribute().getScope().getString();
 				CtxEntityIdentifier ctxEntityScope = new CtxEntityIdentifier(ctxEntityScopeBean);
@@ -189,16 +226,11 @@ public class CtxBrokerServer implements IFeatureServer{
 				Requestor requestorCreateAttr = getRequestorFromBean(reqBeanCreateAttr);
 
 				CtxAttribute ctxAttribute = ctxbroker.createAttribute(requestorCreateAttr, ctxEntityScope, type).get();
-				//LOG.error("CREATE_ATTRIBUTE 1 attribute created in remote cm :" +ctxAttribute.getId());
 				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 
 				CtxAttributeBean ctxAttributeBean = ctxBeanTranslator.fromCtxAttribute(ctxAttribute); 
-				//LOG.error("CREATE_ATTRIBUTE 2 attr translated to bean :" +ctxAttributeBean);
-				//LOG.error("CREATE_ATTRIBUTE 3 attr bean has a null value:" +ctxAttributeBean.getStringValue());
-				//LOG.error("CREATE_ATTRIBUTE 4 attr bean everything else not null (id):" +ctxAttributeBean.getId());
-				//LOG.error("CREATE_ATTRIBUTE   ctxAttributeBean get string value:" +ctxAttributeBean.getStringValue());
 				beanResponse.setCtxBrokerCreateAttributeBeanResult(ctxAttributeBean);
-				//LOG.info("CREATE_ATTRIBUTE 5 beanResponse completed:" +beanResponse);
+				
 
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
@@ -218,8 +250,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		case LOOKUP:
 
 			LOG.info("LOOKUP");
-			//	LOG.info("LOOKUP 1 :");
-
+			
 			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 			beanResponse = new CtxBrokerResponseBean();
 			RequestorBean reqBeanLookup = cbPayload.getLookup().getRequestor();
@@ -359,15 +390,15 @@ public class CtxBrokerServer implements IFeatureServer{
 			RequestorBean reqRetrieveIndiEntIDBean = cbPayload.getRetrieveIndividualEntityId().getRequestor();
 			Requestor requestorRetrieveIndiEntID = getRequestorFromBean(reqRetrieveIndiEntIDBean);
 			String individualEntityIdentityString = cbPayload.getRetrieveIndividualEntityId().getTargetCss().toString();
-	
+
 			IIdentity cssId;
 			try {
 				cssId = this.identMgr.fromJid(individualEntityIdentityString);
 				CtxEntityIdentifier entID = this.ctxbroker.retrieveIndividualEntityId(requestorRetrieveIndiEntID, cssId).get();
-		
+
 				CtxEntityIdentifierBean ctxEntityIdentBean = (CtxEntityIdentifierBean) ctxBeanTranslator4.fromCtxIdentifier(entID);
 				beanResponse.setCtxBrokerRetrieveIndividualEntityIdBeanResult(ctxEntityIdentBean);
-				
+
 			} catch (InvalidFormatException e) {
 				LOG.error(e.getLocalizedMessage());
 			} catch (CtxException e) {
@@ -377,9 +408,9 @@ public class CtxBrokerServer implements IFeatureServer{
 			} catch (ExecutionException e) {
 				LOG.error(e.getLocalizedMessage());
 			}
-	
+
 			break;
-	
+
 		default: 
 			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
 		}

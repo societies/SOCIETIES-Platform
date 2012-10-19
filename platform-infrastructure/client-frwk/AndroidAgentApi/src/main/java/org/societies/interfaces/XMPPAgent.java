@@ -37,4 +37,12 @@ public interface XMPPAgent {
 	public boolean logout();
 	
 	public boolean destroyMainIdentity();
+	
+	public void setDomainAuthorityNode(String domainAuthorityNode);
+	
+	public void setPortNumber(Integer port);
+	
+	public void setResource(String resource);
+	
+	public void setDebug(Boolean enabled);
 }

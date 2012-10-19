@@ -165,6 +165,11 @@ $(document).on('pageinit', '#index', function(event) {
 		$('#connectXMPP').button('refresh');
 	});
 
+	$('#xmppRegistration').off('click').on('click', function(){
+		$.mobile.changePage("new_identity.html");
+	});
+
+
 	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')
 	});

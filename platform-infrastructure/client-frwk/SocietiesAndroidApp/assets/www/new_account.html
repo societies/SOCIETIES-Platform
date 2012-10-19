@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies - New Account</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+
+</head>
+<body>
+<!-- Page starts here -->
+<div data-role="page" id="new-account">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="societies logo"/>
+		<!-- /header -->
+	</div>
+	<div data-role="content" id="contentMain">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">Create a New Societies Account</li>
+		</ul>
+		<br/>
+		<form id="form1">
+			<div id="fnameDiv" data-role="fieldcontain">
+				<label for="fname">First name*</label>
+				<input id="fname" name="fname_r" type="text"/>
+			</div>
+			<div id="lnameDiv" data-role="fieldcontain">
+				<label for="lname">Last name*</label>
+				<input id="lname" name="lname_r" type="text"/>
+			</div>
+			<div id="usernameDiv" data-role="fieldcontain">
+				<label for="username">Username*</label>
+				<input id="username" name="username_r" type="text"/>
+			</div>
+			<div id="cityDiv" data-role="fieldcontain">
+				<label for="city">City*</label>
+				<input id="city" name="city_r" type="text"/>
+			</div>
+			<div data-role="fieldcontain">
+				<fieldset data-role="controlgroup">
+					<legend>Agree to the terms:</legend>
+					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
+					<label for="checkbox-1">I agree</label>
+				</fieldset>
+			</div>
+			<div id="create_account" data-role="fieldcontain">
+				<a href="thank_you.html"><input type="submit" value="Create Account" data-inline="true" data-theme="b"/></a>
+			</div>
+		</form>
+		<br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+    </div>
+	<!-- contentMain -->
+	</body>
+	</html>

@@ -87,6 +87,10 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 							entry.setExtensions(loc);
 							entry.setObject(checkin);
 							
+							ActivityObject aobj = new ActivityObjectImpl();
+							aobj.setDisplayName("I");
+							entry.setActor(aobj);
+							entry.setContent(checkin.getDisplayName()+","+loc.get("location"));
 							
 							entry.setVerb("checkin");
 							entry.setProvider(providerObj);
