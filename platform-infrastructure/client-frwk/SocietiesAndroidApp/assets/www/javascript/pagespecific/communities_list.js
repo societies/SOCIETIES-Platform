@@ -143,10 +143,12 @@ var	SocietiesCISListService = {
 					//BODY FORMATTING
 					var n=data[i].actor.indexOf(".");
 					var actorStr = data[i].actor.substring(0, n);
-					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
-									 "<p>"+ actorStr + " " +
-						 	 		 data[i].verb  + " " + 
-						 	 		 data[i].object + "</p></a>" + deleteTag + "</li>";
+					//var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
+					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
+									 "<h2>"+ actorStr + "</h2>" +
+						 	 		 "<p>" + data[i].verb  + " " + data[i].object + "</p>" +
+						 	 		"<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
+						 	 		 "</a>" + deleteTag + "</li>";
 					$('ul#cis_activity_feed').append(tableEntry);
 				}
 				//STORE MOST RECENT DATE - HELPS ADDING
@@ -155,6 +157,7 @@ var	SocietiesCISListService = {
 				mLastDate = recent.getFullYear() + "-" + (recent.getMonth()+1) + "-" + recent.getDate();
 			}
 			$('ul#cis_activity_feed').listview('refresh');
+			$('ul#cis_activity_feed').trigger( "collapse" );
 			//EXPAND LIST IF SHORT
 			//if (data.length <3)
 			//	$('ul#cis_activity_feed').trigger( "expand" );
@@ -285,7 +288,7 @@ var	SocietiesCISListService = {
 				$('ul#cis_members').append(tableEntry);
 			}
 			$('ul#cis_members').listview('refresh');
-			
+			$('ul#cis_members').trigger( "collapse" );
 			//AUTO EXPAND IF ROW COUNT IS SMALL 
 			//if (data.length <3)
 			//	$('ul#cis_members').trigger( "expand" );
@@ -360,6 +363,7 @@ var	SocietiesCISListService = {
 				$('ul#cis_shared_apps').append(tableEntry);
 			}
 			$('ul#cis_shared_apps').listview('refresh');
+			$('ul#cis_shared_apps').trigger( "collapse" );
 		}
 		
 		function failure(data) {
@@ -398,7 +402,7 @@ var	SocietiesCISListService = {
 			mCis_id = $('input#cis_id').val();
 			serviceObj = mMyServices[servicePos];
 			//if (confirm("Share service: " + serviceName + " to this community?")) {
-			jConfirm("Share " + name + " to this community?", 'Share Service', function(answer) {
+			jConfirm("Share " + serviceName + " to this community?", 'Share Service', function(answer) {
 			     if (answer){
 					window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
 					//ADD SERVICE TO LIST OF SHARED SERVICES

@@ -134,6 +134,7 @@ var	SocietiesCISManagerService = {
 		
 		function success(data) {
 			console.log("List CISs where  = TODO");
+			$("span#myCommunitiesCount").html(data.length);
 			SocietiesCISListService.populateCISListpage(data, false);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -157,6 +158,7 @@ var	SocietiesCISManagerService = {
 		
 		function success(data) {
 			console.log("List CISs where  = TODO");
+			$("span#myCommunitiesAdminCount").html(data.length);
 			SocietiesCISListService.populateCISListpage(data, true);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -187,6 +189,7 @@ var	SocietiesCISManagerService = {
 		console.log("getAllCisDirAds");
 		
 		function success(data) {
+			$("span#mySuggestedCommunitiesCount").html(data.length);
 			SocietiesCisDirService.populateCISListpage(data);
 			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
 		}
