@@ -131,6 +131,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		this.binder.addouterClassreference(this);
 
 		this.cssRecord = null;
+		this.ccm = null;
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -272,7 +273,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		this.ccm = new ClientCommunicationMgr(this);
+		if (null == this.ccm) {
+			this.ccm = new ClientCommunicationMgr(this);
+		}
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 		
@@ -322,12 +325,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 				
 		String params [] = {client};
-
 		
 		DomainLogout domainLogout = new DomainLogout();
 		
 		domainLogout.execute(params);
-
 	}
 
 	public AndroidCSSRecord modifyAndroidCSSRecord(String client, AndroidCSSRecord record) {
@@ -376,6 +377,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
 		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
+		
+		if (null == this.ccm) {
+			this.ccm = new ClientCommunicationMgr(this);
+		}
 		
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -824,7 +829,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
 				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
-				LocalCSSManagerService.this.ccm = null;
 				
 				results[0] = params[0];
 			}

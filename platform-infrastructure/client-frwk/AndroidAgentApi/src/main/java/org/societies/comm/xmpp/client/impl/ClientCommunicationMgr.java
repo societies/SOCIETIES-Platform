@@ -83,7 +83,10 @@ public class ClientCommunicationMgr {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
 				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));
 				try {
+					Log.d(LOG_TAG, "unregister element names unbindService for : " + this.toString() + " " + System.currentTimeMillis());
 					androidContext.unbindService(this);
+					
+					Log.d(LOG_TAG, "unregister element names previous registration unbindService for: " + registerConnection.toString() + " " + System.currentTimeMillis());
 					androidContext.unbindService(registerConnection);
 				} catch(Exception e) {
 					Log.e(LOG_TAG, "Exception while unbinding service.", e);
@@ -196,6 +199,8 @@ public class ClientCommunicationMgr {
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendMessage(xml);		
+				
+				Log.d(LOG_TAG, "sendMessage unbindService for: " + this.toString() + " " + System.currentTimeMillis());
 				androidContext.unbindService(this);
 			}
 
@@ -225,7 +230,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void bindService(ServiceConnection connection) {
-		Log.d(LOG_TAG, "bindService for: " + connection.toString());
+		Log.d(LOG_TAG, "bindService bindService for: " + connection.toString() + " " + System.currentTimeMillis());
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
         androidContext.bindService(intent, connection, BIND_AUTO_CREATE);

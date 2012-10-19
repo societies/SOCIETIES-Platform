@@ -89,5 +89,6 @@ $(document).on('pageinit', '#index', function(event) {
 
 	$('#slide-logout').off('click').on('click', function(){
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
+		$(".ui-page-active span[class='ui-btn-inner']").trigger('click');
 	});
 });
