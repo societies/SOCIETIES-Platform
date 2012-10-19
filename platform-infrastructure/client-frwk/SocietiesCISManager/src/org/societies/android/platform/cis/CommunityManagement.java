@@ -680,6 +680,12 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}
+					//REMOVE MEMBER RESPONSE
+					if (communityResponse.getDeleteMemberResponse() !=null) {
+						boolean bSuccess = communityResponse.getDeleteMemberResponse().isResult();
+						//NOTIFY CALLING CLIENT
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, bSuccess);
+					}
 				}
 				
 				// --------- ACTIVITY FEED BEAN---------
@@ -706,6 +712,12 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						Boolean published = response.getAddActivityResponse().isResult();
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, published);
+					}
+					//REMOVE ACTIVITY RESULT
+					else if (response.getDeleteActivityResponse() != null) {
+						Boolean bDeleted = response.getDeleteActivityResponse().isResult();
+						//NOTIFY CALLING CLIENT
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, bDeleted);
 					}
 				}
 				
