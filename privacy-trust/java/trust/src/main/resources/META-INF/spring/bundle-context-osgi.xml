@@ -34,4 +34,7 @@
 		<osgi:listener ref="trustBroker" bind-method="bindTrustBrokerRemote" unbind-method="unbindTrustBrokerRemote" />
 	</osgi:reference>
 	<osgi:reference id="trustEvidenceCollectorRemote" interface="org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote" cardinality="0..1" />
+	<osgi:reference id="ctxBroker"
+		interface="org.societies.api.internal.context.broker.ICtxBroker"
+		cardinality="0..1" timeout="10000" />
 </beans>
