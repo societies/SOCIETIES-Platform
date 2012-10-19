@@ -46,7 +46,7 @@ $(document).on('pageinit', '#communities-landing', function(event) {
 	});
 	
 	$('a#suggestedCommunities').off('click').on('click', function() {
-		window.alert("Coming soon...");
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.getAllCisDirAds);
 	});
 	
 	$('a#manageCommunities').off('click').on('click', function() {

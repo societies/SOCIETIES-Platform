@@ -216,7 +216,7 @@ var SocietiesLogin = {
 			$.mobile.loadPage("communities_result.html");
 			$.mobile.loadPage("create_community.html");
 			//CSS FRIEND SET OF PAGES
-			$.mobile.loadPage("friends_landing.html");
+			//$.mobile.loadPage("friends_landing.html");
 			$.mobile.loadPage("my_friends_list.html");
 			$.mobile.loadPage("my_friends_details.html");
 			$.mobile.loadPage("suggested_societies_friends_list.html");
