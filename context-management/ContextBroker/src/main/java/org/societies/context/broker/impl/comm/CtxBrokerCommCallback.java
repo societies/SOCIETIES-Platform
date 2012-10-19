@@ -36,6 +36,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -74,9 +75,9 @@ public class CtxBrokerCommCallback implements ICommCallback {
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 
 		//CHECK WHICH END SERVICE IS SENDING THE MESSAGE
-		LOG.info("inside receiveResult ");
+		//LOG.info("inside receiveResult ");
 		if (msgBean.getClass().equals(CtxBrokerResponseBean.class)) {
-			LOG.info("inside receiveResult 1 ");
+			//LOG.info("inside receiveResult 1 ");
 			CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
 			
 			try {
@@ -86,30 +87,41 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					LOG.info("inside receiveResult CREATE ENTITY");
 					CtxEntityBean bean = 
 							(CtxEntityBean) payload.getCtxBrokerCreateEntityBeanResult();
-					//				LOG.info("CreateEntity receiveResult 23");
+					
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 
 					CtxEntity result = CtxModelBeanTranslator.getInstance().fromCtxEntityBean(bean);
-					//				LOG.info("CreateEntity receiveResult 24 " +result);
-
+					
 					ctxCallbackClient.onCreatedEntity(result);
-					//				LOG.info("CreateEntity receiveResult 25  ctxCallbackClient " +ctxCallbackClient);
+					
 					payload = null; 
 					
 					// CREATE ATTRIBUTE				
 				} else if (payload.getCtxBrokerCreateAttributeBeanResult()!=null) {
 					LOG.info("inside receiveResult CREATE ATTRIBUTE");
-					//				LOG.info("inside receiveResult create Attribute");
+					
 					CtxAttributeBean attrBean = 
 							(CtxAttributeBean) payload.getCtxBrokerCreateAttributeBeanResult();
-					//				LOG.info("inside receiveResult create Attribute 1 " +attrBean.toString());
-					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 
+					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					CtxAttribute result = CtxModelBeanTranslator.getInstance().fromCtxAttributeBean(attrBean);
-					//				LOG.info("inside receiveResult create Attribute 2" +result.getId());
 					ctxCallbackClient.onCreatedAttribute(result);
 					payload = null; 
 					
+				// create Assoc
+				} else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null) {
+
+					LOG.info("inside receiveResult CREATE ASSOCIATION");
+					CtxAssociationBean bean = 
+							(CtxAssociationBean) payload.getCtxBrokerCreateAssociationBeanResult();
+					
+					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+					CtxAssociation result = CtxModelBeanTranslator.getInstance().fromCtxAssociationBean(bean);
+					//LOG.info("inside receiveResult CREATE ASSOCIATION result "+result); 
+				
+					ctxCallbackClient.onCreatedAssociation(result);
+					payload = null; 
+								
 					//retrieve
 				} else if (payload.getCtxBrokerRetrieveBeanResult()!=null){
 					
