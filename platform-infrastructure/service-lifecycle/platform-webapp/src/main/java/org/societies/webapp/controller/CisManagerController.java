@@ -68,6 +68,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -98,8 +99,8 @@ public class CisManagerController {
 	private IPrivacyPolicyManager privacyPolicyManager;
 	@Autowired
 	private ICommManager commMngrRef;
-	@Autowired
-	private IUserFeedback userFeedback;
+	//@Autowired
+	//private IUserFeedback userFeedback;
 	
 
 	// -- Data for the Privacy Policy Form
@@ -381,7 +382,9 @@ public class CisManagerController {
 					ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid().trim());
 					if (remoteCIS != null) {
 						res = cisForm.getCisJid().trim();
-						remoteCIS.getListOfMembers(icall);
+						Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
+						remoteCIS.getListOfMembers(req, icall);
+						//remoteCIS.getListOfMembers(icall);
 						res = "After getList";
 						
 						Thread.sleep(5000);
@@ -419,7 +422,9 @@ public class CisManagerController {
 				res += cisForm.getCisJid();
 				res += "Before Remote";
 				ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid());
-				remoteCIS.getListOfMembers(icall);
+				Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
+				remoteCIS.getListOfMembers(req, icall);
+				//remoteCIS.getListOfMembers(icall);
 				res += "After Remote";
 
 			} else if (method.equalsIgnoreCase("RefreshRemoteMembers")) {
@@ -477,6 +482,8 @@ public class CisManagerController {
 			//ALWAYS RETURN THE LIST OF CIS'S I OWN OR AM MEMBER OF
 			// UPDATE, not always
 			if(displayFormAtResult){
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
+				model.put("currentNodeId", currentNodeId);
 				List<ICis> records = this.getCisManager().getCisList();
 				model.put("cisrecords", records);
 			}
@@ -758,16 +765,16 @@ public class CisManagerController {
 	}
 
 	// callback
-	WebAppCISCallback icall = new WebAppCISCallback(this.userFeedback);
+	WebAppCISCallback icall = new WebAppCISCallback();//this.userFeedback);
 
 	
 	public class WebAppCISCallback implements ICisManagerCallback{
-		public WebAppCISCallback(IUserFeedback userFeedback){
+		public WebAppCISCallback(){//IUserFeedback userFeedback){
 			super();
-			this.userFeedback = userFeedback;
+			//this.userFeedback = userFeedback;
 		}
 		
-		IUserFeedback userFeedback;
+		//IUserFeedback userFeedback;
 		
 		
 
@@ -783,17 +790,18 @@ public class CisManagerController {
 								&& communityResultObject.getJoinResponse().getCommunity().getCommunityJid().isEmpty() == false){							
 							String community = communityResultObject.getJoinResponse().getCommunity().getCommunityJid(); 
 							LOG.info("callback for join regarindg community " + community);
-							this.userFeedback.showNotification("Joined CIS: " + community);
+							//this.userFeedback.showNotification("Joined CIS: " + community);
 							resultCallback = "Joined CIS " + community;
 							remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
 							m_session.setAttribute("community", remoteCommunity);
+							LOG.info("done at join response");
 						}
 						else{
 							resultCallback = "Joined CIS work but community xsd was bogus ";
 						}
 					}else{
 						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
-						this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
+						//this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 					}
 
 				}

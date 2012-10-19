@@ -91,7 +91,7 @@
         <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
          <property name="pubsubClient" ref="PubsubClient"/>       
-        
+        <property name="iUsrFeedback" ref="userFeedback"/>  
         
     </bean>
     

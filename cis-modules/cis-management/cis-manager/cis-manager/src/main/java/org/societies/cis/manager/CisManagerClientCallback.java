@@ -68,10 +68,16 @@ public class CisManagerClientCallback implements ICommCallback {
 					cisManag.subscribeToCis(new CisRecord(c.getJoinResponse().getCommunity().getCommunityName(),
 							c.getJoinResponse().getCommunity().getCommunityJid()));
 					LOG.info("subscription worked");
+					if(null != cisManag.getiUsrFeedback()){
+						cisManag.getiUsrFeedback().showNotification("join completed");
+					}
 	
 				}
 				else{ // there is no result field
 					LOG.warn("join failed =S");
+					if(null != cisManag.getiUsrFeedback()){
+						cisManag.getiUsrFeedback().showNotification("join failed");
+					}
 				}
 			}
 			// end of join response

@@ -33,7 +33,7 @@
 		<br />
 		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
 			<h3>Community Members</h3>
-			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_members">
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_members" data-split-icon="delete" >
 			<!-- ADD MEMBERS HERE -->
 		   
 			</ul>
@@ -45,7 +45,7 @@
 			<!-- ADD SHARED APPS HERE -->
 
 		   </ul>
-		   <br/></br/>
+		   <br/>
 		   <form id="frmShareService">
 				<div data-role="controlgroup" > <!-- data-type="horizontal"> -->
 					<label for="connectorType" class="select">Share an application to this community:</label>
@@ -60,12 +60,12 @@
 			<input type="hidden" id="cis_id" />
 			<input type="hidden" id="last_date" />
 			<h3>Activity Feed</h3>
-			<div data-role="fieldcontain">
+			<div id="activityFeedForm" data-role="fieldcontain">
 				<label for="activity_message">Message:</label>
 				<textarea id="activity_message"></textarea>
 			</div>
-			<p align="right"><input id="add_activity" type="button" value="Add" data-inline="true" data-theme="b" /></p>
-			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_activity_feed">
+			<p align="right"><div id="addActivityDiv"><input id="add_activity" type="button" value="Add" data-inline="true" data-theme="b" /></div></p>
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cis_activity_feed" data-split-icon="delete">
 			<!-- ADD ACTIVITIES HERE -->
 			
 			</ul>
