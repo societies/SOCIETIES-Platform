@@ -211,9 +211,8 @@ public class PacketMarshaller {
 	
 	public XMPPError unmarshallError(Packet packet) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Element element = (Element) factory.newDocumentBuilder().parse(new InputSource(new StringReader(packet.toXML()))).getDocumentElement().getFirstChild();
-		
-		Element errorElement = ((Element)element.getElementsByTagName("error").item(0));
+		Element errorElement = (Element) factory.newDocumentBuilder().parse(new InputSource(new StringReader(packet.toXML()))).getDocumentElement().getFirstChild();
+
 		String errorElementName = firstElement(errorElement.getChildNodes()).getTagName(); // TODO assumes the stanza error comes first
 	
 		StanzaError stanzaError = StanzaError.valueOf(errorElementName.replaceAll("-", "_"));
