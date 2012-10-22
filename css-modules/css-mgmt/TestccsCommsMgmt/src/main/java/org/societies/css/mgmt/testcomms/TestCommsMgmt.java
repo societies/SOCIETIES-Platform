@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
@@ -18,12 +19,17 @@ import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.MethodType;
+import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
@@ -58,6 +64,8 @@ public class TestCommsMgmt {
 	
 	public static final String TEST_CSS_NAME = "Liam Marshall";
 	public static final String TEST_CSS_JID = "alan.societies.bespoke";
+	public static final String TEST_CSS_JID1 = "john.societies.local";
+
 	
 //	data required for Friends testing
 //	insert into societiesdb.CssFriendEntry (friendIdentity, requestStatus) values ("liam@sligo.xmpp", "accepted"), ("maria@intel.xmpp", "accepted"), ("midge@home.com", "accepted");
@@ -227,7 +235,21 @@ public class TestCommsMgmt {
 			}
 		});
 		
-		LOG.info("Calling remote CSSManager server for method sendCssFriendRequest");
+		LOG.info("Calling remote CSSManager server for method SEND_CSS_FRIEND_REQUEST_INTERNAL");
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST_INTERNAL);
+		messageBean.setRequestStatus(CssRequestStatusType.PENDING);
+		messageBean.setTargetCssId("jane.societies.local");
+		try {
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(TEST_CSS_JID1));
+			this.commManager.sendMessage(stanza, messageBean);
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.remoteCSSManager.sendCssFriendRequest(TEST_CSS_JID);
 
 		LOG.info("Calling remote CSSDirectory server for method findAllCssAdvertisementRecords");
@@ -251,7 +273,23 @@ public class TestCommsMgmt {
 				
 			}
 		});
-
+		
+		/*
+		LOG.info("Calling remote CSSManager server for method Accept Friends request");
+		messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST_INTERNAL);
+		messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);
+		messageBean.setTargetCssId("jane.societies.local");
+		try {
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(TEST_CSS_JID1));
+			this.commManager.sendMessage(stanza, messageBean);
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		try {
 			Thread.sleep(3000);
@@ -259,6 +297,7 @@ public class TestCommsMgmt {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	/**

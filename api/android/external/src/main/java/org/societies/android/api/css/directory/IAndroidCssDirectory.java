@@ -32,6 +32,17 @@ package org.societies.android.api.css.directory;
  */
 public interface IAndroidCssDirectory {
 
+	/**
+	 * IAndroidCssDirectory intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.cssdirectory.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.cssdirectory.ReturnStatus";
+	public static final String FIND_ALL_CSS_ADVERTISEMENT_RECORDS = "org.societies.android.platform.cssdirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS";
+	public static final String FIND_FOR_ALL_CSS = "org.societies.android.platform.cssdirectory.FIND_FOR_ALL_CSS";
+	
 	String methodsArray [] = {"findForAllCss(String client, String searchTerm)",
 							  "findAllCssAdvertisementRecords(String client)"
 							};

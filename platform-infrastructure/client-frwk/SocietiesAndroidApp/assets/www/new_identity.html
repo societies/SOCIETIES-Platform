@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies - New Identity</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+
+
+</head>
+<body>
+<!-- Page starts here -->
+<div data-role="page" id="new-identity">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="societies logo"/>
+		<!-- /header -->
+	</div>
+	<div data-role="content" id="contentMain">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">Create a New Societies Identity</li>
+		</ul>
+		<br/>
+		<form id="form1">
+			<div data-role="fieldcontain" >
+			</div>
+		
+			<div id="fnameDiv" data-role="fieldcontain">
+		    	<label for="regUsername">Username: </label>
+		    	<input type="text" name="regUserLogin" id="regUsername" />
+			</div>
+			<div id="lnameDiv" data-role="fieldcontain">
+		    	<label for="regUserpass">Password: </label>
+		    	<input type="password" name="regUserPass" id="regUserpass" value="" />
+			</div>
+			<div id="usernameDiv" data-role="fieldcontain">
+		    	<label for="repeatRegUserpass">Repeat Password: </label>
+		    	<input type="password" name="repeatRegUserPass" id="repeatRegUserpass" value="" />
+			</div>
+			
+			<div id="xmppServer" data-role="fieldcontain">
+				<label for="domainServer">Societies Domain Servers</label>
+				<input type="text" name="domainServer" id="domainServer" value="" />
+				
+				<!--select name="domainServersList" id="domainServers">
+		  			<option value="societies.local" selected="selected">societies.local</option>
+		  			<option value="societies.alternative">societies.alternative</option>
+				</select--> 
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>SOCIETIES Terms</h3>
+			
+				<label for="societiesTCs">SOCIETIES Terms of Use:</label>
+				<textarea name="textareaSocietiesTCs" id="societiesTCs">
+				Societies Terms & Conditions. 1. You must be mad 2. Paranoid helps 3. Infinite time
+				</textarea>
+			</div>
+			<div>
+				<label for="regSocietiesTerms">I agree with the Terms of Use for SOCIETIES software</label>
+				<input type="checkbox" name="regSocietiesTerms" id="regSocietiesTerms" class="custom" value="true"/>
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>Identity Terms</h3>
+				<label for="domainTCs">Identity Domain Terms of Use:</label>
+				<textarea name="textareaDomainTCs" id="domainTCs">
+				Domain Server Terms & Conditions 1. Exists 2. Free 3. Never goes missing
+				</textarea>
+			</div>
+
+			<div>
+				<label for="regDomainTerms">I agree with the Terms of Use for the Identity Domain:</label>
+				<input type="checkbox" name="regDomainTerms" id="regDomainTerms" class="custom" />
+			</div>
+
+
+			<div id="create_identity" data-role="fieldcontain" class="sign_up">
+				<!--a href="thank_you.html"--><input id="registerXMPP" type="button" value="Create Identity" data-inline="true" data-theme="h"/>
+			</div>
+		</form>
+		<br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+    </div>
+	<!-- contentMain -->
+	</body>
+	</html>

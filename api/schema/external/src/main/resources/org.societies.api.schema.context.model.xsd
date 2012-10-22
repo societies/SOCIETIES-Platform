@@ -53,6 +53,17 @@
     </xs:complexContent>
   </xs:complexType>
   
+    <xs:complexType name="ctxAssociationBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="parentEntity" type="tns:ctxEntityIdentifierBean" minOccurs="0"/>
+          <xs:element name="childEntities" type="tns:ctxEntityIdentifierBean" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
   <xs:complexType name="ctxAttributeBean">
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
@@ -80,22 +91,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="ctxAssociationBean">
-    <xs:complexContent>
-      <xs:extension base="tns:ctxModelObjectBean">
-        <xs:sequence>
-          <xs:element name="parentEntity" type="tns:ctxEntityIdentifierBean" nillable="true"/>
-          <xs:element name="childEntities" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+
   
   <xs:complexType name="communityMemberCtxEntityBean" abstract="true">
     <xs:complexContent>
       <xs:extension base="tns:ctxEntityBean">
         <xs:sequence>
-          <xs:element name="communities" type="tns:communityCtxEntityBean" maxOccurs="unbounded"/>
+          <xs:element name="communities" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -113,7 +115,7 @@
     <xs:complexContent>
       <xs:extension base="tns:communityMemberCtxEntityBean">
         <xs:sequence>
-          <xs:element name="members" type="tns:communityMemberCtxEntityBean" maxOccurs="unbounded"/>
+          <xs:element name="members" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
           <xs:element name="bonds" type="tns:ctxBondBean" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>

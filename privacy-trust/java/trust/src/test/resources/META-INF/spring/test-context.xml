@@ -93,9 +93,8 @@
 	
 	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.mock.MockEventMgr"/>
 	
-<!-- 
-	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
-		<constructor-arg name="classToBeMocked" value="org.societies.api.osgi.event.IEventMgr" />
+	<bean id="ctxBroker" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
+		<constructor-arg name="classToBeMocked" value="org.societies.api.internal.context.broker.ICtxBroker" />
 	</bean>
- -->	
+	
 </beans>

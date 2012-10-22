@@ -84,10 +84,11 @@ var SocietiesLogout = {
  * @returns null
  */
 
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#index', function(event) {
 	console.log("jQuery pageinit action(s) for logout");
 
 	$('#slide-logout').off('click').on('click', function(){
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
+		$(".ui-page-active span[class='ui-btn-inner']").trigger('click');
 	});
 });

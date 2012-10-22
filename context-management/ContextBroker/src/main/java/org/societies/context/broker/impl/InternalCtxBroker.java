@@ -85,9 +85,11 @@ import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.api.security.CtxPermission;
 import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.comm.CtxBrokerClient;
+import org.societies.context.broker.impl.comm.callbacks.CreateAssociationCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
 import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveCommunityEntityIdCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
@@ -109,10 +111,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
-	
+
 	/** to define a dedicated Logger for Performance Testing */
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
-	
+
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
@@ -924,9 +926,9 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		//	final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
 		//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
-		
+
 		final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
-		
+
 		List<CtxIdentifier> ls;
 		try {
 			ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
@@ -984,7 +986,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			for (CtxAttributeIdentifier escortingAttrID : allAttrIds) {
 				//TODO add a control to verify that only correct identifiers hava been added.
 				// set history flag for all escorting attributes
-				
+
 				CtxAttribute attr = (CtxAttribute) this.userCtxDBMgr.retrieve(escortingAttrID);
 				if(attr != null){
 					attr.setHistoryRecorded(true);
@@ -1006,7 +1008,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			if(updatedTupleAttr != null && updatedTupleAttr.getType().contains("tuple_")) result = true;
 
-				LOG.info("tuple Attr ids "+allAttrIds);
+			LOG.info("tuple Attr ids "+allAttrIds);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1035,12 +1037,12 @@ public class InternalCtxBroker implements ICtxBroker {
 					attr.setHistoryRecorded(true);
 					this.update(attr);	
 				}
-				
+
 			}
 			// set hoc recording flag for the attributes contained in tuple list --end
 
 			final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
-			
+
 			List<CtxAttributeIdentifier> newTupleAttrIDs = new ArrayList<CtxAttributeIdentifier>(); 
 			newTupleAttrIDs.add(0,primaryAttrIdentifier);
 			newTupleAttrIDs.addAll(newAttrList);
@@ -1050,12 +1052,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			if (ls.size() > 0) {
 				CtxIdentifier id = ls.get(0);
 				final CtxAttribute tupleIdsAttribute = (CtxAttribute) this.userCtxDBMgr.retrieve(id);
-				
+
 				//deserialise object
 				byte[] attrIdsBlob = SerialisationHelper.serialise((Serializable) newTupleAttrIDs);
 				tupleIdsAttribute.setBinaryValue(attrIdsBlob);
 				CtxAttribute updatedAttr = (CtxAttribute) this.update(tupleIdsAttribute).get();
-			
+
 				if(updatedAttr != null && updatedAttr.getType().contains("tuple_")) {
 					results = (List<CtxAttributeIdentifier>) SerialisationHelper.deserialise(updatedAttr.getBinaryValue(), this.getClass().getClassLoader());
 				}
@@ -1128,7 +1130,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
-	
+
 
 	@Override
 	@Async
@@ -1217,29 +1219,29 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
-	
-	
+
+
 	private LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> shortByTime(HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> data){
 		LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> result = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 		TreeMap<Date,CtxHistoryAttribute> tempHocDataTreeMap = new TreeMap<Date,CtxHistoryAttribute>();
 
 		for(CtxHistoryAttribute hocAttr: data.keySet()){
-			
+
 			tempHocDataTreeMap.put(hocAttr.getLastModified(),hocAttr);
 		}
 
 		for(Date date :tempHocDataTreeMap.keySet()){
-		
+
 			CtxHistoryAttribute keyHocAttr = tempHocDataTreeMap.get(date);
 			result.put(keyHocAttr, data.get(keyHocAttr));
 		}
-	
+
 		return result;
 	}
-	
-	
-	
+
+
+
 	public void storeHoCAttributeTuples(CtxAttribute primaryAttr){
 
 		//String tupleAttrType = "tuple_"+primaryAttr.getType().toString();
@@ -1268,20 +1270,20 @@ public class InternalCtxBroker implements ICtxBroker {
 			for (CtxAttributeIdentifier tupleAttrID : tupleListIds) {
 				//for one of the escorting attrIds retrieve all history and find the latest value
 
-/*
+				/*
 				Date date = new Date();
 				Date startDate = new Date();
 				LOG.info("startDate before : "+startDate);
 				startDate.setTime(date.getTime() - 10000);
-				
+
 				LOG.info("startDate: "+startDate);
 				LOG.info("startDate: "+startDate.getTime());
-				
+
 				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, startDate, null).get();
-				
+
 				LOG.info("allValues: "+allValues.size());
 				LOG.info("allValues: "+allValues);
-*/
+				 */
 				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, null, null).get();
 				if (allValues != null){
 					//finding latest hoc value
@@ -1296,12 +1298,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 			byte[] tupleValueListBlob = SerialisationHelper.serialise((Serializable) tupleValueList);
 			if(tupleAttr != null) tupleAttr.setBinaryValue(tupleValueListBlob);
-			
+
 			//LOG.info("ready to store tupleAttr: "+tupleAttr);
-			
+
 			CtxHistoryAttribute hocAttr = this.userCtxHistoryMgr.createHistoryAttribute(tupleAttr);
 
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1614,7 +1616,19 @@ public class InternalCtxBroker implements ICtxBroker {
 			associationResult = this.userCtxDBMgr.createAssociation(type);
 
 		}else {
-			LOG.info("remote call");
+
+			final CreateAssociationCallback callback = new CreateAssociationCallback();
+			this.ctxBrokerClient.createRemoteAssociation(requestor, targetCss, type, callback);
+		
+			synchronized (callback) {
+				try {
+					callback.wait();
+					associationResult = callback.getResult();
+					
+				} catch (InterruptedException e) {
+					throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
+				}
+			}			
 		}
 
 		if (associationResult!=null)
@@ -1850,7 +1864,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else {
 				// needed for performanse test
 				long initTimestamp = System.nanoTime();
-				
+
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
 				LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
 				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
@@ -1858,9 +1872,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				synchronized (callback) {
 					try {
-						LOG.info("RetrieveCtx remote call result received 1 ");
+						//LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
 						objectResult = callback.getResult();
+						
 						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
 						IPerformanceMessage m = new PerformanceMessage();
 						m.setTestContext("ContextBroker_Delay_RemoteContextRetrieval");
@@ -1873,24 +1888,18 @@ public class InternalCtxBroker implements ICtxBroker {
 
 						PERF_LOG.trace(m.toString());
 						LOG.info("time needed for remote context retrieval :"+ delay);
-					
+
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 					}
 				}											
-			
 
 
-			
-			
 			}//end of remote code
 		}
 		LOG.info("RETRIEVE context data identifier: " +objectResult.getId().toString());
 
-		
-		
-		
 		return new AsyncResult<CtxModelObject>(objectResult);
 	}
 
@@ -2099,7 +2108,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
 			Requestor requestor, IIdentity cisId) throws CtxException {
 
-		if(requestor == null) requestor = getLocalRequestor();
+		if (requestor == null) requestor = getLocalRequestor();
 
 		if (cisId == null)
 			throw new NullPointerException("cisId can't be null");
@@ -2112,6 +2121,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxEntityIdentifier communityEntityId = null;
 
+		// TODO find alternative
+		// ugly workaround: try local community db mgr, if null try remote call
 		//if (this.idMgr.isMine(cisId)) {
 
 		final CommunityCtxEntity communityEntity;
@@ -2119,15 +2130,30 @@ public class InternalCtxBroker implements ICtxBroker {
 			communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId);
 			if (communityEntity != null)
 				communityEntityId = communityEntity.getId();
+			else {
+				// remote call
+				if (LOG.isInfoEnabled())
+					LOG.info("retrieveCommunityEntityId remote call");
+				final RetrieveCommunityEntityIdCallback callback = 
+						new RetrieveCommunityEntityIdCallback();
+
+				this.ctxBrokerClient.retrieveCommunityEntityId(requestor, cisId, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						communityEntityId = callback.getResult();
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for response");
+					}
+				}
+			}
 		} catch (CtxException ce) {
 
 			throw new CtxBrokerException(
-					"Could not retrieve CommunityCtxEntity from Community Context DB Mgr: "
+					"Could not retrieve community CtxEntityIdentifier from Community Context DB Mgr: "
 							+ ce.getLocalizedMessage(), ce);
 		}
-
-		//} else {LOG.warn("remote call");} 
-
 
 		return new AsyncResult<CtxEntityIdentifier>(communityEntityId);
 	}

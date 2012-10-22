@@ -124,12 +124,18 @@ var SocietiesCSSRecord = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#my-profile', function(event) {
 
 	console.log("jQuery pageinit action(s) for refreshcssrecord");
 
 	$('#updateProfile').off('click').on('click', function(){
+		$('#updateProfile').val("updating...");
+		$('#updateProfile').button('disable');
+		$('#updateProfile').button('refresh');
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.modifyCSSProfile);
+		$('#updateProfile').val("Update Profile");
+		$('#updateProfile').button('enable');
+		$('#updateProfile').button('refresh');
 	});
 
 });

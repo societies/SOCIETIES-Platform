@@ -61,7 +61,7 @@ var SocietiesDeviceInfo = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#???', function(event) {
 
 	console.log("jQuery pageinit action(s) for device info");
 

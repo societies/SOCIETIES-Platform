@@ -91,16 +91,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 					"where entity.ctxId.type = :entType " +
 					"and attribute.ctxId.type = :attrType " +
 					"and attribute.binaryValue = :minAttribValue"
-	),
-	@NamedQuery(
-			name = "getCommunityCtxAssociationsByChildEntityId",
-			query = "select distinct association from CommunityCtxAssociationDAO as association inner join association.childEntities as childEntity " +
-					"where childEntity = :childEntId"
-	),
-	@NamedQuery(
-			name = "getCommunityCtxAssociationsByParentEntityId",
-			query = "select distinct association from CommunityCtxAssociationDAO as association " +
-					"where association.parentEntity = :parentEntId"
 	)
 })
 @Entity

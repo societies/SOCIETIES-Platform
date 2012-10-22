@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -58,20 +59,24 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	}
 
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		
-		LOG.info("onRetrieveIndiEnt ctxId " +ctxId);
+		LOG.info("onRetrievedEntityId: ctxId " +ctxId);
 		this.entityId = ctxId;
 		synchronized (this) {	            
 			notifyAll();	        
 		}
-		LOG.info("onRetrieveIndiEnt, notify all done");
-		
+		LOG.info("onRetrievedEntityId: notify all done");
 	}
 
 	
 	public CtxEntityIdentifier getResult() {
 		return this.entityId;
 	}
-	
+
+	@Override
+	public void onCreatedAssociation(CtxAssociation retObject) {
+		// TODO Auto-generated method stub
+		
+	}	
 }

@@ -27,6 +27,7 @@ package org.societies.context.broker.impl.comm;
 
 import java.util.List;
 
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -37,6 +38,8 @@ import org.societies.api.context.model.CtxModelObject;
 public interface ICtxCallback {
 
 	public void onCreatedEntity(CtxEntity retObject);
+	
+	public void onCreatedAssociation(CtxAssociation retObject);
 
 	public void onCreatedAttribute(CtxAttribute retObject);
 	
@@ -48,5 +51,5 @@ public interface ICtxCallback {
 		
 	public void receiveCtxResult(Object retObject, String type);
 	
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId);
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId);
 }

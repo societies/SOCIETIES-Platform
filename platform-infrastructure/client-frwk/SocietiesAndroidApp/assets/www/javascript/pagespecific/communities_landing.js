@@ -33,7 +33,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @returns null
  */
 
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#communities-landing', function(event) {
 
 	console.log("communities landing pageinit action(s)");
 	
@@ -46,8 +46,13 @@ $(document).bind('pageinit',function(){
 	});
 	
 	$('a#suggestedCommunities').off('click').on('click', function() {
-		window.alert("Coming soon...");
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.getAllCisDirAds);
 	});
+	
+	$('a#manageCommunities').off('click').on('click', function() {
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.manageCIS);
+	});
+	
 	
 	$('#search-communities').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#search-communities')
@@ -70,5 +75,6 @@ $(document).bind('pageinit',function(){
 	$('input#add_activity').off('click').on('click', function() {
 		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISListService.addCISActivity);
 	});
+	
 	
 });

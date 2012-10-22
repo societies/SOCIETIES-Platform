@@ -75,7 +75,7 @@ public class PrivacyAssessmentController {
 
 	// FIXME: The path should not depend on Virgo version, etc.
 	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-			"global/bundle/societies-webapp/0.3.0/societies-webapp.war/";
+			"global/bundle/societies-webapp/0.4.0/societies-webapp.war/";
 
 	/**
 	 * URL parts without prefix and suffix

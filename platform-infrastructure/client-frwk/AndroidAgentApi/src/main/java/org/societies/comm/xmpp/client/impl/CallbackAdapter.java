@@ -95,7 +95,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	private void unbindService() {
-		Log.d(LOG_TAG, "unbindService");
+		Log.d(LOG_TAG, "unbindService for: " + service.toString() + " " + System.currentTimeMillis());
 		context.unbindService(service);
 	}
 	

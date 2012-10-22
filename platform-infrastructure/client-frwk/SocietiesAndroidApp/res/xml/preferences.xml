@@ -4,11 +4,16 @@
   
    	<PreferenceCategory android:title="CSS Information">
     		<EditTextPreference 
-   		    	android:title="Domain Authority URI" 
-   		    	android:key="daURI" 
-   		    	android:defaultValue="societies.local" 
-   		    	android:summary="URI of Domain Authority"/>
-           	<EditTextPreference 
+   		    	android:title="Domain Authority Server URI" 
+   		    	android:key="daServerURI" 
+   		    	android:defaultValue="" 
+   		    	android:summary="URI of Domain Authority Server"/>
+    		<EditTextPreference 
+   		    	android:title="Domain Authority Node" 
+   		    	android:key="daNode" 
+   		    	android:defaultValue="" 
+   		    	android:summary="Domain Authority Node"/>
+    			<EditTextPreference 
    		    	android:title="CSS Identity" 
    		    	android:key="cssIdentity" 
    		    	android:defaultValue="" 
@@ -18,12 +23,17 @@
    		    	android:key="cssPassword" 
    		    	android:defaultValue="" 
    		    	android:summary="CSS XMPP password"/>
-            <EditTextPreference 
-   		    	android:title="Domain Authority Port" 
+           	<EditTextPreference 
+   		    	android:title="Android CSS Node JID Resource" 
+   		    	android:key="cssNodeResource" 
+   		    	android:defaultValue="" 
+   		    	android:summary="CSS Node JID resource"/>
+           	<EditTextPreference 
+   		    	android:title="Domain Authority Server Port" 
    		    	android:numeric="integer"
-   		    	android:key="daPort" 
+   		    	android:key="daServerPort" 
    		    	android:defaultValue="5222" 
-   		    	android:summary="Domain Authority Port"/>
+   		    	android:summary="Domain Authority Server Port"/>
             <EditTextPreference 
             	android:key="nodeType" 
             	android:title="Node Type" 

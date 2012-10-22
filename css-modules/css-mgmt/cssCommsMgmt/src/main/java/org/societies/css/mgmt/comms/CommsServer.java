@@ -261,6 +261,22 @@ public class CommsServer implements IFeatureServer {
 				
 				this.cssManager.updateCssRequest(request);
 				break;
+				
+			case SEND_CSS_FRIEND_REQUEST_INTERNAL:
+				LOG.debug("Intercepting remote method invocation SEND_CSS_FRIEND_REQUEST_INTERNAL");
+				
+				String targetcssId = bean.getTargetCssId();
+				
+								
+				LOG.info("SEND_CSS_FRIEND_REQUEST_INTERNAL " +targetcssId);
+				
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				request.setRequestStatus(CssRequestStatusType.PENDING);
+				request.setCssIdentity(targetcssId);
+				
+				this.cssManager.sendCssFriendRequest(targetcssId); //updateCssRequest(request);
+				break;
 
 			case UPDATE_CSS_FRIEND_REQUEST:
 				receivedID = stanza.getFrom();
@@ -291,6 +307,17 @@ public class CommsServer implements IFeatureServer {
 				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssRequest(request);
+			break;
+			case ACCEPT_CSS_FRIEND_REQUEST_INTERNAL:
+				
+				targetcssId = bean.getTargetCssId();
+				request.setCssIdentity(targetcssId);
+								
+				LOG.info("ACCEPT_CSS_FRIEND_REQUEST_INTERNAL COMMSServer targetcssId " +targetcssId);
+				
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				this.cssManager.acceptCssFriendRequest(request);
 			break;
 			case ACCEPT_CSS_FRIEND_REQUEST:
 				receivedID = stanza.getFrom();

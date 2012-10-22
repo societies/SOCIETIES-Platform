@@ -24,8 +24,10 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,8 @@ import org.societies.api.internal.security.policynegotiator.NegotiationException
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.util.FileName;
+import org.societies.security.policynegotiator.util.Net;
 
 /**
  * 
@@ -90,6 +94,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
+		LOG.info("addService({}, ..., {}, " + files + ")", serviceId, fileServer);
+		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
 		String dataToSign;
@@ -128,28 +134,52 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			URI[] fileUris, INegotiationProviderSLMCallback callback) throws NegotiationException {
+			URL[] fileUrls, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
+		LOG.info("addService({}, ..., {}, " + fileUrls + ")", serviceId, fileServer);
+
 		List<String> files = new ArrayList<String>();
+		String tmpFile ="3p-service.tmp";
+		String fileName;
 		
-		// TODO: upload the files to REST server
-		LOG.warn("Automatic file upload is not supported yet. You still have to manually place " +
-				"the files (e.g. service client jar) to the domain authority node.");
-		
-		for (URI f : fileUris) {
-			files.add(f.getPath());
+		for (URL f : fileUrls) {
+			fileName = FileName.getBasename(f.getPath());
+			LOG.debug("addService(): Adding file: URL = {}, fileName = {}", f, fileName);
+			files.add(fileName);
+			
+			Net net = new Net(f);
+			if (!net.download(tmpFile)) {
+				continue;
+			}
+			URI server;
+			String uploadUri;
+			uploadUri = uriForFileUpload(fileServer.toASCIIString(), fileName,
+					serviceId.getIdentifier(), "FIXMEpublicKey");
+			try {
+				server = new URI(uploadUri);
+			} catch (URISyntaxException e) {
+				LOG.warn("Could not generate URI from {}", fileServer);
+				throw new NegotiationException(e);
+			}
+			net.put(tmpFile, server);
+		}
+		if (fileUrls != null && fileUrls.length > 0) {
+			File tmp = new File(tmpFile);
+			tmp.delete();
 		}
 
 		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 
 	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
-		
+
+		LOG.info("addService({}, ..., {}, String file)", serviceId, fileServer);
+
 		List<String> files = new ArrayList<String>();
 		files.add(clientJarFilePath);
-		addService(serviceId, slaXml, clientJarServer, files, callback);
+		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 	
 	@Override
@@ -204,10 +234,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				LOG.error("Failed to sign file " + filePath.get(k) + " of service " + serviceId, e);
 				throw new NegotiationException(e);
 			}
-			uriStr = host + UrlPath.BASE + UrlPath.PATH + "/" + filePath.get(k).replaceAll(".*/", "") +
-					"?" + UrlPath.URL_PARAM_FILE + "=" + filePath.get(k) +
-					"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
-					"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+			uriStr = uriForFileDownload(host, filePath.get(k), serviceId, sig);
 			
 			try {
 				uri.add(new URI(uriStr));
@@ -216,6 +243,36 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			}
 		}
 		return uri;
+	}
+	
+	private String uriForFileDownload(String host, String filePath, String serviceId, String sig) {
+		
+		String uriStr;
+		
+		LOG.debug("uriForFileDownload({}, {}, ...)", host, filePath);
+		
+		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
+				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
+				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
+				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+
+		LOG.debug("uriForFileDownload(): uri = {}", uriStr);
+		return uriStr;
+	}
+	
+	private String uriForFileUpload(String host, String filePath, URI serviceId, String pubkey) {
+		
+		String uriStr;
+
+		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
+
+		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
+				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
+				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString() +
+				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey;
+
+		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
+		return uriStr;
 	}
 
 	/**

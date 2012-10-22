@@ -32,11 +32,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
@@ -48,12 +49,19 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelBeanTranslator;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -135,7 +143,8 @@ public class UserCtxDBMgrTest {
 		assertNotNull(indEntity.getAttributes());
 		assertTrue(indEntity.getAttributes().isEmpty());
 		assertNotNull(indEntity.getAssociations());
-		assertTrue(indEntity.getAssociations().isEmpty());
+		assertEquals(1, indEntity.getAssociations().size());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
 		assertNotNull(indEntity.getCommunities());
 		assertTrue(indEntity.getCommunities().isEmpty());
 	}
@@ -216,8 +225,8 @@ public class UserCtxDBMgrTest {
 		assertEquals(parentEntityId, association.getParentEntity());
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(parentEntityId);
-		assertTrue(entity.getAssociations().contains(association.getId()));
-		assertEquals(1, entity.getAssociations().size());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.USES_DEVICES).size());
 
 		// Set another Parent Entity (Individual)
 		final CtxEntityIdentifier parentEntityId2 = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
@@ -227,10 +236,10 @@ public class UserCtxDBMgrTest {
 		assertEquals(parentEntityId2, association.getParentEntity());
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(parentEntityId);
-		assertTrue(entity.getAssociations().isEmpty());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).isEmpty());
 		entity = (CtxEntity) this.userDB.retrieve(parentEntityId2);
-		assertTrue(entity.getAssociations().contains(association.getId()));
-		assertEquals(1, entity.getAssociations().size());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.USES_DEVICES).size());
 
 		// Add Child Entities
 		final CtxEntityIdentifier childEntityId = userDB.createEntity(CtxEntityTypes.DEVICE).getId();
@@ -241,8 +250,8 @@ public class UserCtxDBMgrTest {
 		assertTrue(association.getChildEntities().contains(childEntityId));
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(childEntityId);
-		assertTrue(entity.getAssociations().contains(association.getId()));
-		assertEquals(1, entity.getAssociations().size());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.USES_DEVICES).size());
 
 		final CtxEntityIdentifier childEntityId2 = userDB.createEntity(CtxEntityTypes.DEVICE).getId();
 		association.addChildEntity(childEntityId2);
@@ -253,8 +262,8 @@ public class UserCtxDBMgrTest {
 		assertTrue(association.getChildEntities().contains(childEntityId2));
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(childEntityId2);
-		assertTrue(entity.getAssociations().contains(association.getId()));
-		assertEquals(1, entity.getAssociations().size());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.USES_DEVICES).size());
 
 		// Remove Parent Entity
 		association.setParentEntity(null);
@@ -262,7 +271,7 @@ public class UserCtxDBMgrTest {
 		assertEquals(null, association.getParentEntity());
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(parentEntityId2);
-		assertTrue(entity.getAssociations().isEmpty());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).isEmpty());
 
 		// Remove Child Entities
 		association.removeChildEntity(childEntityId);
@@ -271,22 +280,70 @@ public class UserCtxDBMgrTest {
 		assertTrue(association.getChildEntities().isEmpty());
 		// check association from the entity's side
 		entity = (CtxEntity) this.userDB.retrieve(childEntityId);
-		assertTrue(entity.getAssociations().isEmpty());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).isEmpty());
 		entity = (CtxEntity) this.userDB.retrieve(childEntityId2);
-		assertTrue(entity.getAssociations().isEmpty());
+		assertTrue(entity.getAssociations(CtxAssociationTypes.USES_DEVICES).isEmpty());
 	}
 
-	@Ignore
 	@Test
-	public void testRetrieveAssociation() throws CtxException{
-		System.out.println("---- testRetrieveAssociation");
-		////////////////
-		CtxAssociation association = userDB.createAssociation("IsRelatedWith");
+	public void testUpdateIsMemberOfAssociation() throws CtxException{
 
+		// Create IndividualCtxEntity
+		IndividualCtxEntity indEntity = 
+				this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		assertNotNull(indEntity.getAssociations());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertTrue(indEntity.getCommunities().isEmpty());
+		
+		CtxAssociationIdentifier isMemberOfAssociationId = 
+				indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next();
+		CtxAssociation isMemberOfAssociation = 
+				(CtxAssociation) this.userDB.retrieve(isMemberOfAssociationId);
+		assertNotNull(isMemberOfAssociation.getParentEntity());
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
 
-		association = (CtxAssociation) userDB.retrieve(association.getId());
+		// Add Child Entities
+		final CtxEntityIdentifier childEntityId = userDB.createEntity(CtxEntityTypes.COMMUNITY).getId();
+		isMemberOfAssociation.addChildEntity(childEntityId);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
+		assertEquals(1, isMemberOfAssociation.getChildEntities().size());
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId));
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(1, indEntity.getCommunities().size());
+		assertTrue(indEntity.getCommunities().contains(childEntityId));
 
-		assertNotNull(association);
+		final CtxEntityIdentifier childEntityId2 = userDB.createEntity(CtxEntityTypes.COMMUNITY).getId();
+		isMemberOfAssociation.addChildEntity(childEntityId2);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
+		assertEquals(2, isMemberOfAssociation.getChildEntities().size());
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId));
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId2));
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(2, indEntity.getCommunities().size());
+		assertTrue(indEntity.getCommunities().contains(childEntityId));
+		assertTrue(indEntity.getCommunities().contains(childEntityId2));
+
+		// Remove Child Entities
+		isMemberOfAssociation.removeChildEntity(childEntityId);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(1, indEntity.getCommunities().size());
+		assertTrue(indEntity.getCommunities().contains(childEntityId2));
+		
+		isMemberOfAssociation.removeChildEntity(childEntityId2);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(0, indEntity.getCommunities().size());
 	}
 
 	@Test
@@ -512,7 +569,48 @@ public class UserCtxDBMgrTest {
 		assertTrue(ids.contains(entId1));
 		assertTrue(ids.contains(entId2));
 	}
+
+	@Test
+	public void testBeanTranslator() throws CtxException {
+		
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		final CtxEntity entityDevice = this.userDB.createEntity(CtxEntityTypes.DEVICE);
+		final CtxEntity entityNode = this.userDB.createEntity(CtxEntityTypes.CSS_NODE);
+		final CtxAttribute attributeName = this.userDB.createAttribute(entityDevice.getId(), CtxAttributeTypes.NAME);
+		final IndividualCtxEntity indEntity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		
+		final CtxAssociation association = this.userDB.createAssociation(CtxAssociationTypes.USES_DEVICES);
+		association.setParentEntity(entityDevice.getId());
+		association.addChildEntity(entityNode.getId());
+		
+		try {
+			CtxEntityBean entBean = ctxBeanTranslator.fromCtxEntity(entityDevice);
+			CtxEntity entityRetrieved = ctxBeanTranslator.fromCtxEntityBean(entBean);
+			assertEquals(entityDevice, entityRetrieved);
+			
+			CtxAssociationBean assocBean = ctxBeanTranslator.fromCtxAssociation(association);
+			CtxAssociation assocRetrieved = ctxBeanTranslator.fromCtxAssociationBean(assocBean);
+			assertEquals(association,assocRetrieved);
 	
+			CtxAttributeBean attrBean = ctxBeanTranslator.fromCtxAttribute(attributeName);
+			CtxAttribute attributeRetrieved = ctxBeanTranslator.fromCtxAttributeBean(attrBean);
+			assertEquals(attributeName,attributeRetrieved);
+		
+			IndividualCtxEntityBean indiEntBean = ctxBeanTranslator.fromIndiCtxEntity(indEntity);
+			IndividualCtxEntity indiEntRetrieved = ctxBeanTranslator.fromIndiCtxEntityBean(indiEntBean);
+			assertEquals(indEntity, indiEntRetrieved);
+			
+			CtxModelObjectBean ctxModelObjectBean = ctxBeanTranslator.fromCtxModelObject(indEntity);
+			CtxModelObject ctxModelObject = ctxBeanTranslator.fromCtxModelObjectBean(ctxModelObjectBean);
+			assertEquals(indEntity,ctxModelObject);
+	
+		} catch (DatatypeConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
    /*
 	@Ignore
 	@Test

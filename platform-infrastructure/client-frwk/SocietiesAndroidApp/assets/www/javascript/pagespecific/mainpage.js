@@ -146,21 +146,29 @@ jQuery(function() {
  * @returns null
  */
 
-
-$(document).bind('pageinit',function(){
+$(document).on('pageinit', '#index', function(event) {
 
 	console.log("jQuery pageinit action(s) for mainpage");
 
 	$('#connectXMPP').off('click').on('click', function(){
+		//DISPLAY PROGRESS AND DISABLE LOGIN BUTTON
 		$('#connectXMPP').val("logging in...");
-		$("#connectXMPP").attr("disabled",true);
+		$('#connectXMPP').button('disable');
+		$('#connectXMPP').button('refresh');
+		//LOGIN
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
+		//RE-ENABLE LOGIN BUTTON
 		$('#connectXMPP').val("LOGIN");
-		$("#connectXMPP").removeAttr("disabled");
-
+		$('#connectXMPP').button('enable');
+		$('#connectXMPP').button('refresh');
 	});
+
+	$('#xmppRegistration').off('click').on('click', function(){
+		$.mobile.changePage("new_identity.html");
+	});
+
 
 	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')

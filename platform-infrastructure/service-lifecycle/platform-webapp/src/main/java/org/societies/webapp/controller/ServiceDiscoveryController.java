@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -62,6 +64,20 @@ public class ServiceDiscoveryController {
 		this.sdService = sdService;
 	}
 
+	/**
+	 * OSGI service get auto injected
+	 */
+	@Autowired
+	private ICisManager cisManager;
+	
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void getCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+	}
+	
 	@RequestMapping(value = "/servicediscovery.html", method = RequestMethod.GET)
 	public ModelAndView Servicediscovery() {
 
@@ -133,6 +149,10 @@ public class ServiceDiscoveryController {
 				asynchResult=this.getSDService().getServices(node);
 				services = asynchResult.get();
 				model.put("cisservices", services);
+				
+				//Get CIS Name
+				ICis cis = this.getCisManager().getCis(node);
+				model.put("cis", cis);
 					
 			} else{
 				res="error unknown metod";
@@ -190,7 +210,6 @@ public class ServiceDiscoveryController {
 		
 		
 		return new ModelAndView("servicediscpilotresult", model);
-		
 
 	}
 	

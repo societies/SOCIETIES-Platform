@@ -145,7 +145,7 @@ var SocietiesLogin = {
 		function failure(data) {
 			alert("getCSSIdentityDomain - failure: " + data);
 		}
-		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "daURI");
+		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "daServerURI");
 	},
 
 	/**
@@ -163,7 +163,7 @@ var SocietiesLogin = {
 		}
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#identitydomain").val());
 	},
 	/**
 	 * @methodOf SocietiesLogin#
@@ -200,30 +200,31 @@ var SocietiesLogin = {
 			console.log("Current page: " + $.mobile.activePage[0].id);
 			
 			//pre-fetch pre-populated pages
-			$.mobile.loadPage("html/active_services.html");
-			$.mobile.loadPage("html/myProfile.html");
+			$.mobile.loadPage("active_services.html");
+			$.mobile.loadPage("myProfile.html");
 			
 			//MAIN NAVIGATION PAGES
-			$.mobile.loadPage("html/myProfile.html");
-			$.mobile.loadPage("html/settings.html");
-			$.mobile.loadPage("html/about.html");
+			$.mobile.loadPage("myProfile.html");
+			$.mobile.loadPage("settings.html");
+			$.mobile.loadPage("about.html");
 			//APPS SET OF PAGES
-			$.mobile.loadPage("html/my_apps.html");
-			$.mobile.loadPage("html/my_apps_details.html");
+			$.mobile.loadPage("my_apps.html");
+			$.mobile.loadPage("my_apps_details.html");
 			//COMMUNITY SET OF PAGES
-			$.mobile.loadPage("html/communities_list.html");
-			$.mobile.loadPage("html/community_profile.html");
-			$.mobile.loadPage("html/communities_result.html");
-			$.mobile.loadPage("html/create_community.html");
+			$.mobile.loadPage("communities_list.html");
+			$.mobile.loadPage("community_profile.html");
+			$.mobile.loadPage("communities_result.html");
+			$.mobile.loadPage("create_community.html");
 			//CSS FRIEND SET OF PAGES
-			$.mobile.loadPage("html/friends_landing.html");
-			$.mobile.loadPage("html/my_friends_list.html");
-			$.mobile.loadPage("html/my_friends_details.html");
-			$.mobile.loadPage("html/suggested_societies_friends_list.html");
+			//$.mobile.loadPage("friends_landing.html");
+			$.mobile.loadPage("my_friends_list.html");
+			$.mobile.loadPage("my_friends_details.html");
+			$.mobile.loadPage("suggested_societies_friends_list.html");
+			$.mobile.loadPage("friend_request_list.html");
 			//NAVIGATION PAGES
-			$.mobile.loadPage("html/settings.html");
+			$.mobile.loadPage("settings.html");
 			
-			$.mobile.changePage("html/landing.html", { transition: "fade"} );
+			$.mobile.changePage("landing.html", { transition: "fade"} );
 		}
 		
 		function failure(data) {
