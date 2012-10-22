@@ -89,6 +89,7 @@ import org.societies.context.broker.impl.comm.callbacks.CreateAssociationCallbac
 import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
 import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
+import org.societies.context.broker.impl.comm.callbacks.RemoveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCommunityEntityIdCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
@@ -359,9 +360,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException {
 
-		final CtxModelObject modelObj = this.userCtxDBMgr.remove(identifier);
-
-		return new AsyncResult<CtxModelObject>(modelObj) ;
+		return this.remove(null, identifier);
 	}
 
 	@Override
@@ -1509,7 +1508,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}else {
 
 			final CreateEntityCallback callback = new CreateEntityCallback();
-			this.ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
+			this.ctxBrokerClient.createEntity(requestor, targetCss, type, callback);
 
 			synchronized (callback) {
 				try {
@@ -1573,7 +1572,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				final CreateAttributeCallback callback = new CreateAttributeCallback();
 
 				LOG.info("createAttribute perform remote call targetCSS:"+scopeID +" type:"+type);
-				ctxBrokerClient.createRemoteAttribute(requestor, scopeID, scope, type, callback);
+				ctxBrokerClient.createAttribute(requestor, scopeID, scope, type, callback);
 				//LOG.info("createAttribute remote call performed ");
 
 				synchronized (callback) {
@@ -1618,7 +1617,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}else {
 
 			final CreateAssociationCallback callback = new CreateAssociationCallback();
-			this.ctxBrokerClient.createRemoteAssociation(requestor, targetCss, type, callback);
+			this.ctxBrokerClient.createAssociation(requestor, targetCss, type, callback);
 		
 			synchronized (callback) {
 				try {
@@ -1759,7 +1758,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				final LookupCallback callback = new LookupCallback();
 
-				ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
+				ctxBrokerClient.lookup(requestor, target, modelType, type, callback);
 
 				synchronized (callback) {
 
@@ -1867,7 +1866,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
 				LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
-				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
+				ctxBrokerClient.retrieve(requestor, identifier, callback); 
 				///LOG.info("RetrieveCtx remote call performed ");
 
 				synchronized (callback) {
@@ -1954,7 +1953,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				//remote call
 				final UpdateCtxCallback callback = new UpdateCtxCallback();
 				LOG.info("update method remote call ctx object id:"+ctxModelObj.getId());
-				ctxBrokerClient.updateRemote(requestor, ctxModelObj, callback);
+				ctxBrokerClient.update(requestor, ctxModelObj, callback);
 				//LOG.info("UpdateCtx remote call performed ");
 
 				synchronized (callback) {
@@ -2043,7 +2042,81 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxModelObject> remove(Requestor requestor,
 			CtxIdentifier identifier) throws CtxException {
 
-		return this.remove(requestor, identifier);
+		CtxModelObject objectResult = null ;
+
+		if (requestor == null) requestor = getLocalRequestor();
+
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Removing context model object with id " +  identifier);
+
+		IIdentity target;
+
+		try {
+			target = this.idMgr.fromJid(identifier.getOwnerId());
+		} catch (InvalidFormatException ife) {
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
+		}
+		this.logRequest(requestor, target);
+
+		// target is a CIS 
+		if (IdentityType.CIS.equals(target.getType())) {
+			//LOG.info("target is a CIS " +target.getJid());
+			try {
+				// TODO check if CIS is locally maintained or a remote call is necessary
+				// TODO add access control (?)
+				objectResult = this.communityCtxDBMgr.retrieve(identifier);
+
+			} catch (Exception e) {				
+				throw new CtxBrokerException(
+						"Platform context broker failed to retrieve context model object with id " 
+								+ identifier + ": " +  e.getLocalizedMessage(), e);
+			}
+			return new AsyncResult<CtxModelObject>(objectResult);
+
+			//target is a CSS 
+		} else if (IdentityType.CSS.equals(target.getType()) 
+				|| IdentityType.CSS_RICH.equals(target.getType())
+				|| IdentityType.CSS_LIGHT.equals(target.getType())){
+
+			if (this.idMgr.isMine(target)) {
+
+				if(!requestor.equals(this.getLocalRequestor())){
+					LOG.info("Remove method, enforcing access control for requestor: "+requestor);
+					this.ctxAccessController.checkPermission(requestor, target,
+							new CtxPermission(identifier, CtxPermission.DELETE));
+				}
+				try {
+					objectResult = this.userCtxDBMgr.remove(identifier);	
+
+				} catch (Exception e) {
+					throw new CtxBrokerException(
+							"Platform context broker failed to remove context model object with id " 
+									+ identifier + ": " +  e.getLocalizedMessage(), e);
+				}
+				return new AsyncResult<CtxModelObject>(objectResult);
+
+			} else {
+				
+				final RemoveCtxCallback callback = new RemoveCtxCallback();
+				this.ctxBrokerClient.remove(requestor, identifier, callback); 
+				synchronized (callback) {
+					try {
+						callback.wait();
+						objectResult = callback.getResult();
+					} catch (InterruptedException e) {
+						throw new CtxBrokerException("Interrupted while waiting for response");
+					}
+				}											
+
+			}//end of remote code
+		}
+		LOG.info("REMOVE context data identifier: " + objectResult.getId());
+
+		return new AsyncResult<CtxModelObject>(objectResult);
 	}
 
 
@@ -2086,7 +2159,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			LOG.info("RetrieveIndividualEntCallback remote call");
 			RetrieveIndividualEntCallback callback = new RetrieveIndividualEntCallback();
 
-			ctxBrokerClient.retrieveRemoteIndividualEntId(requestor, cssId, callback);
+			ctxBrokerClient.retrieveIndividualEntityId(requestor, cssId, callback);
 			synchronized (callback) {
 				try {
 					LOG.info("RetrieveCtx remote call result received 1 ");
