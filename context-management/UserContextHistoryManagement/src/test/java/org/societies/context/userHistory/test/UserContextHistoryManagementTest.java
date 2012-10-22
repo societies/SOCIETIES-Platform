@@ -24,18 +24,85 @@
  */
 package org.societies.context.userHistory.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.societies.context.api.user.history.IUserCtxHistoryMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class UserContextHistoryManagementTest {
 
-	UserContextHistoryManagementTest(){
+public static final String CSS_ID = "jane.societies.local";
+    
+    @Autowired
+	private IUserCtxDBMgr userDB;
+    
+    @Autowired
+   	private  IUserCtxHistoryMgr userCtxHistoryDb;
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
 		
 	}
-	
-	public static void main(String[] args)  {
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
 		
-		new UserContextHistoryManagementTest();
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
 	}
 	
+	@Test
+	public void testCreateEntity() throws CtxException {
+
+		
+		final CtxEntity entity = this.userDB.createEntity(CtxEntityTypes.DEVICE);
+		final CtxAttribute attribute = this.userDB.createAttribute(entity.getId(), CtxAttributeTypes.NAME);
+	
+		CtxHistoryAttribute hocAttr = this.userCtxHistoryDb.createHistoryAttribute(attribute);
+		
+		assertNotNull(hocAttr);
+		assertNotNull(hocAttr.getId());
+		
+	}
+
 	
 	
 
