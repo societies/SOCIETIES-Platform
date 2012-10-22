@@ -37,8 +37,8 @@
 
 		<property name="annotatedClasses">
 			<list>
-			    <value>UserCtxHistoryAttributeDAO</value>
-		   	</list>
+			    <value>org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO</value>
+			</list>
 		</property>
 		
 		<property name="annotatedPackages">

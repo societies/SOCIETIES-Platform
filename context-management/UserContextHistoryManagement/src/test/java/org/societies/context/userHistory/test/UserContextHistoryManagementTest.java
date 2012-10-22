@@ -28,6 +28,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,8 +38,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxModelObjectFactory;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
@@ -53,8 +58,8 @@ public class UserContextHistoryManagementTest {
 
 public static final String CSS_ID = "jane.societies.local";
     
-    @Autowired
-	private IUserCtxDBMgr userDB;
+  //  @Autowired
+	//private IUserCtxDBMgr userDB;
     
     @Autowired
    	private  IUserCtxHistoryMgr userCtxHistoryDb;
@@ -90,17 +95,24 @@ public static final String CSS_ID = "jane.societies.local";
 	}
 	
 	@Test
-	public void testCreateEntity() throws CtxException {
+	public void testCreateHistoryAttribute() throws CtxException {
 
 		
-		final CtxEntity entity = this.userDB.createEntity(CtxEntityTypes.DEVICE);
-		final CtxAttribute attribute = this.userDB.createAttribute(entity.getId(), CtxAttributeTypes.NAME);
+	//final CtxEntity entity = this.userDB.createEntity(CtxEntityTypes.DEVICE);
+		//CtxEntityIdentifier entID = new CtxEntityIdentifier("context://john.societies.local/ENTITY/entType/65573");
+		CtxAttributeIdentifier attrID = new CtxAttributeIdentifier("context://john.societies.local/ENTITY/entType/65578/ATTRIBUTE/name/65574");
+		
+		//final CtxEntity entity = CtxModelObjectFactory.getInstance().createEntity(entID, new Date(), null, null);
+		final CtxAttribute attribute = CtxModelObjectFactory.getInstance().createAttribute(attrID, new Date(), new Date(), "Giannis");
+		//final CtxAttribute attribute = new CtxAttribute(attrID); 
 	
 		CtxHistoryAttribute hocAttr = this.userCtxHistoryDb.createHistoryAttribute(attribute);
 		
+		
+		
 		assertNotNull(hocAttr);
 		assertNotNull(hocAttr.getId());
-		
+		System.out.println("hocAttr.getId()" +hocAttr.getId());
 	}
 
 	
