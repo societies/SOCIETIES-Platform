@@ -29,10 +29,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -40,26 +38,19 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAssociationBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
@@ -69,11 +60,9 @@ import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRetrieveBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntityIdBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
-import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
-import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
-import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
@@ -82,8 +71,8 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.context.broker.api.CtxBrokerException;
-import org.societies.context.broker.impl.comm.ICtxCallback;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CtxBrokerClient implements ICommCallback {
@@ -130,10 +119,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 	}
 
-	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback) throws CtxException{
-
-		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
-		//final String cssOwnerStr = cssNodeId.getBareJid();
+	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback) throws CtxException {
 
 		IIdentity toIdentity;
 
@@ -168,11 +154,7 @@ public class CtxBrokerClient implements ICommCallback {
 		} 
 	}
 
-
-	public void createRemoteAssociation(Requestor requestor, IIdentity targetCss, String type, ICtxCallback callback) throws CtxBrokerException{
-
-		final CtxAssociation association = null;
-
+	public void createRemoteAssociation(Requestor requestor, IIdentity targetCss, String type, ICtxCallback callback) throws CtxBrokerException {
 
 		IIdentity toIdentity = targetCss;
 
@@ -203,7 +185,6 @@ public class CtxBrokerClient implements ICommCallback {
 			
 		}
 	}
-
 
 	public void createRemoteAttribute(Requestor requestor, IIdentity targetCss, CtxEntityIdentifier scope, String type, ICtxCallback callback) throws CtxBrokerException{
 
@@ -340,7 +321,36 @@ public class CtxBrokerClient implements ICommCallback {
 		}
 
 	}
+	
+	public void retrieveCommunityEntityId(Requestor requestor, IIdentity target,
+			ICtxCallback callback) throws CtxBrokerException {
 
+		try {
+			final Stanza stanza = new Stanza(target);
+			final CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_COMMUNITY_ENTITY_ID);
+
+			final RetrieveCommunityEntityIdBean methodBean = new RetrieveCommunityEntityIdBean();
+
+			//1. requestor
+			final RequestorBean requestorBean = this.createRequestorBean(requestor);
+			methodBean.setRequestor(requestorBean);
+
+			//2. target id
+			methodBean.setTarget(target.getJid());
+
+			cbPacket.setRetrieveCommunityEntityId(methodBean);
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+			
+		} catch (CommunicationException e) {
+
+			throw new CtxBrokerException("Could not retrieve remote individual ctx entity : "
+					+ e.getLocalizedMessage(), e);
+		}
+
+	}
 
 	public void retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback) throws CtxBrokerException  {
 
