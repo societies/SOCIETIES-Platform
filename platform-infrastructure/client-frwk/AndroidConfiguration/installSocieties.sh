@@ -20,14 +20,9 @@ testParams() {
 
 installSocietiesAPK() {
 	echo ""
-	echo "Install AndroidAgent on $1"
+	echo "Install SocietiesComms on $1"
 	echo "----------------------------------------------"
-	adb -s $1 install -r ../AndroidAgent/target/AndroidAgent.apk
-	
-	echo ""
-	echo "Install AndroidPubsub on $1"
-	echo "-------------------"
-	adb -s $1 install -r ../AndroidPubsub/target/AndroidPubsub.apk
+	adb -s $1 install -r ../SocietiesAndroidComms/target/SocietiesComms.apk
 	
 	echo ""
 	echo "Install SocietiesAndroidApp on $1"
