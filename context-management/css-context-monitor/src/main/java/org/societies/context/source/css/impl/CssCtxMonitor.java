@@ -72,7 +72,8 @@ public class CssCtxMonitor extends EventListener {
 	private static final Logger LOG = LoggerFactory.getLogger(CssCtxMonitor.class);
 	
 	private static final String[] EVENT_TYPES = { EventTypes.CSS_RECORD_EVENT,
-		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_SUBS, EventTypes.CIS_UNSUBS };
+		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_CREATION, 
+		EventTypes.CIS_SUBS, EventTypes.CIS_UNSUBS };
 			
 	/** The internal Context Broker service. */
 	@Autowired(required=true)
@@ -152,7 +153,8 @@ public class CssCtxMonitor extends EventListener {
 			this.executorService.execute(new CssFriendedHandler(event.geteventSource(),
 					(String) event.geteventInfo()));
 			
-		} else if (EventTypes.CIS_SUBS.equals(event.geteventType())
+		} else if (EventTypes.CIS_CREATION.equals(event.geteventType())
+				|| EventTypes.CIS_SUBS.equals(event.geteventType())
 				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
 			
 			if (!(event.geteventInfo() instanceof Community)) {
@@ -164,7 +166,8 @@ public class CssCtxMonitor extends EventListener {
 			}
 
 			final Community cisRecord = (Community) event.geteventInfo();	
-			if (EventTypes.CIS_SUBS.equals(event.geteventType()))
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())
+					|| EventTypes.CIS_SUBS.equals(event.geteventType()))
 				this.executorService.execute(new CssJoinedCisHandler(cisRecord.getCommunityJid()));
 			else //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
 				this.executorService.execute(new CssLeftCisHandler(cisRecord.getCommunityJid()));
