@@ -51,5 +51,5 @@ public interface ICtxCallback {
 		
 	public void receiveCtxResult(Object retObject, String type);
 	
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId);
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId);
 }

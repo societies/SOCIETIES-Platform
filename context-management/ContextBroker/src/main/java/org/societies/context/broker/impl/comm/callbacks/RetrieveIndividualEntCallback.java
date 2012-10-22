@@ -59,15 +59,14 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	}
 
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		
-		LOG.info("onRetrieveIndiEnt ctxId " +ctxId);
+		LOG.info("onRetrievedEntityId: ctxId " +ctxId);
 		this.entityId = ctxId;
 		synchronized (this) {	            
 			notifyAll();	        
 		}
-		LOG.info("onRetrieveIndiEnt, notify all done");
-		
+		LOG.info("onRetrievedEntityId: notify all done");
 	}
 
 	
@@ -79,6 +78,5 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
-	}
-	
+	}	
 }

@@ -68,7 +68,7 @@ public class UpdateCtxCallback implements ICtxCallback{
 	}
 
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		// TODO Auto-generated method stub
 		
 	}

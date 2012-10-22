@@ -46,12 +46,10 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
-import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
-import org.societies.context.broker.impl.comm.ICtxCallback;
 
 public class CtxBrokerCommCallback implements ICommCallback {
 
@@ -75,7 +73,8 @@ public class CtxBrokerCommCallback implements ICommCallback {
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 
 		//CHECK WHICH END SERVICE IS SENDING THE MESSAGE
-		//LOG.info("inside receiveResult ");
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("receiveResult: stanza=" + returnStanza + ", msgBean=" + msgBean);
 		if (msgBean.getClass().equals(CtxBrokerResponseBean.class)) {
 			//LOG.info("inside receiveResult 1 ");
 			CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
@@ -94,8 +93,6 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					
 					ctxCallbackClient.onCreatedEntity(result);
 					
-					payload = null; 
-					
 					// CREATE ATTRIBUTE				
 				} else if (payload.getCtxBrokerCreateAttributeBeanResult()!=null) {
 					LOG.info("inside receiveResult CREATE ATTRIBUTE");
@@ -106,7 +103,6 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					CtxAttribute result = CtxModelBeanTranslator.getInstance().fromCtxAttributeBean(attrBean);
 					ctxCallbackClient.onCreatedAttribute(result);
-					payload = null; 
 					
 				// create Assoc
 				} else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null) {
@@ -120,7 +116,6 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					//LOG.info("inside receiveResult CREATE ASSOCIATION result "+result); 
 				
 					ctxCallbackClient.onCreatedAssociation(result);
-					payload = null; 
 								
 					//retrieve
 				} else if (payload.getCtxBrokerRetrieveBeanResult()!=null){
@@ -136,7 +131,6 @@ public class CtxBrokerCommCallback implements ICommCallback {
 
 					ctxCallbackClient.onRetrieveCtx(ctxObj);
 
-					payload = null; 
 					//UPDATE	
 				} else if (payload.getCtxBrokerUpdateBeanResult() != null){
 					
@@ -150,9 +144,7 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 
 					ctxCallbackClient.onUpdateCtx(updatedModelObj);
-					//			LOG.info("inside receiveResult UPDATE method 4 ");
-					
-					payload = null; 
+					//			LOG.info("inside receiveResult UPDATE method 4 "); 
 				
 				} else if(payload.getCtxBrokerRetrieveIndividualEntityIdBeanResult() != null){
 					
@@ -167,10 +159,9 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			//		LOG.info("inside receiveResult RetrieveIndividualEntityId method 4 ");
 					if(ctxId instanceof CtxEntityIdentifier){
 						CtxEntityIdentifier ctxEntityId = 	(CtxEntityIdentifier) ctxId;
-						ctxCallbackClient.onRetrieveIndiEnt(ctxEntityId);
+						ctxCallbackClient.onRetrievedEntityId(ctxEntityId);
 					} else LOG.error ("Returned ctxIdentifier is not a CtxEntityIdentifier");
 
-					payload = null; 
 					// LOOKUP
 				} else if (payload.getCtxBrokerLookupBeanResult() != null){
 					
@@ -190,9 +181,7 @@ public class CtxBrokerCommCallback implements ICommCallback {
 						resultListIdentifiers.add(ctxIdent);
 					}					
 					//			LOG.info("inside receiveResult LOOKUP method 4"+ resultListIdentifiers);
-					ctxCallbackClient.onLookupCallback(resultListIdentifiers);
-					
-					payload = null; 
+					ctxCallbackClient.onLookupCallback(resultListIdentifiers); 
 					
 				} else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null){
 					CtxAssociationBean bean = 
@@ -207,12 +196,34 @@ public class CtxBrokerCommCallback implements ICommCallback {
 							(CtxEntityIdentifierBean) payload.getCtxBrokerRemoveBeanResult();
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					ctxCallbackClient.receiveCtxResult(bean, "remove");
-				}   
-				else 
+				
+					// RETRIEVE_COMMUNITY_ENTITY_ID
+				} else if(payload.getRetrieveCommunityEntityIdBeanResult() != null){
+				
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("receiveResult: payload=retrieveCommunityEntityId");
+				
+					final CtxEntityIdentifierBean communityEntityIdBean = 
+							payload.getRetrieveCommunityEntityIdBeanResult();
+			
+					final ICtxCallback retrieveCommunityEntityIdCallback = 
+							getRequestingClient(returnStanza.getId());
+				
+					final CtxIdentifier communityEntityId = CtxModelBeanTranslator.getInstance()
+							.fromCtxIdentifierBean(communityEntityIdBean);
+		
+					if (communityEntityId instanceof CtxEntityIdentifier)
+						retrieveCommunityEntityIdCallback.onRetrievedEntityId(
+								(CtxEntityIdentifier) communityEntityId);
+					else 
+						LOG.error ("Returned ctxIdentifier is not a CtxEntityIdentifier");
+
+				} else 
 					LOG.error("The payload is not appropriate for the CtxBrokerCommCallback receiveResult method!");
 			} catch (Exception e) {
 
-				LOG.error("Could not parse result bean " + msgBean);
+				LOG.error("Could not parse result bean " + msgBean + ": "
+						+ e.getLocalizedMessage(), e);
 			}
 		}
 	}

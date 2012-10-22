@@ -41,7 +41,6 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 
@@ -113,20 +112,19 @@ public class CtxBrokerServer implements IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 
-		//		LOG.error("Context Broker server received stanza:"+ stanza );
-		//		LOG.error("Context Broker server received payload: "+payload.getClass() );
-		CtxBrokerResponseBean beanResponse = null;
-
-		//CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("getQuery: stanza=" + stanza + ", payload=" + payload);
 
 		if (!(payload instanceof CtxBrokerRequestBean))
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: " + payload.getClass());
 
-		CtxBrokerRequestBean cbPayload = (CtxBrokerRequestBean) payload;
+		final CtxBrokerRequestBean cbPayload = (CtxBrokerRequestBean) payload;
 		if (cbPayload.getMethod() == null) {
 			LOG.error("CtxBrokerRequestBean.getMethod() can't be null");
 			throw new XMPPError(StanzaError.bad_request, "CtxBrokerRequestBean.getMethod() can't be null");
 		}
+		
+		CtxBrokerResponseBean beanResponse = null;
 
 		switch (cbPayload.getMethod()) {
 
@@ -410,11 +408,46 @@ public class CtxBrokerServer implements IFeatureServer{
 			}
 
 			break;
+			
+		case RETRIEVE_COMMUNITY_ENTITY_ID:
+
+			if (LOG.isInfoEnabled())
+				LOG.info("RETRIEVE_COMMUNITY_ENTITY_ID");
+		
+			beanResponse = new CtxBrokerResponseBean();
+			final RequestorBean retrieveCommunityEntityIdBeanRequestorBean = 
+					cbPayload.getRetrieveCommunityEntityId().getRequestor();
+			final Requestor retrieveCommunityEntityIdBeanRequstor = 
+					getRequestorFromBean(retrieveCommunityEntityIdBeanRequestorBean);
+			final String retrieveCommunityEntityIdTargetStr = 
+					cbPayload.getRetrieveCommunityEntityId().getTarget().toString();
+
+			final IIdentity retrieveCommunityEntityIdTarget;
+			try {
+				retrieveCommunityEntityIdTarget = 
+						this.identMgr.fromJid(retrieveCommunityEntityIdTargetStr);
+				final CtxEntityIdentifier communityEntityId = 
+						this.ctxbroker.retrieveCommunityEntityId(
+								retrieveCommunityEntityIdBeanRequstor, retrieveCommunityEntityIdTarget).get();
+
+				final CtxEntityIdentifierBean communityEntityIdBean = 
+						(CtxEntityIdentifierBean) CtxModelBeanTranslator.getInstance()
+							.fromCtxIdentifier(communityEntityId);
+				beanResponse.setRetrieveCommunityEntityIdBeanResult(communityEntityIdBean);
+
+			} catch (Exception e) {
+				LOG.error("Could not retrieve community entity id: " + e.getLocalizedMessage(), e);
+				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), e);
+			}
+
+			break;
 
 		default: 
-			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
+			throw new XMPPError(StanzaError.feature_not_implemented, 
+					"Unsupported remote context method: " + cbPayload.getMethod());
 		}
-		LOG.error(" beanResponse ready:" +beanResponse);
+		if (LOG.isInfoEnabled())
+			LOG.info(" beanResponse ready:" +beanResponse);
 		return beanResponse;
 	}
 	/*
