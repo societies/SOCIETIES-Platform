@@ -74,13 +74,13 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-//		if (null == dataId.getOwnerId()) {
-//			throw new PrivacyException("[Parameters] OwnerId is missing");
-//		}
+		//		if (null == dataId.getOwnerId()) {
+		//			throw new PrivacyException("[Parameters] OwnerId is missing");
+		//		}
 
 		Session session = sessionFactory.openSession();
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		Transaction t = session.beginTransaction();
+		session = sessionFactory.openSession();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
@@ -99,7 +99,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
 			}
 		} catch (Exception e) {
-			t.rollback();
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
 		} finally {
 			if (session != null) {
@@ -126,16 +125,16 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-//		if (null == dataId.getOwnerId()) {
-//			throw new PrivacyException("[Parameters] OwnerId is missing");
-//		}
+		//		if (null == dataId.getOwnerId()) {
+		//			throw new PrivacyException("[Parameters] OwnerId is missing");
+		//		}
 		if (null == actions || actions.size() <= 0) {
 			throw new PrivacyException("[Parameters] Actions are missing");
 		}
 
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
-		Transaction t = session.beginTransaction();
+		session = sessionFactory.openSession();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions);
@@ -170,7 +169,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			permission = relevantPrivacyPermission.createResponseItem();
 			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
 		} catch (Exception e) {
-			t.rollback();
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
 		} finally {
 			if (session != null) {
@@ -228,10 +226,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			LOG.debug("PrivacyPermission saved: "+privacyPermission.toString());
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
 		} finally {
-			if (session != null) {
+			if (null != session) {
 				session.close();
 			}
 		}
@@ -302,7 +302,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the removal of the privacy permission", e);
 		} finally {
 			if (session != null) {
@@ -351,7 +353,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the removal of the privacy permission", e);
 		} finally {
 			if (session != null) {
