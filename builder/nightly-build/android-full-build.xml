@@ -72,6 +72,8 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
+                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
+ 
 		<!--module>../../platform-infrastructure/client-frwk/MasterGUI</module-->
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>

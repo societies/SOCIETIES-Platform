@@ -145,7 +145,7 @@ var SocietiesLogin = {
 		function failure(data) {
 			alert("getCSSIdentityDomain - failure: " + data);
 		}
-		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "daURI");
+		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "daServerURI");
 	},
 
 	/**
@@ -163,7 +163,7 @@ var SocietiesLogin = {
 		}
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#identitydomain").val());
 	},
 	/**
 	 * @methodOf SocietiesLogin#

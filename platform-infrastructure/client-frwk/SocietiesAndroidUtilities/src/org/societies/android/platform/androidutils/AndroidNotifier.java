@@ -24,7 +24,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.cssmanager;
+package org.societies.android.platform.androidutils;
 
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.utilities.DBC.Dbc;

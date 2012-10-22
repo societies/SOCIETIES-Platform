@@ -58,6 +58,8 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
@@ -83,6 +85,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private static final String NEW_CSS_NODE = "New CSS Node";
 	private static final String OLD_CSS_NODE = "Old CSS Node";
 	private static final String NODE_LOGIN = "Node Logged in";
+	
+	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+
 	
 	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
@@ -273,9 +280,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		if (null == this.ccm) {
-			this.ccm = new ClientCommunicationMgr(this);
-		}
+		this.configureClientCommunicationMgr();
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 		
@@ -378,9 +383,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
 		
-		if (null == this.ccm) {
-			this.ccm = new ClientCommunicationMgr(this);
-		}
+		this.configureClientCommunicationMgr();
 		
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -1182,5 +1185,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			throw new RuntimeException(e);
 		}     
     }
+    
+    /**
+     * Create and configureClientCommunicationManager
+     */
+    private void configureClientCommunicationMgr() {
+		if (null == this.ccm) {
+			this.ccm = new ClientCommunicationMgr(this);
+			
+			AppPreferences appPreferences = new AppPreferences(this.getApplicationContext());
 
+			int xmppServerPort = appPreferences.getIntegerPrefValue(DOMAIN_AUTHORITY_SERVER_PORT);
+			String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
+			String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
+			
+			this.ccm.setDomainAuthorityNode(domainAuthorityName);
+			this.ccm.setPortNumber(xmppServerPort);
+			this.ccm.setResource(nodeJIDResource);
+		}
+    }
 }
