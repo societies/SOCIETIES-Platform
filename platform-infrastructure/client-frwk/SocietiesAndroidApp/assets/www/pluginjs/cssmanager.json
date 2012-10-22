@@ -119,19 +119,19 @@
 						},
 		"readProfile" : {
 						"archiveCSSNodes": [],
-	                    "cssIdentity": "android@chosendomain.org",
+	                    "cssIdentity": "john.societies.local",
 	                    "cssInactivation": null,
 	                    "cssNodes": [
 	                    	{
-	                        "identity": "android@something",
+	                        "identity": "john@societies.local/android",
 	                        "status": 0,
 	                        "type": 2},
 	                    	{
-	                        "identity": "node11",
+	                        "identity": "john.societies.local",
 	                        "status": 0,
 	                        "type": 2},
 	                        {
-	                        "identity": "node22",
+	                        "identity": "john@societies.local/rich",
 	                        "status": 2,
 	                        "type": 0
 	                        }
@@ -140,13 +140,13 @@
 	                    "cssHostingLocation" : null,
 	                    "domainServer" : "chosendomain.org",
 	                    "cssUpTime": 0,
-	                    "emailID": "frank@hotmail.com",
+	                    "emailID": "john@hotmail.com",
 	                    "entity": 0,
-	                    "foreName": "frank",
+	                    "foreName": "John",
 	                    "homeLocation": "Dublin",
 	                    "identityName": "The Frankster",
-	                    "imID": "im@imo",
-	                    "name": "The Gangster",
+	                    "imID": "+353 87 1234567",
+	                    "name": "Smith",
 	                    "password": null,
 	                    "presence": 0,
 	                    "sex": 1,
