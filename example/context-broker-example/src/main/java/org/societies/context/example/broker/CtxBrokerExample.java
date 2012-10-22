@@ -199,10 +199,9 @@ public class CtxBrokerExample implements Subscriber{
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
-		this.cisManagerEventsTest();
-
-		LOG.info("*** Starting community context examples...");
+	
 		// community context tests
+		LOG.info("*** Starting community context examples...");
 	
 		this.createIndividualEntities();
 		// includes context bond tests
@@ -210,14 +209,8 @@ public class CtxBrokerExample implements Subscriber{
 		
 		this.retrieveCommunityEntityBasedOnCisID();
 		this.lookupCommunityEntAttributes();
-	}
-
-
-	private void cisManagerEventsTest(){
-		//cisManager.joinRemoteCIS(adv, callback)
-		//this.cisManager.
-
-
+		
+		//this.retrieveCommunityHistory();
 	}
 
 
