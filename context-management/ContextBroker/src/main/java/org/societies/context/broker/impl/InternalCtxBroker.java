@@ -89,6 +89,7 @@ import org.societies.context.broker.impl.comm.callbacks.CreateAssociationCallbac
 import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
 import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveCommunityEntityIdCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
@@ -2107,7 +2108,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
 			Requestor requestor, IIdentity cisId) throws CtxException {
 
-		if(requestor == null) requestor = getLocalRequestor();
+		if (requestor == null) requestor = getLocalRequestor();
 
 		if (cisId == null)
 			throw new NullPointerException("cisId can't be null");
@@ -2120,6 +2121,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxEntityIdentifier communityEntityId = null;
 
+		// TODO find alternative
+		// ugly workaround: try local community db mgr, if null try remote call
 		//if (this.idMgr.isMine(cisId)) {
 
 		final CommunityCtxEntity communityEntity;
@@ -2127,15 +2130,30 @@ public class InternalCtxBroker implements ICtxBroker {
 			communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId);
 			if (communityEntity != null)
 				communityEntityId = communityEntity.getId();
+			else {
+				// remote call
+				if (LOG.isInfoEnabled())
+					LOG.info("retrieveCommunityEntityId remote call");
+				final RetrieveCommunityEntityIdCallback callback = 
+						new RetrieveCommunityEntityIdCallback();
+
+				this.ctxBrokerClient.retrieveCommunityEntityId(requestor, cisId, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						communityEntityId = callback.getResult();
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for response");
+					}
+				}
+			}
 		} catch (CtxException ce) {
 
 			throw new CtxBrokerException(
-					"Could not retrieve CommunityCtxEntity from Community Context DB Mgr: "
+					"Could not retrieve community CtxEntityIdentifier from Community Context DB Mgr: "
 							+ ce.getLocalizedMessage(), ce);
 		}
-
-		//} else {LOG.warn("remote call");} 
-
 
 		return new AsyncResult<CtxEntityIdentifier>(communityEntityId);
 	}

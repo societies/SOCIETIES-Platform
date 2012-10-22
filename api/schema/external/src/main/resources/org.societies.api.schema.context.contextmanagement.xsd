@@ -33,6 +33,8 @@
 					nillable="false" minOccurs="0" />
 				<xs:element name="retrieveIndividualEntityId" type="retrieveIndividualEntityIdBean"
 					nillable="false" minOccurs="0" />
+				<xs:element name="retrieveCommunityEntityId" type="retrieveCommunityEntityIdBean"
+					nillable="false" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -48,10 +50,8 @@
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxModelObjectBean"
 					nillable="false" minOccurs="0" />
-				
-				<xs:element name="ctxBrokerRetrieveIndividualEntityIdBeanResult" type="tns:ctxEntityIdentifierBean"
-				minOccurs="0" />
-				
+				<xs:element name="ctxBrokerRetrieveIndividualEntityIdBeanResult" 
+					type="tns:ctxEntityIdentifierBean" minOccurs="0" />				
 				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxModelObjectBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerUpdateAttributeBeanResult"
@@ -62,6 +62,8 @@
 					minOccurs="0" />
 				<xs:element name="ctxBrokerCreateAttributeBeanResult"
 					type="tns:ctxAttributeBean" minOccurs="0" />
+				<xs:element name="retrieveCommunityEntityIdBeanResult" 
+					type="tns:ctxEntityIdentifierBean" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -152,6 +154,15 @@
 			<xs:element name="type" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:complexType name="retrieveCommunityEntityIdBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="target" type="xs:string"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
 	<xs:simpleType name="brokerMethodBean">
 		<xs:restriction base="xs:string">
@@ -163,6 +174,7 @@
 			<xs:enumeration value="REMOVE" />
 			<xs:enumeration value="LOOKUP" />
 			<xs:enumeration value="RETRIEVE_INDIVIDUAL_ENTITY_ID" />
+			<xs:enumeration value="RETRIEVE_COMMUNITY_ENTITY_ID" />
 		</xs:restriction>
 	</xs:simpleType>
 
