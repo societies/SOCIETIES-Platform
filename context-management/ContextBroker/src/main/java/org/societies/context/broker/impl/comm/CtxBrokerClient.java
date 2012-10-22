@@ -273,8 +273,7 @@ public class CtxBrokerClient implements ICommCallback {
 			ICtxCallback callback) throws CtxBrokerException {
 
 		try {
-			// TODO final Stanza stanza = new Stanza(target);
-			final Stanza stanza = new Stanza(this.idMgr.fromJid("jane.societies.local"));
+			final Stanza stanza = new Stanza(target);
 			final CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_COMMUNITY_ENTITY_ID);
 
