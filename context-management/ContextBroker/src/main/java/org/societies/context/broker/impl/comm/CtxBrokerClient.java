@@ -326,7 +326,8 @@ public class CtxBrokerClient implements ICommCallback {
 			ICtxCallback callback) throws CtxBrokerException {
 
 		try {
-			final Stanza stanza = new Stanza(target);
+			// TODO final Stanza stanza = new Stanza(target);
+			final Stanza stanza = new Stanza(this.idMgr.fromJid("jane.societies.local"));
 			final CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_COMMUNITY_ENTITY_ID);
 
@@ -344,7 +345,7 @@ public class CtxBrokerClient implements ICommCallback {
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 			
-		} catch (CommunicationException e) {
+		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not retrieve remote individual ctx entity : "
 					+ e.getLocalizedMessage(), e);
