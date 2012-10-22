@@ -58,8 +58,6 @@ var SocialNetworksConnectors = {
 				jQuery('ul#listSNSconnectors').append(tableEntry);
 			}
 			$('ul#listSNSconnectors').listview('refresh');
-			//CHANGE TO THE SETTINGS PAGE
-			$.mobile.changePage($("#settings"), {transition: "slideup"});
 		}
 		
 		function failure(data) {
@@ -104,17 +102,17 @@ var SocialNetworksConnectors = {
 	
 	getSNimage: function (cnType){
 		if (cnType == "facebook")
-			return "../images/icons/facebook-col.png";
+			return "images/icons/facebook-col.png";
 		else if (cnType == "twitter")
-			return "../images/icons/twitter-col.png";
+			return "images/icons/twitter-col.png";
 		else if (cnType == "foursquare")
-			return "../images/icons/foursquare-col.png";
+			return "images/icons/foursquare-col.png";
 		else if (cnType == "linkedin")
-			return "../images/icons/linkedin-col.png";
+			return "images/icons/linkedin-col.png";
 		else if (cnType == "googleplus")
-			return "../images/icons/googleplus-col.png";
+			return "images/icons/googleplus-col.png";
 		else 
-			return "../images/icons/worldweb.png";
+			return "images/icons/worldweb.png";
 	}
 };
 
