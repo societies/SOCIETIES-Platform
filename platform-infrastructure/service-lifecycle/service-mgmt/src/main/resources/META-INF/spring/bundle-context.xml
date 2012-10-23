@@ -23,7 +23,8 @@
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="serviceControl" ref ="serviceControl"/>
 		<property name="privacyManager" ref="privacyManagerProviderRef" />
-		<property name="negotiationProvider" ref="negotiationProviderRef" />	
+		<property name="negotiationProvider" ref="negotiationProviderRef" />
+		<property name="eventMgr" ref="eventManagerRef" />	
 	</bean>
 	
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
@@ -42,6 +43,7 @@
 		<property name="policyNegotiation" ref="policyNegotiatorRef" />
 		<property name="deviceMngr" ref="deviceMngrRef" />
 		<property name="userFeedback" ref="userFeedbackRef" />
+		<property name="eventMgr" ref="eventManagerRef" />		
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >

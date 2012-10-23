@@ -39,6 +39,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
@@ -52,6 +53,10 @@ import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
@@ -59,9 +64,11 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
+import org.societies.api.services.ServiceMgmtEventType;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
@@ -88,10 +95,19 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private ICisManager cisManager;
 	private IDeviceManager deviceMngr;
 	private IUserFeedback userFeedback;
+	private IEventMgr eventMgr;
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private final long TIMEOUT = 5;
 
+	
+	public IEventMgr getEventMgr(){
+		return eventMgr;
+	}
+	
+	public void setEventMgr(IEventMgr eventMgr){
+		this.eventMgr=eventMgr;
+	}
 	
 	public IDeviceManager getDeviceMngr(){
 		return deviceMngr;
@@ -508,7 +524,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
-
+				sendEvent(ServiceMgmtEventType.NEW_SERVICE,serviceToInstall);
+				sendEvent(ServiceMgmtEventType.SERVICE_STARTED,serviceToInstall);
+				
 			} else{
 									
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
@@ -575,7 +593,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					returnResult.setServiceId(result.getServiceId());
 					returnResult.setMessage(result.getMessage());
 					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
-
+					sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
+					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
+					
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Installation of client was not successful");
@@ -585,8 +605,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				}
 	
 			}
-			
-
+						
 			return new AsyncResult<ServiceControlResult>(returnResult);	
 			
 		
@@ -917,6 +936,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.info("Service " + service.getServiceName() + " has been uninstalled");
 				
 				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+				sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+				sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service);
+				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
@@ -1135,7 +1158,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							activity.setObject(service.getServiceName());
 							activity.setTarget(node.getJid());
 							activity.setVerb("Shared");
-							//remoteCis.getActivityFeed().addActivity(activity, c)
+							IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
+							remoteCis.getActivityFeed().addActivity(activity, cisCallback );
 							getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
 
 						}	
@@ -1309,7 +1333,37 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return new AsyncResult<ServiceControlResult>(returnResult);
 	}
 	
-	public void cleanAfterRestart(){
+	private void sendEvent(ServiceMgmtEventType eventType, Service service){
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Sending event of type: " + eventType + " for service " + ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
+		
+		ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
+		serviceEvent.setEventType(eventType);
+		serviceEvent.setServiceType(service.getServiceType());
+		serviceEvent.setServiceId(service.getServiceIdentifier());
+
+		if(!service.getServiceType().equals(ServiceType.DEVICE)){
+			Bundle bundle = ServiceModelUtils.getBundleFromService(service, bundleContext);
+			serviceEvent.setBundleId(bundle.getBundleId());
+			serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
+		} else{
+			serviceEvent.setBundleId(-1);
+			serviceEvent.setBundleSymbolName(null);
+		}
+
+		InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
+		
+		try {
+			getEventMgr().publishInternalEvent(internalEvent);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error sending event!");
+		}
+	}
+	
+	private void cleanAfterRestart(){
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Cleaning and Restarting. First we try to restore already installed third party client!");

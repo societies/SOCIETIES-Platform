@@ -52,6 +52,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -60,12 +61,17 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
+import org.societies.api.services.ServiceMgmtEventType;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
 
@@ -89,7 +95,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private INegotiationProviderServiceMgmt negotiationProvider;
 	private IServiceControl serviceControl;
 	private IPrivacyPolicyManager privacyManager;
+	private IEventMgr eventMgr;
 
+	public IEventMgr getEventMgr(){
+		return eventMgr;
+	}
+	
+	public void setEventMgr(IEventMgr eventMgr){
+		this.eventMgr=eventMgr;
+	}
+	
 	public IPrivacyPolicyManager getPrivacyManager(){
 		return privacyManager;
 	}
@@ -229,7 +244,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 				si.setFullJid(nodeId);
 				si.setCssJid(nodeId);
 				si.setParentJid(nodeId); //This is later changed!
-				//si.setXMPPNode(myNode.getNodeIdentifier());
+				si.setXMPPNode(myNode.getNodeIdentifier());
 			}
 			
 		} else{
@@ -237,6 +252,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setCssJid(myNode.getBareJid());
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
+			service.setServiceLocation(serBndl.getLocation());
 		}
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
@@ -325,66 +341,36 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
+					updateSecurityPrivacy(service);
 					
-					if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
-						if(log.isDebugEnabled())
-							log.debug("Adding the shared service to the policy provider!");
-						String slaXml = null;
-						URI clientJar;
-						
-						if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
-							clientJar= new URI("http://www.societies.org/webapp/webservice.test");
-						else
-							clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
-						
-						URI clientHost;
-						if(clientJar.getPort()!= -1)
-							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
-						else
-							clientHost = new URI("http://" + clientJar.getHost() );
-
-						if(log.isDebugEnabled())
-							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-						INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
-						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
-						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
-						
-						String privacyLocation;
-						if(serBndl.getLocation().endsWith("/"))
-							privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
-						else
-							privacyLocation = serBndl.getLocation() + "/privacy-policy.xml";
-						
-						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
-
-						int index = privacyLocation.indexOf('@');	
-						String privacyPath = privacyLocation.substring(index+1);
-						
-						String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyPath);
-						
-						if(log.isDebugEnabled())
-							log.debug("Tried to get privacy policy from: " + privacyLocation);
-						
-						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
-					
-						if(log.isDebugEnabled())
-							log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
-						
+					if(!service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
+						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
+						sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serBndl);
 					}
-										
+					
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
+					if(existService.getServiceStatus()==ServiceStatus.STARTED){
+						if(log.isDebugEnabled())
+							log.debug("This is a restart! We need to update everything!");
+						updateSecurityPrivacy(service);
+					} else{
+						if(log.isDebugEnabled())
+							log.debug("Just restarting the service, no need to update stuff yet.");
+					}
+					
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
+					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serBndl);
+
 				}
-				
+					
 				//The service is now registered, so we update the hashmap
 				if(ServiceControl.installingBundle(serBndl.getBundleId())){
 					if(log.isDebugEnabled())
 						log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
 					ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
 				}
+				
 				
 			} catch (Exception e) {
 				log.error("Error while persisting service meta data");
@@ -401,6 +387,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 				
 				try {
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
+					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service,serBndl);
+
 				} catch (ServiceNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -432,13 +420,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 					
 					if(log.isDebugEnabled())
 						log.debug("Removing the shared service from the policy provider!");
-				getNegotiationProvider().removeService(service.getServiceIdentifier());
+					
+					getNegotiationProvider().removeService(service.getServiceIdentifier());
 				
-				if(log.isDebugEnabled()) log.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
+					if(log.isDebugEnabled()) log.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
 
-				getServiceReg().unregisterServiceList(servicesToRemove);
-				log.info("Service " + service.getServiceName() + " has been uninstalled");
-				
+					getServiceReg().unregisterServiceList(servicesToRemove);
+					log.info("Service " + service.getServiceName() + " has been uninstalled");
+
+					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service,serBndl);
+					sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service,serBndl);
+					
 				} catch (ServiceRegistrationException e) {
 					e.printStackTrace();
 					log.error("Exception while unregistering service: " + e.getMessage());
@@ -513,6 +505,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 			getServiceReg().unregisterServiceList(servicesToRemove);
 			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
 			
+			sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,serviceToRemove,event.getBundle());
+			
 		} catch (ServiceRegistrationException e) {
 			e.printStackTrace();
 			log.error("Exception while unregistering service: " + e.getMessage());
@@ -571,5 +565,93 @@ public class ServiceRegistryListener implements BundleContextAware,
 		// Finally, we return
 		 return result;
 		 
+	}
+	
+	private void updateSecurityPrivacy(Service service){
+		
+		try{
+			if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
+				if(log.isDebugEnabled())
+					log.debug("Adding the shared service to the policy provider!");
+				String slaXml = null;
+				URI clientJar;
+					
+				if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
+					clientJar= new URI("http://www.societies.org/webapp/webservice.test");
+				else
+					clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+					
+				URI clientHost;
+				if(clientJar.getPort()!= -1)
+					clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
+				else
+					clientHost = new URI("http://" + clientJar.getHost() );
+
+				if(log.isDebugEnabled())
+					log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
+					
+				INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+				//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
+				
+				String privacyLocation;
+				if(service.getServiceLocation().endsWith("/"))
+					privacyLocation = service.getServiceLocation() + "privacy-policy.xml";
+				else
+					privacyLocation = service.getServiceLocation() + "/privacy-policy.xml";
+					
+				if(log.isDebugEnabled())
+					log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
+
+				int index = privacyLocation.indexOf('@');	
+				String privacyPath = privacyLocation.substring(index+1);
+					
+				String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyPath);
+					
+				if(log.isDebugEnabled())
+						log.debug("Tried to get privacy policy from: " + privacyLocation);
+
+				IIdentity myNode = getCommMngr().getIdManager().getThisNetworkNode();
+				RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+				RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+				
+				if(log.isDebugEnabled())
+					log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
+					
+				}
+				
+		} catch(Exception ex){
+			log.error("Exception while trying to update Privacy Policy!");
+			ex.printStackTrace();
+		}
+
+	}
+	
+	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
+		
+		if(log.isDebugEnabled())
+			log.debug("Sending event of type: " + eventType + " for service " + ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
+		
+		ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
+		serviceEvent.setEventType(eventType);
+		serviceEvent.setServiceType(service.getServiceType());
+		serviceEvent.setServiceId(service.getServiceIdentifier());
+		if(bundle != null){
+			serviceEvent.setBundleId(bundle.getBundleId());
+			serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
+		} else{
+			serviceEvent.setBundleId(-1);
+			serviceEvent.setBundleSymbolName(null);
+		}
+
+		InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
+		
+		try {
+			getEventMgr().publishInternalEvent(internalEvent);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			log.error("Error sending event!");
+		}
 	}
 }
