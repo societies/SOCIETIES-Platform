@@ -34,6 +34,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,18 +58,22 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	private boolean ctxRecording = true;
+	
 	public UserContextHistoryManagement() {
 		
 		LOG.info(this.getClass().getName() + " instantiated");
 	}
 
-	// TODO throw UserCtxHistoryMgrException
 	@Override
 	public CtxHistoryAttribute createHistoryAttribute(
 			final CtxAttribute attribute) {
 
 		if (attribute == null)
 			throw new NullPointerException("attribute can't be null");
+		
+		//if (ctxRecording == false)
+		//	throw new UserCtxHistoryMgrException("context history recording is disabled");
 		
 		CtxHistoryAttribute result = null;
 		
@@ -187,13 +192,15 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	@Override
 	public void disableCtxRecording() {
-		// TODO Auto-generated method stub
+		
+		ctxRecording =  false;
 
 	}
 
 	@Override
 	public void enableCtxRecording() {
-		// TODO Auto-generated method stub
+
+		ctxRecording =  true;
 
 	}
 
@@ -340,7 +347,9 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		
 		if (endDate != null)
 			criteria.add(Restrictions.le("lastUpdated", endDate));
-	
+		
+		criteria.addOrder(Order.asc("lastUpdated"));
+		
 		try {
 			result.addAll(criteria.list());
 		} finally {
