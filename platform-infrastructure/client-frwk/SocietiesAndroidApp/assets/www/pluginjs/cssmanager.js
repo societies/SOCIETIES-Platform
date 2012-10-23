@@ -67,6 +67,29 @@ window.plugins.SocietiesLocalCSSManager = {
 		}
 	},
 	modifyAndroidCSSRecord: function(successCallback, errorCallback, data){
+		var cssRecord = {
+	  			"archiveCSSNodes": [],
+                "cssIdentity": data.cssIdentity,
+                "cssInactivation": null,
+                "cssNodes": [],
+                "cssRegistration": null,
+                "cssHostingLocation" : null,
+                "domainServer" : null,
+                "cssUpTime": 0,
+                "emailID": data.emailID,
+                "entity": data.entity,
+                "foreName": data.foreName,
+                "homeLocation": null,
+                "identityName": data.cssIdentity,
+                "imID": data.imID,
+                "name": data.name,
+                "password": null,
+                "presence": 0,
+                "sex": data.sex,
+                "socialURI": null,
+                "status": 0
+	            };
+		console.log(cssRecord);
 		if (phonegapdesktop.internal.randomException("CssManagerService")) {
 			errorCallback('A random error was generated');
 		}

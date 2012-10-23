@@ -66,7 +66,7 @@ var SocietiesCSSRecord = {
 		$("#cssrecordimdetails").val(data.imID);
 		$("#cssrecorduserlocation").val(data.homeLocation);
 		$("#cssrecordsnsdetails").val(data.socialURI);
-		$("#cssrecordidentity").val(data.identityName);
+		$("#cssrecordidentity").val(data.cssIdentity); //identityName
 		$("#cssrecordorgtype").val(data.entity);
 		$("#cssrecordsextype").val(data.sex);
 		
@@ -99,11 +99,10 @@ var SocietiesCSSRecord = {
 				"emailID": jQuery("#cssrecordemaildetails").val(),
 				"entity": jQuery("#cssrecordidentity").val(),
 				"foreName": jQuery("#cssrecordforename").val(),
-				"identityName": jQuery("#cssrecordidentity").val(),
+				"cssIdentity": jQuery("#cssrecordidentity").val(),
 				"imID": jQuery("#cssrecordimdetails").val(),
 				"name": jQuery("#cssrecordname").val(),
 				"sex": jQuery("#cssrecordsextype").val(),
-				"socialURI": jQuery("#cssrecordsnsdetails").val(),
 				"entity": jQuery("#cssrecordorgtype").val()
 		};
 		
