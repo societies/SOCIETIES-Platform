@@ -127,7 +127,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				this.privateId,	type, modelObjectNumber);
 		final CtxAssociationDAO associationDAO = new CtxAssociationDAO(id);
 
-		Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try{
 			tx = session.beginTransaction();
@@ -599,10 +599,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		T result = null;
 		
 		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(modelObjectClass)
-				.add(Restrictions.eq("ctxId", ctxId));
-		
-		try { 
+		try {
+			final Criteria criteria = session.createCriteria(modelObjectClass)
+					.add(Restrictions.eq("ctxId", ctxId));
 			result = (T) criteria.uniqueResult();
 		} finally {
 			if (session != null)
@@ -621,18 +620,18 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final Set<T> result = new HashSet<T>();
 		
 		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(modelObjectClass);
-		
-		if (type != null)
-			criteria.add(Restrictions.eq("type", type));
-		
-		if (startDate != null) 
-			criteria.add(Restrictions.ge("lastModified", startDate));
-		
-		if (endDate != null)
-			criteria.add(Restrictions.le("lastModified", endDate));
-	
 		try {
+			final Criteria criteria = session.createCriteria(modelObjectClass);
+		
+			if (type != null)
+				criteria.add(Restrictions.eq("type", type));
+		
+			if (startDate != null) 
+				criteria.add(Restrictions.ge("lastModified", startDate));
+		
+			if (endDate != null)
+				criteria.add(Restrictions.le("lastModified", endDate));
+	
 			result.addAll(criteria.list());
 		} finally {
 			if (session != null)
