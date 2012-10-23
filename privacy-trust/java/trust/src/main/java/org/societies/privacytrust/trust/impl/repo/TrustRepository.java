@@ -82,10 +82,6 @@ public class TrustRepository implements ITrustRepository {
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 
-		// check if the entity is already present
-		//ITrustedEntity entity = this.retrieveEntity(teid); 
-		//if (entity != null)
-		//	return entity;
 		final ITrustedEntity entity;
 		switch (teid.getEntityType()) {
 		
@@ -103,22 +99,25 @@ public class TrustRepository implements ITrustRepository {
 					+ teid.getEntityType());
 		}
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
+		
 		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
+		Transaction tx = null;
 		try {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
-	
+			tx = session.beginTransaction();
 			session.save(entity);
 			session.flush();
-			transaction.commit();
+			tx.commit();
 			
 		} catch (ConstraintViolationException cve) {
-			LOG.warn("Rolling back transaction for entity " + entity);
-			transaction.rollback();
+			LOG.warn("Rolling back transaction for existing entity " + entity);
+			if (tx != null)
+				tx.rollback();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			transaction.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new TrustRepositoryException("Could not add entity " + entity, e);
 		} finally {
 			if (session != null)
@@ -128,7 +127,7 @@ public class TrustRepository implements ITrustRepository {
 		return this.retrieveEntity(teid);
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(java.lang.String, org.societies.privacytrust.trust.api.model.TrustedEntityId)
 	 */
 	@Override
@@ -154,15 +153,22 @@ public class TrustRepository implements ITrustRepository {
 		//if (TrustedCis.class.equals(entityClass))
 		//	criteria.setFetchMode("members", FetchMode.SELECT);
 		
-		final ITrustedEntity result = (ITrustedEntity) criteria.uniqueResult();
+		final ITrustedEntity result;
 		
-		if (session != null)
-			session.close();
+		try {
+			result = (ITrustedEntity) criteria.uniqueResult();
+		} catch (Exception e) {
+			throw new TrustRepositoryException("Could not retrieve trusted entity '"
+					+ teid + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 			
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
 	@Override
@@ -171,13 +177,15 @@ public class TrustRepository implements ITrustRepository {
 		
 		ITrustedEntity result = null;
 		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
+		Transaction tx = null;
 		try {
+			tx = session.beginTransaction();
 			result = (ITrustedEntity) session.merge(entity);
-			transaction.commit();
+			tx.commit();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			transaction.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new TrustRepositoryException("Could not add entity " + entity
 					+ ": " + e.getLocalizedMessage(), e);
 		} finally {
@@ -189,7 +197,6 @@ public class TrustRepository implements ITrustRepository {
 	}
 
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
@@ -204,13 +211,15 @@ public class TrustRepository implements ITrustRepository {
 			return;
 		
 		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
+		Transaction tx = null;
 		try {
+			tx = session.beginTransaction();
 			session.delete(entity);
-			transaction.commit();
+			tx.commit();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			transaction.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new TrustRepositoryException("Could not remove entity " + entity
 					+ ": " + e.getLocalizedMessage(), e);
 		} finally {
@@ -248,10 +257,15 @@ public class TrustRepository implements ITrustRepository {
 		final Criteria criteria = session.createCriteria(daClass)
 				.add(Restrictions.eq("teid.trustor_id", trustorId));
 		
-		result.addAll(criteria.list());
-		
-		if (session != null)
-			session.close();
+		try {
+			result.addAll(criteria.list());
+		} catch (Exception e) {
+			throw new TrustRepositoryException("Could not retrieve entities trusted by '"
+					+ trustorId + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 		
 		return result;
 	}

@@ -98,6 +98,9 @@
 	<osgi:reference id="commMgr"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
 		cardinality="1..1" />
+	<osgi:reference id="commMgrFactory"
+		interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"
+		cardinality="1..1" />
 	<osgi:reference id="privacyDataMgr"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager"
 		cardinality="0..1" timeout="10000" />
