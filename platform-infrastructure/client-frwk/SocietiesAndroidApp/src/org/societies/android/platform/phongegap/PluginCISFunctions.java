@@ -44,10 +44,12 @@ import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.cis.CisDirectoryRemote;
 import org.societies.android.platform.cis.CommunityManagement;
 import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
 
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -465,6 +467,12 @@ public class PluginCISFunctions extends Plugin {
 					//remove callback ID for given method invocation
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+					
+					//CREATE ANDROID NOTIFICATION
+					int notifierflags [] = new int [1];
+					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+					AndroidNotifier notifier = new AndroidNotifier(PluginCISFunctions.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
+					notifier.notifyMessage("Joined new community", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
 				}
 			}  
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
