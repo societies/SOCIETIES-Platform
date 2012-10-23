@@ -24,19 +24,33 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.monitor;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * Describe your class here...
  *
- * @author 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS) 
  * @since 0.4.1
  */
 @Service
@@ -48,14 +62,20 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	private ITrustEvidenceCollector trustEvidenceCollector;
 	
 	private ICtxBroker ctxBroker;
+	
+	private final IIdentity ownerId;
+	
+	/** The executor service. */
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	@Autowired
-	CtxTrustEvidenceMonitor(ICtxBroker ctxBroker) {
+	CtxTrustEvidenceMonitor(ICommManager commMgr) throws Exception {
 		
-		LOG.info(this.getClass() + " instantiated");
-		this.ctxBroker = ctxBroker;
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		
-		//this.ctxBroker.re
+		final String ownerIdStr = commMgr.getIdManager().getThisNetworkNode().getBareJid();
+		this.ownerId = commMgr.getIdManager().fromJid(ownerIdStr);
 	}
 
 	/*
@@ -63,8 +83,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	 */
 	@Override
 	public void onCreation(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received CREATED event " + event);
 	}
 
 	/*
@@ -72,8 +93,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	 */
 	@Override
 	public void onUpdate(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received UPDATED event " + event);
 	}
 
 	/*
@@ -82,7 +104,11 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Override
 	public void onModification(CtxChangeEvent event) {
 		// TODO Auto-generated method stub
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received MODIFIED event " + event);
 		
+		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType()))
+			this.executorService.execute(new CisMembershipHandler(event.getId()));
 	}
 
 	/*
@@ -90,7 +116,55 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	 */
 	@Override
 	public void onRemoval(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received REMOVED event " + event);
+	}
+	
+	@Autowired(required=false)
+	void setCtxBroker(ICtxBroker ctxBroker)	throws Exception {
+		
+		this.ctxBroker = ctxBroker;
+		if (LOG.isInfoEnabled())
+			LOG.info("Registering for context changes related to CSS '"
+					+ ownerId + "'");
+		this.ctxBroker.registerForChanges(this, this.ownerId);
+	}
+	
+	private class CisMembershipHandler implements Runnable {
+
+		private final CtxIdentifier ctxId;
+		
+		private CisMembershipHandler(CtxIdentifier ctxId) {
+			
+			this.ctxId = ctxId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final CtxAssociation isMemberOf = (CtxAssociation) ctxBroker.retrieve(ctxId).get();
+				if (isMemberOf == null) {
+					LOG.error("Could not handle CIS membership change: "
+							+ "Could not retrieve '" + this.ctxId + "'");
+					return;
+				}
+				final Set<TrustedEntityId> cisTeids = new HashSet<TrustedEntityId>();
+				for (final CtxEntityIdentifier cisCtxId : isMemberOf.getChildEntities())
+					cisTeids.add(new TrustedEntityId(isMemberOf.getParentEntity().getOwnerId(),
+							TrustedEntityType.CIS, cisCtxId.getOwnerId()));
+				for (final TrustedEntityId cisTeid : cisTeids)
+					trustEvidenceCollector.addDirectEvidence(cisTeid, TrustEvidenceType.JOINED_COMMUNITY,
+						isMemberOf.getLastModified(), null);
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CIS membership change: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
 	}
 }
