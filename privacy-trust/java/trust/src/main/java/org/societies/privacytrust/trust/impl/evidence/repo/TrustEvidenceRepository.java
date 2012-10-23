@@ -257,21 +257,20 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			final Date endDate) throws TrustEvidenceRepositoryException {
 		
 		final Set<T> result = new HashSet<T>();
+		final Session session = this.sessionFactory.openSession();
+		try {		
+			final Criteria criteria = session.createCriteria(evidenceClass)
+					.add(Restrictions.eq("teid", teid));
 		
-		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(evidenceClass)
-			.add(Restrictions.eq("teid", teid));
+			if (type != null)
+				criteria.add(Restrictions.eq("type", type));
 		
-		if (type != null)
-			criteria.add(Restrictions.eq("type", type));
+			if (startDate != null) 
+				criteria.add(Restrictions.ge("timestamp", startDate));
 		
-		if (startDate != null) 
-			criteria.add(Restrictions.ge("timestamp", startDate));
-		
-		if (endDate != null)
-			criteria.add(Restrictions.le("timestamp", endDate));
+			if (endDate != null)
+				criteria.add(Restrictions.le("timestamp", endDate));
 	
-		try {
 			result.addAll(criteria.list());
 		} catch (Exception e) {
 			throw new TrustEvidenceRepositoryException("Could not retrieve evidence " 
