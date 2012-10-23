@@ -166,6 +166,7 @@ public class CtxAttribute extends CtxModelObject {
 		this.binaryValue = null;
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
+		this.setValueType(CtxAttributeValueType.STRING);
 	}
 
 	/**
@@ -200,6 +201,7 @@ public class CtxAttribute extends CtxModelObject {
 		this.binaryValue = null;
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
+		this.setValueType(CtxAttributeValueType.INTEGER);
 	}
 	
 	/**
@@ -234,6 +236,7 @@ public class CtxAttribute extends CtxModelObject {
 		this.binaryValue = null;
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
+		this.setValueType(CtxAttributeValueType.DOUBLE);
 	}
 	
 	/**
@@ -268,6 +271,7 @@ public class CtxAttribute extends CtxModelObject {
 		this.binaryValue = value;
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
+		this.setValueType(CtxAttributeValueType.BINARY);
 	}
 	
 	Serializable getValue() {
