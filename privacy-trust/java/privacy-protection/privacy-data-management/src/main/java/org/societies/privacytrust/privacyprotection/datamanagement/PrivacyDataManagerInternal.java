@@ -93,7 +93,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				if (session != null) {
 					session.close();
 				}
-				permissions = null;
+				return null;
 			}
 			// - Privacy permissions retrieved
 			for(PrivacyPermission privacyPermission : privacyPermissions) {
