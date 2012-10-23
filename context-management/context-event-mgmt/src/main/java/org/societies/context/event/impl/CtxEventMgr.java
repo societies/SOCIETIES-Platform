@@ -27,10 +27,8 @@ package org.societies.context.event.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +61,6 @@ import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.stereotype.Service;
@@ -83,8 +80,9 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	
 	private static final String EVENT_ID_PROPERTY_KEY = "id";
 	
-	private static final List<String> EVENT_SCHEMA_PACKAGES = 
-			Collections.unmodifiableList(Arrays.asList("org.societies.api.schema.context.model"));
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.schema.context.model.CtxIdentifierBean"));
 			
 	/** The OSGi EventAdmin service. */
 	@Autowired(required=true)
@@ -112,7 +110,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		this.idMgr = commMgr.getIdManager();
 		try {
 			this.pubsubId = this.idMgr.getThisNetworkNode();
-			this.pubsubClient.addJaxbPackages(EVENT_SCHEMA_PACKAGES);
+			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.CREATED);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.UPDATED);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.MODIFIED);

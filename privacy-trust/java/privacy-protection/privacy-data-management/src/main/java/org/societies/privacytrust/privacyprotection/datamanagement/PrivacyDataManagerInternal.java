@@ -80,7 +80,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 		Session session = sessionFactory.openSession();
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		session = sessionFactory.openSession();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
@@ -91,6 +90,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Privacy Permissions don't exist
 			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
+				if (session != null) {
+					session.close();
+				}
 				return null;
 			}
 			// - Privacy permissions retrieved
@@ -98,9 +100,11 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				permissions.add(privacyPermission.createResponseItem());
 				LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		} finally {
+		}
+		finally {
 			if (session != null) {
 				session.close();
 			}
@@ -134,7 +138,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
-		session = sessionFactory.openSession();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions);
@@ -145,6 +148,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Privacy Permissions don't exist
 			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
+				if (session != null) {
+					session.close();
+				}
 				return null;
 			}
 			// - Privacy permissions retrieved
@@ -159,7 +165,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 					break;
 				}
 			}
-			// If no PERMIT has been found: take the most relevant (i.e. the first one)
+			// If no PERMIT has been found: take the one relevant (i.e. the first one)
 			if (!found) {
 				relevantPrivacyPermission = privacyPermissions.get(0);
 			}
@@ -168,9 +174,11 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Return the most relevant privacy permission
 			permission = relevantPrivacyPermission.createResponseItem();
 			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		} finally {
+		}
+		finally {
 			if (session != null) {
 				session.close();
 			}

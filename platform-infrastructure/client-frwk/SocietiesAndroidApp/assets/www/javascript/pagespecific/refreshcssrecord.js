@@ -60,28 +60,31 @@ var SocietiesCSSRecord = {
 		var status = ["Available for Use", "Unavailable", "Not active but on alert"];
 		var type = ["Android based client", "Cloud Node", "JVM based client"];
 		
-		jQuery("#cssrecordforename").val(data.foreName);
-		jQuery("#cssrecordname").val(data.name);
-		jQuery("#cssrecordemaildetails").val(data.emailID);
-		jQuery("#cssrecordimdetails").val(data.imID);
-		jQuery("#cssrecorduserlocation").val(data.homeLocation);
-		jQuery("#cssrecordsnsdetails").val(data.socialURI);
-		jQuery("#cssrecordidentity").val(data.identityName);
-		jQuery("#cssrecordorgtype").val(data.entity);
-		jQuery("#cssrecordsextype").val(data.sex);
+		$("#cssrecordforename").val(data.foreName);
+		$("#cssrecordname").val(data.name);
+		$("#cssrecordemaildetails").val(data.emailID);
+		$("#cssrecordimdetails").val(data.imID);
+		$("#cssrecorduserlocation").val(data.homeLocation);
+		$("#cssrecordsnsdetails").val(data.socialURI);
+		$("#cssrecordidentity").val(data.identityName);
+		$("#cssrecordorgtype").val(data.entity);
+		$("#cssrecordsextype").val(data.sex);
 		
-		//empty table
-		jQuery('#cssNodesTable tbody').remove();
-		
+		//REMOVE ALL ENTRIES
+		while( $('ul#cssNodesList').children().length >0 )
+			$('ul#cssNodesList li:last').remove();
+		//POPULATE LIST
 		for (i  = 0; i < data.cssNodes.length; i++) {
-			var tableEntry = "<tr>" + 
-			"<td>" + data.cssNodes[i].identity + "</td>" + 
-			"<td>" + status[data.cssNodes[i].status] + "</td>" + 
-			"<td>" + type[data.cssNodes[i].type] + "</td>" + 
-				+ "</tr>"
-
-			jQuery('#cssNodesTable').append(tableEntry);
+			var tableEntry = '<li><h2>' + data.cssNodes[i].identity + '</h2>' + 
+							 '<p>' + status[data.cssNodes[i].status] + '</p>' + 
+							 '<p>' + type[data.cssNodes[i].type] + '</p>' +
+							 '</li>';
+			$('ul#cssNodesList').append(tableEntry);
 		}
+		$('#cssNodesList').listview('refresh');
+		
+		//SET SLIDER WIDTH TO BE LENGTH OF 'Individual'
+		$('.ui-slider-switch').width(120);
 	},
 	
 	/**
@@ -128,6 +131,15 @@ $(document).on('pageinit', '#my-profile', function(event) {
 
 	console.log("jQuery pageinit action(s) for refreshcssrecord");
 
+	$('a#btnProfileCancel').off('click').on('click', function(){
+		$.mobile.changePage($("#landing"), {transition: "fade"});
+	});
+	
+	$('a#btnProfileSave').off('click').on('click', function(e){
+		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.modifyCSSProfile);
+		$.mobile.changePage($("#landing"), {transition: "fade"});
+	});
+	
 	$('#updateProfile').off('click').on('click', function(){
 		$('#updateProfile').val("updating...");
 		$('#updateProfile').button('disable');

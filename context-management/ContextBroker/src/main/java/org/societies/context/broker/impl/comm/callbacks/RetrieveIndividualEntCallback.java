@@ -53,12 +53,6 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	}
 
 	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		
 		LOG.info("onRetrievedEntityId: ctxId " +ctxId);
@@ -78,5 +72,14 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
-	}	
+	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRemovedModelObject(CtxModelObject ctxObj) {
+		
+		// TODO Auto-generated method stub
+	}
 }

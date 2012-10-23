@@ -18,6 +18,7 @@ var CSSFriendsServices = {
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.acceptFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+					'<img src="images/profile_pic.png" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
@@ -49,6 +50,7 @@ var CSSFriendsServices = {
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i].id + '\')">' +
+					'<img src="images/profile_pic.png" />' +	
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
@@ -117,6 +119,7 @@ var CSSFriendsServices = {
 		//DISPLAY SUGGESTIONS
 		for (i  = 0; i < data.length; i++) {
 			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+				'<img src="images/profile_pic.png" />' +	
 				'<h2>' + data[i].name + '</h2>' + 
 				'<p>' + data[i].id + '</p>' +
 				'</a></li>';
