@@ -909,8 +909,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 
 		this.logRequest(null, targetCss);
-
-		printHocDB(); // TODO remove
+		
 		return null;
 	}
 
@@ -1323,14 +1322,20 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxHistoryAttribute> createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType){
 
-		CtxHistoryAttribute hocAttr = this.userCtxHistoryMgr.createHistoryAttribute(attID,date,value,valueType);
+		CtxHistoryAttribute hocAttr = null;
+		try {
+			hocAttr = this.userCtxHistoryMgr.createHistoryAttribute(attID,date,value,valueType);
+		} catch (CtxException e) {
+
+			LOG.error("context attribute not stored in context DB"
+						+ attID + ": " + e.getLocalizedMessage(), e);
+			
+		}	
+
 		return new AsyncResult<CtxHistoryAttribute>(hocAttr);
 	}
 
-	void printHocDB(){
-		this.userCtxHistoryMgr.printHocDB();
-	}
-
+	
 	/*
 	 * HoC tuples will be stored in an attribute of type "tuple_attibuteType" (tuple_status)
 	 * the value will contain a list of ICtxHistoricAttribute 
@@ -1618,12 +1623,12 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			final CreateAssociationCallback callback = new CreateAssociationCallback();
 			this.ctxBrokerClient.createAssociation(requestor, targetCss, type, callback);
-		
+
 			synchronized (callback) {
 				try {
 					callback.wait();
 					associationResult = callback.getResult();
-					
+
 				} catch (InterruptedException e) {
 					throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
 				}
@@ -1874,7 +1879,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						//LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
 						objectResult = callback.getResult();
-						
+
 						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
 						IPerformanceMessage m = new PerformanceMessage();
 						m.setTestContext("ContextBroker_Delay_RemoteContextRetrieval");
@@ -2100,7 +2105,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				return new AsyncResult<CtxModelObject>(objectResult);
 
 			} else {
-				
+
 				final RemoveCtxCallback callback = new RemoveCtxCallback();
 				this.ctxBrokerClient.remove(requestor, identifier, callback); 
 				synchronized (callback) {

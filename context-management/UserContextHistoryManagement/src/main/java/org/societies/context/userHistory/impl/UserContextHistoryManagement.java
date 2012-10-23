@@ -67,13 +67,13 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	@Override
 	public CtxHistoryAttribute createHistoryAttribute(
-			final CtxAttribute attribute) {
+			final CtxAttribute attribute) throws CtxException{
 
 		if (attribute == null)
 			throw new NullPointerException("attribute can't be null");
 		
-		//if (ctxRecording == false)
-		//	throw new UserCtxHistoryMgrException("context history recording is disabled");
+		if (ctxRecording == false)
+			throw new UserCtxHistoryMgrException("context history recording is disabled");
 		
 		CtxHistoryAttribute result = null;
 		
@@ -103,13 +103,25 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return result;
 	}
 
-	// TODO throw UserCtxHistoryMgrException
 	@Override
-	public CtxHistoryAttribute createHistoryAttribute(
+	public CtxHistoryAttribute createHistoryAttribute (
 			final CtxAttributeIdentifier attrId, final Date date, 
-			final Serializable value, final CtxAttributeValueType valueType) {
+			final Serializable value, final CtxAttributeValueType valueType) throws CtxException{
 		
-		// TODO null checks??
+		if (attrId == null)
+			throw new NullPointerException("attrId can't be null");
+		
+		if (date == null)
+			throw new NullPointerException("date can't be null");
+		
+		if (value == null)
+			throw new NullPointerException("value can't be null");
+		
+		if (valueType == null)
+			throw new NullPointerException("valueType can't be null");
+	
+		if (ctxRecording == false)
+			throw new UserCtxHistoryMgrException("context history recording is disabled");
 		
 		CtxHistoryAttribute result = null;
 		
@@ -177,11 +189,18 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return result;
 	}
 
-	// TODO deprecate
+	
+	@Deprecated
 	@Override
-	public void storeHoCAttribute(CtxAttribute ctxAttribute){
+	public void storeHoCAttribute(CtxAttribute ctxAttribute) throws CtxException{
 
-		this.createHistoryAttribute(ctxAttribute);	
+		try {
+			this.createHistoryAttribute(ctxAttribute);
+		} catch (CtxException e) {
+			
+		throw new UserCtxHistoryMgrException("context attribute not stored in context DB"
+					+ ctxAttribute.getId() + ": " + e.getLocalizedMessage(), e);
+		}	
 	}
 
 
@@ -206,7 +225,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	// TODO throws UserCtxHistoryException
 	@Override
-	public List<CtxHistoryAttribute> retrieveHistory(final CtxAttributeIdentifier attrId) {
+	public List<CtxHistoryAttribute> retrieveHistory(final CtxAttributeIdentifier attrId) throws CtxException{
 		
 		if (attrId == null)
 			throw new NullPointerException("attrId can't be null");
