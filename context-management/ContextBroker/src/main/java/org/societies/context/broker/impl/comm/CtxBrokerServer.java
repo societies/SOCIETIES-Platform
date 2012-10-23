@@ -22,7 +22,6 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.context.broker.impl.comm;
 
 import java.util.ArrayList;
@@ -30,38 +29,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
-
-import org.societies.api.schema.context.model.CtxAssociationBean;
-import org.societies.api.schema.context.model.CtxAttributeBean;
-import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
-import org.societies.api.schema.context.model.CtxEntityBean;
-import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
-import org.societies.api.schema.context.model.CtxIdentifierBean;
-import org.societies.api.schema.context.model.CtxModelObjectBean;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -73,8 +49,32 @@ import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxIdentifierBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.context.broker.impl.CtxBroker;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,8 +91,13 @@ public class CtxBrokerServer implements IFeatureServer{
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
+	
+	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION };
 
 	private ICommManager commManager;
+	
+	@Autowired
+	private ICISCommunicationMgrFactory commMgrFactory;
 
 	@Autowired(required=true)
 	private CtxBroker ctxbroker;
@@ -100,12 +105,19 @@ public class CtxBrokerServer implements IFeatureServer{
 	private IIdentityManager identMgr = null;
 
 	@Autowired
-	public CtxBrokerServer(ICommManager commManager) throws CommunicationException {
-		LOG.info(this.getClass() +" instantiated");
+	public CtxBrokerServer(ICommManager commManager, IEventMgr eventMgr) throws Exception {
+		
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		this.commManager = commManager;
 		this.identMgr = this.commManager.getIdManager();
 
+		LOG.info("Registering CtxBrokerServer to Comms Manager for CSS '"
+				+ this.commManager.getIdManager().getThisNetworkNode() + "'");
 		this.commManager.register(this);
+		if (LOG.isInfoEnabled())
+			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
+		eventMgr.subscribeInternalEvent(new NewCisHandler(), EVENT_TYPES, null);
 	}
 
 	// returns an object
@@ -517,4 +529,61 @@ public class CtxBrokerServer implements IFeatureServer{
 		}
 	}
 
+	private class NewCisHandler extends EventListener {
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+		 */
+		@Override
+		public void handleExternalEvent(CSSEvent event) {
+		
+			if (LOG.isWarnEnabled())
+				LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
+		}
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+		 */
+		@Override
+		public void handleInternalEvent(InternalEvent event) {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("Received internal " + event.geteventType() + " event: " + event);
+			
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())) {
+				
+				if (!(event.geteventInfo() instanceof Community)) {
+
+					LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+							+ "Expected event info of type " + Community.class.getName()
+							+ " but was " + event.geteventInfo().getClass());
+					return;
+				}
+
+				final String cisIdStr = ((Community) event.geteventInfo()).getCommunityJid();
+				try {
+					final IIdentity cisId = commManager.getIdManager().fromJid(cisIdStr);
+					final ICommManager cisCommMgr = commMgrFactory.getAllCISCommMgrs().get(cisId);
+					if (cisCommMgr == null) {
+						LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 
+								+ cisId + "': Comms Manager not found" );
+						return;
+					}
+					if (LOG.isInfoEnabled())
+						LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
+								+ cisId + "'");
+					cisCommMgr.register(CtxBrokerServer.this);
+				
+				} catch (Exception e) {
+					LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 
+							+ cisIdStr + "': " + e.getLocalizedMessage(), e);
+				}
+				
+			} else {
+				
+				if (LOG.isWarnEnabled())
+					LOG.warn("Received unexpeted event of type '" + event.geteventType() + "'");
+			}
+		}
+	}
 }
