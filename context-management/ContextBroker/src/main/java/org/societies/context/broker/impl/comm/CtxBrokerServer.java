@@ -27,6 +27,7 @@ package org.societies.context.broker.impl.comm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -96,7 +97,6 @@ public class CtxBrokerServer implements IFeatureServer{
 
 	private ICommManager commManager;
 	
-	@Autowired
 	private ICISCommunicationMgrFactory commMgrFactory;
 
 	@Autowired(required=true)
@@ -105,16 +105,29 @@ public class CtxBrokerServer implements IFeatureServer{
 	private IIdentityManager identMgr = null;
 
 	@Autowired
-	public CtxBrokerServer(ICommManager commManager, IEventMgr eventMgr) throws Exception {
+	public CtxBrokerServer(ICommManager commManager, 
+			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr)
+					throws Exception {
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
 		this.commManager = commManager;
 		this.identMgr = this.commManager.getIdManager();
+		this.commMgrFactory = commMgrFactory;
 
-		LOG.info("Registering CtxBrokerServer to Comms Manager for CSS '"
-				+ this.commManager.getIdManager().getThisNetworkNode() + "'");
+		// Register to CSS Comm Mgr
+		if (LOG.isInfoEnabled())
+			LOG.info("Registering CtxBrokerServer to Comms Manager for CSS '"
+					+ this.commManager.getIdManager().getThisNetworkNode() + "'");
 		this.commManager.register(this);
+		// Register to all available CIS Comm Mgrs
+		for (final Map.Entry<IIdentity, ICommManager> entry : this.commMgrFactory.getAllCISCommMgrs().entrySet()) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
+						+ entry.getKey() + "'");
+			entry.getValue().register(this);
+		}
+		// Register for new CISs
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
 		eventMgr.subscribeInternalEvent(new NewCisHandler(), EVENT_TYPES, null);

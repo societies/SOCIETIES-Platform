@@ -400,7 +400,7 @@ public class CssCtxMonitor extends EventListener {
 				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
 		final CtxAttribute attr;
 		if (!ctxIds.isEmpty())
-			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0));
+			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
 		else
 			attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
 			
