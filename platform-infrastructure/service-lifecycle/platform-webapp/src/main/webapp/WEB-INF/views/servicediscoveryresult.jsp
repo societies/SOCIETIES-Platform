@@ -76,29 +76,45 @@ function updateForm(serviceID, toDo) {
 
 <%
 	for(Service myService : myServices ){
-		%>
-		<tr>
-    	<td><%= myService.getServiceName() %></td>
-     	<td><%= myService.getServiceDescription() %></td>
-        <td><%= myService.getAuthorSignature() %></td>
-        <td><%= myService.getServiceStatus() %></td>      
-        <td>
-		
-            <%
-			if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
+
+		if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 				
+			if(!myService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
+
+				%>
+				<tr>
+			    <td><%= myService.getServiceName() %></td>
+			    <td><%= myService.getServiceDescription() %></td>
+				<td><%= myService.getAuthorSignature() %></td>
+				<td><%= myService.getServiceStatus() %></td>      
+				<td>
+				<%
 				if(isShared(myService,cisServices)){
+					%>
+					<input type="button" value="unshare" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier()) %>', 'UnshareService')" >		
+					<%
+				}else{					
+					%>
+					<input type="button" value="share" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier() )%>', 'ShareService')" >
+					<%
+				}
 				%>
-				<input type="button" value="unshare" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier()) %>', 'UnshareService')" >		
-				<%
-				 }else{					
+				</td></tr>
+				<% 
+			}
+				
+		} else {
+				
 				%>
-				<input type="button" value="share" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier() )%>', 'ShareService')" >
-				<%
-			 	}
+				<tr>
+		    	<td><%= myService.getServiceName() %></td>
+		     	<td><%= myService.getServiceDescription() %></td>
+		        <td><%= myService.getAuthorSignature() %></td>
+		        <td><%= myService.getServiceStatus() %></td>      
+		        <td>
 				
-			} else {
-				
+		         <%
+		            
 				if(!myService.getServiceType().equals(ServiceType.DEVICE)){
 				%>
 					<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
@@ -120,13 +136,12 @@ function updateForm(serviceID, toDo) {
 					Device Management
 					<%
 				}
-
+		            %>
+					</td>	
+		        </tr>
+		    <%
 			}
-            %>
-			</td>
-			
-        </tr>
-    <%
+
 	}
 	%>
 	</table>

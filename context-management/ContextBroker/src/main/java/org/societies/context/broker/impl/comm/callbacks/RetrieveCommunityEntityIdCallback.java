@@ -12,15 +12,12 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.broker.impl.comm.ICtxCallback;
 
-public class RetrieveIndividualEntCallback implements ICtxCallback{
+public class RetrieveCommunityEntityIdCallback implements ICtxCallback{
 
-	
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(RetrieveCtxCallback.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RetrieveCommunityEntityIdCallback.class);
 	
-	CtxEntityIdentifier entityId;
-	
-	
+	private CtxEntityIdentifier entityId;	
 	
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
@@ -63,16 +60,11 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 		LOG.info("onRetrievedEntityId: notify all done");
 	}
 
-	
-	public CtxEntityIdentifier getResult() {
-		return this.entityId;
-	}
-
 	@Override
 	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
-	}
+	}	
 	
 	/*
 	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
@@ -81,5 +73,10 @@ public class RetrieveIndividualEntCallback implements ICtxCallback{
 	public void onRemovedModelObject(CtxModelObject ctxObj) {
 		
 		// TODO Auto-generated method stub
+	}
+	
+	public CtxEntityIdentifier getResult() {
+		
+		return this.entityId;
 	}
 }

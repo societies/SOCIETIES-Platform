@@ -28,10 +28,6 @@ public class LookupCallback implements ICtxCallback {
 	}
 
 	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-	}
-
-	@Override
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
 
 		LOG.info("onLookupCallback retObject " +idList);
@@ -69,5 +65,14 @@ public class LookupCallback implements ICtxCallback {
 	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRemovedModelObject(CtxModelObject ctxObj) {
+		
+		// TODO Auto-generated method stub
 	}
 }

@@ -1165,9 +1165,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
@@ -1189,9 +1189,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
@@ -1213,9 +1213,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
