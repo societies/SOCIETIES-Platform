@@ -58,18 +58,22 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	boolean ctxRecording = true;
+	
 	public UserContextHistoryManagement() {
 		
 		LOG.info(this.getClass().getName() + " instantiated");
 	}
 
-	// TODO throw UserCtxHistoryMgrException
 	@Override
 	public CtxHistoryAttribute createHistoryAttribute(
 			final CtxAttribute attribute) {
 
 		if (attribute == null)
 			throw new NullPointerException("attribute can't be null");
+		
+		//if (ctxRecording == false)
+		//	throw new UserCtxHistoryMgrException("context history recording is disabled");
 		
 		CtxHistoryAttribute result = null;
 		
@@ -188,13 +192,15 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	@Override
 	public void disableCtxRecording() {
-		// TODO Auto-generated method stub
+		
+		ctxRecording =  false;
 
 	}
 
 	@Override
 	public void enableCtxRecording() {
-		// TODO Auto-generated method stub
+
+		ctxRecording =  true;
 
 	}
 

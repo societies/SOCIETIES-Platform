@@ -187,9 +187,9 @@ public interface IUserCtxHistoryMgr {
 	 */
 	public void storeHoCAttribute(CtxAttribute hocAttribute) throws CtxException;
 	
-	public CtxHistoryAttribute createHistoryAttribute(CtxAttribute ctxAttribute);
+	public CtxHistoryAttribute createHistoryAttribute(CtxAttribute ctxAttribute) ;
 	
-	public CtxHistoryAttribute createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType);
+	public CtxHistoryAttribute createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType) ;
 		
 	
 	public void printHocDB();
