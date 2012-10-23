@@ -135,7 +135,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException("Could not create association of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -194,7 +195,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			session.save(attributeDAO);
 			tx.commit();				
 		} catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -234,7 +236,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException("Could not create entity of type '" 
 					+ "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -274,7 +277,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException("Could not create individual entity of type '" 
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -429,16 +433,18 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (result == null)
 			return null;
 		
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
 		try{
 			final CtxModelObjectDAO dao = CtxModelDAOTranslator.getInstance().fromCtxModelObject(result);
+			tx = session.beginTransaction();
 			session.delete(dao);
 			session.flush();
-			t.commit();
+			tx.commit();
 		}
 		catch (Exception e) {
-			t.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException("Could not remove entity '" + id 
 					+ "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -551,20 +557,20 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (modelObject == null) 
 			throw new NullPointerException("modelObject can't be null");
 		
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-		
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
 		try {	
 			final CtxModelObjectDAO modelObjectDAO = 
 					CtxModelDAOTranslator.getInstance().fromCtxModelObject(modelObject);
-
+			tx = session.beginTransaction();
 			session.merge(modelObjectDAO);
 			session.flush();
-			t.commit();
+			tx.commit();
 		} catch (Exception e) {
-				t.rollback();
-				throw new UserCtxDBMgrException("Could not update '" 
-						+ modelObject + "': " + e.getLocalizedMessage(), e);
+			if (tx != null)
+				tx.rollback();
+			throw new UserCtxDBMgrException("Could not update '"
+					+ modelObject + "': " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -641,14 +647,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final UserCtxModelObjectNumberDAO objectNumberDAO =
 				new UserCtxModelObjectNumberDAO();
 		
-		Session session = this.sessionFactory.openSession();
+		final Session session = this.sessionFactory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
 			session.save(objectNumberDAO);
 			tx.commit();
 		} catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new UserCtxDBMgrException(
 					"Could not generate next context model object number");
 		} finally {
