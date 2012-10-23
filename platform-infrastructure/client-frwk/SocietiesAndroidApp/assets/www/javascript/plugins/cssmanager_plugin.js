@@ -461,16 +461,22 @@ var	SocietiesLocalCSSManagerHelper = {
 	disconnectFromLocalCSSManager: function() {
 		console.log("Disconnect from LocalCSSManager");
 			
-		function success(data) {
-			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+		//Until Service connection leakage problem is sorted do not 
+		//unbind from the CSSManager service
+		$.mobile.changePage( ($("#index")), { transition: "slideup"} );
 
-			console.log(data);
-		}
-		
-		function failure(data) {
-			alert("disconnectFromLocalCSSManager - failure: " + data);
-		}
-	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
+		console.log(data);
+
+//		function success(data) {
+//			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+//
+//			console.log(data);
+//		}
+//		
+//		function failure(data) {
+//			alert("disconnectFromLocalCSSManager - failure: " + data);
+//		}
+//	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
 	},
 	/**
 	 * @methodOf SocietiesLocalCSSManagerHelper#

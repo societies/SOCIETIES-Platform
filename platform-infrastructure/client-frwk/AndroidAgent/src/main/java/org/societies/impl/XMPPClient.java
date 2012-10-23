@@ -50,6 +50,9 @@ public class XMPPClient implements XMPPAgent {
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
 	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
 	private Configuration defaultConfig;
+	private String domainAuthorityNode;
+	int port;
+	boolean debug;
 	
 	public XMPPClient(ResourceBundle configutationBundle) {
 		
@@ -191,7 +194,7 @@ public class XMPPClient implements XMPPAgent {
 	
 	public String getDomainAuthorityNode() {
 		Log.d(LOG_TAG, "getDomainAuthorityNode");
-		return defaultConfig.getDomainAuthorityNode();
+		return domainAuthorityNode;
 	}
 	
 	public String getItems(String entity, String node, final Callback callback) throws CommunicationException {		
@@ -403,17 +406,18 @@ public class XMPPClient implements XMPPAgent {
 	
 	private void loadDefaultConfig() {		
 		Log.d(LOG_TAG, "loadDefaultConfig");
-		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword());
+		domainAuthorityNode = defaultConfig.getDomainAuthorityNode();		
+		port = defaultConfig.getPort();
+		resource = defaultConfig.getResource();
+		debug = defaultConfig.getDebug();
+		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword());	
 	}
 	
 	private void loadConfig(String server, String username, String password) {
 		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password);
 		
-		int port = defaultConfig.getPort();
 		this.username = username;
 		this.password = password;
-		resource = defaultConfig.getResource();
-		boolean debug = defaultConfig.getDebug();
 		
 		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
 
@@ -447,5 +451,21 @@ public class XMPPClient implements XMPPAgent {
 				
 			});
 		}
+	}
+	
+	public void setDomainAuthorityNode(String domainAuthorityNode) {
+		this.domainAuthorityNode = domainAuthorityNode;
+	}
+	
+	public void setPortNumber(Integer port) {
+		this.port = port;
+	}
+	
+	public void setResource(String resource) {
+		this.resource = resource;		
+	}
+	
+	public void setDebug(Boolean enabled) {
+		this.debug = enabled;		
 	}
 }

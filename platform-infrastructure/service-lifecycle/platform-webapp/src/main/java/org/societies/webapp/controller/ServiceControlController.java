@@ -38,6 +38,8 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
@@ -86,6 +88,20 @@ public class ServiceControlController {
 		this.commManager = commManager;
 	}
 
+	/**
+	 * OSGI service get auto injected
+	 */
+	@Autowired
+	private ICisManager cisManager;
+	
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void getCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+	}
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -314,6 +330,10 @@ public class ServiceControlController {
 				model.put("cisservices", cisServices);
 				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
 
+				//Get CIS Name
+				ICis cis = this.getCisManager().getCis(node);
+				model.put("cis", cis);
+				
 				res = "Success";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
@@ -365,6 +385,10 @@ public class ServiceControlController {
 				model.put("cisservices", cisServices);
 				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
 
+				//Get CIS Name
+				ICis cis = this.getCisManager().getCis(node);
+				model.put("cis", cis);
+				
 				res = "Success";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
@@ -395,7 +419,7 @@ public class ServiceControlController {
 				returnPage = "servicecontrolresult";
 	
 			} else {
-				res="error unknown metod";
+				res="error unknown method";
 			}
 		
 			if (returnPage.equals("servicediscoveryresult")) {

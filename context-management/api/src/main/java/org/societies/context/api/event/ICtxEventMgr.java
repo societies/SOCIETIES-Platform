@@ -30,6 +30,7 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.event.CtxEvent;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 
 /**
  * The Context Event Manager is responsible for the subscription and publishing
@@ -58,6 +59,56 @@ public interface ICtxEventMgr {
     public void post(final CtxEvent event, final String[] topics,
     		final CtxEventScope scope) throws CtxException;
 	
+    /**
+     * Registers the specified {@link CtxChangeEventListener} for events of the
+     * supplied topics. Once registered, the <code>CtxChangeEventListener</code>
+     * will handle {@link CtxChangeEvent CtxChangeEvents} associated with the
+     * identified owner of context information, i.e. CSS or CIS.
+     * <p>
+     * To unregister the specified <code>CtxChangeEventListener</code>, use the
+     * {@link #unregisterListener(CtxChangeEventListener, String[], IIdentity)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>CtxChangeEventListener</code> to register.
+     * @param topics
+     *            the event topics to register for.
+     * @param ownerId
+     *            the identifier of the CSS or CIS owning the context model
+     *            objects whose events to register for.
+     * @throws CtxException
+     *             if the registration process of the specified
+     *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @since 0.4.1
+     */
+    public void registerChangeListener(final CtxChangeEventListener listener,
+            final String[] topics, final IIdentity ownerId) throws CtxException;
+    
+    /**
+     * Unregisters the specified {@link CtxChangeEventListener} for events of
+     * the supplied topics related to the identified owner of context
+     * information.
+     * 
+     * @param listener
+     *            the <code>CtxChangeEventListener</code> to unregister.
+     * @param topics
+     *            the event topics to unregister from.
+     * @param ownerId
+     *            the identifier of the context model object whose events to
+     *            unregister from.
+     * @throws CtxException
+     *             if the unregistration process of the specified
+     *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @see #registerListener(CtxChangeEventListener, String[], IIdentity)
+     * @since 0.4.1
+     */
+    public void unregisterChangeListener(final CtxChangeEventListener listener,
+            final String[] topics, final IIdentity ownerId) throws CtxException;
+    
 	/**
      * Registers the specified {@link CtxChangeEventListener} for events of the
      * supplied topics. Once registered, the <code>CtxChangeEventListener</code>

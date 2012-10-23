@@ -44,13 +44,6 @@ public class CtxAssociationTypes {
 	 * 
 	 * @since 0.0.8
 	 */
-	public static final String ARE_FRIENDS = "areFriends";
-	
-	/**
-	 * Undirected context association.
-	 * 
-	 * @since 0.0.8
-	 */
 	public static final String ARE_WORK_COLLEAGUES = "areWorkColleagues";
 	
 	/**
@@ -94,6 +87,15 @@ public class CtxAssociationTypes {
 	 * Directed context association.
 	 */
 	public static final String IS_CONNECTED_TO_SNS = "isConnectedToSns";
+	
+	/**
+	 * Directed context association between an {@link IndividualCtxEntity} 
+	 * (parent entity) and the {@link IndividualCtxEntity IndividualCtxEntities}
+	 * (child entities) this individual is friends with.
+	 * 
+	 * @since 0.5
+	 */
+	public static final String IS_FRIENDS_WITH = "isFriendsWith";
 	
 	/**
 	 * Directed context association between an {@link IndividualCtxEntity} 

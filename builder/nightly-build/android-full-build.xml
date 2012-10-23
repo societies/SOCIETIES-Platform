@@ -52,6 +52,8 @@
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsub</module>
+		<!-- Societies Android Comms APK-->
+		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidComms</module>
 
 		<!-- API -->
 		<!--module>../../platform-infrastructure/client-frwk/CoreInterfaces</module -->
@@ -72,13 +74,17 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
+                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
+ 
 		<!--module>../../platform-infrastructure/client-frwk/MasterGUI</module-->
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
 		<module>../../platform-infrastructure/sns/SocietiesAndroidSocialData</module>
-		
+		<!-- Societies Android Client APK-->
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
+
+
 		<!-- CIS manager light modules -->
 		<module>../../platform-infrastructure/client-frwk/TestContainerCIS</module>
 		<!-- <module>../cis-modules/android/client-lib-android</module> -->

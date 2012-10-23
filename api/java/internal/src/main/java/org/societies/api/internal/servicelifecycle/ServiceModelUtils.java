@@ -2,6 +2,7 @@ package org.societies.api.internal.servicelifecycle;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -321,6 +322,51 @@ public class ServiceModelUtils {
 			e.printStackTrace();
 		}
 		return serResId;
+	}
+	
+	public static List<Service> getClients(ServiceResourceIdentifier service, IServiceDiscovery serviceDiscovery){
+		
+		List<Service> clients = new ArrayList<Service>();
+		
+		Service filter = generateEmptyFilter();
+		ServiceInstance serviceInstance = filter.getServiceInstance();
+		serviceInstance.setParentIdentifier(service);
+		filter.setServiceInstance(serviceInstance);
+		Future<List<Service>> clientAsync;
+		try {
+			clientAsync = serviceDiscovery.searchServices(filter);
+			clients = clientAsync.get();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return clients;
+		
+	}
+	
+	public static ServiceResourceIdentifier generateServiceResourceIdentifierFromString(String serviceId){
+		
+		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
+		
+		int index = serviceId.indexOf('_');	
+		String instanceExtract = serviceId.substring(0, index);
+		String identifierExtract = serviceId.substring(index+1);
+				
+		result.setServiceInstanceIdentifier(instanceExtract);
+		try {
+			result.setIdentifier(new URI(identifierExtract));
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		return result;
+	}
+	
+	public static String serviceResourceIdentifierToString(ServiceResourceIdentifier serviceId){
+		
+		return serviceId.getServiceInstanceIdentifier() + "_" + serviceId.getIdentifier().toString();
 	}
 
 }

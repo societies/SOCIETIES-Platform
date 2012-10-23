@@ -45,7 +45,7 @@ public class PubsubClientAndroid implements PubsubClient {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(PubsubClientAndroid.class);
 	
-	private static final ComponentName serviceCN = new ComponentName("org.societies.pubsub", "org.societies.pubsub.PubsubService"); // TODO	
+	private static final ComponentName serviceCN = new ComponentName("org.societies.comms", "org.societies.comms.PubsubService"); // TODO	
 
 	private MethodInvocationServiceConnection<Pubsub> miServiceConnection;
 	private Serializer serializer;
