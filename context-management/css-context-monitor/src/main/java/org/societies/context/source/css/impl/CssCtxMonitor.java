@@ -51,6 +51,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -70,7 +71,9 @@ public class CssCtxMonitor extends EventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CssCtxMonitor.class);
 	
-	private static final String[] EVENT_TYPES = { EventTypes.CSS_RECORD_EVENT, EventTypes.CSS_FRIENDED_EVENT };
+	private static final String[] EVENT_TYPES = { EventTypes.CSS_RECORD_EVENT,
+		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_CREATION, 
+		EventTypes.CIS_SUBS, EventTypes.CIS_UNSUBS };
 			
 	/** The internal Context Broker service. */
 	@Autowired(required=true)
@@ -96,7 +99,7 @@ public class CssCtxMonitor extends EventListener {
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
 		this.eventMgr.subscribeInternalEvent(this, EVENT_TYPES, null);
-		// TODO unsubscribe when stopped
+		// TODO unsubscribe when stopped?
 	}
 
 	/*
@@ -150,8 +153,27 @@ public class CssCtxMonitor extends EventListener {
 			this.executorService.execute(new CssFriendedHandler(event.geteventSource(),
 					(String) event.geteventInfo()));
 			
-		} else {
+		} else if (EventTypes.CIS_CREATION.equals(event.geteventType())
+				|| EventTypes.CIS_SUBS.equals(event.geteventType())
+				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
 			
+			if (!(event.geteventInfo() instanceof Community)) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected event info of type " + Community.class.getName()
+						+ " but was " + event.geteventInfo().getClass());
+				return;
+			}
+
+			final Community cisRecord = (Community) event.geteventInfo();	
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())
+					|| EventTypes.CIS_SUBS.equals(event.geteventType()))
+				this.executorService.execute(new CssJoinedCisHandler(cisRecord.getCommunityJid()));
+			else //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
+				this.executorService.execute(new CssLeftCisHandler(cisRecord.getCommunityJid()));
+			
+		} else {
+		
 			if (LOG.isWarnEnabled())
 				LOG.warn("Received unexpeted event of type '" + event.geteventType() + "'");
 		}
@@ -250,6 +272,111 @@ public class CssCtxMonitor extends EventListener {
 				isFriendsWithAssoc.setParentEntity(myCssEnt.getId());
 				isFriendsWithAssoc.addChildEntity(newFriendEntId);
 				ctxBroker.update(isFriendsWithAssoc);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
+	private class CssJoinedCisHandler implements Runnable {
+		
+		private final String cisIdStr;
+		
+		private CssJoinedCisHandler(final String cisIdStr) {
+			
+			this.cisIdStr = cisIdStr;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("CSS joined CIS '" + cisIdStr + "'");
+			
+			try {
+				// TODO find the right way (TM) to get my CSS ID?
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(
+						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+				final IndividualCtxEntity myCssEnt = 
+						ctxBroker.retrieveIndividualEntity(myCssId).get();
+
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				final CtxEntityIdentifier cisEntId =
+						ctxBroker.retrieveCommunityEntityId(
+								new Requestor(myCssId), cisId).get();
+				
+				final CtxAssociation isMemberOfAssoc;
+				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
+					isMemberOfAssoc = ctxBroker.createAssociation(
+							new Requestor(myCssId), myCssId, CtxAssociationTypes.IS_MEMBER_OF).get();
+				else
+					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+				isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+				isMemberOfAssoc.addChildEntity(cisEntId);
+				ctxBroker.update(isMemberOfAssoc);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
+	private class CssLeftCisHandler implements Runnable {
+		
+		private final String cisIdStr;
+		
+		private CssLeftCisHandler(final String cisIdStr) {
+			
+			this.cisIdStr = cisIdStr;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("CSS left CIS '" + cisIdStr + "'");
+			
+			try {
+				// TODO find the right way (TM) to get my CSS ID?
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(
+						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+				final IndividualCtxEntity myCssEnt = 
+						ctxBroker.retrieveIndividualEntity(myCssId).get();
+
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				final CtxEntityIdentifier cisEntId =
+						ctxBroker.retrieveCommunityEntityId(
+								new Requestor(myCssId), cisId).get();
+				
+				final CtxAssociation isMemberOfAssoc;
+				if (!myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
+					
+					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+					isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+					isMemberOfAssoc.removeChildEntity(cisEntId);
+					ctxBroker.update(isMemberOfAssoc);
+				}
 
 			} catch (InvalidFormatException ife) {
 

@@ -59,6 +59,8 @@ var SocietiesNavigation = {
 	settingsAction: function() {
 		//ADD LIST OF PRE-POPULATED CONENT FOR SETTINGS PAGE HERE
 		SocialConnectorsServiceHelper.connectToSNConnectorService(SocialNetworksConnectors.refreshConnectors);
+		//CHANGE TO THE SETTINGS PAGE
+		$.mobile.changePage($("#settings"), {transition: "slideup"});
 	},
 	/**
 	 * @methodOf SocietiesNavigation#

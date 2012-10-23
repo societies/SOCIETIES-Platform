@@ -15,23 +15,25 @@
 			<xs:sequence>
 				<xs:element name="method" type="brokerMethodBean"
 					nillable="false" minOccurs="1" />
-				<xs:element name="retrieve" type="ctxBrokerRetrieveBean"
+				<xs:element name="createEntity" type="createEntityBean"
 					nillable="false" minOccurs="0" />
-				<xs:element name="lookup" type="ctxBrokerLookupBean"
+				<xs:element name="createAttribute" type="createAttributeBean"
 					nillable="false" minOccurs="0" />
-				<xs:element name="createEntity" type="ctxBrokerCreateEntityBean"
+				<xs:element name="createAssociation" type="createAssociationBean"
 					nillable="false" minOccurs="0" />
-				<xs:element name="updateAttribute" type="ctxBrokerUpdateAttributeBean"
-					nillable="false" minOccurs="0" />
-				<xs:element name="createAssociation" type="ctxBrokerCreateAssociationBean"
-					nillable="false" minOccurs="0" />
-				<xs:element name="remove" type="ctxBrokerRemoveBean"
-					nillable="false" minOccurs="0" />
-				<xs:element name="update" type="ctxBrokerUpdateBean"
-					nillable="false" minOccurs="0" />
-				<xs:element name="createAttribute" type="ctxBrokerCreateAttributeBean"
+				<xs:element name="retrieve" type="retrieveBean"
 					nillable="false" minOccurs="0" />
 				<xs:element name="retrieveIndividualEntityId" type="retrieveIndividualEntityIdBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="retrieveCommunityEntityId" type="retrieveCommunityEntityIdBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="update" type="updateBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="updateAttribute" type="updateAttributeBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="remove" type="removeBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="lookup" type="lookupBean"
 					nillable="false" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
@@ -42,41 +44,106 @@
 			<xs:sequence>
 				<xs:element name="method" type="brokerMethodBean"
 					nillable="false" minOccurs="1" />
-				<xs:element name="ctxBrokerCreateEntityBeanResult" type="tns:ctxEntityBean"
+				<xs:element name="createEntityBeanResult" type="tns:ctxEntityBean"
 					nillable="false" minOccurs="0" />
-				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
-					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxModelObjectBean"
-					nillable="false" minOccurs="0" />
-				
-				<xs:element name="ctxBrokerRetrieveIndividualEntityIdBeanResult" type="tns:ctxEntityIdentifierBean"
-				minOccurs="0" />
-				
-				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxModelObjectBean"
-					minOccurs="0" />
-				<xs:element name="ctxBrokerUpdateAttributeBeanResult"
-					type="tns:ctxModelObjectBean" nillable="false" minOccurs="0" />
-				<xs:element name="ctxBrokerCreateAssociationBeanResult"
-					type="tns:ctxAssociationBean" minOccurs="0" />
-				<xs:element name="ctxBrokerRemoveBeanResult" type="tns:ctxEntityIdentifierBean"
-					minOccurs="0" />
-				<xs:element name="ctxBrokerCreateAttributeBeanResult"
+				<xs:element name="createAttributeBeanResult"
 					type="tns:ctxAttributeBean" minOccurs="0" />
+				<xs:element name="createAssociationBeanResult"
+					type="tns:ctxAssociationBean" minOccurs="0" />
+				<xs:element name="retrieveBeanResult" type="tns:ctxModelObjectBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="retrieveIndividualEntityIdBeanResult" 
+					type="tns:ctxEntityIdentifierBean" minOccurs="0" />
+				<xs:element name="retrieveCommunityEntityIdBeanResult" 
+					type="tns:ctxEntityIdentifierBean" minOccurs="0" />
+				<xs:element name="updateBeanResult" type="tns:ctxModelObjectBean"
+					minOccurs="0" />
+				<xs:element name="updateAttributeBeanResult"
+					type="tns:ctxModelObjectBean" nillable="false" minOccurs="0" />
+				<xs:element name="removeBeanResult" type="tns:ctxModelObjectBean"
+					minOccurs="0" />				
+				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
+					minOccurs="0" maxOccurs="unbounded" />				
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+	
+	<xs:complexType name="createEntityBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="targetCss" type="xs:string" minOccurs="1" />
+			<xs:element name="type" type="xs:string" minOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="createAttributeBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="scope" type="tns:ctxEntityIdentifierBean"
+				minOccurs="0" />
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="createAssociationBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="targetCss" type="xs:string" minOccurs="0" />
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="retrieveBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="id" type="tns:ctxIdentifierBean"
+				minOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
 
 	<xs:complexType name="retrieveIndividualEntityIdBean">
 		<xs:sequence>
 			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
-			<xs:element name="targetCss" type="xs:string" minOccurs="0" />
+			<xs:element name="targetCss" type="xs:string" 
+				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 
-
-	<xs:complexType name="ctxBrokerRetrieveBean">
+	<xs:complexType name="retrieveCommunityEntityIdBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="1" />
+			<xs:element name="target" type="xs:string"
+				minOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="updateBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="ctxModelOject" type="tns:ctxModelObjectBean"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="updateAttributeBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="attrId" type="tns:ctxAttributeIdentifierBean"
+				minOccurs="0" />
+			<xs:element name="value" type="xs:base64Binary" minOccurs="0" />
+			<xs:element name="valueMetric" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="removeBean">
 		<xs:sequence>
 			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
@@ -84,8 +151,8 @@
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerLookupBean">
+	
+	<xs:complexType name="lookupBean">
 		<xs:sequence>
 			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
@@ -96,73 +163,17 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:complexType name="ctxBrokerCreateEntityBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="targetCss" type="xs:string" minOccurs="1" />
-			<xs:element name="type" type="xs:string" minOccurs="1" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerUpdateAttributeBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="attrId" type="tns:ctxAttributeIdentifierBean"
-				minOccurs="0" />
-			<xs:element name="value" type="xs:base64Binary" minOccurs="0" />
-			<xs:element name="valueMetric" type="xs:string" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerCreateAssociationBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="targetCss" type="xs:string" minOccurs="0" />
-			<xs:element name="type" type="xs:string" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerRemoveBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="id" type="tns:ctxIdentifierBean"
-				minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerUpdateBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="ctxModelOject" type="tns:ctxModelObjectBean"
-				minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="ctxBrokerCreateAttributeBean">
-		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />
-			<xs:element name="scope" type="tns:ctxEntityIdentifierBean"
-				minOccurs="0" />
-			<xs:element name="type" type="xs:string" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:simpleType name="brokerMethodBean">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="CREATE_ENTITY" />
 			<xs:enumeration value="CREATE_ATTRIBUTE" />
 			<xs:enumeration value="CREATE_ASSOCIATION" />
 			<xs:enumeration value="RETRIEVE" />
+			<xs:enumeration value="RETRIEVE_INDIVIDUAL_ENTITY_ID" />
+			<xs:enumeration value="RETRIEVE_COMMUNITY_ENTITY_ID" />
 			<xs:enumeration value="UPDATE" />
 			<xs:enumeration value="REMOVE" />
 			<xs:enumeration value="LOOKUP" />
-			<xs:enumeration value="RETRIEVE_INDIVIDUAL_ENTITY_ID" />
 		</xs:restriction>
 	</xs:simpleType>
 

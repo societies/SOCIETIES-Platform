@@ -17,28 +17,6 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		<ul data-role="listview" data-theme="d" data-divider-theme="b">
-			<li data-role="list-divider">Security Settings</li>
-		</ul>
-		<br/>
-		<form id="form1">
-			<div id="securityDiv" data-role="fieldcontain">
-				<label for="securityQ" id="securityQLabel">Security Question</label>
-				<input id="securityQ" name="securityQ_r" type="text"/>
-			</div>
-			<div id="securityADiv" data-role="fieldcontain">
-				<label for="securityA" id="securityALabel">Security Answer</label>
-				<input id="securityA" name="securityA_r" type="text"/>
-			</div>
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>App Passwords:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Enable</label>
-				</fieldset>
-			</div>
-		</form>
-		<br/>
 		<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listSNSconnectors" >
 			<li data-role="list-divider">Social Network Connectors</li>
 			<!--  ADD LIST OF CONNECTORS HERE -->
@@ -91,6 +69,7 @@
 				<label for="password" id="passwordLabel" name="fnameLabel">Re-type New Password</label>
 				<input id="password" name="password_r" type="text"/>
 			</div>
+			<!-- 
 			<div data-role="fieldcontain">
 				<fieldset data-role="controlgroup">
 					<legend>Password expires every 30 days</legend>
@@ -98,8 +77,8 @@
 					<label for="checkbox-1">Enable</label>
 				</fieldset>
 			</div>
+			 -->
 			<div id="create_account" data-role="fieldcontain">
-			
 			<a href="#"><input type="submit" value="Update" data-inline="true" data-theme="b"/></a>
 		</div>
         </form>

@@ -20,11 +20,6 @@ public class CreateAssociationCallback implements ICtxCallback {
 	private CtxAssociation ctxAssocResult =  null;
 
 	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-
-	}
-
-	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
 		// TODO Auto-generated method stub
 		
@@ -55,7 +50,7 @@ public class CreateAssociationCallback implements ICtxCallback {
 	}
 	
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -70,6 +65,15 @@ public class CreateAssociationCallback implements ICtxCallback {
 		}
 		LOG.info("onCreatedAssociation, notify all done");
 		
+	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRemovedModelObject(CtxModelObject ctxObj) {
+		
+		// TODO Auto-generated method stub
 	}
 	
 	public CtxAssociation getResult() {

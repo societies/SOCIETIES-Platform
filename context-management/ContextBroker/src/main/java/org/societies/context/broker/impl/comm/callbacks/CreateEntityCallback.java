@@ -20,11 +20,6 @@ public class CreateEntityCallback implements ICtxCallback {
 	private CtxEntity result;
 
 	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-
-	}
-
-	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
 
 		LOG.info("onCreatedEntity retObject " +retObject);
@@ -66,7 +61,7 @@ public class CreateEntityCallback implements ICtxCallback {
 	}
 
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -75,5 +70,14 @@ public class CreateEntityCallback implements ICtxCallback {
 	public void onCreatedAssociation(CtxAssociation retObject) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRemovedModelObject(CtxModelObject ctxObj) {
+		
+		// TODO Auto-generated method stub
 	}
 }
