@@ -69,7 +69,7 @@ public class CssRegistry implements ICssRegistry {
 	}
 
 	public CssRegistry() {
-		log.info("CSS registry bundle instantiated.");
+		log.debug("CSS registry bundle instantiated.");
 	}
 
 	/*
@@ -84,8 +84,8 @@ public class CssRegistry implements ICssRegistry {
 			throws CssRegistrationException {
 		// TODO Auto-generated method stub
 		
-		log.info("??????????????? CSSRegistry registerCss Called : ");
-		log.info("??????????????? CSSRegistry cssRecord node Size passed in is : " +cssRecord.getCssNodes().size());
+		log.debug("CSSRegistry registerCss Called : ");
+		log.debug("CSSRegistry cssRecord node Size passed in is : " +cssRecord.getCssNodes().size());
 
 		CssInterfaceResult result = new CssInterfaceResult();
 
@@ -97,16 +97,12 @@ public class CssRegistry implements ICssRegistry {
 		try {
 
 			if (cssRecord.getCssNodes() != null) {
-				log.info("??????????????? CSSRegistry Node Size is : " +cssRecord.getCssNodes().size());
+				log.debug("CSSRegistry Node Size is : " +cssRecord.getCssNodes().size());
 				for (CssNode cssNode : cssRecord.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
-					log.info("??????????????? CSSRegistry nodeId is : " +cssNode.getIdentity());
-					log.info("??????????????? CSSRegistry status is : " +cssNode.getStatus());
-					log.info("??????????????? CSSRegistry type is : " +cssNode.getType());
-					log.info("??????????????? CSSRegistry nodeMAC is : " +cssNode.getCssNodeMAC());
-					//log.info("??????????????? CSSRegistry interactable is : " +cssNode.isInteractable());
 					session.save(tmpNodeEntry);
+					log.debug("CSSRegistry Node entry saved");
 				}
 			}
 			if (cssRecord.getArchiveCSSNodes() != null) {
@@ -114,6 +110,7 @@ public class CssRegistry implements ICssRegistry {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
 					session.save(tmpNodeEntry);
+					log.debug("CSSRegistry Archived Node entry saved");
 				}
 			}
 			tmpRegistryEntry = new CssRegistryEntry(
@@ -129,10 +126,9 @@ public class CssRegistry implements ICssRegistry {
 					cssRecord.getStatus());
 
 			session.save(tmpRegistryEntry);
+			log.debug("CSSRegistry record entry saved");
 
 			t.commit();
-			log.debug("Css Details saved.");
-			log.info("Css Details saved.");
 
 		} catch (Exception e) {
 			t.rollback();
@@ -146,9 +142,9 @@ public class CssRegistry implements ICssRegistry {
 
 		result.setResultStatus(true);
 		result.setProfile(cssRecord);
-		log.info("??????????????? CSSRegistry cssRecord node Size passed in is : " +cssRecord.getCssNodes().size());
+		log.debug("CSSRegistry cssRecord node Size passed in is : " +cssRecord.getCssNodes().size());
 		for (int index = 0; index < cssRecord.getCssNodes().size(); index++) {
-			log.info("@@@@@@@@@@@@@ CSSRegistry cssRecord node identity is : " +cssRecord.getCssNodes().get(index).getIdentity());
+			log.debug("CSSRegistry cssRecord node identity is : " +cssRecord.getCssNodes().get(index).getIdentity());
 		}
 			//
 
@@ -167,7 +163,7 @@ public class CssRegistry implements ICssRegistry {
 	public void unregisterCss(CssRecord cssRecord)
 			throws CssRegistrationException {
 		// TODO Auto-generated method stub
-		log.info("%%%%%%%%%%%%%% CSSRegistry unregisterCss Called");
+		log.debug("CSSRegistry unregisterCss Called");
 		
 		Session session = sessionFactory.openSession();
 		CssRegistryEntry tmpRegistryEntry = null;
@@ -180,8 +176,8 @@ public class CssRegistry implements ICssRegistry {
 				for (CssNode cssNode : cssRecord.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
-					log.info("!!!!!!!!!!!!!!!!!!! cssNode identity: " +cssNode.getIdentity() + " cssNode Status : " +cssNode.getStatus() + " cssNode Type : " +cssNode.getType() + "cssNodeMAC : " +cssNode.getCssNodeMAC());
 					session.delete(tmpNodeEntry);
+					log.debug("CSSRegistry Node entry deleted");
 				}
 			}
 			
@@ -190,6 +186,7 @@ public class CssRegistry implements ICssRegistry {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
 					session.delete(tmpNodeEntry);
+					log.debug("CSSRegistry Archived Node entry deleted");
 				}
 			}
 			
@@ -206,10 +203,9 @@ public class CssRegistry implements ICssRegistry {
 					cssRecord.getStatus());
 
 			session.delete(tmpRegistryEntry);
+			log.debug("CSSRegistry record deleted");
 
 			t.commit();
-			log.debug("Css Details unregistered.");
-			log.info("Css Details unregistered.");
 
 		} catch (Exception e) {
 			t.rollback();
@@ -237,7 +233,7 @@ public class CssRegistry implements ICssRegistry {
 		CssRecord cssDetails = new CssRecord();
 		CssNode cssNodeDetails = null;
 		
-		log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry getCssRecord Called : ");
+		log.debug("CSSRegistry getCssRecord Called : ");
 
 		Transaction t = session.beginTransaction();
 		try {
@@ -279,18 +275,15 @@ public class CssRegistry implements ICssRegistry {
 						.createCriteria(CssNodeEntry.class).list();
 
 			
-				log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList size : " +tmpNodeRegistryEntryList.size());
+				log.debug("CSSRegistry tmpNodeRegistryEntryList size : " +tmpNodeRegistryEntryList.size());
 			
 				if (tmpNodeRegistryEntryList != null) {
 					for (CssNodeEntry savedNode : tmpNodeRegistryEntryList) {
 						cssNodeDetails = new CssNode();
-						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList identity : " +savedNode.getNodeIdentity());
 						cssNodeDetails.setIdentity(savedNode.getNodeIdentity());
 						cssNodeDetails.setType(savedNode.getType());
 						cssNodeDetails.setStatus(savedNode.getStatus());
 						cssNodeDetails.setCssNodeMAC(savedNode.getcssNodeMAC());
-						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList MAC : " +savedNode.getcssNodeMAC());
-						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList Interactable : " +savedNode.getInteractable());
 						cssNodeDetails.setInteractable(savedNode.getInteractable());
 
 						if (savedNode.getArchived() == true) 
@@ -326,7 +319,7 @@ public class CssRegistry implements ICssRegistry {
 	public void updateCssRecord(CssRecord cssDetails)
 			throws CssRegistrationException {
 
-		log.info("??????????????? CSSRegistry updateCssRecord Called : ");
+		log.debug("CSSRegistry updateCssRecord Called : ");
 		
 		Session session = sessionFactory.openSession();
 		CssNodeEntry tmpNodeEntry = null;
@@ -334,16 +327,18 @@ public class CssRegistry implements ICssRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 
-			// Celar the nodeEntry table, we will repopulate it
+			// Clear the nodeEntry table, we will re-populate it
 			List<CssNodeEntry> tmpNodeRegistryEntryList = session
 					.createCriteria(CssNodeEntry.class).list();
 			session.delete(tmpNodeRegistryEntryList);
+			log.debug("CSSRegistry Node tables cleared");
 
 			if (cssDetails.getCssNodes() != null) {
 				for (CssNode cssNode : cssDetails.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
 					session.save(tmpNodeEntry);
+					log.debug("CSSRegistry Node entry saved");
 				}
 			}
 
@@ -351,12 +346,8 @@ public class CssRegistry implements ICssRegistry {
 				for (CssNode cssNode : cssDetails.getArchiveCSSNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
-					log.info("??????????????? CSSRegistry nodeId is : " +cssNode.getIdentity());
-					log.info("??????????????? CSSRegistry status is : " +cssNode.getStatus());
-					log.info("??????????????? CSSRegistry type is : " +cssNode.getType());
-					log.info("??????????????? CSSRegistry nodeMAC is : " +cssNode.getCssNodeMAC());
-					log.info("??????????????? CSSRegistry interactable is : " +cssNode.getInteractable());
 					session.save(tmpNodeEntry);
+					log.debug("CSSRegistry ArchivedNode entry saved");
 				}
 			}
 
@@ -396,6 +387,7 @@ public class CssRegistry implements ICssRegistry {
 					.setPresence(cssDetails.getPresence());
 
 			session.update(tmpCssRegistryEntryList);
+			log.debug("CSSRegistry record udated");
 
 			t.commit();
 		} catch (Exception e) {
