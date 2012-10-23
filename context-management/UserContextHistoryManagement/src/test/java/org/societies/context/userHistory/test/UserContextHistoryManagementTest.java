@@ -27,8 +27,11 @@ package org.societies.context.userHistory.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,6 +47,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxModelObjectFactory;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -57,10 +61,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class UserContextHistoryManagementTest {
 
 public static final String CSS_ID = "jane.societies.local";
-    
-  //  @Autowired
-	//private IUserCtxDBMgr userDB;
-    
+    	
+	
+	CtxAttribute attribute1;
+	CtxAttribute attribute2;
+	
+	
     @Autowired
    	private  IUserCtxHistoryMgr userCtxHistoryDb;
 
@@ -95,27 +101,85 @@ public static final String CSS_ID = "jane.societies.local";
 	}
 	
 	@Test
-	public void testCreateHistoryAttribute() throws CtxException {
-
+	public void testCreateHistoryDataSet() throws CtxException {
 		
-	//final CtxEntity entity = this.userDB.createEntity(CtxEntityTypes.DEVICE);
-		//CtxEntityIdentifier entID = new CtxEntityIdentifier("context://john.societies.local/ENTITY/entType/65573");
-		CtxAttributeIdentifier attrID = new CtxAttributeIdentifier("context://john.societies.local/ENTITY/entType/65578/ATTRIBUTE/name/65574");
-		
-		//final CtxEntity entity = CtxModelObjectFactory.getInstance().createEntity(entID, new Date(), null, null);
-		final CtxAttribute attribute = CtxModelObjectFactory.getInstance().createAttribute(attrID, new Date(), new Date(), "Giannis");
-		//final CtxAttribute attribute = new CtxAttribute(attrID); 
 	
-		CtxHistoryAttribute hocAttr = this.userCtxHistoryDb.createHistoryAttribute(attribute);
+		CtxAttributeIdentifier ctxAttrID1 = new CtxAttributeIdentifier("context://john.societies.local/ENTITY/person/31/ATTRIBUTE/temperature/48");
+		CtxAttributeIdentifier ctxAttrID2 = new CtxAttributeIdentifier("context://john.societies.local/ENTITY/person/31/ATTRIBUTE/locationSymbolic/40");
 		
 		
+		attribute1 = CtxModelObjectFactory.getInstance().createAttribute(ctxAttrID1, new Date(), new Date(), "hot");
+		attribute1.setHistoryRecorded(true);
+		this.userCtxHistoryDb.storeHoCAttribute(attribute1);
 		
-		assertNotNull(hocAttr);
-		assertNotNull(hocAttr.getId());
-		System.out.println("hocAttr.getId()" +hocAttr.getId());
+		attribute1.setStringValue("warm");
+		this.userCtxHistoryDb.storeHoCAttribute(attribute1);
+		
+		attribute1.setStringValue("mild");
+		this.userCtxHistoryDb.storeHoCAttribute(attribute1);
+		
+		attribute1.setStringValue("cold");
+		this.userCtxHistoryDb.storeHoCAttribute(attribute1);
+		
+		attribute1.setStringValue("freezing");
+		this.userCtxHistoryDb.storeHoCAttribute(attribute1);
+		
+		List<CtxHistoryAttribute> hocResultsTemperature = this.userCtxHistoryDb.retrieveHistory(ctxAttrID1);
+		
+		System.out.println("temperature results "+hocResultsTemperature.size() );
+		assertEquals(5, hocResultsTemperature.size());
+		
+		
+		//for(CtxHistoryAttribute hocAttr: hocResultsTemperature){
+		//	System.out.println("hoc attribute "+hocAttr.getStringValue() + " timestamp "+hocAttr.getLastUpdated());}
+		
+		
+		// location history test
+		Date startDate = new Date();
+		Date endDate = null;
+		attribute2 = CtxModelObjectFactory.getInstance().createAttribute(ctxAttrID2, new Date(), new Date(), "home");
+		attribute2.setHistoryRecorded(true);
+	
+		for (int i=0; i<100; i++){
+		this.userCtxHistoryDb.storeHoCAttribute(attribute2);
+		attribute2.setStringValue("office");
+		
+		
+		this.userCtxHistoryDb.storeHoCAttribute(attribute2);
+		attribute2.setStringValue("pub");
+		 
+		
+		
+		this.userCtxHistoryDb.storeHoCAttribute(attribute2);
+		attribute2.setStringValue("park");
+
+		this.userCtxHistoryDb.storeHoCAttribute(attribute2);
+		attribute2.setStringValue("restaurant");
+		
+		if(i==50) endDate= new Date();
+		
+		}
+		
+		List<CtxHistoryAttribute> hocResultsLocation = this.userCtxHistoryDb.retrieveHistory(ctxAttrID2);
+		assertEquals(400, hocResultsLocation.size());
+		System.out.println("all location results "+hocResultsLocation.size() );
+		
+		Date lastTime = null;
+		for(CtxHistoryAttribute hocAttr: hocResultsLocation){
+		//	System.out.println("hoc attribute Location: "+hocAttr.getStringValue() + " timestamp "+hocAttr.getLastUpdated());
+			lastTime = hocAttr.getLastUpdated();
+		}
+		
+		
+		System.out.println("start: "+startDate.getTime()+" end "+ endDate.getTime() +" total end: "+ lastTime.getTime());
+		List<CtxHistoryAttribute> hocResultsLocationTimeBased = this.userCtxHistoryDb.retrieveHistory(ctxAttrID2, startDate, endDate);
+		
+		System.out.println("location results time based "+hocResultsLocationTimeBased.size() );
+		assertEquals(205, hocResultsLocationTimeBased.size());
+		
+				
+		//for(CtxHistoryAttribute hocAttr: hocResultsLocationTimeBased){
+		//System.out.println("time based hoc attribute Location dataset: "+hocAttr.getStringValue() + " timestamp "+hocAttr.getLastUpdated().getTime());}
 	}
-
-	
-	
 
 }

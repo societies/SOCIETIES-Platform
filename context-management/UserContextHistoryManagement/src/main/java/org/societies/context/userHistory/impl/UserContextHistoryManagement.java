@@ -34,6 +34,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -340,7 +341,9 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		
 		if (endDate != null)
 			criteria.add(Restrictions.le("lastUpdated", endDate));
-	
+		
+		criteria.addOrder(Order.asc("lastUpdated"));
+		
 		try {
 			result.addAll(criteria.list());
 		} finally {
