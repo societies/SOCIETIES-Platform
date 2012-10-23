@@ -59,13 +59,12 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	@SuppressWarnings("unused")
 	private long id;
 	
 	/** The identifier of this trusted entity. */
 	@Columns(columns = {
-			@Column(name = "trustor_id", nullable = false, updatable = false, length = 256),
-			@Column(name = "trustee_id", nullable = false, updatable = false, length = 256)
+			@Column(name = "trustor_id", nullable = false, updatable = false, length = 255),
+			@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
 	})
 	@Type(type = "org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
