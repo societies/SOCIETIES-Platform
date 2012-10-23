@@ -214,7 +214,7 @@ boolean haveClient(Service sharedService, List<Service> installedServices){
 	boolean clientInstalled = false;
 	
 	for(Service installedService: installedServices ){
-		if(ServiceModelUtils.compare(sharedService.getServiceIdentifier(), installedService.getServiceInstance().getParentIdentifier()))
+		if(installedService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && ServiceModelUtils.compare(sharedService.getServiceIdentifier(), installedService.getServiceInstance().getParentIdentifier()))
 			return true;				
 	}
 	
