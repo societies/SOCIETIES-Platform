@@ -240,6 +240,52 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException;
 	
 	/**
+	 * Registers the specified {@link CtxChangeEventListener} for events of the
+     * supplied topics. Once registered, the <code>CtxChangeEventListener</code>
+     * will handle {@link CtxChangeEvent CtxChangeEvents} associated with the
+     * identified owner of context information, i.e. CSS or CIS.
+     * <p>
+     * To unregister the specified <code>CtxChangeEventListener</code>, use the
+     * {@link #unregisterFromChanges(CtxChangeEventListener, IIdentity)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>CtxChangeEventListener</code> to register.
+     * @param ownerId
+     *            the identifier of the CSS or CIS owning the context model
+     *            objects whose events to register for.
+     * @throws CtxException
+     *             if the registration process of the specified
+     *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @since 0.4.1
+     */
+	public void registerForChanges(final CtxChangeEventListener listener, 
+			final IIdentity ownerId) throws CtxException;
+	
+	/**
+     * Unregisters the specified {@link CtxChangeEventListener} for events of
+     * the supplied topics related to the identified owner of context
+     * information.
+     * 
+     * @param listener
+     *            the <code>CtxChangeEventListener</code> to unregister.
+     * @param ownerId
+     *            the identifier of the context model object whose events to
+     *            unregister from.
+     * @throws CtxException
+     *             if the unregistration process of the specified
+     *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @see #registerForChanges(CtxChangeEventListener, IIdentity)
+     * @since 0.4.1
+     */
+    public void unregisterFromChanges(final CtxChangeEventListener listener,
+            final IIdentity ownerId) throws CtxException;
+	
+	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context model object referenced by the specified
 	 * {@link CtxIdentifier}. Once registered, the CtxChangeEventListener

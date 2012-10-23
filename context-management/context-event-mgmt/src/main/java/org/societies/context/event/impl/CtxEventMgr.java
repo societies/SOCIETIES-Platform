@@ -167,6 +167,43 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	}
 	
 	/*
+	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void registerChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		
+		if (this.idMgr.isMine(ownerId))
+			this.registerLocalChangeListener(listener, topics, ownerId);
+		else
+			; // TODO ? this.registerRemoteChangeListener(ownerId, listener, topics);
+	}
+
+	/*
+	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void unregisterChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/*
 	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -308,6 +345,21 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 						+ e.getLocalizedMessage(), e);
 			}
 		}
+	}
+	
+	private void registerLocalChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		final Dictionary<String, Object> props = new Hashtable<String, Object>();
+		props.put(EventConstants.EVENT_TOPIC, topics);
+		props.put(EventConstants.EVENT_FILTER, 
+				"(" + EVENT_ID_PROPERTY_KEY + "=*" + ownerId.toString() + "*)");
+		if (LOG.isInfoEnabled()) 
+			LOG.info("Registering local context change event listener to topics "
+					+ Arrays.toString(topics)
+					+ " with properties '" + props + "'");
+		this.bundleContext.registerService(EventHandler.class.getName(),
+				new LocalChangeEventHandler(listener), props);
 	}
 	
 	private void registerLocalChangeListener(final CtxChangeEventListener listener,

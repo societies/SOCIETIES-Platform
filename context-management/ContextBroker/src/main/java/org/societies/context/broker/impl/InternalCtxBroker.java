@@ -649,13 +649,59 @@ public class InternalCtxBroker implements ICtxBroker {
 
 
 	//***********************************************
-	//     Context Update Events Methods  
+	//     Context Change Events Methods  
 	//***********************************************
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO remove DEPRECATED
 
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void registerForChanges(final CtxChangeEventListener listener,
+			final IIdentity ownerId) throws CtxException {
+
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for IIdentity '"
+						+ ownerId + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, ownerId);
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for IIdentity '"
+					+ ownerId + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void unregisterFromChanges(final CtxChangeEventListener listener,
+			final IIdentity ownerId) throws CtxException {
+
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		
+		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -687,6 +733,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	public void unregisterFromChanges(final CtxChangeEventListener listener,
 			final CtxIdentifier ctxId) throws CtxException {
@@ -699,7 +748,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 	}
 
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	public void registerForChanges(final CtxChangeEventListener listener,
 			final CtxEntityIdentifier scope, final String attrType)
@@ -711,6 +762,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new NullPointerException("scope can't be null");
 
 		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
 				CtxChangeEventTopic.UPDATED,
 				CtxChangeEventTopic.MODIFIED,
 				CtxChangeEventTopic.REMOVED,
@@ -728,7 +780,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	public void unregisterFromChanges(final CtxChangeEventListener listener,
 			final CtxEntityIdentifier scope, final String attrType) throws CtxException {

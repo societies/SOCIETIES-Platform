@@ -425,7 +425,8 @@ public class CssRegistry implements ICssRegistry {
 
 		Session session = sessionFactory.openSession();
 		CssRequestEntry filterRegistryEntry = new CssRequestEntry();
-
+		
+		
 		Transaction t = session.beginTransaction();
 		try {
 
@@ -516,6 +517,7 @@ public class CssRegistry implements ICssRegistry {
 	public void updateCssFriendRequestRecord(CssRequest cssRequest)
 			throws CssRegistrationException {
 
+		
 		Session session = sessionFactory.openSession();
 		CssFriendEntry filterRegistryEntry = new CssFriendEntry();
 
@@ -536,7 +538,7 @@ public class CssRegistry implements ICssRegistry {
 			}
 
 			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
-
+				log.info("updateCssFriendRequestRecord Called: IF Statement for CANCELLED");
 				filterRegistryEntry.setRequestStatus(cssRequest
 						.getRequestStatus().value());
 
