@@ -58,8 +58,18 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.springframework.scheduling.annotation.AsyncResult;
 
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
+
+
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
+    private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); 
+    // to define a dedicated Logger
+    IPerformanceMessage m;
+
+	
+	
 	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentTaskManager.class);
 	public static final int UPDATE_TRIGGER_THRESHOLD = 2;
 	public static HashMap<String, CtxAttributeIdentifier> REGISTERED_CONTEXTS = null;
@@ -232,6 +242,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public void updateUserSituation(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
+
 		CRISTUserSituation currentUserSituation = inferUserSituation(entityID);
 		if (currentUserSituation != null) {
 			this.currentUserSituationMap.put(entityID, currentUserSituation);
@@ -512,8 +523,56 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				//@@@
+			    // Logging for test
+			    m = new PerformanceMessage();
+			    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        m.setPerformanceType(IPerformanceMessage.Quanitative);
+				m.setPerformanceNameValue("Size=" + historyList.size());
+				//LOG.info("#2#This is a test log for PerformanceMessage S18!");
+		        PERF_LOG.trace(m.toString());
+				
+		        m = new PerformanceMessage();
+				m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        
+		        m.setPerformanceType(IPerformanceMessage.Delay);
+		        long startTime = System.currentTimeMillis();
+	        
+		        
+		        
+				
+				//@@@ tested method
 				this.intentModel = this.cristDiscovery
 							.generateNewCRISTUIModel(this.historyList);
+				
+		        
+				m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+		        PERF_LOG.trace(m.toString());
+				//Logging end
+		        //@@@
+				
+				
+				
+				
+				
+				
 				
 			}
 			return getNextActions(entityID, userAction, currentUserSituation);
@@ -575,10 +634,48 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
+				
+				
+				
+				
+				
+				
+				//@@@
+			    // Logging for test
+			    m = new PerformanceMessage();
+			    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        m.setPerformanceType(IPerformanceMessage.Quanitative);
+				m.setPerformanceNameValue("Size=" + historyList.size());
+				//LOG.info("#1#This is a test log for PerformanceMessage S18!");
+		        PERF_LOG.trace(m.toString());
+				
+		        m = new PerformanceMessage();
+				m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        
+		        m.setPerformanceType(IPerformanceMessage.Delay);
+		        long startTime = System.currentTimeMillis();
+	        
+		        
+		        
+				
+				//@@@ tested method
 				this.intentModel = this.cristDiscovery
 						.generateNewCRISTUIModel(this.historyList);// ensure not
 																	// return
 																	// null
+		        
+				m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+		        PERF_LOG.trace(m.toString());
+				//Logging end
+		        //@@@
+				
+				
 			}
 
 			return getNextActions(entityID, userAction, currentUserSituation);
@@ -632,8 +729,51 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 				return new CRISTUserAction();
 			}
 			// this.cristDiscovery.enableCRISTUIDiscovery(true);
+			
+			
+			
+			
+			
+			
+			
+			
+			//@@@
+		    // Logging for test
+		    m = new PerformanceMessage();
+		    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+		    m.setSourceComponent(this.getClass()+"");
+	        m.setOperationType("IntentModelLearningFromActionHistory");//?
+	        m.setD82TestTableName("S18");
+	        m.setPerformanceType(IPerformanceMessage.Quanitative);
+			m.setPerformanceNameValue("Size=" + historyList.size());
+			//LOG.info("#3#This is a test log for PerformanceMessage S18!");
+	        PERF_LOG.trace(m.toString());
+			
+	        m = new PerformanceMessage();
+			m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+		    m.setSourceComponent(this.getClass()+"");
+	        m.setOperationType("IntentModelLearningFromActionHistory");//?
+	        m.setD82TestTableName("S18");
+	        
+	        m.setPerformanceType(IPerformanceMessage.Delay);
+	        long startTime = System.currentTimeMillis();
+        
+	        
+	        
+			
+			//@@@ tested method
 			this.intentModel = this.cristDiscovery
 						.generateNewCRISTUIModel(this.historyList);
+	        
+			m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+	        PERF_LOG.trace(m.toString());
+			//Logging end
+	        //@@@
+			
+			
+			
+			
+			
 			
 		}
 
