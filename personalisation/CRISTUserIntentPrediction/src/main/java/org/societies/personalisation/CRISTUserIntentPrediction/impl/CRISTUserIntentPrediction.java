@@ -38,6 +38,8 @@ import org.societies.api.context.model.CtxModelObject;
 // import org.societies.api.personalisation.model.IAction;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -49,9 +51,17 @@ import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIn
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
+
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
+    private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); 
+    // to define a dedicated Logger
+    IPerformanceMessage m;
+	
+	
 	private static Logger LOG = LoggerFactory.getLogger(CRISTUserIntentPrediction.class);
 
 	private ICtxBroker ctxBroker;
@@ -174,7 +184,33 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			
 		}
 
+		
+		
+		
+		//@@@
+	    // Logging for test
+		// the size can be get from the most recent performance record
+		//m.setPerformanceNameValue("Size=" + cristTaskManager.historyList.size());
+
+		
+        m = new PerformanceMessage();
+	    m.setSourceComponent(this.getClass()+"");
+	    m.setD82TestTableName("S18");
+	    m.setTestContext("Personalisation.CRISTUserIntent.IntentPrediction.Delay");
+	    m.setOperationType("IntentPredictionFromIntentModel");//?
+	    m.setPerformanceType(IPerformanceMessage.Delay);
+        //LOG.info("#4#This is a test log for PerformanceMessage S18!");
+        long startTime = System.currentTimeMillis();
+    
+		//@@@ tested method
 		List<CRISTUserAction> results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+        
+		m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime)); //"Delay="
+        PERF_LOG.trace(m.toString());
+		//Logging end
+        //@@@
+		
+		
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
@@ -203,8 +239,36 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			
 		}
 
-		List<CRISTUserAction> results = this.cristTaskManager.predictUserIntent(entityID, new CRISTUserAction(action));
+		
+		
+		
+		//@@@
+	    // Logging for test
+		// the size can be get from the most recent performance record
+		//m.setPerformanceNameValue("Size=" + cristTaskManager.historyList.size());
 
+		
+        m = new PerformanceMessage();
+		m.setTestContext("Personalisation.CRISTUserIntent.IntentPrediction.Delay");
+	    m.setSourceComponent(this.getClass()+"");
+        m.setOperationType("IntentPredictionFromIntentModel");//?
+        m.setD82TestTableName("S18");
+        
+        m.setPerformanceType(IPerformanceMessage.Delay);
+        long startTime = System.currentTimeMillis();
+    
+        
+        
+		
+		//@@@ tested method
+		List<CRISTUserAction> results = this.cristTaskManager.predictUserIntent(entityID, new CRISTUserAction(action));
+		
+		m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+        PERF_LOG.trace(m.toString());
+		//Logging end
+        //@@@
+		
+		
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
@@ -243,7 +307,33 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			return new AsyncResult<CRISTUserAction>(null);			
 		}
 		
+		
+		
+		//@@@
+	    // Logging for test
+		// the size can be get from the most recent performance record
+		//m.setPerformanceNameValue("Size=" + cristTaskManager.historyList.size());
+
+		
+        m = new PerformanceMessage();
+		m.setTestContext("Personalisation.CRISTUserIntent.IntentPrediction.Delay");
+	    m.setSourceComponent(this.getClass()+"");
+        m.setOperationType("IntentPredictionFromIntentModel");//?
+        m.setD82TestTableName("S18");
+        
+        m.setPerformanceType(IPerformanceMessage.Delay);
+        long startTime = System.currentTimeMillis();
+    
+        
+        
+		
+		//@@@ tested method
 		CRISTUserAction result = this.cristTaskManager.getCurrentUserIntent(ownerID, serviceID, parameterName);
+		
+		m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+        PERF_LOG.trace(m.toString());
+		//Logging end
+        //@@@
 		
 		return new AsyncResult<CRISTUserAction>(result);
 	}
