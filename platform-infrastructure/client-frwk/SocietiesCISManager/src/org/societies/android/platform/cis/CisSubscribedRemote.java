@@ -24,12 +24,41 @@
  */
 package org.societies.android.platform.cis;
 
+import org.societies.android.api.cis.management.ICisSubscribed;
+import org.societies.android.api.utilities.RemoteServiceHandler;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.util.Log;
+
 /**
  * Describe your class here...
  *
  * @author aleckey
  *
  */
-public class CisDirectoryRemote {
+public class CisSubscribedRemote   extends Service {
+	private static final String LOG_TAG = CisSubscribedRemote.class.getName();
+	private Messenger inMessenger;
 
+	@Override
+	public void onCreate () {
+		CommunityManagementBase cisSubscribeBase = new CommunityManagementBase(this.getApplicationContext());
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(cisSubscribeBase.getClass(), cisSubscribeBase, ICisSubscribed.methodsArray));
+		Log.i(LOG_TAG, "CisSubscribedRemote creation");
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		Log.d(LOG_TAG, "CisSubscribedRemote onBind");
+		return inMessenger.getBinder();
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.i(LOG_TAG, "CisSubscribedRemote terminating");
+	}
 }

@@ -69,6 +69,7 @@ import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -81,8 +82,10 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CommunityManagement extends Service implements ICisManager, ICisSubscribed {
-
+public class CommunityManagementBase implements ICisManager, ICisSubscribed {
+	//LOGGING TAG
+	private static final String LOG_TAG = CommunityManagementBase.class.getName();
+	
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
@@ -92,37 +95,24 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 													    	   "org.societies.api.schema.activityfeed",
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
-    private static final String LOG_TAG = CommunityManagement.class.getName();
-    private IBinder binder = null;
+    private Context androidContext;
     
-    @Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "CommunityManagement service starting");
+    /**
+     * CONSTRUCTOR
+     */
+    public CommunityManagementBase(Context androidContext) {
+    	Log.d(LOG_TAG, "CommunityManagementBase created");
+    	
+    	this.androidContext = androidContext;
+    	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			commMgr = new ClientCommunicationMgr(this);
+			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
-	}
 
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "CommunityManagement service terminating");
-	}
-
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public CommunityManagement getService() {
-			return CommunityManagement.this;
-		}
-	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
+    }
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
@@ -608,8 +598,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 					
 				}
 				intent.setPackage(client);
-				CommunityManagement.this.sendBroadcast(intent);
-				CommunityManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
+				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 
@@ -722,8 +712,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 				}
 				
 				intent.setPackage(client);
-				CommunityManagement.this.sendBroadcast(intent);
-				CommunityManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
+				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
