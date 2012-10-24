@@ -18,9 +18,9 @@ public class ServiceUtilitiesRemote extends Service {
 
 	@Override
 	public void onCreate () {
-		ServiceUtilitiesBase serviceManagementBase = new ServiceUtilitiesBase(this.getApplicationContext());
+		ServiceUtilitiesBase servUtilBase = new ServiceUtilitiesBase(this.getApplicationContext());
 		
-		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceManagementBase.getClass(), serviceManagementBase, IServiceUtilities.methodsArray));
+		this.inMessenger = new Messenger(new RemoteServiceHandler(servUtilBase.getClass(), servUtilBase, IServiceUtilities.methodsArray));
 		Log.i(LOG_TAG, "ServiceUtilitiesRemote creation");
 	}
 
