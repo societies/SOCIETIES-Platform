@@ -239,64 +239,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
         }		
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisManager#subscribeToCommunity(java.lang.String, java.lang.String, java.lang.String)*/
-/*	public void subscribeToCommunity(String client, String name, String cisId) {
-		Log.d(LOG_TAG, "subscribeToCommunity called by client: " + client);
-		
-		//COMMUNIY INFO
-		Community cis = new Community();
-		cis.setCommunityJid(cisId);
-		cis.setCommunityName(name);
-		//SUBSCRIBED TO INFO
-		SubscribedTo subTo = new SubscribedTo();
-		subTo.setCommunity(cis);
-		//NOTIFICATION INFO
-		Notification note = new Notification();
-		note.setSubscribedTo(subTo);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setNotification(note);
-		
-		//COMMS STUFF
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, new CommunityCallback());
-        	commMgr.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-	}*/
-
-	/* @see org.societies.android.api.cis.management.ICisManager#unsubscribeFromCommunity(java.lang.String, java.lang.String)*/
-	/*public void unsubscribeFromCommunity(String client, String cisId) {
-		Log.d(LOG_TAG, "unsubscribeFromCommunity called by client: " + client);
-		
-		//DELETE NOTIFICATION
-		DeleteNotification delNote = new DeleteNotification();
-		delNote.setCommunityJid(cisId);
-		//NOTIFICATION INFO
-		Notification note = new Notification();
-		note.setDeleteNotification(delNote);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setNotification(note);
-		
-		//COMMS STUFF
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, new CommunityCallback());
-        	commMgr.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-	}*/
-	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
 	public String Join(String client, ACisAdvertisementRecord targetCis) {

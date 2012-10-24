@@ -41,12 +41,11 @@ import org.societies.api.schema.cis.directory.CisDirectoryBean;
 import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 import org.societies.api.schema.cis.directory.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.utilities.DBC.Dbc;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
+import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -87,71 +86,98 @@ public class CisDirectoryBase implements ICisDirectory {
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
 	public ACisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
-		Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
+        Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
 		
-		//CREATE MESSAGE BEAN
-		CisDirectoryBean messageBean = new CisDirectoryBean();
-		messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_ALL_CIS); 
-		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-        return null;
+        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+		String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
+		methodAsync.execute(params);
+		
+		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
-	public ACisAdvertisementRecord[] findForAllCis(String client, String filter) {
-		Log.d(LOG_TAG, "findForAllCis called by client: " + client + " using filter: " + filter);
+	public ACisAdvertisementRecord[] findForAllCis(String client, String filter) {       
+        Log.d(LOG_TAG, "findForAllCis called by client: " + client);
 		
-		//CREATE MESSAGE BEAN
-		CisDirectoryBean messageBean = new CisDirectoryBean();
-		messageBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FILTER_CIS); 
-		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-        return null;
+        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+		String params[] = {client, ICisDirectory.FILTER_CIS, filter};
+		methodAsync.execute(params);
+		
+		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
 	public ACisAdvertisementRecord searchByID(String client, String cis_id) {
-		Log.d(LOG_TAG, "findForAllCis called by client: " + client + " using cis_is: " + cis_id);
+		Log.d(LOG_TAG, "searchByID called by client: " + client);
 		
-		//CREATE MESSAGE BEAN
-		CisDirectoryBean messageBean = new CisDirectoryBean();
-		messageBean.setMethod(MethodType.SEARCH_BY_ID);
+        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
+		methodAsync.execute(params);
+		
+		return null;
+	}
 
-		//COMMS STUFF
-		ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_CIS_ID); 
-		IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>getDomainAuthorityNode: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-        return null;
+	/**
+	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
+	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
+	 * method invocation is an explicitly asynchronous operation, other usage is not and the use of these types of classes
+	 * is encouraged. Remember, Android Not Responding (ANR) exceptions will be invoked if the main app thread is abused
+	 * and the app will be closed down by Android very soon after.
+	 * 
+	 * Although the result of an AsyncTask can be obtained by using <AsyncTask Object>.get() it's not a good idea as 
+	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
+	 * class ineffective. Use Intents as an asynchronous callback mechanism.
+	 */
+
+	/**
+	 * This class carries out the GetFriendRequests method call asynchronously
+	 */
+	private class AsyncDirFunctions extends AsyncTask<String, Void, String[]> {
+		
+		@Override
+		protected String[] doInBackground(String... params) {
+			Dbc.require("At least one parameter must be supplied", params.length >= 1);
+			Log.d(LOG_TAG, "AsyncFriendRequests - doInBackground");
+			
+			//PARAMETERS
+			String client = params[0];
+			String method = params[1];
+			String filterCis = params[2];
+			//RETURN OBJECT
+			String results[] = new String[1];
+			results[0] = client;
+			//MESSAGE BEAN
+			CisDirectoryBean messageBean = new CisDirectoryBean();
+			if (method.equals(ICisDirectory.FIND_CIS_ID)) {
+				messageBean.setMethod(MethodType.SEARCH_BY_ID);
+				messageBean.setFilter(filterCis);
+			} 
+			else if (method.equals(ICisDirectory.FILTER_CIS)) {
+				messageBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
+				CisAdvertisementRecord advert = new CisAdvertisementRecord();
+				advert.setName(filterCis);
+				messageBean.setCisA(advert);
+			} 
+			else {
+				messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
+			}
+			//COMMS CONFIG
+			IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
+			ICommCallback cisCallback = new CisDirectoryCallback(client, method);
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.register(ELEMENT_NAMES, cisCallback);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+	        }
+			return results;
+		}
+
+		@Override
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+	    }
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
