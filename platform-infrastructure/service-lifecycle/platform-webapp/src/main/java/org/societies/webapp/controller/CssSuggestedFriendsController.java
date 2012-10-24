@@ -30,8 +30,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 public class CssSuggestedFriendsController {
+	
+	private static Logger LOG = LoggerFactory.getLogger(CssSuggestedFriendsController.class);
 
 	/**
 	 * OSGI service get auto injected
@@ -241,7 +246,7 @@ public class CssSuggestedFriendsController {
 		if (sfForm.getMethod() != null)
 		{
 			if (sfForm.getMethod().contains("accept")) {
-				// acept the pending friend request
+				// Accept the pending friend request
 				CssRequest pendingFR = new CssRequest();
 				pendingFR.setCssIdentity(sfForm.getFriendId());
 				pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
@@ -249,14 +254,24 @@ public class CssSuggestedFriendsController {
 				getCssLocalManager().acceptCssFriendRequest(pendingFR);
 				
 			} else if (sfForm.getMethod().contains("cancel")) {
-				// acept the pending friend request
+				// Cancel the pending friend request
 				CssRequest pendingFR = new CssRequest();
 				pendingFR.setCssIdentity(sfForm.getFriendId());
 				pendingFR.setRequestStatus(CssRequestStatusType.CANCELLED);
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				//getCssLocalManager().updateCssRequest(pendingFR);
 				getCssLocalManager().updateCssFriendRequest(pendingFR);
-				// cancel pendinf fr
+				
+			} else if (sfForm.getMethod().contains("denied")) {
+				// Decline the pending friend request
+				LOG.info("Webapp -> Decline Friend Requst Called: ");
+				CssRequest pendingFR = new CssRequest();
+				pendingFR.setCssIdentity(sfForm.getFriendId());
+				pendingFR.setRequestStatus(CssRequestStatusType.DENIED);
+				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
+				//getCssLocalManager().updateCssRequest(pendingFR);
+				getCssLocalManager().declineCssFriendRequest(pendingFR);
+				
 			} else {
 				// send fr
 				getCssLocalManager().sendCssFriendRequest(sfForm.getFriendId());

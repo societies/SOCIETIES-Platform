@@ -263,5 +263,12 @@ public interface ICSSRemoteManager {
 		 * @param CssRequest
 		 */
 		void acceptCssFriendRequestInternal(CssRequest request);
+		
+	/**
+	 * accept/reject a CSS Friend Requests 
+	 * 
+	 * @param CssRequest
+	 */
+	 void declineCssFriendRequest(CssRequest request);
 
 }
