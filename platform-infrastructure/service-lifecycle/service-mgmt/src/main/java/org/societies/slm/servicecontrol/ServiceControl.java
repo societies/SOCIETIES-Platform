@@ -1123,6 +1123,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
 
 					returnResult.setMessage(ResultMessage.SUCCESS);
+					
+					if(logger.isDebugEnabled())
+						logger.debug("Updating ActivityFeed for " + myCIS.getCisId());
+					
 					updateActivityFeed(node,"Shared",service);
 					
 					getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
@@ -1157,6 +1161,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							// And we add it to the table
 							getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
 							ICis remoteCis = getCisManager().getCis(node.getJid());
+							
+							if(logger.isDebugEnabled())
+								logger.debug("Updating ActivityFeed for " + remoteCis.getCisId());
 							
 							updateActivityFeed(node,"Shared",service);
 							getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
@@ -1366,6 +1373,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 	
+	@Async
+	private void sendUserNotification(String message){
+		getUserFeedback().showNotification(message);
+	}
+	
+	@Async
 	private void updateActivityFeed(IIdentity target, String verb, Service service){
 		
 		ICis remoteCis = getCisManager().getCis(target.getJid());
@@ -1378,6 +1391,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
 		remoteCis.getActivityFeed().addActivity(activity, cisCallback );
 		
+		if(logger.isDebugEnabled())
+			logger.debug("Updated ActivityFeed for " + remoteCis.getCisId());
 	}
 	
 	@Override
