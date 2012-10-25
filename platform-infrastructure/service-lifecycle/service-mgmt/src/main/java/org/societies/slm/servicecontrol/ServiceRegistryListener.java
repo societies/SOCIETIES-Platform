@@ -29,7 +29,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -121,7 +123,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceControl = serviceControl;
 	}
 	
-	
 	  public INegotiationProviderServiceMgmt getNegotiationProvider(){
 		return negotiationProvider;
 	}
@@ -171,6 +172,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("Bundle Listener Registered");
 		this.bctx.addBundleListener(this);
 		
+		getServiceControl().cleanAfterRestart();
 		
 	}
 
@@ -252,7 +254,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setCssJid(myNode.getBareJid());
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
-			service.setServiceLocation(serBndl.getLocation());
+			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
+				service.setServiceLocation(serBndl.getLocation());
 		}
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
@@ -654,4 +657,5 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.error("Error sending event!");
 		}
 	}
+	
 }

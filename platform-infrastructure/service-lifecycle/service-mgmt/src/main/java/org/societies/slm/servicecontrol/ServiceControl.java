@@ -24,6 +24,7 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -551,7 +552,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("Now trying to download the jar...");
 				
-				String jarLocation = ServiceDownloader.downloadServiceJar(bundleLocation, serviceToInstall);
+				URI jarLocation = ServiceDownloader.downloadServiceJar(bundleLocation, serviceToInstall);
 				
 				if(jarLocation == null){
 					if(logger.isDebugEnabled())
@@ -561,7 +562,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				}
 				
-				asyncResult = installService(bundleLocation);
+				asyncResult = installService(jarLocation.toURL());
 				ServiceControlResult result = asyncResult.get();
 
 				if(result == null){
@@ -582,10 +583,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					ServiceInstance newServiceInstance = newService.getServiceInstance();
 					newServiceInstance.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
 					newServiceInstance.setParentIdentifier(serviceToInstall.getServiceIdentifier());
+
 					ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
-					newServImpl.setServiceClient(jarLocation);
+					newServImpl.setServiceClient(jarLocation.toString());
 					newServiceInstance.setServiceImpl(newServImpl);
 					newService.setServiceInstance(newServiceInstance);
+					
 					getServiceReg().updateRegisteredService(newService);
 						
 					//
@@ -1120,6 +1123,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
 
 					returnResult.setMessage(ResultMessage.SUCCESS);
+					
+					if(logger.isDebugEnabled())
+						logger.debug("Updating ActivityFeed for " + myCIS.getCisId());
+					
+					updateActivityFeed(node,"Shared",service);
+					
 					getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
 					
 				} else {
@@ -1153,13 +1162,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
 							ICis remoteCis = getCisManager().getCis(node.getJid());
 							
-							IActivity activity = remoteCis.getActivityFeed().getEmptyIActivity();
-							activity.setActor(getCommMngr().getIdManager().getThisNetworkNode().getJid());
-							activity.setObject(service.getServiceName());
-							activity.setTarget(node.getJid());
-							activity.setVerb("Shared");
-							IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
-							remoteCis.getActivityFeed().addActivity(activity, cisCallback );
+							if(logger.isDebugEnabled())
+								logger.debug("Updating ActivityFeed for " + remoteCis.getCisId());
+							
+							updateActivityFeed(node,"Shared",service);
 							getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
 
 						}	
@@ -1275,6 +1281,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							
 							getDeviceMngr().fireDisconnectedSharedDevice(service.getServiceIdentifier().getServiceInstanceIdentifier());
 						}
+					} else{
+						updateActivityFeed(node,"Unshared",service);
 					}
 		
 					returnResult.setMessage(ResultMessage.SUCCESS);
@@ -1312,6 +1320,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								List<Service> servicesList = new ArrayList<Service>();
 								servicesList.add(service);
 								getServiceReg().unregisterServiceList(servicesList);
+							} else{
+								updateActivityFeed(node,"Unshared",service);
 							}
 						}
 					}
@@ -1363,7 +1373,30 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 	
-	private void cleanAfterRestart(){
+	@Async
+	private void sendUserNotification(String message){
+		getUserFeedback().showNotification(message);
+	}
+	
+	@Async
+	private void updateActivityFeed(IIdentity target, String verb, Service service){
+		
+		ICis remoteCis = getCisManager().getCis(target.getJid());
+		
+		IActivity activity = remoteCis.getActivityFeed().getEmptyIActivity();
+		activity.setActor(getCommMngr().getIdManager().getThisNetworkNode().getJid());
+		activity.setObject(service.getServiceName());
+		activity.setTarget(target.getJid());
+		activity.setVerb(verb);
+		IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
+		remoteCis.getActivityFeed().addActivity(activity, cisCallback );
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Updated ActivityFeed for " + remoteCis.getCisId());
+	}
+	
+	@Override
+	public void cleanAfterRestart(){
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Cleaning and Restarting. First we try to restore already installed third party client!");
@@ -1389,31 +1422,39 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Attempting to reinstall 3p client: " + thirdPartyClient.getServiceName());
 					}
 							
-					String bundleLocation = thirdPartyClient.getServiceLocation();
+					URI bundleLocation = new URI(thirdPartyClient.getServiceLocation());
 		
-					Future<ServiceControlResult> asyncResult = installService(new URL("file://"+bundleLocation));
-					ServiceControlResult result = asyncResult.get();
+					File localBundle = new File(bundleLocation);
+					if(localBundle.exists()){
+						Future<ServiceControlResult> asyncResult = installService(bundleLocation.toURL());
+						ServiceControlResult result = asyncResult.get();
+									
+						if(result.getMessage() == ResultMessage.SUCCESS){
 								
-					if(result.getMessage() == ResultMessage.SUCCESS){
+							// We get the service from the registry
+							Service newService = getServiceReg().retrieveService(result.getServiceId());
+								
+							ServiceInstance newServiceInstance = newService.getServiceInstance();
+							newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getFullJid());
+							newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
 							
-						// We get the service from the registry
-						Service newService = getServiceReg().retrieveService(result.getServiceId());
+							ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
+							newServImpl.setServiceClient(bundleLocation.toString());
+							newServiceInstance.setServiceImpl(newServImpl);
+							newService.setServiceInstance(newServiceInstance);
 							
-						ServiceInstance newServiceInstance = newService.getServiceInstance();
-						newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getFullJid());
-						newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
-						ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
-						newServImpl.setServiceClient(bundleLocation);
-						newServiceInstance.setServiceImpl(newServImpl);
-						newService.setServiceInstance(newServiceInstance);
-						getServiceReg().updateRegisteredService(newService);
+							getServiceReg().updateRegisteredService(newService);
+								
+							if(logger.isDebugEnabled())
+								logger.debug("Installed shared third-party service client for " + newService.getServiceName());
 							
-						if(logger.isDebugEnabled())
-							logger.debug("Installed shared third-party service client for " + newService.getServiceName());
-						
+						} else{
+							if(logger.isDebugEnabled())
+								logger.debug("Installation of client for "+ thirdPartyClient.getServiceName() +" was not successful");
+						}
 					} else{
 						if(logger.isDebugEnabled())
-							logger.debug("Installation of client for "+ thirdPartyClient.getServiceName() +" was not successful");
+							logger.debug("Bundle for " + thirdPartyClient.getServiceName() + " can't be found at: " + bundleLocation);
 					}
 					
 				} 
