@@ -24,8 +24,12 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.monitor;
 
+import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +41,7 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
@@ -61,9 +66,14 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Autowired(required=true)
 	private ITrustEvidenceCollector trustEvidenceCollector;
 	
+	@Autowired(required=false)
 	private ICtxBroker ctxBroker;
 	
 	private final IIdentity ownerId;
+	
+	private final Set<String> friends = new CopyOnWriteArraySet<String>();
+	
+	private final Set<String> communities = new CopyOnWriteArraySet<String>();
 	
 	/** The executor service. */
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -103,11 +113,13 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	 */
 	@Override
 	public void onModification(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
+		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received MODIFIED event " + event);
 		
-		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType()))
+		if (CtxAssociationTypes.IS_FRIENDS_WITH.equals(event.getId().getType()))
+			this.executorService.execute(new CssFriendshipHandler(event.getId()));
+		else if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType()))
 			this.executorService.execute(new CisMembershipHandler(event.getId()));
 	}
 
@@ -121,14 +133,101 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			LOG.debug("Received REMOVED event " + event);
 	}
 	
-	@Autowired(required=false)
-	void setCtxBroker(ICtxBroker ctxBroker)	throws Exception {
+	/**
+	 * This method is called when the {@link ICtxBroker} service is bound.
+	 * 
+	 * @param ctxBroker
+	 *            the {@link ICtxBroker} service that was bound
+	 * @param props
+	 *            the set of properties that the {@link ICtxBroker} service
+	 *            was registered with
+	 */
+	void bindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props)
+			throws Exception {
 		
-		this.ctxBroker = ctxBroker;
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering for context changes related to CSS '"
-					+ ownerId + "'");
-		this.ctxBroker.registerForChanges(this, this.ownerId);
+		LOG.info("Binding service reference " + ctxBroker);
+		this.executorService.submit(new Initialiser()).get();
+	}
+	
+	/**
+	 * This method is called when the {@link ICtxBroker} service is unbound.
+	 * 
+	 * @param ctxBroker
+	 *            the {@link ICtxBroker} service that was unbound
+	 * @param props
+	 *            the set of properties that the {@link ICtxBroker} service
+	 *            was registered with
+	 */
+	void unbindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props) {
+		
+		LOG.info("Unbinding service reference " + ctxBroker);
+	}
+	
+	private class CssFriendshipHandler implements Runnable {
+
+		private final CtxIdentifier ctxId;
+		
+		private CssFriendshipHandler(CtxIdentifier ctxId) {
+			
+			this.ctxId = ctxId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final CtxAssociation isFriendsWith = (CtxAssociation) ctxBroker.retrieve(ctxId).get();
+				if (isFriendsWith == null) {
+					LOG.error("Could not handle CSS friendship change: "
+							+ "Could not retrieve '" + this.ctxId + "'");
+					return;
+				}
+				final Set<String> currentFriends = new HashSet<String>();
+				for (final CtxEntityIdentifier cisCtxId : isFriendsWith.getChildEntities())
+					currentFriends.add(cisCtxId.getOwnerId());
+				// find friends the user is no long member of
+				final Set<String> oldFriends = new HashSet<String>(friends);
+				oldFriends.removeAll(currentFriends);
+				// find new friends the user is member of
+				final Set<String> newFriends = new HashSet<String>(currentFriends);
+				newFriends.removeAll(friends);
+				// update friends the user is member of
+				friends.clear();
+				friends.addAll(currentFriends);
+				
+				for (final String oldFriend : oldFriends) {
+					
+					final TrustedEntityId teid = new TrustedEntityId(
+							isFriendsWith.getParentEntity().getOwnerId(), TrustedEntityType.CSS, oldFriend);
+					final TrustEvidenceType type = TrustEvidenceType.UNFRIENDED_USER;
+					final Date ts = isFriendsWith.getLastModified();
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Adding direct trust evidence: teid="
+								+ teid + ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+				}
+
+				for (final String newFriend : newFriends) {
+					
+					final TrustedEntityId teid = new TrustedEntityId(
+							isFriendsWith.getParentEntity().getOwnerId(), TrustedEntityType.CSS, newFriend);
+					final TrustEvidenceType type = TrustEvidenceType.FRIENDED_USER;
+					final Date ts = isFriendsWith.getLastModified();
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Adding direct trust evidence: teid="
+								+ teid + ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+				}
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CSS friendship change: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
 	}
 	
 	private class CisMembershipHandler implements Runnable {
@@ -153,18 +252,87 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 							+ "Could not retrieve '" + this.ctxId + "'");
 					return;
 				}
-				final Set<TrustedEntityId> cisTeids = new HashSet<TrustedEntityId>();
+				final Set<String> currentCommunities = new HashSet<String>();
 				for (final CtxEntityIdentifier cisCtxId : isMemberOf.getChildEntities())
-					cisTeids.add(new TrustedEntityId(isMemberOf.getParentEntity().getOwnerId(),
-							TrustedEntityType.CIS, cisCtxId.getOwnerId()));
-				for (final TrustedEntityId cisTeid : cisTeids)
-					trustEvidenceCollector.addDirectEvidence(cisTeid, TrustEvidenceType.JOINED_COMMUNITY,
-						isMemberOf.getLastModified(), null);
+					currentCommunities.add(cisCtxId.getOwnerId());
+				// find communities the user is no long member of
+				final Set<String> oldCommunities = new HashSet<String>(communities);
+				oldCommunities.removeAll(currentCommunities);
+				// find new communities the user is member of
+				final Set<String> newCommunities = new HashSet<String>(currentCommunities);
+				newCommunities.removeAll(communities);
+				// update communities the user is member of
+				communities.clear();
+				communities.addAll(currentCommunities);
+				
+				for (final String oldCommunity : oldCommunities) {
+					
+					final TrustedEntityId teid = new TrustedEntityId(
+							isMemberOf.getParentEntity().getOwnerId(), TrustedEntityType.CIS, oldCommunity);
+					final TrustEvidenceType type = TrustEvidenceType.LEFT_COMMUNITY;
+					final Date ts = isMemberOf.getLastModified();
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Adding direct trust evidence: teid="
+								+ teid + ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+				}
+
+				for (final String newCommunity : newCommunities) {
+					
+					final TrustedEntityId teid = new TrustedEntityId(
+							isMemberOf.getParentEntity().getOwnerId(), TrustedEntityType.CIS, newCommunity);
+					final TrustEvidenceType type = TrustEvidenceType.JOINED_COMMUNITY;
+					final Date ts = isMemberOf.getLastModified();
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Adding direct trust evidence: teid="
+								+ teid + ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+				}
+						
 			} catch (Exception e) {
 				
 				LOG.error("Could not handle CIS membership change: " 
 						+ e.getLocalizedMessage(), e);
 			}
 		}	
+	}
+	
+	private class Initialiser implements Callable<Void> {
+		
+		/*
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		@Override
+		public Void call() throws Exception {
+			
+			final IndividualCtxEntity ownerEnt = ctxBroker.retrieveIndividualEntity(ownerId).get();
+			// init friends set
+			if (LOG.isInfoEnabled())
+				LOG.info("Acquiring friends of CSS '" + ownerId + "'");
+			if (ownerEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().hasNext()) {
+				
+				final CtxAssociation isFriendsWith = (CtxAssociation) 
+						ctxBroker.retrieve(ownerEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().next()).get();
+				for (final CtxEntityIdentifier friendEntId : isFriendsWith.childEntities)
+					friends.add(friendEntId.getOwnerId());
+			}
+			// init communitites set
+			if (LOG.isInfoEnabled())
+				LOG.info("Acquiring communities of CSS '" + ownerId + "'");
+			if (ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().hasNext()) {
+
+				final CtxAssociation isMemberOf = (CtxAssociation) 
+						ctxBroker.retrieve(ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+				for (final CtxEntityIdentifier friendEntId : isMemberOf.childEntities)
+					communities.add(friendEntId.getOwnerId());
+			}
+		
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering for context changes related to CSS '"
+						+ ownerId + "'");
+			ctxBroker.registerForChanges(CtxTrustEvidenceMonitor.this, ownerId);
+			
+			return null;
+		}
 	}
 }
