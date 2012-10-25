@@ -58,7 +58,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class ACtxIdentifier extends DataIdentifier implements Parcelable {
+public abstract class ACtxIdentifier extends DataIdentifier implements Parcelable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
@@ -122,7 +122,7 @@ public class ACtxIdentifier extends DataIdentifier implements Parcelable {
     	out.writeLong(objectNumber);
     }
 
-    public static final Parcelable.Creator<ACtxIdentifier> CREATOR
+/*    public static final Parcelable.Creator<ACtxIdentifier> CREATOR
             = new Parcelable.Creator<ACtxIdentifier>() {
         public ACtxIdentifier createFromParcel(Parcel in) {
             return new ACtxIdentifier(in);
@@ -131,9 +131,9 @@ public class ACtxIdentifier extends DataIdentifier implements Parcelable {
         public ACtxIdentifier[] newArray(int size) {
             return new ACtxIdentifier[size];
         }
-    };
+    };*/
     
-    private ACtxIdentifier(Parcel in) {
+    protected ACtxIdentifier(Parcel in) {
     	ownerId = in.readString();
 
     	try {

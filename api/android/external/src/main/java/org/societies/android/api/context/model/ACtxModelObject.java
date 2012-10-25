@@ -41,7 +41,7 @@ import android.os.Parcelable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class ACtxModelObject implements Parcelable {
+public abstract class ACtxModelObject implements Parcelable {
 
 	/** The identifier of this context model object. */
 	private ACtxIdentifier id;
@@ -65,7 +65,7 @@ public class ACtxModelObject implements Parcelable {
       
   }
 
-    public static final Parcelable.Creator<ACtxModelObject> CREATOR = new Parcelable.Creator<ACtxModelObject>() {
+/*    public static final Parcelable.Creator<ACtxModelObject> CREATOR = new Parcelable.Creator<ACtxModelObject>() {
         public ACtxModelObject createFromParcel(Parcel in) {
             return new ACtxModelObject(in);
         }
@@ -73,9 +73,9 @@ public class ACtxModelObject implements Parcelable {
         public ACtxModelObject[] newArray(int size) {
             return new ACtxModelObject[size];
         }
-    };
+    };*/
        
-    private ACtxModelObject(Parcel in) {
+    protected ACtxModelObject(Parcel in) {
 //        mData = in.readInt();
     	id = in.readParcelable(ACtxIdentifier.class.getClassLoader());
     	lastModified.setTime(in.readLong());
@@ -88,7 +88,7 @@ public class ACtxModelObject implements Parcelable {
 	 * @param id
 	 *            the identifier of the newly created context model object
 	 */
-	ACtxModelObject(ACtxIdentifier id) {
+	protected ACtxModelObject(ACtxIdentifier id) {
 		
 		this.id = id;
 	}
