@@ -181,12 +181,12 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 
 
 	public void addActivity(IActivity activity) {
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		newact.setOwnerId(this.id);
+		list.add(newact);
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
 		try{
-			list.add(newact);
 			session.save(newact);
 			//session.save(this);
 			t.commit();
@@ -201,7 +201,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		}		
 	}
 
-
+	// TODO: be aware that this code is never committing!!
 	synchronized public int cleanupFeed(String criteria) {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
@@ -290,10 +290,10 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 
 	public boolean deleteActivity(IActivity activity) {
-        Session session = sessionFactory.openSession();
 		if(!list.contains(activity))
 			return false;
 		boolean ret = list.remove(activity);
+		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
         try {
             session.delete(activity);

@@ -200,13 +200,13 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	public void addActivity(IActivity activity) {
 //        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
         boolean err = false;
-		Session session = this.sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		Activity newAct = new Activity(activity);
 		newAct.setPublished(Long.toString(new Date().getTime())); // NOTICE THAT THE TIME IS BEING SET IN THE SERVER
         LOG.info("adding activity with id: "+this.id);
         newAct.setOwnerId(this.id);
         long actv_id = 0;
+		Session session = this.sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
 		try{
 			actv_id = (Long) session.save(newAct);
 			t.commit();
@@ -300,10 +300,10 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
+        Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
 		try{
 			for(ActivityEntry act : castedList){
 				pp.setIndex(0);
