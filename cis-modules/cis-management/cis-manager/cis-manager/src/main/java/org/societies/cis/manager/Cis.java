@@ -99,10 +99,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
 							"http://societies.org/api/schema/activityfeed",
 					  		"http://societies.org/api/schema/cis/community"));
-	//		.singletonList("http://societies.org/api/schema/cis/community");
 	@Transient
 	private final static List<String> PACKAGES = Collections
-			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 			"org.societies.api.schema.activityfeed",
 		"org.societies.api.schema.cis.community"));
