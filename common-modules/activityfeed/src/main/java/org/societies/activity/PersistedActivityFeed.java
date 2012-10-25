@@ -340,6 +340,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 			return a.getUrl();
 		return a.getContent();
 	}
+	
+	// TODO: dont we need to use a transaction here
 	public void clear(){
         Session session = sessionFactory.openSession();
         try{

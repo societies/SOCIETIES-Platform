@@ -298,7 +298,9 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
         try {
             session.delete(activity);
         } catch (Exception e){
-
+			t.rollback();
+			LOG.warn("delete activity failed, rolling back");
+			ret = false;
         } finally {
             if(session!=null)
                 session.close();
@@ -361,14 +363,17 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	public void clear(){
         Session session = sessionFactory.openSession();
+        Transaction t = null;
         try{
             for(Activity act : list){
-                Transaction t = session.beginTransaction();
+                t = session.beginTransaction();
                 session.delete(act);
                 t.commit();
             }
         } catch (Exception e){
-
+			if(null!= t) t.rollback();
+			LOG.warn("clear failed, rolling back");// TODO: revise as Im not sure if this would rollback 
+			//a single activitiy clean or the whole, nor I know what is the behavior we would like to see here
         } finally {
             if(session!=null)
                 session.close();
