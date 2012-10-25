@@ -76,6 +76,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.services.ServiceMgmtEventType;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * 
@@ -344,7 +345,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
-					updateSecurityPrivacy(service);
+					updateSecurityPrivacy(service,serBndl);
 					
 					if(!service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
 						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
@@ -356,7 +357,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 					if(existService.getServiceStatus()==ServiceStatus.STARTED){
 						if(log.isDebugEnabled())
 							log.debug("This is a restart! We need to update everything!");
-						updateSecurityPrivacy(service);
+						updateSecurityPrivacy(service,serBndl);
 					} else{
 						if(log.isDebugEnabled())
 							log.debug("Just restarting the service, no need to update stuff yet.");
@@ -570,7 +571,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		 
 	}
 	
-	private void updateSecurityPrivacy(Service service){
+	private void updateSecurityPrivacy(Service service, Bundle bundle){
 		
 		try{
 			if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
@@ -598,10 +599,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 				//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
 				
 				String privacyLocation;
-				if(service.getServiceLocation().endsWith("/"))
-					privacyLocation = service.getServiceLocation() + "privacy-policy.xml";
+				if(bundle.getLocation().endsWith("/"))
+					privacyLocation = bundle.getLocation() + "privacy-policy.xml";
 				else
-					privacyLocation = service.getServiceLocation() + "/privacy-policy.xml";
+					privacyLocation = bundle.getLocation() + "/privacy-policy.xml";
 					
 				if(log.isDebugEnabled())
 					log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
@@ -630,6 +631,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 	}
 	
+	@Async
 	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
 		
 		if(log.isDebugEnabled())

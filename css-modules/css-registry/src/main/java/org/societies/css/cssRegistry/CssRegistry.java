@@ -433,7 +433,8 @@ public class CssRegistry implements ICssRegistry {
 				}
 			}
 
-			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
+			if ((cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) && (cssRequest.getRequestStatus() != CssRequestStatusType.ACCEPTED)) {
+				log.info("updateCssRequestRecord getRequestStatus() = " +cssRequest.getRequestStatus());
 				filterRegistryEntry.setRequestStatus(cssRequest
 						.getRequestStatus().value());
 

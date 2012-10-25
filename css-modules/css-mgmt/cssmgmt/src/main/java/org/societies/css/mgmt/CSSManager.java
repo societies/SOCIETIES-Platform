@@ -1455,6 +1455,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		// remotely, it will be an accepted of the request we sent
 			try {
 				cssRegistry.updateCssFriendRequestRecord(request);
+				cssRegistry.updateCssRequestRecord(request);
 				// internal eventing for notifying of new Friend
 				LOG.info("Generating CSS_Friended_Event to notify CSS Friend Request has been accepted");
 				if(this.getEventMgr() != null){
@@ -1516,5 +1517,48 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		}
 		return retValue;
 	}
+	
+	public void declineCssFriendRequest(CssRequest request) {
+		
+	
+	LOG.info("Decline Css Friend Request has been called");
+	LOG.info("declineCssFriendRequest status: " +request.getRequestStatus());
+	LOG.info("declineCssFriendRequest Origin: " +request.getOrigin());
+	LOG.info("declineCssFriendRequest ID: " +request.getCssIdentity());
+		
+	
+			try {
+				cssRegistry.updateCssFriendRequestRecord(request);
+								
+				
+				} catch (CssRegistrationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+			// If this was initiated locally then inform remote css
+			// We only want to sent messages to remote Css's for this function if we initiated the call locally
+			if (request.getOrigin() == CssRequestOrigin.LOCAL)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					//cssManagerRemote.acceptCssFriendRequest(request); 
+					cssManagerRemote.declineCssFriendRequest(request);
+			}
+			if (request.getOrigin() == CssRequestOrigin.REMOTE)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					cssManagerRemote.updateCssFriendRequest(request); 
+			}
+		}
 }
 
