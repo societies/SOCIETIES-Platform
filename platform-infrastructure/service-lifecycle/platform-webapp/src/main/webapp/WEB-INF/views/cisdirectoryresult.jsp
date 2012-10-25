@@ -42,7 +42,9 @@
         	<td>${advert.cssownerid}</td>
             <td>${advert.type}</td>
             <td>${advert.id}</td> 
-            <td><input type="button" value="join" onclick="updateForm('${advert.id}')" ></td> 
+            <td><input type="button" value="join" onclick="updateForm('${advert.id}')" >
+            <a href="cis-privacy-policy-show.html?cisId=${advert.id}&cisOwnerId=${advert.cssownerid}" class="privacy-policy-handler">Privacy Policy</a>
+            </td> 
            
         </tr>
     </xc:forEach>
