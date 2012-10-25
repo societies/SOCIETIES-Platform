@@ -162,7 +162,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote = null;
 
-	IServiceDiscoveryRemote iServDiscRemote = null;
+	//IServiceDiscoveryRemote iServDiscRemote = null;
 	IServiceControlRemote iServCtrlRemote = null;
 	private IPrivacyPolicyManager privacyPolicyManager = null;
 	private IEventMgr eventMgr = null;
@@ -217,12 +217,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 		this.internalCtxBroker = internalCtxBroker;
 	}
-	public IServiceDiscoveryRemote getiServDiscRemote() {
+	/*public IServiceDiscoveryRemote getiServDiscRemote() {
 		return iServDiscRemote;
 	}
 	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
 		this.iServDiscRemote = iServDiscRemote;
-	}
+	}*/
 	public IServiceControlRemote getiServCtrlRemote() {
 		return iServCtrlRemote;
 	}
@@ -293,7 +293,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient,
-					 this.iServCtrlRemote, this.privacyDataManager,this.iServDiscRemote);
+					 this.iServCtrlRemote, this.privacyDataManager);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -481,7 +481,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
-		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
+		this.ccmFactory, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
 		,description,cisCriteria,this.pubsubClient);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
@@ -1613,10 +1613,10 @@ public class JoinCallBack implements ICisManagerCallback{
 				return false;
 			}
 			
-			if (null == iServDiscRemote) {
+			/*if (null == iServDiscRemote) {
 				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
 				return false;
-			}
+			}*/
 			if (null == iServCtrlRemote) {
 				LOG.info("[Dependency Injection] Missing IServiceControlRemote");
 				return false;

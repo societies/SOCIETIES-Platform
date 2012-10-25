@@ -139,8 +139,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
-	@Transient
-	IServiceDiscoveryRemote iServDiscRemote = null;
+	//@Transient
+	//IServiceDiscoveryRemote iServDiscRemote = null;
 	@Transient
 	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
@@ -347,13 +347,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.activityFeed = activityFeed;
 	}
 
-	public IServiceDiscoveryRemote getiServDiscRemote() {
+/*	public IServiceDiscoveryRemote getiServDiscRemote() {
 		return iServDiscRemote;
 	}
 
 	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
 		this.iServDiscRemote = iServDiscRemote;
-	}
+	}*/
 
 	public IServiceControlRemote getiServCtrlRemote() {
 		return iServCtrlRemote;
@@ -393,7 +393,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	//  constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
-			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,
+			,IServiceControlRemote iServCtrlRemote,
 			IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
 			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
 			PubsubClient pubsubClient) {
@@ -407,7 +407,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		
 		this.iServCtrlRemote = iServCtrlRemote;
-		this.iServDiscRemote = iServDiscRemote;
 		
 		membershipCritOnDb= new HashSet<String>();
 		
@@ -516,12 +515,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient,
-			IServiceControlRemote iServCtrlRemote, IPrivacyDataManager	privacyDataManager, IServiceDiscoveryRemote iServDiscRemote){
+			IServiceControlRemote iServCtrlRemote, IPrivacyDataManager	privacyDataManager){
 				
 		this.psc = pubsubClient;
 		this.iServCtrlRemote = iServCtrlRemote;
 		
 		this.privacyPolicyManager = privacyPolicyManager;
+		this.privacyDataManager = privacyDataManager;
 		// first Ill try without members
 		
 
@@ -964,7 +964,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 						return result;
 					}
 				}
-				
+				else{
+					if(null == this.privacyDataManager)LOG.info("privacy data manager is null");
+					else LOG.info("requestor is null");
+				}
+				LOG.info("permission was granted");
 				Set<CisParticipant> s = this.getMembersCss();
 				Iterator<CisParticipant> it = s.iterator();
 				
@@ -1345,7 +1349,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 				return;
 			}
 		}
-		
+		else{
+			LOG.info("Privacy data manager is null");
+		}
+		LOG.info("permission was granted");
 		// -- Retrieve the list of members
 		getListOfMembers(callback);
 	}
