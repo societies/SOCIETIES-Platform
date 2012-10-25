@@ -177,9 +177,10 @@ public class CssSuggestedFriendsController {
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
 			
+			
 			for (int index = 0; index < allcssDetails.size(); index++) {
 				// ignore myself!
-
+				
 				if (!allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(commManager.getIdManager().getThisNetworkNode().getBareJid())) 
 				{
 					// skip people we are already friends with	
@@ -188,12 +189,13 @@ public class CssSuggestedFriendsController {
 						
 						for ( int indexFR = 0; indexFR < friendReq.size(); indexFR++)
 						{
-							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()))
+							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssDetails.get(index).getStatus() != CssRequestStatusType.DENIED))
 							{
 								// We have a pending FR from this people, change status. This should be done in the CssManager 
 								// but not for the pilot
 								allcssDetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 								indexFR = friendReq.size();
+								
 							}
 						}
 						
@@ -300,21 +302,23 @@ public class CssSuggestedFriendsController {
 			
 			for (int index = 0; index < allcssDetails.size(); index++) {
 				// ignore myself!
-
+				
 				if (!allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(commManager.getIdManager().getThisNetworkNode().getBareJid())) 
 				{
+					//Put the check for DENIED here on the outside -> see if this works
 					// skip people we are already friends with	
 					if (allcssDetails.get(index).getStatus() != CssRequestStatusType.ACCEPTED) 
 					{
 						
 						for ( int indexFR = 0; indexFR < friendReq.size(); indexFR++)
 						{
-							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()))
+							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssDetails.get(index).getStatus() != CssRequestStatusType.DENIED))
 							{
 								// We have a pending FR from this people, change status. This should be done in the CssManager 
 								// but not for the pilot
 								allcssDetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 								indexFR = friendReq.size();
+								
 							}
 						}
 						

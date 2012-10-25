@@ -77,7 +77,7 @@
         				<td><input type="button" value="Send Friend Request" onclick="updateForm('${otherFriend.resultCssAdvertisementRecord.id}','sendfr')" ></td> 	       	       
         			</xc:if>
         			<xc:if test="${otherFriend.status=='DENIED'}">
-        				<td><input type="button" value="Send Friend Request" onclick="updateForm('${otherFriend.resultCssAdvertisementRecord.id}','sendfr')" ></td> 	       	       
+        				<td><input type="button" value="Request Declined Send Again?" onclick="updateForm('${otherFriend.resultCssAdvertisementRecord.id}','sendfr')" ></td> 	       	       
         			</xc:if>
         		</tr>
     			</xc:forEach>

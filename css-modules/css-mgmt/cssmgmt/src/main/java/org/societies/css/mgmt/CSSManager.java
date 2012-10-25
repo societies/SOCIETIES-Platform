@@ -1442,6 +1442,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		// remotely, it will be an accepted of the request we sent
 			try {
 				cssRegistry.updateCssFriendRequestRecord(request);
+				cssRegistry.updateCssRequestRecord(request);
 				// internal eventing for notifying of new Friend
 				LOG.info("Generating CSS_Friended_Event to notify CSS Friend Request has been accepted");
 				if(this.getEventMgr() != null){
