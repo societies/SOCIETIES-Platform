@@ -14,6 +14,7 @@ var CSSFriendsServices = {
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendRequests").html(data.length);
+			$("span#myFriendRequests").css({ visibility: "visible"});
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendRequestsListUL').children().length >1 )
 				$('ul#FriendRequestsListUL li:last').remove();
@@ -47,6 +48,7 @@ var CSSFriendsServices = {
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendsCount").html(data.length);
+			$("span#myFriendsCount").css({ visibility: "visible"});
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendsListDiv').children().length >1 )
 				$('ul#FriendsListDiv li:last').remove();
@@ -107,6 +109,8 @@ var CSSFriendsServices = {
 		function success(data) {
 			//UPDATE COUNT
 			$("span#suggestedFriendsCount").html(data.length);
+			$("span#suggestedFriendsCount").css({ visibility: "visible"});			
+			//DISPLAY RECORDS
 			CSSFriendsServices.displayCSSAdvertRecords(data);
 		}
 		
