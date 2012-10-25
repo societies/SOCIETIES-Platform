@@ -11,7 +11,9 @@ var CSSFriendsServices = {
 	 * @returns null
 	 */
 	refreshFriendRequests: function() {
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#myFriendRequests").html(data.length);
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendRequestsListUL').children().length >1 )
 				$('ul#FriendRequestsListUL li:last').remove();
@@ -42,7 +44,9 @@ var CSSFriendsServices = {
 	refreshFriendList: function() {
 		console.log("refreshFriendList");
 
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#myFriendsCount").html(data.length);
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendsListDiv').children().length >1 )
 				$('ul#FriendsListDiv li:last').remove();
@@ -100,7 +104,9 @@ var CSSFriendsServices = {
 	refreshSuggestedFriendsList: function() {
 		console.log("Refreshing Suggested friends");
 
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#suggestedFriendsCount").html(data.length);
 			CSSFriendsServices.displayCSSAdvertRecords(data);
 		}
 		
