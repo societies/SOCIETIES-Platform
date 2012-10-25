@@ -38,6 +38,18 @@ public enum TrustEvidenceType {
 	RATED,
 	
 	/**
+	 * The enum constant for friending users.
+	 * @since 0.4.1
+	 */
+	FRIENDED_USER,
+	
+	/**
+	 * The enum constant for unfriending users.
+	 * @since 0.4.1
+	 */
+	UNFRIENDED_USER,
+	
+	/**
 	 * The enum constant for joining communities.
 	 */
 	JOINED_COMMUNITY,

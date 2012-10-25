@@ -18,6 +18,7 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 
 
 /**
@@ -324,6 +325,12 @@ public class ServiceModelUtils {
 		return serResId;
 	}
 	
+	public static boolean hasClient(ServiceResourceIdentifier serviceId, IServiceDiscovery serviceDiscovery){
+		
+		return !getClients(serviceId,serviceDiscovery).isEmpty();
+
+	}
+	
 	public static List<Service> getClients(ServiceResourceIdentifier service, IServiceDiscovery serviceDiscovery){
 		
 		List<Service> clients = new ArrayList<Service>();
@@ -332,9 +339,10 @@ public class ServiceModelUtils {
 		ServiceInstance serviceInstance = filter.getServiceInstance();
 		serviceInstance.setParentIdentifier(service);
 		filter.setServiceInstance(serviceInstance);
-		Future<List<Service>> clientAsync;
+		filter.setServiceType(ServiceType.THIRD_PARTY_CLIENT);
+		
 		try {
-			clientAsync = serviceDiscovery.searchServices(filter);
+			Future<List<Service>> clientAsync = serviceDiscovery.searchServices(filter);
 			clients = clientAsync.get();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -368,5 +376,6 @@ public class ServiceModelUtils {
 		
 		return serviceId.getServiceInstanceIdentifier() + "_" + serviceId.getIdentifier().toString();
 	}
+	
 
 }

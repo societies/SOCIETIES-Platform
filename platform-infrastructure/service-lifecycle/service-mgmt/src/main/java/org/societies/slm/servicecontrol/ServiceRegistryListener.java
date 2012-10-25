@@ -29,7 +29,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -74,6 +76,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.services.ServiceMgmtEventType;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * 
@@ -120,7 +123,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 	public void setServiceControl(IServiceControl serviceControl){
 		this.serviceControl = serviceControl;
 	}
-	
 	
 	  public INegotiationProviderServiceMgmt getNegotiationProvider(){
 		return negotiationProvider;
@@ -171,6 +173,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("Bundle Listener Registered");
 		this.bctx.addBundleListener(this);
 		
+		getServiceControl().cleanAfterRestart();
 		
 	}
 
@@ -252,7 +255,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setCssJid(myNode.getBareJid());
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
-			service.setServiceLocation(serBndl.getLocation());
+			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
+				service.setServiceLocation(serBndl.getLocation());
 		}
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
@@ -341,7 +345,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
-					updateSecurityPrivacy(service);
+					updateSecurityPrivacy(service,serBndl);
 					
 					if(!service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
 						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
@@ -353,7 +357,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 					if(existService.getServiceStatus()==ServiceStatus.STARTED){
 						if(log.isDebugEnabled())
 							log.debug("This is a restart! We need to update everything!");
-						updateSecurityPrivacy(service);
+						updateSecurityPrivacy(service,serBndl);
 					} else{
 						if(log.isDebugEnabled())
 							log.debug("Just restarting the service, no need to update stuff yet.");
@@ -567,7 +571,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		 
 	}
 	
-	private void updateSecurityPrivacy(Service service){
+	private void updateSecurityPrivacy(Service service, Bundle bundle){
 		
 		try{
 			if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
@@ -595,10 +599,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 				//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
 				
 				String privacyLocation;
-				if(service.getServiceLocation().endsWith("/"))
-					privacyLocation = service.getServiceLocation() + "privacy-policy.xml";
+				if(bundle.getLocation().endsWith("/"))
+					privacyLocation = bundle.getLocation() + "privacy-policy.xml";
 				else
-					privacyLocation = service.getServiceLocation() + "/privacy-policy.xml";
+					privacyLocation = bundle.getLocation() + "/privacy-policy.xml";
 					
 				if(log.isDebugEnabled())
 					log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
@@ -627,6 +631,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 	}
 	
+	@Async
 	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
 		
 		if(log.isDebugEnabled())
@@ -654,4 +659,5 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.error("Error sending event!");
 		}
 	}
+	
 }

@@ -115,7 +115,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICommManager mockCISendpoint3;
 	private IPrivacyPolicyManager mockPrivacyPolicyManager;
 	private IEventMgr mockEventMgr;
-	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
 	private IPrivacyDataManager mockIPrivacyDataManager;
 	private ICtxBroker mockContextBroker;
@@ -251,7 +250,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	void setUpFactory() throws Exception {
 		System.out.println("in setupFactory!");
 		mockCcmFactory = mock(ICISCommunicationMgrFactory.class);
-		mockIServDiscRemote = mock(IServiceDiscoveryRemote.class);
 		mockIServCtrlRemote = mock(IServiceControlRemote.class);
 		mockPrivacyPolicyManager = mock(IPrivacyPolicyManager.class);		
 		mockEventMgr = mock(IEventMgr.class);
@@ -1115,7 +1113,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	private void setMockingOnCISManager(CisManager cisManagerUnderTest){
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
+		cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
 		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setPubsubClient(mockPubSubClient);
 		cisManagerUnderTest.setPrivacyDataManager(mockIPrivacyDataManager);
