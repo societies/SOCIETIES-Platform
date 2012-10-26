@@ -168,14 +168,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 	
 	@Override
-	public void setBundleContext(BundleContext bundleContext) {
-		
+	public void setBundleContext(BundleContext bundleContext) {	
 		this.bundleContext = bundleContext;
 
-		if(logger.isDebugEnabled()) logger.debug("BundleContextSet");
 	}
 
-	
+
 	@Async
 	@Override
 	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
@@ -449,7 +447,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled()) 
 						logger.debug("Problem installing device!");
 					returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
 
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
@@ -458,7 +456,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Device installed with id: " + deviceId);
 					returnResult.setServiceId(ServiceModelUtils.generateServiceResourceIdentifierForDevice(serviceToInstall, deviceId));
 					returnResult.setMessage(ResultMessage.SUCCESS);
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
 
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				}
@@ -486,7 +484,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
-				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
 
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			} 
@@ -496,7 +494,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("Negotiation was not successful!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_FAILED);
-				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
 
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}	
@@ -504,7 +502,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled())
 					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
 			
-			getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' : negotiation success!");
+			//sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' : negotiation success!");
 
 			// Now install the client!
 			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
@@ -524,7 +522,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
-				getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
 				sendEvent(ServiceMgmtEventType.NEW_SERVICE,serviceToInstall);
 				sendEvent(ServiceMgmtEventType.SERVICE_STARTED,serviceToInstall);
 				
@@ -543,7 +541,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("No client url returned from negotiation!");
 					returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: No file to install returned!");
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: No file to install returned!");
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
 				}
@@ -558,7 +556,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Problem with downloading jar, no file available!");
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: Failure to download jar!");
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: Failure to download jar!");
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				}
 				
@@ -570,7 +568,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Error with installation! ");
 						
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
 
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				} 
@@ -595,7 +593,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					logger.info("Installed shared third-party service client!");
 					returnResult.setServiceId(result.getServiceId());
 					returnResult.setMessage(result.getMessage());
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
 					sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
 					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
 					
@@ -603,7 +601,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Installation of client was not successful");
 					returnResult.setMessage(result.getMessage());
-					getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + result.getMessage());
+					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + result.getMessage());
 
 				}
 	
@@ -613,7 +611,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 		
 		} catch (Exception ex) {
-			getUserFeedback().showNotification("Service '"+serviceToInstall.getServiceName()+"' : Problems!");
+			sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' : Problems!");
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
 			ex.printStackTrace();
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
@@ -1129,7 +1127,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					
 					updateActivityFeed(node,"Shared",service);
 					
-					getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
+					sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
 					
 				} else {
 					
@@ -1166,7 +1164,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								logger.debug("Updating ActivityFeed for " + remoteCis.getCisId());
 							
 							updateActivityFeed(node,"Shared",service);
-							getUserFeedback().showNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
+							sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
 
 						}	
 					}				
@@ -1283,6 +1281,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						}
 					} else{
 						updateActivityFeed(node,"Unshared",service);
+						sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + myCIS.getName());
 					}
 		
 					returnResult.setMessage(ResultMessage.SUCCESS);
@@ -1322,6 +1321,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								getServiceReg().unregisterServiceList(servicesList);
 							} else{
 								updateActivityFeed(node,"Unshared",service);
+								sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
 							}
 						}
 					}
@@ -1373,12 +1373,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 	
-	@Async
 	private void sendUserNotification(String message){
 		getUserFeedback().showNotification(message);
 	}
 	
-	@Async
 	private void updateActivityFeed(IIdentity target, String verb, Service service){
 		
 		ICis remoteCis = getCisManager().getCis(target.getJid());
