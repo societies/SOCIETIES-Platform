@@ -104,8 +104,8 @@ var SocietiesXMPPRegistration = {
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#domainServer").val());
 		
 		//Update the login page with XMPP registered values
-		jQuery("#username").val(jQuery("#regUsername").val());
-		jQuery("#password").val(jQuery("#regUserpass").val());
+		jQuery("#loginUsername").val(jQuery("#regUsername").val());
+		jQuery("#loginPassword").val(jQuery("#regUserpass").val());
 		jQuery("#identitydomain").val(jQuery("#domainServer").val());
 
 	},
