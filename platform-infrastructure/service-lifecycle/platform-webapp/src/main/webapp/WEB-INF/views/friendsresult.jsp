@@ -21,13 +21,25 @@
 <h4>${result}</h4>
 <br/>
 <br/>
+<script language="javascript">
+	function updateForm(friendId, method) {    
+		document.forms["friendResForm"]["friendId"].value = friendId;
+		document.forms["friendResForm"]["method"].value = method;
+		document.forms["friendResForm"].submit();
+	} 
+</script>
+
+<form id="friendResForm" name="friendResForm" method="post" action="suggestedfriendspilot.html">
+		<input type="hidden" name="friendId" id="friendId">
+		<input type="hidden" name="method" id="method">
 <Table border="1">
 <tr><td><B>Friend Name</B></td><td><B>CSS Identity</B></td></tr>
 
 	<xc:forEach var="cssfriend" items="${cssfriends}">
         <tr>
         	<td>${cssfriend.getName()}</td>
-        	<td>${cssfriend.getId()}</td>	         	       
+        	<td>${cssfriend.getId()}</td>
+        	<td><input type="button" value="Remove Friend" onclick="updateForm('${cssfriend.getId()}','delete')" ></td>	         	       
         </tr>
     </xc:forEach>
     	

@@ -495,7 +495,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		} catch (Exception e) {
 			if(t!= null)
 				t.rollback();
-			new ServiceNotFoundException(e);
+			throw new ServiceNotFoundException(e);
 		} finally {
 			if(session != null)
 				session.close();

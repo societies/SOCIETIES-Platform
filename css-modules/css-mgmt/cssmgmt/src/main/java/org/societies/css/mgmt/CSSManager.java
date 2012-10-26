@@ -980,6 +980,7 @@ public class CSSManager implements ICSSLocalManager {
 		LOG.info("Request  origin: " +request.getOrigin());
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
