@@ -51,7 +51,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
-	
+
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserContextHistoryManagement.class);
 
@@ -59,9 +59,9 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	private SessionFactory sessionFactory;
 
 	private boolean ctxRecording = true;
-	
+
 	public UserContextHistoryManagement() {
-		
+
 		LOG.info(this.getClass().getName() + " instantiated");
 	}
 
@@ -71,15 +71,15 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 		if (attribute == null)
 			throw new NullPointerException("attribute can't be null");
-		
+
 		if (ctxRecording == false)
 			throw new UserCtxHistoryMgrException("context history recording is disabled");
-		
+
 		CtxHistoryAttribute result = null;
-		
+
 		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
 				.fromCtxAttribute(attribute);
-		
+
 		final Session session = this.sessionFactory.openSession();
 		Transaction tx = null;
 		try {
@@ -90,7 +90,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 					UserCtxHistoryAttributeDAO.class, historyRecordId);
 			result = UserCtxHistoryDAOTranslator.getInstance()
 					.fromUserCtxHistoryAttributeDAO(dao);
-			
+
 		} catch (Exception e) {
 			tx.rollback();
 			throw new IllegalStateException("Could not create history for attribute "
@@ -99,7 +99,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			if (session != null)
 				session.close();
 		}
-			
+
 		return result;
 	}
 
@@ -107,65 +107,65 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public CtxHistoryAttribute createHistoryAttribute (
 			final CtxAttributeIdentifier attrId, final Date date, 
 			final Serializable value, final CtxAttributeValueType valueType) throws CtxException{
-		
+
 		if (attrId == null)
 			throw new NullPointerException("attrId can't be null");
-		
+
 		if (date == null)
 			throw new NullPointerException("date can't be null");
-		
+
 		if (value == null)
 			throw new NullPointerException("value can't be null");
-		
+
 		if (valueType == null)
 			throw new NullPointerException("valueType can't be null");
-	
+
 		if (ctxRecording == false)
 			throw new UserCtxHistoryMgrException("context history recording is disabled");
-		
+
 		CtxHistoryAttribute result = null;
-		
+
 		final String stringValue;
 		final Integer integerValue;
 		final Double doubleValue;
 		final byte[] binaryValue;
-		
+
 		if (valueType.equals(CtxAttributeValueType.STRING)) {
-			
+
 			stringValue = (String) value;
 			integerValue = null;
 			doubleValue = null;
 			binaryValue = null;
 		} else if (valueType.equals(CtxAttributeValueType.INTEGER)) {
-			
+
 			stringValue = null;
 			integerValue = (Integer) value;
 			doubleValue = null;
 			binaryValue = null;
 		} else if (valueType.equals(CtxAttributeValueType.DOUBLE)) {
-			
+
 			stringValue = null;
 			integerValue = null;
 			doubleValue = (Double) value;
 			binaryValue = null;
 		} else if (valueType.equals(CtxAttributeValueType.BINARY)) {
-			
+
 			stringValue = null;
 			integerValue = null;
 			doubleValue = null;
 			binaryValue = (byte[]) value;
 		} else {
-			
+
 			stringValue = null;
 			integerValue = null;
 			doubleValue = null;
 			binaryValue = null;
 		}
-		
+
 		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
 				.fromCtxAttributeProperties(attrId, date, date, stringValue, 
 						integerValue, doubleValue, binaryValue, valueType, null);
-		
+
 		final Session session = this.sessionFactory.openSession();
 		Transaction tx = null;
 		try {
@@ -176,7 +176,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 					UserCtxHistoryAttributeDAO.class, historyRecordId);
 			result = UserCtxHistoryDAOTranslator.getInstance()
 					.fromUserCtxHistoryAttributeDAO(dao);
-			
+
 		} catch (Exception e) {
 			tx.rollback();
 			throw new IllegalStateException("Could not create history for attribute "
@@ -185,11 +185,11 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			if (session != null)
 				session.close();
 		}
-			
+
 		return result;
 	}
 
-	
+
 	@Deprecated
 	@Override
 	public void storeHoCAttribute(CtxAttribute ctxAttribute) throws CtxException{
@@ -197,8 +197,8 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		try {
 			this.createHistoryAttribute(ctxAttribute);
 		} catch (CtxException e) {
-			
-		throw new UserCtxHistoryMgrException("context attribute not stored in context DB"
+
+			throw new UserCtxHistoryMgrException("context attribute not stored in context DB"
 					+ ctxAttribute.getId() + ": " + e.getLocalizedMessage(), e);
 		}	
 	}
@@ -211,7 +211,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	@Override
 	public void disableCtxRecording() {
-		
+
 		ctxRecording =  false;
 
 	}
@@ -226,7 +226,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	// TODO throws UserCtxHistoryException
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(final CtxAttributeIdentifier attrId) throws CtxException{
-		
+
 		if (attrId == null)
 			throw new NullPointerException("attrId can't be null");
 
@@ -247,9 +247,9 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId,
 			final Date startDate, final Date endDate) {
-		
+
 		final List<CtxHistoryAttribute> results = new LinkedList<CtxHistoryAttribute>();
-		
+
 		try {
 			final List<UserCtxHistoryAttributeDAO> historyDAOs = this.retrieve(attrId, startDate, endDate);
 			for (final UserCtxHistoryAttributeDAO historyDAO : historyDAOs)
@@ -342,40 +342,41 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				System.out.println(dao.getHistoryRecordId()+" | "+dao.getId()+" | "+valueSt+" | "+date.getTime());
 			}
 		} catch (Exception e) {
-			
+
 			throw new IllegalStateException("Could not print history of context: "
 					+ e.getLocalizedMessage(), e);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<UserCtxHistoryAttributeDAO> retrieve(
 			final CtxAttributeIdentifier ctxId,	final Date startDate,
 			final Date endDate) throws Exception {
-		
+
 		final List<UserCtxHistoryAttributeDAO> result= new LinkedList<UserCtxHistoryAttributeDAO>();
-		
+
 		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(UserCtxHistoryAttributeDAO.class);
-		
-		if (ctxId != null)
-			criteria.add(Restrictions.eq("ctxId", ctxId));
-		
-		if (startDate != null) 
-			criteria.add(Restrictions.ge("lastUpdated", startDate));
-		
-		if (endDate != null)
-			criteria.add(Restrictions.le("lastUpdated", endDate));
-		
-		criteria.addOrder(Order.asc("lastUpdated"));
-		
 		try {
+			final Criteria criteria = session.createCriteria(UserCtxHistoryAttributeDAO.class);
+
+			if (ctxId != null)
+				criteria.add(Restrictions.eq("ctxId", ctxId));
+
+			if (startDate != null) 
+				criteria.add(Restrictions.ge("lastUpdated", startDate));
+
+			if (endDate != null)
+				criteria.add(Restrictions.le("lastUpdated", endDate));
+
+			criteria.addOrder(Order.asc("lastUpdated"));
+
+
 			result.addAll(criteria.list());
 		} finally {
 			if (session != null)
 				session.close();
 		}
-			
+
 		return result;
 	}
 }
