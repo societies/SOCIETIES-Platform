@@ -73,9 +73,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	//List<MockHistoryData> historyList = null;
 
 	public CAUIDiscovery(){
+		
 		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		//remove after testing
-	//cauiTaskManager = new CAUITaskManager();
+		//cauiTaskManager = new CAUITaskManager();
 
 	}
 
@@ -86,7 +87,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		//System.out.println(this.getClass().getName()+": Got cauiTaskManager");
-		this.cauiTaskManager = cauiTaskManager;
+		//this.cauiTaskManager = cauiTaskManager;
 	}
 
 	public ICtxBroker getCtxBroker() {
@@ -116,15 +117,50 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 	}
 
+	
+	/*
+	 *  
+	 */
+	@Override
+	public UserIntentModelData generateNewUserModel(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
+	
+		UserIntentModelData modelData = null;
+		
+		System.out.println(" generate dictionaries ");
+		LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionaries = this.generateDictionaries(history);
+		System.out.println(" generate dictionaries " +dictionaries);
+				
+		if(dictionaries != null){
+			modelData =	this.generateUIModel(dictionaries);	
+		}
+		
+		if(modelData != null && this.ctxBroker != null){
+			CtxAttribute ctxAttr = storeModelCtxDB(modelData);	
+			LOG.info("model stored under attribute id: "+ctxAttr.getId());
+			LOG.info("modelData "+ modelData.getActionModel());	
+		}
+	
+		return modelData;
+	}
+	
+	
 	@Override
 	public void generateNewUserModel() {
 
 		LOG.debug("start model generation");
-	
+		
+		UserIntentModelData modelData = null;
+		
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
-
-			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
-
+			
+			// 1. retrieve history
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = this.retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
+	    	// 2. generate dictionaries (store them to context) three different dictionaries
+			
+			this.generateNewUserModel(history);
+			
+		
+			/*
 			LOG.info("2. Convert History Data");
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
 						
@@ -133,34 +169,95 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			
 			// step 1 only
 			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = currentActCtxDictionaryAll.get(1);
-			
-			
+				
 			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 			LinkedHashMap<List<String>,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
-			//printTransProbDictionary(trans2ProbDictionary);
-			//LOG.info("5. Assign context to actions");
 			
+			//printTransProbDictionary(trans2ProbDictionary);
+		
+			//LOG.info("5. Assign context to actions");
 			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(currentActCtxDictionary);
-			//LOG.info("5. Generate UserIntentModelData");
-	
+			
+			//LOG.info("6. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
-			//LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
-			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
+			//LOG.info("6a trans2ProbDictionary "+ trans2ProbDictionary);
+			//LOG.info("6a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			//LOG.info("6. result "+modelData.getActionModel());
+			//LOG.info("7. result "+modelData.getActionModel());
 
-			//LOG.info("7. Store UserIntentModelData to ctx DB");
+			//LOG.info("8. Store UserIntentModelData to ctx DB");
 
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 			LOG.info("model stored under attribute id: "+ctxAttr.getId());
 			LOG.info("modelData "+ modelData.getActionModel());
-			
+			*/
 		}else LOG.info("not enough history data");
 	}
+	
+	
+	/*
+	 * given the the transition numbers in dictionary, calculate:  
+	 * 
+	 * transition probabilities
+	 * assign context to actions
+	 * create user intent model
+	 */
+	
+	private UserIntentModelData generateUIModel(LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionaries){
+																	 
+		UserIntentModelData modelData = null;
+		
+		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
+		try {
+			LinkedHashMap<List<String>,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionaries.get(2));
+			LinkedHashMap<List<String>,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(dictionaries.get(3));
+			
+			LinkedHashMap<String,List<String>> ctxActionsMap =   (LinkedHashMap<String, List<String>>) assignContextToAction(dictionaries.get(1));
+			
+			ConstructUIModel cmodel = new ConstructUIModel(this.cauiTaskManager, this.ctxBroker); 
+			modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+					
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}		
+		return modelData;
+	}
 
-	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(String attributeType){
+	
+	/*
+	 * Total dictionary format
+	 * map { key: 1 , value: [dictionary for one char]
+     *	 	     key: 2 , value: [dictionary for two chars]
+	 *	     key: 3 , value: [dictionary for three chars]}
+	 * 
+	 */
+	
+	public  LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateDictionaries(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
+		
+		LOG.info("2. Convert History Data");
+		List<MockHistoryData> convertedHistory = convertHistoryData(history);
+					
+		LOG.info("3. Generate Transition Dictionary");
+		 
+		LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+				
+		for(int i=1; i<=3; i++){
+			actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+			actCtxDictionary = populateActionCtxDictionary(convertedHistory, i);
+			actCtxDictionaryAll.put(i, actCtxDictionary);
+		}		
+		return actCtxDictionaryAll;				
+	}
+		
+	
+	
+	
+		
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(String attributeType){
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
@@ -359,10 +456,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 
 
-	public HashMap<String,List<String>> assignContextToAction(LinkedHashMap<List<String>,ActionDictObject> dictionaryFull){
+	public LinkedHashMap<String,List<String>> assignContextToAction(LinkedHashMap<List<String>,ActionDictObject> dictionaryFull){
 
 		//key:ActionName value:[home,free,10]
-		HashMap<String,List<String>> results = new HashMap<String,List<String>>();
+		LinkedHashMap<String,List<String>> results = new LinkedHashMap<String,List<String>>();
 
 		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 		LinkedHashMap<List<String>,ActionDictObject> dic = transProb.getStepDict(dictionaryFull, 1);

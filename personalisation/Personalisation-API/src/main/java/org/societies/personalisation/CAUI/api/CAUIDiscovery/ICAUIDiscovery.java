@@ -24,6 +24,12 @@
  */
 package org.societies.personalisation.CAUI.api.CAUIDiscovery;
 
+import java.util.List;
+import java.util.Map;
+
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
+
 
 /**
  * @since 0.0.1
@@ -37,6 +43,10 @@ public interface ICAUIDiscovery {
 	/**
 	 * This method initiates the generation of a new user model.
 	 */
-	
 	public void generateNewUserModel();
+	
+	/**
+	 * This method initiates the generation of a new user model, requires as input a history data set.
+	 */
+	public UserIntentModelData generateNewUserModel(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history);
 }

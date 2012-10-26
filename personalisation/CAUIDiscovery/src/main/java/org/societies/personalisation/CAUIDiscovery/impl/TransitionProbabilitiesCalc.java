@@ -66,8 +66,13 @@ public class TransitionProbabilitiesCalc {
 	/*
 	 * The method returns a map of the form {A--> [B, 0.5],[A,0.4],[C,0.1]}
 	 */
-	public LinkedHashMap<List<String>,HashMap<String,Double>> calcTrans2Prob(LinkedHashMap<List<String>,ActionDictObject> step2Dict){
+	public LinkedHashMap<List<String>,HashMap<String,Double>> calcTrans2Prob(LinkedHashMap<List<String>,ActionDictObject> step2Dict) throws Exception{
 
+		
+		if(step2Dict.size() == 0 || step2Dict == null) {
+			throw new Exception("Dictionary can't be null");
+		}
+		
 		LinkedHashMap<List<String>,HashMap<String,Double>> results = new  LinkedHashMap<List<String>,HashMap<String,Double>>();
 
 		for (List<String> act : step2Dict.keySet()){

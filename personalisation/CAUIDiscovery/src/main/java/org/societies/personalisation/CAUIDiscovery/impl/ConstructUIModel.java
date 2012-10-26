@@ -94,15 +94,26 @@ public class ConstructUIModel {
 		// set links among actions
 		//	LOG.info("4 set links among actions");
 		for (List<String> sourceActionConcList : transDictionaryAll.keySet()){
+			//System.out.println("sourceActionConcList "+sourceActionConcList);
 			
 			String sourceActionConc = sourceActionConcList.get(0);
+			//System.out.println("sourceActionConc "+sourceActionConc);
+			
 			String [] sourceAction = sourceActionConc.split("\\#");
 			
+			
 			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
+			System.out.println("sourceActionList "+sourceActionList);
 			//	LOG.info("5 sourceActionList "+ sourceActionList);
 			IUserIntentAction sourceActionObj = sourceActionList.get(0);
-
-			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConc);
+			
+		//	System.out.println("sourceActionObj "+sourceActionObj);
+			
+			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConcList);
+			
+			
+			//System.out.println("transDictionaryAll "+transDictionaryAll);
+			//System.out.println("targetActionsMap "+targetActionsMap);
 			//	LOG.info("6 targetActionsMap "+ targetActionsMap);
 			for(String targetActionString : targetActionsMap.keySet()){
 				String [] actionStringTarg = targetActionString.split("\\#");

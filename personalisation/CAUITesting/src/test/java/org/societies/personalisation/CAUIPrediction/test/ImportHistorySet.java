@@ -1,23 +1,14 @@
-package org.societies.personalisation.CAUIDiscovery.test;
-
-import static org.junit.Assert.*;
+package org.societies.personalisation.CAUIPrediction.test;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -28,95 +19,26 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.CAUIDiscovery.impl.ActionDictObject;
-import org.societies.personalisation.CAUIDiscovery.impl.CAUIDiscovery;
-import org.societies.personalisation.CAUIDiscovery.impl.MockHistoryData;
 
-public class CAUIDiscoveryTest {
+public class ImportHistorySet {
 
-	
+	Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 	private static Long nextValue = 0L;
 	private CtxEntity operator = null;
 	
-	static Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> historyDataSet = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 	
-	CAUIDiscovery discovery;
 	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-			
-		this.discovery = new CAUIDiscovery();
+	public ImportHistorySet(){
 		operator = createOperator();
-		createContextHistoryAttributesSet();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getHistory(){
+		return mapHocData;
 	}
-
-
-	@Test
-	public void testGenerateHistory() {
-	
-		//printHistory(this.mapHocData);
-		System.out.println("history size :"+ historyDataSet.size());
-		assertEquals(80, historyDataSet.size());
-	}
-
-	@Test
-	public void testConvertHistoryData() {
-	
-		List<MockHistoryData> mockData = this.discovery.convertHistoryData(historyDataSet);
-		MockHistoryData mockHoC = mockData.get(2);
-		
-		assertNotNull(mockHoC.getActionValue());
-		assertNotNull(mockHoC.getParameterName());
-		assertNotNull(mockHoC.getContext());
-		assertNotNull(mockHoC.getTimestamp());
-		System.out.println("converted data size: "+mockData.size());
-		assertEquals(160, mockData.size());
-		//System.out.println("converted data: "+mockData);
-		
-	}
-
-	
-	@Test
-	public void testGenerateDictionaries() {
-		
-		HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionaries = this.discovery.generateDictionaries(historyDataSet);
-		//System.out.println("dictionary :"+ dictionaries);
-		assertNotNull(dictionaries);
-		assertEquals(3, dictionaries.size());
-	
-		LinkedHashMap<List<String>,ActionDictObject> dictionaryStep0 = dictionaries.get(1);
-		//System.out.println("0 "+ dictionaryStep0.size());
-		assertEquals(7, dictionaryStep0.size());
-		
-		LinkedHashMap<List<String>,ActionDictObject> dictionaryStep1 = dictionaries.get(2);
-		//System.out.println("1 "+ dictionaryStep1.size());
-		assertEquals(14, dictionaryStep1.size());
-		
-		LinkedHashMap<List<String>,ActionDictObject> dictionaryStep2 = dictionaries.get(3);
-		//System.out.println("2 "+ dictionaryStep2.size());
-		assertEquals(17, dictionaryStep2.size());
-	}
-
-
 	
 	
-	/* 
-	 * helper classes
-	 */		
 	public void createContextHistoryAttributesSet(){
-		
+
 		//create actions
 		//IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
@@ -165,7 +87,6 @@ public class CAUIDiscoveryTest {
 			monitorAction(action5,"park","away",25);
 	
 		}
-		
 	}
 
 	private void monitorAction(IAction action, String location, String status, Integer temperature){
@@ -178,9 +99,10 @@ public class CAUIDiscoveryTest {
 		escortingCtxDataX.add(attrLocationX);
 		escortingCtxDataX.add(attrStatusX);
 		escortingCtxDataX.add(attrTemperatureX);
-		historyDataSet.put(mockPrimaryHocActionAttrX, escortingCtxDataX);
+		this.mapHocData.put(mockPrimaryHocActionAttrX, escortingCtxDataX);
 
 	}
+
 
 	private CtxHistoryAttribute createMockHocAttr(String ctxAttrType, Serializable ctxAttrValue){
 
@@ -198,7 +120,6 @@ public class CAUIDiscoveryTest {
 		return ctxHocAttr;
 	}
 
-
 	private CtxHistoryAttribute createMockHocActionAttr(IAction action){
 		CtxHistoryAttribute ctxHocAttr = null;
 		try {
@@ -212,23 +133,8 @@ public class CAUIDiscoveryTest {
 		}
 		return ctxHocAttr;
 	}
-	
-	public static Long getNextValue() {
-		return nextValue++;
-	}
-	
-	private CtxEntity createOperator(){
-		CtxEntityIdentifier ctxEntId = new CtxEntityIdentifier("operatorID","person",getNextValue());
-		CtxEntity ctxEntity = new CtxEntity(ctxEntId);
-		setOperatorEntity(ctxEntity);
-		return ctxEntity;
-	}
 
-	private void setOperatorEntity(CtxEntity entity){
-		operator = entity;
-	}
-	
-	private void printHistory(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+	public void printHistory(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 		int i = 0;
 		for(CtxHistoryAttribute ctxHocAttr :mapHocData.keySet()){
 
@@ -248,4 +154,22 @@ public class CAUIDiscoveryTest {
 		}
 	}
 
+	private CtxEntity createOperator(){
+		CtxEntityIdentifier ctxEntId = new CtxEntityIdentifier("operatorID","person",getNextValue());
+		CtxEntity ctxEntity = new CtxEntity(ctxEntId);
+		setOperatorEntity(ctxEntity);
+		return ctxEntity;
+	}
+
+	private void setOperatorEntity(CtxEntity entity){
+		operator = entity;
+	}
+
+
+	public static Long getNextValue() {
+		return nextValue++;
+	}
+	
+	
+	
 }

@@ -56,16 +56,30 @@ public class CAUIDiscoveryLearningTest {
 		operator = createOperator();
 	}
 
+	
+	private void  startTesting2(){
+	
+		System.out.println("1. create history");
+		createContextHistoryAttributesSet();
+		System.out.println("print history:");
+		printHistory(this.mapHocData);
+		
+		UserIntentModelData modelData = discover.generateNewUserModel(this.mapHocData);
+		System.out.println("modelData "+modelData.getActionModel() );
+	}
+		
+	
 	private void  startTesting(){
 
 		System.out.println("1. create history");
 		createContextHistoryAttributesSet();
 	
-		
+		System.out.println("print history:");
 		printHistory(this.mapHocData);
 		
+		UserIntentModelData modelData = discover.generateNewUserModel(this.mapHocData);
 
-		
+		/*
 		List<MockHistoryData> mockData = discover.convertHistoryData(this.mapHocData);
 		System.out.println("2. Convert History Data, size:" +mockData.size());
 		
@@ -123,7 +137,7 @@ public class CAUIDiscoveryLearningTest {
 			//	System.out.println(userAction);
 			//	System.out.println(userAction.getActionContext());
 	//	}
-	
+	*/
 	}
 
 
@@ -288,7 +302,7 @@ public class CAUIDiscoveryLearningTest {
 
 	public static void main(String[] args) {
 		CAUIDiscoveryLearningTest cdt = new CAUIDiscoveryLearningTest();
-		cdt.startTesting();
+		cdt.startTesting2();
 	}
 
 

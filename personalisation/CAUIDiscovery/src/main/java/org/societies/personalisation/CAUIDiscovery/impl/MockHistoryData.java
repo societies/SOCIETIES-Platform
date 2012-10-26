@@ -41,6 +41,11 @@ public class MockHistoryData {
 		this.serviceId  = serviceId;
 	}
 
+	public Date getTimestamp(){
+		
+		return this.timestamp;
+	}
+	
 	public Map<String,String> getContext() {
 		return contextMap;
 	}

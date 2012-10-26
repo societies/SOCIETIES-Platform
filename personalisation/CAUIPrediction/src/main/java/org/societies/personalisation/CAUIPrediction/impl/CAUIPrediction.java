@@ -175,10 +175,47 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return null;
 	}
 
+	
+	
+	public List<IUserIntentAction> performPrediction(IIdentity requestor, IAction action){
+		
+		List<IUserIntentAction> predictionList = new ArrayList<IUserIntentAction>();
+		
+		String par = action.getparameterName();
+		String val = action.getvalue();
+		
+		//add code here for retrieving current context;
+		// identify performed action in model
+		System.out.println("actionsList par "+ par);
+		System.out.println("actionsList val "+ val);
+		
+		List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
+		System.out.println("vv actionsList "+actionsList);
+		
+		if(actionsList.size()>0){
+			// improve this to also use context for action identification
+			IUserIntentAction currentAction = actionsList.get(0);
+			//LOG.info("4. currentAction " +currentAction);
+			Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
+			//LOG.info("5. nextActionsMap " +nextActionsMap);
+			if(nextActionsMap.size()>0){
+				for(IUserIntentAction nextAction : nextActionsMap.keySet()){
+					Double doubleConf = nextActionsMap.get(nextAction);
+					nextAction.setConfidenceLevel(doubleConf.intValue());
+				
+					predictionList.add(nextAction);
+					
+				}
+			}			
+		}
+				
+		return predictionList;
+	}
+	
+
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
-
 		
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
@@ -196,19 +233,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(modelExist == true && enablePrediction == true){
-			//LOG.info("1. model exists " +modelExist);
-			//LOG.info("START PREDICTION caui modelExist "+modelExist);
-			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
-			//setActiveModel(requestor);
+			
+			results = this.performPrediction(requestor, action);
+			/*
 			String par = action.getparameterName();
 			String val = action.getvalue();
-			//LOG.info("2. action perf par:"+ par+" action val:"+val);
+			
 			//add code here for retrieving current context;
-
 
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-			//LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 			if(actionsList.size()>0){
 				// improve this to also use context for action identification
@@ -226,11 +260,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 					}
 				}			
 			}
+		*/
 		} else {
 			LOG.info("no CAUI model exist yet ");
 		}
-		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
-
+		
 		if(results.size()>0){
 			for(IUserIntentAction predAction : results){
 				this.recordPrediction(predAction);		

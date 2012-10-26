@@ -75,7 +75,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	}
 
 	public CAUITaskManager(){
-		//UserIntentModelData activeModel = new UserIntentModelData();
+		System.out.println("CAUITaskManager constructor -- testing");
 	}
 
 /*
