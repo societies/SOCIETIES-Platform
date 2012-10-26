@@ -134,7 +134,8 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			session.save(attributeDAO);
 			tx.commit();				
 		} catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new CommunityCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -178,7 +179,8 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new CommunityCtxDBMgrException("Could not create community context entity for CIS '" 
 					+ cisId + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -226,16 +228,18 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			return null;
 		
 		final Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		Transaction tx = null;
 		try{
 			final CtxModelObjectDAO dao = CommunityCtxModelDAOTranslator
 					.getInstance().fromCtxModelObject(result);
+			tx = session.beginTransaction();
 			session.delete(dao);
 			session.flush();
-			t.commit();
+			tx.commit();
 		}
 		catch (Exception e) {
-			t.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new CommunityCtxDBMgrException("Could not remove model object '" + id 
 					+ "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -266,17 +270,17 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			throw new NullPointerException("modelObject can't be null");
 		
 		final Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-		
+		Transaction tx = null;
 		try {	
 			final CtxModelObjectDAO modelObjectDAO = 
 					CommunityCtxModelDAOTranslator.getInstance().fromCtxModelObject(modelObject);
-
+			tx = session.beginTransaction();
 			session.merge(modelObjectDAO);
 			session.flush();
-			t.commit();
+			tx.commit();
 		} catch (Exception e) {
-				t.rollback();
+			if (tx != null)
+				tx.rollback();
 				throw new CommunityCtxDBMgrException("Could not update '" 
 						+ modelObject + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -326,9 +330,8 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		final CommunityCtxEntity entity;
 		
 		final Session session = sessionFactory.openSession();
-		final Query query;
 		try {
-			query = session.getNamedQuery("getCommunityCtxEntityIdByOwnerId");
+			final Query query = session.getNamedQuery("getCommunityCtxEntityIdByOwnerId");
 			query.setParameter("ownerId", cisId.toString(), Hibernate.STRING);
 			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
 			if (entityId != null)
@@ -455,9 +458,9 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 //        final boolean isWildcardType = type.contains("%");
 
 		final Session session = sessionFactory.openSession();
-		final Query query;
-		
         try {
+        	final Query query;
+        	
             switch (modelType) {
             
             case ENTITY:
@@ -496,10 +499,9 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		T result = null;
 		
 		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(modelObjectClass)
-				.add(Restrictions.eq("ctxId", ctxId));
-		
-		try { 
+		try {
+			final Criteria criteria = session.createCriteria(modelObjectClass)
+					.add(Restrictions.eq("ctxId", ctxId)); 
 			result = (T) criteria.uniqueResult();
 		} finally {
 			if (session != null)
@@ -530,7 +532,8 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new CommunityCtxDBMgrException("Could not create association of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
@@ -563,7 +566,8 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			session.save(objectNumberDAO);
 			tx.commit();
 		} catch (Exception e) {
-			tx.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new CommunityCtxDBMgrException(
 					"Could not generate next context model object number");
 		} finally {
