@@ -274,7 +274,17 @@ public class CssSuggestedFriendsController {
 				//getCssLocalManager().updateCssRequest(pendingFR);
 				getCssLocalManager().declineCssFriendRequest(pendingFR);
 				
-			} else {
+			} else if (sfForm.getMethod().contains("delete")) {
+				// Decline the pending friend request
+				LOG.info("Webapp -> Delete Friend Called: ");
+				CssRequest pendingFR = new CssRequest();
+				pendingFR.setCssIdentity(sfForm.getFriendId());
+				pendingFR.setRequestStatus(CssRequestStatusType.DELETEFRIEND);
+				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
+				//getCssLocalManager().updateCssRequest(pendingFR);
+				getCssLocalManager().updateCssFriendRequest(pendingFR);
+				
+			}else {
 				// send fr
 				getCssLocalManager().sendCssFriendRequest(sfForm.getFriendId());
 			}
