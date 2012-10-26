@@ -22,44 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.servicemonitor;
+package org.societies.android.platform.cis;
+
+import org.societies.android.api.cis.management.ICisSubscribed;
+import org.societies.android.api.utilities.RemoteServiceHandler;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 /**
- * This wrapper class acts as a local wrapper for the Service Management Android service.
- * It uses the base service implementation {@link ServiceUtilitiesBase} provide the service functionality
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
+public class CisSubscribedRemote   extends Service {
+	private static final String LOG_TAG = CisSubscribedRemote.class.getName();
+	private Messenger inMessenger;
 
-public class ServiceManagementLocal extends Service {
-	
-    private static final String LOG_TAG = ServiceManagementLocal.class.getName();
-    private IBinder binder = null;
-    
-    @Override
+	@Override
 	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ServiceManagementLocal service starting");
+		CommunityManagementBase cisSubscribeBase = new CommunityManagementBase(this.getApplicationContext());
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(cisSubscribeBase.getClass(), cisSubscribeBase, ICisSubscribed.methodsArray));
+		Log.i(LOG_TAG, "CisSubscribedRemote creation");
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		Log.d(LOG_TAG, "CisSubscribedRemote onBind");
+		return inMessenger.getBinder();
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "ServiceManagementLocal service terminating");
-	}
-
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public ServiceManagementBase getService() {
-			return new ServiceManagementBase(ServiceManagementLocal.this.getApplicationContext());
-		}
-	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
+		Log.i(LOG_TAG, "CisSubscribedRemote terminating");
 	}
 }

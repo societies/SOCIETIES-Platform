@@ -64,8 +64,8 @@
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
-        <service android:name="org.societies.android.platform.cis.CommunityManagement" />
-        <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" />
+        <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
+        <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
         
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />

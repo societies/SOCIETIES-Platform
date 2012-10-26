@@ -133,8 +133,10 @@ var	SocietiesCISManagerService = {
 		console.log("list CISs");
 		
 		function success(data) {
-			console.log("List CISs where  = TODO");
+			//UPDATE COUNT
 			$("span#myCommunitiesCount").html(data.length);
+			$("span#myCommunitiesCount").css({ visibility: "visible"});
+			
 			SocietiesCISListService.populateCISListpage(data, false);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -157,8 +159,10 @@ var	SocietiesCISManagerService = {
 		console.log("list CISs");
 		
 		function success(data) {
-			console.log("List CISs where  = TODO");
+			//UPDATE COUNT
 			$("span#myCommunitiesAdminCount").html(data.length);
+			$("span#myCommunitiesAdminCount").css({ visibility: "visible"});
+			
 			SocietiesCISListService.populateCISListpage(data, true);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -189,7 +193,10 @@ var	SocietiesCISManagerService = {
 		console.log("getAllCisDirAds");
 		
 		function success(data) {
+			//UPDATE COUNT
 			$("span#mySuggestedCommunitiesCount").html(data.length);
+			$("span#mySuggestedCommunitiesCount").css({ visibility: "visible"});
+			
 			SocietiesCisDirService.populateCISListpage(data);
 			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
 		}

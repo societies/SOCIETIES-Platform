@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.servicemonitor;
+package org.societies.android.platform.cis;
 
 import android.app.Service;
 import android.content.Intent;
@@ -31,30 +31,31 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * This wrapper class acts as a local wrapper for the Service Management Android service.
- * It uses the base service implementation {@link ServiceUtilitiesBase} provide the service functionality
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-
-public class ServiceManagementLocal extends Service {
+public class CisDirectoryLocal extends Service {
 	
-    private static final String LOG_TAG = ServiceManagementLocal.class.getName();
+    private static final String LOG_TAG = CisDirectoryLocal.class.getName();
     private IBinder binder = null;
     
     @Override
 	public void onCreate () {
 		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ServiceManagementLocal service starting");
+		Log.d(LOG_TAG, "CisDirectoryLocal service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "ServiceManagementLocal service terminating");
+		Log.d(LOG_TAG, "CisDirectoryLocal service terminating");
 	}
 
 	/**Create Binder object for local service invocation */
 	public class LocalBinder extends Binder {
-		public ServiceManagementBase getService() {
-			return new ServiceManagementBase(ServiceManagementLocal.this.getApplicationContext());
+		public CisDirectoryBase getService() {
+			return new CisDirectoryBase(CisDirectoryLocal.this.getApplicationContext());
 		}
 	}
 	
