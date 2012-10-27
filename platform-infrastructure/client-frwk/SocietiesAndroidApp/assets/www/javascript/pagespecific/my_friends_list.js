@@ -87,6 +87,9 @@ var CSSFriendsServices = {
 	
 	showFriendDetailPage: function(data) {
 		//CSS Record OBJECT
+		var forename = data.foreName;
+		if (forename=="undefined")
+			forename="";
 		var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
 					 "<p>" + data.homeLocation + "</p>" +
 					 "<p>" + data.cssIdentity + "</p><br />"; 
@@ -162,6 +165,9 @@ var CSSFriendsServices = {
 			$('#li' + id).remove().slideUp('slow');
 			//CSSFriendsServices.showFriendDetailPage(data);
 			//$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+			//UPDATE COUNTER
+			var count = parseInt($("span#myFriendRequests").html());
+			$("span#myFriendRequests").html(--count);
 		}
 		
 		function failure(data) {
