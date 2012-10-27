@@ -83,14 +83,12 @@ var SocietiesLogin = {
 
 		console.log("displayConnectionInfo");
 		
-		console.log("Number of plugins" + window.plugins.length);
-		for (i = 0; i < window.plugins.length; i++) {
-			console.log("plugin: " + window.plugin[i])
-		};
-
-		
-//		SocietiesLogin.getCSSIdentity();
-//		SocietiesLogin.getCSSIdentityPassword();
+//		console.log("Number of plugins" + window.plugins.length);
+//		for (i = 0; i < window.plugins.length; i++) {
+//			console.log("plugin: " + window.plugin[i])
+//		};
+		SocietiesLogin.getCSSIdentity();
+		SocietiesLogin.getCSSIdentityPassword();
 		SocietiesLogin.getCSSIdentityDomain();
 	},
 	
@@ -102,7 +100,7 @@ var SocietiesLogin = {
 	getCSSIdentity: function () {
 		function success(data) {
 			console.log("getCSSIdentity - successful: " + data.value);
-			jQuery("#username").val(data.value);
+			jQuery("#loginUsername").val(data.value);
 		}
 		
 		function failure(data) {
@@ -121,7 +119,7 @@ var SocietiesLogin = {
 	getCSSIdentityPassword: function () {
 		function success(data) {
 			console.log("getCSSIdentityPassword - successful: " + data.value);
-			jQuery("#password").val(data.value);
+			jQuery("#loginPassword").val(data.value);
 		}
 		
 		function failure(data) {
@@ -161,8 +159,8 @@ var SocietiesLogin = {
 		function failure(data) {
 			alert("updateLoginCredentialPreferences - failure: " + data);
 		}
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#loginUsername").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#loginPassword").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#identitydomain").val());
 	},
 	/**

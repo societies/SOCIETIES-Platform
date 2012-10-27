@@ -97,9 +97,6 @@ var SocietiesUtility = {
 		document.addEventListener("backbutton", SocietiesUtility.backButtonHandler, false);
 
 		SocietiesLogin.displayConnectionInfo();
-		
-
-
 	},
 
 	/**
@@ -156,7 +153,7 @@ $(document).on('pageinit', '#index', function(event) {
 		$('#connectXMPP').button('disable');
 		$('#connectXMPP').button('refresh');
 		//LOGIN
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 		//RE-ENABLE LOGIN BUTTON
@@ -170,16 +167,16 @@ $(document).on('pageinit', '#index', function(event) {
 	});
 
 
-	$('#username').off('focus').on('focus', function(){
-		SocietiesLogin.clearElementValue('#username')
+	$('#loginUsername').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#loginUsername')
 	});
 
-	$('#password').off('focus').on('focus', function(){
-		SocietiesLogin.clearElementValue('#password')
+	$('#loginPassword').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#loginPassword')
 	});
 	
 	$("form#login").submit(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 		
