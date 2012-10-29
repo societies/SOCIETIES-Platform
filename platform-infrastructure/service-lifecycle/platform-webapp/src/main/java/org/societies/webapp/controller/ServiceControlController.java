@@ -202,8 +202,10 @@ public class ServiceControlController {
 			return new ModelAndView("servicecontrolresult", model);
 		}
 		
-		ServiceResourceIdentifier serviceId = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceUri);
-		
+		ServiceResourceIdentifier serviceId = null;
+		if(serviceUri != null && !serviceUri.equals("NONE"))
+			serviceId = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceUri);
+
 		/*
 		if(!serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
 			int index = serviceUri.indexOf('_');	

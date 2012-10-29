@@ -24,6 +24,7 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +32,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
+import java.util.jar.JarFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -194,129 +197,24 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 		if(log.isDebugEnabled())
 			log.debug("Service Listener event received");
+
+		Service service = getServiceFromOSGIEvent(event);
+		
+		if(service == null){
+			log.warn("Couldn't get information from service!");
+			return;
+		}
 		
 		Bundle serBndl = event.getServiceReference().getBundle();
-		String propKeys[] = event.getServiceReference().getPropertyKeys();
-
-		if(log.isDebugEnabled()){
-			for (String key : propKeys) {
-				log.debug("Property Key: " + key);
-				Object value = event.getServiceReference().getProperty(key);
-				log.debug("Property value: " + value);
-				// serviceMeteData.put(key, value);
-			}
-		
-			log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
-				+ serBndl.getState() + "  Bundle Symbolic Name: "
-				+ serBndl.getSymbolicName());
-		}
-		
-		Service service = (Service) event.getServiceReference().getProperty(
-				"ServiceMetaModel");
-		
-		if(service==null || (!(service instanceof Service) )){
-			if(log.isDebugEnabled()) log.debug("**Service MetadataModel object is null**");
-			return;
-		}
-			
-		//TODO DEAL WITH THIS
-		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
-
-		//TODO: Do this properly!
-		ServiceInstance si = new ServiceInstance();
-		
-		INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
-		
-		if(service.getServiceType().equals(ServiceType.DEVICE)){
-			String nodeId = (String)event.getServiceReference().getProperty(DeviceMgmtConstants.DEVICE_NODE_ID);
-			
-			if(log.isDebugEnabled())
-				log.debug("This is device... : " + nodeId);
-				
-			try{
-				INetworkNode serviceNode = getCommMngr().getIdManager().fromFullJid(nodeId);
-				
-				si.setFullJid(serviceNode.getJid());
-				si.setCssJid(serviceNode.getBareJid());
-				si.setParentJid(serviceNode.getBareJid()); //This is later changed!
-				si.setXMPPNode(serviceNode.getNodeIdentifier());
-			
-			}catch(Exception ex){
-				ex.printStackTrace();
-				log.warn("Exception in IdManager, doing alternate solution!");
-				si.setFullJid(nodeId);
-				si.setCssJid(nodeId);
-				si.setParentJid(nodeId); //This is later changed!
-				si.setXMPPNode(myNode.getNodeIdentifier());
-			}
-			
-		} else{
-			si.setFullJid(myNode.getJid());
-			si.setCssJid(myNode.getBareJid());
-			si.setParentJid(myNode.getBareJid()); //This is later changed!
-			si.setXMPPNode(myNode.getNodeIdentifier());
-			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
-				service.setServiceLocation(serBndl.getLocation());
-		}
-		
-		ServiceImplementation servImpl = new ServiceImplementation();
-		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
-		
-		if(service.getServiceType().equals(ServiceType.DEVICE))
-			servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
-		else
-			servImpl.setServiceNameSpace(serBndl.getSymbolicName());
-		
-		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
-		servImpl.setServiceClient((String) event.getServiceReference().getProperty("ServiceClient"));
-		
-		si.setServiceImpl(servImpl);
-		service.setServiceInstance(si);
-		
-		if(log.isDebugEnabled()){
-			log.debug("**Service MetadataModel Data Read**");
-			log.debug("Service Name: "+service.getServiceName());
-			log.debug("Service Description: "+service.getServiceDescription());
-			log.debug("Service type: "+service.getServiceType().toString());
-			log.debug("Service Location: "+service.getServiceLocation());
-			log.debug("Service Endpoint: "+service.getServiceEndpoint());
-			log.debug("Service PrivacyPolicy: "+service.getPrivacyPolicy());
-			log.debug("Service SecurityPolicy: "+service.getSecurityPolicy());
-			log.debug("Service SecurityPolicy: "+service.getContextSource());
-			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
-			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
-			log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
-			log.debug("Service Version: "+service.getServiceInstance().getServiceImpl().getServiceVersion());
-			log.debug("Service XMPPNode: "+service.getServiceInstance().getXMPPNode());
-			log.debug("Service FullJid: "+service.getServiceInstance().getFullJid());
-			log.debug("Service CssJid: "+service.getServiceInstance().getCssJid());
-		}
-		
-		service.setServiceStatus(ServiceStatus.STARTED);
-		
-		String deviceId = null;
-		deviceId = (String) event.getServiceReference().getProperty("DeviceId");
-		if(service.getServiceType().equals(ServiceType.DEVICE) && deviceId == null){
-			log.warn("Service Type is DEVICE but no device Id. Aborting");
-			return;
-		}
-		
-		if(!service.getServiceType().equals(ServiceType.DEVICE))
-			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
-		else
-			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierForDevice(service, deviceId));
-		
-		si.setParentIdentifier(service.getServiceIdentifier());
-		service.setServiceInstance(si);
 		
 		List<Service> serviceList = new ArrayList<Service>();
+
 		switch (event.getType()) {
 
 		case ServiceEvent.MODIFIED:
 			if(log.isDebugEnabled()) log.debug("Service Modification");
 
-			// Probably should check to see something if the service is shared
-			
+			// Probably should check to see something if the service is shared		
 			try {
 				serviceList.add(service);
 				this.getServiceReg().unregisterServiceList(serviceList);
@@ -327,6 +225,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 				e.printStackTrace();
 			}
 			break;
+			
 		case ServiceEvent.REGISTERED:
 			
 			if(log.isDebugEnabled()) log.debug("Service Registered");			
@@ -343,9 +242,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 				Service existService = this.getServiceReg().retrieveService(service.getServiceIdentifier());
 				
 				if(existService == null){
+
+					if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
+						if(!updateSecurityPolicy(service,serBndl) || !updatePrivacyPolicy(service,serBndl)){
+							log.warn("Adding security and privacy failed!");
+							return;
+						}
+					}
+					
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
-					updateSecurityPrivacy(service,serBndl);
 					
 					if(!service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
 						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
@@ -357,7 +263,12 @@ public class ServiceRegistryListener implements BundleContextAware,
 					if(existService.getServiceStatus()==ServiceStatus.STARTED){
 						if(log.isDebugEnabled())
 							log.debug("This is a restart! We need to update everything!");
-						updateSecurityPrivacy(service,serBndl);
+						if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
+							if(!updateSecurityPolicy(service,serBndl) || !updatePrivacyPolicy(service,serBndl)){
+								log.warn("Adding security and privacy failed!");
+								return;
+							}
+						}
 					} else{
 						if(log.isDebugEnabled())
 							log.debug("Just restarting the service, no need to update stuff yet.");
@@ -532,7 +443,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
 		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
-		filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
+		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices;
 		try {
@@ -571,67 +482,239 @@ public class ServiceRegistryListener implements BundleContextAware,
 		 
 	}
 	
-	private void updateSecurityPrivacy(Service service, Bundle bundle){
+	private boolean updateSecurityPolicy(Service service, Bundle bundle){
 		
 		try{
-			if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
-				if(log.isDebugEnabled())
-					log.debug("Adding the shared service to the policy provider!");
-				String slaXml = null;
-				URI clientJar;
-					
-				if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
-					clientJar= new URI("http://www.societies.org/webapp/webservice.test");
-				else
-					clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
-					
-				URI clientHost;
-				if(clientJar.getPort()!= -1)
-					clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
-				else
-					clientHost = new URI("http://" + clientJar.getHost() );
-
-				if(log.isDebugEnabled())
-					log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-					
-				INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
-				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
-				//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
+							
+			if(log.isDebugEnabled())
+				log.debug("Adding the shared service to the policy provider!");
 				
-				String privacyLocation;
-				if(bundle.getLocation().endsWith("/"))
-					privacyLocation = bundle.getLocation() + "privacy-policy.xml";
-				else
-					privacyLocation = bundle.getLocation() + "/privacy-policy.xml";
+			String slaXml = null;
+			URI clientJar;
 					
-				if(log.isDebugEnabled())
-					log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
+			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
+				clientJar= new URI("http://www.societies.org/webapp/webservice.test");
+			else
+				clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+					
+			URI clientHost;
+			if(clientJar.getPort()!= -1)
+				clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
+			else
+				clientHost = new URI("http://" + clientJar.getHost() );
 
-				int index = privacyLocation.indexOf('@');	
-				String privacyPath = privacyLocation.substring(index+1);
+			if(log.isDebugEnabled())
+				log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
 					
-				String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyPath);
-					
-				if(log.isDebugEnabled())
-						log.debug("Tried to get privacy policy from: " + privacyLocation);
+			INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+			getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+			//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
+			
+		} catch(Exception ex){
+			log.error("Error while adding security policy for Service: " + ex.getMessage());
+			ex.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+		
+	private boolean updatePrivacyPolicy(Service service, Bundle bundle){
+			
+		try{
+			if(log.isDebugEnabled())
+				log.debug("Adding privacy policy for " + service.getServiceName());
 
-				IIdentity myNode = getCommMngr().getIdManager().getThisNetworkNode();
-				RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-				RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+			//First we check if we have a privacy policy online
+			String privacyLocation = service.getPrivacyPolicy();
+			String privacyPolicy = null;
 				
+			privacyLocation = null;
+			if(privacyLocation != null){
 				if(log.isDebugEnabled())
-					log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
+					log.debug("Privacy Policy url is supplied, trying to use that.");
 					
-				}
+				privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
+			} else{
+	
+				if(log.isDebugEnabled())
+					log.debug("Privacy Policy url not supplied, looking inside bundle jar: " + bundle.getLocation());
+
+				String privacyPath = bundle.getLocation();
+				int index = privacyPath.indexOf('@');	
+				privacyLocation = privacyPath.substring(index+1);
 				
+				File bundleFile = new File(new URI(privacyLocation));
+					
+				if(bundleFile.isDirectory()){
+					if(log.isDebugEnabled())
+						log.debug("OSGI expanded .jar, getting privacy-policy directly");
+				
+					privacyLocation = privacyLocation + "/privacy-policy.xml";
+					privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
+					
+				} else 
+					if(bundleFile.isFile()) {
+						if(log.isDebugEnabled())
+							log.debug("OSGI didn't expand .jar, getting privacy-policy from inside.");
+						
+						JarFile jarFile = new JarFile(bundleFile);	
+						privacyPolicy = new Scanner( jarFile.getInputStream(jarFile.getEntry("privacy-policy.xml")) ).useDelimiter("\\A").next();
+					
+					} else{
+						if(log.isDebugEnabled())
+							log.debug("Couldn't get privacy-policy from jar!");
+					}
+			}
+
+			if(privacyPolicy == null){
+				if(log.isDebugEnabled())
+					log.debug("Couldn't get privacy policy from jar, aborting process!");
+				return false;
+			}
+				
+			IIdentity myNode = getCommMngr().getIdManager().getThisNetworkNode();
+			RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+			RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+			
+			if(policyResult == null){
+				if(log.isDebugEnabled())
+					log.debug("Error adding privacyPolicy to Privacy Manager!");
+				return true;
+			} else{
+				if(log.isDebugEnabled())
+					log.debug("Added privacyPolicy to Privacy Manager!");
+				return true;
+			}
+			
+						
 		} catch(Exception ex){
 			log.error("Exception while trying to update Privacy Policy!");
 			ex.printStackTrace();
+			return false;
 		}
 
 	}
 	
-	@Async
+	private Service getServiceFromOSGIEvent(ServiceEvent event){
+		
+		Bundle serBndl = event.getServiceReference().getBundle();
+		String propKeys[] = event.getServiceReference().getPropertyKeys();
+
+		if(log.isDebugEnabled()){
+			for (String key : propKeys) {
+				log.debug("Property Key: " + key);
+				Object value = event.getServiceReference().getProperty(key);
+				log.debug("Property value: " + value);
+				// serviceMeteData.put(key, value);
+			}
+		
+			log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
+				+ serBndl.getState() + "  Bundle Symbolic Name: "
+				+ serBndl.getSymbolicName());
+		}
+		
+		Service service = (Service) event.getServiceReference().getProperty(
+				"ServiceMetaModel");
+		
+		if(service==null || (!(service instanceof Service) )){
+			if(log.isDebugEnabled()) log.debug("**Service MetadataModel object is null**");
+			return null;
+		}
+			
+		//TODO DEAL WITH THIS
+		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
+
+		//TODO: Do this properly!
+		ServiceInstance si = new ServiceInstance();
+		
+		INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
+		
+		if(service.getServiceType().equals(ServiceType.DEVICE)){
+			String nodeId = (String)event.getServiceReference().getProperty(DeviceMgmtConstants.DEVICE_NODE_ID);
+			
+			if(log.isDebugEnabled())
+				log.debug("This is device... : " + nodeId);
+				
+			try{
+				INetworkNode serviceNode = getCommMngr().getIdManager().fromFullJid(nodeId);
+				
+				si.setFullJid(serviceNode.getJid());
+				si.setCssJid(serviceNode.getBareJid());
+				si.setParentJid(serviceNode.getBareJid()); //This is later changed!
+				si.setXMPPNode(serviceNode.getNodeIdentifier());
+			
+			}catch(Exception ex){
+				ex.printStackTrace();
+				log.warn("Exception in IdManager, doing alternate solution!");
+				si.setFullJid(nodeId);
+				si.setCssJid(nodeId);
+				si.setParentJid(nodeId); //This is later changed!
+				si.setXMPPNode(myNode.getNodeIdentifier());
+			}
+			
+		} else{
+			si.setFullJid(myNode.getJid());
+			si.setCssJid(myNode.getBareJid());
+			si.setParentJid(myNode.getBareJid()); //This is later changed!
+			si.setXMPPNode(myNode.getNodeIdentifier());
+			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
+				service.setServiceLocation(serBndl.getLocation());
+		}
+		
+		ServiceImplementation servImpl = new ServiceImplementation();
+		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
+		
+		if(service.getServiceType().equals(ServiceType.DEVICE))
+			servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
+		else
+			servImpl.setServiceNameSpace(serBndl.getSymbolicName());
+		
+		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
+		servImpl.setServiceClient((String) event.getServiceReference().getProperty("ServiceClient"));
+		
+		si.setServiceImpl(servImpl);
+		service.setServiceInstance(si);
+		
+		if(log.isDebugEnabled()){
+			log.debug("**Service MetadataModel Data Read**");
+			log.debug("Service Name: "+service.getServiceName());
+			log.debug("Service Description: "+service.getServiceDescription());
+			log.debug("Service type: "+service.getServiceType().toString());
+			log.debug("Service Location: "+service.getServiceLocation());
+			log.debug("Service Endpoint: "+service.getServiceEndpoint());
+			log.debug("Service PrivacyPolicy: "+service.getPrivacyPolicy());
+			log.debug("Service SecurityPolicy: "+service.getSecurityPolicy());
+			log.debug("Service SecurityPolicy: "+service.getContextSource());
+			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
+			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
+			log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
+			log.debug("Service Version: "+service.getServiceInstance().getServiceImpl().getServiceVersion());
+			log.debug("Service XMPPNode: "+service.getServiceInstance().getXMPPNode());
+			log.debug("Service FullJid: "+service.getServiceInstance().getFullJid());
+			log.debug("Service CssJid: "+service.getServiceInstance().getCssJid());
+		}
+		
+		service.setServiceStatus(ServiceStatus.STARTED);
+		
+		String deviceId = null;
+		deviceId = (String) event.getServiceReference().getProperty("DeviceId");
+		if(service.getServiceType().equals(ServiceType.DEVICE) && deviceId == null){
+			log.warn("Service Type is DEVICE but no device Id. Aborting");
+			return null;
+		}
+		
+		if(!service.getServiceType().equals(ServiceType.DEVICE))
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+		else
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierForDevice(service, deviceId));
+		
+		si.setParentIdentifier(service.getServiceIdentifier());
+		service.setServiceInstance(si);
+		
+		return service;		
+	}
+	
 	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
 		
 		if(log.isDebugEnabled())
