@@ -74,7 +74,7 @@ public class PrivacyAssessmentController {
 	private static final String RESULT = "result";
 
 	// FIXME: The path should not depend on Virgo version, etc.
-	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.3.RELEASE/staging/" +
 			"global/bundle/societies-webapp/0.4.0/societies-webapp.war/";
 
 	/**
@@ -101,12 +101,14 @@ public class PrivacyAssessmentController {
 			public static final String RECEIVER_IDS = "Receiver identities";
 			public static final String SENDER_IDS = "Sender identities";
 			public static final String SENDER_CLASSES = "Sender classes";
+			public static final String DATA_ACCESS_IDS = "Data access identities";
 			public static final String DATA_ACCESS_CLASSES = "Data access classes";
 
 			// Keys
 			public static final String RECEIVER_IDS_KEY = "receiverIds";
 			public static final String SENDER_IDS_KEY = "senderIds";
 			public static final String SENDER_CLASSES_KEY = "senderClasses";
+			public static final String DATA_ACCESS_IDS_KEY = "dataAccessIds";
 			public static final String DATA_ACCESS_CLASSES_KEY = "dataAccessClasses";
 		}
 		
@@ -220,12 +222,13 @@ public class PrivacyAssessmentController {
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.RECEIVER_IDS_KEY, Presentation.SubjectTypes.RECEIVER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_IDS_KEY, Presentation.SubjectTypes.SENDER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_CLASSES_KEY, Presentation.SubjectTypes.SENDER_CLASSES);
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY, Presentation.SubjectTypes.DATA_ACCESS_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY, Presentation.SubjectTypes.DATA_ACCESS_CLASSES);
 		model.put("assessmentSubjectTypes", assessmentSubjectTypes);
 
 		Map<String, String> presentationFormats = new LinkedHashMap<String, String>();
-		presentationFormats.put(Presentation.Format.TABLE, Presentation.Format.TABLE);
 		presentationFormats.put(Presentation.Format.CHART, Presentation.Format.CHART);
+		presentationFormats.put(Presentation.Format.TABLE, Presentation.Format.TABLE);
 		model.put("presentationFormats", presentationFormats);
 
 		Map<String, String> assessmentSubjects = new LinkedHashMap<String, String>();
@@ -257,62 +260,66 @@ public class PrivacyAssessmentController {
 		String presentationFormat = assForm.getPresentationFormat();
 		String subjectType = assForm.getAssessmentSubjectType();
 		LOG.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
-		Object assValues;
 		Collection<PrivacyAssessmentForm> charts = new ArrayList<PrivacyAssessmentForm>();
 		
 		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
 			
 			String chartFileName = "chart-1.png";
-			String chart2Filename = "chart-2.png";
-			double[][] data1;
-			double[][] data2;
 			
-			data2 = new double[][] {  // TODO
-					{210, 300, 320, 265, 299},
-					{200, 304, 201, 201, 340}
-					};
+			String title;
+			String xlabel;
+			String ylabel;
+			double[][] data;
+			String[] dataLabels;
 			
-			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
-				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-				assResult = assessment.getAssessmentAllIds();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
-						};
-			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
+			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
 				// FIXME
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
-						};
+				title = null;
+				xlabel = null;
+				ylabel = null;
+				data = null;
+			}
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
+				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
+				assResult = assessment.getAssessmentAllIds();
+				title = null;
+				xlabel = null;
+				ylabel = null;
+				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
-						};
-
+				title = null;
+				xlabel = null;
+				ylabel = null;
+				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
-				Map<IIdentity, Integer> dataAccessIdentities;
 				Map<String, Integer> dataAccessClasses;
-				PlotData data;
-				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
-				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
+				PlotData plotData;
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
 				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
-				data = mapToArrays(dataAccessIdentities);
-				data1 = new double[][] {data.getData()};
-				data = mapToArrays(dataAccessClasses);
-				data2 = new double[][] {data.getData()};
+				plotData = mapToArrays(dataAccessClasses);
+				title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
+				xlabel = "Class";
+				ylabel = "Number of accesses to local data";
+				data = new double[][] {plotData.getData()};
+				dataLabels = plotData.getLabels();
+			}
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
+				Map<IIdentity, Integer> dataAccessIdentities;
+				PlotData plotData;
+				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
+				plotData = mapToArrays(dataAccessIdentities);
+				title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
+				xlabel = "Identity";
+				ylabel = "Number of accesses to local data";
+				data = new double[][] {plotData.getData()};
+				dataLabels = plotData.getLabels();
 			}
 			else {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
@@ -321,14 +328,14 @@ public class PrivacyAssessmentController {
 			//model.put("assessmentResults", assValues);
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
-			form1.setAssessmentSubject("Subject 1");
-			createBarchart(null, "Identity", "Packets per month", data1, chartFileName);
+			form1.setAssessmentSubject(title);
+			createBarchart(null, xlabel, ylabel, data, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
 			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
-			form2.setAssessmentSubject("Subject 2");
-			createBarchart(null, "Class", "Correlation with data access by same identity", data2, chart2Filename);
-			form2.setChart(chart2Filename);
+			form2.setAssessmentSubject(title);
+			//createBarchart(null, "Class", "Correlation with data access by same identity", data, chartFileName);
+			form2.setChart(chartFileName);
 			charts.add(form2);
 			model.put("assessmentResults", charts);
 
@@ -413,7 +420,7 @@ public class PrivacyAssessmentController {
 		renderer = new BarRenderer();
 
 		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-		plot.setOrientation(PlotOrientation.HORIZONTAL);
+		plot.setOrientation(PlotOrientation.VERTICAL);
 		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
 //		chart.setBackgroundPaint(new Color(255, 255, 255));
