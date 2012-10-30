@@ -27,8 +27,12 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_AI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_SI;
@@ -44,10 +48,15 @@ public class UserPreferenceLearning implements IC45Learning{
 	private SA_AI sa_ai;
 	private SA_SI sa_si;
 	private ICtxBroker ctxBroker;
+	
+	//evaluation logging
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
+	private int requestCount = 0;
 
 	@Override
 	//run preference learning on all actions for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate) {
+		this.logBatchLearningRequest();
 		aa_ai = new AA_AI(requestor, startDate, ctxBroker);
 		aa_ai.start();
 	}
@@ -56,6 +65,7 @@ public class UserPreferenceLearning implements IC45Learning{
 	//run preference learning on specific service action parameterName for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate,
 			ServiceResourceIdentifier serviceId, String parameterName) {
+		this.logBatchLearningRequest();
 		sa_ai = new SA_AI(requestor, startDate, serviceId, parameterName, ctxBroker);
 		sa_ai.start();
 	}
@@ -67,6 +77,7 @@ public class UserPreferenceLearning implements IC45Learning{
 	@Override
 	//run C45 on all actions for specific identity
 	public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner){
+		this.logBatchLearningRequest();
 		aa_si = new AA_SI(requestor, startDate, historyOwner, ctxBroker);
 		aa_si.start();
 	}
@@ -75,18 +86,30 @@ public class UserPreferenceLearning implements IC45Learning{
 	//run C45 learning on specific service action for specific identity
 	public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner,
 			ServiceResourceIdentifier serviceId, String parameterName){
+		this.logBatchLearningRequest();
 		sa_si = new SA_SI(requestor, startDate, historyOwner, serviceId, parameterName, ctxBroker);
 		sa_si.start();
 	}
 	
 	
-
 	public void initialiseUserPreferenceLearning(){
-		//null
+		//empty
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
+	}
+	
+	
+	private void logBatchLearningRequest(){
+		IPerformanceMessage requestFreq = new PerformanceMessage();
+		requestFreq.setTestContext("RequestToRunBatchPreferenceLearningReceived");
+		requestFreq.setSourceComponent("org.societies.personalisation.UserPreferenceLearning.impl.UserPreferenceLearning");
+		requestFreq.setPerformanceType(IPerformanceMessage.Quanitative);
+		requestFreq.setOperationType("LoggingFrequencyOfBatchLearningRequests");
+		requestFreq.setD82TestTableName("S22");
+		requestFreq.setPerformanceNameValue("Count="+requestCount++);
+		PERF_LOG.trace(requestFreq.toString());
 	}
 
 }

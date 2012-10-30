@@ -101,7 +101,7 @@ var SocietiesXMPPRegistration = {
 		}
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServer").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#domainServer").val());
 		
 		//Update the login page with XMPP registered values
 		jQuery("#username").val(jQuery("#regUsername").val());
@@ -148,10 +148,6 @@ $(document).on('pageinit', '#new-identity', function(event) {
 		}
 	});
 	
-	$('#xmppRegistration').off('click').on('click', function(){
-		$.mobile.changePage("html/new_identity.html");
-	});
-
 });
 
 /**

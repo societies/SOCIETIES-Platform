@@ -35,8 +35,8 @@ import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.content.CssRecordDAO;
-import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalCSSManagerBinder;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
@@ -391,6 +391,7 @@ public class PluginCSSManager extends Plugin {
 					e.printStackTrace();
 				}
 			} 
+			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);

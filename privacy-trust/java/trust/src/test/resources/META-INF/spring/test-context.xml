@@ -93,9 +93,8 @@
 	
 	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.mock.MockEventMgr"/>
 	
-<!-- 
-	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
-		<constructor-arg name="classToBeMocked" value="org.societies.api.osgi.event.IEventMgr" />
+	<bean id="ctxTrustEvidenceMonitor" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
+		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.impl.evidence.monitor.CtxTrustEvidenceMonitor" />
 	</bean>
- -->	
+	
 </beans>

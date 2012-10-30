@@ -223,18 +223,13 @@ public class PrivacyPolicyController {
 		// -- Retrieve the privacy policy
 		RequestorService provider = null;
 		RequestPolicy privacyPolicy = null;
-		Service service = ServiceModelUtils.getServiceFromServiceInstance(serviceId, serviceDiscovery);
+		Service service = null;
+		//Service service = ServiceModelUtils.getServiceFromServiceInstance(serviceId, serviceDiscovery);
 		//service.setServiceName(serviceId);
 		try {
-			IIdentity serviceOwnerIdentity = null;
-			// Current node
-			if (null == serviceOwnerId || "".equals(serviceOwnerId)) {
-				serviceOwnerIdentity = commMngrRef.getIdManager().getThisNetworkNode(); 
-			}
-			else {
-				serviceOwnerIdentity = commMngrRef.getIdManager().fromJid(serviceOwnerId);
-			}
-			ServiceResourceIdentifier serviceIdentity = service.getServiceIdentifier();
+			ServiceResourceIdentifier serviceIdentity = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceId);
+			IIdentity serviceOwnerIdentity  = commMngrRef.getIdManager().fromJid(ServiceModelUtils.getJidFromServiceIdentifier(serviceIdentity));
+
 			provider = new RequestorService(serviceOwnerIdentity, serviceIdentity);
 			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(provider);
 			Future<Service> serviceFuture = serviceDiscovery.getService(serviceIdentity);

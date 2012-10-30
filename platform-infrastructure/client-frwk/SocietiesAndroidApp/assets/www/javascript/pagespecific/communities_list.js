@@ -32,9 +32,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 var	SocietiesCISListService = {
 		
-	mCommunitities: {}, //USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
-	mCisServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
-	mMyServices: {}, 		//USED TO STORE ALL SERVICES TO SAVE ROUND TRIPS
+	mCommunitities: {}, 	//USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
+	mCisServices: {}, 		//USED TO STORE ALL CIS SERVICES TO SAVE ROUND TRIPS
+	mMyServices: {}, 		//USED TO STORE ALL MY SERVICES TO SAVE ROUND TRIPS
+	mActivities: {}, 		//USED TO STORE ALL ACTIVITIES TO SAVE ROUND TRIPS
 	mCis_id: "",
 	mLastDate: "",
 	
@@ -45,8 +46,9 @@ var	SocietiesCISListService = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns none
 	 */
-	populateCISListpage: function(data) {
-		
+	populateCISListpage: function(data, bAdmin) {
+		if(bAdmin==undefined)
+		    bAdmin=true;
 		mCommunitities = data;
 		//EMPTY TABLE - NEED TO LEAVE THE HEADER
 		while( $('ul#CommunitiesListDiv').children().length >1 )
@@ -54,7 +56,7 @@ var	SocietiesCISListService = {
 		
 		//DISPLAY COMMUNTIES
 		for (i  = 0; i < data.length; i++) {
-			var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+			var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ', ' + bAdmin + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 							 '<h2>' + data[i].communityName + '</h2>' + 
 							 '<p>' + data[i].communityType + '</p>' + 
 							 '</a></li>';
@@ -63,7 +65,7 @@ var	SocietiesCISListService = {
 		$('#CommunitiesListDiv').listview('refresh');
 	},
 	
-	showCISDetails: function (cisPos) {
+	showCISDetails: function (cisPos, bAdmin) {
 		// GET SERVICE FROM ARRAY AT POSITION
 		var communityObj = mCommunitities[ cisPos ];
 		if ( communityObj ) {
@@ -84,8 +86,8 @@ var	SocietiesCISListService = {
 			catch(err) {}
 			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 			
-			SocietiesCISListService.showCISActivities(communityObj.communityJid);
-			SocietiesCISListService.showCISMembers(communityObj.communityJid);
+			SocietiesCISListService.showCISActivities(communityObj.communityJid, bAdmin);
+			SocietiesCISListService.showCISMembers(communityObj.communityJid, bAdmin);
 			ServiceManagementServiceHelper.connectToServiceManagement(function() {
 								SocietiesCISListService.showCISServices(communityObj.communityJid); }
 								);
@@ -93,13 +95,24 @@ var	SocietiesCISListService = {
 		}
 	},
 	
-	showCISActivities: function (cisId) {
+	showCISActivities: function (cisId, bAdmin) {
 		function success(data) {
+			//INIT
+			mActivities = data;
 			mLastDate="";
+			//ADD ACTIVTY FORM VISIBLE IF NOT IN ADMIN MODE
+			if (bAdmin) {
+				$('div#activityFeedForm').hide();
+				$('div#addActivityDiv').hide();
+			} else {
+				$('div#activityFeedForm').show();
+				$('div#addActivityDiv').show();
+			}
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_activity_feed').children().length >0 )
 				$('ul#cis_activity_feed li:last').remove();
-			
+
+			//FOREACH ACTIVITY
 			if(data.length > 0) {
 				for (i=data.length-1; i >= 0 ; i--) {
 					//HEADER
@@ -109,6 +122,11 @@ var	SocietiesCISListService = {
 					if (mLastDate != dateStr) {
 						mLastDate = dateStr;
 						$('ul#cis_activity_feed').append("<li data-role=\"list-divider\">" + dateStr + "</li>" );
+					}
+					//LINKS TO ALLOW DELETE IF IN ADMIN MODE
+					var deleteTag = '';
+					if (bAdmin) {
+						deleteTag = '<a href="#" onclick="SocietiesCISListService.deleteActivity(' + i + ', \'' + cisId + '\')">Delete</a>';
 					}
 					//DATA
 					var hours = d.getHours(),
@@ -125,10 +143,12 @@ var	SocietiesCISListService = {
 					//BODY FORMATTING
 					var n=data[i].actor.indexOf(".");
 					var actorStr = data[i].actor.substring(0, n);
-					var tableEntry = "<li><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
-									 "<p>"+ actorStr + " " +
-						 	 		 data[i].verb  + " " + 
-						 	 		 data[i].object + "</p></li>";
+					//var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
+					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
+									 "<h2>"+ actorStr + "</h2>" +
+						 	 		 "<p>" + data[i].verb  + " " + data[i].object + "</p>" +
+						 	 		"<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
+						 	 		 "</a>" + deleteTag + "</li>";
 					$('ul#cis_activity_feed').append(tableEntry);
 				}
 				//STORE MOST RECENT DATE - HELPS ADDING
@@ -137,6 +157,7 @@ var	SocietiesCISListService = {
 				mLastDate = recent.getFullYear() + "-" + (recent.getMonth()+1) + "-" + recent.getDate();
 			}
 			$('ul#cis_activity_feed').listview('refresh');
+			$('ul#cis_activity_feed').trigger( "collapse" );
 			//EXPAND LIST IF SHORT
 			//if (data.length <3)
 			//	$('ul#cis_activity_feed').trigger( "expand" );
@@ -150,6 +171,27 @@ var	SocietiesCISListService = {
 		
 		window.plugins.SocietiesLocalCISManager.getActivityFeed(cisId, success, failure);
 	},
+	
+	deleteActivity: function(pos, cisId) {
+		function success(data) {
+			$('#li' + mActivities[pos].published).remove().slideUp('slow');
+		}
+		
+		function failure(data) {
+			alert("Delete Activity - failure: " + data);
+		}
+		
+		//SEND REQUEST
+		var activity = mActivities[pos];
+		//if (window.confirm("Remove this entry?")) {
+		jConfirm("Delete this entry?", 'Delete Activity', function(answer) {
+			if (answer) {
+				$('#li' + mActivities[pos].published).append("Removing...");
+				window.plugins.SocietiesLocalCISManager.deleteActivity(cisId, activity, success, failure);
+			}
+		});
+	},
+
 	/*
 	  var lastdata = null;     
 	  var liCount = 0;     
@@ -217,20 +259,36 @@ var	SocietiesCISListService = {
 		window.plugins.SocietiesLocalCISManager.addActivity(mCis_id, activity, success, failure);
 	},
 	
-	showCISMembers: function (cisId) {
-		
+	showCISMembers: function (cisId, bAdmin) {		
 		function success(data) {
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_members').children().length >0 )
 				$('ul#cis_members li:last').remove();
 			
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = "<li><h2>"+ data[i].jid + "</h2>" + 
-									 "<p>" + data[i].role  + "</p></li>";
+				//TODO: NEED TO GET NAME ADDED TO PARTICIPANT OBJECT. ONLY HAVE JID!
+				var n=data[i].jid.indexOf(".");
+				var identityStr = data[i].jid.substring(0, n);
+				//SEND FRIEND REQUEST LINK
+				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
+					friendRequestATagClose = "</a>";
+				//GENERATE REMOVE MEMBER LINK - ADMIN MODE ONLY
+				var removeMember = "";
+				if (bAdmin) {
+					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
+					if (data[i].role == "owner") {
+						//PREVENT FRIEND REQUESTS TO SELF
+						friendRequestATag = "", friendRequestATagClose = "", removeMember="";
+					}
+				}
+				//TABLE ENTRY
+				var tableEntry = '<li id="li' + i + '">' + friendRequestATag + 
+								 '<h2>'+ data[i].jid + '</h2>' + 
+								 '<p>' + data[i].role  + '</p>' + friendRequestATagClose + removeMember + '</li>';
 				$('ul#cis_members').append(tableEntry);
 			}
 			$('ul#cis_members').listview('refresh');
-			
+			$('ul#cis_members').trigger( "collapse" );
 			//AUTO EXPAND IF ROW COUNT IS SMALL 
 			//if (data.length <3)
 			//	$('ul#cis_members').trigger( "expand" );
@@ -243,6 +301,40 @@ var	SocietiesCISListService = {
 		}
 		
 		window.plugins.SocietiesLocalCISManager.getMembers(cisId, success, failure);
+	},
+	
+	removeMember: function(name, css_id, id) {
+		function success(data) {
+			$('li#li' + id).remove().slideUp('slow');
+		}
+		
+		function failure(data) {
+			$('li#li' + id).append("Error removing: " + data);
+		}
+		
+		//SEND REQUEST
+		if (window.confirm("Remove " + name + " from this community?")) {
+			$('li#li' + id).append('removing...');
+			window.plugins.SocietiesLocalCISManager.removeMember(mCis_id, css_id, success, failure);
+		}
+	},
+	
+	sendFriendRequest: function(name, css_id, id) {
+		function success(data) {
+			$('li#li' + id).append("Request sent.");
+		}
+		
+		function failure(data) {
+			$('li#li' + id).append("Error sending request: " + data);
+		}
+		
+		//SEND REQUEST
+		//if (window.confirm("Send friend request to " + name + "?")) {
+		jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
+		     if (answer){
+		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
+		     }
+		});
 	},
 	
 	/**
@@ -271,6 +363,7 @@ var	SocietiesCISListService = {
 				$('ul#cis_shared_apps').append(tableEntry);
 			}
 			$('ul#cis_shared_apps').listview('refresh');
+			$('ul#cis_shared_apps').trigger( "collapse" );
 		}
 		
 		function failure(data) {
@@ -308,13 +401,15 @@ var	SocietiesCISListService = {
 		if (servicePos != "0000") { //"Select a Service"
 			mCis_id = $('input#cis_id').val();
 			serviceObj = mMyServices[servicePos];
-			if (confirm("Share service: " + serviceName + " to this community?")) {
-				window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
-				//ADD SERVICE TO LIST OF SHARED SERVICES
-				mCisServices.push(serviceObj);
-			}
-			else
+			//if (confirm("Share service: " + serviceName + " to this community?")) {
+			jConfirm("Share " + serviceName + " to this community?", 'Share Service', function(answer) {
+			     if (answer){
+					window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
+					//ADD SERVICE TO LIST OF SHARED SERVICES
+					mCisServices.push(serviceObj);
+			     } else
 				$('select#selShareService').attr('selectedIndex', 0);
+			});
 		}
 		$('select#selShareService').selectmenu('refresh');
 	},

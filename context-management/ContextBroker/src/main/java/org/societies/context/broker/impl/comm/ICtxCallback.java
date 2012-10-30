@@ -27,6 +27,7 @@ package org.societies.context.broker.impl.comm;
 
 import java.util.List;
 
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -37,16 +38,18 @@ import org.societies.api.context.model.CtxModelObject;
 public interface ICtxCallback {
 
 	public void onCreatedEntity(CtxEntity retObject);
-
+	
 	public void onCreatedAttribute(CtxAttribute retObject);
 	
-	public void onLookupCallback(List<CtxIdentifier> ctxIdsList);
-	
+	public void onCreatedAssociation(CtxAssociation retObject);
+
 	public void onRetrieveCtx(CtxModelObject ctxObj);
 	
-	public void onUpdateCtx(CtxModelObject ctxObj);
-		
-	public void receiveCtxResult(Object retObject, String type);
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId);
 	
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId);
+	public void onUpdateCtx(CtxModelObject ctxObj);
+	
+	public void onRemovedModelObject(CtxModelObject ctxObj);
+	
+	public void onLookupCallback(List<CtxIdentifier> ctxIdsList);
 }

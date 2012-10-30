@@ -6,7 +6,7 @@
     <groupId>org.societies.comm.android</groupId>
     <artifactId>AndroidPubsub</artifactId>
     <version>${version.comm}</version>
-    <packaging>apk</packaging>
+    <packaging>apklib</packaging>
 
     <parent>
 	    <groupId>org.societies</groupId>

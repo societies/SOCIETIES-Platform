@@ -33,7 +33,7 @@ public class ClientCommunicationMgr {
 	
 	private static final String LOG_TAG = ClientCommunicationMgr.class.getName();
 
-	private static final ComponentName serviceCN = new ComponentName("org.societies", "org.societies.AgentService"); // TODO
+	private static final ComponentName serviceCN = new ComponentName("org.societies.comms", "org.societies.comms.AgentService"); // TODO
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
@@ -83,7 +83,10 @@ public class ClientCommunicationMgr {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
 				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));
 				try {
+					Log.d(LOG_TAG, "unregister element names unbindService for : " + this.toString() + " " + System.currentTimeMillis());
 					androidContext.unbindService(this);
+					
+					Log.d(LOG_TAG, "unregister element names previous registration unbindService for: " + registerConnection.toString() + " " + System.currentTimeMillis());
 					androidContext.unbindService(registerConnection);
 				} catch(Exception e) {
 					Log.e(LOG_TAG, "Exception while unbinding service.", e);
@@ -196,6 +199,8 @@ public class ClientCommunicationMgr {
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendMessage(xml);		
+				
+				Log.d(LOG_TAG, "sendMessage unbindService for: " + this.toString() + " " + System.currentTimeMillis());
 				androidContext.unbindService(this);
 			}
 
@@ -225,7 +230,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void bindService(ServiceConnection connection) {
-		Log.d(LOG_TAG, "bindService");
+		Log.d(LOG_TAG, "bindService bindService for: " + connection.toString() + " " + System.currentTimeMillis());
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
         androidContext.bindService(intent, connection, BIND_AUTO_CREATE);
@@ -360,6 +365,58 @@ public class ClientCommunicationMgr {
 		return rv;
 	}	
 	
+	public void setDomainAuthorityNode(final String domainAuthorityNode) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setDomainAuthorityNode(domainAuthorityNode);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public void setPortNumber(final int port) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setPortNumber(port);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public void setResource(final String resource) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setResource(resource);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}		
+	}
+	
+	public void setDebug(final boolean enabled) {
+		try {
+			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					agent.setDebug(enabled);
+					return null;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
 	private static IIdentityManager createIdentityManager(String thisNode, String daNode) throws InvalidFormatException {
 		IIdentityManager idm;
 		if(daNode == null)
@@ -367,5 +424,5 @@ public class ClientCommunicationMgr {
 		else
 			idm = new IdentityManagerImpl(thisNode, daNode);
 		return idm;
-	}
+	}	
 }

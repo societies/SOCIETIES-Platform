@@ -26,25 +26,32 @@ package org.societies.context.source.css.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -64,7 +71,9 @@ public class CssCtxMonitor extends EventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CssCtxMonitor.class);
 	
-	private static final String[] EVENT_TYPES = { EventTypes.CSS_RECORD_EVENT };
+	private static final String[] EVENT_TYPES = { EventTypes.CSS_RECORD_EVENT,
+		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_CREATION, 
+		EventTypes.CIS_SUBS, EventTypes.CIS_UNSUBS };
 			
 	/** The internal Context Broker service. */
 	@Autowired(required=true)
@@ -75,6 +84,9 @@ public class CssCtxMonitor extends EventListener {
 	
 	/** The Comm Mgr service. */
 	private ICommManager commMgr;
+	
+	/** The executor service. */
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	
 	@Autowired(required=true)
 	CssCtxMonitor(IEventMgr eventMgr, ICommManager commMgr) {
@@ -87,7 +99,7 @@ public class CssCtxMonitor extends EventListener {
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
 		this.eventMgr.subscribeInternalEvent(this, EVENT_TYPES, null);
-		// TODO unsubscribe when stopped
+		// TODO unsubscribe when stopped?
 	}
 
 	/*
@@ -96,7 +108,8 @@ public class CssCtxMonitor extends EventListener {
 	@Override
 	public void handleExternalEvent(CSSEvent event) {
 		
-		LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
+		if (LOG.isWarnEnabled())
+			LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
 	}
 
 	/*
@@ -108,53 +121,272 @@ public class CssCtxMonitor extends EventListener {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received internal " + event.geteventType() + " event: " + event);
 		
-		if (!(event.geteventInfo() instanceof CssRecord)) {
+		if (EventTypes.CSS_RECORD_EVENT.equals(event.geteventType())) {
+
+			if (!(event.geteventInfo() instanceof CssRecord)) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected event info of type " + CssRecord.class.getName()
+						+ " but was " + event.geteventInfo().getClass());
+				return;
+			}
+
+			final CssRecord cssRecord = (CssRecord) event.geteventInfo();
+			this.executorService.execute(new CssRecordUpdateHandler(cssRecord));
 			
-			LOG.error("Could not handle internal " + event.geteventType() + " event: " 
-					+ "Expected event info of type " + CssRecord.class.getName()
-					+ " but was " + event.geteventInfo().getClass());
-			return;
-		}
+		} else if (EventTypes.CSS_FRIENDED_EVENT.equals(event.geteventType())) {
+			
+			if (event.geteventSource() == null || event.geteventSource().isEmpty()) {
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected non-empty event source "
+						+ " but was " + event.geteventSource());
+				return;
+			}
+			if (!(event.geteventInfo() instanceof String)) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected event info of type " + CssRecord.class.getName()
+						+ " but was " + event.geteventInfo().getClass());
+				return;
+			}
+			
+			this.executorService.execute(new CssFriendedHandler(event.geteventSource(),
+					(String) event.geteventInfo()));
+			
+		} else if (EventTypes.CIS_CREATION.equals(event.geteventType())
+				|| EventTypes.CIS_SUBS.equals(event.geteventType())
+				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
+			
+			if (!(event.geteventInfo() instanceof Community)) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected event info of type " + Community.class.getName()
+						+ " but was " + event.geteventInfo().getClass());
+				return;
+			}
+
+			final Community cisRecord = (Community) event.geteventInfo();	
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())
+					|| EventTypes.CIS_SUBS.equals(event.geteventType()))
+				this.executorService.execute(new CssJoinedCisHandler(cisRecord.getCommunityJid()));
+			else //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
+				this.executorService.execute(new CssLeftCisHandler(cisRecord.getCommunityJid()));
+			
+		} else {
 		
-		final CssRecord cssRecord = (CssRecord) event.geteventInfo();
-		this.updateCssContext(cssRecord);
+			if (LOG.isWarnEnabled())
+				LOG.warn("Received unexpeted event of type '" + event.geteventType() + "'");
+		}
 	}
 	
-	private void updateCssContext(CssRecord cssRecord) {
+	private class CssRecordUpdateHandler implements Runnable {
 		
-		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Updating context based on updated CSS record: " + cssRecord);
-		final String cssIdStr = cssRecord.getCssIdentity();
-		try {
-			IIdentity cssId = this.commMgr.getIdManager().fromJid(cssIdStr);
-			CtxEntityIdentifier ownerCtxId = 
-					this.ctxBroker.retrieveIndividualEntity(cssId).get().getId();
+		private final CssRecord cssRecord;
+		
+		private CssRecordUpdateHandler(final CssRecord cssRecord) {
 			
-			String value;
+			this.cssRecord = cssRecord;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("Updated CSS record: " + cssRecord);
 			
-			// NAME
-			value = cssRecord.getName();
-			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME, value);
+			final String cssIdStr = cssRecord.getCssIdentity();
+			try {
+				IIdentity cssId = commMgr.getIdManager().fromJid(cssIdStr);
+				CtxEntityIdentifier ownerCtxId = 
+						ctxBroker.retrieveIndividualEntity(cssId).get().getId();
+
+				String value;
+
+				// NAME
+				value = cssRecord.getName();
+				if (value != null && !value.isEmpty())
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME, value);
+
+				// EMAIL
+				value = cssRecord.getEmailID();
+				if (value != null && !value.isEmpty())
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+
+				// ADDRESS_HOME_CITY
+				value = cssRecord.getHomeLocation();
+				if (value != null && !value.isEmpty())
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
+	private class CssFriendedHandler implements Runnable {
+		
+		private final String myCssIdStr;
+		private final String newFriendIdStr;
+		
+		private CssFriendedHandler(final String myCssIdStr,final String newFriendIdStr) {
 			
-			// EMAIL
-			value = cssRecord.getEmailID();
-			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+			this.myCssIdStr = myCssIdStr;
+			this.newFriendIdStr = newFriendIdStr;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("CSS '" + myCssIdStr + "' friended '" + newFriendIdStr + "'");
 			
-			// ADDRESS_HOME_CITY
-			value = cssRecord.getHomeLocation();
-			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
+			try {
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(myCssIdStr);
+				final IndividualCtxEntity myCssEnt = 
+						ctxBroker.retrieveIndividualEntity(myCssId).get();
+
+				final IIdentity newFriendId = commMgr.getIdManager().fromJid(newFriendIdStr);
+				final CtxEntityIdentifier newFriendEntId =
+						ctxBroker.retrieveIndividualEntityId(
+								new Requestor(myCssId), newFriendId).get();
+				
+				final CtxAssociation isFriendsWithAssoc;
+				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).isEmpty())
+					isFriendsWithAssoc = ctxBroker.createAssociation(
+							new Requestor(myCssId), myCssId, CtxAssociationTypes.IS_FRIENDS_WITH).get();
+				else
+					isFriendsWithAssoc = (CtxAssociation) ctxBroker.retrieve(
+							myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().next()).get();
+				isFriendsWithAssoc.setParentEntity(myCssEnt.getId());
+				isFriendsWithAssoc.addChildEntity(newFriendEntId);
+				ctxBroker.update(isFriendsWithAssoc);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
+	private class CssJoinedCisHandler implements Runnable {
+		
+		private final String cisIdStr;
+		
+		private CssJoinedCisHandler(final String cisIdStr) {
 			
-		} catch (InvalidFormatException ife) {
+			this.cisIdStr = cisIdStr;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("CSS joined CIS '" + cisIdStr + "'");
 			
-			LOG.error("Invalid CSS IIdentity found in CSS record: " 
-					+ ife.getLocalizedMessage(), ife);
-		} catch (Exception e) {
+			try {
+				// TODO find the right way (TM) to get my CSS ID?
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(
+						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+				final IndividualCtxEntity myCssEnt = 
+						ctxBroker.retrieveIndividualEntity(myCssId).get();
+
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				final CtxEntityIdentifier cisEntId =
+						ctxBroker.retrieveCommunityEntityId(
+								new Requestor(myCssId), cisId).get();
+				
+				final CtxAssociation isMemberOfAssoc;
+				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
+					isMemberOfAssoc = ctxBroker.createAssociation(
+							new Requestor(myCssId), myCssId, CtxAssociationTypes.IS_MEMBER_OF).get();
+				else
+					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+				isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+				isMemberOfAssoc.addChildEntity(cisEntId);
+				ctxBroker.update(isMemberOfAssoc);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
+	private class CssLeftCisHandler implements Runnable {
+		
+		private final String cisIdStr;
+		
+		private CssLeftCisHandler(final String cisIdStr) {
 			
-			LOG.error("Failed to access context data: " 
-					+ e.getLocalizedMessage(), e);
+			this.cisIdStr = cisIdStr;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isInfoEnabled())
+				LOG.info("CSS left CIS '" + cisIdStr + "'");
+			
+			try {
+				// TODO find the right way (TM) to get my CSS ID?
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(
+						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+				final IndividualCtxEntity myCssEnt = 
+						ctxBroker.retrieveIndividualEntity(myCssId).get();
+
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				final CtxEntityIdentifier cisEntId =
+						ctxBroker.retrieveCommunityEntityId(
+								new Requestor(myCssId), cisId).get();
+				
+				final CtxAssociation isMemberOfAssoc;
+				if (!myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
+					
+					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+					isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+					isMemberOfAssoc.removeChildEntity(cisEntId);
+					ctxBroker.update(isMemberOfAssoc);
+				}
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (Exception e) {
+
+				LOG.error("Failed to access context data: " 
+						+ e.getLocalizedMessage(), e);
+			}
 		}
 	}
 	
@@ -168,7 +400,7 @@ public class CssCtxMonitor extends EventListener {
 				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
 		final CtxAttribute attr;
 		if (!ctxIds.isEmpty())
-			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0));
+			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
 		else
 			attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
 			

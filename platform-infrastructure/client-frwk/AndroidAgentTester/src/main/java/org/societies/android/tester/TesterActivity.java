@@ -156,7 +156,8 @@ public class TesterActivity extends Activity {
 			}
 
 			public void receiveError(Stanza stanza, XMPPError error) {
-				log.debug("receiveError");
+				log.debug("receiveError: "+error.getStanzaErrorString());
+				debugStanza(stanza);				
 			}
 
 			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {

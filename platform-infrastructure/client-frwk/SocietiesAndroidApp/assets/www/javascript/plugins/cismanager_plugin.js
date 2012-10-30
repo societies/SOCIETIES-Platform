@@ -89,15 +89,17 @@ var	SocietiesLocalCISManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 * @returns CIS record array
 	 */
-	listCIS: function(successCallback, failureCallback) {
+	listCIS: function(successCallback, failureCallback, listCriteria) {
 		console.log("Call LocalCISManagerService - listCIS");
 		var client = "org.societies.android.platform.gui";
+		if (listCriteria==undefined)
+			listCriteria = "all";
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'getCisList',          //Telling the plugin, which action we want to perform
-				[client, "all"]);        //Passing a list of arguments to the plugin
+				[client, listCriteria]);        //Passing a list of arguments to the plugin
 	},
 	
 	findForAllCis: function(searchTerm, successCallback, failureCallback) {
@@ -164,6 +166,28 @@ var	SocietiesLocalCISManager = {
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'addActivity',          //Telling the plugin, which action we want to perform
 				[client, cis_id, activity]);        //Passing a list of arguments to the plugin
+	},
+	
+	deleteActivity: function(cis_id, activity, successCallback, failureCallback) {
+		console.log("deleteActivity invoked");
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'deleteActivity',          //Telling the plugin, which action we want to perform
+				[client, cis_id, activity]);        //Passing a list of arguments to the plugin
+	},
+	
+	removeMember: function(cis_id, memberJid, successCallback, failureCallback) {
+		console.log("removeMember invoked");
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'removeMember',          //Telling the plugin, which action we want to perform
+				[client, cis_id, memberJid]);        //Passing a list of arguments to the plugin
 	}
 	
 };

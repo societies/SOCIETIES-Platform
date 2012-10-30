@@ -44,10 +44,12 @@ import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.cis.CisDirectoryRemote;
 import org.societies.android.platform.cis.CommunityManagement;
 import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
 
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -190,9 +192,9 @@ public class PluginCISFunctions extends Plugin {
         intentFilter.addAction(ICisSubscribed.DELETE_ACTIVITY);
         intentFilter.addAction(ICisSubscribed.CLEAN_ACTIVITIES);
         //CIS DIRECTORY
-        intentFilter.addAction(CisDirectoryRemote.FIND_ALL_CIS);
-        intentFilter.addAction(CisDirectoryRemote.FILTER_CIS);
-        intentFilter.addAction(CisDirectoryRemote.FIND_CIS_ID);
+        intentFilter.addAction(ICisDirectory.FIND_ALL_CIS);
+        intentFilter.addAction(ICisDirectory.FILTER_CIS);
+        intentFilter.addAction(ICisDirectory.FIND_CIS_ID);
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     }
     
@@ -383,7 +385,7 @@ public class PluginCISFunctions extends Plugin {
 			Log.d(LOG_TAG, intent.getAction());
 			
 			//>>>>>>>>>  ICisManager METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			if (intent.getAction().equals(CommunityManagement.CREATE_CIS)) {
+			if (intent.getAction().equals(ICisManager.CREATE_CIS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 0);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -400,14 +402,12 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.DELETE_CIS)) {
+			} else if (intent.getAction().equals(ICisManager.DELETE_CIS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 1);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					//Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-					//Boolean deleted = Boolean.parseBoolean(parcel.toString());
 					Boolean deleted = intent.getBooleanExtra(ICisManager.INTENT_RETURN_VALUE, true);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
@@ -418,7 +418,7 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.GET_CIS_LIST)) {
+			} else if (intent.getAction().equals(ICisManager.GET_CIS_LIST)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 2);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -437,7 +437,21 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.JOIN_CIS)) { 
+			} else if (intent.getAction().equals(ICisManager.REMOVE_MEMBER)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3);
+				
+				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					//UNMARSHALL THE RESPONSE FROM intent
+					boolean bRemoved = intent.getBooleanExtra(ICisManager.INTENT_RETURN_VALUE, true);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, bRemoved);
+					result.setKeepCallback(false);
+					PluginCISFunctions.this.success(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			}  else if (intent.getAction().equals(ICisManager.JOIN_CIS)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 4);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -453,10 +467,16 @@ public class PluginCISFunctions extends Plugin {
 					//remove callback ID for given method invocation
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+					
+					//CREATE ANDROID NOTIFICATION
+					int notifierflags [] = new int [1];
+					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+					AndroidNotifier notifier = new AndroidNotifier(PluginCISFunctions.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
+					notifier.notifyMessage("Joined new community", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
 				}
 			}  
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			else if (intent.getAction().equals(CommunityManagement.GET_MEMBERS)) { 
+			else if (intent.getAction().equals(ICisSubscribed.GET_MEMBERS)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 0);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -475,7 +495,7 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.GET_CIS_INFO)) { 
+			} else if (intent.getAction().equals(ICisSubscribed.GET_CIS_INFO)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 1);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -491,7 +511,7 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.GET_ACTIVITY_FEED)) { 
+			} else if (intent.getAction().equals(ICisSubscribed.GET_ACTIVITY_FEED)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 2);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
@@ -510,26 +530,38 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
+			} else if (intent.getAction().equals(ICisSubscribed.ADD_ACTIVITY)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					boolean deleted = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_VALUE, true);
-					//RETURN A JSON OBJECT
-					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
+					boolean bAdded = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_VALUE, true);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, bAdded);
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
-					
+					//remove callback ID for given method invocation
+					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(ICisSubscribed.DELETE_ACTIVITY)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4);
+				
+				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {					
+					//unmarshall intent
+					boolean bDeleted = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_VALUE, true);
+					PluginResult result = new PluginResult(PluginResult.Status.OK, bDeleted);
+					result.setKeepCallback(false);
+					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			}
 			//>>>>>>>>>  ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			else if (intent.getAction().equals(CisDirectoryRemote.FIND_ALL_CIS)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(CisDirectoryRemote.methodsArray, 0);
+			else if (intent.getAction().equals(ICisDirectory.FIND_ALL_CIS)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 0);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -547,8 +579,8 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CisDirectoryRemote.FILTER_CIS)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(CisDirectoryRemote.methodsArray, 1);
+			} else if (intent.getAction().equals(ICisDirectory.FILTER_CIS)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 1);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -566,8 +598,8 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(CisDirectoryRemote.FIND_CIS_ID)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(CisDirectoryRemote.methodsArray, 2);
+			} else if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 2);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

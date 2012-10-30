@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.cssmanager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,6 +58,8 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
@@ -83,6 +86,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private static final String OLD_CSS_NODE = "Old CSS Node";
 	private static final String NODE_LOGIN = "Node Logged in";
 	
+	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+
+	
 	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
 	//Pubsub packages
@@ -99,7 +107,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
 
-	private IBinder binder = null;
+	private LocalCSSManagerBinder binder = null;
     
 //	private Messenger inMessenger;
 	private AndroidCSSRecord cssRecord;
@@ -126,8 +134,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
 		this.binder = new LocalCSSManagerBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(this);
 
 		this.cssRecord = null;
+		this.ccm = null;
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -141,16 +152,29 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	/**
 	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
 	 */
-	 public class LocalCSSManagerBinder extends Binder {
+	 public static class LocalCSSManagerBinder extends Binder {
+		 private WeakReference<LocalCSSManagerService> outerClassReference = null;
+		 
+		 public void addouterClassreference(LocalCSSManagerService instance) {
+			 this.outerClassReference = new WeakReference<LocalCSSManagerService>(instance);
+		 }
+		 
 		 public LocalCSSManagerService getService() {
-	            return LocalCSSManagerService.this;
+	            return outerClassReference.get();
 	        }
 	    }
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-//		return inMessenger.getBinder();
 		return this.binder;
 	}
 	
@@ -256,7 +280,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		this.ccm = new ClientCommunicationMgr(this);
+		this.configureClientCommunicationMgr();
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 		
@@ -306,12 +330,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 				
 		String params [] = {client};
-
 		
 		DomainLogout domainLogout = new DomainLogout();
 		
 		domainLogout.execute(params);
-
 	}
 
 	public AndroidCSSRecord modifyAndroidCSSRecord(String client, AndroidCSSRecord record) {
@@ -360,6 +382,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
 		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
+		
+		this.configureClientCommunicationMgr();
 		
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -808,7 +832,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
 				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
-				LocalCSSManagerService.this.ccm = null;
 				
 				results[0] = params[0];
 			}
@@ -1162,5 +1185,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			throw new RuntimeException(e);
 		}     
     }
+    
+    /**
+     * Create and configureClientCommunicationManager
+     */
+    private void configureClientCommunicationMgr() {
+		if (null == this.ccm) {
+			this.ccm = new ClientCommunicationMgr(this);
+			
+			AppPreferences appPreferences = new AppPreferences(this.getApplicationContext());
 
+			int xmppServerPort = appPreferences.getIntegerPrefValue(DOMAIN_AUTHORITY_SERVER_PORT);
+			String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
+			String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
+			
+			this.ccm.setDomainAuthorityNode(domainAuthorityName);
+			this.ccm.setPortNumber(xmppServerPort);
+			this.ccm.setResource(nodeJIDResource);
+		}
+    }
 }

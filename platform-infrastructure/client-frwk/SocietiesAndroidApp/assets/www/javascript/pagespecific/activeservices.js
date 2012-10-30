@@ -120,6 +120,7 @@ $(document).on('pageinit', '#activeServices', function(event) {
 	
 	$('#temp-active-services').off('click').on('click', function(){
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.getActiveServices);
+		$(".ui-page-active span[class='ui-btn-inner']").trigger('click');
 
 	});
 

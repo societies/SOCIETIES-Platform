@@ -47,7 +47,7 @@ import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidenc
 @Table(
 		name = TableName.INDIRECT_TRUST_EVIDENCE, 
 		uniqueConstraints = { @UniqueConstraint(columnNames = { 
-				"trustor_id", "trustee_id", "type", "timestamp", "info", "source" }) }
+				"trustor_id", "trustee_id", "type", "timestamp", "source" }) }
 )
 public class IndirectTrustEvidence extends TrustEvidence implements
 		IIndirectTrustEvidence {
