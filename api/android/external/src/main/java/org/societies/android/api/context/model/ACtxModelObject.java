@@ -24,17 +24,18 @@
  */
 package org.societies.android.api.context.model;
 
-import java.io.Serializable;
 import java.util.Date;
+
+import org.societies.api.context.model.CtxModelType;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
  * Base class for representing context model objects. This class defines methods
- * for accessing information common to all <code>CtxModelOject</code>
+ * for accessing information common to all <code>ACtxModelOject</code>
  * implementations. More specifically, every context model object can be referenced
- * by its {@link CtxIdentifier}. In addition, upon modification of a CtxModelOject
+ * by its {@link ACtxIdentifier}. In addition, upon modification of a ACtxModelOject
  * the last modification time is updated.   
  * 
  * @see CtxModelType
@@ -83,7 +84,7 @@ public abstract class ACtxModelObject implements Parcelable {
     
 	
 	/**
-	 * Constructs a CtxModelObject with the specified identifier
+	 * Constructs a ACtxModelObject with the specified identifier
 	 * 
 	 * @param id
 	 *            the identifier of the newly created context model object
@@ -97,7 +98,7 @@ public abstract class ACtxModelObject implements Parcelable {
 	 * Returns the identifier of this context model object
      * 
      * @return the identifier of this context model object
-     * @see CtxIdentifier
+     * @see ACtxIdentifier
 	 */
 	public ACtxIdentifier getId(){
 		
@@ -125,7 +126,7 @@ public abstract class ACtxModelObject implements Parcelable {
      * 
 	 * @return the IIdentity String representation of the CSS or CIS where the
 	 *             identified context model object is stored
-	 * @see CtxIdentifier#getOwnerId()
+	 * @see ACtxIdentifier#getOwnerId()
 	 */
 	public String getOwnerId() {
 		
@@ -137,7 +138,7 @@ public abstract class ACtxModelObject implements Parcelable {
 	 * Attribute or Association
 	 * 
 	 * @return the enum constant for the context model type
-	 * @see CtxIdentifier#getModelType()
+	 * @see ACtxIdentifier#getModelType()
 	 */
 	public CtxModelType getModelType() {
 		
@@ -148,7 +149,7 @@ public abstract class ACtxModelObject implements Parcelable {
 	 * Returns the semantic tag (e.g. "person") of this context model object
 	 * 
 	 * @return the semantic tag of this context model object
-	 * @see CtxIdentifier#getType()
+	 * @see ACtxIdentifier#getType()
 	 */
 	public String getType() {
 		
@@ -159,7 +160,7 @@ public abstract class ACtxModelObject implements Parcelable {
 	 * Returns the numeric part of this context model object identifier 
 	 * 
 	 * @return the numeric part of this context model object identifier
-	 * @see CtxIdentifier#getObjectNumber()
+	 * @see ACtxIdentifier#getObjectNumber()
 	 */
 	public Long getObjectNumber() {
 		

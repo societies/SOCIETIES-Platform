@@ -27,42 +27,69 @@ package org.societies.android.api.context.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used to represent context associations.
  * 
- * @see CtxAssociationIdentifier
- * @see CtxEntity
+ * @see ACtxAssociationIdentifier
+ * @see ACtxEntity
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
-public class CtxAssociation extends ACtxModelObject {
-
-	private static final long serialVersionUID = 4837712964619525572L;
+public class ACtxAssociation extends ACtxModelObject {
 	
-	public CtxEntityIdentifier parentEntity;
+	public ACtxEntityIdentifier parentEntity;
 	
-	public final Set<CtxEntityIdentifier> childEntities = new HashSet<CtxEntityIdentifier>();
+	public final Set<ACtxEntityIdentifier> childEntities = new HashSet<ACtxEntityIdentifier>();
 	
 	/**
-	 * Constructs a CtxAssociation with the specified identifier
+	 * Constructs a ACtxAssociation with the specified identifier
 	 * 
 	 * @param id
 	 *            the identifier of the newly created cotnext association
 	 */
-	public CtxAssociation(CtxAssociationIdentifier id) {
+	public ACtxAssociation(ACtxAssociationIdentifier id) {
 		
 		super(id);
 	}
 
 	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    }
+
+    public static final Parcelable.Creator<ACtxAssociation> CREATOR = new Parcelable.Creator<ACtxAssociation>() {
+        public ACtxAssociation createFromParcel(Parcel in) {
+            return new ACtxAssociation(in);
+        }
+
+        public ACtxAssociation[] newArray(int size) {
+            return new ACtxAssociation[size];
+        }
+    };
+       
+    private ACtxAssociation(Parcel in) {
+    	super(in);
+    }
+    
+	/**
 	 * Returns the identifier of this context association.
 	 * 
-	 * @see CtxAssociationIdentifier
+	 * @see ACtxAssociationIdentifier
 	 */
 	@Override
-	public CtxAssociationIdentifier getId() {
+	public ACtxAssociationIdentifier getId() {
 		
-		return (CtxAssociationIdentifier) super.getId();
+		return (ACtxAssociationIdentifier) super.getId();
 	}
 
 	/**
@@ -70,9 +97,9 @@ public class CtxAssociation extends ACtxModelObject {
      * <code>null</code> to indicate an undirected association.
      * 
      * @return the parent entity of this context association
-     * @see CtxEntity
+     * @see ACtxEntity
 	 */
-	public CtxEntityIdentifier getParentEntity() {
+	public ACtxEntityIdentifier getParentEntity() {
 		
 		return this.parentEntity;
 	}
@@ -83,7 +110,7 @@ public class CtxAssociation extends ACtxModelObject {
      * If a <code>null</code> parameter is specified then the current parent
      * entity is unset and this association becomes undirected.
 	 */
-	public void setParentEntity(CtxEntityIdentifier parentEntity){
+	public void setParentEntity(ACtxEntityIdentifier parentEntity){
 		
 		this.parentEntity = parentEntity;
 	}
@@ -96,7 +123,7 @@ public class CtxAssociation extends ACtxModelObject {
 	 * @return a set containing the child entities in this context association
 	 * @see #getEntities(String)
 	 */
-	public Set<CtxEntityIdentifier> getChildEntities() {
+	public Set<ACtxEntityIdentifier> getChildEntities() {
 		
 		return this.getChildEntities(null);
 	}
@@ -115,14 +142,14 @@ public class CtxAssociation extends ACtxModelObject {
      * @return the associated context entities with the specified type
      * @see #getEntities() 
 	 */
-	public Set<CtxEntityIdentifier> getChildEntities(String type) {
+	public Set<ACtxEntityIdentifier> getChildEntities(String type) {
 		
-		final Set<CtxEntityIdentifier> result = new HashSet<CtxEntityIdentifier>();
+		final Set<ACtxEntityIdentifier> result = new HashSet<ACtxEntityIdentifier>();
 		
 		if (type == null) {
 			result.addAll(this.childEntities);
 		} else {
-			for (final CtxEntityIdentifier entity : this.childEntities)
+			for (final ACtxEntityIdentifier entity : this.childEntities)
 				if (type.equalsIgnoreCase(entity.getType()))
 					result.add(entity);
 		}
@@ -137,9 +164,9 @@ public class CtxAssociation extends ACtxModelObject {
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
-     * @see CtxEntityIdentifier
+     * @see ACtxEntityIdentifier
 	 */
-	public void addChildEntity(CtxEntityIdentifier childEntity) {
+	public void addChildEntity(ACtxEntityIdentifier childEntity) {
 		
 		if (childEntity == null)
 			throw new NullPointerException("childEntity can't be null");
@@ -155,9 +182,9 @@ public class CtxAssociation extends ACtxModelObject {
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
-     * @see CtxEntityIdentifier
+     * @see ACtxEntityIdentifier
 	 */
-	public void removeChildEntity(CtxEntityIdentifier childEntity) {
+	public void removeChildEntity(ACtxEntityIdentifier childEntity) {
 		
 		if (childEntity == null)
 			throw new NullPointerException("childEntity can't be null");

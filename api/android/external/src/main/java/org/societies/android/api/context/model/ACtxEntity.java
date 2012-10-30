@@ -24,35 +24,37 @@
  */
 package org.societies.android.api.context.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used to represent context entities. A
- * <code>CtxEntity</code> is the core concept upon which the context model is
+ * <code>ACtxEntity</code> is the core concept upon which the context model is
  * built. It corresponds to an object of the physical or conceptual world. For
  * example an entity could be a person, a device, or a service. The
- * {@link CtxAttribute} class is used in order to describe an entity's
+ * {@link ACtxAttribute} class is used in order to describe an entity's
  * properties. Concepts such as the name, the age, and the location of a person
  * are described by different context attributes. Relations that may exist among
- * different entities are described by the {@link CtxAssociation} class.
+ * different entities are described by the {@link ACtxAssociation} class.
  * <p>
- * The <code>CtxEntity</code> class provides access to the contained
+ * The <code>ACtxEntity</code> class provides access to the contained
  * context attributes and the associations this entity is member of.
  * 
- * @see CtxEntityIdentifier
- * @see CtxAttribute
- * @see CtxAssociation
+ * @see ACtxEntityIdentifier
+ * @see ACtxAttribute
+ * @see ACtxAssociation
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
 public class ACtxEntity extends ACtxModelObject {
 
-	private static final long serialVersionUID = -9180016236230471418L;
+	private Set<ACtxAttribute> attributes = new HashSet<ACtxAttribute>();
 	
-	private final Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
-	
-	private final Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
+	private Set<ACtxAssociationIdentifier> associations = new HashSet<ACtxAssociationIdentifier>();
 	
 	/**
 	 * Constructs a CtxEntity with the specified identifier
@@ -60,19 +62,54 @@ public class ACtxEntity extends ACtxModelObject {
 	 * @param id
 	 *            the identifier of the newly created context entity
 	 */
-	public ACtxEntity(CtxEntityIdentifier id) {
+	public ACtxEntity(ACtxEntityIdentifier id) {
 		
 		super(id);
 	}
 	
 	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    	out.writeTypedList(new ArrayList<ACtxAttribute>(attributes));
+    }
+
+    public static final Parcelable.Creator<ACtxEntity> CREATOR = new Parcelable.Creator<ACtxEntity>() {
+        public ACtxEntity createFromParcel(Parcel in) {
+            return new ACtxEntity(in);
+        }
+
+        public ACtxEntity[] newArray(int size) {
+            return new ACtxEntity[size];
+        }
+    };
+       
+    protected ACtxEntity(Parcel in) {
+    	super(in);
+    	if (attributes == null) {
+    		attributes = new HashSet<ACtxAttribute>();
+    	}
+    	in.readTypedList(new ArrayList<ACtxAttribute>(attributes), ACtxAttribute.CREATOR);
+    	if (associations == null) {
+    		associations = new HashSet<ACtxAssociationIdentifier>();
+    	}
+    	in.readTypedList(new ArrayList<ACtxAssociationIdentifier>(associations), ACtxAssociationIdentifier.CREATOR);
+    }
+    
+	/**
 	 * Returns the identifier of this context entity.
-	 * @see CtxEntityIdentifier
+	 * @see ACtxEntityIdentifier
 	 */
 	@Override
-	public CtxEntityIdentifier getId() {
+	public ACtxEntityIdentifier getId() {
 		
-		return (CtxEntityIdentifier) super.getId();
+		return (ACtxEntityIdentifier) super.getId();
 	}
 
 	/**
@@ -81,10 +118,10 @@ public class ACtxEntity extends ACtxModelObject {
      * attributes.
      * 
      * @return a set of the context attributes contained in this entity.
-     * @see CtxAttribute
+     * @see ACtxAttribute
      * @see #getAttributes(String)
 	 */
-	public Set<CtxAttribute> getAttributes(){
+	public Set<ACtxAttribute> getAttributes(){
 		
 		return this.getAttributes(null);
 	}
@@ -102,17 +139,17 @@ public class ACtxEntity extends ACtxModelObject {
 	 *            the context attribute type to match.
 	 * @return a set of the context attributes contained in this entity that
 	 *         have the specified type.
-	 * @see CtxAttribute
+	 * @see ACtxAttribute
 	 * @see #getAttributes()
 	 */
-	public Set<CtxAttribute> getAttributes(String type) {
+	public Set<ACtxAttribute> getAttributes(String type) {
 		
-		final Set<CtxAttribute> result = new HashSet<CtxAttribute>();
+		final Set<ACtxAttribute> result = new HashSet<ACtxAttribute>();
 		
 		if (type == null) {
 			result.addAll(this.attributes);
 		} else {
-			for (final CtxAttribute attr : this.attributes)
+			for (final ACtxAttribute attr : this.attributes)
 				if (type.equalsIgnoreCase(attr.getType()))
 						result.add(attr);
 		}
@@ -125,10 +162,10 @@ public class ACtxEntity extends ACtxModelObject {
 	 * member of any association.
 	 * 
 	 * @return a set containing all association identifiers this entity is member of
-	 * @see CtxAssociationIdentifier
+	 * @see ACtxAssociationIdentifier
 	 * @see #getAssociations(String)
 	 */
-	public Set<CtxAssociationIdentifier> getAssociations() {
+	public Set<ACtxAssociationIdentifier> getAssociations() {
 		
 		return this.getAssociations(null);
 	}
@@ -145,28 +182,28 @@ public class ACtxEntity extends ACtxModelObject {
 	 *            the context association type to match
 	 * @return a set containing all associations of the specified type this
 	 *         entity is member of
-	 * @see CtxAssociationIdentifier
+	 * @see ACtxAssociationIdentifier
 	 * @see #getAssociations()
 	 */
-	public Set<CtxAssociationIdentifier> getAssociations(String type) {
+	public Set<ACtxAssociationIdentifier> getAssociations(String type) {
 		
-		final Set<CtxAssociationIdentifier> result = new HashSet<CtxAssociationIdentifier>();
+		final Set<ACtxAssociationIdentifier> result = new HashSet<ACtxAssociationIdentifier>();
 		
 		if (type == null) {
 			result.addAll(this.associations);
 		} else {
-			for (final CtxAssociationIdentifier assoc : this.associations)
+			for (final ACtxAssociationIdentifier assoc : this.associations)
 				if (type.equalsIgnoreCase(assoc.getType()))
 						result.add(assoc);
 		}
 		return result;
 	}
 	
-	public void addAttribute(CtxAttribute attribute) {
+	public void addAttribute(ACtxAttribute attribute) {
         attributes.add(attribute);
     }
 	
-	void addAssociation(CtxAssociationIdentifier association) {
+	void addAssociation(ACtxAssociationIdentifier association) {
         associations.add(association);
     }
 

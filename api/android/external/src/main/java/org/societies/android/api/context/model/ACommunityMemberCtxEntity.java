@@ -24,23 +24,87 @@
  */
 package org.societies.android.api.context.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import android.os.Parcel;
+
 /**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
+ * This abstract class is used in order to represent members of a
+ * {@link ACommunityCtxEntity} (CIS). A <code>ACommunityMemberCtxEntity</code>
+ * can be an individual or a sub-community, hence, there are two concrete
+ * implementations of this class, namely {@link AIndividualCtxEntity} and
+ * {@link ACommunityCtxEntity}. A ACommunityMemberCtxEntity may belong to
+ * multiple communities, simultaneously. This class provides methods for
+ * accessing and modifying these communities.
  * 
- * @see CtxEntityIdentifier
+ * @see ACtxEntityIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
-
-	private static final long serialVersionUID = -1841816618272931692L;
+public abstract class ACommunityMemberCtxEntity extends ACtxEntity {
+		
+	/** The communities this entity is member of. */
+	private Set<ACommunityCtxEntity> communities = new HashSet<ACommunityCtxEntity>();
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
+	ACommunityMemberCtxEntity(ACtxEntityIdentifier id) {
 		
 		super(id);
+	}
+
+	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    }
+
+/*    public static final Parcelable.Creator<ACommunityMemberCtxEntity> CREATOR = new Parcelable.Creator<ACommunityMemberCtxEntity>() {
+        public ACommunityMemberCtxEntity createFromParcel(Parcel in) {
+            return new ACommunityMemberCtxEntity(in);
+        }
+
+        public ACommunityMemberCtxEntity[] newArray(int size) {
+            return new ACommunityMemberCtxEntity[size];
+        }
+    };*/
+       
+    protected ACommunityMemberCtxEntity(Parcel in) {
+    	super(in);
+    }
+    
+	/**
+	 * Returns a set with the community members.
+	 * 
+	 * @return set CommunityCtxEntity
+	 */
+	public Set<ACommunityCtxEntity> getCommunities() {
+		
+		return new HashSet<ACommunityCtxEntity>(this.communities);
+	}
+	
+	/**
+	 * Add a CommunityCtxEntity to the community
+	 * 
+	 * @param community
+	 */
+	public void addCommunity(ACommunityCtxEntity community) {
+		
+		this.communities.add(community);
+	}
+	
+	/**
+	 * Remove a CommunityCtxEntity from the community.
+	 * 
+	 * @param community
+	 */
+	public void removeCommunity(ACommunityCtxEntity community) {
+		
+		this.communities.remove(community);
 	}
 }

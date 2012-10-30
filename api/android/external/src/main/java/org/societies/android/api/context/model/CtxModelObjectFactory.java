@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import org.societies.api.context.model.CtxAttributeValueType;
+
 public final class CtxModelObjectFactory {
 
 	private static CtxModelObjectFactory instance = new CtxModelObjectFactory();
@@ -39,65 +41,65 @@ public final class CtxModelObjectFactory {
 		return instance;
 	}
 
-	public CtxEntity createEntity(final CtxEntityIdentifier id, 
-			final Date lastModified, final Set<CtxAttribute> attributes,
-			final Set<CtxAssociationIdentifier> associations) {
+	public ACtxEntity createEntity(final ACtxEntityIdentifier id, 
+			final Date lastModified, final Set<ACtxAttribute> attributes,
+			final Set<ACtxAssociationIdentifier> associations) {
 		
-		final CtxEntity result = new CtxEntity(id);
+		final ACtxEntity result = new ACtxEntity(id);
 		result.setLastModified(lastModified);
 		
 		if (attributes != null && !attributes.isEmpty())
-			for (final CtxAttribute attribute : attributes)
+			for (final ACtxAttribute attribute : attributes)
 				result.addAttribute(attribute);
 		
 		if (associations != null)
-			for (final CtxAssociationIdentifier association : associations)
+			for (final ACtxAssociationIdentifier association : associations)
 				result.addAssociation(association);
 				
 		return result;
 	}
 	
-	public IndividualCtxEntity createIndividualEntity(final CtxEntityIdentifier id, 
-			final Date lastModified, final Set<CtxAttribute> attributes,
-			final Set<CtxAssociationIdentifier> associations) {
+	public AIndividualCtxEntity createIndividualEntity(final ACtxEntityIdentifier id, 
+			final Date lastModified, final Set<ACtxAttribute> attributes,
+			final Set<ACtxAssociationIdentifier> associations) {
 		
-		final IndividualCtxEntity result = new IndividualCtxEntity(id);
+		final AIndividualCtxEntity result = new AIndividualCtxEntity(id);
 		result.setLastModified(lastModified);
 		
 		if (attributes != null)
-			for (final CtxAttribute attribute : attributes)
+			for (final ACtxAttribute attribute : attributes)
 				result.addAttribute(attribute);
 		
 		if (associations != null)
-			for (final CtxAssociationIdentifier association : associations)
+			for (final ACtxAssociationIdentifier association : associations)
 				result.addAssociation(association);
 				
 		return result;
 	}
 	
-	public CommunityCtxEntity createCommunityEntity(final CtxEntityIdentifier id, 
-			final Date lastModified, final Set<CtxAttribute> attributes,
-			final Set<CtxAssociationIdentifier> associations) {
+	public ACommunityCtxEntity createCommunityEntity(final ACtxEntityIdentifier id, 
+			final Date lastModified, final Set<ACtxAttribute> attributes,
+			final Set<ACtxAssociationIdentifier> associations) {
 		
-		final CommunityCtxEntity result = new CommunityCtxEntity(id);
+		final ACommunityCtxEntity result = new ACommunityCtxEntity(id);
 		result.setLastModified(lastModified);
 		
 		if (attributes != null)
-			for (final CtxAttribute attribute : attributes)
+			for (final ACtxAttribute attribute : attributes)
 				result.addAttribute(attribute);
 		
 		if (associations != null)
-			for (final CtxAssociationIdentifier association : associations)
+			for (final ACtxAssociationIdentifier association : associations)
 				result.addAssociation(association);
 				
 		return result;
 	}
 	
-	public CtxAttribute createAttribute(final CtxAttributeIdentifier id, 
+	public ACtxAttribute createAttribute(final ACtxAttributeIdentifier id, 
 			final Date lastModified, final Date lastUpdated, 
 			final Serializable value) {
 		
-		final CtxAttribute result = new CtxAttribute(id);
+		final ACtxAttribute result = new ACtxAttribute(id);
 		result.setLastModified(lastModified);
 		result.setValue(value);
 		if (lastUpdated != null)
@@ -106,22 +108,22 @@ public final class CtxModelObjectFactory {
 		return result;
 	}
 	
-	public CtxHistoryAttribute createHistoryAttribute(
-			final CtxAttributeIdentifier id, final Date lastModified,
+	public ACtxHistoryAttribute createHistoryAttribute(
+			final ACtxAttributeIdentifier id, final Date lastModified,
 			final Date lastUpdated,	final String stringValue,
 			final Integer integerValue,	final Double doubleValue, 
 			final byte[] binaryValue, final CtxAttributeValueType valueType,
 			final String valueMetric) {
 		
-		return new CtxHistoryAttribute(id,
+		return new ACtxHistoryAttribute(id,
 				lastModified, lastUpdated, stringValue, integerValue,
 				doubleValue, binaryValue, valueType, valueMetric);
 	}
 	
-	public CtxHistoryAttribute createHistoryAttribute(
-			final CtxAttribute attribute) {
+	public ACtxHistoryAttribute createHistoryAttribute(
+			final ACtxAttribute attribute) {
 		
-		return new CtxHistoryAttribute(attribute.getId(),
+		return new ACtxHistoryAttribute(attribute.getId(),
 				attribute.getLastModified(), 
 				attribute.getQuality().getLastUpdated(), 
 				attribute.getStringValue(), 
@@ -132,17 +134,17 @@ public final class CtxModelObjectFactory {
 				attribute.getValueMetric());
 	}
 	
-	public CtxAssociation createAssociation(final CtxAssociationIdentifier id, 
-			final Date lastModified, final CtxEntityIdentifier parentEntity,
-			final Set<CtxEntityIdentifier> childEntities) {
+	public ACtxAssociation createAssociation(final ACtxAssociationIdentifier id, 
+			final Date lastModified, final ACtxEntityIdentifier parentEntity,
+			final Set<ACtxEntityIdentifier> childEntities) {
 		
-		final CtxAssociation result = new CtxAssociation(id);
+		final ACtxAssociation result = new ACtxAssociation(id);
 		result.setLastModified(lastModified);
 		
 		result.setParentEntity(parentEntity);
 		
 		if (childEntities != null && !childEntities.isEmpty())
-			for (final CtxEntityIdentifier childEntity : childEntities)
+			for (final ACtxEntityIdentifier childEntity : childEntities)
 				result.addChildEntity(childEntity);
 				
 		return result;

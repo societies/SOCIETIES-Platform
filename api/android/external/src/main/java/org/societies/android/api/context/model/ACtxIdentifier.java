@@ -28,13 +28,14 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
+
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * This abstract class is used to identify context model objects. It provides
@@ -59,8 +60,8 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @since 0.0.1
  */
 public abstract class ACtxIdentifier extends DataIdentifier implements Parcelable {
-
-	private static final long serialVersionUID = 3552976823045895472L;
+	
+	private static final long serialVersionUID = -9169891916571423259L;
 	
 	protected static final String SCHEME_DELIM = "://";
 	protected static final String DELIM        = "/";

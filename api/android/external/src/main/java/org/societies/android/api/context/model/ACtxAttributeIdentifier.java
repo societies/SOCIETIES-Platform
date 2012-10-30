@@ -24,6 +24,9 @@
  */
 package org.societies.android.api.context.model;
 
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -48,19 +51,19 @@ import android.os.Parcelable;
  * &lt;Scope&gt;/ATTRIBUTE/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
  * <p>
- * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifier}
+ * Use the {@link #getScope()} method to retrieve the {@link ACtxEntityIdentifier}
  * representing the attribute's <tt>Scope</tt>
- * as a <code>CtxEntityIdentifier</code> object.
+ * as a <code>ACtxEntityIdentifier</code> object.
  * 
- * @see CtxEntityIdentifier
- * @see CtxIdentifier
+ * @see ACtxEntityIdentifier
+ * @see ACtxIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
 public class ACtxAttributeIdentifier extends ACtxIdentifier {
 	
-	private static final long serialVersionUID = -282171829285239788L;
-	
+	private static final long serialVersionUID = 2493913125507653922L;
+
 	/** The scope of this context attribute identifier. */
 	private transient ACtxEntityIdentifier scope;
 	
@@ -69,7 +72,7 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 	 * entity, the attribute type and the unique numeric model object identifier
 	 * 
 	 * @param scope
-	 *            the {@link CtxEntityIdentifier} of the context entity containing
+	 *            the {@link ACtxEntityIdentifier} of the context entity containing
 	 *            the identified attribute
 	 * @param type
 	 *            the attribute type, e.g. "name"
@@ -117,10 +120,10 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 
 	
 	/**
-	 * Returns the {@link CtxEntityIdentifier} of the context entity containing
+	 * Returns the {@link ACtxEntityIdentifier} of the context entity containing
 	 * the identified attribute.
 	 * 
-	 * @return the {@link CtxEntityIdentifier} of the context entity containing
+	 * @return the {@link ACtxEntityIdentifier} of the context entity containing
 	 *         the identified attribute.
 	 */
 	public ACtxEntityIdentifier getScope() {
@@ -173,7 +176,7 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#defineString()
+	 * @see ACtxIdentifier#defineString()
 	 */
 	@Override
 	protected void defineString() {
@@ -200,7 +203,7 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#parseString(java.lang.String)
+	 * @see ACtxIdentifier#parseString(java.lang.String)
 	 */
 	@Override
 	protected void parseString(String input)

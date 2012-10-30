@@ -24,55 +24,50 @@
  */
 package org.societies.android.api.context.model;
 
-import org.societies.api.schema.context.model.CtxIdentifierBean;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Describe your class here...
- *
- * @author pkosmides
- *
+ * This class is used to represent a single participant (CSS) of a
+ * {@link ACommunityCtxEntity} (CIS). An <code>AIndividualCtxEntity</code> may belong to
+ * zero or more CISs, simultaneously. The individual members of a pervasive community do
+ * not need to be human beings. They can also be organisations, smart space
+ * infrastructures, autonomous or semi-autonomous agents, etc.
+ * 
+ * @see ACtxEntityIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
-public class ACtxIdentifierBean extends CtxIdentifierBean implements Parcelable {
+public class AIndividualCtxEntity extends ACommunityMemberCtxEntity {
 	
-	private static final long serialVersionUID = 6612786379303369931L;
-
-	public ACtxIdentifierBean() {
-		super();
-	}
-	
-	/* @see android.os.Parcelable#describeContents()*/
-	public int describeContents() {
-		return 0;
-	}
-
-	/* @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)*/
-	public void writeToParcel(Parcel dest, int flags) {
-
-		dest.writeString(this.getString());
-	}
-			
-	private ACtxIdentifierBean(Parcel in) {
-		super();
+	public AIndividualCtxEntity(ACtxEntityIdentifier id) {
 		
-		this.setString(in.readString());
+		super(id);
 	}
-
-	public static final Parcelable.Creator<ACtxIdentifierBean> CREATOR = new Parcelable.Creator<ACtxIdentifierBean>() {
-		public ACtxIdentifierBean createFromParcel(Parcel in) {
-			return new ACtxIdentifierBean(in);
-		}
-
-		public ACtxIdentifierBean[] newArray(int size) {
-			return new ACtxIdentifierBean[size];
-		}
-	};
 	
-	public static ACtxIdentifierBean convertIdentifierBean(CtxIdentifierBean idbean) {
-		ACtxIdentifierBean aidbean = new ACtxIdentifierBean();
-		aidbean.setString(idbean.getString());
-		return aidbean;
-	}
+	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    }
+
+    public static final Parcelable.Creator<AIndividualCtxEntity> CREATOR = new Parcelable.Creator<AIndividualCtxEntity>() {
+        public AIndividualCtxEntity createFromParcel(Parcel in) {
+            return new AIndividualCtxEntity(in);
+        }
+
+        public AIndividualCtxEntity[] newArray(int size) {
+            return new AIndividualCtxEntity[size];
+        }
+    };
+       
+    private AIndividualCtxEntity(Parcel in) {
+    	super(in);
+    }
 }

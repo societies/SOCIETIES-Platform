@@ -26,11 +26,18 @@ package org.societies.android.api.context.model;
 
 import java.io.Serializable;
 
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBondOriginType;
+import org.societies.api.context.model.CtxModelType;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used to represent context bonds among members of a 
- * {@link CommunityCtxEntity}. Each bond refers to a {@link CtxAttribute} of a
+ * {@link ACommunityCtxEntity}. Each bond refers to a {@link ACtxAttribute} of a
  * particular type that expresses a commonality shared by community members.
- * For example, a <code>CtxAttributeBond</code> could be based on the context
+ * For example, a <code>ACtxAttributeBond</code> could be based on the context
  * attribute of type {@link CtxAttributeTypes#LOCATION_SYMBOLIC}. The
  * {@link CtxBondOriginType} is used to specify how the bond was identified.
  * More specifically, a context bond may have been manually set, discovered or
@@ -39,7 +46,7 @@ import java.io.Serializable;
  * In the following example, a bond is created to specify that all members of a
  * community share the same home city:
  * <pre>
- * CtxAttributeBond locationBond = new CtxAttributeBond(
+ * ACtxAttributeBond locationBond = new ACtxAttributeBond(
  *     CtxAttributeTypes.ADDRESS_HOME_CITY, CtxBondOriginType.MANUALLY_SET);
  * locationBond.setValueType(CtxAttributeValueType.STRING);
  * locationBond.setMinValue("Athens");
@@ -56,9 +63,7 @@ import java.io.Serializable;
  *
  * @since 0.4
  */
-public class CtxAttributeBond extends CtxBond {
-
-	private static final long serialVersionUID = -3094451475477736607L;
+public class ACtxAttributeBond extends ACtxBond {
 
 	/** The type of the context attribute value this bond refers to. */
 	private CtxAttributeValueType valueType;
@@ -78,13 +83,39 @@ public class CtxAttributeBond extends CtxBond {
 	 * @param originType
 	 *			the origin type of the newly created CtxBond
 	 * @return
-	 *        a new CtxAttributeBond
+	 *        a new ACtxAttributeBond
 	 */
-	public CtxAttributeBond(final String type, final CtxBondOriginType originType) {
+	public ACtxAttributeBond(final String type, final CtxBondOriginType originType) {
 
 		super(CtxModelType.ATTRIBUTE, type, originType);
 	}
 	
+	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    }
+
+    public static final Parcelable.Creator<ACtxAttributeBond> CREATOR = new Parcelable.Creator<ACtxAttributeBond>() {
+        public ACtxAttributeBond createFromParcel(Parcel in) {
+            return new ACtxAttributeBond(in);
+        }
+
+        public ACtxAttributeBond[] newArray(int size) {
+            return new ACtxAttributeBond[size];
+        }
+    };
+       
+    private ACtxAttributeBond(Parcel in) {
+    	super(in);
+    }
+    
 	/**
 	 * Returns the type of the context attribute value this bond refers to.
 	 * 

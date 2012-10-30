@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.context.model;
 
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 import android.os.Parcel;
@@ -49,7 +51,7 @@ import android.os.Parcelable;
  * &lt;OwnerId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
  * 
- * @see CtxIdentifier
+ * @see ACtxIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
@@ -114,7 +116,7 @@ public class ACtxAssociationIdentifier extends ACtxIdentifier {
 	 * ownerId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#defineString()
+	 * @see ACtxIdentifier#defineString()
 	 */
 	@Override
 	protected void defineString() {
@@ -143,7 +145,7 @@ public class ACtxAssociationIdentifier extends ACtxIdentifier {
 	 * ownerId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#parseString(java.lang.String)
+	 * @see ACtxIdentifier#parseString(java.lang.String)
 	 */
 	@Override
 	protected void parseString(String input)

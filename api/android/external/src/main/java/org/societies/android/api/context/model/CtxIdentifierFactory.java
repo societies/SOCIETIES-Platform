@@ -24,6 +24,9 @@
  */
 package org.societies.android.api.context.model;
 
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+
 /**
  * Describe your class here...
  *
@@ -61,11 +64,11 @@ public final class CtxIdentifierFactory {
 			throw new NullPointerException("str cannot be null");
 		
 		if (str.indexOf(CtxModelType.ATTRIBUTE.toString()) != -1) 
-			return new CtxAttributeIdentifier(str);
+			return new ACtxAttributeIdentifier(str);
 		else if (str.indexOf(CtxModelType.ENTITY.toString()) != -1)
-			return new CtxEntityIdentifier(str);
+			return new ACtxEntityIdentifier(str);
 		else if (str.indexOf(CtxModelType.ASSOCIATION.toString()) != -1)
-			return new CtxAssociationIdentifier(str);
+			return new ACtxAssociationIdentifier(str);
 		else
 			throw new MalformedCtxIdentifierException();
 	}

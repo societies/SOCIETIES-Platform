@@ -35,6 +35,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -48,9 +52,12 @@ import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.api.schema.context.model.CtxOriginTypeBean;
 import org.societies.api.schema.context.model.CtxQualityBean;
 
+import android.util.Log;
+
 public final class CtxModelBeanTranslator {
 
 	/** The logging facility. */
+    private static final String LOG_TAG = CtxModelBeanTranslator.class.getName();
 //	private static final Logger LOG = LoggerFactory.getLogger(CtxModelBeanTranslator.class);
 	
 	private static CtxModelBeanTranslator instance = new CtxModelBeanTranslator();
@@ -62,7 +69,7 @@ public final class CtxModelBeanTranslator {
 		return instance;
 	}
 
-	public CtxEntityBean fromCtxEntity(CtxEntity entity) throws DatatypeConfigurationException {
+	public CtxEntityBean fromCtxEntity(ACtxEntity entity) throws DatatypeConfigurationException {
 
 		CtxEntityBean bean=new CtxEntityBean();
 		bean.setId(fromCtxIdentifier(entity.getId()));
@@ -71,13 +78,13 @@ public final class CtxModelBeanTranslator {
 		bean.setLastModified(lastModifiedXML);
 
 		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
-		for (CtxAssociationIdentifier assoc : entity.getAssociations()) {
+		for (ACtxAssociationIdentifier assoc : entity.getAssociations()) {
 			assocIdBeans.add((CtxAssociationIdentifierBean) fromCtxIdentifier(assoc));
 		}
 		bean.setAssociations(assocIdBeans);
 
 		List<CtxAttributeBean> attrIdBeans = new ArrayList<CtxAttributeBean>();
-		for (CtxAttribute attr : entity.getAttributes()) {
+		for (ACtxAttribute attr : entity.getAttributes()) {
 			attrIdBeans.add(fromCtxAttribute(attr));
 		}
 		bean.setAttributes(attrIdBeans);
@@ -85,22 +92,22 @@ public final class CtxModelBeanTranslator {
 		return bean;
 	}
 
-	public CtxEntity fromCtxEntityBean(CtxEntityBean entityBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException{
+	public ACtxEntity fromCtxEntityBean(CtxEntityBean entityBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException{
 
-		CtxEntity entity = new CtxEntity(
-				(CtxEntityIdentifier) fromCtxIdentifierBean(entityBean.getId()));
+		ACtxEntity entity = new ACtxEntity(
+				(ACtxEntityIdentifier) fromCtxIdentifierBean(entityBean.getId()));
 		entity.setLastModified(XMLGregorianCalendarToDate(entityBean.getLastModified()));
 		// Handle entity attributes
 		for (CtxAttributeBean attrBean : entityBean.getAttributes())
 			entity.addAttribute(fromCtxAttributeBean(attrBean));
 		// Handle entity association IDs
 		for (CtxAssociationIdentifierBean assocIdBean : entityBean.getAssociations())
-			entity.addAssociation((CtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
+			entity.addAssociation((ACtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
 
 		return entity;	
 	}
 
-	public CtxIdentifierBean fromCtxIdentifier(CtxIdentifier identifier) {
+	public CtxIdentifierBean fromCtxIdentifier(ACtxIdentifier identifier) {
 
 		CtxIdentifierBean ctxIdBean = null;
 
@@ -120,12 +127,12 @@ public final class CtxModelBeanTranslator {
 		return ctxIdBean;
 	}
 
-	public CtxIdentifier fromCtxIdentifierBean(CtxIdentifierBean identifierBean) throws MalformedCtxIdentifierException {
+	public ACtxIdentifier fromCtxIdentifierBean(CtxIdentifierBean identifierBean) throws MalformedCtxIdentifierException {
 
 		return CtxIdentifierFactory.getInstance().fromString(identifierBean.getString());
 	}
 
-	public CtxAttributeBean fromCtxAttribute(CtxAttribute attr) throws DatatypeConfigurationException {
+	public CtxAttributeBean fromCtxAttribute(ACtxAttribute attr) throws DatatypeConfigurationException {
 
 		CtxAttributeBean bean = new CtxAttributeBean();
 		bean.setBinaryValue(attr.getBinaryValue());
@@ -144,11 +151,11 @@ public final class CtxModelBeanTranslator {
 		return bean;
 	}
 
-	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean bean) 
+	public ACtxAttribute fromCtxAttributeBean(CtxAttributeBean bean) 
 			throws DatatypeConfigurationException, MalformedCtxIdentifierException {
 
-		final CtxAttribute object = new CtxAttribute(
-				(CtxAttributeIdentifier) fromCtxIdentifierBean(bean.getId()));
+		final ACtxAttribute object = new ACtxAttribute(
+				(ACtxAttributeIdentifier) fromCtxIdentifierBean(bean.getId()));
 		object.setLastModified(XMLGregorianCalendarToDate(bean.getLastModified()));
 		// Handle value
 		if (bean.getStringValue() != null)
@@ -177,7 +184,7 @@ public final class CtxModelBeanTranslator {
 		return object;
 	}
 
-	public CtxAssociationBean fromCtxAssociation(CtxAssociation object) throws DatatypeConfigurationException {
+	public CtxAssociationBean fromCtxAssociation(ACtxAssociation object) throws DatatypeConfigurationException {
 
 		CtxAssociationBean bean = new CtxAssociationBean();
 		bean.setId(fromCtxIdentifier(object.getId()));
@@ -187,57 +194,59 @@ public final class CtxModelBeanTranslator {
 			bean.setParentEntity(fromCtxEntityIdentifier(object.getParentEntity()));
 		// Handle child entities
 		final List<CtxEntityIdentifierBean> childEntities = new ArrayList<CtxEntityIdentifierBean>();
-		for (CtxEntityIdentifier childEntityId : object.getChildEntities())
+		for (ACtxEntityIdentifier childEntityId : object.getChildEntities())
 			childEntities.add(fromCtxEntityIdentifier(childEntityId));
 		bean.setChildEntities(childEntities);
 		
 		return bean;
 	}
 
-	public CtxAssociation fromCtxAssociationBean(CtxAssociationBean assocBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
+	public ACtxAssociation fromCtxAssociationBean(CtxAssociationBean assocBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
 
-		CtxAssociation assoc = new CtxAssociation(
-				(CtxAssociationIdentifier) fromCtxIdentifierBean(assocBean.getId()));
+		ACtxAssociation assoc = new ACtxAssociation(
+				(ACtxAssociationIdentifier) fromCtxIdentifierBean(assocBean.getId()));
 		assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
 		// Handle parent entity
-		assoc.setParentEntity((CtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
+		assoc.setParentEntity((ACtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
 		// Handle child entities
 		for (CtxEntityIdentifierBean childEntityIdBean : assocBean.getChildEntities())
-			assoc.addChildEntity((CtxEntityIdentifier) fromCtxIdentifierBean(childEntityIdBean));
+			assoc.addChildEntity((ACtxEntityIdentifier) fromCtxIdentifierBean(childEntityIdBean));
 
 		return assoc;
 	}
 
-	public CtxModelObjectBean fromCtxModelObject(CtxModelObject object) {
+	public CtxModelObjectBean fromCtxModelObject(ACtxModelObject object) {
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Creating CtxModelObject bean from instance " + object);
+		Log.d(LOG_TAG, "Creating ACtxModelObject bean from instance " + object);
+//		if (LOG.isDebugEnabled())
+//			LOG.debug("Creating ACtxModelObject bean from instance " + object);
 		
 		final CtxModelObjectBean bean;
 		try {
-			if (object instanceof CtxEntity)
-				bean = this.fromCtxEntity((CtxEntity) object);
-			else if (object instanceof CtxAttribute)
-				bean = this.fromCtxAttribute((CtxAttribute) object);
-			else if (object instanceof CtxAssociation)
-				bean = this.fromCtxAssociation((CtxAssociation) object);
+			if (object instanceof ACtxEntity)
+				bean = this.fromCtxEntity((ACtxEntity) object);
+			else if (object instanceof ACtxAttribute)
+				bean = this.fromCtxAttribute((ACtxAttribute) object);
+			else if (object instanceof ACtxAssociation)
+				bean = this.fromCtxAssociation((ACtxAssociation) object);
 			else
-				throw new IllegalArgumentException("Could not create CtxModelObject bean from instance "
-						+ object + ": Unsupported CtxModelObject class: " + object.getClass().getName());
+				throw new IllegalArgumentException("Could not create ACtxModelObject bean from instance "
+						+ object + ": Unsupported ACtxModelObject class: " + object.getClass().getName());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not create CtxModelObject bean from instance "
+			throw new IllegalArgumentException("Could not create ACtxModelObject bean from instance "
 					+ object + ": " + e.getLocalizedMessage(), e);
 		}
 
 		return bean;
 	}
 
-	public CtxModelObject fromCtxModelObjectBean(CtxModelObjectBean bean){
+	public ACtxModelObject fromCtxModelObjectBean(CtxModelObjectBean bean){
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Creating CtxModelObject instance from bean " + bean);
+		Log.d(LOG_TAG, "Creating ACtxModelObject instance from bean " + bean);		
+//		if (LOG.isDebugEnabled())
+//			LOG.debug("Creating CtxModelObject instance from bean " + bean);
 		
-		final CtxModelObject object;
+		final ACtxModelObject object;
 		try {
 			if (bean instanceof CtxEntityBean)
 				object = this.fromCtxEntityBean((CtxEntityBean) bean);
@@ -246,10 +255,10 @@ public final class CtxModelBeanTranslator {
 			else if (bean instanceof CtxAssociationBean)
 				object = this.fromCtxAssociationBean((CtxAssociationBean) bean);
 			else
-				throw new IllegalArgumentException("Could not create CtxModelObject instance from bean "
+				throw new IllegalArgumentException("Could not create ACtxModelObject instance from bean "
 						+ bean + ": Unsupported bean class: " + bean.getClass().getName());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not create CtxModelObject instance from bean "
+			throw new IllegalArgumentException("Could not create ACtxModelObject instance from bean "
 					+ bean + ": " + e.getLocalizedMessage(), e);
 		} 
 		
@@ -257,14 +266,14 @@ public final class CtxModelBeanTranslator {
 	}
 
 	private CtxEntityIdentifierBean fromCtxEntityIdentifier(
-			CtxEntityIdentifier object) {
+			ACtxEntityIdentifier object) {
 
 		final CtxEntityIdentifierBean bean = new CtxEntityIdentifierBean();
 		bean.setString(object.toString());
 		return bean;
 	}
 
-	public CtxQualityBean fromCtxQuality(CtxQuality quality) throws DatatypeConfigurationException {
+	public CtxQualityBean fromCtxQuality(ACtxQuality quality) throws DatatypeConfigurationException {
 
 		CtxQualityBean bean=new CtxQualityBean();
 		bean.setPrecision(quality.getPrecision());

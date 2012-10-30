@@ -27,19 +27,24 @@ package org.societies.android.api.context.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.context.model.CtxAttributeValueType;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used to represent context attributes which describe the
- * properties of a {@link CtxEntity}. Multiple <code>CtxAttribute</code>
+ * properties of a {@link ACtxEntity}. Multiple <code>ACtxAttribute</code>
  * objects can be assigned to an entity. For example, concepts such as the name,
  * the age, and the location of a person entity are described by different
  * attributes. Similarly, attributes describing a device's properties might be
  * the identity, the voltage, and the operational status of the device.
- * Essentially, CtxAttribute objects are used to identify an entity's status in
+ * Essentially, ACtxAttribute objects are used to identify an entity's status in
  * terms of its static and dynamic properties and therefore, capture all context
  * information items that characterise the situation of the owner entity. Note
  * that the containing entity is called the attribute's scope.
  * <p>
- * The value of a <code>CtxAttribute</code> can be set and retrieved using the
+ * The value of a <code>ACtxAttribute</code> can be set and retrieved using the
  * appropriate setter and getter method. The following value types are supported:
  * <dl>
  * <dt><code>String</code></dt>
@@ -55,26 +60,24 @@ import java.util.Date;
  * <code>String</code> value:
  * <pre>
  * // Assuming we have obtained a reference to the context attribute 
- * CtxAttribute nameAttr;
+ * ACtxAttribute nameAttr;
  * // Initialise or update its value 
  * nameAttr.setStringValue(&quot;Sakis Rouvas&quot;);
  * // Retrieve its value 
  * String name = nameAttr.getStringValue();
  * </pre>
  * <p>
- * The <code>CtxAttribute</code> class also provides access to the history flag
+ * The <code>ACtxAttribute</code> class also provides access to the history flag
  * which controls whether the represented attribute is maintained in the
  * historic context database.
  * 
- * @see CtxAttributeIdentifier
- * @see CtxEntity
+ * @see ACtxAttributeIdentifier
+ * @see ACtxEntity
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxAttribute extends ACtxModelObject {
+public class ACtxAttribute extends ACtxModelObject {
 
-	private static final long serialVersionUID = 2885099443175534995L;
-	
 	/** The text value of this context attribute. */
 	private String stringValue;
 	
@@ -94,7 +97,7 @@ public class CtxAttribute extends ACtxModelObject {
 	private String valueMetric;
 	
 	/** The QoC meta-data. */
-	private final ACtxQuality quality = new ACtxQuality(this);
+	private ACtxQuality quality = new ACtxQuality(this);
 	
 	/** The identifier of the context source for the current attribute value. */
 	private String sourceId;
@@ -103,25 +106,87 @@ public class CtxAttribute extends ACtxModelObject {
 	private boolean historyRecorded;
 	
 	/**
-	 * Constructs a CtxAttribute with the specified identifier.
+	 * Constructs a ACtxAttribute with the specified identifier.
 	 * 
 	 * @param id
 	 *            the identifier of the newly created context attribute
 	 */
-	public CtxAttribute(CtxAttributeIdentifier id) {
+	public ACtxAttribute(ACtxAttributeIdentifier id) {
 		
 		super(id);
 	}
 	
+	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    	out.writeString(stringValue);
+    	out.writeInt(integerValue);
+    	out.writeDouble(doubleValue);
+    	out.writeByteArray(binaryValue);
+    	out.writeString((valueType == null) ? "" : valueType.name());
+    	out.writeString(valueMetric);
+    	out.writeParcelable((Parcelable) quality, flags);
+    	out.writeString(sourceId);
+    	out.writeInt(historyRecorded ? 1 : 0);
+//    	out.writeBooleanArray(new boolean[]{historyRecorded});
+    	
+    }
+
+    public static final Parcelable.Creator<ACtxAttribute> CREATOR = new Parcelable.Creator<ACtxAttribute>() {
+        public ACtxAttribute createFromParcel(Parcel in) {
+            return new ACtxAttribute(in);
+        }
+
+        public ACtxAttribute[] newArray(int size) {
+            return new ACtxAttribute[size];
+        }
+    };
+       
+    private ACtxAttribute(Parcel in) {
+    	super(in);
+    	
+    	stringValue = in.readString();
+    	integerValue = in.readInt();
+    	doubleValue = in.readDouble();
+    	
+		binaryValue = new byte[in.readInt()];
+		in.readByteArray(this.binaryValue);
+
+    	try {
+    		this.valueType = CtxAttributeValueType.valueOf(in.readString());
+    	} catch (IllegalArgumentException x) {
+    		this.valueType = null;
+    	}
+
+    	valueMetric = in.readString();
+    	
+    	quality = in.readParcelable(ACtxQuality.class.getClassLoader());
+
+    	sourceId = in.readString();
+    	
+    	historyRecorded = (in.readInt() == 0) ? false : true;
+//    	boolean[] bool = new boolean[1];
+//    	in.readBooleanArray(bool);
+//    	historyRecorded = bool[0];  	
+    	
+    }
+    
 	/**
 	 * Returns the identifier of this context attribute.
 	 * 
 	 * @return the identifier of this context attribute.
 	 */
 	@Override
-	public CtxAttributeIdentifier getId() {
+	public ACtxAttributeIdentifier getId() {
 		
-		return (CtxAttributeIdentifier) super.getId();
+		return (ACtxAttributeIdentifier) super.getId();
 	}
 	
 	/**
@@ -129,7 +194,7 @@ public class CtxAttribute extends ACtxModelObject {
 	 * 
 	 * @return the identifier of the context entity containing this attribute
 	 */
-	public CtxEntityIdentifier getScope() {
+	public ACtxEntityIdentifier getScope() {
 		
 		return this.getId().getScope();
 	}
@@ -365,9 +430,9 @@ public class CtxAttribute extends ACtxModelObject {
 	 * Returns the Quality of Context (QoC) information associated to this context
 	 * attribute.
 	 * 
-	 * @return the <code>CtxQuality</code> associated to this context
+	 * @return the <code>ACtxQuality</code> associated to this context
 	 *         attribute.
-	 * @see CtxQuality
+	 * @see ACtxQuality
 	 */
 	public ACtxQuality getQuality() {
 		

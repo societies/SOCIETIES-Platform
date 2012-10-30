@@ -27,6 +27,8 @@ package org.societies.android.api.context.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.context.model.CtxOriginType;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -56,7 +58,7 @@ import android.os.Parcelable;
  * </ul>
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @see CtxAttribute
+ * @see ACtxAttribute
  * @see CtxOriginType
  * @since 0.0.1
  */
@@ -65,7 +67,7 @@ public class ACtxQuality implements Serializable {
 	private static final long serialVersionUID = 2596329083367854427L;
 
 	/** The context attribute this QoC information refers to. */
-	private final CtxAttribute attribute;
+	private final ACtxAttribute attribute;
 	
 	/** The time the current context attribute value was last updated. */
 	private Date lastUpdated;
@@ -86,7 +88,7 @@ public class ACtxQuality implements Serializable {
 	 * @param attribute
 	 * the context attribute to associate with this QoC information.
 	 */
-	ACtxQuality(CtxAttribute attribute) {
+	ACtxQuality(ACtxAttribute attribute) {
 		
 		this.attribute = attribute;
 	}
@@ -118,7 +120,7 @@ public class ACtxQuality implements Serializable {
     };
     
     private ACtxQuality(Parcel in) {
-    	attribute = in.readParcelable(CtxAttribute.class.getClassLoader());
+    	attribute = in.readParcelable(ACtxAttribute.class.getClassLoader());
     	getLastUpdated().setTime(in.readLong());
     	
     	try {
@@ -136,7 +138,7 @@ public class ACtxQuality implements Serializable {
 	 * 
 	 * @return the context attribute associated to this QoC information.
 	 */
-	public CtxAttribute getAttribute() {
+	public ACtxAttribute getAttribute() {
 		
 		return this.attribute;
 	}

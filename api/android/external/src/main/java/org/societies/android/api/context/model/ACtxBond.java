@@ -24,13 +24,17 @@
  */
 package org.societies.android.api.context.model;
 
-import java.io.Serializable;
+import org.societies.api.context.model.CtxBondOriginType;
+import org.societies.api.context.model.CtxModelType;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * This class is used to represent context bonds among members of a 
- * {@link CommunityCtxEntity}. Each bond refers to a {@link CtxAttribute}
- * or {@link CtxAssociation} of a particular type that expresses a commonality
- * shared by community members. For example, a <code>CtxBond</code> could be
+ * {@link ACommunityCtxEntity}. Each bond refers to a {@link ACtxAttribute}
+ * or {@link ACtxAssociation} of a particular type that expresses a commonality
+ * shared by community members. For example, a <code>ACtxBond</code> could be
  * based on the context attribute of "location". The {@link CtxBondOriginType}
  * is used to specify how the bond was identified. More specifically, a context
  * bond may have been manually set, discovered or inherited.
@@ -38,18 +42,16 @@ import java.io.Serializable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public abstract class CtxBond implements Serializable {
+public abstract class ACtxBond implements Parcelable {
 	
-	private static final long serialVersionUID = 2972314471738603009L;
-
 	/** The context model type of this bond. */
-	private final CtxModelType modelType;
+	private CtxModelType modelType;
 	
 	/** The context type of this bond. */
 	private final String type;
 	
 	/** The origin of this bond. */
-	private final CtxBondOriginType originType;
+	private CtxBondOriginType originType;
 	
 	/**
 	 * Constructs a <code>CtxBond</code> with the specified context model type, context type,
@@ -67,7 +69,7 @@ public abstract class CtxBond implements Serializable {
 	 * @throws IllegalArgumentException if the specified modelType is not one of
 	 *         {@link CtxModelType#ATTRIBUTE} or {@link CtxModelType#ASSOCIATION}
 	 */
-	CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
+	ACtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
 		
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");
@@ -87,7 +89,37 @@ public abstract class CtxBond implements Serializable {
 		this.type = type;
 		this.originType = originType;
 	}
-	
+
+	/**
+	 * Making class Parcelable
+	 */
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	out.writeString((modelType == null) ? "" : modelType.name());
+    	out.writeString(type);
+    	out.writeString((originType == null) ? "" : originType.name());
+    }
+
+    
+    protected ACtxBond(Parcel in) {
+    	try {
+    		modelType = CtxModelType.valueOf(in.readString());
+    	} catch (IllegalArgumentException x) {
+    		modelType = null;
+    	}
+    	
+    	type = in.readString();
+    	
+    	try {
+    		originType = CtxBondOriginType.valueOf(in.readString());
+    	} catch (IllegalArgumentException x) {
+    		originType = null;
+    	}
+    }
+    
 	/**
 	 * Returns the context model type of this bond
 	 * 

@@ -27,6 +27,11 @@ package org.societies.android.api.context.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.context.model.CtxAttributeValueType;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used in order to represent context history attributes
  * maintained in the context history database.
@@ -34,10 +39,8 @@ import java.util.Date;
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxHistoryAttribute extends ACtxModelObject {
+public class ACtxHistoryAttribute extends ACtxModelObject {
 
-	private static final long serialVersionUID = -1908778456166623132L;
-	
 	private final Date lastUpdated;
 	
 	/** The text value of this context history attribute. */
@@ -52,7 +55,7 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 	/** The binary value of this context history attribute. */
 	private final byte[] binaryValue;
 	
-	private final CtxAttributeValueType valueType;
+	private CtxAttributeValueType valueType;
 	
 	private final String valueMetric;
 
@@ -70,7 +73,7 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 	 * 
 	 * @since 0.4
 	 */
-	CtxHistoryAttribute(final CtxAttributeIdentifier attrId, 
+	ACtxHistoryAttribute(final ACtxAttributeIdentifier attrId, 
 			final Date lastModified, final Date lastUpdated,
 			final String stringValue, final Integer integerValue,
 			final Double doubleValue, final byte[] binaryValue,
@@ -88,13 +91,61 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 	}
 	
 	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    	out.writeLong(lastUpdated.getTime());
+    	out.writeString(stringValue);
+    	out.writeInt(integerValue);
+    	out.writeDouble(doubleValue);
+    	out.writeByteArray(binaryValue);
+    	out.writeString((valueType == null) ? "" : valueType.name());
+    	out.writeString(valueMetric);
+    }
+
+    public static final Parcelable.Creator<ACtxHistoryAttribute> CREATOR = new Parcelable.Creator<ACtxHistoryAttribute>() {
+        public ACtxHistoryAttribute createFromParcel(Parcel in) {
+            return new ACtxHistoryAttribute(in);
+        }
+
+        public ACtxHistoryAttribute[] newArray(int size) {
+            return new ACtxHistoryAttribute[size];
+        }
+    };
+       
+    private ACtxHistoryAttribute(Parcel in) {
+    	super(in);
+//    	this.lastUpdated.setTime(in.readLong());
+    	this.lastUpdated = new Date (in.readLong());
+		this.stringValue = in.readString();
+		this.integerValue = in.readInt();
+		this.doubleValue = in.readDouble();
+		this.binaryValue = new byte[in.readInt()];
+		in.readByteArray(this.binaryValue);
+		
+    	try {
+    		this.valueType = CtxAttributeValueType.valueOf(in.readString());
+    	} catch (IllegalArgumentException x) {
+    		this.valueType = null;
+    	}
+    	
+		this.valueMetric = in.readString();
+    }
+    
+	/**
 	 * 
 	 * @param attribute
 	 * @param historyRecordId
-	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(CtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)} 
+	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(ACtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)} 
 	 */
 	@Deprecated
-	public CtxHistoryAttribute(CtxAttribute attribute, Long historyRecordId) {
+	public ACtxHistoryAttribute(ACtxAttribute attribute, Long historyRecordId) {
 		
 		super(attribute.getId());
 		super.setLastModified(attribute.getLastModified());
@@ -114,10 +165,10 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 	 * @param value
 	 * @param valueType
 	 * @param historyRecordId
-	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(CtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)}
+	 * @deprecated As of 0.4, use {@link CtxModelObjectFactory#createHistoryAttribute(ACtxAttributeIdentifier, Date, Date, String, Integer, Double, byte[], CtxAttributeValueType, String)}
 	 */
 	@Deprecated
-	public CtxHistoryAttribute(CtxAttributeIdentifier attrId, Date date, Serializable value, 
+	public ACtxHistoryAttribute(ACtxAttributeIdentifier attrId, Date date, Serializable value, 
 			CtxAttributeValueType valueType, Long historyRecordId) {
 		
 		super(attrId);
@@ -164,9 +215,9 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 	 * @return the identifier of this historic context attribute.
 	 */
 	@Override
-	public CtxAttributeIdentifier getId() {
+	public ACtxAttributeIdentifier getId() {
 		
-		return (CtxAttributeIdentifier) super.getId();
+		return (ACtxAttributeIdentifier) super.getId();
 	}
 	
 	/**
@@ -279,7 +330,7 @@ public class CtxHistoryAttribute extends ACtxModelObject {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxHistoryAttribute other = (CtxHistoryAttribute) that;
+		ACtxHistoryAttribute other = (ACtxHistoryAttribute) that;
 		if (this.lastUpdated == null) {
 			if (other.lastUpdated != null)
 				return false;

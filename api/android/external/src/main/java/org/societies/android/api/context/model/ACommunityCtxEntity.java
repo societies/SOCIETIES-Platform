@@ -27,44 +27,70 @@ package org.societies.android.api.context.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * This class is used to represent community context entities. A
- * <code>CommunityCtxEntity</code> corresponds to a pervasive community (CIS)
- * and is associated with a set of {@link CommunityMemberCtxEntity} objects
- * representing its members, i.e. {@link IndividualCtxEntity individuals}
- * and/or other {@link CommunityCtxEntity communities}. The {@link CtxAttribute}
+ * <code>ACommunityCtxEntity</code> corresponds to a pervasive community (CIS)
+ * and is associated with a set of {@link ACommunityMemberCtxEntity} objects
+ * representing its members, i.e. {@link AIndividualCtxEntity individuals}
+ * and/or other {@link ACommunityCtxEntity communities}. The {@link ACtxAttribute}
  * class is used in order to describe the community context attributes of a CIS.
  * Common context characteristics shared among community members are described
- * by the {@link CtxBond} class. 
+ * by the {@link ACtxBond} class. 
  * 
- * @see CtxEntityIdentifier
+ * @see ACtxEntityIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CommunityCtxEntity extends CommunityMemberCtxEntity {
-	
-	private static final long serialVersionUID = -8564823052068362334L;
+public class ACommunityCtxEntity extends ACommunityMemberCtxEntity {
 	
 	/** The members of this CIS. */
-	//private Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
-	private Set<CtxEntityIdentifier> members = new HashSet<CtxEntityIdentifier>();
+	private Set<ACtxEntityIdentifier> members = new HashSet<ACtxEntityIdentifier>();
 	
 	/** The context bond of this CIS. */
-	private Set<CtxBond> bonds = new HashSet<CtxBond>();
+	private Set<ACtxBond> bonds = new HashSet<ACtxBond>();
 	
-	public CommunityCtxEntity(CtxEntityIdentifier id) {
+	public ACommunityCtxEntity(ACtxEntityIdentifier id) {
 		
 		super(id);
 	}
 
 	/**
+	 * Making class Parcelable
+	 */
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+    	super.writeToParcel(out, flags);
+    }
+
+    public static final Parcelable.Creator<ACommunityCtxEntity> CREATOR = new Parcelable.Creator<ACommunityCtxEntity>() {
+        public ACommunityCtxEntity createFromParcel(Parcel in) {
+            return new ACommunityCtxEntity(in);
+        }
+
+        public ACommunityCtxEntity[] newArray(int size) {
+            return new ACommunityCtxEntity[size];
+        }
+    };
+       
+    private ACommunityCtxEntity(Parcel in) {
+    	super(in);
+    }
+    
+	/**
 	 * Returns the members of this CIS.
 	 *  
 	 * @return a set containing the members of this CIS.
 	 */
-	public Set<CtxEntityIdentifier> getMembers() {
+	public Set<ACtxEntityIdentifier> getMembers() {
 		
-		return new HashSet<CtxEntityIdentifier>(this.members);
+		return new HashSet<ACtxEntityIdentifier>(this.members);
 	}
 	
 	/**
@@ -75,7 +101,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	@Deprecated
-	public void addMember(CtxEntityIdentifier member) {
+	public void addMember(ACtxEntityIdentifier member) {
 		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
@@ -91,7 +117,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	@Deprecated
-	public void removeMember(CtxEntityIdentifier member) {
+	public void removeMember(ACtxEntityIdentifier member) {
 		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
@@ -104,9 +130,9 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *  
 	 * @return a set containing the context bonds of this CIS.
 	 */
-	public Set<CtxBond> getBonds() {
+	public Set<ACtxBond> getBonds() {
 		
-		return new HashSet<CtxBond>(this.bonds);
+		return new HashSet<ACtxBond>(this.bonds);
 	}
 	
 	/**
@@ -116,7 +142,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the context bond to add
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
-	public void addBond(CtxBond bond) {
+	public void addBond(ACtxBond bond) {
 		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");
@@ -131,7 +157,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the context bond to remove
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
-	public void removeBond(CtxBond bond) {
+	public void removeBond(ACtxBond bond) {
 		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");
