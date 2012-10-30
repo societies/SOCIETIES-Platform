@@ -354,20 +354,25 @@ public class ContextController {
 		if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
 			
 			CtxAttribute attr = (CtxAttribute) elm;
-			logger.info("Ctx Attribute value Metric"+ attr.getValueMetric());
-			ctxBean.setValue(" -- ");
-			if (attr.getValueType() == CtxAttributeValueType.STRING){
-				ctxBean.setValue( attr.getStringValue());
+			logger.info("Ctx Attribute type "+attr.getValueType());
+			
+			
+			if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
+				ctxBean.setValue(""  + attr.getStringValue());
 			}
-			else if (attr.getValueType() == CtxAttributeValueType.DOUBLE){
+			else if (attr.getValueType().equals(CtxAttributeValueType.DOUBLE)){
 				ctxBean.setValue(""+attr.getDoubleValue());
 			}
-			else if (attr.getValueType() == CtxAttributeValueType.INTEGER){
+			else if (attr.getValueType().equals( CtxAttributeValueType.INTEGER)){
 				ctxBean.setValue(""+attr.getIntegerValue());
 			}
-			else if (attr.getValueType() == CtxAttributeValueType.BINARY){
-				ctxBean.setValue("Binary Obj[" + attr.getBinaryValue().length+"bytes]");
+			else if (attr.getValueType().equals(CtxAttributeValueType.BINARY)){
+				ctxBean.setValue("Binary [" + attr.getBinaryValue().length+"bytes]");
 			}
+			else {
+				ctxBean.setValue(" -- ");
+			}
+			
 			if (attr.getQuality().getPrecision()!=null)
 				ctxBean.setQuality("Precision:" +attr.getQuality().getPrecision());
 			
