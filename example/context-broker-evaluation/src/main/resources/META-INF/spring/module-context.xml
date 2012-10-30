@@ -14,5 +14,5 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
        
-	<context:component-scan base-package="org.societies.context.example.broker"></context:component-scan>
+	<context:component-scan base-package="org.societies.context.evaluation.broker"></context:component-scan>
 </beans>
