@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"
-	import="java.util.*" %>
+	import="java.util.*,org.societies.api.internal.servicelifecycle.*,org.societies.api.schema.servicelifecycle.model.*" %>
 <%@ taglib prefix="c" uri="http://www.springframework.org/tags/form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -32,6 +32,8 @@
 <!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
 <%
+
+
 //GET THE METHOD CALLED FROM THE FORM
 Map model = request.getParameterMap();
 String[] methodCalledArr = (String[]) model.get("method");
@@ -42,6 +44,10 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
 	String[] nodeArr = (String[]) model.get("node");
 	node = nodeArr[0];
 }
+
+List<Service> myServices = (List<Service>) request.getAttribute("services");
+List<Service> cisServices = (List<Service>) request.getAttribute("cisservices");
+
 %>
 <a href="javascript:history.back()">&lt;--back</a>
 <h4>${result}</h4>
@@ -61,75 +67,161 @@ function updateForm(serviceID, toDo) {
 <input type="hidden" name="node" id="node" value="<%= node %>" />
 
 <table border="1">
-<tr><td><B>Name</B></td><td><B>Description</B></td>
+	<tr><td><B>Name</B></td>
+	<td><B>Description</B></td>
 	<td><B>Author</B></td>
 	<td><B>Status</B></td>
 	<td><B>Action</B></td>
 </tr> 
 
-	<xc:forEach var="service" items="${services}">
-        <tr>
-        	<td>${service.serviceName}</td>
-         	<td>${service.serviceDescription}</td>
-            <td>${service.authorSignature}</td>
-            <td>${service.serviceStatus}</td>      
-            <td>
-            <%
-			if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
-			%>
-				<input type="button" value="share" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'ShareService')" >
-				<input type="button" value="unshare" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UnshareService')" >
-			<%
-			} else {
-			%>
-			<xc:if test="${service.serviceType != 'DEVICE'}">
-				<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
-				<input type="button" value="start" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StartService')" >
-				<input type="button" value="stop" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StopService')" >
-	<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
-			</xc:if>
-			<%
-			}
-            %>
-			</td>
-        </tr>
-    </xc:forEach>
+<%
+	for(Service myService : myServices ){
 
+		if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
+				
+			if(!myService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
+
+				%>
+				<tr>
+			    <td><%= myService.getServiceName() %></td>
+			    <td><%= myService.getServiceDescription() %></td>
+				<td><%= myService.getAuthorSignature() %></td>
+				<td><%= myService.getServiceStatus() %></td>      
+				<td>
+				<%
+				if(isShared(myService,cisServices)){
+					%>
+					<input type="button" value="unshare" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier()) %>', 'UnshareService')" >		
+					<%
+				}else{					
+					%>
+					<input type="button" value="share" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier() )%>', 'ShareService')" >
+					<%
+				}
+				%>
+				</td></tr>
+				<% 
+			}
+				
+		} else {
+				
+				%>
+				<tr>
+		    	<td><%= myService.getServiceName() %></td>
+		     	<td><%= myService.getServiceDescription() %></td>
+		        <td><%= myService.getAuthorSignature() %></td>
+		        <td><%= myService.getServiceStatus() %></td>      
+		        <td>
+				
+		         <%
+		            
+				if(!myService.getServiceType().equals(ServiceType.DEVICE)){
+				%>
+					<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+				<%
+				
+					if(myService.getServiceStatus().equals(ServiceStatus.STARTED)){
+						%>
+						<input type="button" value="stop" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StopService')" >
+						<%
+					} else{
+						%>
+						<input type="button" value="start" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StartService')" >
+						<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
+						<%
+					}
+				}
+				else{
+					%>
+					Device Management
+					<%
+				}
+		            %>
+					</td>	
+		        </tr>
+		    <%
+			}
+
+	}
+	%>
 	</table>
 <%
 //DISPLAY LIST OF SERVICES FROM CIS
 if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 %>
 	<p>&nbsp;</p>
-    <p><b>Community Services: <%= node %></b></p>	
+    <p><b>Community Services: ${cis.name}</b></p>	
 	<table border="1">
-		<tr><td><B>Name</B></td><td><B>Description</B></td>
-			<td><B>Author</B></td>
-			<td><B>Status</B></td>
-			<td><B>Action</B></td>
+		<tr><td><B>Name</B></td>
+		<td><B>Description</B></td>
+		<td><B>Author</B></td>
+		<td><B>Action</B></td>
 		</tr> 
-
-	<xc:forEach var="service" items="${cisservices}">
-        <tr>
-        	<td>${service.serviceName}</td>
-         	<td>${service.serviceDescription}</td>
-            <td>${service.authorSignature}</td>
-            <td>${service.serviceStatus}</td>
-            <td>
-            <xc:if test="${service.serviceType != 'DEVICE'}">
-				<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
-			</xc:if>
-			 <xc:if test="${service.serviceType == 'DEVICE'}">
-			 	Device
-			</xc:if>
-            <input type="button" value="install" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'Install3PService')" >
-			</td>
-        </tr>
-    </xc:forEach>
-	</table>
 <% 
-} 
+
+	for(Service cisService : cisServices ){		
+		%>
+		<tr>
+    	<td><%= cisService.getServiceName() %></td>
+     	<td><%= cisService.getServiceDescription() %></td>
+        <td><%= cisService.getAuthorSignature() %></td>
+        <td>
+        <%        
+        if(!haveClient(cisService,myServices)){
+    		if(!cisService.getServiceType().equals(ServiceType.DEVICE)){
+    			%>
+    				<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(cisService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+    			<%
+    			} else{
+    				%>
+    				Device 
+    				<%
+    			}
+        	%>
+			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(cisService.getServiceIdentifier())%>', 'Install3PService')" >
+        	<%
+        } else{
+        	%>
+        	Client installed!
+        	<%
+        }
+        %>
+    	</td>
+    	</tr>
+    	<%
+	}
+	%>
+	</table>
+	<% 
+}
 %>
+
+<%! 
+boolean isShared(Service myService, List<Service> sharedServices){
+	
+	boolean shared = false;
+	for(Service sharedService: sharedServices){
+		if(ServiceModelUtils.compare(myService.getServiceIdentifier(), sharedService.getServiceIdentifier()))
+			return true;
+	}
+	
+	return shared;
+}
+%>
+<%!
+boolean haveClient(Service sharedService, List<Service> installedServices){
+	
+	boolean clientInstalled = false;
+	
+	for(Service installedService: installedServices ){
+		if(installedService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && ServiceModelUtils.compare(sharedService.getServiceIdentifier(), installedService.getServiceInstance().getParentIdentifier()))
+			return true;				
+	}
+	
+	return clientInstalled;
+}
+%>
+
 	
 </form>	
 <!-- .................END PLACE YOUR CONTENT ................ -->

@@ -33,15 +33,15 @@ configAVD() {
 	echo "--------------------------"
  	
 	adb -s $1 shell cat /etc/hosts
-	echo ""
-	echo "Push customised AndroidAgent XMPP properties on $1"
-	echo "--------------------------------------------"
+#	echo ""
+#	echo "Push customised AndroidAgent XMPP properties on $1"
+#	echo "--------------------------------------------"
 
-	adb -s $1 push AndroidAgent.properties /sdcard/Android/data/org.societies/files/AndroidAgent.properties
-	echo ""	
-	echo "Contents of customised AndroidAgent XMPP properties on $1"
-	echo "---------------------------------------------------"
-	adb -s $1 shell cat /sdcard/Android/data/org.societies/files/AndroidAgent.properties
+#	adb -s $1 push AndroidAgent.properties /sdcard/Android/data/org.societies/files/AndroidAgent.properties
+#	echo ""	
+#	echo "Contents of customised AndroidAgent XMPP properties on $1"
+#	echo "---------------------------------------------------"
+#	adb -s $1 shell cat /sdcard/Android/data/org.societies/files/AndroidAgent.properties
 }
 
 testParams $#

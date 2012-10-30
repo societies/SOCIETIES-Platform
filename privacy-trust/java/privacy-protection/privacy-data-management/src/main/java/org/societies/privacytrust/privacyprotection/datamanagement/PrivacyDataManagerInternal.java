@@ -74,13 +74,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-//		if (null == dataId.getOwnerId()) {
-//			throw new PrivacyException("[Parameters] OwnerId is missing");
-//		}
+		//		if (null == dataId.getOwnerId()) {
+		//			throw new PrivacyException("[Parameters] OwnerId is missing");
+		//		}
 
 		Session session = sessionFactory.openSession();
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
@@ -91,17 +90,20 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Privacy Permissions don't exist
 			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
-				return null;
+				permissions = null;
 			}
 			// - Privacy permissions retrieved
-			for(PrivacyPermission privacyPermission : privacyPermissions) {
-				permissions.add(privacyPermission.createResponseItem());
-				LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
+			else {
+				for(PrivacyPermission privacyPermission : privacyPermissions) {
+					permissions.add(privacyPermission.createResponseItem());
+					LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
+				}
 			}
-		} catch (Exception e) {
-			t.rollback();
+		}
+		catch (Exception e) {
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		} finally {
+		}
+		finally {
 			if (session != null) {
 				session.close();
 			}
@@ -126,16 +128,15 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-//		if (null == dataId.getOwnerId()) {
-//			throw new PrivacyException("[Parameters] OwnerId is missing");
-//		}
+		//		if (null == dataId.getOwnerId()) {
+		//			throw new PrivacyException("[Parameters] OwnerId is missing");
+		//		}
 		if (null == actions || actions.size() <= 0) {
 			throw new PrivacyException("[Parameters] Actions are missing");
 		}
 
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
-		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions);
@@ -146,33 +147,36 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Privacy Permissions don't exist
 			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
-				return null;
+				permission = null;
 			}
 			// - Privacy permissions retrieved
-			PrivacyPermission relevantPrivacyPermission = null;
-			// Find the most relevant PERMIT (even if we need to avoid some optional actions)
-			boolean found = false;
-			for(PrivacyPermission privacyPermission : privacyPermissions) {
-				// If it matches to PERMIT, this is the most relevant
-				if (privacyPermission.getPermission().equals(Decision.PERMIT)) {
-					relevantPrivacyPermission = privacyPermission;
-					found = true;
-					break;
+			else {
+				PrivacyPermission relevantPrivacyPermission = null;
+				// Find the most relevant PERMIT (even if we need to avoid some optional actions)
+				boolean found = false;
+				for(PrivacyPermission privacyPermission : privacyPermissions) {
+					// If it matches to PERMIT, this is the most relevant
+					if (privacyPermission.getPermission().equals(Decision.PERMIT)) {
+						relevantPrivacyPermission = privacyPermission;
+						found = true;
+						break;
+					}
 				}
+				// If no PERMIT has been found: take the one relevant (i.e. the first one)
+				if (!found) {
+					relevantPrivacyPermission = privacyPermissions.get(0);
+				}
+				// - We could also try (in a second loop) to deduce a result by enlarging the research
+				// Not at the moment
+				// - Return the most relevant privacy permission
+				permission = relevantPrivacyPermission.createResponseItem();
+				LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
 			}
-			// If no PERMIT has been found: take the most relevant (i.e. the first one)
-			if (!found) {
-				relevantPrivacyPermission = privacyPermissions.get(0);
-			}
-			// - We could also try (in a second loop) to deduce a result by enlarging the research
-			// Not at the moment
-			// - Return the most relevant privacy permission
-			permission = relevantPrivacyPermission.createResponseItem();
-			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
-		} catch (Exception e) {
-			t.rollback();
+		}
+		catch (Exception e) {
 			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		} finally {
+		}
+		finally {
 			if (session != null) {
 				session.close();
 			}
@@ -228,10 +232,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			LOG.debug("PrivacyPermission saved: "+privacyPermission.toString());
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
 		} finally {
-			if (session != null) {
+			if (null != session) {
 				session.close();
 			}
 		}
@@ -302,7 +308,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the removal of the privacy permission", e);
 		} finally {
 			if (session != null) {
@@ -351,7 +359,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			result = true;
 		} catch (Exception e) {
-			t.rollback();
+			if (null != t) {
+				t.rollback();
+			}
 			throw new PrivacyException("Error during the removal of the privacy permission", e);
 		} finally {
 			if (session != null) {

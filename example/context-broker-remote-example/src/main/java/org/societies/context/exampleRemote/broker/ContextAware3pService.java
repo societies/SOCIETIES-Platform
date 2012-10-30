@@ -394,23 +394,17 @@ public class ContextAware3pService implements IContextAware3pService{
 
 	@Override
 	public void retrieveRemoteIndiEntity() {
-		LOG.info("retrieve remote Individual Entity id  1");
-
-
-		// retrieve remote indi Ent ID
+		
 
 		IIdentity targetId;
 		try {
 			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
-			LOG.info("retrieve remote Individual Entity id 2   "+targetId.getBareJid());
-
+		
 			CtxEntityIdentifier remoteEntityID = this.ctxBroker.retrieveIndividualEntityId(requestor, targetId).get();
-			LOG.info("retrieve remote Individual Entity id 3   "+remoteEntityID.toString());
-
-			//IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(simpleRequestor, remoteEntityID).get();	
-
+		
 			CtxAttribute attrName = this.ctxBroker.createAttribute(requestor, remoteEntityID, CtxAttributeTypes.NAME).get();
 			attrName.setStringValue("Aris");
+		
 			CtxAttribute attrNameUpdated = (CtxAttribute) this.ctxBroker.update(requestor, attrName).get();
 
 			LOG.info("verify that remote ctx attribute name updated   "+attrNameUpdated.getStringValue());
@@ -432,6 +426,10 @@ public class ContextAware3pService implements IContextAware3pService{
 			LOG.info("retrieve remote ctxAttribute id   "+attrNameRemote.getId());
 			LOG.info("retrieve remote ctxAttribute value   "+attrNameRemote.getStringValue());
 
+			LOG.info("retrieve remote indi entity 0");
+			IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.ctxBroker.retrieve(requestor, remoteEntityID).get();
+			LOG.info("retrieve remote indi entity 1 "+indiEnt.getId());  
+			
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -445,9 +443,38 @@ public class ContextAware3pService implements IContextAware3pService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-
 	}
 
+
+	@Override
+	public CtxAssociation createRemoteCtxAssociation(String type) {
+		
+		IIdentity targetId;
+		CtxAssociation remoteAssoc = null;
+
+		try {
+			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			LOG.info("create remote Association:  targetId "+ targetId.getJid());
+
+			// create remote association
+			remoteAssoc = this.ctxBroker.createAssociation(requestor, targetId, type).get();
+			
+			LOG.info("remote association:"+ remoteAssoc);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+		return remoteAssoc;
+	}
+	
 }

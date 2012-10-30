@@ -254,7 +254,8 @@ public class CssSuggestedFriendsController {
 				pendingFR.setCssIdentity(sfForm.getFriendId());
 				pendingFR.setRequestStatus(CssRequestStatusType.CANCELLED);
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
-				getCssLocalManager().updateCssRequest(pendingFR);
+				//getCssLocalManager().updateCssRequest(pendingFR);
+				getCssLocalManager().updateCssFriendRequest(pendingFR);
 				// cancel pendinf fr
 			} else {
 				// send fr

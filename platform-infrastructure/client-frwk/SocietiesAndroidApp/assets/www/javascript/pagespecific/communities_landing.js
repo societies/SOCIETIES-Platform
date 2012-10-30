@@ -46,8 +46,13 @@ $(document).on('pageinit', '#communities-landing', function(event) {
 	});
 	
 	$('a#suggestedCommunities').off('click').on('click', function() {
-		window.alert("Coming soon...");
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.getAllCisDirAds);
 	});
+	
+	$('a#manageCommunities').off('click').on('click', function() {
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.manageCIS);
+	});
+	
 	
 	$('#search-communities').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#search-communities')
@@ -70,5 +75,6 @@ $(document).on('pageinit', '#communities-landing', function(event) {
 	$('input#add_activity').off('click').on('click', function() {
 		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISListService.addCISActivity);
 	});
+	
 	
 });

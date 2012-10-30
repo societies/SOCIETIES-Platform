@@ -17,7 +17,8 @@ var CSSFriendsServices = {
 				$('ul#FriendRequestsListUL li:last').remove();
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.acceptFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\')">' +
+				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.acceptFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+					'<img src="images/profile_pic.png" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
@@ -49,6 +50,7 @@ var CSSFriendsServices = {
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i].id + '\')">' +
+					'<img src="images/profile_pic.png" />' +	
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
@@ -116,19 +118,19 @@ var CSSFriendsServices = {
 
 		//DISPLAY SUGGESTIONS
 		for (i  = 0; i < data.length; i++) {
-			var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\')">' +
+			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+				'<img src="images/profile_pic.png" />' +	
 				'<h2>' + data[i].name + '</h2>' + 
 				'<p>' + data[i].id + '</p>' +
 				'</a></li>';
-			jQuery('ul#SuggestedFriendsListUL').append(tableEntry);
+			$('ul#SuggestedFriendsListUL').append(tableEntry);
 		}
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
 	
-	sendFriendRequest: function(name, css_id) {
+	sendFriendRequest: function(name, css_id, id) {
 		function success(data) {
-			//CSSFriendsServices.showFriendDetailPage(data);
-			//$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+			$('#li' + id).remove().slideUp('slow');
 		}
 		
 		function failure(data) {
@@ -136,15 +138,20 @@ var CSSFriendsServices = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-			window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-		}
+		//if (window.confirm("Send friend request to " + name + "?")) {
+		jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
+			if (answer) {
+		    	 $('#li' + id).append("Sending Request...");
+		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
+			}
+		});
 	},
 	
-	acceptFriendRequest: function(name, css_id) {
+	acceptFriendRequest: function(name, css_id, id) {
 		function success(data) {
-			CSSFriendsServices.showFriendDetailPage(data);
-			$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+			$('#li' + id).remove().slideUp('slow');
+			//CSSFriendsServices.showFriendDetailPage(data);
+			//$.mobile.changePage($("#friend-profile"), {transition: "fade"});
 		}
 		
 		function failure(data) {
@@ -152,9 +159,13 @@ var CSSFriendsServices = {
 		}
 
 		//ACCEPT REQUEST
-		if (window.confirm("Accept friend request from " + name + "?")) {
-			window.plugins.SocietiesLocalCSSManager.acceptFriendRequest(css_id, success, failure);
-		}
+		//if (window.confirm("Accept friend request from " + name + "?")) {
+		jConfirm("Accept friend request from " + name + "?", 'Accept Friend', function(answer) {
+		     if (answer){
+		    	 $('#li' + id).append("Accepting Request...");
+		 		window.plugins.SocietiesLocalCSSManager.acceptFriendRequest(css_id, success, failure);
+		     }
+		});
 	},
 	
 	searchCssDirectory: function(searchTerm) {
@@ -184,6 +195,7 @@ var CSSFriendsServices = {
 		}
 		window.plugins.SocietiesLocalCSSManager.findAllCssAdvertisementRecords(success, failure);
 	}
+	
 };
 
 /**
@@ -192,7 +204,7 @@ var CSSFriendsServices = {
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
-$(document).on('pageinit', '#my-friends-list', function(event) {
+$(document).on('pageinit', '#friends-landing', function(event) {
 
 	console.log("pageinit: MyFriends jQuery calls");
 	
@@ -228,7 +240,6 @@ $(document).on('pageinit', '#my-friends-list', function(event) {
 		else
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(CSSFriendsServices.returnAllCssDirAdverts);
 		e.preventDefault();
-		//return false;
+		return false;
 	});
-	
 });

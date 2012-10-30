@@ -281,7 +281,7 @@ var	SocietiesLocalCSSManager = {
 
 		var cssRecord = {
 	  			"archiveCSSNodes": [],
-                "cssIdentity": null,
+                "cssIdentity": data.cssIdentity,
                 "cssInactivation": null,
                 "cssNodes": [],
                 "cssRegistration": null,
@@ -292,13 +292,13 @@ var	SocietiesLocalCSSManager = {
                 "entity": data.entity,
                 "foreName": data.foreName,
                 "homeLocation": null,
-                "identityName": data.identityName,
+                "identityName": data.cssIdentity,
                 "imID": data.imID,
                 "name": data.name,
                 "password": null,
                 "presence": 0,
                 "sex": data.sex,
-                "socialURI": data.socialURI,
+                "socialURI": null,
                 "status": 0
 	            }
 
@@ -461,16 +461,22 @@ var	SocietiesLocalCSSManagerHelper = {
 	disconnectFromLocalCSSManager: function() {
 		console.log("Disconnect from LocalCSSManager");
 			
-		function success(data) {
-			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+		//Until Service connection leakage problem is sorted do not 
+		//unbind from the CSSManager service
+		$.mobile.changePage( ($("#index")), { transition: "slideup"} );
 
-			console.log(data);
-		}
-		
-		function failure(data) {
-			alert("disconnectFromLocalCSSManager - failure: " + data);
-		}
-	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
+		console.log(data);
+
+//		function success(data) {
+//			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+//
+//			console.log(data);
+//		}
+//		
+//		function failure(data) {
+//			alert("disconnectFromLocalCSSManager - failure: " + data);
+//		}
+//	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
 	},
 	/**
 	 * @methodOf SocietiesLocalCSSManagerHelper#

@@ -91,6 +91,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.cis.manager.Cis;
 
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -171,14 +172,24 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IPrivacyDataManager privacyDataManager;
 
 	private PubsubClient pubsubClient;
+	
+	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
 	
 	
-	
+	public IUserFeedback getiUsrFeedback() {
+		return iUsrFeedback;
+	}
+
+	public void setiUsrFeedback(IUserFeedback iUsrFeedback) {
+		this.iUsrFeedback = iUsrFeedback;
+	}
+
 	
 	public INegotiation getNegotiator() {
 		return negotiator;
 	}
+
 
 	public PubsubClient getPubsubClient() {
 		return pubsubClient;
@@ -459,7 +470,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("creating a CIS");
 		// -- Verification
 		// Dependency injection
-		if (!isDepencyInjectionDone(1)) {
+		if (!isDepencyInjectionDone(0)) {
 			LOG.error("[Dependency Injection] CisManager::createCis not ready");
 			return null;
 		}
@@ -1154,9 +1165,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
@@ -1178,9 +1189,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
@@ -1202,9 +1213,9 @@ public class JoinCallBack implements ICisManagerCallback{
 		}finally{
 			if(session!=null){
 				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
+				//session = sessionFactory.openSession();
+				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				//session.close();
 			}
 			
 		}
@@ -1442,6 +1453,11 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		private void returnFail(){
 			LOG.debug("privacy negotiation error");
+			
+			if(null != iUsrFeedback){
+				iUsrFeedback.showNotification("privacy negotiation errorn when joining" + targetJid);
+			}
+			
 			CommunityMethods result = new CommunityMethods();		
 			Community com = new Community();
 			com.setCommunityJid(targetJid);
@@ -1627,6 +1643,11 @@ public class JoinCallBack implements ICisManagerCallback{
 				LOG.info("[Dependency Injection] Missing Event Manager");
 				return false;
 			}
+			if (null == iUsrFeedback) {
+				LOG.info("[Dependency Injection] Missing Usr Feedback");
+				return false;
+			}
+			
 		}
 		return true;
 	}

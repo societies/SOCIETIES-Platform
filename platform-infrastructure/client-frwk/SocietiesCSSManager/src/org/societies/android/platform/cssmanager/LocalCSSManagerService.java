@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.cssmanager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,6 +58,8 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
@@ -83,6 +86,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private static final String OLD_CSS_NODE = "Old CSS Node";
 	private static final String NODE_LOGIN = "Node Logged in";
 	
+	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+
+	
 	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
 	//Pubsub packages
@@ -99,7 +107,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
 
-	private IBinder binder = null;
+	private LocalCSSManagerBinder binder = null;
     
 //	private Messenger inMessenger;
 	private AndroidCSSRecord cssRecord;
@@ -126,8 +134,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
 		this.binder = new LocalCSSManagerBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(this);
 
 		this.cssRecord = null;
+		this.ccm = null;
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -141,16 +152,29 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	/**
 	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
 	 */
-	 public class LocalCSSManagerBinder extends Binder {
+	 public static class LocalCSSManagerBinder extends Binder {
+		 private WeakReference<LocalCSSManagerService> outerClassReference = null;
+		 
+		 public void addouterClassreference(LocalCSSManagerService instance) {
+			 this.outerClassReference = new WeakReference<LocalCSSManagerService>(instance);
+		 }
+		 
 		 public LocalCSSManagerService getService() {
-	            return LocalCSSManagerService.this;
+	            return outerClassReference.get();
 	        }
 	    }
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-//		return inMessenger.getBinder();
 		return this.binder;
 	}
 	
@@ -256,7 +280,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		this.ccm = new ClientCommunicationMgr(this);
+		this.configureClientCommunicationMgr();
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 		
@@ -306,12 +330,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 				
 		String params [] = {client};
-
 		
 		DomainLogout domainLogout = new DomainLogout();
 		
 		domainLogout.execute(params);
-
 	}
 
 	public AndroidCSSRecord modifyAndroidCSSRecord(String client, AndroidCSSRecord record) {
@@ -360,6 +382,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
 		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
+		
+		this.configureClientCommunicationMgr();
 		
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -490,30 +514,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	public void sendFriendRequest(String client, String cssId) {
-		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
-		Dbc.require("CSS Identity parameter must have a value", null != cssId && cssId.length() > 0);
-		Log.d(LOG_TAG, "sendFriendRequest called with client: " + client);
-
-		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
-
-		Stanza stanza = new Stanza(cloudNodeIdentity);		
-		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.SEND_FRIEND_REQUEST);
-        try {
-    		ccm.register(ELEMENT_NAMES, callback);
-			ccm.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Send stanza");
-		} catch (Exception e) {
-			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
-        }
+		Log.d(LOG_TAG, "sendFriendRequest called by client: " + client + " for: " + cssId);
+		
+		AsyncFriendRequests methodAsync = new AsyncFriendRequests();
+		String params[] = {client, cssId, IAndroidCSSManager.SEND_FRIEND_REQUEST};
+		methodAsync.execute(params);
 	}
 
 	/* @see org.societies.android.api.internal.cssmanager.IAndroidCSSManager#acceptFriendRequest(java.lang.String, java.lang.String)*/
 	public void acceptFriendRequest(String client, String cssId) {
 		Log.d(LOG_TAG, "shareService called by client: " + client);
 		
-		AsyncAcceptFriendRequests methodAsync = new AsyncAcceptFriendRequests();
-		String params[] = {client, cssId};
+		AsyncFriendRequests methodAsync = new AsyncFriendRequests();
+		String params[] = {client, cssId, IAndroidCSSManager.ACCEPT_FRIEND_REQUEST};
 		methodAsync.execute(params);
 	}
 
@@ -556,8 +569,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			messageBean.setMethod(MethodType.GET_FRIEND_REQUESTS);
 			//COMMS CONFIG
 			ICommCallback discoCallback = new CSSManagerCallback(params[0], IAndroidCSSManager.GET_FRIEND_REQUESTS); 
-			IIdentity toID = ccm.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
+			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
 	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
@@ -576,23 +588,32 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	/**
 	 * This class carries out the AcceptFriendRequests method call asynchronously
 	 */
-	private class AsyncAcceptFriendRequests extends AsyncTask<String, Void, String[]> {
+	private class AsyncFriendRequests extends AsyncTask<String, Void, String[]> {
 		
 		@Override
 		protected String[] doInBackground(String... params) {
 			Dbc.require("At least one parameter must be supplied", params.length >= 1);
-			Log.d(LOG_TAG, "GetFriendRequests - doInBackground");
-			String results [] = new String[1];
-			results[0] = params[0];
+			Log.d(LOG_TAG, "AsyncFriendRequests - doInBackground");
+			
+			//PARAMETERS
+			String client = params[0];
+			String targetCssId = params[1];
+			String method = params[2];
+			//RETURN OBJECT
+			String results[] = new String[1];
+			results[0] = client;
 			//MESSAGE BEAN
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
-			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
-			messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);
-			//messageBean.settargetCSSID to accept
+			messageBean.setTargetCssId(targetCssId);
+			if (method.equals(IAndroidCSSManager.SEND_FRIEND_REQUEST)) {
+				messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST_INTERNAL);
+			} else {
+				messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST_INTERNAL);
+				messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);	
+			}
 			//COMMS CONFIG
-			ICommCallback discoCallback = new CSSManagerCallback(params[0], IAndroidCSSManager.ACCEPT_FRIEND_REQUEST); 
-			IIdentity toID = ccm.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
+			ICommCallback discoCallback = new CSSManagerCallback(client, method);
+			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
 	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendMessage(stanza, messageBean);
@@ -604,7 +625,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 		@Override
 		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+			Log.d(LOG_TAG, "AsyncFriendRequests - onPostExecute");
 	    }
 	}
 	
@@ -811,7 +832,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
 				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
-				LocalCSSManagerService.this.ccm = null;
 				
 				results[0] = params[0];
 			}
@@ -1165,5 +1185,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			throw new RuntimeException(e);
 		}     
     }
+    
+    /**
+     * Create and configureClientCommunicationManager
+     */
+    private void configureClientCommunicationMgr() {
+		if (null == this.ccm) {
+			this.ccm = new ClientCommunicationMgr(this);
+			
+			AppPreferences appPreferences = new AppPreferences(this.getApplicationContext());
 
+			int xmppServerPort = appPreferences.getIntegerPrefValue(DOMAIN_AUTHORITY_SERVER_PORT);
+			String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
+			String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
+			
+			this.ccm.setDomainAuthorityNode(domainAuthorityName);
+			this.ccm.setPortNumber(xmppServerPort);
+			this.ccm.setResource(nodeJIDResource);
+		}
+    }
 }

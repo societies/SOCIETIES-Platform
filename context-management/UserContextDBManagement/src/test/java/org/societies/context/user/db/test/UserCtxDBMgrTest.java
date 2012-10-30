@@ -32,11 +32,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
@@ -48,12 +49,19 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelBeanTranslator;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -561,7 +569,48 @@ public class UserCtxDBMgrTest {
 		assertTrue(ids.contains(entId1));
 		assertTrue(ids.contains(entId2));
 	}
+
+	@Test
+	public void testBeanTranslator() throws CtxException {
+		
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		final CtxEntity entityDevice = this.userDB.createEntity(CtxEntityTypes.DEVICE);
+		final CtxEntity entityNode = this.userDB.createEntity(CtxEntityTypes.CSS_NODE);
+		final CtxAttribute attributeName = this.userDB.createAttribute(entityDevice.getId(), CtxAttributeTypes.NAME);
+		final IndividualCtxEntity indEntity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		
+		final CtxAssociation association = this.userDB.createAssociation(CtxAssociationTypes.USES_DEVICES);
+		association.setParentEntity(entityDevice.getId());
+		association.addChildEntity(entityNode.getId());
+		
+		try {
+			CtxEntityBean entBean = ctxBeanTranslator.fromCtxEntity(entityDevice);
+			CtxEntity entityRetrieved = ctxBeanTranslator.fromCtxEntityBean(entBean);
+			assertEquals(entityDevice, entityRetrieved);
+			
+			CtxAssociationBean assocBean = ctxBeanTranslator.fromCtxAssociation(association);
+			CtxAssociation assocRetrieved = ctxBeanTranslator.fromCtxAssociationBean(assocBean);
+			assertEquals(association,assocRetrieved);
 	
+			CtxAttributeBean attrBean = ctxBeanTranslator.fromCtxAttribute(attributeName);
+			CtxAttribute attributeRetrieved = ctxBeanTranslator.fromCtxAttributeBean(attrBean);
+			assertEquals(attributeName,attributeRetrieved);
+		
+			IndividualCtxEntityBean indiEntBean = ctxBeanTranslator.fromIndiCtxEntity(indEntity);
+			IndividualCtxEntity indiEntRetrieved = ctxBeanTranslator.fromIndiCtxEntityBean(indiEntBean);
+			assertEquals(indEntity, indiEntRetrieved);
+			
+			CtxModelObjectBean ctxModelObjectBean = ctxBeanTranslator.fromCtxModelObject(indEntity);
+			CtxModelObject ctxModelObject = ctxBeanTranslator.fromCtxModelObjectBean(ctxModelObjectBean);
+			assertEquals(indEntity,ctxModelObject);
+	
+		} catch (DatatypeConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
    /*
 	@Ignore
 	@Test

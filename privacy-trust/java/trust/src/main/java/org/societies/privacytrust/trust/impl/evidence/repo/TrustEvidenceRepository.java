@@ -82,19 +82,21 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding trust evidence " + evidence + " to the Trust Evidence Repository...");
+		
 		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
+		Transaction tx = null;
 		try {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Adding trust evidence " + evidence + " to the Trust Evidence Repository...");
-	
+			tx = session.beginTransaction();
 			session.save(evidence);
 			session.flush();
-			transaction.commit();
+			tx.commit();
 	
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for trust evidence " + evidence);
-			transaction.rollback();
+			if (tx != null)
+				tx.rollback();
 			throw new TrustEvidenceRepositoryException("Could not add evidence " 
 					+ evidence + ": " + e.getLocalizedMessage(), e);
 		} finally {
@@ -255,24 +257,28 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			final Date endDate) throws TrustEvidenceRepositoryException {
 		
 		final Set<T> result = new HashSet<T>();
+		final Session session = this.sessionFactory.openSession();
+		try {		
+			final Criteria criteria = session.createCriteria(evidenceClass)
+					.add(Restrictions.eq("teid", teid));
 		
-		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(evidenceClass)
-			.add(Restrictions.eq("teid", teid));
+			if (type != null)
+				criteria.add(Restrictions.eq("type", type));
 		
-		if (type != null)
-			criteria.add(Restrictions.eq("type", type));
+			if (startDate != null) 
+				criteria.add(Restrictions.ge("timestamp", startDate));
 		
-		if (startDate != null) 
-			criteria.add(Restrictions.ge("timestamp", startDate));
-		
-		if (endDate != null)
-			criteria.add(Restrictions.le("timestamp", endDate));
+			if (endDate != null)
+				criteria.add(Restrictions.le("timestamp", endDate));
 	
-		result.addAll(criteria.list());
-		
-		if (session != null)
-			session.close();
+			result.addAll(criteria.list());
+		} catch (Exception e) {
+			throw new TrustEvidenceRepositoryException("Could not retrieve evidence " 
+					+ "for TEID '" + teid + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 			
 		return result;
 	}
@@ -282,8 +288,6 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			final TrustEvidenceType type, final Date startDate,
 			final Date endDate)	throws TrustEvidenceRepositoryException {
 		
-		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
 		String hqlDelete = "delete " + evidenceClass.getName() + " ec where"
 				+ " ec.teid = :teid";
 		
@@ -296,25 +300,37 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (endDate != null)
 			hqlDelete += " and ec.timestamp <= :endDate";
 		
-		final Query deleteQuery = session.createQuery(hqlDelete)
-				.setParameter("teid", teid, Hibernate.custom(TrustedEntityIdCompositeType.class));
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null; 
+		try {
+			tx = session.beginTransaction();
+			final Query deleteQuery = session.createQuery(hqlDelete)
+					.setParameter("teid", teid, Hibernate.custom(TrustedEntityIdCompositeType.class));
 		
-		if (type != null)
-			deleteQuery.setParameter("type", type);
+			if (type != null)
+				deleteQuery.setParameter("type", type);
 		
-		if (startDate != null)
-			deleteQuery.setParameter("startDate", startDate, Hibernate.custom(DateTimeUserType.class));
+			if (startDate != null)
+				deleteQuery.setParameter("startDate", startDate, Hibernate.custom(DateTimeUserType.class));
 		
-		if (endDate != null)
-			deleteQuery.setParameter("endDate", endDate, Hibernate.custom(DateTimeUserType.class));
+			if (endDate != null)
+				deleteQuery.setParameter("endDate", endDate, Hibernate.custom(DateTimeUserType.class));
 		        
-		int deletedEntities = deleteQuery.executeUpdate();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Removed " + deletedEntities + " " + evidenceClass.getSimpleName() 
-					+ "s from the Trust Evidence Repository");
-		transaction.commit();
-		
-		if (session != null)
-			session.close();
+			int deletedEntities = deleteQuery.executeUpdate();
+			if (LOG.isDebugEnabled())
+				LOG.debug("Removed " + deletedEntities + " " + evidenceClass.getSimpleName()
+						+ "s from the Trust Evidence Repository");
+			tx.commit();
+			
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for query " + hqlDelete);
+			if (tx != null)
+				tx.rollback();
+			throw new TrustEvidenceRepositoryException("Could not remove evidence for TEID '" 
+					+ teid + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 }

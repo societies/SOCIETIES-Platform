@@ -35,7 +35,7 @@
     </osgi-compendium:cm-properties>
 	
 	<!-- PubsubClient Service -->
-	<osgi:service ref="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
+	<osgi:service ref="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" depends-on="pubsubService"/>
 	
 	<!-- Privacy Logging Service -->
 	<!--osgi:reference id="privacyLog" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" cardinality="0..1" /-->

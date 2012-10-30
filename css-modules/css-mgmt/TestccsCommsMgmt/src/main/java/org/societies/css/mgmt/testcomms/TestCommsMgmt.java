@@ -235,7 +235,21 @@ public class TestCommsMgmt {
 			}
 		});
 		
-		LOG.info("Calling remote CSSManager server for method sendCssFriendRequest");
+		LOG.info("Calling remote CSSManager server for method SEND_CSS_FRIEND_REQUEST_INTERNAL");
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST_INTERNAL);
+		messageBean.setRequestStatus(CssRequestStatusType.PENDING);
+		messageBean.setTargetCssId("jane.societies.local");
+		try {
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(TEST_CSS_JID1));
+			this.commManager.sendMessage(stanza, messageBean);
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.remoteCSSManager.sendCssFriendRequest(TEST_CSS_JID);
 
 		LOG.info("Calling remote CSSDirectory server for method findAllCssAdvertisementRecords");
@@ -260,8 +274,9 @@ public class TestCommsMgmt {
 			}
 		});
 		
+		/*
 		LOG.info("Calling remote CSSManager server for method Accept Friends request");
-		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean = new CssManagerMessageBean();
 		messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST_INTERNAL);
 		messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);
 		messageBean.setTargetCssId("jane.societies.local");
@@ -276,21 +291,13 @@ public class TestCommsMgmt {
 			e.printStackTrace();
 		}
 		
-		//try {
-			//this.commManager.sendMessage(stanza, messageBean);
-	//	} catch (CommunicationException e1) {
-			// TODO Auto-generated catch block
-		//	e1.printStackTrace();
-		//}
-		//this.remoteCSSManager.acceptCssFriendRequest(messageBean); 
-
-		
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	/**

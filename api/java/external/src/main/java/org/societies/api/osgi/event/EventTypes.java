@@ -66,7 +66,7 @@ public class EventTypes {
     
     /** Used by Service Management (Service Discovery) to notify peers of a new service. */
 	public static final String NEW_SERVICE_EVENT = "org/societies/servicemgmt/service/newservice";
-	
+
 	/** Used by Service Management (Service Discovery) to notify peers of a removed service. */
 	public static final String REMOVED_SERVICE_EVENT = "org/societies/servicemgmt/service/removeservice";
 	

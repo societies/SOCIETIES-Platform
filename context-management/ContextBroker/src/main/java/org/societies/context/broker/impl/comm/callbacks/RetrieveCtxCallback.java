@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -16,7 +17,7 @@ public class RetrieveCtxCallback implements ICtxCallback{
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(RetrieveCtxCallback.class);
 	
-	CtxModelObject result;
+	private CtxModelObject result;
 
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
@@ -48,13 +49,7 @@ public class RetrieveCtxCallback implements ICtxCallback{
 		LOG.info("onRetrieveCtx, notify all done");
 
 	}
-
-	@Override
-	public void receiveCtxResult(Object retObject, String type) {
-		// TODO Auto-generated method stub
-
-	}	
-
+	
 	@Override
 	public void onUpdateCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
@@ -65,8 +60,23 @@ public class RetrieveCtxCallback implements ICtxCallback{
 	}
 
 	@Override
-	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onCreatedAssociation(CtxAssociation retObject) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRemovedModelObject(CtxModelObject ctxObj) {
+		
+		// TODO Auto-generated method stub
 	}
 }
