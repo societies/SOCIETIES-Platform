@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import jxl.Cell;
 import jxl.Sheet;
@@ -37,6 +39,19 @@ import jxl.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociationTypes;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,29 +64,32 @@ public class CtxBrokerEvaluation {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerEvaluation.class);
-	
+
 	private static final String XLS_INPUT_FILE = "realityMining.xls";
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
 	private ICommManager commMgrService;
 
+
+	HashMap<Integer, List<Integer>> data = new HashMap<Integer, List<Integer>>();
+
 	CtxBrokerEvaluation(){
-	
+
 	}
-	
+
 	@Autowired(required=true)
 	public CtxBrokerEvaluation(ICtxBroker internalCtxBroker, ICommManager commMgr) throws Exception {
 
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
-		
+
 		this.internalCtxBroker = internalCtxBroker;
 		LOG.info("*** CtxBroker service "+this.internalCtxBroker);
 
 		this.commMgrService = commMgr;
 		LOG.info("*** commMgrService instantiated "+this.commMgrService);
-		
+
 		try {
 			this.readData(XLS_INPUT_FILE);
 		} catch (Exception e) {
@@ -88,24 +106,141 @@ public class CtxBrokerEvaluation {
 
 		//test.setInputFile("./realityMining.xls");
 
-		HashMap<Integer, List<Integer>> data = xlsReader(file);
+		this.data = xlsReader(file);
 
 		if (LOG.isInfoEnabled())
 			LOG.info("CtxBrokerEvaluation data "+data);	
 
-		for( Integer i : data.keySet()){
-			String identityString = "identity_"+i+"@societies.local";
 
-			//	IIdentity cssIDx =  this.commMgrService.getIdManager().fromJid(identityString);
-			//	IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity(cssIDx, CtxEntityTypes.PERSON);
-			//	System.out.println(indiEnt.getId());
+		// create individual entities
+		for( Integer i : data.keySet()){
+
+			if (this.getIndiEntity(i) == null) {
+				String identityString = "identity_"+i+"@societies.local";
+
+				IIdentity cssIDx =  this.commMgrService.getIdManager().fromJid(identityString);
+
+				IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity(cssIDx, CtxEntityTypes.PERSON).get();
+				CtxAttribute attributeEvalID = this.internalCtxBroker.createAttribute(indiEnt.getId(), "evaluationID").get();
+				attributeEvalID.setIntegerValue(i);
+				this.internalCtxBroker.update(attributeEvalID);
+				//System.out.println(indiEnt.getId());
+
+			}
 		}
+		List<CtxIdentifier> allIndiEntityIDList = this.internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON).get();
+		System.out.println("idList: "+allIndiEntityIDList);
+		System.out.println("idList size : "+allIndiEntityIDList.size());
+
+		//individual entities created
+		LOG.info("individual entities created ");
+		// add friend associations
+		IndividualCtxEntity indiEntity = null;
+
+		LOG.info("create associations ");
+		for(CtxIdentifier indiEntIdentifier : allIndiEntityIDList){
+
+			indiEntity = (IndividualCtxEntity) this.internalCtxBroker.retrieve(indiEntIdentifier).get();
+
+			CtxAttribute attrID = getEvaluationID(indiEntity);
+
+			if(attrID != null){
+
+				List<Integer> idFriendsList = data.get(attrID.getIntegerValue());
+
+				LOG.info("friends for indiEntity "+indiEntity.getId() +" are :"+idFriendsList);
+
+				Set<CtxAssociationIdentifier> friendsAssocIdSet = indiEntity.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH);
+				List<CtxAssociationIdentifier> friendsAssocIdList = new ArrayList<CtxAssociationIdentifier>(friendsAssocIdSet);
+				
+				CtxAssociation friendsAssoc = null;
+				if(friendsAssocIdSet.size() == 0  ){
+
+					friendsAssoc = this.internalCtxBroker.createAssociation(CtxAssociationTypes.IS_FRIENDS_WITH).get();
+					LOG.info("friendsAssoc "+friendsAssoc.getId() +" created ");
+				} else {
+					friendsAssoc =   (CtxAssociation) this.internalCtxBroker.retrieve(friendsAssocIdList.get(0)).get();
+				}
+					
+					
+					if(idFriendsList.size() > 0 ){
+						friendsAssoc.setParentEntity((CtxEntityIdentifier) indiEntIdentifier);
+						for(Integer i : idFriendsList ){
+							if(this.getIndiEntity(i) != null){
+								IndividualCtxEntity friendIndiEntity = this.getIndiEntity(i);
+								friendsAssoc.addChildEntity(friendIndiEntity.getId());
+							}
+						}
+						this.internalCtxBroker.update(friendsAssoc);	
+					}
+			
+				
+				// end if assoc
+
+
+			
+			}
+		}
+
 	}
-	
+
+	//attribute type "evaluationID" has value "i"
+	// for this i retrieve the respective individual entity
+
+	private IndividualCtxEntity getIndiEntity(Integer i){
+
+		IndividualCtxEntity indiEntityResult = null;
+
+		//HashMap<Integer, List<Integer>> data
+
+		try {
+			//List<CtxIdentifier> attrEvalIDs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE,"evaluationID").get();
+			List<CtxIdentifier> listIds = this.internalCtxBroker.lookup(CtxModelType.ENTITY,CtxEntityTypes.PERSON).get();
+
+			List<CtxEntityIdentifier> entityCtxId = new ArrayList<CtxEntityIdentifier>();
+
+			for(CtxIdentifier ctxId : listIds){
+				entityCtxId.add((CtxEntityIdentifier) ctxId);
+			}
+
+			List<CtxEntityIdentifier> entityIdList = internalCtxBroker.lookupEntities(entityCtxId, "evaluationID", i).get();
+			if( entityIdList.size() == 1 ) {
+				CtxEntityIdentifier indiEntityID = entityIdList.get(0);
+				indiEntityResult = (IndividualCtxEntity) this.internalCtxBroker.retrieve(indiEntityID).get();
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return indiEntityResult;
+	}
+
+
+	private CtxAttribute getEvaluationID(IndividualCtxEntity indiEntity){
+
+		CtxAttribute attrID = null;
+
+		Set<CtxAttribute> attrsSet = indiEntity.getAttributes("evaluationID");
+		List<CtxAttribute> attrListID = new ArrayList<CtxAttribute>(attrsSet);
+		if(attrListID.size() > 0  ) attrID = attrListID.get(0);
+
+		return attrID;
+	}
+
+
+
 	public HashMap<Integer, List<Integer>> xlsReader(String inputFile) throws Exception {
 
 		final HashMap<Integer, List<Integer>> mapOfContextData = new HashMap<Integer, List<Integer>>();
-		
+
 		final InputStream is = this.getClass().getResourceAsStream("/" + inputFile);
 		if (is == null)
 			throw new FileNotFoundException(inputFile + " (No such file in resources)");
@@ -122,17 +257,12 @@ public class CtxBrokerEvaluation {
 				List<Integer> data = new ArrayList<Integer>();
 				key=j;
 
-				// Cell cell = sheet.getCell(j, 0); //the first row only == the label
-				// if (cell.getType() == CellType.LABEL) {
-				//     contextAttribute = cell.getContents();
-				// }
-
 				//for each column store the data
 				for (int i = 0; i < sheet.getRows(); i++) { //from the second row and on
 					Cell cell = sheet.getCell(j, i);
-					System.out.println("key:"+j);
-					System.out.println("cell column:"+cell.getColumn());
-					System.out.println("cell getContents:"+cell.getContents());
+					//System.out.println("key:"+j);
+					//System.out.println("cell column:"+cell.getColumn());
+					//System.out.println("cell getContents:"+cell.getContents());
 					if (cell.getContents().equals("1") ) {
 						data.add(i+1); 
 					}
