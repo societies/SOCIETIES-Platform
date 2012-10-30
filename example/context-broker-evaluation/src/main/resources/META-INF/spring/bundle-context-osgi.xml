@@ -11,12 +11,9 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
     
-    <osgi:service ref="ctxBrokerExample" interface="org.societies.context.example.broker.CtxBrokerExample" />   
+    <osgi:service ref="ctxBrokerEvaluation" interface="org.societies.context.evalutaion.broker.CtxBrokerEvaluation" />   
     
 	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
 	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />
-	<osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager" cardinality="1..1" />
-	<osgi:reference id="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" cardinality="1..1" />
-	<osgi:reference id="cssManager" interface="org.societies.api.internal.css.management.ICSSLocalManager" cardinality="1..1" />
 	
 </beans>
