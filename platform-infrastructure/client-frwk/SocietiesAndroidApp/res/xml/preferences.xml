@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-  
+	<PreferenceCategory android:title="Behaviour">
+     		<CheckBoxPreference 
+     		    android:summary="Display passwords on entry" 
+     		    android:key="displayPasswords" 
+     		    android:defaultValue="false" 
+     		    android:title="Credential Passwords"/>
+    </PreferenceCategory>
+    		
    	<PreferenceCategory android:title="CSS Information">
     		<EditTextPreference 
    		    	android:title="Domain Authority Server URI" 

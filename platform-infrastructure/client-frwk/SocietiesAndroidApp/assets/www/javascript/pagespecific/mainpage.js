@@ -96,9 +96,13 @@ var SocietiesUtility = {
 		//app intercepts button and simulates back button behaviour
 		document.addEventListener("backbutton", SocietiesUtility.backButtonHandler, false);
 
-		SocietiesLogin.displayConnectionInfo();
+		//App behaviour preferences need to be determined asap
+		//Do not attempt to read the values here as the process 
+		//to determine their values is asynchronous.
+		SocietiesAppConfig.isDisplayPassword(SocietiesLogin.displayConnectionInfo);
+		
 	},
-
+	
 	/**
 	 * @methodOf SocietiesUtility#
 	 * @description Convert an uptime in milliseconds to conventional time units
@@ -146,7 +150,7 @@ jQuery(function() {
 $(document).on('pageinit', '#index', function(event) {
 
 	console.log("jQuery pageinit action(s) for mainpage");
-
+	
 	$('#connectXMPP').off('click').on('click', function(){
 		//DISPLAY PROGRESS AND DISABLE LOGIN BUTTON
 		$('#connectXMPP').val("logging in...");

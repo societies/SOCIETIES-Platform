@@ -87,6 +87,16 @@ var SocietiesLogin = {
 //		for (i = 0; i < window.plugins.length; i++) {
 //			console.log("plugin: " + window.plugin[i])
 //		};
+		
+		if (SocietiesAppConfig.DISPLAY_PASSWORDS_ON_ENTRY) {
+			$('#loginPassword').get(0).type = 'text';
+			//jQuery("#loginPassword").attr("type", "text"); doesn't work as JQuery inserts a security check !
+			console.log("Set Login password to read");
+		} else {
+			$('#loginPassword').get(0).type = 'password';
+			//jQuery("#loginPassword").attr("type", "password"); doesn't work as JQuery inserts a security check !
+			console.log("Set Login password to obscure");
+		}
 		SocietiesLogin.getCSSIdentity();
 		SocietiesLogin.getCSSIdentityPassword();
 		SocietiesLogin.getCSSIdentityDomain();
