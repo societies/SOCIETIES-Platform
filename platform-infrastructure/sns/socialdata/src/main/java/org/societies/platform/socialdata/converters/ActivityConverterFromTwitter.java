@@ -45,7 +45,7 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 			for (int i=0; i<elements.length(); i++){
 				JSONObject elm = elements.getJSONObject(i);
 				ActivityEntry entry = new ActivityEntryImpl();
-				entry.setId(elm.getString("id"));
+				entry.setId("twitter:"+elm.getString("id"));
 				if (elm.has("text")) 
 					entry.setContent(elm.getString("text"));
 				if (elm.has("user")) {
