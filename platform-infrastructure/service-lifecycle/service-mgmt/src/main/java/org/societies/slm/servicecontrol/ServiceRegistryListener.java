@@ -442,7 +442,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
-		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
+		filter.setServiceLocation(bundle.getLocation());
 		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices;
@@ -463,12 +464,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 		Service result = null;
 
 		for(Service service: listServices){
-			Long serBundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
+			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
-			if(log.isDebugEnabled())
-				log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());
-			
-			if(serBundleId == bundle.getBundleId()){
+			if(bundleSymbolic == bundle.getSymbolicName()){
 				result = service;
 				break;
 			}
@@ -508,6 +506,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 					
 			INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
 			getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+			
 			//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
 			
 		} catch(Exception ex){
@@ -658,8 +657,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setCssJid(myNode.getBareJid());
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
-			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
-				service.setServiceLocation(serBndl.getLocation());
+			service.setServiceLocation(serBndl.getLocation());
 		}
 		
 		ServiceImplementation servImpl = new ServiceImplementation();

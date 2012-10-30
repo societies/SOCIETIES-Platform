@@ -986,6 +986,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 		} catch(Exception ex){
 			logger.error("Exception while uninstalling service: " + ex.getMessage());
+			ex.printStackTrace();
 			throw new ServiceControlException("Exception uninstalling service bundle.", ex);
 		}
 
@@ -1001,15 +1002,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private Bundle getBundleFromService(Service service) {
 		
 		if(logger.isDebugEnabled()) logger.debug("Obtaining Bundle that corresponds to a service...");
-		
-		// First we get the bundleId
-		 long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
-				 
-		 if(logger.isDebugEnabled())
-			 logger.debug("The bundle Id is " + bundleId);
-		 
+			 
 		 // Now we get the bundle
-		 Bundle result = bundleContext.getBundle(bundleId);
+		 Bundle result = bundleContext.getBundle(service.getServiceLocation());
 
 		 if(logger.isDebugEnabled()) 
 				logger.debug("Bundle is " + result.getSymbolicName() + " with id: " + result.getBundleId() + " and state: " + ServiceModelUtils.getBundleStateName(result.getState()));
@@ -1374,6 +1369,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 	
 	private void sendUserNotification(String message){
+		if(logger.isDebugEnabled())
+			logger.debug("Sending notification: " + message);
 		getUserFeedback().showNotification(message);
 	}
 	
@@ -1407,12 +1404,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			for(Service thirdPartyClient : thirdPartyClients){
 
-				Long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(thirdPartyClient.getServiceIdentifier());
+				String serviceLocation = thirdPartyClient.getServiceLocation();
 				
 				if(logger.isDebugEnabled())
-					logger.debug("Checking if Bundle Id: " + bundleId + " exists in OSGI...");
+					logger.debug("Checking if Bundle with location: " + serviceLocation + " exists in OSGI...");
 				
-				Bundle thisBundle = this.bundleContext.getBundle(bundleId);
+				Bundle thisBundle = this.bundleContext.getBundle(serviceLocation);
 				
 				if(thisBundle == null || (thisBundle != null && !(thisBundle.getSymbolicName().equals(thirdPartyClient.getServiceInstance().getServiceImpl().getServiceNameSpace())))){
 					if(logger.isDebugEnabled()){
@@ -1485,12 +1482,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 				if(!oldService.getServiceType().equals(ServiceType.DEVICE) && !oldService.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
 					
-					Long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(oldService.getServiceIdentifier());
+					String serviceLocation = oldService.getServiceLocation();
 					
 					if(logger.isDebugEnabled())
-						logger.debug("Checking if Bundle Id: " + bundleId + " exists in OSGI...");
+						logger.debug("Checking if Bundle with location: " + serviceLocation + " exists in OSGI...");
 					
-					Bundle thisBundle = this.bundleContext.getBundle(bundleId);
+					Bundle thisBundle = this.bundleContext.getBundle(serviceLocation);
 
 					if(thisBundle == null){
 						if(logger.isDebugEnabled())
