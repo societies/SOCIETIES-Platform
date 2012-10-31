@@ -93,6 +93,13 @@ var	SocietiesCisDirService = {
 				}
 				catch(err) {}
 				$.mobile.changePage($("#community-details-page"), {transition: "fade"});
+				//SHOW ACTIVITY FEED/SERVICES/MEMBERS
+				SocietiesCISListService.showCISActivities(communityObj.communityJid, false);
+				SocietiesCISListService.showCISMembers(communityObj.communityJid, false);
+				ServiceManagementServiceHelper.connectToServiceManagement(function() {
+									SocietiesCISListService.showCISServices(communityObj.communityJid); }
+									);
+				SocietiesCISListService.createSelectServices();
 			}
 		}
 		else // TODO: NOT JOINED
