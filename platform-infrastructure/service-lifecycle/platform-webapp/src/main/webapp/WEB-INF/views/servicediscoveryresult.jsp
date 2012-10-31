@@ -79,7 +79,7 @@ function updateForm(serviceID, toDo) {
 
 		if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 				
-			if(!myService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
+			if(!myService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && (myService.getServiceInstance().getServiceImpl().getServiceClient() != null || myService.getServiceType().equals(ServiceType.DEVICE))){
 
 				%>
 				<tr>
@@ -91,11 +91,11 @@ function updateForm(serviceID, toDo) {
 				<%
 				if(isShared(myService,cisServices)){
 					%>
-					<input type="button" value="unshare" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier()) %>', 'UnshareService')" >		
+					<input type="button" value="unshare" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier()) %>', 'UnshareService')" >		
 					<%
 				}else{					
 					%>
-					<input type="button" value="share" onclick="updateForm('<%= ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier() )%>', 'ShareService')" >
+					<input type="button" value="share" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'ShareService')" >
 					<%
 				}
 				%>
@@ -109,24 +109,30 @@ function updateForm(serviceID, toDo) {
 				<tr>
 		    	<td><%= myService.getServiceName() %></td>
 		     	<td><%= myService.getServiceDescription() %></td>
-		        <td><%= myService.getAuthorSignature() %></td>
+		        <td><%= myService.getServiceType() %></td>
 		        <td><%= myService.getServiceStatus() %></td>      
 		        <td>
 				
 		         <%
 		            
 				if(!myService.getServiceType().equals(ServiceType.DEVICE)){
-				%>
-					<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
-				<%
-				
+	    			if(myService.getServiceType().equals(ServiceType.THIRD_PARTY_SERVER)){
+	        			%>
+	        			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+	        			<%
+	        		} else{
+	            		%>
+	        			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceInstance().getParentIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+	        			<%
+	        		}
+	
 					if(myService.getServiceStatus().equals(ServiceStatus.STARTED)){
 						%>
-						<input type="button" value="stop" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StopService')" >
+						<input type="button" value="stop" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'StopService')" >
 						<%
 					} else{
 						%>
-						<input type="button" value="start" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StartService')" >
+						<input type="button" value="start" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'StartService')" >
 						<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
 						<%
 					}
@@ -170,16 +176,18 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
         if(!haveClient(cisService,myServices)){
     		if(!cisService.getServiceType().equals(ServiceType.DEVICE)){
     			%>
-    				<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(cisService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+    			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+    			<%		
+    		} else{
+    			%>
+    			Device 
     			<%
-    			} else{
-    				%>
-    				Device 
-    				<%
-    			}
+    		}
+    		
         	%>
-			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(cisService.getServiceIdentifier())%>', 'Install3PService')" >
+			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>', 'Install3PService')" >
         	<%
+        	
         } else{
         	%>
         	Client installed!
