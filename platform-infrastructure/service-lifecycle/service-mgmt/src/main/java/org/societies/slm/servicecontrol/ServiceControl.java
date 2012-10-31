@@ -30,6 +30,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -101,6 +103,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private final long TIMEOUT = 5;
 
+	private static ExecutorService executor;
 	
 	public IEventMgr getEventMgr(){
 		return eventMgr;
@@ -173,7 +176,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
-
+	public ServiceControl(){
+		executor = Executors.newCachedThreadPool();
+	}
+	
 	@Async
 	@Override
 	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
@@ -587,13 +593,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					newServiceInstance.setServiceImpl(newServImpl);
 					newService.setServiceInstance(newServiceInstance);
 					
-					getServiceReg().updateRegisteredService(newService);
-						
+					boolean test = getServiceReg().updateRegisteredService(newService);
+					
 					//
-					logger.info("Installed shared third-party service client!");
+					logger.info("Installed shared third-party service client! : " + test);
 					returnResult.setServiceId(result.getServiceId());
 					returnResult.setMessage(result.getMessage());
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
+					
 					sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
 					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
 					
@@ -1369,25 +1376,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 	
 	private void sendUserNotification(String message){
-		if(logger.isDebugEnabled())
-			logger.debug("Sending notification: " + message);
-		getUserFeedback().showNotification(message);
+		ServiceControlAsync servAsync = new ServiceControlAsync(message);
+		executor.execute(servAsync);
 	}
 	
 	private void updateActivityFeed(IIdentity target, String verb, Service service){
-		
-		ICis remoteCis = getCisManager().getCis(target.getJid());
-		
-		IActivity activity = remoteCis.getActivityFeed().getEmptyIActivity();
-		activity.setActor(getCommMngr().getIdManager().getThisNetworkNode().getJid());
-		activity.setObject(service.getServiceName());
-		activity.setTarget(target.getJid());
-		activity.setVerb(verb);
-		IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
-		remoteCis.getActivityFeed().addActivity(activity, cisCallback );
-		
-		if(logger.isDebugEnabled())
-			logger.debug("Updated ActivityFeed for " + remoteCis.getCisId());
+		ServiceControlAsync servAsync = new ServiceControlAsync(target,verb,service);
+		executor.execute(servAsync);
 	}
 	
 	@Override
@@ -1415,6 +1410,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled()){
 						logger.debug("Bundle doesn't exist, or isn't our service! We need to install!");
 						logger.debug("Attempting to reinstall 3p client: " + thirdPartyClient.getServiceName());
+						logger.debug("Parent is: " + ServiceModelUtils.serviceResourceIdentifierToString(thirdPartyClient.getServiceInstance().getParentIdentifier()));
 					}
 							
 					URI bundleLocation = new URI(thirdPartyClient.getServiceLocation());
@@ -1430,7 +1426,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							Service newService = getServiceReg().retrieveService(result.getServiceId());
 								
 							ServiceInstance newServiceInstance = newService.getServiceInstance();
-							newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getFullJid());
+							newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getParentJid());
 							newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
 							
 							ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
@@ -1439,7 +1435,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							newService.setServiceInstance(newServiceInstance);
 							
 							getServiceReg().updateRegisteredService(newService);
-								
+							
+							sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
+							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
+							
 							if(logger.isDebugEnabled())
 								logger.debug("Installed shared third-party service client for " + newService.getServiceName());
 							
@@ -1515,6 +1514,62 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		} catch(Exception ex){
 			ex.printStackTrace();
 			logger.error("Exception while cleaning database: " + ex);
+		}
+		
+	}
+	
+	private class ServiceControlAsync implements Runnable{
+
+		String message;
+		IIdentity target;
+		String verb;
+		Service service;
+		boolean activityUpdate;
+		
+		public ServiceControlAsync(String message){
+			this.message = message;
+			activityUpdate = false;
+		}
+		
+		public ServiceControlAsync(IIdentity target, String verb, Service service){
+			this.target = target;
+			this.verb = verb;
+			this.service = service;
+			activityUpdate = true;
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			if(activityUpdate)
+				this.updateActivityFeed(target,verb,service);
+			else
+				this.sendUserNotification(message);
+			
+		}
+		
+		private void sendUserNotification(String message){
+			if(logger.isDebugEnabled())
+				logger.debug("Sending notification: " + message);
+			getUserFeedback().showNotification(message);
+		}
+		
+		private void updateActivityFeed(IIdentity target, String verb, Service service){
+			
+			ICis remoteCis = getCisManager().getCis(target.getJid());
+			
+			IActivity activity = remoteCis.getActivityFeed().getEmptyIActivity();
+			activity.setActor(getCommMngr().getIdManager().getThisNetworkNode().getJid());
+			activity.setObject(service.getServiceName());
+			activity.setTarget(target.getJid());
+			activity.setVerb(verb);
+			IActivityFeedCallback cisCallback = new ServiceActivityFeedbackCallback();
+			remoteCis.getActivityFeed().addActivity(activity, cisCallback );
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Updated ActivityFeed for " + remoteCis.getCisId());
 		}
 		
 	}
