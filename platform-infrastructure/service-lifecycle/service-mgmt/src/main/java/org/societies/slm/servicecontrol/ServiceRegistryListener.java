@@ -66,6 +66,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceUpdateException;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -214,21 +215,21 @@ public class ServiceRegistryListener implements BundleContextAware,
 		case ServiceEvent.MODIFIED:
 			if(log.isDebugEnabled()) log.debug("Service Modification");
 
-			// Probably should check to see something if the service is shared		
+			/*serviceList.add(service);
+			this.getServiceReg().unregisterServiceList(serviceList);
+			this.getServiceReg().registerServiceList(serviceList);
+			*/
 			try {
-				serviceList.add(service);
-				this.getServiceReg().unregisterServiceList(serviceList);
-				this.getServiceReg().registerServiceList(serviceList);
-				
-			} catch (ServiceRegistrationException e) {
-				log.debug("Error while modifying service meta data");
-				e.printStackTrace();
+				this.getServiceReg().updateRegisteredService(service);
+			} catch (ServiceUpdateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 			break;
 			
 		case ServiceEvent.REGISTERED:
 			
-			if(log.isDebugEnabled()) log.debug("Service Registered");			
+			if(log.isDebugEnabled()) log.debug("Service Registering...");			
 			//service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 			
 			if(log.isDebugEnabled())
@@ -269,6 +270,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 								return;
 							}
 						}
+						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
+						
 					} else{
 						if(log.isDebugEnabled())
 							log.debug("Just restarting the service, no need to update stuff yet.");
@@ -442,7 +445,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
-		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
+		filter.setServiceLocation(bundle.getLocation());
 		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices;
@@ -463,12 +467,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 		Service result = null;
 
 		for(Service service: listServices){
-			Long serBundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
+			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
-			if(log.isDebugEnabled())
-				log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());
-			
-			if(serBundleId == bundle.getBundleId()){
+			if(bundleSymbolic == bundle.getSymbolicName()){
 				result = service;
 				break;
 			}
@@ -490,24 +491,30 @@ public class ServiceRegistryListener implements BundleContextAware,
 				log.debug("Adding the shared service to the policy provider!");
 				
 			String slaXml = null;
-			URI clientJar;
-					
+			URI clientJar = null;
+			INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+			
 			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
 				clientJar= new URI("http://www.societies.org/webapp/webservice.test");
-			else
-				clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
-					
-			URI clientHost;
-			if(clientJar.getPort()!= -1)
-				clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
-			else
-				clientHost = new URI("http://" + clientJar.getHost() );
+			else{
+				if(service.getServiceInstance().getServiceImpl().getServiceClient() != null)
+					clientJar= new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
+			}
+	
+			URI clientHost = null;
+			if(clientJar!=null){
+				if(clientJar.getPort()!= -1)
+					clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
+				else
+					clientHost = new URI("http://" + clientJar.getHost() );
+	
+				if(log.isDebugEnabled())
+					log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
+			
+				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+			} else
+				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, (String) null, callback);
 
-			if(log.isDebugEnabled())
-				log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-					
-			INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
-			getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
 			//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
 			
 		} catch(Exception ex){
@@ -524,7 +531,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		try{
 			if(log.isDebugEnabled())
 				log.debug("Adding privacy policy for " + service.getServiceName());
-
+			
 			//First we check if we have a privacy policy online
 			String privacyLocation = service.getPrivacyPolicy();
 			String privacyPolicy = null;
@@ -658,8 +665,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			si.setCssJid(myNode.getBareJid());
 			si.setParentJid(myNode.getBareJid()); //This is later changed!
 			si.setXMPPNode(myNode.getNodeIdentifier());
-			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT))
-				service.setServiceLocation(serBndl.getLocation());
+			service.setServiceLocation(serBndl.getLocation());
 		}
 		
 		ServiceImplementation servImpl = new ServiceImplementation();

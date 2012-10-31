@@ -136,7 +136,7 @@ public class ServiceControlController {
 			while(servIt.hasNext()){
 				Service next = servIt.next();
 				
-				String serviceId = ServiceModelUtils.serviceResourceIdentifierToString(next.getServiceIdentifier());
+				String serviceId = ServiceModelUtils.getServiceId64Encode(next.getServiceIdentifier());
 				
 				if(logger.isDebugEnabled())
 					logger.debug("Service: " + serviceId);
@@ -191,7 +191,7 @@ public class ServiceControlController {
 			logger.debug("node =  " + node );
 			logger.debug("method=" + method );
 			logger.debug("url: " + url );
-			logger.debug("Service Id:" + serviceUri );
+			logger.debug("Service Id (encoded): " + serviceUri );
 			logger.debug("Endpoint: " + endpoint);
 		}
 		
@@ -204,7 +204,7 @@ public class ServiceControlController {
 		
 		ServiceResourceIdentifier serviceId = null;
 		if(serviceUri != null && !serviceUri.equals("NONE"))
-			serviceId = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceUri);
+			serviceId = ServiceModelUtils.getServiceId64Decode(serviceUri);
 
 		/*
 		if(!serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
@@ -261,7 +261,12 @@ public class ServiceControlController {
 		
 		try {
 	
-	
+			if (returnPage.equals("servicediscoveryresult")) {
+				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
+				List<Service> services = asynchServices.get();
+				model.put("services", services);	
+			}
+			
 			if (method.equalsIgnoreCase("InstallService")) {
 				
 				URL serviceUrl = new URL(url);
@@ -428,12 +433,7 @@ public class ServiceControlController {
 				res="error unknown method";
 			}
 		
-			if (returnPage.equals("servicediscoveryresult")) {
-				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
-				List<Service> services = asynchServices.get();
-				model.put("services", services);	
-			}
-			
+
 		} catch (ServiceControlException e) {
 			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
 		} catch (Exception ex) {
