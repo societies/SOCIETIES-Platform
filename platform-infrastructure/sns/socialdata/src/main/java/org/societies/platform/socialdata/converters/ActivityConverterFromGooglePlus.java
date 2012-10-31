@@ -68,6 +68,12 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 	public List<ActivityEntry> load(String data) {
 		List<ActivityEntry> activities = Collections.emptyList(); 
 		
+		
+		ActivityObject providerObj = new ActivityObjectImpl();
+		providerObj.setUrl("plus.google.com");
+		providerObj.setId("plus.google.com");
+		providerObj.setDisplayName("Google+");
+		
 		try{
 			JSONObject db = new JSONObject(data);
 			
@@ -78,9 +84,11 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 			activities = new ArrayList<ActivityEntry>(items.length());
 			for(int i=0; i<items.length(); i++) {
 				JSONObject item = items.getJSONObject(i);
-				ActivityEntry activity = new ActivityEntryImpl();				
+				ActivityEntry activity = new ActivityEntryImpl();		
+				activity.setProvider(providerObj);
 				parseActivity(item, activity);
 				activities.add(activity);
+				
 			}
 		}
 		catch (JSONException e) {
@@ -96,14 +104,14 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 			if(json.has(TITLE)) activity.setTitle(json.getString(TITLE));
 			activity.setPublished(json.getString(PUBLISHED));
 			if(json.has(UPDATED)) activity.setUpdated(json.getString(UPDATED));
-			activity.setId(json.getString(ID));
+			activity.setId("googleplus:"+json.getString(ID));
 			if(json.has(URL)) activity.setUrl(json.getString(URL));
 			parseActor(json.getJSONObject(ACTOR), activity);
 			if(json.has(VERB)) activity.setVerb(json.getString(VERB));
 			parseObject(json, activity);			
 //			annotation 	string 	Additional content added by the person who shared this activity, applicable only when resharing an activity.			
 //			crosspostSource 	string 	If this activity is a crosspost from another system, this property specifies the ID of the original activity.
-			parseProvider(json, activity);
+			//parseProvider(json, activity);
 
 //			access 	nested object 	Identifies who has access to see this activity. 	
 //			access.kind 	string 	Identifies this resource as a collection of access controls. Value: "plus#acl". 	
