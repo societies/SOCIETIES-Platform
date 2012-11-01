@@ -86,8 +86,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		LOG.info ("inside assignInfAttributeTypes type: " + this.getInferrableTypes());
 		inferableTypesList.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		inferableTypesList.add(CtxAttributeTypes.LOCATION_COORDINATES);
-		inferableTypesList.add(CtxAttributeTypes.STATUS);
-		inferableTypesList.add(CtxAttributeTypes.TEMPERATURE);
+		//inferableTypesList.add(CtxAttributeTypes.STATUS);
+		//inferableTypesList.add(CtxAttributeTypes.TEMPERATURE);
 		this.setInferrableTypes(inferableTypesList);
 		
 		LOG.info ("getInferrableTypes " + this.getInferrableTypes());
