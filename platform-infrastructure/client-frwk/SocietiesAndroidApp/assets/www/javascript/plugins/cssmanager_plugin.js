@@ -281,7 +281,7 @@ var	SocietiesLocalCSSManager = {
 
 		var cssRecord = {
 	  			"archiveCSSNodes": [],
-                "cssIdentity": null,
+                "cssIdentity": data.cssIdentity,
                 "cssInactivation": null,
                 "cssNodes": [],
                 "cssRegistration": null,
@@ -292,13 +292,13 @@ var	SocietiesLocalCSSManager = {
                 "entity": data.entity,
                 "foreName": data.foreName,
                 "homeLocation": null,
-                "identityName": data.identityName,
+                "identityName": data.cssIdentity,
                 "imID": data.imID,
                 "name": data.name,
                 "password": null,
                 "presence": 0,
                 "sex": data.sex,
-                "socialURI": data.socialURI,
+                "socialURI": null,
                 "status": 0
 	            }
 

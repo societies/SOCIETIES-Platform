@@ -18,14 +18,15 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-	<context:component-scan base-package="org.societies.privacytrust.trust.impl" />
+	<context:component-scan base-package="org.societies.context.userHistory" />
 	
-	<bean id="TrustRepositoryConfig"
+	<bean id="UserCtxHistoryConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true"></property>
 		<property name="locations">
 			<list>
-				<value>classpath:META-INF/spring/derby.properties</value>	
+				<value>classpath:META-INF/spring/derby.properties</value>
+				<!-- <value>classpath:META-INF/spring/mysql.properties</value>	 -->
 			</list>
 		</property>	
 	</bean>
@@ -36,39 +37,23 @@
 
 		<property name="annotatedClasses">
 			<list>
-				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
-				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
-				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedService</value>
-				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence</value>
-				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence</value>
-			</list>
-		</property>
-
-		<property name="annotatedPackages">
-			<list>
-				<value>org.societies.privacytrust.trust.impl.repo.model</value>
-				<value>org.societies.privacytrust.trust.impl.evidence.repo.model</value>
+			    <value>org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO</value>
 			</list>
 		</property>
 		
-		<property name="eventListeners">
-			<map>
-				<entry key="post-insert">
-					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostInsertEventUserListener" />
-				</entry>
-				<entry key="post-update">
-					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostUpdateEventUserListener" />
-				</entry>
-  			</map>
- 		</property>
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.context.userHistory.impl.model</value>
+			</list>
+		</property>
 
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
 				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.show_sql">${show_sql}</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.format_sql">${format_sql}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
 			</props>
 		</property>
 	</bean>
@@ -90,11 +75,10 @@
 		<property name="initialSize" value="10" />
 		<property name="maxActive" value="100" />
 	</bean>
-	
-	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.mock.MockEventMgr"/>
-	
-	<bean id="ctxTrustEvidenceMonitor" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
-		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.impl.evidence.monitor.CtxTrustEvidenceMonitor" />
-	</bean>
-	
+
+<!-- 
+    <bean id="mockCtxEventMgr" class="org.societies.context.user.db.test.util.MockitoFactoryBean">
+        <constructor-arg name="classToBeMocked" value="org.societies.context.api.event.ICtxEventMgr" />
+    </bean>
+     -->
 </beans>

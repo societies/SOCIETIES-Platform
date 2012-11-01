@@ -32,11 +32,11 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 		JSONObject response;
 		JSONArray elements;
 
-		ActivityObject providerObj = new ActivityObjectImpl();
-		providerObj.setContent("foursquare");
-		providerObj.setUrl("www.foursquare.com");
-		providerObj.setId("foursquare");
-		providerObj.setDisplayName("Foursquare");
+//		ActivityObject providerObj = new ActivityObjectImpl();
+//		providerObj.setContent("foursquare");
+//		providerObj.setUrl("www.foursquare.com");
+//		providerObj.setId("foursquare");
+//		providerObj.setDisplayName("Foursquare");
 
 		try {
 			response = new JSONObject(data);
@@ -54,7 +54,7 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 						for (int i = 0; i < elements.length(); i++) {
 							JSONObject elm = elements.getJSONObject(i);
 							ActivityEntry entry = new ActivityEntryImpl();
-							entry.setId(elm.getString("id"));
+							entry.setId("foursqure:"+elm.getString("id"));
 
 							Date createdTime = new Date(
 									elm.getLong("createdAt")*1000);
@@ -93,7 +93,6 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 							entry.setContent(checkin.getDisplayName()+","+loc.get("location"));
 							
 							entry.setVerb("checkin");
-							entry.setProvider(providerObj);
 							activities.add(entry);
 						}
 					}

@@ -36,11 +36,11 @@ public class TableName {
 	 * 
 	 * @since 0.3
 	 */
-	public static final String DIRECT_TRUST_EVIDENCE = "t_direct_trust_evidence";
+	public static final String DIRECT_TRUST_EVIDENCE = "org_societies_trust_direct_evidence";
 	
 	/**
 	 * 
 	 * @since 0.3
 	 */
-	public static final String INDIRECT_TRUST_EVIDENCE = "t_indirect_trust_evidence";
+	public static final String INDIRECT_TRUST_EVIDENCE = "org_societies_trust_indirect_evidence";
 }

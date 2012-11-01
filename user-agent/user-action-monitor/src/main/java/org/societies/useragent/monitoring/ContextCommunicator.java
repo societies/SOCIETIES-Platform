@@ -52,6 +52,7 @@ import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class ContextCommunicator {
 
@@ -68,7 +69,7 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		URI serviceID = action.getServiceID().getIdentifier();
+		ServiceResourceIdentifier serviceID = action.getServiceID();
 		String parameterName = action.getparameterName();
 		String key = serviceID+"|"+parameterName;
 		if(mappings.containsKey(key)){  //already has service attribute
@@ -216,7 +217,7 @@ public class ContextCommunicator {
 		return usesServiceAssoc;
 	}
 	
-	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, URI serviceID){
+	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, ServiceResourceIdentifier serviceID){
 		CtxEntity serviceEntity = null;
 		try {
 			//create new SERVICE entity
@@ -236,7 +237,7 @@ public class ContextCommunicator {
 			byte[] serialised = SerialisationHelper.serialise(serviceID);
 			LOG.debug("SERIALISED: "+serialised);
 			try {
-				URI deserialised = (URI)SerialisationHelper.deserialise(serialised, this.getClass().getClassLoader());
+				ServiceResourceIdentifier deserialised = (ServiceResourceIdentifier)SerialisationHelper.deserialise(serialised, this.getClass().getClassLoader());
 				LOG.debug("DESERIALISED: "+deserialised);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();

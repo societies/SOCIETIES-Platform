@@ -33,6 +33,7 @@
 	<!--version>1.0-SNAPSHOT</version-->
 	<version>${release.version}</version>
 	<name>Domain authority REST Jersey Webapp</name>
+	<description>REST server for sharing any files related to SOCIETIES 3rd party services, for example jar file for service client, any service specific resources like videos, etc. The server has access control and allows download only to clients that present a valid proof of authorization from the service provider (given by the service provider after a successful policy negotiation).</description>
 
 	<developers>
 		<developer>

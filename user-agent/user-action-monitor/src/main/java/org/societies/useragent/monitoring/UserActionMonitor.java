@@ -50,6 +50,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 
 	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
 	private boolean interactable;
+	private boolean interactableSet;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
@@ -62,7 +63,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		System.out.println("Initialising user action monitor!");
 
 		//get myDeviceID from comms Mgr
-		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
+		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();  //with resource
 		myCssID = commsMgr.getIdManager().getThisNetworkNode();
 		
 		LOG.debug("My device ID is: "+myDeviceID);
@@ -70,8 +71,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 
 		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
 
-		//set interactable value
-		setInteractable();
+		interactableSet = false;
 	}
 
 	@Override
@@ -81,6 +81,12 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		LOG.debug("action serviceType: "+action.getServiceType());
 		LOG.debug("action parameterName: "+action.getparameterName());
 		LOG.debug("action value: "+action.getvalue());
+		
+		if(!interactableSet){
+			//interactable not yet set - set now
+			setInteractable();
+			interactableSet = true;
+		}
 
 		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
@@ -115,6 +121,12 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		LOG.debug("action serviceType: "+action.getServiceType());
 		LOG.debug("action parameterName: "+action.getparameterName());
 		LOG.debug("action value: "+action.getvalue());
+		
+		if(!interactableSet){
+			//interactable not yet set - set now
+			setInteractable();
+			interactableSet = true;
+		}
 
 		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
@@ -139,7 +151,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		LOG.debug("Setting interactable variable in UAM for this device with ID: "+myDeviceID);
 		interactable = true;
 		
-		/*try {
+		try {
 			CssInterfaceResult cssInterface = cssMgr.getCssRecord().get();
 			CssRecord record = cssInterface.getProfile();
 			if(record != null){
@@ -153,9 +165,9 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 							LOG.debug("Found this device in CSS record");
 							found = true;
 							
-							
-							 * Temporary use of String
-							 
+							 /* 
+							  * Temporary use of String
+							  */
 							String tmp = nextNode.getInteractable();
 							if(tmp.equalsIgnoreCase("true")){
 								LOG.debug("This device is interactable");
@@ -167,9 +179,9 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 								LOG.error("Interactable variable is not defined for this node, assuming default: not interactable");
 								interactable = false;
 							}
-							
+							/*
 							 * end
-							 
+							 */
 							
 							break;
 						}
@@ -190,7 +202,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	public void setCtxBroker(ICtxBroker broker){

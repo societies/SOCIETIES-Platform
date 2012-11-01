@@ -27,10 +27,8 @@ package org.societies.context.event.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +61,6 @@ import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.stereotype.Service;
@@ -83,8 +80,9 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	
 	private static final String EVENT_ID_PROPERTY_KEY = "id";
 	
-	private static final List<String> EVENT_SCHEMA_PACKAGES = 
-			Collections.unmodifiableList(Arrays.asList("org.societies.api.schema.context.model"));
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.schema.context.model.CtxIdentifierBean"));
 			
 	/** The OSGi EventAdmin service. */
 	@Autowired(required=true)
@@ -112,7 +110,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		this.idMgr = commMgr.getIdManager();
 		try {
 			this.pubsubId = this.idMgr.getThisNetworkNode();
-			this.pubsubClient.addJaxbPackages(EVENT_SCHEMA_PACKAGES);
+			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.CREATED);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.UPDATED);
 			this.pubsubClient.ownerCreate(this.pubsubId, CtxChangeEventTopic.MODIFIED);
@@ -166,6 +164,43 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 					+ Arrays.toString(topics) 
 					+ ": Unsupported CtxEvent implementation");
 		}
+	}
+	
+	/*
+	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void registerChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		
+		if (this.idMgr.isMine(ownerId))
+			this.registerLocalChangeListener(listener, topics, ownerId);
+		else
+			; // TODO ? this.registerRemoteChangeListener(ownerId, listener, topics);
+	}
+
+	/*
+	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public void unregisterChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		
+		// TODO Auto-generated method stub
 	}
 	
 	/*
@@ -310,6 +345,21 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 						+ e.getLocalizedMessage(), e);
 			}
 		}
+	}
+	
+	private void registerLocalChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final IIdentity ownerId) throws CtxException {
+		
+		final Dictionary<String, Object> props = new Hashtable<String, Object>();
+		props.put(EventConstants.EVENT_TOPIC, topics);
+		props.put(EventConstants.EVENT_FILTER, 
+				"(" + EVENT_ID_PROPERTY_KEY + "=*" + ownerId.toString() + "*)");
+		if (LOG.isInfoEnabled()) 
+			LOG.info("Registering local context change event listener to topics "
+					+ Arrays.toString(topics)
+					+ " with properties '" + props + "'");
+		this.bundleContext.registerService(EventHandler.class.getName(),
+				new LocalChangeEventHandler(listener), props);
 	}
 	
 	private void registerLocalChangeListener(final CtxChangeEventListener listener,

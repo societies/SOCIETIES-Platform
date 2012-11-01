@@ -958,9 +958,13 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public void updateCssFriendRequest(CssRequest request) {
 	
-		//TODO: This is called either locally or remotle
+		//TODO: This is called either locally or remote
 		//Locally, we can cancel pending request, or leave css's
 		// remotely, it will be an accepted of the request we sent
+		LOG.info("updateCssFriendRequest called : ");
+		LOG.info("Request  identity: " +request.getCssIdentity());
+		LOG.info("Request  status: " +request.getRequestStatus());
+		LOG.info("Request  origin: " +request.getOrigin());
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
 		} catch (CssRegistrationException e) {
@@ -968,6 +972,7 @@ public class CSSManager implements ICSSLocalManager {
 			e.printStackTrace();
 		}
 	
+		LOG.info("updateCssFriendRequest and we're back : " );
 		// If this was initiated locally then inform remote css
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
 		if (request.getOrigin() == CssRequestOrigin.LOCAL)
@@ -975,7 +980,8 @@ public class CSSManager implements ICSSLocalManager {
 			
 			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
 			// otherwise send message to remote css
-
+			
+			LOG.info("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
 				//called updateCssFriendRequest on remote
 				request.setOrigin(CssRequestOrigin.REMOTE);
 				cssManagerRemote.updateCssRequest(request);

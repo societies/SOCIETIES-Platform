@@ -36,32 +36,17 @@ public class TableName {
 	/**
 	 * The table used to maintain {@link TrustedCss CSSs}.
 	 */
-	public static final String TRUSTED_CSS = "t_users";
+	public static final String TRUSTED_CSS = "org_societies_trust_users";
 	
 	/**
 	 * The table used to maintain {@link TrustedCis CISs}.
 	 */
-	public static final String TRUSTED_CIS = "t_communities";
+	public static final String TRUSTED_CIS = "org_societies_trust_communities";
 	
 	/**
 	 * The table used to maintain {@link TrustedService services}.
 	 */
-	public static final String TRUSTED_SERVICE = "t_services";
-	
-	/**
-	 * The table used to maintain {@link DirectTrust} data.
-	 */
-	public static final String DIRECT_TRUST = "t_direct_trust";
-	
-	/**
-	 * The table used to maintain {@link IndirectTrust} data.
-	 */
-	public static final String INDIRECT_TRUST = "t_indirect_trust";
-	
-	/**
-	 * The table used to maintain {@link UserPerceivedTrust} data.
-	 */
-	public static final String USER_PERCEIVED_TRUST = "t_user_perceived_trust";
+	public static final String TRUSTED_SERVICE = "org_societies_trust_services";
 	
 	/**
 	 * The table used to associate {@link TrustedCss CSSs} with
@@ -69,5 +54,5 @@ public class TableName {
 	 * 
 	 * @since 0.0.8
 	 */
-	public static final String TRUSTED_CSS_CIS = "t_users_communities";
+	public static final String TRUSTED_CSS_CIS = "org_societies_trust_users_communities";
 }

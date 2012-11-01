@@ -43,6 +43,19 @@ public interface IDisplayDriver {
 	 * @param requiresKinect	indicates whether this executable needs access to a Kinect device
 	 */
 	public void registerDisplayableService(IDisplayableService service, String serviceName, URL executableLocation, boolean requiresKinect);
+
+	/**
+	 * This method should be called by any service that wants to be displayed in the public displays in HWU. The display portal can execute jars and exe files and 
+	 * also load webpages. Therefore, if a service has a web interface that can be called using a browser, then the URL of the webpage should be
+	 * provided.  
+	 * 
+	 * @param service 	the service of the 3p service registering its executable with the portal service
+	 * @param serviceName	the user-friendly name of the service registering 
+	 * @param executableLocation	the location of the executable on a web server or the URL of the webpage
+	 * @param portNumber	the port number of the socketserver on this node that the executable running in the portal will connect to, to retrieve relevant platform information
+	 * @param requiresKinect	indicates whether this executable needs access to a Kinect device
+	 */
+	public void registerDisplayableService(IDisplayableService service, String serviceName, URL executableLocation, int portNumber, boolean requiresKinect);
 	
 	
 	/**

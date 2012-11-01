@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
@@ -68,16 +69,13 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		person = new PersonImpl();
 		this.rawData = data;
 		
-		ActivityObject providerObj = new ActivityObjectImpl();
-		providerObj.setUrl("www.facebook.com");
-		providerObj.setId("facebook.com");
-		providerObj.setDisplayName("Facebook");
+		
+		
 		
 		try{
 			
 			db = new JSONObject(this.rawData);
-			person.setId("facebook:"+db.getString(ID));
-
+			person.setId(db.getString(ID));
 			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(BIO))		 	person.setAboutMe(db.getString(BIO));
@@ -97,6 +95,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if (db.has(INTERESTS))	    person.setInterests(jarrayToList(db.getString(INTERESTS)));
 			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));					
 			
+			setAccount();
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -108,6 +107,29 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		
 			
 		return person;
+	}
+	
+	private void setAccount(){
+		Account account = new AccountImpl();
+		try{
+			account.setDomain("facebook.com");
+			String name = "";
+			if(db.has(FIRSTNAME))
+				name = name + db.getString(FIRSTNAME);
+			if(db.has(LASTNAME))
+				name = name + " "+db.getString(LASTNAME);
+			
+			account.setUsername(name);
+			account.setUserId(db.getString(ID));
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		//Add the Facebook account
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.add(account);
+		person.setAccounts(accounts);
 	}
 	
 	private List<String> jarrayToList(String data) {
