@@ -72,7 +72,10 @@ public class CtxBrokerEvaluation {
 	private ICommManager commMgrService;
 
 
-	HashMap<Integer, List<Integer>> data = new HashMap<Integer, List<Integer>>();
+	HashMap<Integer, List<Integer>> friendsData = new HashMap<Integer, List<Integer>>();
+	//HashMap<Integer, List<String>> proximityData = new HashMap<Integer, List<String>>();
+
+	Workbook w = null;
 
 	CtxBrokerEvaluation(){
 
@@ -91,7 +94,11 @@ public class CtxBrokerEvaluation {
 		LOG.info("*** commMgrService instantiated "+this.commMgrService);
 
 		try {
+			long startTime = System.currentTimeMillis();	
 			this.readData(XLS_INPUT_FILE);
+			long totalTime = System.currentTimeMillis() - startTime;	
+			LOG.info("total time "+totalTime);
+
 		} catch (Exception e) {
 			LOG.error("Could not read " + XLS_INPUT_FILE 
 					+ ": " + e.getLocalizedMessage(), e);
@@ -103,17 +110,15 @@ public class CtxBrokerEvaluation {
 	private void readData(String file) throws Exception {
 
 		//ReadExcel test = new ReadExcel();
-
 		//test.setInputFile("./realityMining.xls");
 
-		this.data = xlsReader(file);
+		this.friendsData = xlsFriendsReader(file);
 
 		if (LOG.isInfoEnabled())
-			LOG.info("CtxBrokerEvaluation data "+data);	
-
+			LOG.info("CtxBrokerEvaluation data "+friendsData);	
 
 		// create individual entities
-		for( Integer i : data.keySet()){
+		for( Integer i : friendsData.keySet()){
 
 			if (this.getIndiEntity(i) == null) {
 				String identityString = "identity_"+i+"@societies.local";
@@ -134,6 +139,8 @@ public class CtxBrokerEvaluation {
 
 		//individual entities created
 		LOG.info("individual entities created ");
+
+
 		// add friend associations
 		IndividualCtxEntity indiEntity = null;
 
@@ -146,13 +153,13 @@ public class CtxBrokerEvaluation {
 
 			if(attrID != null){
 
-				List<Integer> idFriendsList = data.get(attrID.getIntegerValue());
+				List<Integer> idFriendsList = friendsData.get(attrID.getIntegerValue());
 
 				LOG.info("friends for indiEntity "+indiEntity.getId() +" are :"+idFriendsList);
 
 				Set<CtxAssociationIdentifier> friendsAssocIdSet = indiEntity.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH);
 				List<CtxAssociationIdentifier> friendsAssocIdList = new ArrayList<CtxAssociationIdentifier>(friendsAssocIdSet);
-				
+
 				CtxAssociation friendsAssoc = null;
 				if(friendsAssocIdSet.size() == 0  ){
 
@@ -161,32 +168,45 @@ public class CtxBrokerEvaluation {
 				} else {
 					friendsAssoc =   (CtxAssociation) this.internalCtxBroker.retrieve(friendsAssocIdList.get(0)).get();
 				}
-					
-					
-					if(idFriendsList.size() > 0 ){
-						friendsAssoc.setParentEntity((CtxEntityIdentifier) indiEntIdentifier);
-						for(Integer i : idFriendsList ){
-							if(this.getIndiEntity(i) != null){
-								IndividualCtxEntity friendIndiEntity = this.getIndiEntity(i);
-								friendsAssoc.addChildEntity(friendIndiEntity.getId());
-							}
+
+				if(idFriendsList.size() > 0 ){
+					friendsAssoc.setParentEntity((CtxEntityIdentifier) indiEntIdentifier);
+					for(Integer i : idFriendsList ){
+						if(this.getIndiEntity(i) != null){
+							IndividualCtxEntity friendIndiEntity = this.getIndiEntity(i);
+							friendsAssoc.addChildEntity(friendIndiEntity.getId());
 						}
-						this.internalCtxBroker.update(friendsAssoc);	
 					}
-			
-				
+					this.internalCtxBroker.update(friendsAssoc);	
+				}
 				// end if assoc
-
-
-			
 			}
 		}
 
+		// proximity levels
+
+		this.addProximityLevels();
 	}
+
+
+	private void addProximityLevels(){
+
+		HashMap<Integer, List<String>> proximityData = new HashMap<Integer, List<String>>();
+
+		proximityData = this.xlsProximityReader(w);
+
+
+
+
+
+
+
+
+	}
+
 
 	//attribute type "evaluationID" has value "i"
 	// for this i retrieve the respective individual entity
-
 	private IndividualCtxEntity getIndiEntity(Integer i){
 
 		IndividualCtxEntity indiEntityResult = null;
@@ -236,19 +256,51 @@ public class CtxBrokerEvaluation {
 	}
 
 
+	/*
+	 * dailyWorkProximity1
+	 * dailyWorkProximity2
+	 *	
+	 */
+	public HashMap<Integer, List<String>> xlsProximityReader(Workbook w)  {
 
-	public HashMap<Integer, List<Integer>> xlsReader(String inputFile) throws Exception {
+		// user '1' has proximity with {'2#5,'3#1','4#2'} userId#ProximityLevel
+		final HashMap<Integer, List<String>> mapOfProximityData = new HashMap<Integer, List<String>>();
 
-		final HashMap<Integer, List<Integer>> mapOfContextData = new HashMap<Integer, List<Integer>>();
+		// 1 is outlab
+		Sheet sheet = this.w.getSheet(1);
+		Integer key = 0;
+		for (int j = 0; j < sheet.getColumns(); j++) {
+
+			List<String> data = new ArrayList<String>();
+			key=j;
+			String proximityValue;
+			for (int i = 0; i < sheet.getRows(); i++) { 
+				Cell cell = sheet.getCell(j, i);
+				proximityValue = i+"#"+cell.getContents();
+				data.add(proximityValue);
+			}
+		}
+
+
+
+		return mapOfProximityData;
+	}
+
+
+
+
+	public HashMap<Integer, List<Integer>> xlsFriendsReader(String inputFile) throws Exception {
+
+		final HashMap<Integer, List<Integer>> mapFriendsData = new HashMap<Integer, List<Integer>>();
 
 		final InputStream is = this.getClass().getResourceAsStream("/" + inputFile);
 		if (is == null)
 			throw new FileNotFoundException(inputFile + " (No such file in resources)");
-		final Workbook w;
+
 		try {
-			w = Workbook.getWorkbook(is);
+			this.w = Workbook.getWorkbook(is);
 			// Get the first sheet
-			Sheet sheet = w.getSheet(0);
+			Sheet sheet = this.w.getSheet(0);
 			Integer key = 0;
 			// Loop over column and lines
 			// get the labels of the columns
@@ -258,7 +310,7 @@ public class CtxBrokerEvaluation {
 				key=j;
 
 				//for each column store the data
-				for (int i = 0; i < sheet.getRows(); i++) { //from the second row and on
+				for (int i = 0; i < sheet.getRows(); i++) { 
 					Cell cell = sheet.getCell(j, i);
 					//System.out.println("key:"+j);
 					//System.out.println("cell column:"+cell.getColumn());
@@ -268,7 +320,7 @@ public class CtxBrokerEvaluation {
 					}
 
 				}
-				mapOfContextData.put(key,data);
+				mapFriendsData.put(key,data);
 
 			}
 			if (LOG.isInfoEnabled()) {
@@ -280,6 +332,6 @@ public class CtxBrokerEvaluation {
 				is.close();
 		}
 
-		return mapOfContextData;
+		return mapFriendsData;
 	}
 }
