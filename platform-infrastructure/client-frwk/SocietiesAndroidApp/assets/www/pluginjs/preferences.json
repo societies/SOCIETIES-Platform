@@ -14,7 +14,7 @@
 			"value" : "A float value"
 			},
 		"getBooleanPrefValue" : {
-			"value" : "A boolean value"
+			"value" : true
 			},
 		"putStringPrefValue" : {
 			"value" : "updated"

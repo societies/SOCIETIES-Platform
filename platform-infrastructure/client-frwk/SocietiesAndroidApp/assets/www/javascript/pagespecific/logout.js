@@ -40,8 +40,8 @@ var SocietiesLogout = {
 		console.log("Logout from CSS");
 
 		function success(data) {
-			jQuery("#username").val("");
-			jQuery("#userpass").val("");
+			jQuery("#loginUsername").val("");
+			jQuery("#loginPassword").val("");
 			SocietiesLogout.successfulXMPPServerLogout();
 
 		}

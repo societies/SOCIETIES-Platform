@@ -18,7 +18,7 @@
 	<task:annotation-driven />
 
 	<bean id="serListener" class="org.societies.slm.servicecontrol.ServiceRegistryListener"
-		init-method="registerListener" destroy-method="unRegisterListener">	
+		init-method="registerListener" destroy-method="unRegisterListener" >	
 		<property name="serviceReg" ref="serviceRegRef" />
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="serviceControl" ref ="serviceControl"/>
@@ -31,11 +31,10 @@
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
-		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />					
+		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />		
 	</bean>
 
-	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl"
-	init-method="cleanAfterRestart" depends-on="serListener" >
+	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
@@ -43,7 +42,7 @@
 		<property name="policyNegotiation" ref="policyNegotiatorRef" />
 		<property name="deviceMngr" ref="deviceMngrRef" />
 		<property name="userFeedback" ref="userFeedbackRef" />
-		<property name="eventMgr" ref="eventManagerRef" />		
+		<property name="eventMgr" ref="eventManagerRef" />
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >

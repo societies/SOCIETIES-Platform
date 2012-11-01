@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
@@ -53,13 +54,15 @@ public class PrivatePreferenceCache {
 	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> idsCtxIDtoModel;
 	//the key refers to the ctxID of the (ids) preference attribute (not the affected context attribute)
 	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> dobfCtxIDtoModel;
+	private IIdentityManager idMgr;
 	
 	
 
-	public PrivatePreferenceCache(ICtxBroker broker){
+	public PrivatePreferenceCache(ICtxBroker broker, IIdentityManager idMgr){
+		this.idMgr = idMgr;
 		this.ppnCtxIDtoModel = new Hashtable<CtxAttributeIdentifier,IPrivacyPreferenceTreeModel>();
 		this.idsCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel>();
-		this.retriever = new PreferenceRetriever(broker);
+		this.retriever = new PreferenceRetriever(broker, this.idMgr);
 		this.storer = new PreferenceStorer(broker);
 		this.registry = retriever.retrieveRegistry();
 		
