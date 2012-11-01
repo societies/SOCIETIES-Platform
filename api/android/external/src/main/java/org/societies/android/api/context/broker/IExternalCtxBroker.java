@@ -57,6 +57,36 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IExternalCtxBroker {
+	
+	//Intents
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxbroker.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.ctxbroker.ReturnStatus";
+
+	public static final String CREATE_ENTITY = "org.societies.android.platform.ctxBroker.CREATE_ENTITY";
+	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.ctxBroker.CREATE_ATTRIBUTE";
+	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.ctxBroker.CREATE_ASSOCIATION";
+	public static final String LOOKUP = "org.societies.android.platform.ctxBroker.LOOKUP";
+	public static final String LOOKUP_CTX_ENTITY = "org.societies.android.platform.ctxBroker.LOOKUP_CTX_ENTITY";
+	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.ctxBroker.LOOKUP_ENTITIES";
+	public static final String REMOVE = "org.societies.android.platform.ctxBroker.REMOVE";
+	public static final String RETRIEVE = "org.societies.android.platform.ctxBroker.RETRIEVE";
+	public static final String RETRIEVE_INDIVIDUAL_ENTITY_ID = "org.societies.android.platform.ctxBroker.RETRIEVE_INDIVIDUAL_ENTITY_ID";
+	public static final String RETRIEVE_COMMUNITY_ENTITY_ID = "org.societies.android.platform.ctxBroker.RETRIEVE_COMMUNITY_ENTITY_ID";
+	public static final String UPDATE = "org.societies.android.platform.ctxBroker.UPDATE";
+	
+	//Array of interface method signatures
+	String methodsArray [] = {"createEntity(String client, final Requestor requestor, final IIdentity targetCss, final String type)",
+			"createAttribute(String client, final Requestor requestor, final ACtxEntityIdentifier scope, final String type)",
+			"createAssociation(String client, final Requestor requestor, final IIdentity targetCss, final String type)",
+			"lookup(String client, final Requestor requestor, final IIdentity target, final CtxModelType modelType, final String type)",
+			"lookup(String client, final Requestor requestor, final ACtxEntityIdentifier entityId, final CtxModelType modelType, final String type)",
+			"lookupEntities(String client, final Requestor requestor, final IIdentity targetCss, final String entityType, final String attribType, final Serializable minAttribValue, final Serializable maxAttribValue)",
+			"remove(String client, final Requestor requestor, final ACtxIdentifier identifier)",
+			"retrieve(String client, final Requestor requestor, final ACtxIdentifier identifier)",
+			"retrieveIndividualEntityId(String client, final Requestor requestor, final IIdentity cssId)",
+			"retrieveCommunityEntityId(String client, final Requestor requestor, final IIdentity cisId)",
+			"update(String client, final Requestor requestor, final ACtxModelObject object)"
+	};
 
 	/**
 	 * Creates a {@link ACtxEntity} with the specified type on the identified CSS.
