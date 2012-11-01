@@ -90,12 +90,27 @@ public class AndroidNotifier {
 	}
 	
 	/**
-	 * Create a notification for CSS Events
-	 * 
-	 * @param event
+	 * Create a notification for Societies Events with no re-direction intent
+	 * @param message
 	 * @param notificationTag
+	 * @param clazz
 	 */
 	public void notifyMessage(String message, String notificationTag, Class clazz) {
+		Dbc.require("Message cannot be null", null != message && message.length() > 0);
+		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
+		Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
+		
+		this.notifyMessage(message, notificationTag, clazz, new Intent());
+	}
+	
+	/**
+	 * Create a notification for Societies Events
+	 * @param message
+	 * @param notificationTag
+	 * @param clazz
+	 * @param intent of activity to be displayed when notification is viewed
+	 */
+	public void notifyMessage(String message, String notificationTag, Class clazz, Intent intent) {
 		Dbc.require("Message cannot be null", null != message && message.length() > 0);
 		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
 		Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
@@ -113,8 +128,9 @@ public class AndroidNotifier {
 		
 		Intent notificationIntent = new Intent(this.context, clazz);
 		
-		PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+		PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 		notification.setLatestEventInfo(context, "CSSManager", message, contentIntent);
 		this.notifyMgr.notify(notificationTag, 1, notification);
 	}
+
 }
