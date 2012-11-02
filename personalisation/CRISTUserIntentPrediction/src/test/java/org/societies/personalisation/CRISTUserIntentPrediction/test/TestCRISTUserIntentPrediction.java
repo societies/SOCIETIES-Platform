@@ -25,7 +25,9 @@ import static org.mockito.Mockito.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -60,6 +62,7 @@ import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserInte
 import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;
 import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 
@@ -93,17 +96,19 @@ public class TestCRISTUserIntentPrediction {
 		try {
 			String stringId = "zhiyong@societies.org";
 			CtxEntityIdentifier entityId = new CtxEntityIdentifier(stringId, "testEntity", new Long(123456));
-			CtxAttributeIdentifier lightId = new CtxAttributeIdentifier(entityId, "LIGHT", new Long(123456));
-			CtxAttributeIdentifier soundId = new CtxAttributeIdentifier(entityId, "SOUND", new Long(123456));
-			CtxAttributeIdentifier tempId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.TEMPERATURE, new Long(123456));
+			CtxAttributeIdentifier statusId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.STATUS, new Long(123456));
+			CtxAttributeIdentifier locationId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(123456));
 			CtxAttributeIdentifier gpsId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.LOCATION_COORDINATES, new Long(123456));
-			CtxAttribute light = new CtxAttribute(lightId);
-			CtxAttribute sound = new CtxAttribute(soundId);
-			CtxAttribute temp = new CtxAttribute(tempId);
+			CtxAttribute status = new CtxAttribute(statusId);
+			CtxAttribute location = new CtxAttribute(locationId);
 			CtxAttribute gps = new CtxAttribute(gpsId);
 			
 			userId = new MockIdentity(IdentityType.CSS, "zhiyong", "societies.org");
-			IndividualCtxEntity personEntity = new IndividualCtxEntity(entityId);
+			IndividualCtxEntity personEntity = new IndividualCtxEntity(entityId);	
+			Future<IndividualCtxEntity> personEntityFuture = new AsyncResult<IndividualCtxEntity>(personEntity);
+			personEntity.addAttribute(status);
+			personEntity.addAttribute(location);
+			personEntity.addAttribute(gps);
 
 			CRISTUserIntentPrediction cristPredictor = new CRISTUserIntentPrediction();
 			CRISTUserIntentTaskManager cristMgr = new CRISTUserIntentTaskManager();
@@ -113,161 +118,150 @@ public class TestCRISTUserIntentPrediction {
 			cristMgr.setCtxBroker(ctxBroker);
 			cristMgr.setCristDiscovery(cristDisc);
 			
-			when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(personEntity));
+			when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(personEntityFuture);
 			when(ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
 					new ArrayList<CtxAttributeIdentifier>(), null, null)).thenReturn(null);		
-			when(ctxBroker.retrieve(lightId)).thenReturn(new AsyncResult<CtxModelObject>(light));
-			when(ctxBroker.retrieve(soundId)).thenReturn(new AsyncResult<CtxModelObject>(sound));
-			when(ctxBroker.retrieve(tempId)).thenReturn(new AsyncResult<CtxModelObject>(temp));
+			when(ctxBroker.retrieve(statusId)).thenReturn(new AsyncResult<CtxModelObject>(status));
+			when(ctxBroker.retrieve(locationId)).thenReturn(new AsyncResult<CtxModelObject>(location));
 			when(ctxBroker.retrieve(gpsId)).thenReturn(new AsyncResult<CtxModelObject>(gps));
 
+			IInternalPersonalisationManager mockPersoMgr = mock(IInternalPersonalisationManager.class);
+			cristMgr.setPersoMgr(mockPersoMgr);
+			doNothing().when(mockPersoMgr).registerForContextUpdate(userId, PersonalisationTypes.CRISTIntent, statusId);
+			doNothing().when(mockPersoMgr).registerForContextUpdate(userId, PersonalisationTypes.CRISTIntent, locationId);
+			doNothing().when(mockPersoMgr).registerForContextUpdate(userId, PersonalisationTypes.CRISTIntent, gpsId);
+
 			
-			ServiceResourceIdentifier serviceId_music = new ServiceResourceIdentifier();
-			serviceId_music.setIdentifier(new URI("http://testService_music"));
+			
+			
+			
+			ServiceResourceIdentifier serviceId_MyTV = new ServiceResourceIdentifier();
+			serviceId_MyTV.setIdentifier(new URI("http://testService_MyTV"));
 			ServiceResourceIdentifier serviceId_checkin = new ServiceResourceIdentifier();
 			serviceId_checkin.setIdentifier(new URI("http://testService_checkin"));
 
 
 			
 			System.out.println("Start to input mock history: ");
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			//status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//0
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			//status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "unmute"));
 			Thread.sleep(100);//1
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+	
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//2
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			//status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "3"));
 			Thread.sleep(100);//3
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("outdoor"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "on"));
 			Thread.sleep(100);//4
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("outdoor"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "checkin", "current"));
 			Thread.sleep(100);//5
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("80"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("outdoor"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "off"));
 			Thread.sleep(100);//6
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("office"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
 			Thread.sleep(100);//7
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("office"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "up"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//8
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
-			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			// location.setStringValue("office"); cristPredictor.getCRISTPrediction(userId, location);
+			// gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//9
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("26"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "3"));
 			Thread.sleep(100);//10
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("office"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "on"));
 			Thread.sleep(100);//11
 			
-			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("office"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "checkin", "current"));
 			Thread.sleep(100);//12
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("80"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("outdoor"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "off"));
 			Thread.sleep(100);//13
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//14
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "unmute"));
 			Thread.sleep(100);//15
 
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "3"));
 			Thread.sleep(100);//16
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//17
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "unmute"));
 			Thread.sleep(100);//18
 			
-			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
-			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
-			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
-			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//19
 			
 			cristMgr.displayHistoryList();
@@ -276,15 +270,15 @@ public class TestCRISTUserIntentPrediction {
 			
 			
 			//check the result
-			light.setStringValue("120");
-			Future<List<CRISTUserAction>> results = cristPredictor.getCRISTPrediction(userId, light);
+			status.setStringValue("idle");
+			Future<List<CRISTUserAction>> results = cristPredictor.getCRISTPrediction(userId, status);
 			for (int i = 0; i < results.get().size(); i++)	{
 				System.out.println("Infer intent by context: ");
 				System.out.println("results.get().get(i).getActionID(): " + results.get().get(i).getActionID());
 				Assert.assertTrue(results.get().get(i).getActionID() != null);
 			}
 			
-			IAction myAction = new Action(serviceId_music, "musicService", "switch", "on");
+			IAction myAction = new Action(serviceId_MyTV, "TVService", "channel", "3");
 			results = cristPredictor.getCRISTPrediction(userId, myAction);
 			for (int i = 0; i < results.get().size(); i++)	{
 				System.out.println("Infer intent by action: ");
@@ -301,8 +295,8 @@ public class TestCRISTUserIntentPrediction {
 			verify(ctxBroker).retrieveIndividualEntity(userId);
 			verify(ctxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
 					new ArrayList<CtxAttributeIdentifier>(), null, null);
-			verify(ctxBroker).retrieve(lightId);
-			verify(ctxBroker).retrieve(soundId);
+			verify(ctxBroker).retrieve(statusId);
+			verify(ctxBroker).retrieve(locationId);
 			verify(ctxBroker).retrieve(tempId);
 			verify(ctxBroker).retrieve(gpsId);
 */
