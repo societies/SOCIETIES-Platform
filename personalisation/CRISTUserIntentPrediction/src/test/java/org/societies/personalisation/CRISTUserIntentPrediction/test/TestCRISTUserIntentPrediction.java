@@ -133,20 +133,6 @@ public class TestCRISTUserIntentPrediction {
 
 			
 			
-/*
-			Set<CtxAttribute> statusSet = new LinkedHashSet<CtxAttribute>();
-			statusSet.add(status);
-			when(personEntity.getAttributes(CtxAttributeTypes.STATUS)).thenReturn(statusSet);
-			
-			Set<CtxAttribute> locationSet = new LinkedHashSet<CtxAttribute>();
-			locationSet.add(location);
-			when(personEntity.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(locationSet);
-			
-			Set<CtxAttribute> gpsSet = new LinkedHashSet<CtxAttribute>();
-			gpsSet.add(gps);
-			when(personEntity.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES)).thenReturn(gpsSet);
-*/			
-			
 			
 			
 			ServiceResourceIdentifier serviceId_MyTV = new ServiceResourceIdentifier();
@@ -157,13 +143,13 @@ public class TestCRISTUserIntentPrediction {
 
 			
 			System.out.println("Start to input mock history: ");
-			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			//status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
 			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//0
 			
-			status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
+			//status.setStringValue("idle"); cristPredictor.getCRISTPrediction(userId, status);
 			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "unmute"));
@@ -176,7 +162,7 @@ public class TestCRISTUserIntentPrediction {
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//2
 			
-			status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
+			//status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
 			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "3"));
