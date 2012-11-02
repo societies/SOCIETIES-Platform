@@ -54,7 +54,7 @@ public interface IDirectTrustEngine {
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluateCssTrustValues(final List<ITrustedCss> cssList, 
+	public void evaluateCss(final List<ITrustedCss> cssList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
 	/**
@@ -71,7 +71,7 @@ public interface IDirectTrustEngine {
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluateCisTrustValues(final List<ITrustedCis> cisList, 
+	public void evaluateCis(final List<ITrustedCis> cisList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
 	/**
@@ -88,6 +88,6 @@ public interface IDirectTrustEngine {
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluateServiceTrustValues(final List<ITrustedService> serviceList, 
+	public void evaluateService(final List<ITrustedService> serviceList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 }

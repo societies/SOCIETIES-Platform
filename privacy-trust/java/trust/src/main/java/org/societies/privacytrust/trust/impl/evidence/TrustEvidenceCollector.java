@@ -26,22 +26,20 @@ package org.societies.privacytrust.trust.impl.evidence;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
-import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote;
 import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.trust.api.ITrustMgr;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
@@ -61,18 +59,21 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEvidenceCollector.class);
 	
+	/** The Trust Mgr service reference. */
+	@Autowired(required=true)
+	private ITrustMgr trustMgr;
+	
+	@Autowired(required=false)
 	/** The Trust Evidence Repository service reference. */
 	private ITrustEvidenceRepository trustEvidenceRepository;
 	
 	/** The remote Trust Evidence Collector service reference. */
 	private ITrustEvidenceCollectorRemote trustEvidenceCollectorRemote;
 	
-	/** The Communications Mgr service reference. */
-	private ICommManager commMgr;
-	
 	TrustEvidenceCollector() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -148,7 +149,8 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
 		
-		if (this.isLocalTeid(teid)) {
+		final boolean doLocal = this.trustMgr.isLocalId(teid);
+		if (doLocal) {
 		
 			final DirectTrustEvidence evidence = new DirectTrustEvidence(
 					teid, type, timestamp, info);
@@ -207,18 +209,6 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	}
 	
 	/**
-	 * Sets the {@link ITrustEvidenceRepository} service reference.
-	 * 
-	 * @param trustEvidenceRepository
-	 *            the {@link ITrustEvidenceRepository} service reference to set
-	 */
-	@Autowired(required=false)
-	public void bindTrustEvidenceRepository(ITrustEvidenceRepository trustEvidenceRepository, Dictionary<Object,Object> props) {
-		
-		this.trustEvidenceRepository = trustEvidenceRepository;
-	}
-	
-	/**
 	 * Sets the {@link ITrustEvidenceCollectorRemote} service reference.
 	 * 
 	 * @param trustEvidenceCollectorRemote
@@ -228,35 +218,6 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	public void setTrustEvidenceCollectorRemote(ITrustEvidenceCollectorRemote trustEvidenceCollectorRemote) {
 		
 		this.trustEvidenceCollectorRemote = trustEvidenceCollectorRemote;
-	}
-	
-	/**
-	 * Sets the {@link ICommManager} service reference.
-	 * 
-	 * @param commMgr
-	 *            the {@link ICommManager} service reference to set
-	 */
-	@Autowired(required=false)
-	public void setCommMgr(ICommManager commMgr) {
-		
-		this.commMgr = commMgr;
-	}
-	
-	private boolean isLocalTeid(final TrustedEntityId teid) throws TrustEvidenceCollectorException {
-			
-		try {
-			final IIdentity trustorId = this.commMgr.getIdManager().fromJid(teid.getTrustorId());
-			return this.commMgr.getIdManager().isMine(trustorId);
-		} catch (InvalidFormatException ife) {		
-			throw new TrustEvidenceCollectorException(teid
-					+ ": Could not determine if the TrustedEntityId is local" 
-					+ ": Invalid trustorId IIdentity String: "
-					+ ife.getLocalizedMessage(), ife);
-		} catch (ServiceUnavailableException sue) {
-			throw new TrustEvidenceCollectorException(teid
-					+ ": Could not determine if the TrustedEntityId is local"
-					+ "ICommManager service is not available");
-		}
 	}
 	
 	private class TrustEvidenceCollectorRemoteCallback implements ITrustEvidenceCollectorRemoteCallback {

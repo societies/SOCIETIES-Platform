@@ -22,59 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.engine.util;
+package org.societies.privacytrust.trust.api;
 
-import org.apache.commons.math.stat.StatUtils;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
- * Describe your class here...
+ * Thrown to indicate Trust Entity Id Mgr exceptions.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.4.1
  */
-public class MathUtils {
+public class TrustMgrException extends TrustException {
 
-	public static double[] normalise(double[] input) {
-	
-		return StatUtils.normalize(input);
-	}
-	
-	public static double[] stanine(double[] input) {
-		
-		double[] zscores = normalise(input);
-		
-		double[] stanines = new double[zscores.length];
-		for (int i = 0; i < zscores.length; ++i) {
-			if (zscores[i] < -1.75d)
-				stanines[i] = 1;
-			else if (zscores[i] >= -1.75d && zscores[i] < -1.25d)
-				stanines[i] = 2;
-			else if (zscores[i] >= -1.25d && zscores[i] < -0.75d)
-				stanines[i] = 3;
-			else if (zscores[i] >= -0.75d && zscores[i] < -0.25d)
-				stanines[i] = 4;
-			else if (zscores[i] >= -0.25d && zscores[i] < +0.25d)
-				stanines[i] = 5;
-			else if (zscores[i] >= +0.25d && zscores[i] < +0.75d)
-				stanines[i] = 6;
-			else if (zscores[i] >= +0.75d && zscores[i] < +1.25d)
-				stanines[i] = 7;
-			else if (zscores[i] >= +1.25d && zscores[i] < +1.75d)
-				stanines[i] = 8;
-			else // if (zscores[i] >= +1.75d)
-				stanines[i] = 9;
-		}
-		
-		return stanines;
-	}
-	
-	public static double min(double[] input) {
-		
-		return StatUtils.min(input);
-	}
-	
-	public static double max(double[] input) {
-		
-		return StatUtils.max(input);
-	}
+	private static final long serialVersionUID = 8911874378554304981L;
+
+	/**
+     * Constructs a <code>TrustMgrException</code> with no detail message.
+     */
+    public TrustMgrException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustMgrException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustMgrException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustMgrException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustMgrException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustMgrException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustMgrException(Throwable cause) {
+    	
+        super(cause);
+    }
 }
