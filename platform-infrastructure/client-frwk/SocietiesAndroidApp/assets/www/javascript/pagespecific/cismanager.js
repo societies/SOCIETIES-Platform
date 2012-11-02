@@ -80,6 +80,19 @@ var	SocietiesCISManagerService = {
 						 "<p>Owner: " + data.ownerJid + "</p>";
 			$('input#cis_id').val(data.communityJid);
 			
+			//INITIALISE THE MEMBERS LIST - NEED TO LEAVE THE HEADER
+			while( $('ul#cis_members').children().length >0 )
+				$('ul#cis_members li:last').remove();
+			var ownerEntry = '<li id="li' + i + '">' + 
+							 '<h2>'+ data.ownerJid + '</h2>' + 
+							 '<p>owner</p></li>';
+			$('ul#cis_members').append(ownerEntry);
+			$('ul#cis_members').listview('refresh');
+			
+			//INITIALISE SHARED SERVICES LIST - NEED TO LEAVE THE HEADER
+			while( $('ul#cis_shared_apps').children().length >0 )
+				$('ul#cis_shared_apps li:last').remove();
+			
 			//PREPARE THE ACTIVITY FEED
 			var currentDateTime = new Date(), 
 				headerText = currentDateTime.getFullYear() + "-" + (currentDateTime.getMonth()+1) + "-" + currentDateTime.getDate();
@@ -133,8 +146,10 @@ var	SocietiesCISManagerService = {
 		console.log("list CISs");
 		
 		function success(data) {
-			console.log("List CISs where  = TODO");
+			//UPDATE COUNT
 			$("span#myCommunitiesCount").html(data.length);
+			$("span#myCommunitiesCount").css({ visibility: "visible"});
+			
 			SocietiesCISListService.populateCISListpage(data, false);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -157,8 +172,10 @@ var	SocietiesCISManagerService = {
 		console.log("list CISs");
 		
 		function success(data) {
-			console.log("List CISs where  = TODO");
+			//UPDATE COUNT
 			$("span#myCommunitiesAdminCount").html(data.length);
+			$("span#myCommunitiesAdminCount").css({ visibility: "visible"});
+			
 			SocietiesCISListService.populateCISListpage(data, true);
 			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
@@ -189,7 +206,10 @@ var	SocietiesCISManagerService = {
 		console.log("getAllCisDirAds");
 		
 		function success(data) {
+			//UPDATE COUNT
 			$("span#mySuggestedCommunitiesCount").html(data.length);
+			$("span#mySuggestedCommunitiesCount").css({ visibility: "visible"});
+			
 			SocietiesCisDirService.populateCISListpage(data);
 			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
 		}

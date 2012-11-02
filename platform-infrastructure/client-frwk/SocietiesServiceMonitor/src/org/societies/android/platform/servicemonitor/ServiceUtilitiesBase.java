@@ -65,21 +65,11 @@ import android.util.Log;
 public class ServiceUtilitiesBase implements IServiceUtilities { 
 	//Logging tag
     private static final String LOG_TAG = ServiceUtilitiesBase.class.getName();
-    
-	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
-    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery",
-															  	  "http://societies.org/api/schema/servicelifecycle/servicecontrol",
-															  	  "http://societies.org/api/schema/servicelifecycle/model");
-    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.servicelifecycle.servicediscovery", 
-															   "org.societies.api.schema.servicelifecycle.servicecontrol",
-															   "org.societies.api.schema.servicelifecycle.model");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
-    
 
     /**
-     * Default constructor
+     * Constructor
      */
     public ServiceUtilitiesBase(Context androidContext) {
     	Log.d(LOG_TAG, "Object created");
@@ -91,14 +81,11 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
-        }    
-
+        }
     }
 
-
-
     /**
-     * Implementation if IServiceUtilities
+     * Implementation of IServiceUtilities
      */
     
 	/* @see org.societies.android.api.servicelifecycle.IServiceUtilities#getMyServiceId(java.lang.String) */
@@ -106,9 +93,7 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 		Log.d(LOG_TAG, "Calling getMyServiceId from client: " + client);
 		
 		AsynGetMyServiceId methodAsync = new AsynGetMyServiceId();
-		
 		String params [] = {client};
-
 		methodAsync.execute(params);
 
 		return null;
@@ -130,89 +115,6 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 		return appName;
 	}
 
-	
-	/**
-	 * Callback required for Android Comms Manager to enable remote invocations to callback with returned information
-	 */
-	private class ServiceLifecycleCallback implements ICommCallback {
-		private String returnIntent;
-		private String client;
-
-		/**Constructor sets the calling client and Intent to be returned
-		 * @param client
-		 * @param returnIntent
-		 */
-		public ServiceLifecycleCallback(String client, String returnIntent) {
-			this.client = client;
-			this.returnIntent = returnIntent;
-		}
-
-		public List<String> getXMLNamespaces() {
-			return NAME_SPACES;
-		}
-
-		public List<String> getJavaPackages() {
-			return PACKAGES;
-		}
-
-		public void receiveError(Stanza arg0, XMPPError err) {
-			Log.d(LOG_TAG, "Callback receiveError:" + err.getMessage());			
-		}
-
-		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-			Log.d(LOG_TAG, "Callback receiveInfo");
-		}
-
-		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-			Log.d(LOG_TAG, "Callback receiveItems");
-		}
-
-		public void receiveMessage(Stanza arg0, Object arg1) {
-			Log.d(LOG_TAG, "Callback receiveMessage");	
-		}
-
-		public void receiveResult(Stanza returnStanza, Object msgBean) {
-			Log.d(LOG_TAG, "Callback receiveResult");
-			
-			if (client != null) {
-				Intent intent = new Intent(returnIntent);
-				
-				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
-				if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
-				// --------- Service Discovery Bean ---------
-				if (msgBean instanceof ServiceDiscoveryResultBean) {
-					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
-					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
-					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
-					//CONVERT TO PARCEL BEANS
-					int i=0;
-					//AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
-					Parcelable serviceArray[] = new Parcelable[serviceList.size()];
-					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
-						serviceArray[i] = AService.convertService(tmpService);
-						i++;
-					}
-					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, serviceArray); 
-					intent.setPackage(client);
-				} 
-				// --------- Service Control Bean ---------
-				if(msgBean instanceof ServiceControlResultBean) {
-					Log.d(LOG_TAG, "ServiceControlBeanResult!");
-					ServiceControlResultBean controlResult = (ServiceControlResultBean)msgBean;
-					ServiceControlResult resultObj = controlResult.getControlResult();
-					Log.d(LOG_TAG, "ServiceControlBeanResult: " + resultObj.getMessage());
-					
-					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) resultObj);
-					intent.setPackage(client);
-				}
-				ServiceUtilitiesBase.this.androidContext.sendBroadcast(intent);
-				ServiceUtilitiesBase.this.commMgr.unregister(ELEMENT_NAMES, this);
-			}
-		}
-	}
-	
 	/**
 	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
 	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
@@ -224,17 +126,16 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
 	 * class ineffective. Use Intents as an asynchronous callback mechanism.
 	 */
-	
-	
+		
 	/**
 	 * This class carries out the getMyServiceId method call asynchronously
 	 */
 	private class AsynGetMyServiceId extends AsyncTask<String, Void, String[]> {
 		
-		@Override
 		/**
 		 * Carry out compute task 
 		 */
+		@Override
 		protected String[] doInBackground(String... params) {
 			Dbc.require("At least one parameter must be supplied", params.length >= 1);
 			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
@@ -262,12 +163,11 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 	 
 			return results;
 		}
-
 		
-		@Override
 		/**
 		 * Handle the communication of the result
 		 */
+		@Override
 		protected void onPostExecute(String results []) {
 			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
 	    }

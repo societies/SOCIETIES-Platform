@@ -133,7 +133,7 @@ public class Tester {
 		actionsTask2(action4,action5,action6);
 		randomAction(actionRandom2);
 		actionsTask3(action7,action8);
-
+		
 		actionsTask1(action1,action2,action3);
 		randomAction(actionRandom2);
 		randomAction(actionRandom1);
@@ -144,7 +144,7 @@ public class Tester {
 		randomAction(actionRandom1);
 
 		//actionsTask3(action7,action8);
-		/*
+	
 
 		actionsTask1(action1,action2,action3);
 		randomAction(actionRandom3);
@@ -166,7 +166,7 @@ public class Tester {
 		randomAction(actionRandom4);
 		randomAction(actionRandom2);
 		randomAction(actionRandom4);
-		 */
+		
 		/*
 		 * CHECK HISTORY DATA
 		 */

@@ -65,10 +65,14 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public void registerServiceList(List<Service> servicesList)
 			throws ServiceRegistrationException {
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		RegistryEntry tmpRegistryEntry = null;
-		Transaction t = session.beginTransaction();
+		Transaction t = null;
+		
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			for (Service service : servicesList) {
 
 				tmpRegistryEntry = new RegistryEntry(
@@ -92,7 +96,8 @@ public class ServiceRegistry implements IServiceRegistry {
 			log.debug("Service list saved.");
 
 		} catch (Exception e) {
-			t.rollback();
+			if(t != null)
+				t.rollback();
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
 		} finally {
@@ -106,10 +111,14 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public void unregisterServiceList(List<Service> servicesList)
 			throws ServiceRegistrationException {
-		Session session = sessionFactory.openSession();
+		Session session = null; 
 		RegistryEntry tmpRegistryEntry = null;
-		Transaction t = session.beginTransaction();
+		Transaction t = null;
+		
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			for (Service service : servicesList) {
 
 				tmpRegistryEntry = new RegistryEntry(
@@ -154,7 +163,8 @@ public class ServiceRegistry implements IServiceRegistry {
 			t.commit();
 
 		} catch (Exception e) {
-			t.rollback();
+			if(t != null)
+				t.rollback();
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
 		} finally {
@@ -170,10 +180,11 @@ public class ServiceRegistry implements IServiceRegistry {
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
 		
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		
 		try {
-
+			session = sessionFactory.openSession();
+			
 			List<RegistryEntry> tmpRegistryEntryList = session
 					.createCriteria(RegistryEntry.class)
 					.createCriteria("serviceInstance")
@@ -186,7 +197,9 @@ public class ServiceRegistry implements IServiceRegistry {
 		} catch (Exception e) {
 			throw new ServiceRetrieveException(e);
 		} finally {
-			session.close();
+			if (session != null) {
+				session.close();
+			}
 		}
 		return returnedServiceList;
 	}
@@ -202,8 +215,10 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> retrieveServicesSharedByCIS(String CISID)
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
-		Session session = sessionFactory.openSession();
+		Session session = null;
+		
 		try {
+			session = sessionFactory.openSession();
 			ServiceSharedInCISDAO filterServiceSharedCISDAO = new ServiceSharedInCISDAO();
 			filterServiceSharedCISDAO.setCISId(CISID);
 
@@ -220,7 +235,9 @@ public class ServiceRegistry implements IServiceRegistry {
 		} catch (Exception e) {
 			throw new ServiceRetrieveException(e);
 		} finally {
-			session.close();
+			if (session != null) {
+				session.close();
+			}
 		}
 		return returnedServiceList;
 	}
@@ -315,10 +332,21 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> findServices(Service filter)
 			throws ServiceRetrieveException {
 		
-		Session session = sessionFactory.openSession();
-		Criteria c = this.createCriteriaFromService(filter, session);
-		List<RegistryEntry> tmpRegistryEntryList = c.list();
-		session.close();
+		Session session = null;
+		List<RegistryEntry> tmpRegistryEntryList = new ArrayList<RegistryEntry>();
+		
+		try{
+			session = sessionFactory.openSession();
+			Criteria c = this.createCriteriaFromService(filter, session);
+			tmpRegistryEntryList = c.list();
+		} catch(Exception ex){
+			log.error("Exception in findServices: " + ex.getMessage());
+			throw new ServiceRetrieveException(ex);
+		} finally{
+			if(session!= null)
+				session.close();
+		}
+
 		return createListService(tmpRegistryEntryList);
 	}
 
@@ -335,9 +363,12 @@ public class ServiceRegistry implements IServiceRegistry {
 	public void notifyServiceIsSharedInCIS(
 			ServiceResourceIdentifier serviceIdentifier, String CISID)
 			throws ServiceSharingNotificationException {
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		Session session = null;
+		Transaction t = null;
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			if (session.get(
 					RegistryEntry.class,
 					new ServiceResourceIdentifierDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier())
@@ -356,11 +387,12 @@ public class ServiceRegistry implements IServiceRegistry {
 			}
 
 		} catch (Exception e) {
-			t.rollback();
+			if(t!= null)
+				t.rollback();
 			throw new ServiceSharingNotificationException(e);
 		} finally {
-
-			session.close();
+			if(session != null)
+				session.close();
 		}
 	}
 
@@ -378,9 +410,12 @@ public class ServiceRegistry implements IServiceRegistry {
 			ServiceResourceIdentifier serviceIdentifier, String CISID)
 			throws ServiceSharingNotificationException {
 
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		Session session = null;
+		Transaction t = null;
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
 					CISID, new ServiceResourceIdentifierDAO(serviceIdentifier
 							.getIdentifier().toString(),
@@ -391,11 +426,12 @@ public class ServiceRegistry implements IServiceRegistry {
 			t.commit();
 
 		} catch (Exception e) {
-			t.rollback();
+			if(t!= null)
+				t.rollback();
 			throw new ServiceSharingNotificationException(e);
 		} finally {
-
-			session.close();
+			if(session != null)
+				session.close();
 		}
 	}
 
@@ -410,10 +446,11 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier)
 			throws ServiceRetrieveException {
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		Service tmpService = null;
 		RegistryEntry tmpRegistryEntry = null;
 		try {
+			session = sessionFactory.openSession();
 			tmpRegistryEntry = (RegistryEntry) session.get(
 					RegistryEntry.class,
 					new ServiceResourceIdentifierDAO(serviceIdentifier
@@ -438,9 +475,15 @@ public class ServiceRegistry implements IServiceRegistry {
 	public boolean changeStatusOfService(
 			ServiceResourceIdentifier serviceIdentifier,
 			ServiceStatus serviceStatus) throws ServiceNotFoundException {
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+
+		Session session = null;
+		Transaction t = null;
+		boolean result = false;
+		
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			RegistryEntry tmpRegistryEntry = (RegistryEntry) session.get(
 					RegistryEntry.class, new ServiceResourceIdentifierDAO(
 							serviceIdentifier.getIdentifier().toString(),
@@ -448,13 +491,17 @@ public class ServiceRegistry implements IServiceRegistry {
 			tmpRegistryEntry.setServiceStatus(serviceStatus.toString());
 			session.update(tmpRegistryEntry);
 			t.commit();
+			result = true;
 		} catch (Exception e) {
-			t.rollback();
-			new ServiceNotFoundException(e);
+			if(t!= null)
+				t.rollback();
+			throw new ServiceNotFoundException(e);
 		} finally {
-			session.close();
+			if(session != null)
+				session.close();
 		}
-		return true;
+		
+		return result;
 	}
 
 	public SessionFactory getSessionFactory() {
@@ -474,10 +521,12 @@ public class ServiceRegistry implements IServiceRegistry {
 	 */
 	@Override
 	public boolean deleteServiceCSS(String CSSId) throws CSSNotFoundException {
-		Session session = sessionFactory.openSession();
-
+		
+		Session session = null;
+		
 		boolean returnedValue = false;
 		try {
+			session = sessionFactory.openSession();
 			List<RegistryEntry> tmpRegistryEntryList = session
 					.createCriteria(RegistryEntry.class)
 					.createCriteria("serviceInstance")
@@ -501,7 +550,8 @@ public class ServiceRegistry implements IServiceRegistry {
 
 			log.error(e.getMessage());
 		} finally {
-			session.close();
+			if(session != null )
+				session.close();
 		}
 		return returnedValue;
 	}
@@ -516,21 +566,27 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public boolean clearServiceSharedCIS(String CISId)
 			throws CISNotFoundException {
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		Transaction t = null;
+		
 		try {
+			session = sessionFactory.openSession();
 			List<ServiceSharedInCISDAO> tmpServiceSharedCIS = session
 					.createCriteria(ServiceSharedInCISDAO.class)
 					.add(Restrictions.eq("CISId", CISId)).list();
+			
 			if (tmpServiceSharedCIS.size() == 0) {
 				throw new CISNotFoundException("The CIS with id: " + CISId
 						+ " is not in the Registry.");
 			}
+			
 			t = session.beginTransaction();
 			for (ServiceSharedInCISDAO serviceSharedInCISDAO : tmpServiceSharedCIS) {
 				session.delete(serviceSharedInCISDAO);
 			}
+			
 			t.commit();
+			
 		} catch (CISNotFoundException ex) {
 
 			log.error(ex.getMessage());
@@ -541,7 +597,7 @@ public class ServiceRegistry implements IServiceRegistry {
 			}
 			log.error(e.getMessage());
 		} finally {
-			if (session != null) {
+			if (session != null ) {
 				session.close();
 			}
 		}
@@ -555,19 +611,23 @@ public class ServiceRegistry implements IServiceRegistry {
 	public boolean updateRegisteredService(Service service)
 			throws ServiceUpdateException {
 		boolean returnedStatus=false;
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		Transaction t = null;
+		
 		try {
-		 RegistryEntry retrievedRegistryEntry= (RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentifierDAO(service.getServiceIdentifier().getIdentifier().toString(),service.getServiceIdentifier().getServiceInstanceIdentifier()));
-	     if(retrievedRegistryEntry!=null){
-	     retrievedRegistryEntry.updateRegistryEntry(service);
-	     t=session.beginTransaction();
-	     session.update(retrievedRegistryEntry);
-	     t.commit();
-	     }
-	    returnedStatus=true;
+			session = sessionFactory.openSession();
+			RegistryEntry retrievedRegistryEntry= (RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentifierDAO(service.getServiceIdentifier().getIdentifier().toString(),service.getServiceIdentifier().getServiceInstanceIdentifier()));
+			if(retrievedRegistryEntry!=null){
+				retrievedRegistryEntry.updateRegistryEntry(service);
+				t=session.beginTransaction();
+				session.update(retrievedRegistryEntry);
+				t.commit();
+			}
+			returnedStatus=true;
 		} catch (HibernateException he) {
-			t.rollback();
+			if(t != null)
+				t.rollback();
+			
 			log.error(he.getMessage());
 			throw new ServiceUpdateException(he);
 		}
@@ -589,8 +649,9 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<String> retrieveCISSharedService(ServiceResourceIdentifier serviceIdentifier) {
 		List<String> returnedServiceList = new ArrayList<String>();
-		Session session = sessionFactory.openSession();
+		Session session = null;
 		try {
+			session = sessionFactory.openSession();
 			Criteria c = session.createCriteria(ServiceSharedInCISDAO.class);
 			//Service Identifier
 			if (serviceIdentifier != null) {
@@ -606,10 +667,16 @@ public class ServiceRegistry implements IServiceRegistry {
 			for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
 				returnedServiceList.add(serviceSharedInCISDAO.getCISId());
 			}
-		} finally {
-			session.close();
+		} catch(Exception ex){
+			log.error("Error RetrievingCISSharedService: " + ex.getMessage());
+			ex.printStackTrace();
 		}
+		
+		if(session != null)
+			session.close();
+		
 		return returnedServiceList;
+		
 	}
 
 	/* Utility methods */

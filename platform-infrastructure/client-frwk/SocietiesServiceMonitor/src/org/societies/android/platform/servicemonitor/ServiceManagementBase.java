@@ -90,8 +90,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
-        }    
-
+        }
     }
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery methods >>>>>>>>>>>>>>>>>>>>>>>

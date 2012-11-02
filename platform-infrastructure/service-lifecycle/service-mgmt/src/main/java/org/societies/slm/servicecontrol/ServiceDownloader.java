@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -52,14 +53,14 @@ public class ServiceDownloader {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceDownloader.class);
 	
-	public static boolean deleteFile(String path){
+	public static boolean deleteFile(URI path){
 		
 		File file = new File(path);
 		
 		return file.delete();
 	}
 	
-	public static String downloadServiceJar(URL jarURL, Service service){
+	public static URI downloadServiceJar(URL jarURL, Service service){
 		
 		String serviceName = service.getServiceName().replace(' ', '-');
 		String version = service.getServiceInstance().getServiceImpl().getServiceVersion();
@@ -75,7 +76,7 @@ public class ServiceDownloader {
 			if(logger.isDebugEnabled())
 				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
 			
-			return downloadedClient.getAbsolutePath();
+			return downloadedClient.toURI();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

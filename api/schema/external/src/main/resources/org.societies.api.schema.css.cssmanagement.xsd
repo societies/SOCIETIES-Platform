@@ -139,6 +139,8 @@
 			<xs:enumeration value="acceptCssFriendRequest" />
 			<xs:enumeration value="acceptCssFriendRequestInternal" />
 			<xs:enumeration value="sendCssFriendRequestInternal" />
+			<xs:enumeration value="declineCssFriendRequest" />
+			<xs:enumeration value="deleteCssFriend" />
 
 		</xs:restriction>
 	</xs:simpleType>
@@ -151,6 +153,7 @@
 			<xs:enumeration value="cancelled" />
 			<xs:enumeration value="notrequested" />
 			<xs:enumeration value="needsresp" />
+			<xs:enumeration value="deletefriend" />
 		</xs:restriction>
 	</xs:simpleType>
 	

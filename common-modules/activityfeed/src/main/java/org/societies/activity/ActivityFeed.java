@@ -181,40 +181,47 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 
 
 	public void addActivity(IActivity activity) {
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		newact.setOwnerId(this.id);
+		list.add(newact);
+		Session session = null;
+		Transaction t = null;
 		try{
-			list.add(newact);
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
 			session.save(newact);
-			//session.save(this);
 			t.commit();
 		}catch(Exception e){
 			e.printStackTrace();
-			t.rollback();
+			if (t != null)
+				t.rollback();
 			LOG.warn("Saving activity failed, rolling back");
-			e.printStackTrace();
 		}finally{
             if(session!=null)
                 session.close();
 		}		
 	}
 
-
+	// TODO: be aware that this code is never committing!!
 	synchronized public int cleanupFeed(String criteria) {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
 		List<IActivity> toBeDeleted = getActivities(criteria,forever);
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		Session session = null;
+		Transaction t = null;
 		try{
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			for(IActivity act : toBeDeleted){
 				this.list.remove(act);
 				session.delete((Activity)act);
 			}
+			t.commit();
 		}catch(Exception e){
-			t.rollback();
+			e.printStackTrace();
+			if (t != null)
+				t.rollback();
 			LOG.warn("deleting activities failed, rolling back");
 		} finally {
             if(session!=null)
@@ -233,11 +240,11 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	
 	synchronized public void startUp(SessionFactory sessionFactory, String id){
         this.id = id;
-        //Session session = sessionFactory.openSession();
         list = new HashSet<Activity>();
         LOG.info("starting loading activities from db with ownerId: "+ id );
-        Session session = sessionFactory.openSession();
+        Session session = null;
         try{
+        	session = sessionFactory.openSession();
             list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
             if(list.size() == 0){
                 LOG.error("did not find actitivties with ownerId: "+ id ) ;
@@ -245,12 +252,13 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
                 LOG.error("activityfeed startup with ownerId: "+id+" gave more than one activityfeed!! ");
             }
         }catch(Exception e){
+        	e.printStackTrace();
             LOG.warn("Query for actitvies failed..");
-
         }finally{
             if(session!=null)
                 session.close();
         }
+        
         LOG.info("loaded activityfeed with ownerId: " + id + " with "+list.size()+" activities.");
         for(Activity act : list){
             act.repopHash();
@@ -290,15 +298,22 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 
 	public boolean deleteActivity(IActivity activity) {
-        Session session = sessionFactory.openSession();
 		if(!list.contains(activity))
 			return false;
 		boolean ret = list.remove(activity);
-		Transaction t = session.beginTransaction();
+		Session session = null;
+		Transaction t = null;
         try {
+        	session = sessionFactory.openSession();
+    		t = session.beginTransaction();
             session.delete(activity);
+            t.commit();
         } catch (Exception e){
-
+        	e.printStackTrace();
+			if (t != null)
+				t.rollback();
+			LOG.warn("delete activity failed, rolling back");
+			ret = false;
         } finally {
             if(session!=null)
                 session.close();
@@ -318,11 +333,15 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		}
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+        Session session = null;
+		Transaction t = null;
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
 		try{
+			
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+				
 			for(ActivityEntry act : castedList){
 				pp.setIndex(0);
 				newAct = new Activity();
@@ -338,10 +357,10 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 			}
 			t.commit();
 		}catch(Exception e){
-			t.rollback();
+			if (t != null)
+				t.rollback();
 			LOG.warn("Importing of activities from social data failed..");
 			e.printStackTrace();
-
 		}finally{
             if(session!=null)
                 session.close();
@@ -360,16 +379,21 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		return a.getContent();
 	}
 	public void clear(){
-        Session session = sessionFactory.openSession();
+        Session session = null;
+        Transaction t = null;
         try{
+        	session = sessionFactory.openSession();
+        	t = session.beginTransaction();
             for(Activity act : list){
-                Transaction t = session.beginTransaction();
                 session.delete(act);
-                t.commit();
             }
+            t.commit();
         } catch (Exception e){
-
-        } finally {
+			if(null!= t) 
+				t.rollback();
+			LOG.warn("clear failed, rolling back");
+			e.printStackTrace();
+		} finally {
             if(session!=null)
                 session.close();
         }

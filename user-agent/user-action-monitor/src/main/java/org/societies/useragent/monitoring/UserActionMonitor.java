@@ -169,7 +169,10 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 							  * Temporary use of String
 							  */
 							String tmp = nextNode.getInteractable();
-							if(tmp.equalsIgnoreCase("true")){
+							if(tmp == null){
+								LOG.error("getInteractable returns null for node -> "+nextNode.getIdentity()+", assuming default: not interactable");
+								interactable = false;
+							}else if(tmp.equalsIgnoreCase("true")){
 								LOG.debug("This device is interactable");
 								interactable = true;
 							}else if(tmp.equalsIgnoreCase("false")){
