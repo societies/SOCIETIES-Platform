@@ -32,13 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.util.SerialisationHelper;
-
 
 public class CtxBrokerUtils {
 
-	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerUtils.class);
 	
@@ -46,7 +43,6 @@ public class CtxBrokerUtils {
      * String representation of binary large object
      */
     public static final String BLOB_STRING = "_BLOB_";
-
     
     /**
      * Returns an attribute value as a String.
@@ -122,14 +118,11 @@ public class CtxBrokerUtils {
     public static Boolean hasValue(CtxAttribute ctxAttribute){
     	Boolean hasValue = false; 
     	
-    	if(ctxAttribute.getDoubleValue() != null) return true;
-    	if(ctxAttribute.getIntegerValue() != null) return true;
     	if(ctxAttribute.getStringValue() != null) return true;
-    	if(ctxAttribute.getBinaryValue() != null) return true;
-    	if(ctxAttribute.getBinaryValue() != null) return true;
-    	
+    	if(ctxAttribute.getIntegerValue() != null) return true;
+    	if(ctxAttribute.getDoubleValue() != null) return true;
+    	if(ctxAttribute.getBinaryValue() != null) return true;	
     	
     	return hasValue;
     }
-    
 }
