@@ -72,7 +72,6 @@ public interface IUserCtxInferenceMgr {
 	 */
 	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
-
 	/**
 	 * Inherits the Context Attribute belonging to a CIS.
 	 * 
@@ -104,12 +103,20 @@ public interface IUserCtxInferenceMgr {
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
-	 * Refines context for an indicate Context Attribute. 
+	 * Refines the identified context attribute. 
 	 * 
 	 * @param ctxAttrId
 	 * @since 0.0.1
 	 */
-	public CtxAttribute refineContext(CtxAttributeIdentifier ctxAttrId);
+	public CtxAttribute refine(CtxAttributeIdentifier ctxAttrId) throws UserCtxInferenceMgrException;
+	
+	/**
+	 * Refines the identified context attribute. 
+	 * 
+	 * @param ctxAttrId
+	 * @since 0.0.1
+	 */
+	public void refineContinuously(CtxAttributeIdentifier ctxAttrId, Double updateFrequency) throws UserCtxInferenceMgrException;
 
 	/**
 	 * Returns a list of CtxAttributeTypes that can be inferred. 
@@ -120,10 +127,18 @@ public interface IUserCtxInferenceMgr {
 	public List<String> getInferrableTypes();
 	
 	/**
-	 * Sets a list of CtxAttributeTypes that can be inferred. 
+	 * Adds the specified type to the list of CtxAttributeTypes that can be inferred. 
 	 * 
-	 *  @param Set of ctxAttributeTypes
-	 *  @since 0.0.8
+	 *  @param the new type of inferrable attribute
+	 *  @since 0.5
 	 */
-	public void setInferrableTypes(List<String> inferableTypes);
+	public void addInferrableType(final String attrType);
+	
+	/**
+	 * Removes the specified type from the list of CtxAttributeTypes that can be inferred. 
+	 * 
+	 *  @param the new type of inferrable attribute
+	 *  @since 0.5
+	 */
+	public void removeInferrableType(final String attrType);
 }
