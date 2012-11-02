@@ -700,26 +700,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void registerForChanges(final CtxChangeEventListener listener,
 			final CtxIdentifier ctxId) throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (ctxId == null)
-			throw new NullPointerException("ctxId can't be null");
-
-		final String[] topics = new String[] {
-				CtxChangeEventTopic.UPDATED,
-				CtxChangeEventTopic.MODIFIED,
-				CtxChangeEventTopic.REMOVED,
-		};
-		if (this.ctxEventMgr != null) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering context change event listener for object '"
-						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
-			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
-		} else {
-			throw new CtxBrokerException("Could not register context change event listener for object '"
-					+ ctxId + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
-		}
+		this.registerForChanges(null, listener, ctxId);
 	}
 
 	/*
@@ -745,28 +726,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			final CtxEntityIdentifier scope, final String attrType)
 					throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (scope == null)
-			throw new NullPointerException("scope can't be null");
-
-		final String[] topics = new String[] {
-				CtxChangeEventTopic.CREATED,
-				CtxChangeEventTopic.UPDATED,
-				CtxChangeEventTopic.MODIFIED,
-				CtxChangeEventTopic.REMOVED,
-		};
-		if (this.ctxEventMgr != null) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering context change event listener for attributes with scope '"
-						+ scope + "' and type '" + attrType + "' to topics '" 
-						+ Arrays.toString(topics) + "'");
-			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
-		} else {
-			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
-					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
-		}
+		this.registerForChanges(null, listener, scope, attrType);
 	}
 
 	/*
@@ -1999,12 +1959,37 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.Requestor, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	public void registerForChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxIdentifier ctxId)
 					throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for object '"
+						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for object '"
+					+ ctxId + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	@Override
@@ -2019,8 +2004,32 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void registerForChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for attributes with scope '"
+						+ scope + "' and type '" + attrType + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
+					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	@Override
@@ -2328,22 +2337,16 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public Requestor getLocalRequestor() throws CtxBrokerException {
 
-		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
-
-		IIdentity cssOwnerId;
-		Requestor requestor = null;
+		final INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
 		try {
-			cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
-			requestor = new Requestor(cssOwnerId);
+			final IIdentity cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			return new Requestor(cssOwnerId);
 		} catch (InvalidFormatException e) {
 
-			throw new CtxBrokerException(" requestor could not be set: " + e.getLocalizedMessage(), e);
-
+			throw new CtxBrokerException("requestor could not be set for local network node '" 
+					+ cssNodeId + "': " + e.getLocalizedMessage(), e);
 		}	
-
-		return requestor;
 	}
-
 
 	private IIdentity getLocalIdentity() throws CtxBrokerException {
 
