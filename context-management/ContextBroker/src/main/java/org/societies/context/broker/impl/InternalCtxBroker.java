@@ -67,6 +67,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -1389,8 +1390,19 @@ public class InternalCtxBroker implements ICtxBroker {
 				LOG.info("Found CSS node context entity " + cssNodeEnt.getId());
 				return;
 			}
-
+			
+			final IIdentity cssId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
+			final CtxAssociation ownsCssNodesAssoc;
+			if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+				ownsCssNodesAssoc = this.createAssociation(CtxAssociationTypes.OWNS_CSS_NODES).get();
+			else
+				ownsCssNodesAssoc = (CtxAssociation) this.retrieve(
+						cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next()).get();
+			ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
 			cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
+			ownsCssNodesAssoc.addChildEntity(cssNodeEnt.getId());
+			this.update(ownsCssNodesAssoc);
 			final CtxAttribute cssNodeIdAttr = this.createAttribute(cssNodeEnt.getId(), CtxAttributeTypes.ID).get();
 			this.updateAttribute(cssNodeIdAttr.getId(), cssNodeId.toString());
 			LOG.info("Created CSS node context entity " + cssNodeEnt.getId());

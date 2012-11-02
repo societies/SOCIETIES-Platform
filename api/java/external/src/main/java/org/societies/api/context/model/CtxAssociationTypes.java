@@ -112,6 +112,14 @@ public class CtxAssociationTypes {
 	public static final String OWNS_SERVICES = "ownsServices";
 	
 	/**
+	 * Directed context association between an {@link IndividualCtxEntity} and
+	 * the {@link CtxEntityTypes#CSS_NODE} entities it owns.
+	 * 
+	 * @since 0.5
+	 */
+	public static final String OWNS_CSS_NODES = "ownsCssNodes";
+	
+	/**
 	 * Directed context association.
 	 */
 	public static final String SHARES_SERVICES = "sharesServices";
