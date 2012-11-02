@@ -44,6 +44,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
+import org.societies.context.api.user.refinement.IUserCtxRefiner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -59,13 +60,12 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	private INetworkNode cssNodeId;
 	private IIdentity cssOwnerId;
 
-
 	private ICtxBroker internalCtxBroker;
-	ICommManager commMgr;
-
-	UserCtxInferenceMgr(){
-		
-	}
+	
+	private ICommManager commMgr;
+	
+	@Autowired(required=false)
+	private IUserCtxRefiner userCtxRefiner;
 	
 	@Autowired(required=true)
 	UserCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr){
