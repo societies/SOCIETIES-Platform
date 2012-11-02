@@ -1818,7 +1818,23 @@ public class InternalCtxBroker implements ICtxBroker {
 							new CtxPermission(identifier, CtxPermission.READ));
 				}
 				try {
-					objectResult = this.userCtxDBMgr.retrieve(identifier);	
+					objectResult = this.userCtxDBMgr.retrieve(identifier);
+					// Check if inference is required
+					if (objectResult instanceof CtxAttribute) {
+						try {
+							CtxAttribute attributeResult = (CtxAttribute) objectResult;
+							if (this.userCtxInferenceMgr.getInferrableTypes().contains(attributeResult.getType())
+									&& this.userCtxInferenceMgr.isPoorQuality(attributeResult.getQuality())) {
+								if (LOG.isInfoEnabled()) // TODO DEBUG
+									LOG.info("Inferring context attribute " + attributeResult.getId());
+								objectResult = this.userCtxInferenceMgr.refine(attributeResult.getId());
+							}
+						} catch (ServiceUnavailableException sue) {
+							
+							LOG.warn("Could not check if attribute requires inference: "
+									+ "User Context Inference Mgr is not available");
+						}
+					}
 
 				} catch (Exception e) {
 					throw new CtxBrokerException(
