@@ -68,45 +68,6 @@ public class CtxBrokerUtils {
         return BLOB_STRING;
     }
 
-    /**
-     * Checks if the quality of the inferred attribute value is poor.
-     * 
-     * The quality is poor if an update is overdue based on the freshness
-     * (milliseconds since last update) and the expected update frequency
-     * (in Hertz i.e. number of expected updates per second).
-     * 
-     * If the update frequency is not specified (is null) then the quality
-     * is not poor.
-     * 
-     * For inferred attributes, the update frequency will never be null
-     * because the reasoning manager will always set it.
-     * 
-     * @param quality The ICtxQuality associated with the ICtxAttribute.
-     * 
-     * @return true if the quality is poor, false otherwise.
-     */
-    public static boolean isPoorQuality(CtxQuality quality)  {
-    	   	
-       boolean isPoorQuality;
-
-       LOG.debug("freshness = " + quality.getFreshness() + " updateFrequency = " + quality.getUpdateFrequency());
-                
-        if (null == quality.getUpdateFrequency()) {
-
-            isPoorQuality = false;
-
-        } else {
-            
-            final double timeBetweenUpdatesMillis = (1.0 / quality.getUpdateFrequency()) * 1000.0;
-            LOG.debug("time between updates (in milliseconds) = " +timeBetweenUpdatesMillis);
-            isPoorQuality = (double) quality.getFreshness() > timeBetweenUpdatesMillis;
-        }
-        LOG.debug("is poor quality = " + isPoorQuality);
-    
-        return isPoorQuality;
-    }
-    
-    
     public static CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;

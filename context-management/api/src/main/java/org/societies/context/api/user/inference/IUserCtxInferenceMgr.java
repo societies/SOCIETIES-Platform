@@ -33,7 +33,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxQuality;
 
 /**
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
@@ -41,12 +41,15 @@ import org.societies.api.context.model.CtxModelObject;
 public interface IUserCtxInferenceMgr {
 
 	/**
-	 * Checks the quality of an indicated Context Model Object.
+	 * Returns <code>true</code> if the specified quality is poor; 
+	 * <code>false</code> otherwise.
 	 * 
-	 * @param object
-	 * @since 0.0.1
+	 * @param quality
+	 * @return <code>true</code> if the specified quality is poor; 
+	 *         <code>false</code> otherwise
+	 * @since 0.5
 	 */
-	public void checkQuality(CtxModelObject object);
+	public boolean isPoorQuality(final CtxQuality quality);
 
 	/**
 	 * Evaluates the similatiry of two indicated Context Attributes.

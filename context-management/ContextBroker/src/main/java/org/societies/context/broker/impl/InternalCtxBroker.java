@@ -558,7 +558,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 
 		if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-			if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
+			if (this.userCtxInferenceMgr.isPoorQuality(ctxAttr.getQuality())) 
+				inferValue = true;
 		}
 		//	LOG.info("inferValue: "+ inferValue);
 

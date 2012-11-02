@@ -37,7 +37,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
@@ -131,10 +131,33 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		}
 	}
 
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#isPoorQuality(org.societies.api.context.model.CtxQuality)
+	 */
 	@Override
-	public void checkQuality(CtxModelObject arg0) {
-		// TODO Auto-generated method stub
+	public boolean isPoorQuality(CtxQuality quality) {
+		
+		boolean isPoorQuality;
 
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("freshness = " + quality.getFreshness() + " updateFrequency = " 
+					+ quality.getUpdateFrequency());
+
+		if (null == quality.getUpdateFrequency()) {
+
+			isPoorQuality = false;
+
+		} else {
+
+			final double timeBetweenUpdatesMillis = (1.0 / quality.getUpdateFrequency()) * 1000.0;
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("time between updates (in milliseconds) = " +timeBetweenUpdatesMillis);
+			isPoorQuality = (double) quality.getFreshness() > timeBetweenUpdatesMillis;
+		}
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("is poor quality = " + isPoorQuality);
+
+		return isPoorQuality;
 	}
 
 	@Override
