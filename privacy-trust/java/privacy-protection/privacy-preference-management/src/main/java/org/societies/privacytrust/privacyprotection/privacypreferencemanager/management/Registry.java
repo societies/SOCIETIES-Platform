@@ -33,8 +33,21 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxModelBeanTranslator;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfMappings;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSMappings;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNMappings;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
@@ -397,5 +410,215 @@ public class Registry implements Serializable{
 			
 		}
 		return details;
+	}
+	
+	
+	/*
+	 * converter methods
+	 */
+	
+	
+	/*
+	 * FROM BEAN
+	 */
+	
+	public static Registry fromBean(RegistryBean bean, IIdentityManager idMgr){
+		Registry registry = new Registry();
+		registry.ppnp_index = bean.getPpnIndex();
+		registry.ids_index = bean.getIdsIndex();
+		registry.dobf_index = bean.getDobfIndex();
+		
+		List<PPNMappings> ppnMappings = bean.getPpnMappings();
+		
+		for (PPNMappings ppnMap : ppnMappings){
+			try {
+				registry.ppnpMappings.put(toPPNPreferenceDetails(ppnMap.getPpnPrefDetails(), idMgr), (CtxAttributeIdentifier) CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(ppnMap.getCtxID()));
+			} catch (MalformedCtxIdentifierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		List<IDSMappings> idsMappings = bean.getIdsMappings();
+		
+		for (IDSMappings idsMap : idsMappings){
+			try {
+				registry.idsMappings.put(toIDSPreferenceDetails(idsMap.getIdsPrefDetails(), idMgr), (CtxAttributeIdentifier) CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(idsMap.getCtxID()));
+			} catch (MalformedCtxIdentifierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		List<DObfMappings> dobfMappings = bean.getDobfMappings();
+		for (DObfMappings dobfMap : dobfMappings){
+			try {
+				registry.dobfMappings.put(toDObfPreferenceDetails(dobfMap.getDobfPrefDetails(), idMgr), (CtxAttributeIdentifier) CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(dobfMap.getCtxID()));
+			} catch (MalformedCtxIdentifierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return registry;
+	}
+	
+	public static DObfPreferenceDetails toDObfPreferenceDetails(
+			DObfPreferenceDetailsBean bean, IIdentityManager idMgr) {
+		DObfPreferenceDetails details = new DObfPreferenceDetails(bean.getDataType());
+		
+		if (bean.getDataId()!=null){
+			details.setAffectedDataId(bean.getDataId());
+		}
+		
+		if (bean.getRequestor()!=null){
+			try {
+				details.setRequestor(RequestorUtils.toRequestor(bean.getRequestor(), idMgr));
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		details.setDataType(bean.getDataType());
+		return details;
+	}
+
+
+	public static IDSPreferenceDetails toIDSPreferenceDetails(
+			IDSPreferenceDetailsBean bean, IIdentityManager idMgr) {
+		try {
+			IDSPreferenceDetails details = new IDSPreferenceDetails(idMgr.fromJid(bean.getAffectedIdentity()));
+			if (bean.getRequestor()!=null){
+				details.setRequestor(RequestorUtils.toRequestor(bean.getRequestor(), idMgr));
+			}
+			
+			return details;
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+
+	public static PPNPreferenceDetails toPPNPreferenceDetails(
+			PPNPreferenceDetailsBean bean, IIdentityManager idMgr) {
+		PPNPreferenceDetails details = new PPNPreferenceDetails(bean.getDataType());
+		if (bean.getDataId()!=null){
+			details.setAffectedDataId(bean.getDataId());
+		}
+		
+		if (bean.getRequestor()!=null){
+			try {
+				details.setRequestor(RequestorUtils.toRequestor(bean.getRequestor(), idMgr));
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		bean.setDataType(bean.getDataType());
+		return details;
+	}
+
+
+	/*
+	 * TO BEAN
+	 */
+	public RegistryBean toRegistryBean(){
+		RegistryBean bean = new RegistryBean();
+		bean.setDobfIndex(this.dobf_index);
+		bean.setPpnIndex(this.ppnp_index);
+		bean.setIdsIndex(this.ids_index);
+		
+		ArrayList<PPNMappings> ppnList = new ArrayList<PPNMappings>();
+		
+		List<PPNPreferenceDetails> ppnDetails = this.getPPNPreferenceDetails();
+		
+		
+		for (PPNPreferenceDetails detail : ppnDetails){
+			PPNMappings ppnMap = new PPNMappings();
+			ppnMap.setPpnPrefDetails(toBean(detail));
+			ppnMap.setCtxID((CtxAttributeIdentifierBean) CtxModelBeanTranslator.getInstance().fromCtxIdentifier(this.ppnpMappings.get(detail)));
+			ppnList.add(ppnMap);
+			
+		}
+		
+		bean.setPpnMappings(ppnList);
+		
+		
+		ArrayList<IDSMappings> idsList = new ArrayList<IDSMappings>();
+		List<IDSPreferenceDetails> idsDetails = this.getIDSPreferenceDetails();
+		
+		for (IDSPreferenceDetails detail : idsDetails){
+			IDSMappings idsMap = new IDSMappings();
+			idsMap.setIdsPrefDetails(toBean(detail));
+			idsMap.setCtxID((CtxAttributeIdentifierBean) CtxModelBeanTranslator.getInstance().fromCtxIdentifier(this.idsMappings.get(detail)));
+			idsList.add(idsMap);
+		}
+		
+		bean.setIdsMappings(idsList);
+		
+		
+		ArrayList<DObfMappings> dobfList = new ArrayList<DObfMappings>();
+		List<DObfPreferenceDetails> dobfDetails = this.getDObfPreferenceDetails();
+		
+		for (DObfPreferenceDetails detail : dobfDetails){
+			DObfMappings dobfMap = new DObfMappings();
+			dobfMap.setDobfPrefDetails(toBean(detail));
+			dobfMap.setCtxID((CtxAttributeIdentifierBean) CtxModelBeanTranslator.getInstance().fromCtxIdentifier(this.dobfMappings.get(detail)));
+			dobfList.add(dobfMap);
+		}
+		
+		bean.setDobfMappings(dobfList);
+		return bean;
+		
+	}
+
+
+	private DObfPreferenceDetailsBean toBean(DObfPreferenceDetails detail) {
+
+		DObfPreferenceDetailsBean bean = new DObfPreferenceDetailsBean();
+		
+		if (detail.getAffectedDataId()!=null){
+			bean.setDataId(detail.getAffectedDataId());
+		}
+		if (detail.getRequestor()!=null){
+			bean.setRequestor(RequestorUtils.toRequestorBean(detail.getRequestor()));
+		}
+		
+		bean.setDataType(detail.getDataType());
+		
+		return bean;
+		
+	}
+
+
+	private IDSPreferenceDetailsBean toBean(IDSPreferenceDetails detail) {
+		IDSPreferenceDetailsBean bean = new IDSPreferenceDetailsBean();
+		
+		bean.setAffectedIdentity(detail.getAffectedDPI().getJid());
+		if(detail.getRequestor()!=null){
+			bean.setRequestor(RequestorUtils.toRequestorBean(detail.getRequestor()));
+		}
+		
+		return bean;
+	}
+
+
+	private PPNPreferenceDetailsBean toBean(PPNPreferenceDetails detail) {
+		PPNPreferenceDetailsBean bean = new PPNPreferenceDetailsBean();
+		
+		if (detail.getAffectedDataId()!=null){
+			bean.setDataId(detail.getAffectedDataId());
+		}
+		bean.setDataType(detail.getDataType());
+		if (detail.getRequestor()!=null){
+			bean.setRequestor(RequestorUtils.toRequestorBean(detail.getRequestor()));
+		}
+		
+		return bean;
 	}
 }

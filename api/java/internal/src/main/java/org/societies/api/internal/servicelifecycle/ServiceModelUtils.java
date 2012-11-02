@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.eclipse.osgi.internal.signedcontent.Base64;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -104,8 +105,8 @@ public class ServiceModelUtils {
 	 */
 	public static Bundle getBundleFromService(Service service, BundleContext bundleContext) {
 		
-		Long bundleId = getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
-		return bundleContext.getBundle(bundleId);
+		//Long bundleId = getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
+		return bundleContext.getBundle(service.getServiceLocation());
 		
 	}
 
@@ -120,7 +121,9 @@ public class ServiceModelUtils {
 			
 		// Preparing the search filter
 		Service filter = generateEmptyFilter();
-		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
+		filter.setServiceLocation(bundle.getLocation());
+		
 		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices = null;
@@ -138,9 +141,9 @@ public class ServiceModelUtils {
 		Service result = null;
 
 		for(Service service: listServices){
-			Long serBundleId = getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
+			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
-			if(serBundleId == bundle.getBundleId()){
+			if(bundleSymbolic == bundle.getSymbolicName()){
 				result = service;
 				break;
 			}
@@ -201,15 +204,17 @@ public class ServiceModelUtils {
 		return identifier.substring(0, lastIndex);
 	}
 	
+	
 	/**
 	 * This method takes a Service Resource Identifier and returns the id of the bundle
 	 * 
 	 * @param serviceId
 	 * @return the bundle Id
-	 */
+	 
 	public static Long getBundleIdFromServiceIdentifier(ServiceResourceIdentifier serviceId){
 		return Long.parseLong(serviceId.getServiceInstanceIdentifier());
 	}
+	*/
 	
 	/**
 	 * This method returns the textual description of a Bundle state
@@ -261,7 +266,7 @@ public class ServiceModelUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		result.setServiceInstanceIdentifier(String.valueOf(serviceBundle.getBundleId()));
+		result.setServiceInstanceIdentifier(serviceBundle.getSymbolicName());
 		//result.setServiceInstanceIdentifier(value);
 		
 		return result;
@@ -283,7 +288,7 @@ public class ServiceModelUtils {
 		try {
 			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()+'/'+ service.getServiceName().replace(' ', '_')));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
-			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
+			serResId.setServiceInstanceIdentifier(serBndl.getSymbolicName());
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -357,7 +362,7 @@ public class ServiceModelUtils {
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
 		
-		int index = serviceId.indexOf('_');	
+		int index = serviceId.indexOf(' ');	
 		String instanceExtract = serviceId.substring(0, index);
 		String identifierExtract = serviceId.substring(index+1);
 				
@@ -374,8 +379,16 @@ public class ServiceModelUtils {
 	
 	public static String serviceResourceIdentifierToString(ServiceResourceIdentifier serviceId){
 		
-		return serviceId.getServiceInstanceIdentifier() + "_" + serviceId.getIdentifier().toString();
+		return serviceId.getServiceInstanceIdentifier() + " " + serviceId.getIdentifier().toString();
 	}
 	
 
+	public static String getServiceId64Encode(ServiceResourceIdentifier serviceId){
+
+		return new String(Base64.encode(serviceResourceIdentifierToString(serviceId).getBytes()));
+	}
+	
+	public static ServiceResourceIdentifier getServiceId64Decode(String encoded64){
+		return generateServiceResourceIdentifierFromString(new String(Base64.decode(encoded64.getBytes())));
+	}
 }
