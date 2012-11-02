@@ -27,17 +27,13 @@ package org.societies.context.api.user.inference;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-//import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.context.api.user.prediction.PredictionMethod;
-//import org.societies.context.user.prediction.api.platform.*;
 
 /**
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
