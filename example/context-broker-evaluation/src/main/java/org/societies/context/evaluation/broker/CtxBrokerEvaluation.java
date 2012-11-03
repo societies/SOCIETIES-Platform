@@ -24,17 +24,11 @@
  */
 package org.societies.context.evaluation.broker;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +46,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,20 +57,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class CtxBrokerEvaluation {
 
+	
+//	private static final String XLS_INPUT_FILE = "realityMining.xls";
+
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerEvaluation.class);
-
-	private static final String XLS_INPUT_FILE = "realityMining.xls";
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
 	private ICommManager commMgrService;
 
+	private XlsReader xlsReader;
 
 	HashMap<Integer, List<Integer>> friendsData = new HashMap<Integer, List<Integer>>();
 	//HashMap<Integer, List<String>> proximityData = new HashMap<Integer, List<String>>();
-
-	Workbook w = null;
 
 	CtxBrokerEvaluation(){
 
@@ -93,46 +88,65 @@ public class CtxBrokerEvaluation {
 		this.commMgrService = commMgr;
 		LOG.info("*** commMgrService instantiated "+this.commMgrService);
 
-		try {
-			long startTime = System.currentTimeMillis();	
-			this.readData(XLS_INPUT_FILE);
-			long totalTime = System.currentTimeMillis() - startTime;	
-			LOG.info("total time "+totalTime);
-
-		} catch (Exception e) {
-			LOG.error("Could not read " + XLS_INPUT_FILE 
-					+ ": " + e.getLocalizedMessage(), e);
-			throw e;
+		this.xlsReader = new XlsReader();
+		loadCtxData();
 		}
 
+	
+	
+	private void loadCtxData(){
+		
+		LOG.info("*** loading friends");
+		loadIndiEntitiesFriend();
+		
+		
+		LOG.info("*** loading Lab Proximity");
+		loadLabProximity();	
+		
+		LOG.info("*** loading Outlab Proximity");
+		loadOutLabProximity();
+		
 	}
-
-	private void readData(String file) throws Exception {
-
-		//ReadExcel test = new ReadExcel();
-		//test.setInputFile("./realityMining.xls");
-
-		this.friendsData = xlsFriendsReader(file);
+	
+	private void loadLabProximity(){
+		
+	}
+	
+	
+	private void loadOutLabProximity(){
+		
+	}
+	
+	
+	
+	private void loadIndiEntitiesFriend() {
 
 		if (LOG.isInfoEnabled())
 			LOG.info("CtxBrokerEvaluation data "+friendsData);	
 
+		//1. create entities, add friends associations
+		friendsData = this.xlsReader.xlsFriendsReader();
+		
+		try {
+		
 		// create individual entities
 		for( Integer i : friendsData.keySet()){
 
 			if (this.getIndiEntity(i) == null) {
 				String identityString = "identity_"+i+"@societies.local";
 
-				IIdentity cssIDx =  this.commMgrService.getIdManager().fromJid(identityString);
-
+				IIdentity cssIDx;
+				
+					cssIDx = this.commMgrService.getIdManager().fromJid(identityString);
+			
 				IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity(cssIDx, CtxEntityTypes.PERSON).get();
 				CtxAttribute attributeEvalID = this.internalCtxBroker.createAttribute(indiEnt.getId(), "evaluationID").get();
 				attributeEvalID.setIntegerValue(i);
 				this.internalCtxBroker.update(attributeEvalID);
 				//System.out.println(indiEnt.getId());
-
 			}
 		}
+
 		List<CtxIdentifier> allIndiEntityIDList = this.internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON).get();
 		System.out.println("idList: "+allIndiEntityIDList);
 		System.out.println("idList size : "+allIndiEntityIDList.size());
@@ -182,37 +196,31 @@ public class CtxBrokerEvaluation {
 				// end if assoc
 			}
 		}
-
-		// proximity levels
-
-		this.addProximityLevels();
-	}
-
-
-	private void addProximityLevels(){
-
-		HashMap<Integer, List<String>> proximityData = new HashMap<Integer, List<String>>();
-
-		proximityData = this.xlsProximityReader(w);
-
-
-
-
-
-
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 
 	}
 
 
-	//attribute type "evaluationID" has value "i"
+	// attribute type "evaluationID" has value "i"
 	// for this i retrieve the respective individual entity
 	private IndividualCtxEntity getIndiEntity(Integer i){
 
 		IndividualCtxEntity indiEntityResult = null;
 
 		//HashMap<Integer, List<Integer>> data
-
 		try {
 			//List<CtxIdentifier> attrEvalIDs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE,"evaluationID").get();
 			List<CtxIdentifier> listIds = this.internalCtxBroker.lookup(CtxModelType.ENTITY,CtxEntityTypes.PERSON).get();
@@ -259,8 +267,7 @@ public class CtxBrokerEvaluation {
 	/*
 	 * dailyWorkProximity1
 	 * dailyWorkProximity2
-	 *	
-	 */
+	
 	public HashMap<Integer, List<String>> xlsProximityReader(Workbook w)  {
 
 		// user '1' has proximity with {'2#5,'3#1','4#2'} userId#ProximityLevel
@@ -285,53 +292,5 @@ public class CtxBrokerEvaluation {
 
 		return mapOfProximityData;
 	}
-
-
-
-
-	public HashMap<Integer, List<Integer>> xlsFriendsReader(String inputFile) throws Exception {
-
-		final HashMap<Integer, List<Integer>> mapFriendsData = new HashMap<Integer, List<Integer>>();
-
-		final InputStream is = this.getClass().getResourceAsStream("/" + inputFile);
-		if (is == null)
-			throw new FileNotFoundException(inputFile + " (No such file in resources)");
-
-		try {
-			this.w = Workbook.getWorkbook(is);
-			// Get the first sheet
-			Sheet sheet = this.w.getSheet(0);
-			Integer key = 0;
-			// Loop over column and lines
-			// get the labels of the columns
-
-			for (int j = 0; j < sheet.getColumns(); j++) {
-				List<Integer> data = new ArrayList<Integer>();
-				key=j;
-
-				//for each column store the data
-				for (int i = 0; i < sheet.getRows(); i++) { 
-					Cell cell = sheet.getCell(j, i);
-					//System.out.println("key:"+j);
-					//System.out.println("cell column:"+cell.getColumn());
-					//System.out.println("cell getContents:"+cell.getContents());
-					if (cell.getContents().equals("1") ) {
-						data.add(i+1); 
-					}
-
-				}
-				mapFriendsData.put(key,data);
-
-			}
-			if (LOG.isInfoEnabled()) {
-				LOG.info("sheet.getColumns():"+sheet.getColumns());
-				LOG.info("sheet.getRows():"+sheet.getRows());
-			}
-		} finally {
-			if (is != null)
-				is.close();
-		}
-
-		return mapFriendsData;
-	}
+ */
 }
