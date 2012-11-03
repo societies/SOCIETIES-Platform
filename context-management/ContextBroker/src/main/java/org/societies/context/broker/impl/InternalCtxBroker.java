@@ -371,9 +371,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		return this.retrieve(null, identifier);
 	}	
 
-
-
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveAttribute(org.societies.api.context.model.CtxAttributeIdentifier, boolean)
+	 */
 	@Override
 	@Async
 	public Future<CtxAttribute> retrieveAttribute(
@@ -383,51 +383,75 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (identifier == null)
 			throw new NullPointerException("identifier can't be null");
 
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving context attribute with id " +  identifier);
+		
+		CtxAttribute attribute = null;
 
-		final CtxAttribute ctxAttrReturn;
-		//final CtxAttribute inferedAttrReturn;
-
-		//	LOG.info("identifier " + identifier);
-		//	LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
-
-		IIdentity targetCss;
+		final IIdentity target;
 		try {
-			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.idMgr.fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 
-		this.logRequest(null, targetCss);
+		this.logRequest(null, target);
+		
+		// if target is a CSS
+		if (IdentityType.CSS.equals(target.getType()) 
+				|| IdentityType.CSS_RICH.equals(target.getType())
+				|| IdentityType.CSS_LIGHT.equals(target.getType())) {
+			
+			// if target is local CSS
+			if (this.idMgr.isMine(target)) {
 
-		if (IdentityType.CSS.equals(targetCss.getType()) 
-				|| IdentityType.CSS_RICH.equals(targetCss.getType())
-				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
+				try {
+					attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);
+					// Check if inference is required:
+					// 1. enableInference flag set to true AND 
+					// 2. inferrable attribute type AND
+					// 3. either has no value OR a value of poor quality
+					try {
+						if (enableInference 
+								&& this.userCtxInferenceMgr.getInferrableTypes().contains(attribute.getType())
+								&& (!CtxBrokerUtils.hasValue(attribute) || 
+										this.userCtxInferenceMgr.isPoorQuality(attribute.getQuality()))) {
+							if (LOG.isInfoEnabled()) // TODO DEBUG
+								LOG.info("Inferring context attribute " + attribute.getId());
+							attribute = this.userCtxInferenceMgr.refine(attribute.getId());
+						}
+					} catch (ServiceUnavailableException sue) {
 
-			//	LOG.info("retrieving css " + targetCss.getType());
-			ctxAttrReturn = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);	
+						LOG.warn("Could not check if attribute requires inference: "
+								+ "User Context Inference Mgr is not available");
+					}
 
-		}else if (IdentityType.CIS.equals(targetCss.getType())){
+				} catch (Exception e) {
+					throw new CtxBrokerException(
+							"Platform context broker failed to retrieve context attribute with id " 
+									+ identifier + ": " +  e.getLocalizedMessage(), e);
+				}
 
-			//	LOG.info("retrieving cis " + targetCss.getType());
-			ctxAttrReturn = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
+			// if target is remote CSS
+			} else {
+				// TODO handle remote call
+				new CtxBrokerException(
+						"Platform context broker failed to retrieve context attribute with id " 
+								+ identifier + ": Remote method call is not implemented yet");
+			}
 
-		} else throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
+		// if target is a CIS
+		} else if (IdentityType.CIS.equals(target.getType())) {
 
-		// inference code
-		// TO DO following lines initiate inference, uncomment when inference code is ready
+			// TODO check if CIS is locally maintained or a remote call is necessary
+			attribute = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
+			// TODO integrate with Community Inference Mgr
 
-		if(enableInference == true){
+		} else 
+			throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
 
-			// check if value is null and if yes estimate community context 
-			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
-
-				// LOG.info("initiate inference for "+ ctxAttrReturn.getId());
-				// inferedAttrReturn = this.initiateInference((CtxAttribute) ctxAttrReturn);
-			}   // TO DO integrate inference outcome with returned value
-		}
-
-		return new AsyncResult<CtxAttribute>(ctxAttrReturn);
+		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
 
