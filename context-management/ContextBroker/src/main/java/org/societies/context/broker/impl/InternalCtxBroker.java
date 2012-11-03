@@ -1819,12 +1819,15 @@ public class InternalCtxBroker implements ICtxBroker {
 				}
 				try {
 					objectResult = this.userCtxDBMgr.retrieve(identifier);
-					// Check if inference is required
+					// Check if inference is required:
+					// 1. inferrable attribute type AND
+					// 2. either has no value OR a value of poor quality
 					if (objectResult instanceof CtxAttribute) {
 						try {
 							CtxAttribute attributeResult = (CtxAttribute) objectResult;
 							if (this.userCtxInferenceMgr.getInferrableTypes().contains(attributeResult.getType())
-									&& this.userCtxInferenceMgr.isPoorQuality(attributeResult.getQuality())) {
+									&& (!CtxBrokerUtils.hasValue(attributeResult) || 
+											this.userCtxInferenceMgr.isPoorQuality(attributeResult.getQuality()))) {
 								if (LOG.isInfoEnabled()) // TODO DEBUG
 									LOG.info("Inferring context attribute " + attributeResult.getId());
 								objectResult = this.userCtxInferenceMgr.refine(attributeResult.getId());
