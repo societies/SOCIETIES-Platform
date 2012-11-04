@@ -151,7 +151,7 @@ public class Tester {
 	private void testOnDemandInference(){
 
 		LOG.info("start testing testOnDemandInference ");
-	
+
 		this.createCSSNodeLocationAttributes();
 
 		CtxAttribute indiLocation = this.getIndiEntityLocation();
@@ -163,49 +163,71 @@ public class Tester {
 		LOG.info("1 PZ will update the CSS node entity with location value:RoomPZ and FreqId:1/60 with ctxSource name PZ0 ");
 		CtxAttribute locationCssNodeAttrPZ = this.updateLocationCSSNode("room1PZ", CtxSourceNames.PZ+"0", 1d/60);
 		LOG.info("1 update performed, check values");
-		LOG.info("1 CSS node location value: "+locationCssNodeAttrPZ.getStringValue());
-		LOG.info("1 CSS node location sourceID: "+locationCssNodeAttrPZ.getSourceId());
-		LOG.info("1 CSS node location update freq: "+locationCssNodeAttrPZ.getQuality().getUpdateFrequency().toString());
+		LOG.info("1 CSS node location value: "+locationCssNodeAttrPZ.getStringValue()+" sourceID:"+locationCssNodeAttrPZ.getSourceId()+ " update freq:"+locationCssNodeAttrPZ.getQuality().getUpdateFrequency());
+
+		//check if indi entity is updated 
+		indiLocation = this.getIndiEntityLocation();
+		try {
+			CtxAttribute entLocation = (CtxAttribute) this.internalCtxBroker.retrieve(indiLocation.getId()).get();
+			LOG.info("1-------> indi entity current location :"+ entLocation.getStringValue()+" should be room1PZ");
+			assertEquals("room1PZ",entLocation.getStringValue());
+
+
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CtxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
 
 		try {
-			long start = System.currentTimeMillis();
-			Thread.sleep(4000);
-			long delay = System.currentTimeMillis() - start;
-			LOG.info (" delayed for :"+ delay);
-
+			Thread.sleep(35000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		//check if indi entity is updated 
-		indiLocation = this.getIndiEntityLocation();
-		LOG.info("1-------> indi entity current location :"+ indiLocation.getStringValue()+" should be room1PZ");
-		assertEquals("room1PZ",indiLocation.getStringValue());
-		
-		
+
 		// 2 update rfid
 		LOG.info("----- second update -----");
 		LOG.info("2 RFID will update the CSS node entity with location value:Room1RFID and FreqId:1/60 with ctxSource name RFID0 ");
 		CtxAttribute locationCssNodeAttrRFID = this.updateLocationCSSNode("room1RFID", CtxSourceNames.RFID+"0", 1d/60);
 		LOG.info("2 update performed, check values");
-		LOG.info("2 CSS node location value: "+locationCssNodeAttrRFID.getStringValue());
-		LOG.info("2 CSS node location sourceID: "+locationCssNodeAttrRFID.getSourceId());
-		LOG.info("2 CSS node location update freq: "+locationCssNodeAttrRFID.getQuality().getUpdateFrequency().toString());
+		LOG.info("2 CSS node location value: "+locationCssNodeAttrRFID.getStringValue()+" sourceID:"+locationCssNodeAttrRFID.getSourceId()+ " update freq:"+locationCssNodeAttrRFID.getQuality().getUpdateFrequency());
 
 		try {
-			LOG.info ("start delay "+ System.currentTimeMillis());
-			Thread.sleep(4000);
-			LOG.info ("end delay "+ System.currentTimeMillis());
+			indiLocation = this.getIndiEntityLocation();
+			CtxAttribute entLocation = (CtxAttribute) this.internalCtxBroker.retrieve(indiLocation.getId()).get();
+
+			LOG.info("2-----> individual entity current location :"+ entLocation.getStringValue()+" should be room1RFID");
+			assertEquals("room1RFID",entLocation.getStringValue());
+
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CtxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}	
+
+
+		try {
+			Thread.sleep(35000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		//check if indi entity is updated 
-		indiLocation = this.getIndiEntityLocation();
-		LOG.info("2-----> indi entity current location :"+ indiLocation.getStringValue()+" should be room1RFID");
-		assertEquals("room1RFID",indiLocation.getStringValue());
+
 	}
 
 
@@ -226,13 +248,13 @@ public class Tester {
 
 			cssNodeEntity = this.internalCtxBroker.retrieveCssNode(this.cssNodeId).get();
 			Set<CtxAttribute> attrLocNodeSet = cssNodeEntity.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
-					List<CtxAttribute> attrLocList = new ArrayList<CtxAttribute>(attrLocNodeSet);
+			List<CtxAttribute> attrLocList = new ArrayList<CtxAttribute>(attrLocNodeSet);
 
 			if(attrLocList.size() > 0){
 
 				for(CtxAttribute locationCssNodeAttr : attrLocList){
 					LOG.info("update  location attribute "+locationCssNodeAttr.getId()  +" with source id "+locationCssNodeAttr.getSourceId()+" for source "+sourceId );
-								
+
 					if(locationCssNodeAttr.getSourceId().contains(CtxSourceNames.PZ) && sourceId.contains(CtxSourceNames.PZ)){
 						//LOG.info("update PZ location attribute with value "+locationValue);
 						locationCssNodeAttr_pz = locationCssNodeAttr;
@@ -241,7 +263,7 @@ public class Tester {
 						locationCssNodeAttr_pz = (CtxAttribute) this.internalCtxBroker.update(locationCssNodeAttr_pz).get();
 						return locationCssNodeAttr_pz;
 					}
-					
+
 					if(locationCssNodeAttr.getSourceId().contains(CtxSourceNames.RFID) && sourceId.contains(CtxSourceNames.RFID)){
 						LOG.info("update rfid location attribute with value"+locationValue);
 						locationCssNodeAttr_rfid = locationCssNodeAttr;
@@ -284,14 +306,14 @@ public class Tester {
 			List<CtxAttribute> attrLocList = new ArrayList<CtxAttribute>(attrLocSet);
 
 			for(CtxAttribute attrLoc : attrLocList){
-					if(attrLoc.getSourceId().contains(CtxSourceNames.RFID)) createLocAttrRFID = false;
-				
+				if(attrLoc.getSourceId().contains(CtxSourceNames.RFID)) createLocAttrRFID = false;
+
 			}
 
 			for(CtxAttribute attrLoc : attrLocList){
-			
+
 				if(attrLoc.getSourceId().contains(CtxSourceNames.PZ)) createLocAttrPZ = false;
-				
+
 			}
 
 			if(createLocAttrRFID) {
