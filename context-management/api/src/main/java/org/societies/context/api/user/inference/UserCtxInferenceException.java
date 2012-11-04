@@ -32,32 +32,32 @@ import org.societies.api.context.CtxException;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
-public class UserCtxInferenceMgrException extends CtxException {
+public class UserCtxInferenceException extends CtxException {
  
 	private static final long serialVersionUID = -2490872382562481000L;
 
 	/**
-     * Constructs a <code>UserCtxInferenceMgrException</code> with no detail message.
+     * Constructs a <code>UserCtxInferenceException</code> with no detail message.
      */
-    public UserCtxInferenceMgrException() {
+    public UserCtxInferenceException() {
     	
         super();
     }
 
     /**
-     * Constructs a <code>UserCtxInferenceMgrException</code> with the specified detail
+     * Constructs a <code>UserCtxInferenceException</code> with the specified detail
      * message.
      * 
      * @param message
      *            the detail message.
      */
-    public UserCtxInferenceMgrException(String message) {
+    public UserCtxInferenceException(String message) {
 
         super(message);
     }
 
     /**
-     * Creates a <code>UserCtxInferenceMgrException</code> with the specified detail
+     * Creates a <code>UserCtxInferenceException</code> with the specified detail
      * message and cause.
      * 
      * @param message
@@ -69,13 +69,13 @@ public class UserCtxInferenceMgrException extends CtxException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public UserCtxInferenceMgrException(String message, Throwable cause) {
+    public UserCtxInferenceException(String message, Throwable cause) {
 
         super(message, cause);
     }
 
     /**
-     * Creates a <code>UserCtxInferenceMgrException</code> with the specified cause and a
+     * Creates a <code>UserCtxInferenceException</code> with the specified cause and a
      * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
      * typically contains the class and detail message of <tt>cause</tt>).
      * 
@@ -85,7 +85,7 @@ public class UserCtxInferenceMgrException extends CtxException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public UserCtxInferenceMgrException(Throwable cause) {
+    public UserCtxInferenceException(Throwable cause) {
 
         super(cause);
     }

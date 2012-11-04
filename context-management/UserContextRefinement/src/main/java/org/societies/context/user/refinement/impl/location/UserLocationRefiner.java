@@ -24,9 +24,27 @@
  */
 package org.societies.context.user.refinement.impl.location;
 
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.source.CtxSourceNames;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.context.api.user.inference.UserCtxInferenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +69,140 @@ public class UserLocationRefiner {
 			LOG.info(this.getClass() + " instantiated");
 	}
 
+	public CtxAttribute refineOnDemand(final CtxAttributeIdentifier attrId) 
+			throws UserCtxInferenceException {
+		
+		if (LOG.isInfoEnabled())
+			LOG.info("Refining attribute " + attrId);
+		if (!CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
+		
+		final CtxEntityIdentifier ownerEntId = attrId.getScope();
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("ownerEntId=" + ownerEntId);
+		try {
+			final CtxEntity ownerEnt = (CtxEntity) this.internalCtxBroker.retrieve(ownerEntId).get();
+			if (ownerEnt == null)
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "': Owner entity '" + ownerEnt +  "' does not exist");
+			if (ownerEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+				return null; // Cannot refine without OWNS_CSS_NODES association
+			final CtxAssociationIdentifier ownsCssNodesAssocId = 
+					ownerEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next();
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("ownsCssNodesAssocId=" + ownsCssNodesAssocId);
+			final CtxAssociation ownsCssNodesAssoc = (CtxAssociation) 
+					this.internalCtxBroker.retrieve(ownsCssNodesAssocId).get();
+			if (ownsCssNodesAssoc == null)
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "': Association '" + ownsCssNodesAssocId +  "' does not exist");
+			if (ownsCssNodesAssoc.getChildEntities().isEmpty())
+				return null; // Cannot refine without CSS_NODE entities
+			// TODO select User Interaction Node; pick first for now
+			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("cssNodeEntId=" + cssNodeEntId);
+			final CtxEntity cssNodeEnt = (CtxEntity) 
+					this.internalCtxBroker.retrieve(cssNodeEntId).get();
+			if (cssNodeEnt == null)
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "': Entity '" + cssNodeEntId +  "' does not exist");
+			final Set<CtxAttribute> inputAttrs = cssNodeEnt.getAttributes(attrId.getType());
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("inputAttrs.size()=" + inputAttrs.size());
+			if (inputAttrs.isEmpty())
+				return null; // Cannot refine without attributes of the specified type under the CSS_NODE entity
+			final SortedSet<CtxAttribute> sortedInputAttrs = 
+					new TreeSet<CtxAttribute>(LocationSymbolicComparator);
+			sortedInputAttrs.addAll(inputAttrs);
+			final CtxAttribute optimalInputAttr = sortedInputAttrs.last();
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("optimalInputAttr=" + optimalInputAttr.getId());
+			final CtxAttribute refinedAttr = 
+					this.internalCtxBroker.retrieveAttribute(attrId, false).get();
+			refinedAttr.setStringValue(optimalInputAttr.getStringValue());
+			refinedAttr.setValueType(CtxAttributeValueType.STRING);
+			refinedAttr.setSourceId("UserLocationRefiner");
+			refinedAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
+			if (optimalInputAttr.getQuality().getUpdateFrequency() != null)
+				refinedAttr.getQuality().setUpdateFrequency(optimalInputAttr.getQuality().getUpdateFrequency());
+			
+			return refinedAttr;
+			
+		} catch (Exception e) {
+			
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': " + e.getLocalizedMessage(), e);
+		}
+	}
 	
+	private static Comparator<CtxAttribute> LocationSymbolicComparator =
+			new Comparator<CtxAttribute>() {
+
+		@Override
+		public int compare(CtxAttribute a1, CtxAttribute a2) {
+
+			final double now = new Date().getTime();
+
+			final double timeSinceLastUpdate1 = now - a1.getLastModified().getTime();
+			final Double timeBetweenUpdates1 = (a1.getQuality().getUpdateFrequency() != null)
+					? (1d / a1.getQuality().getUpdateFrequency()) * 1000d : null;
+			final boolean isFresh1 = (timeBetweenUpdates1 != null)
+					? timeBetweenUpdates1 > timeSinceLastUpdate1 : true; 
+
+			final double timeSinceLastUpdate2 = now - a2.getLastModified().getTime();
+			final Double timeBetweenUpdates2 = (a2.getQuality().getUpdateFrequency() != null)
+					? (1d / a2.getQuality().getUpdateFrequency()) * 1000d : null;
+			final boolean isFresh2 = (timeBetweenUpdates1 != null)
+					? timeBetweenUpdates2 > timeSinceLastUpdate2 : true;
+
+			if (isFresh1 && isFresh2) { // both attributes are fresh
+				
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("a1 and a2 fresh");
+
+				if (a1.getSourceId().contains(CtxSourceNames.PZ)
+						&& a2.getSourceId().contains(CtxSourceNames.RFID))
+					return -1;
+				else if ((a1.getSourceId().contains(CtxSourceNames.PZ)
+								&& a2.getSourceId().contains(CtxSourceNames.PZ))
+						|| (a1.getSourceId().contains(CtxSourceNames.RFID)
+								&& a2.getSourceId().contains(CtxSourceNames.RFID)))
+					return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
+				else if (a1.getSourceId().contains(CtxSourceNames.RFID)
+						&& a2.getSourceId().contains(CtxSourceNames.PZ))
+					return +1;
+				else if (a2.getSourceId().contains(CtxSourceNames.PZ) 
+						|| a2.getSourceId().contains(CtxSourceNames.RFID))
+					return -1;
+				else if (a1.getSourceId().contains(CtxSourceNames.PZ)
+						|| a1.getSourceId().contains(CtxSourceNames.RFID))
+					return +1;
+				else 
+					return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
+			
+			} else if (isFresh1) { // a1 is fresh
+				
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("a1 fresh");
+
+				return +1;
+
+			} else if (isFresh2) { // a2 is fresh
+				
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("a2 fresh");
+
+				return -1;
+
+			} else { // none of the attributes is fresh
+				
+				if (LOG.isInfoEnabled()) // TODO DEBUG
+					LOG.info("a1 and a2 NOT fresh");
+
+				return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
+			}
+		}
+	};
 }

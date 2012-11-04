@@ -31,8 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.context.api.user.inference.UserCtxInferenceException;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
-import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.DAG;
+//import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.DAG;
+import org.societies.context.user.refinement.impl.location.UserLocationRefiner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,63 +47,68 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserCtxRefiner implements IUserCtxRefiner {
 
-	private BayesEngine learner = BayesEngine.getInstance();
+	private static Logger LOG = LoggerFactory.getLogger(UserCtxRefiner.class);
+	
+	@Autowired(required=false)
+	private UserLocationRefiner userLocationRefiner;
+	
+	//private BayesEngine learner = BayesEngine.getInstance();
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	private BayesianInference bayesianInference;
-
+	//private BayesianInference bayesianInference;
 
 	public UserCtxRefiner() {
-		initialise();
-	}
 		
-	public void initialise(){
-		this.bayesianInference = new BayesianInference();
-		logger.info("{}", "CSM started");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
+		//this.initialise();
 	}
-	
+/* TODO	
+	private void initialise() {
+		
+		this.bayesianInference = new BayesianInference();
+	}
+*/	
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext
-	 * (org.societies.api.context.model.CtxAttributeIdentifier)
+	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#refineOnDemand(org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
-	public CtxAttribute refineContext(CtxAttributeIdentifier arg0) {
-		
-		CtxAttribute toRefine = null;
-		//TODO retrieve CtxAttribute to modify from its identifier
-		
+	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException {
+	
+		if (LOG.isInfoEnabled())
+			LOG.info("Refining attribute " + attrId);
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			try {
+				return this.userLocationRefiner.refineOnDemand(attrId);
+			} catch (ServiceUnavailableException sue) {
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "': Service UserLocationRefiner is not available");
+			}
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
+		// TODO bayesian
+		/*
 		DAG rule = null;
 		
 		return (bayesianInference.eval(toRefine, rule)).iterator().next();
-		
-		
-
+		*/
 	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#getInferableTypes()
+	
+	/*
+	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#refineContinuously(org.societies.api.context.model.CtxAttributeIdentifier, double)
 	 */
 	@Override
-	public List<String> getInferableTypes() {
+	public void refineContinuously(final CtxAttributeIdentifier attrId, double updateFreq) 
+			throws UserCtxInferenceException {
+		//TODO
+	}
+	
+	/*
+	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#getInferrableTypes()
+	 */
+	@Override
+	public List<String> getInferrableTypes() {
 		// TODO Auto-generated method stub
 		return new ArrayList<String>();
 	}
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.context.api.user.refinement.IUserCtxRefiner#inferContextContinuously
-	 * (org.societies.api.context.model.CtxAttributeIdentifier, double)
-	 */
-	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq){
-		//TODO
-	}
-
 }

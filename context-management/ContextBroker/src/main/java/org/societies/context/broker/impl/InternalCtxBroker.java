@@ -419,7 +419,12 @@ public class InternalCtxBroker implements ICtxBroker {
 										this.userCtxInferenceMgr.isPoorQuality(attribute.getQuality()))) {
 							if (LOG.isInfoEnabled()) // TODO DEBUG
 								LOG.info("Inferring context attribute " + attribute.getId());
-							attribute = this.userCtxInferenceMgr.refine(attribute.getId());
+							final CtxAttribute refinedAttribute = 
+									this.userCtxInferenceMgr.refineOnDemand(attribute.getId());
+							if (LOG.isInfoEnabled()) // TODO DEBUG
+								LOG.info("Refined attribute " + attribute);
+							if (refinedAttribute != null)
+								attribute = refinedAttribute;
 						}
 					} catch (ServiceUnavailableException sue) {
 
@@ -1833,7 +1838,6 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
-
 			if (this.idMgr.isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
@@ -1854,7 +1858,11 @@ public class InternalCtxBroker implements ICtxBroker {
 											this.userCtxInferenceMgr.isPoorQuality(attributeResult.getQuality()))) {
 								if (LOG.isInfoEnabled()) // TODO DEBUG
 									LOG.info("Inferring context attribute " + attributeResult.getId());
-								objectResult = this.userCtxInferenceMgr.refine(attributeResult.getId());
+								attributeResult = this.userCtxInferenceMgr.refineOnDemand(attributeResult.getId());
+								if (LOG.isInfoEnabled()) // TODO DEBUG
+									LOG.info("Refined attribute " + attributeResult);
+								if (attributeResult != null)
+									objectResult = attributeResult;
 							}
 						} catch (ServiceUnavailableException sue) {
 							

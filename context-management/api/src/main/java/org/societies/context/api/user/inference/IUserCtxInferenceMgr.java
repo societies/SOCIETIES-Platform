@@ -80,43 +80,51 @@ public interface IUserCtxInferenceMgr {
 	 * @param cisid
 	 * @since 0.0.1
 	 */
-	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, IIdentity cisid);
+	public void inheritContext(CtxAttributeIdentifier attrId, CtxAttributeValueType type, IIdentity cisid);
 
 	/**
 	 * Predicts context using indicated date. 
 	 * 
-	 * @param ctxAttrID
+	 * @param attrId
 	 * @param date
 	 * @returns context attribute with predicted context
 	 * @since 0.0.1
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrId, Date date);
 
 	/**
 	 * Predicts context using indicated index.
 	 * 
-	 * @param ctxAttrID
+	 * @param attrId
 	 * @param index
 	 * @returns context attribute with predicted context
 	 * @since 0.0.1
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrId, int index);
 
 	/**
-	 * Refines the identified context attribute. 
+	 * Refines the identified context attribute. The method returns 
+	 * <code>null</code> if the identified attribute cannot be refined.
 	 * 
-	 * @param ctxAttrId
-	 * @since 0.0.1
+	 * @param attrId
+	 *            the identifier of the context attribute to be refined.
+	 * @return the refined context attribute or <code>null</code> if the
+	 *         identified attribute cannot be refined.
+	 * @since 0.5
 	 */
-	public CtxAttribute refine(CtxAttributeIdentifier ctxAttrId) throws UserCtxInferenceMgrException;
+	public CtxAttribute refineOnDemand(final CtxAttributeIdentifier attrId) 
+			throws UserCtxInferenceException;
 	
 	/**
 	 * Refines the identified context attribute. 
 	 * 
-	 * @param ctxAttrId
-	 * @since 0.0.1
+	 * @param attrId
+	 * 			the identifier of the context attribute to refine.
+	 * @param updateFrequency
+	 * @since 0.5
 	 */
-	public void refineContinuously(CtxAttributeIdentifier ctxAttrId, Double updateFrequency) throws UserCtxInferenceMgrException;
+	public void refineContinuously(final CtxAttributeIdentifier attrId, 
+			final Double updateFrequency) throws UserCtxInferenceException;
 
 	/**
 	 * Returns a list of CtxAttributeTypes that can be inferred. 

@@ -44,7 +44,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
-import org.societies.context.api.user.inference.UserCtxInferenceMgrException;
+import org.societies.context.api.user.inference.UserCtxInferenceException;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -187,22 +187,36 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	}
 
 	/*
-	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refine(org.societies.api.context.model.CtxAttributeIdentifier)
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineOnDemand(org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
-	public CtxAttribute refine(CtxAttributeIdentifier arg0) throws UserCtxInferenceMgrException {
-		
-		// TODO
-		CtxAttribute ctxAttribute = null;
+	public CtxAttribute refineOnDemand(CtxAttributeIdentifier ctxAttrId) throws UserCtxInferenceException {
 
-		return ctxAttribute;
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute " + ctxAttrId);
+		CtxAttribute refinedAttribute;
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(ctxAttrId.getType()))
+			refinedAttribute = this.userCtxRefiner.refineOnDemand(ctxAttrId);
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ ctxAttrId + "': Unsupported attribute type: " + ctxAttrId.getType());
+		
+		if (refinedAttribute != null)
+			try {
+				refinedAttribute = (CtxAttribute) this.internalCtxBroker.update(refinedAttribute).get();
+			} catch (Exception e) {
+				throw new UserCtxInferenceException("Could not update refined attribute in the database:"
+					+ e.getLocalizedMessage(), e);
+			}
+
+		return refinedAttribute;
 	}
 	
 	/*
 	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineContinuously(org.societies.api.context.model.CtxAttributeIdentifier, java.lang.Double)
 	 */
 	@Override
-	public void refineContinuously(CtxAttributeIdentifier arg0, Double updateFrequency) throws UserCtxInferenceMgrException {
+	public void refineContinuously(CtxAttributeIdentifier arg0, Double updateFrequency) throws UserCtxInferenceException {
 		
 		// TODO
 	}
