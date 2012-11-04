@@ -190,16 +190,16 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineOnDemand(org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
-	public CtxAttribute refineOnDemand(CtxAttributeIdentifier ctxAttrId) throws UserCtxInferenceException {
+	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException {
 
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Refining attribute " + ctxAttrId);
+			LOG.info("Refining attribute '" + attrId + "'");
 		CtxAttribute refinedAttribute;
-		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(ctxAttrId.getType()))
-			refinedAttribute = this.userCtxRefiner.refineOnDemand(ctxAttrId);
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			refinedAttribute = this.userCtxRefiner.refineOnDemand(attrId);
 		else
 			throw new UserCtxInferenceException("Could not refine attribute '"
-					+ ctxAttrId + "': Unsupported attribute type: " + ctxAttrId.getType());
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
 		
 		if (refinedAttribute != null)
 			try {
@@ -216,9 +216,16 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineContinuously(org.societies.api.context.model.CtxAttributeIdentifier, java.lang.Double)
 	 */
 	@Override
-	public void refineContinuously(CtxAttributeIdentifier arg0, Double updateFrequency) throws UserCtxInferenceException {
+	public void refineContinuously(final CtxAttributeIdentifier attrId, 
+			final Double updateFrequency) throws UserCtxInferenceException {
 		
-		// TODO
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute '" + attrId + "'");
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			this.userCtxRefiner.refineContinuously(attrId, 0d); // TODO handle updateFrequency
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "' continuously: Unsupported attribute type: " + attrId.getType());
 	}
 
 	/*

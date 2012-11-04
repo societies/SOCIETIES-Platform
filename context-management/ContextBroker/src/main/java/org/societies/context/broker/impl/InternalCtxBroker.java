@@ -2049,6 +2049,20 @@ public class InternalCtxBroker implements ICtxBroker {
 				LOG.info("Registering context change event listener for object '"
 						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
 			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
+			
+			try {
+				if (ctxId instanceof CtxAttributeIdentifier 
+						&& this.userCtxInferenceMgr.getInferrableTypes().contains(ctxId.getType())) {
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Triggering continuous inference of attribute '" + ctxId + "'");
+					this.userCtxInferenceMgr.refineContinuously(
+							(CtxAttributeIdentifier) ctxId, new Double(0)); // TODO handle updateFreq
+				}
+			} catch (ServiceUnavailableException sue) {
+
+				LOG.warn("Could not check if attribute requires inference: "
+						+ "User Context Inference Mgr is not available");
+			}
 		} else {
 			throw new CtxBrokerException("Could not register context change event listener for object '"
 					+ ctxId + "' to topics '" + Arrays.toString(topics)

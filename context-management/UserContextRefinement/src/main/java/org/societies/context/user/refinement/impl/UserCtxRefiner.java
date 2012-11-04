@@ -74,8 +74,8 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 	@Override
 	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException {
 	
-		if (LOG.isInfoEnabled())
-			LOG.info("Refining attribute " + attrId);
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute '" + attrId + "'");
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			try {
 				return this.userLocationRefiner.refineOnDemand(attrId);
@@ -100,7 +100,19 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 	@Override
 	public void refineContinuously(final CtxAttributeIdentifier attrId, double updateFreq) 
 			throws UserCtxInferenceException {
-		//TODO
+		
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute '" + attrId + "' continuously");
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			try {
+				this.userLocationRefiner.refineContinuously(attrId, updateFreq);
+			} catch (ServiceUnavailableException sue) {
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "' continuously: Service UserLocationRefiner is not available");
+			}
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
 	}
 	
 	/*
