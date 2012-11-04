@@ -187,6 +187,7 @@ public class Tester {
 
 
 		try {
+			LOG.info("---- waiting ----");
 			Thread.sleep(35000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -218,15 +219,6 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}	
-
-
-		try {
-			Thread.sleep(35000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 
 	}
 
