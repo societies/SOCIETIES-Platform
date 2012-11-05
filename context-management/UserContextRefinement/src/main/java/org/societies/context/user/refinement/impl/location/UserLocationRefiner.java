@@ -160,7 +160,7 @@ public class UserLocationRefiner {
 			throws UserCtxInferenceException {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Refining attribute " + attrId);
+			LOG.info("Refining attribute '" + attrId + "' on-demand");
 		if (!CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "': Unsupported attribute type: " + attrId.getType());
@@ -184,6 +184,8 @@ public class UserLocationRefiner {
 			if (ownsCssNodesAssoc == null)
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "': Association '" + ownsCssNodesAssocId +  "' does not exist");
+			if (!ownerEntId.equals(ownsCssNodesAssoc.getParentEntity()))
+				return null; // Cannot refine if the CSS owner entity is not the parent of the OWNS_CSS_NODES association
 			if (ownsCssNodesAssoc.getChildEntities().isEmpty())
 				return null; // Cannot refine without CSS_NODE entities
 			// TODO select User Interaction Node; pick first for now
