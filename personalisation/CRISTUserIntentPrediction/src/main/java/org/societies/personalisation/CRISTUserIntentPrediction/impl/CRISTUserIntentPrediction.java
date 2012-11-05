@@ -67,7 +67,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	private ICtxBroker ctxBroker;
 	private ICRISTUserIntentTaskManager cristTaskManager;
 	private IInternalPersonalisationManager persoMgr;
-
+	private Boolean enablePrediction = true; 
 	/*
 	private IIdentity myId;
 	private CtxAttributeIdentifier myCtxId;
@@ -134,7 +134,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public void enableCRISTPrediction(boolean bool) {
 		// TODO Auto-generated method stub
-		
+		this.enablePrediction = bool;
 	}
 
 	/* (non-Javadoc)
@@ -163,6 +163,12 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
+		
+		if (enablePrediction != true) {
+			LOG.error("The enablePrediction is false, getCRISTPrediction can not run.");
+			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());
+		}
+		
 		//handle null parameters
 		if (entityID == null)
 		{
@@ -219,6 +225,12 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	 */
 	@Override
 	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,	IAction action) {
+		
+		if (enablePrediction != true) {
+			LOG.error("The enablePrediction is false, getCRISTPrediction can not run.");
+			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());
+		}
+		
 		//handle null parameters
 		if (entityID == null)
 		{
@@ -280,6 +292,11 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public Future<CRISTUserAction> getCurrentUserIntentAction(
 			IIdentity ownerID, ServiceResourceIdentifier serviceID, String parameterName) { 
+		
+		if (enablePrediction != true) {
+			LOG.error("The enablePrediction is false, getCRISTPrediction can not run.");
+			return new AsyncResult<CRISTUserAction>(null);
+		}
 		
 		//handle null parameters
 		if (ownerID == null)
