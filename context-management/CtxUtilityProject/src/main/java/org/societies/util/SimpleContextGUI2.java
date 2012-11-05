@@ -76,15 +76,9 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 	JTextField txtOtherCtxAttributeValue;
 	JButton btUpdateOther;
 	private ICtxBroker ctxBroker;
-	private Set<CtxAttribute> symlocAttributes; 
+
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
-	private IIdentity userIdentity;
-
-	private IndividualCtxEntity entityPerson;
-	private JTextField textField;
-
-	private CtxEntity activeEntity;
 	private INetworkNode cssNodeId;
 	private IIdentity cssOwnerId;
 
@@ -117,7 +111,7 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 	public SimpleContextGUI2() 
 	{
 		super( "TITLE" );
-		this.symlocAttributes = new HashSet<CtxAttribute>();
+
 		pnPanel0 = new JPanel();
 		GridBagLayout gbPanel0 = new GridBagLayout();
 		GridBagConstraints gbcPanel0 = new GridBagConstraints();
@@ -129,7 +123,8 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 		GridBagConstraints gbcPanel4 = new GridBagConstraints();
 		pnPanel4.setLayout( gbPanel4 );
 
-		Object[] ctxAttributetypes = this.getCtxAttributeTypesList();
+		//Object[] ctxAttributetypes = this.getCtxAttributeTypesList();
+		Object[] ctxAttributetypes = CtxAttributeTypes.class.getDeclaredFields();
 		cmbCtxAttr = new JComboBox( ctxAttributetypes );
 		gbcPanel4.gridx = 0;
 		gbcPanel4.gridy = 0;
@@ -156,7 +151,8 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 		gbPanel4.setConstraints( txtCtxAttributeValue, gbcPanel4 );
 		pnPanel4.add( txtCtxAttributeValue );
 
-		Object[] ctxAttributeSourcetypes = this.getCtxAttributeSourceTypeList();
+		Object[] ctxAttributeSourcetypes = CtxSourceNames.class.getDeclaredFields();
+		
 		cmbCtxAttrSourceType = new JComboBox( ctxAttributeSourcetypes );
 		gbcPanel4.gridx = 0;
 		gbcPanel4.gridy = 1;
@@ -183,7 +179,7 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 		gbPanel0.setConstraints( pnPanel4, gbcPanel0 );
 		pnPanel0.add( pnPanel4 );
 
-		btUpdateCtxAttribute = new JButton( "Update"  );
+		btUpdateCtxAttribute = new JButton( "Create/Update"  );
 		btUpdateCtxAttribute.addActionListener(this);
 		gbcPanel0.gridx = 1;
 		gbcPanel0.gridy = 3;
@@ -209,7 +205,8 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 		pnPanel21.setLayout( gbPanel21 );
 		lbLabel21 = new JLabel( "CtxEntity type"  );
 
-		Object[] ctxEntitytypes = this.getCtxEntityTypesList();
+		Object[] ctxEntitytypes = CtxEntityTypes.class.getDeclaredFields();
+ 
 		cmbCtxEnt = new JComboBox( ctxEntitytypes );
 
 		gbcPanel21.gridx = 0;
@@ -244,19 +241,22 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 
 	}
 
+	/*
 	private Object[] getCtxAttributeTypesList() {
+		
 		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
 
 		String[] names = new String[fields.length];
 
 		for (int i=0; i<names.length; i++){
 			names[i] = fields[i].getName();
+			System.out.println("fields "+fields[i]);
 		}
-
+	
 		return fields;
 	}
 
-	
+
 	private Object[] getCtxEntityTypesList() {
 		Field[] fields = CtxEntityTypes.class.getDeclaredFields();
 
@@ -278,15 +278,15 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 		for (int i=0; i<names.length; i++){
 			names[i] = fields[i].getName();
 		}
-
+		
 		return fields;
 	}
-
+*/
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
 
-		
+
 
 		if (event.getSource().equals(this.btUpdateCtxAttribute)){
 			Field field1 = (Field) this.cmbCtxEnt.getSelectedItem();
@@ -301,28 +301,38 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 				String ctxAttributeSourceType = (String) field3.get(null);
 
 				if(ctxEntityType.equals(CtxEntityTypes.CSS_NODE) ){
-					
+
 					this.updateLocationCSSNode(this.txtCtxAttributeValue.getText(), ctxAttributeSourceType, 1d/60);	
 				}
 
 
 				List<CtxIdentifier> listCtxEntID =  this.ctxBroker.lookup(CtxModelType.ENTITY,ctxEntityType).get();
-
+				CtxEntity ctxEntity = null;
 				if(listCtxEntID.size()>0) {
-					CtxEntity ctxEntity = (CtxEntity) this.ctxBroker.retrieve(listCtxEntID.get(0)).get();
-
-					List<CtxIdentifier> listCtxAttrID =  this.ctxBroker.lookup(ctxEntity.getId(), CtxModelType.ATTRIBUTE,ctxAttributeType).get();
-
-					if(listCtxAttrID.size()>0){
-						CtxAttribute attr = (CtxAttribute) this.ctxBroker.retrieve(listCtxAttrID.get(0)).get();
-						attr.setStringValue(this.txtCtxAttributeValue.getText());
-						ctxBroker.update(attr);
-						attr = (CtxAttribute) ctxBroker.retrieve(attr.getId()).get();
-						
-						JOptionPane.showMessageDialog(this,  "Updated "+ attr.getId()+ "with value:"+attr.getStringValue(), "??", JOptionPane.INFORMATION_MESSAGE, null);
-					}
+					ctxEntity = (CtxEntity) this.ctxBroker.retrieve(listCtxEntID.get(0)).get();
+				} else if(listCtxEntID.size() == 0){
+					ctxEntity = (CtxEntity) this.ctxBroker.createEntity(ctxEntityType).get();
 
 				}
+
+				List<CtxIdentifier> listCtxAttrID =  this.ctxBroker.lookup(ctxEntity.getId(), CtxModelType.ATTRIBUTE,ctxAttributeType).get();
+
+
+				if(listCtxAttrID.size()>0){
+					CtxAttribute attr = (CtxAttribute) this.ctxBroker.retrieve(listCtxAttrID.get(0)).get();
+					attr.setStringValue(this.txtCtxAttributeValue.getText());
+					ctxBroker.update(attr);
+					attr = (CtxAttribute) ctxBroker.retrieve(attr.getId()).get();
+
+					JOptionPane.showMessageDialog(this,  "Updated "+ attr.getId()+ "with value:"+attr.getStringValue(), "??", JOptionPane.INFORMATION_MESSAGE, null);
+				} else if (listCtxAttrID.size() == 0){
+					CtxAttribute attr = this.ctxBroker.createAttribute(ctxEntity.getId(),ctxAttributeType ).get();
+					attr.setStringValue(this.txtCtxAttributeValue.getText());
+					ctxBroker.update(attr);
+					attr = (CtxAttribute) ctxBroker.retrieve(attr.getId()).get();
+					JOptionPane.showMessageDialog(this,  "Created "+ attr.getId()+ "with value:"+attr.getStringValue(), "??", JOptionPane.INFORMATION_MESSAGE, null);
+				}
+
 
 			} catch (IllegalArgumentException e1) {
 				// TODO Auto-generated catch block
@@ -349,13 +359,16 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 
 
 
+
+
+
 	private CtxAttribute updateLocationCSSNode(String locationValue, String sourceId, Double updateFreq){
 
 		LOG.info("*** updateLocationCSSNode : updates an existing  Location attribute in CSS node");
 
-		
-		
-		
+
+
+
 		CtxEntity cssNodeEntity = null ;
 		CtxAttribute locationCssNodeAttr_pz = null;
 		CtxAttribute locationCssNodeAttr_rfid = null;
@@ -385,9 +398,9 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 			if(attrLocList.size() <2){
 				createCSSNodeLocationAttributes();	
 			}
-			
-			
-			
+
+
+
 			if(attrLocList.size() > 0){
 
 				for(CtxAttribute locationCssNodeAttr : attrLocList){
@@ -515,7 +528,7 @@ public class SimpleContextGUI2 extends JFrame  implements ActionListener
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		this.idMgr = this.commManager.getIdManager();
-		this.userIdentity = this.idMgr.getThisNetworkNode();
+		//this.userIdentity = this.idMgr.getThisNetworkNode();
 	} 
 
 
