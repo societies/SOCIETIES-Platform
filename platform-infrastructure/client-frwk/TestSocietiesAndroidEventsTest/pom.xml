@@ -9,10 +9,10 @@
    </parent>
 
    <groupId>org.societies.android.platform.events</groupId>
-   <artifactId>SocietiesPlatformEvents</artifactId>
-   <name>PlatformEvents</name>
+   <artifactId>TestSocietiesPlatformEvents</artifactId>
+   <name>TestPlatformEvents</name>
    <version>${release.version}</version>
-   <packaging>apklib</packaging>
+   <packaging>apk</packaging>
 
    <developers>
       <developer>
@@ -25,43 +25,53 @@
 
 
     <dependencies>
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
         <dependency>
             <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
+            <artifactId>android-test</artifactId>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
-		</dependency>
-        <dependency>
+		</dependency-->
+        <!--dependency>
 			<groupId>org.societies.comm.android</groupId>
 			<artifactId>AndroidPubsubApi</artifactId>
 			<version>${version.comm}</version>
-		</dependency>
+		</dependency-->
         
-        <dependency>
+        <!--dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
-		</dependency>
-		<dependency>
+		</dependency-->
+		<!--dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
-		</dependency>
-		<dependency>
+		</dependency-->
+		<!--dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
+		</dependency-->
+		<dependency>
+			<groupId>org.societies.android.platform.events</groupId>
+			<artifactId>SocietiesPlatformEvents</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
-        
     </dependencies>
 
     <build>

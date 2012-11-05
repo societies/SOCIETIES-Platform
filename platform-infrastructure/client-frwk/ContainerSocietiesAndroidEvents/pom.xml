@@ -9,10 +9,10 @@
    </parent>
 
    <groupId>org.societies.android.platform.events</groupId>
-   <artifactId>SocietiesPlatformEvents</artifactId>
-   <name>PlatformEvents</name>
+   <artifactId>ContainerSocietiesPlatformEvents</artifactId>
+   <name>ContainerPlatformEvents</name>
    <version>${release.version}</version>
-   <packaging>apklib</packaging>
+   <packaging>apk</packaging>
 
    <developers>
       <developer>
@@ -23,24 +23,24 @@
 	  </developer>
    </developers>
 
-
-    <dependencies>
-        <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
+	<dependencies>    
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-        
-        <dependency>
+		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
@@ -49,19 +49,38 @@
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
 		</dependency>
 		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.asmack</groupId>
+	    	<artifactId>asmack</artifactId>
 		</dependency>
-        
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+			        	<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			 	</exclusion>
+			    <!-- Provided by Android -->
+			 	<exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			 	</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.events</groupId>
+			<artifactId>SocietiesPlatformEvents</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		
     </dependencies>
 
     <build>

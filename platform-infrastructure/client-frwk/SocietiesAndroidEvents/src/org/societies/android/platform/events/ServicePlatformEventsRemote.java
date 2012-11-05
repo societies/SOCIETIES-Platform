@@ -2,6 +2,8 @@ package org.societies.android.platform.events;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.RemoteServiceHandler;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
 import android.app.Service;
 import android.content.Intent;
@@ -18,7 +20,10 @@ public class ServicePlatformEventsRemote extends Service {
 
 	@Override
 	public void onCreate () {
-		PlatformEventsBase serviceBase = new PlatformEventsBase(this.getApplicationContext());
+		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
+		
+		PlatformEventsBase serviceBase = new PlatformEventsBase(this.getApplicationContext(), pubsubClient, ccm);
 		
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IAndroidSocietiesEvents.methodsArray));
 		Log.i(LOG_TAG, "ServicePlatformEventsRemote creation");

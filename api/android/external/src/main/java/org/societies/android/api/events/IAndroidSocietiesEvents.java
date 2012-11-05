@@ -13,6 +13,23 @@ package org.societies.android.api.events;
  *
  */
 public interface IAndroidSocietiesEvents {
+	
+	/**
+	 * Societies Events intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.events.ReturnValue";
+
+	public static final String PUBLISH_EVENT = "org.societies.android.platform.events.PUBLISH_EVENT";
+	public static final String SUBSCRIBE_TO_ALL_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_ALL_EVENTS";
+	public static final String SUBSCRIBE_TO_EVENT = "org.societies.android.platform.events.SUBSCRIBE_TO_EVENT";
+	public static final String SUBSCRIBE_TO_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_EVENTS";
+	public static final String UNSUBSCRIBE_FROM_ALL_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_ALL_EVENTS";
+	public static final String UNSUBSCRIBE_FROM_EVENT = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENT";
+	public static final String UNSUBSCRIBE_FROM_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENTS";
+
 	/**
 	 * Android intent Societies platform events. The Pubsub event nodes are the final part of the intent 
 	 * 

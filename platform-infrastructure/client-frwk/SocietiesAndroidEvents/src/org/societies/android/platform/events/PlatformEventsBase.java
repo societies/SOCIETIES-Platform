@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.identity.IdentityManagerImpl;
@@ -54,15 +55,16 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     /**
      * Default constructor
      */
-    public PlatformEventsBase(Context androidContext) {
+    public PlatformEventsBase(Context androidContext, PubsubClientAndroid pubsubClient, ClientCommunicationMgr ccm) {
     	Log.d(LOG_TAG, "Object created");
     	
+    	this.pubsubClient = pubsubClient;
+		this.ccm = ccm;
     	this.androidContext = androidContext;
+
     	this.subscribedClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
     	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, Subscriber>());
     	
-		this.pubsubClient = new PubsubClientAndroid(this.androidContext);
-		this.ccm = new ClientCommunicationMgr(this.androidContext);
 		
 		this.assignConnectionParameters();
 		this.registerForPubsub();
@@ -99,7 +101,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			if (!this.pubsubSubscribes.keySet().contains(intent)) {
 				ArrayList<String> events = new ArrayList<String>();
 				events.add(intent);
-		    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
+		    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client); 
 		    	subPubSub.execute(events);
 			}
 		}
@@ -112,11 +114,14 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		Log.d(LOG_TAG, "Invocation of subscribeToEvents for client: " + client + " and filter: " + intentFilter);
 
 		ArrayList<String> targetEvents = null;
+		String returnIntent;
 		
 		if (ALL_EVENT_FILTER.equals(intentFilter)) {
 			targetEvents = this.getAllPlatformEvents();
+			returnIntent = IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS;
 		} else {
 			targetEvents = this.getFilteredEvents(intentFilter);
+			returnIntent = IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS;
 		}
 		
 		ArrayList<String> unSubscribedEvents = new ArrayList<String>();
@@ -134,7 +139,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			}
 		}
 		if (unSubscribedEvents.size() > 0) {
-		   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
+		   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client); 
 	    	subPubSub.execute(unSubscribedEvents);
 		}
  		
@@ -162,7 +167,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			if (this.pubsubSubscribes.keySet().contains(intent) && !this.otherClientsSubscribed(client, intent)) {
 				ArrayList<String> events = new ArrayList<String>();
 				events.add(intent);
-				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(); 
+				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client); 
 				unsubPubSub.execute(events);
 			}
 		}
@@ -175,11 +180,14 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvents for client: " + client + " and filter: " + intentFilter);
 
 		ArrayList<String> targetEvents = null;
-		
+		String returnIntent;
+
 		if (ALL_EVENT_FILTER.equals(intentFilter)) {
 			targetEvents = this.getAllPlatformEvents();
+			returnIntent = IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS;
 		} else {
 			targetEvents = this.getFilteredEvents(intentFilter);
+			returnIntent = IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS;
 		}
 		
 		ArrayList<String> subscribedEvents = new ArrayList<String>();
@@ -197,7 +205,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			}
 		}
 		if (subscribedEvents.size() > 0) {
-			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(); 
+			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client); 
 			unsubPubSub.execute(subscribedEvents);
 		}
 		return false;
@@ -267,6 +275,20 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     private class UnSubscribeFromPubsub extends AsyncTask<List<String>, Void, Boolean> {
 		private boolean resultStatus = true;
     	
+    	private String intentValue;
+    	private String client;
+
+    	/**
+    	 * Constructor
+    	 * 
+    	 * @param intentValue
+    	 * @param client
+    	 */
+    	public UnSubscribeFromPubsub(String intentValue, String client) {
+    		this.intentValue = intentValue;
+    		this.client = client;
+		}
+
     	protected Boolean doInBackground(List<String>... args) {
     		
     		List<String> events = args[0];
@@ -284,6 +306,13 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
                			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + event);
         			}
+        			Intent returnIntent = new Intent(intentValue);
+        			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, resultStatus);
+        			returnIntent.setPackage(this.client);
+        			
+        			Log.d(LOG_TAG, "UnSubscribeToPubsub return result sent");
+
+        			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
     			}
     			
 			} catch (Exception e) {
@@ -303,6 +332,20 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
      *
      */
     private class SubscribeToPubsub extends AsyncTask<List<String>, Void, Boolean> {
+    	private String intentValue;
+    	private String client;
+
+    	/**
+    	 * Constructor
+    	 * 
+    	 * @param intentValue
+    	 * @param client
+    	 */
+    	public SubscribeToPubsub(String intentValue, String client) {
+    		this.intentValue = intentValue;
+    		this.client = client;
+		}
+    	
 		private boolean resultStatus = true;
     	
     	protected Boolean doInBackground(List<String>... args) {
@@ -323,6 +366,13 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
             			Log.d(LOG_TAG, "Pubsub subscription created for: " + eventName);
          			}
+        			Intent returnIntent = new Intent(intentValue);
+        			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, resultStatus);
+        			returnIntent.setPackage(this.client);
+        			
+        			Log.d(LOG_TAG, "SubscribeToPubsub return result sent");
+
+        			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
        			}
 			} catch (Exception e) {
     			this.resultStatus = false;
