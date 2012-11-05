@@ -23,7 +23,7 @@ import org.societies.api.osgi.event.InternalEvent;
 
 @Service
 public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
-	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
+	private static Logger LOG = LoggerFactory.getLogger(NewDeviceListener.class);
 	private BundleContext bundleContext;
 	private ServiceTracker serviceTracker;
 

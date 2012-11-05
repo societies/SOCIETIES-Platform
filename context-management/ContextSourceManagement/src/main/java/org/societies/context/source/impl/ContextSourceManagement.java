@@ -163,8 +163,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		// newDeviceListener.run();
 		
 		try {
-			List<CtxEntityIdentifier> shadowEntitiesFuture = ctxBroker
-					.lookupEntities(sensor, "CtxSourceId", null, null).get();
+			List<CtxIdentifier> shadowEntitiesFuture = ctxBroker
+					.lookup(CtxModelType.ENTITY, sensor).get(); // TODO  , "CtxSourceId", null, null).get();
 			counter = shadowEntitiesFuture.size();
 		} catch (CtxException e) {
 			LOG.error(e.getMessage());
@@ -221,7 +221,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
-					.lookupEntities(sensor, "CtxSourceId", null, null);// TODO
+					.lookupEntities(sensor, "CtxSourceId", id, id);// TODO
 																		// Check
 																		// if
 																		// min
