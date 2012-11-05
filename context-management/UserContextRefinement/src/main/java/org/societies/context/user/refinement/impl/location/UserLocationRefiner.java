@@ -78,68 +78,75 @@ public class UserLocationRefiner {
 			new Comparator<CtxAttribute>() {
 
 		@Override
-		public int compare(CtxAttribute a1, CtxAttribute a2) {
+		public int compare(CtxAttribute attr1, CtxAttribute attr2) {
 
-			final double now = new Date().getTime();
+			if (attr1 == null && attr2 == null) 
+				return 0; 
+		    // we want null values first 
+		    if (attr1 != null && attr2 == null) 
+		    	return +1; 
+		    if (attr1 == null && attr2 != null) 
+		    	return -1;
+		    
+			final long now = new Date().getTime();
+			final boolean isAttr1Fresh = this.isFresh(attr1, now); 
+			final boolean isAttr2Fresh = this.isFresh(attr2, now);
 
-			final double timeSinceLastUpdate1 = now - a1.getLastModified().getTime();
-			final Double timeBetweenUpdates1 = (a1.getQuality().getUpdateFrequency() != null)
-					? (1d / a1.getQuality().getUpdateFrequency()) * 1000d : null;
-			final boolean isFresh1 = (timeBetweenUpdates1 != null)
-					? timeBetweenUpdates1 > timeSinceLastUpdate1 : true; 
-
-			final double timeSinceLastUpdate2 = now - a2.getLastModified().getTime();
-			final Double timeBetweenUpdates2 = (a2.getQuality().getUpdateFrequency() != null)
-					? (1d / a2.getQuality().getUpdateFrequency()) * 1000d : null;
-			final boolean isFresh2 = (timeBetweenUpdates1 != null)
-					? timeBetweenUpdates2 > timeSinceLastUpdate2 : true;
-
-			if (isFresh1 && isFresh2) { // both attributes are fresh
+			if (isAttr1Fresh && isAttr2Fresh) { // both attributes are fresh
 				
 				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("a1 and a2 fresh");
+					LOG.info("attr1 and attr2 fresh");
 
-				if (a1.getSourceId().contains(CtxSourceNames.PZ)
-						&& a2.getSourceId().contains(CtxSourceNames.RFID))
+				if (attr1.getSourceId().contains(CtxSourceNames.PZ)
+						&& attr2.getSourceId().contains(CtxSourceNames.RFID))
 					return -1;
-				else if ((a1.getSourceId().contains(CtxSourceNames.PZ)
-								&& a2.getSourceId().contains(CtxSourceNames.PZ))
-						|| (a1.getSourceId().contains(CtxSourceNames.RFID)
-								&& a2.getSourceId().contains(CtxSourceNames.RFID)))
-					return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
-				else if (a1.getSourceId().contains(CtxSourceNames.RFID)
-						&& a2.getSourceId().contains(CtxSourceNames.PZ))
+				else if ((attr1.getSourceId().contains(CtxSourceNames.PZ)
+								&& attr2.getSourceId().contains(CtxSourceNames.PZ))
+						|| (attr1.getSourceId().contains(CtxSourceNames.RFID)
+								&& attr2.getSourceId().contains(CtxSourceNames.RFID)))
+					return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
+				else if (attr1.getSourceId().contains(CtxSourceNames.RFID)
+						&& attr2.getSourceId().contains(CtxSourceNames.PZ))
 					return +1;
-				else if (a2.getSourceId().contains(CtxSourceNames.PZ) 
-						|| a2.getSourceId().contains(CtxSourceNames.RFID))
+				else if (attr2.getSourceId().contains(CtxSourceNames.PZ) 
+						|| attr2.getSourceId().contains(CtxSourceNames.RFID))
 					return -1;
-				else if (a1.getSourceId().contains(CtxSourceNames.PZ)
-						|| a1.getSourceId().contains(CtxSourceNames.RFID))
+				else if (attr1.getSourceId().contains(CtxSourceNames.PZ)
+						|| attr1.getSourceId().contains(CtxSourceNames.RFID))
 					return +1;
 				else 
-					return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
+					return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
 			
-			} else if (isFresh1) { // a1 is fresh
+			} else if (isAttr1Fresh) { // a1 is fresh
 				
 				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("a1 fresh");
+					LOG.info("attr1 fresh");
 
 				return +1;
 
-			} else if (isFresh2) { // a2 is fresh
+			} else if (isAttr2Fresh) { // a2 is fresh
 				
 				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("a2 fresh");
+					LOG.info("attr2 fresh");
 
 				return -1;
 
 			} else { // none of the attributes is fresh
 				
 				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("a1 and a2 NOT fresh");
+					LOG.info("attr1 and attr2 NOT fresh");
 
-				return a1.getQuality().getLastUpdated().compareTo(a2.getQuality().getLastUpdated());
+				return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
 			}
+		}
+		
+		private boolean isFresh(final CtxAttribute attr, final long now) {
+			
+			final long timeSinceLastUpdate = now - attr.getQuality().getLastUpdated().getTime();
+			final Double timeBetweenUpdates = (attr.getQuality().getUpdateFrequency() != null)
+					? (1d / attr.getQuality().getUpdateFrequency()) * 1000d : null;
+			return (timeBetweenUpdates != null)
+					? timeBetweenUpdates > timeSinceLastUpdate : true;
 		}
 	};
 	
@@ -313,7 +320,7 @@ public class UserLocationRefiner {
 		public void onUpdate(CtxChangeEvent event) {
 			
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("Received event " + event);
+				LOG.info("LocationSymbolicChangeListener received event " + event);
 			executorService.execute(new LocationSymbolicChangeHandler(this.attrId));
 		}
 	}
