@@ -18,7 +18,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");
-		String access_token = "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
+		String access_token = "";
 		ISocialConnector c = new FoursquareConnectorImpl(access_token,"dingqi");
 
 		//		profile test
