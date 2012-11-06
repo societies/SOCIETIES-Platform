@@ -123,7 +123,7 @@ public class Tester {
 		//set context data
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 		//setContext(CtxAttributeTypes.TEMPERATURE, 25);
-		setContext(CtxAttributeTypes.STATUS, "free");
+		//setContext(CtxAttributeTypes.STATUS, "free");
 
 		//send actions - 2 second delay
 		LOG.info("Monitor services #1109 - sending mock actions for storage");
@@ -186,7 +186,9 @@ public class Tester {
 
 	@Test
 	public void TestHistoryDataRetrieval() {
-
+		
+		LOG.info("TestHistoryDataRetrieval ");
+		
 		List<CtxAttributeIdentifier> ls = new ArrayList<CtxAttributeIdentifier>();
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults;
 		try {
@@ -257,7 +259,7 @@ public class Tester {
 				if(context.get(CtxAttributeTypes.STATUS)!= null){
 					String status = (String) context.get(CtxAttributeTypes.STATUS);
 					LOG.info("String context status value :"+ status);
-					Assert.assertEquals("driving", status);
+					//Assert.assertEquals("driving", status);
 				}
 
 			}
@@ -324,7 +326,7 @@ public class Tester {
 			
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 						
 			LOG.info("print current context");
 			printOperatorAttr();
@@ -366,7 +368,7 @@ public class Tester {
 
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
 		//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
-		setContext(CtxAttributeTypes.STATUS, "randomStatus");
+		//setContext(CtxAttributeTypes.STATUS, "randomStatus");
 
 		TestCase1109.uam.monitor(cssOwnerId, action);
 		try {
@@ -384,29 +386,29 @@ public class Tester {
 			IIdentity cssOwnerId = getOwnerId();
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action1 + " time "+date.getTime());
+			LOG.info("monitor action1 "+action1 + " time "+date.getTime());
 
 			TestCase1109.uam.monitor(cssOwnerId, action1);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action2 + " time "+date.getTime());
+			LOG.info("monitor action2 "+action2 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action2);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action3 + " time "+date.getTime());
+			LOG.info("monitor action3 "+action3 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action3);
 			Thread.sleep(5000);
 
@@ -428,7 +430,7 @@ public class Tester {
 			setContext(CtxAttributeTypes.STATUS, "driving");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action4 + " time "+date.getTime());
+			LOG.info("monitor action4 "+action4 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action4);
 			Thread.sleep(5000);
 
@@ -437,7 +439,7 @@ public class Tester {
 			setContext(CtxAttributeTypes.STATUS, "stopped");
 
 			date= new Date();
-			LOG.info("monitor action "+action5 + " time "+date.getTime());
+			LOG.info("monitor action5 "+action5 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action5);
 			Thread.sleep(5000);
 
@@ -446,7 +448,7 @@ public class Tester {
 			setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action6 + " time "+date.getTime());
+			LOG.info("monitor action6 "+action6 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action6);
 			Thread.sleep(5000);
 		} catch (InterruptedException e1) {
@@ -466,12 +468,12 @@ public class Tester {
 			setContext(CtxAttributeTypes.STATUS, "stopped");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action7 + " time "+date.getTime());
+			LOG.info("monitor action7 "+action7 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action7);
 
 			date= new Date();
 			Thread.sleep(5000);
-			LOG.info("monitor action "+action8 + " time "+date.getTime());
+			LOG.info("monitor action8 "+action8 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action8);
 
 			Thread.sleep(5000);

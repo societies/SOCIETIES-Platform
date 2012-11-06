@@ -422,8 +422,6 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 		boolean result = false;
 
-		//	LOG.info("setting history tuples primaryAttrIdentifier: "+primaryAttrIdentifier );
-
 		try {
 			// set hoc recording flag for the attributes contained in tuple list
 			final List<CtxAttributeIdentifier> allAttrIds = new ArrayList<CtxAttributeIdentifier>();
@@ -434,13 +432,17 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 			//TODO add a control to verify that only correct identifiers hava been added.
 			// set history flag for all escorting attributes
+						
 			for (CtxAttributeIdentifier escortingAttrID : allAttrIds) {
-
-				CtxAttribute attr = (CtxAttribute) this.userCtxDBMgr.retrieve(escortingAttrID);
-				if(attr != null){
-					attr.setHistoryRecorded(true);
-					this.userCtxDBMgr.update(attr);	
-				}				
+				
+				if (escortingAttrID != null ){
+					CtxAttribute attr = (CtxAttribute) this.userCtxDBMgr.retrieve(escortingAttrID);
+					if(attr != null){
+						attr.setHistoryRecorded(true);
+						this.userCtxDBMgr.update(attr);	
+					}	
+				}
+				
 			}
 
 			//this attr will maintain the attr ids of all the (not only the escorting) hoc_attibutes in a blob

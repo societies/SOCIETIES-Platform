@@ -31,8 +31,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;

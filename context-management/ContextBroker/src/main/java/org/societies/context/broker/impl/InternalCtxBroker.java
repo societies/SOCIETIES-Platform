@@ -201,9 +201,22 @@ public class InternalCtxBroker implements ICtxBroker {
 		final IIdentity localCssId = this.idMgr.fromJid(localCssNodeId.getBareJid());
 		LOG.info("Found local CSS ID " + localCssId);
 
-		this.createIndividualEntity(localCssId, CtxEntityTypes.PERSON); // TODO remove? 
-		// don't hardcode the cssOwner type
-		this.createCssNode(localCssNodeId); // TODO remove?
+		//new Thread() { // Do not hang in the bundle activator. 
+		//	           // Spawn a new thread if the bundle is not completely event-driven.
+			/*
+			 * @see java.lang.Thread#run()
+			 */
+		//	@Override
+		//	public void run() {
+		//		try {
+					createIndividualEntity(localCssId, CtxEntityTypes.PERSON); // TODO don't hardcode the cssOwner type
+					createCssNode(localCssNodeId);
+		//		} catch (Exception e) {
+		//			throw new RuntimeException("Could not initialise Internal Context Broker: "
+		//					+ e.getLocalizedMessage(), e);
+		//		}
+		//	}
+		//}.start();
 	}
 
 	/*
@@ -1154,7 +1167,6 @@ public class InternalCtxBroker implements ICtxBroker {
 					// retrieve historic attrs of type "tuple_action"
 					// each hoc attr contains a value (blob) list of historic attrs store together
 					List<CtxHistoryAttribute> hocResults = retrieveHistory(tupleAttrTypeID,startDate,endDate).get();            
-					LOG.info("retrieve history "+ hocResults);
 
 					// for each "tuple_status" hoc attr 
 					for (CtxHistoryAttribute hocAttr : hocResults) {
@@ -1405,18 +1417,15 @@ public class InternalCtxBroker implements ICtxBroker {
 	//  service refs used by junit tests
 	//******************************************
 
-
-
-
-	// TODO remove
-	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
+	private void createCssNode(INetworkNode cssNodeId) throws CtxException {
 
 		try {
 			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
-			CtxEntity cssNodeEnt = this.retrieveCssNode(cssNodeId).get();
-			if (cssNodeEnt != null) {
+			final List<CtxEntityIdentifier> cssNodeEntIds = this.userCtxDBMgr.lookupEntities(
+					CtxEntityTypes.CSS_NODE, CtxAttributeTypes.ID, cssNodeId.toString(), cssNodeId.toString());
+			if (!cssNodeEntIds.isEmpty()) {
 
-				LOG.info("Found CSS node context entity " + cssNodeEnt.getId());
+				LOG.info("Found CSS node context entity " + cssNodeEntIds.get(0));
 				return;
 			}
 			
@@ -1429,7 +1438,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				ownsCssNodesAssoc = (CtxAssociation) this.retrieve(
 						cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next()).get();
 			ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
-			cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
+			final CtxEntity cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
 			ownsCssNodesAssoc.addChildEntity(cssNodeEnt.getId());
 			this.update(ownsCssNodesAssoc);
 			final CtxAttribute cssNodeIdAttr = this.createAttribute(cssNodeEnt.getId(), CtxAttributeTypes.ID).get();
@@ -1566,11 +1575,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				// remote call
 				final CreateAttributeCallback callback = new CreateAttributeCallback();
-
-				LOG.info("createAttribute perform remote call targetCSS:"+scopeID +" type:"+type);
 				ctxBrokerClient.createAttribute(requestor, scopeID, scope, type, callback);
-				//LOG.info("createAttribute remote call performed ");
-
 				synchronized (callback) {
 					try {
 						//LOG.info("Attribute creation Callback wait");
