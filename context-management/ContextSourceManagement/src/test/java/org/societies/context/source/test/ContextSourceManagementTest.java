@@ -99,6 +99,7 @@ public class ContextSourceManagementTest {
 	public static void setUpBeforeClass() throws Exception {
 		mockCtxEntity = mock(CtxEntity.class);
 
+		when(mockBroker.lookup(CtxModelType.ENTITY, "CONTEXT_SOURCE")).thenReturn(mockFutureIDs);
 		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", null, null)).thenReturn(mockFutureEntityIDs);
 		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "TemperatureSensor0", "TemperatureSensor0")).thenReturn(mockFutureEntityIDs);
 		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "IamAnewID", "IamAnewID")).thenReturn(mockFutureEntityIDsEmpty);
