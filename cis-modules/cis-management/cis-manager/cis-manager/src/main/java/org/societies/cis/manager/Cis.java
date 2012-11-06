@@ -175,8 +175,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
-	@Column
-	public String owner;
+	//@Column
+	//public String owner;
 	
 	//@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
 	//@Transient
@@ -400,7 +400,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.description = description;
 		
-		this.owner = cssOwner;
+		//this.owner = cssOwner;
 		this.cisType = cisType;
 
 		
@@ -464,8 +464,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS listener registered");
 		
 		
-		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(cisName, cisIdentity.getJid());
+		cisRecord = new CisRecord(cisName, cisIdentity.getJid(),cssOwner);
 		
 		LOG.info("CIS creating pub sub service");
 		
@@ -484,7 +483,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if(null != this.psc){
 			try {
 				LOG.info("starting activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
 			} catch (InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				LOG.info("starting activ feed without pubsub");
@@ -564,7 +563,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if(null != this.psc){
 			try {
 				LOG.info("restoring activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
 			} catch (InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				LOG.info("restoring activ feed without pubsub");
@@ -1499,7 +1498,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	@Override
 	public String getOwnerId() {
-		return this.owner;
+		return this.cisRecord.getOwner();
 	}
 
 	@Override
