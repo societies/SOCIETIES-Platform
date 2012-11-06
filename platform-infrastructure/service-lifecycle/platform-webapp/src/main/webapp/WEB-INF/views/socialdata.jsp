@@ -129,7 +129,7 @@ div#addConnector{
      <input class="icon" onclick="getToken('http://dev.lucasimone.eu/fb.php', 'facebook');" type="image" src="images/facebook.png">
      <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/TwitterLoginServlet','twitter');" type="image" src="images/Twitter.jpg">
 	 <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/FoursquareLoginServlet', 'foursquare');" type="image" src="images/Foursquare.png">
-	 <input class="icon" onclick="alert('Not implemented yet')" type="image" src="images/Linkedin.png">
+	 <input class="icon" onclick="getToken('http://dev.lucasimone.eu/auth.php', 'Linkedin')" type="image" src="images/Linkedin.png">
    </p>
    <div id="addConnector">
    

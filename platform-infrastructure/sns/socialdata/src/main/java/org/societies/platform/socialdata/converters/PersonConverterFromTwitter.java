@@ -61,7 +61,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 			db = new JSONObject(data);
 			if (db.has("error"))
 				return person;
-			person.setId(db.getString(ID));
+			person.setId("twitter:"+db.getString(ID));
 			//			System.out.println("id: "+db.getString(ID));
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(NAME))			person.setName(new NameImpl(db.getString(NAME)));

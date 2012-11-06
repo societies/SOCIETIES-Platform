@@ -71,7 +71,7 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 				if (user.has("user")){
 					db = (JSONObject) user.get("user");
 //					System.out.println(db);
-					person.setId(db.getString(ID));
+					person.setId("foursquare:" +db.getString(ID));
 
 					if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
 					if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));

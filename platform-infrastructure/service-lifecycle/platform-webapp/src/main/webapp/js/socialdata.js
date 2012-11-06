@@ -76,6 +76,7 @@ function countConnectors(){
     // setTimeout(CheckLoginStatus(), 3000);
     document.getElementById("method").value  = "add";
     document.getElementById("snName").value  = title;
+    document.getElementById("token").value  = "";
  
   }
   

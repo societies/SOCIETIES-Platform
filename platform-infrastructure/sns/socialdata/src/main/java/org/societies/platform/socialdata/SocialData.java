@@ -25,6 +25,7 @@ import org.societies.api.internal.sns.ISocialData;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
+import org.societies.platform.sns.connecor.linkedin.LinkedinConnector;
 import org.societies.platform.socialdata.converters.ActivityConverter;
 import org.societies.platform.socialdata.converters.ActivityConveterFactory;
 import org.societies.platform.socialdata.converters.FriendsConverter;
@@ -386,23 +387,32 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public ISocialConnector createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
-
-
+		
+		String name="me";
+		try{
+			name=this.cssOwnerId.getJid();
+		}
+		catch(Exception ex){}
 
 		logger.info("Create a new connector with "+snName + " name");
 		switch(snName){
-		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		case twitter:    
 			// Just for now that we don't have a way to use our persona token
 			//return (ISocialConnector) new TwitterConnectorImpl();
-			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
+			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		case Foursquare: 
 
 			// Just for now ...
 			// return (ISocialConnector) new FoursquareConnectorImpl();
-			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
+			
+		case linkedin: 
+
+			
+			return (ISocialConnector) new LinkedinConnector(params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		default : return null;
 		}
