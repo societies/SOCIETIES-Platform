@@ -520,11 +520,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//this.persist(cis);
 		//cis.setSessionFactory(sessionFactory);
 
-		// TODO Check what else is required in relation to the CIS Advertisement owner Css Id
 		
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
-		//cisAd.setMode(0);//TODO: update this
 		MembershipCrit m = new MembershipCrit();
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
@@ -724,9 +722,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
 					String pPolicy;
-					if(create.getCommunity().getPrivacyPolicy() != null && 
-							create.getCommunity().getPrivacyPolicy().isEmpty() == false){
-						pPolicy = create.getCommunity().getPrivacyPolicy();
+					if(create.getPrivacyPolicy() != null && 
+							create.getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getPrivacyPolicy();
 					}else{
 						LOG.info("create came with an empty policy");
 						pPolicy = "<RequestPolicy></RequestPolicy>";	
