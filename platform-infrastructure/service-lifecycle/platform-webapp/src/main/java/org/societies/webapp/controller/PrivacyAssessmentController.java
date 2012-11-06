@@ -274,61 +274,59 @@ public class PrivacyAssessmentController {
 			String xlabel;
 			String ylabel;
 			PlotData plotData;
-			String[] dataLabels;
-			double[][] data;
 			
 			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.RECEIVER_IDS;
+				xlabel = "Identity";
+				ylabel = "Correlation of data transmission and data access";
+
 				// FIXME
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				title = null;
-				xlabel = null;
-				ylabel = null;
 				plotData = null;
-				dataLabels = null;
-				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.SENDER_IDS;
+				xlabel = "Identity";
+				ylabel = "Correlation of data transmission and data access";
+
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				title = null;
-				xlabel = null;
-				ylabel = null;
 				plotData = null;
-				dataLabels = null;
-				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
+				
+				title = Presentation.SubjectTypes.SENDER_CLASSES;
+				xlabel = "Class";
+				ylabel = "Correlation of data transmission and data access";
+
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
-				title = null;
-				xlabel = null;
-				ylabel = null;
 				plotData = null;
-				dataLabels = null;
-				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
+				
+				title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
+				xlabel = "Class";
+				ylabel = "Number of accesses to local data";
+
 				Map<String, Integer> dataAccessClasses;
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
 				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 				plotData = mapToArrays(dataAccessClasses);
-				title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
-				xlabel = "Class";
-				ylabel = "Number of accesses to local data";
-				data = new double[][] {plotData.getData()};
-				dataLabels = plotData.getLabels();
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
+				xlabel = "Identity";
+				ylabel = "Number of accesses to local data";
+
 				Map<IIdentity, Integer> dataAccessIdentities;
 				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
 				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
 				plotData = mapToArrays(dataAccessIdentities);
-				title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
-				xlabel = "Identity";
-				ylabel = "Number of accesses to local data";
-				data = new double[][] {plotData.getData()};
-				dataLabels = plotData.getLabels();
 			}
 			else {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
