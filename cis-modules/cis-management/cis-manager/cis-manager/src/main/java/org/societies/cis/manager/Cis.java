@@ -870,12 +870,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 							qualification.put(q.getAttrib(), q.getValue());
 						}
 						
-						// TODO: uncomment qualification check
-						//if (this.checkQualification(qualification) == false){
-						//	j.setResult(addresult);
-						//	LOG.info("qualification mismatched");
-						//	return result;
-						//}
+						if (this.checkQualification(qualification) == false){
+							j.setResult(addresult);
+							LOG.info("qualification mismatched");
+							return result;
+						}
 							
 					}
 					else{
@@ -1699,7 +1698,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		RequestPolicy p;
+	
+		/*RequestPolicy p;
 		try {
 			p = this.privacyPolicyManager.getPrivacyPolicy(new RequestorCis(this.CISendpoint.getIdManager().fromJid(owner) ,this.cisIdentity));
 			if (p != null && p.toXMLString().isEmpty()==false){
@@ -1711,7 +1711,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
+		}  */
 		
 		
 		// fill criteria
