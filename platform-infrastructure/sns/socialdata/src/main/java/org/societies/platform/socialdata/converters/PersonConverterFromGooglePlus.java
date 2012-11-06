@@ -126,7 +126,7 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 			if (db.has(ERROR))
 				return person;
 			
-			person.setId(db.getString(ID));
+			person.setId("googleplus:"+db.getString(ID));
 			person.setDisplayName(db.getString(DISPLAY_NAME));			
 			parseName(db, person);
 			if(db.has(NICKNAME)) person.setNickname(NICKNAME);

@@ -80,6 +80,13 @@
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>linkedin_connector</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.societies.platform</groupId>
