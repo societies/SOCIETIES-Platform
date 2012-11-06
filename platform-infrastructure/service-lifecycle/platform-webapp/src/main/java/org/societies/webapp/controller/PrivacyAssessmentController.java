@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,10 +39,12 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.StandardEntityCollection;
@@ -49,6 +52,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +78,8 @@ public class PrivacyAssessmentController {
 	private static final String RESULT = "result";
 
 	// FIXME: The path should not depend on Virgo version, etc.
-	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.3.RELEASE/staging/" +
-			"global/bundle/societies-webapp/0.4.0/societies-webapp.war/";
+	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+			"global/bundle/societies-webapp/0.4.1/societies-webapp.war/";
 
 	/**
 	 * URL parts without prefix and suffix
@@ -101,8 +105,8 @@ public class PrivacyAssessmentController {
 			public static final String RECEIVER_IDS = "Receiver identities";
 			public static final String SENDER_IDS = "Sender identities";
 			public static final String SENDER_CLASSES = "Sender classes";
-			public static final String DATA_ACCESS_IDS = "Data access identities";
-			public static final String DATA_ACCESS_CLASSES = "Data access classes";
+			public static final String DATA_ACCESS_IDS = "Data access by identities";
+			public static final String DATA_ACCESS_CLASSES = "Data access by classes";
 
 			// Keys
 			public static final String RECEIVER_IDS_KEY = "receiverIds";
@@ -269,8 +273,9 @@ public class PrivacyAssessmentController {
 			String title;
 			String xlabel;
 			String ylabel;
-			double[][] data;
+			PlotData plotData;
 			String[] dataLabels;
+			double[][] data;
 			
 			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
 				// FIXME
@@ -279,6 +284,8 @@ public class PrivacyAssessmentController {
 				title = null;
 				xlabel = null;
 				ylabel = null;
+				plotData = null;
+				dataLabels = null;
 				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
@@ -287,6 +294,8 @@ public class PrivacyAssessmentController {
 				title = null;
 				xlabel = null;
 				ylabel = null;
+				plotData = null;
+				dataLabels = null;
 				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
@@ -295,11 +304,12 @@ public class PrivacyAssessmentController {
 				title = null;
 				xlabel = null;
 				ylabel = null;
+				plotData = null;
+				dataLabels = null;
 				data = null;
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
 				Map<String, Integer> dataAccessClasses;
-				PlotData plotData;
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
 				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 				plotData = mapToArrays(dataAccessClasses);
@@ -311,7 +321,6 @@ public class PrivacyAssessmentController {
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
 				Map<IIdentity, Integer> dataAccessIdentities;
-				PlotData plotData;
 				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
 				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
 				plotData = mapToArrays(dataAccessIdentities);
@@ -325,18 +334,17 @@ public class PrivacyAssessmentController {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
 				return privacyAssessment();
 			}
-			//model.put("assessmentResults", assValues);
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject(title);
-			createBarchart(null, xlabel, ylabel, data, chartFileName);
+//			createBarchart(null, xlabel, ylabel, dataLabels, data, chartFileName);
+			createBarchart(null, xlabel, ylabel, plotData, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
-			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
-			form2.setAssessmentSubject(title);
-			//createBarchart(null, "Class", "Correlation with data access by same identity", data, chartFileName);
-			form2.setChart(chartFileName);
-			charts.add(form2);
+//			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
+//			form2.setAssessmentSubject(title + " 2");
+//			form2.setChart(chartFileName);
+//			charts.add(form2);
 			model.put("assessmentResults", charts);
 
 			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
@@ -389,61 +397,94 @@ public class PrivacyAssessmentController {
 	 *        };
 	 * @param filename
 	 */
-	private void createBarchart(String title, String categoryLabel, String valueLabel, double[][] data, String filename) {
-
-		LOG.debug("createBarchart({}, ..., {})", title, filename);
-		
-		final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
-				categoryLabel + " ", "", data);
-
-		JFreeChart chart;
-		BarRenderer renderer;
-		CategoryPlot plot;
-
-		CategoryAxis categoryAxis;
-		ValueAxis valueAxis;
-		
-		if (categoryLabel == null) {
-			categoryAxis = new CategoryAxis();
-		}
-		else {
-			categoryAxis = new CategoryAxis(categoryLabel);
-		}
-//		categoryAxis.setTickLabelsVisible(false);
-//		categoryAxis.setVisible(false);
-		if (valueLabel == null) {
-			valueAxis = new NumberAxis();
-		}
-		else {
-			valueAxis = new NumberAxis(valueLabel);
-		}
-		renderer = new BarRenderer();
-
-		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-		plot.setOrientation(PlotOrientation.VERTICAL);
-		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-
-//		chart.setBackgroundPaint(new Color(255, 255, 255));
+//	private void createBarchart(String title, String categoryLabel, String valueLabel, String[] categories, double[][] data, String filename) {
 //
-//		Paint p1 = new GradientPaint(
-//				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
-//		renderer.setSeriesPaint(1, p1);
+//		LOG.debug("createBarchart({}, ..., {})", title, filename);
+//		
+//		final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
+//				categoryLabel + " ", "", data);
 //
-//		Paint p2 = new GradientPaint(
-//				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
-//		renderer.setSeriesPaint(2, p2);
+//		JFreeChart chart;
+//		BarRenderer renderer;
+//		CategoryPlot plot;
+//
+//		CategoryAxis categoryAxis;
+//		ValueAxis valueAxis;
+//		
+//		if (categoryLabel == null) {
+//			categoryAxis = new CategoryAxis();
+//		}
+//		else {
+//			categoryAxis = new CategoryAxis(categoryLabel);
+//		}
+////		categoryAxis.setTickLabelsVisible(false);
+////		categoryAxis.setVisible(false);
+//		if (valueLabel == null) {
+//			valueAxis = new NumberAxis();
+//		}
+//		else {
+//			valueAxis = new NumberAxis(valueLabel);
+//		}
+//		renderer = new BarRenderer();
+//
+//		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
+//		plot.setOrientation(PlotOrientation.VERTICAL);
+//		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+//
+////		chart.setBackgroundPaint(new Color(255, 255, 255));
+////
+////		Paint p1 = new GradientPaint(
+////				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
+////		renderer.setSeriesPaint(1, p1);
+////
+////		Paint p2 = new GradientPaint(
+////				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
+////		renderer.setSeriesPaint(2, p2);
+//
+//		plot.setRenderer(renderer);
+//
+//		try {
+//			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
+//			final File file1 = new File(contextPath + filename);
+//			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
+//		} catch (Exception e) {
+//			LOG.warn("createBarchart(): ", e);
+//		}
+//	}
 
-		plot.setRenderer(renderer);
+	private void createBarchart(String title, String categoryLabel, String valueLabel, PlotData data, String filename) {
+		DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
+		for (int k = 0; k < data.getData().length; k++) {
+			dataSet.addValue(data.getData()[k], "series", data.getLabels()[k]);
+		}
+
+		JFreeChart chart = ChartFactory.createBarChart(
+				title,
+				null,
+				null,
+				dataSet,
+				PlotOrientation.VERTICAL,
+				false,
+				false,
+				false
+				);
+
+		CategoryPlot plot = (CategoryPlot)chart.getPlot();
+		CategoryAxis xAxis = (CategoryAxis)plot.getDomainAxis();
+		xAxis.setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
+		xAxis.setMaximumCategoryLabelLines(6);
+
+		//chart.setBackgroundPaint(ChartColor.WHITE);
+		int width = 50 + data.getData().length * 170;
+		int height = 400;
 		try {
-			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-			final File file1 = new File(contextPath + filename);
-			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
-		} catch (Exception e) {
+			ChartUtilities.saveChartAsPNG(new File(contextPath + filename), chart, width, height);
+		} catch(IOException e) {
 			LOG.warn("createBarchart(): ", e);
 		}
 	}
-
+	
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessmentSettings() {
 
