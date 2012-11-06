@@ -39,6 +39,7 @@ import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AJoinResponse;
 import org.societies.android.api.cis.management.AParticipant;
+import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -116,7 +117,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
-	public ACommunity createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy) {
+	public ACommunity createCis(String client, String cisName, String cisType, String description, AMembershipCrit aMemberShipCrit, String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 		
 		//COMMUNITY INFO
@@ -125,17 +126,17 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		cisinfo.setDescription(description);
 		cisinfo.setCommunityType(cisType);
 		//MEMBERSHIP CRITERIA - CONVERT FROM PARCELABLE VERSION
-		MembershipCrit rules = new MembershipCrit();
-		List<Criteria> listCriteria = new ArrayList<Criteria>();
+		MembershipCrit rules = AMembershipCrit.convertAMembershipCrit(aMemberShipCrit) ;
+		/*List<Criteria> listCriteria = new ArrayList<Criteria>();
 		for(ACriteria acrit: criteria) {
 			listCriteria.add( ACriteria.convertACriteria(acrit));
 		}	
-		rules.setCriteria(listCriteria);
+		rules.setCriteria(listCriteria);*/
 		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX
-		cisinfo.setPrivacyPolicy(privacyPolicy);
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);
+		create.setPrivacyPolicy(privacyPolicy);
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setCreate(create);

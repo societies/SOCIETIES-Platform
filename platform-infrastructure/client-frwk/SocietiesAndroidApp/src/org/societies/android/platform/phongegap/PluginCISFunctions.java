@@ -39,6 +39,7 @@ import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AJoinResponse;
+import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
@@ -247,7 +248,9 @@ public class PluginCISFunctions extends Plugin {
 				try { //CREATE CIS
 					JSONArray jArray = data.getJSONArray(4); //ListCriteria
 					List<ACriteria> criteriaList = CreateCriteriaList(jArray);
-					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), criteriaList, data.getString(5));
+					AMembershipCrit aMembCrit = new AMembershipCrit();
+					aMembCrit.setACriteria(criteriaList);
+					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), aMembCrit, data.getString(5));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

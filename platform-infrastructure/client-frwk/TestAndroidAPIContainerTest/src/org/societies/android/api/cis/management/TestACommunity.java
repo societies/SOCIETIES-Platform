@@ -3,12 +3,14 @@ package org.societies.android.api.cis.management;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+
+import org.societies.android.api.cis.management.ACommunity;
+import org.societies.android.api.cis.management.ACriteria;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -31,6 +33,7 @@ public class TestACommunity extends AndroidTestCase{
 		aCommunity.setCommunityType("type");
 		aCommunity.setCommunityJid("jid");
 		aCommunity.setOwnerJid("ownerJid");
+
 		
 		assertEquals(0, aCommunity.describeContents());
 		
@@ -47,6 +50,7 @@ public class TestACommunity extends AndroidTestCase{
         assertEquals(aCommunity.getCommunityJid(), createFromParcel.getCommunityJid());
         assertEquals(aCommunity.getOwnerJid(), createFromParcel.getOwnerJid());
 
+
 		
 	}
 	
@@ -57,10 +61,11 @@ public class TestACommunity extends AndroidTestCase{
 		aCommunity.setCommunityType("type");
 		aCommunity.setCommunityJid("jid");
 		aCommunity.setOwnerJid("ownerJid");
-//		AMembershipCrit amembershipCrit = new AMembershipCrit();
+
+		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		List<ACriteria> l = new ArrayList<ACriteria>();
-//		amembershipCrit.setACriteria(l);
-//		aCommunity.setMembershipCrit(amembershipCrit);
+		amembershipCrit.setACriteria(l);
+		aCommunity.setMembershipCrit(amembershipCrit);
 
 		
         Parcel parcel = Parcel.obtain();
@@ -76,8 +81,9 @@ public class TestACommunity extends AndroidTestCase{
         assertEquals(aCommunity.getCommunityJid(), createFromParcel.getCommunityJid());
         assertEquals(aCommunity.getOwnerJid(), createFromParcel.getOwnerJid());
 
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
-//        assertEquals(0, createFromParcel.getMembershipCrit().getACriteria().size());
+
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
+        assertEquals(0, createFromParcel.getMembershipCrit().getACriteria().size());
 
 		
 	}
@@ -90,7 +96,9 @@ public class TestACommunity extends AndroidTestCase{
 		aCommunity.setCommunityType("type");
 		aCommunity.setCommunityJid("jid");
 		aCommunity.setOwnerJid("ownerJid");
-//		AMembershipCrit amembershipCrit = new AMembershipCrit();
+
+
+		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		List<ACriteria> l = new ArrayList<ACriteria>();
 		ACriteria a = new ACriteria();
 		a.setAttrib("location");
@@ -98,8 +106,8 @@ public class TestACommunity extends AndroidTestCase{
 		a.setRank(1);
 		a.setValue1("Paris");
 		l.add(a);
-//		amembershipCrit.setACriteria(l);
-//		aCommunity.setMembershipCrit(amembershipCrit);
+		amembershipCrit.setACriteria(l);
+		aCommunity.setMembershipCrit(amembershipCrit);
 
 		
         Parcel parcel = Parcel.obtain();
@@ -115,11 +123,12 @@ public class TestACommunity extends AndroidTestCase{
         assertEquals(aCommunity.getCommunityJid(), createFromParcel.getCommunityJid());
         assertEquals(aCommunity.getOwnerJid(), createFromParcel.getOwnerJid());
 
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getAttrib(), createFromParcel.getMembershipCrit().getACriteria().get(0).getAttrib());
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getOperator(), createFromParcel.getMembershipCrit().getACriteria().get(0).getOperator());
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getValue1(), createFromParcel.getMembershipCrit().getACriteria().get(0).getValue1());
-//        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getRank(), createFromParcel.getMembershipCrit().getACriteria().get(0).getRank());
+
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getAttrib(), createFromParcel.getMembershipCrit().getACriteria().get(0).getAttrib());
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getOperator(), createFromParcel.getMembershipCrit().getACriteria().get(0).getOperator());
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getValue1(), createFromParcel.getMembershipCrit().getACriteria().get(0).getValue1());
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().get(0).getRank(), createFromParcel.getMembershipCrit().getACriteria().get(0).getRank());
 
         
         

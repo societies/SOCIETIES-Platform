@@ -288,7 +288,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//doNothing().when(mockICisDirRemote3).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		
 		//pubsub mocking
-		doNothing().when(mockPubSubClient).addJaxbPackages(anyListOf(String.class));
+		//doNothing().when(mockPubSubClient).addJaxbPackages(anyListOf(String.class));
 		doNothing().when(mockPubSubClient).ownerCreate(any(org.societies.api.identity.IIdentity.class),anyString());
 		when(mockPubSubClient.publisherPublish(any(org.societies.api.identity.IIdentity.class)
 				, anyString(), anyString(), anyObject())).thenReturn("");

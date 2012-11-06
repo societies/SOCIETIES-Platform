@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
+import org.societies.android.api.cis.management.ACriteria;
 
 public class TestMembershipCrit extends AndroidTestCase {
 
