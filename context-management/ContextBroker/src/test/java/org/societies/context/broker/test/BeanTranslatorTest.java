@@ -102,7 +102,7 @@ public class BeanTranslatorTest {
 		//internalCtxBroker.setUserCtxInferenceMgr(new UserCtxInferenceMgr());
 		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
 		internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
-		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
+		//internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 		
 		//this.commMgr.getIdManager().fromJid(ctxModelObj.getOwnerId());
 		
