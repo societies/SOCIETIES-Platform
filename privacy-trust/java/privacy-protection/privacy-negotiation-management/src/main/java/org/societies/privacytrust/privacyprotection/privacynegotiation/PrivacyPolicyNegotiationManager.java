@@ -44,6 +44,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -422,6 +423,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
+		this.logging.debug("Received an event: "+event.geteventType());
 		if (event.geteventType().equals(EventTypes.FAILED_NEGOTIATION_EVENT)){
 			FailedNegotiationEvent negEvent = (FailedNegotiationEvent) event.geteventInfo();
 			Requestor id = negEvent.getRequestor();
@@ -429,15 +431,26 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			if(this.negClients.containsKey(id)){
 				//INegotiationClient client = this.negClients.get(id);
 				this.negClients.remove(id);
+				this.logging.debug("Destroying NegotiationClient instance");
 				//JOptionPane.showMessageDialog(null, "Negotiation with: "+id.toUriString()+" failed.");
 			}
+		}else if (event.geteventType().equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)){
+			PPNegotiationEvent ppnEvent = (PPNegotiationEvent) event.geteventInfo();
+			
+			Requestor requestor = ppnEvent.getAgreement().getRequestor();
+			this.logging.debug("Received successfull Negotiation event for : "+requestor.toString());
+			if (this.negClients.contains(requestor)){
+				this.negClients.remove(requestor);
+				this.logging.debug("Destroying NegotiationClient instance");
+			}
+			
 		}
 		
 	}
 	
 
 	private void registerForFailedNegotiationEvent(){
-		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.FAILED_NEGOTIATION_EVENT}, null);
+		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.FAILED_NEGOTIATION_EVENT, EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, null);
 		
 		this.logging.debug("Registered for events: "+EventTypes.FAILED_NEGOTIATION_EVENT);
 
