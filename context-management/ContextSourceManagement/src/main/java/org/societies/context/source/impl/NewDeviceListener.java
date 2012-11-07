@@ -22,7 +22,7 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 
 @Service
-public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
+public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware {
 	private static Logger LOG = LoggerFactory.getLogger(NewDeviceListener.class);
 	private BundleContext bundleContext;
 	private ServiceTracker serviceTracker;
@@ -66,15 +66,13 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	@Autowired(required=true)
 	public NewDeviceListener(IDeviceManager deviceManager, 
 			IEventMgr eventManager, ICtxSourceMgr contextSourceManagement) {
+		
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		this.deviceManager = deviceManager;
 		this.eventManager = eventManager;
 		this.csm = contextSourceManagement;
-
-		LOG.info(this.getClass() + " instantiated");
-		//registerDevicesAndUpdates();
 	}
-
-	
 
 	public void registerDevicesAndUpdates() {
 

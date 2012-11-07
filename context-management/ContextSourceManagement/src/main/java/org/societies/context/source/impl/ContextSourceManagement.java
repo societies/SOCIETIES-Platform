@@ -50,6 +50,9 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.internal.context.broker.*;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
@@ -126,7 +129,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	private IIdentityManager idManager;
 
 	private NewDeviceListener newDeviceListener;
-	private final String sensor = "CONTEXT_SOURCE";
+	
 	private int counter;
 
 	/**
@@ -162,7 +165,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		
 		try {
 			List<CtxIdentifier> shadowEntitiesFuture = ctxBroker
-					.lookup(CtxModelType.ENTITY, sensor).get(); // TODO  , "CtxSourceId", null, null).get();
+					.lookup(CtxModelType.ENTITY, CtxEntityTypes.CONTEXT_SOURCE).get();
 			counter = shadowEntitiesFuture.size();
 		} catch (CtxException e) {
 			LOG.error(e.getMessage());
@@ -219,15 +222,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
-					.lookupEntities(sensor, "CtxSourceId", id, id);// TODO
-																		// Check
-																		// if
-																		// min
-																		// or
-																		// max
-																		// values
-																		// are
-																		// necessary
+					.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE, CtxAttributeTypes.ID, id, id);
 			List<CtxEntityIdentifier> shadowEntities = shadowEntitiesFuture
 					.get();
 
@@ -235,7 +230,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			if (shadowEntities.size() > 0) {
 				for (CtxEntityIdentifier cei : shadowEntities) {
 					Set<CtxAttribute> sourceIDs = ((CtxEntity) ctxBroker
-							.retrieve(cei).get()).getAttributes("CtxSourceId");
+							.retrieve(cei).get()).getAttributes(CtxAttributeTypes.ID);
 					if (sourceIDs.size() == 0)
 						continue;
 					if (sourceIDs.size() > 1) {
@@ -256,17 +251,17 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			}
 
 			Future<CtxEntity> fooEntFuture;
-			fooEntFuture = ctxBroker.createEntity(sensor);
+			fooEntFuture = ctxBroker.createEntity(CtxEntityTypes.CONTEXT_SOURCE);
 			CtxEntity fooEnt = fooEntFuture.get();
 
 			Future<CtxAttribute> nameAttrFuture = ctxBroker.createAttribute(
-					fooEnt.getId(), "CtxSourceId");
+					fooEnt.getId(), CtxAttributeTypes.ID);
 			CtxAttribute nameAttr = nameAttrFuture.get();
 			// nameAttr.setStringValue(id);
 			ctxBroker.updateAttribute(nameAttr.getId(), id);
 
 			Future<CtxAttribute> ctxTypeAttrFuture = ctxBroker.createAttribute(
-					fooEnt.getId(), "CtxType");
+					fooEnt.getId(), CtxAttributeTypes.TYPE);
 			CtxAttribute ctxTypeAttr = ctxTypeAttrFuture.get();
 			ctxBroker.updateAttribute(ctxTypeAttr.getId(), contextType);
 
@@ -279,7 +274,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 						ownerCtxEntityID).get();
 
 				Future<CtxAssociation> futAssociationToContextOwnerEntity = ctxBroker
-						.createAssociation("providesUpdatesFor");
+						.createAssociation(CtxAssociationTypes.PROVIDES_UPDATES_FOR);
 				CtxAssociation associationToContextOwnerEntity = futAssociationToContextOwnerEntity
 						.get();
 				associationToContextOwnerEntity.setParentEntity(fooEnt.getId());
@@ -339,8 +334,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			CtxAttribute dataAttr;
 			CtxQuality quality;
 
-			shadowEntitiesFuture = ctxBroker.lookupEntities(sensor,
-					"CtxSourceId", identifier, identifier);
+			shadowEntitiesFuture = ctxBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE,
+					CtxAttributeTypes.ID, identifier, identifier);
 			shadowEntities = shadowEntitiesFuture.get();
 			if (shadowEntities.size() > 1) {
 				if (LOG.isErrorEnabled())
@@ -362,7 +357,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 						.get();
 			}
 
-			attrs = shadowEntity.getAttributes("CtxType");
+			attrs = shadowEntity.getAttributes(CtxAttributeTypes.TYPE);
 			if (attrs != null && attrs.size() > 0)
 				type = attrs.iterator().next().getStringValue();
 			else
@@ -406,7 +401,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 					// Check if the shadow entity has an association to an
 					// ctxEntity
 					List<CtxIdentifier> assocIdentifierList = ctxBroker.lookup(
-							CtxModelType.ASSOCIATION, "providesUpdatesFor")
+							CtxModelType.ASSOCIATION, CtxAssociationTypes.PROVIDES_UPDATES_FOR)
 							.get();
 					CtxAssociation temp;
 					CtxEntity parent;
@@ -432,8 +427,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 								break;
 							}
 						}
-
-					// owner = ctxBroker.retrieveCssOperator().get();
+					
 					owner = ctxBroker.retrieveCssNode(
 							commMgr.getIdManager().getThisNetworkNode()).get();
 
@@ -585,8 +579,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		List<CtxEntityIdentifier> shadowEntities;
 		CtxIdentifier shadowEntity = null;
 		try {
-			shadowEntitiesFuture = ctxBroker.lookupEntities(sensor,
-					"CtxSourceId", identifier, identifier);
+			shadowEntitiesFuture = ctxBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE,
+					CtxAttributeTypes.ID, identifier, identifier);
 			shadowEntities = shadowEntitiesFuture.get();
 			if (shadowEntities.size() > 1) {
 				LOG.debug("Sensor-ID " + identifier
@@ -617,5 +611,4 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		}
 		return new AsyncResult<Boolean>(true);
 	}
-
 }
