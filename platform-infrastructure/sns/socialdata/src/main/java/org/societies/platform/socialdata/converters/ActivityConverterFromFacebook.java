@@ -109,7 +109,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				
 				
 				JSONObject elm = elements.getJSONObject(i);
-			
+			    
 				ActivityEntry entry = new ActivityEntryImpl();
 				entry.setId("facebook:"+elm.getString(ID));
 				entry.setActor(setActor(elm.getString(FROM)));

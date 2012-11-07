@@ -305,20 +305,26 @@ public class CSSManager implements ICSSLocalManager {
 			if (this.cssRegistry.cssRecordExists()) {
 				cssRecord = this.cssRegistry.getCssRecord();
 				
-				// add new node to login to cloud CssRecord
-				cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
+				//check if attempted login has already been attempted
+				if (!cssNodeExist(profile.getCssNodes().get(0), cssRecord)) {
+					// add new node to login to cloud CssRecord
+					LOG.debug("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " has not logged in");
+					cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
-				this.updateCssRegistry(cssRecord);
-				LOG.debug("Updating CSS with local database");
-				
-				result.setProfile(cssRecord);
-				result.setResultStatus(true);
-				
-				CssEvent event = new CssEvent();
-				event.setType(CSSManagerEnums.ADD_CSS_NODE);
-				event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-				
-				this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+					this.updateCssRegistry(cssRecord);
+					LOG.debug("Updating CSS with local database");
+					
+					result.setProfile(cssRecord);
+					result.setResultStatus(true);
+					
+					CssEvent event = new CssEvent();
+					event.setType(CSSManagerEnums.ADD_CSS_NODE);
+					event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
+					
+					this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				} else {
+					LOG.error("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " has already logged in");
+				}
 				
 			} else {
 				LOG.error("CSS record does not exist");
@@ -357,31 +363,38 @@ public class CSSManager implements ICSSLocalManager {
 		
 		try{
 			if (this.cssRegistry.cssRecordExists()) {
+
 				cssRecord = this.cssRegistry.getCssRecord();
 				
-				// remove new node to login to cloud CssRecord
-				for (Iterator<CssNode> iter = cssRecord.getCssNodes().iterator(); iter
-						.hasNext();) {
-					CssNode node = (CssNode) iter.next();
-					CssNode logoutNode = profile.getCssNodes().get(0);
-					if (node.getIdentity().equals(logoutNode.getIdentity())
-							&& node.getType() == logoutNode.getType()) {
-						iter.remove();
-						break;
-					}
-				}
+				//check if attempted login has already been attempted
+				if (cssNodeExist(profile.getCssNodes().get(0), cssRecord)) {
+					LOG.debug("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " is already logged in");
 
-				result.setProfile(cssRecord);
-				result.setResultStatus(true);
-				
-				this.updateCssRegistry(cssRecord);
-				
-				CssEvent event = new CssEvent();
-				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
-				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
-				
-				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
-				
+					// remove new node to login to cloud CssRecord
+					for (Iterator<CssNode> iter = cssRecord.getCssNodes().iterator(); iter
+							.hasNext();) {
+						CssNode node = (CssNode) iter.next();
+						CssNode logoutNode = profile.getCssNodes().get(0);
+						if (node.getIdentity().equals(logoutNode.getIdentity())
+								&& node.getType() == logoutNode.getType()) {
+							iter.remove();
+							break;
+						}
+					}
+	
+					result.setProfile(cssRecord);
+					result.setResultStatus(true);
+					
+					this.updateCssRegistry(cssRecord);
+					
+					CssEvent event = new CssEvent();
+					event.setType(CSSManagerEnums.DEPART_CSS_NODE);
+					event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+					
+					this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+				} else {
+					LOG.error("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " has already logged out");
+				}
 			} else {
 				LOG.error("Css Record does not exist");
 			}
@@ -967,6 +980,7 @@ public class CSSManager implements ICSSLocalManager {
 		LOG.info("Request  origin: " +request.getOrigin());
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1442,6 +1456,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		// remotely, it will be an accepted of the request we sent
 			try {
 				cssRegistry.updateCssFriendRequestRecord(request);
+				cssRegistry.updateCssRequestRecord(request);
 				// internal eventing for notifying of new Friend
 				LOG.info("Generating CSS_Friended_Event to notify CSS Friend Request has been accepted");
 				if(this.getEventMgr() != null){
@@ -1471,6 +1486,69 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					//called updateCssFriendRequest on remote
 					request.setOrigin(CssRequestOrigin.REMOTE);
 					cssManagerRemote.acceptCssFriendRequest(request); 
+			}
+			if (request.getOrigin() == CssRequestOrigin.REMOTE)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					cssManagerRemote.updateCssFriendRequest(request); 
+			}
+		}
+	/**
+	 * Determine if a CssNode object exists in the CssRecord maintained 
+	 * by the CSS Cloud node
+	 * 
+	 * @param node
+	 * @param record
+	 * @return
+	 */
+	private boolean cssNodeExist(CssNode node, CssRecord record) {
+		boolean retValue = false;
+		
+		for (CssNode element: record.getCssNodes()) {
+			if (element.getIdentity().equals(node.getIdentity())
+					&& element.getType() == node.getType()) {
+				retValue = true;
+				break;
+			}
+		}
+		return retValue;
+	}
+	
+	public void declineCssFriendRequest(CssRequest request) {
+		
+	
+	LOG.info("Decline Css Friend Request has been called");
+	LOG.info("declineCssFriendRequest status: " +request.getRequestStatus());
+	LOG.info("declineCssFriendRequest Origin: " +request.getOrigin());
+	LOG.info("declineCssFriendRequest ID: " +request.getCssIdentity());
+		
+	
+			try {
+				cssRegistry.updateCssFriendRequestRecord(request);
+								
+				
+				} catch (CssRegistrationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+			// If this was initiated locally then inform remote css
+			// We only want to sent messages to remote Css's for this function if we initiated the call locally
+			if (request.getOrigin() == CssRequestOrigin.LOCAL)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					//cssManagerRemote.acceptCssFriendRequest(request); 
+					cssManagerRemote.declineCssFriendRequest(request);
 			}
 			if (request.getOrigin() == CssRequestOrigin.REMOTE)
 			{

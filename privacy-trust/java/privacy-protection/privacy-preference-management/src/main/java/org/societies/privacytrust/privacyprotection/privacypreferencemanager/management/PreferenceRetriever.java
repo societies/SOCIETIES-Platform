@@ -37,9 +37,14 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
+import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
 
 /**
  * @author Elizabeth
@@ -48,10 +53,12 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.Ctx
 public class PreferenceRetriever {
 	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private ICtxBroker ctxBroker; 
+	private ICtxBroker ctxBroker;
+	private final IIdentityManager idMgr; 
 
-	public PreferenceRetriever(ICtxBroker ctxBroker){
+	public PreferenceRetriever(ICtxBroker ctxBroker, IIdentityManager idMgr){
 		this.ctxBroker = ctxBroker;
+		this.idMgr = idMgr;
 	}
 	
 	public Registry retrieveRegistry(){
@@ -69,9 +76,10 @@ public class PreferenceRetriever {
 						return new Registry();
 					}
 					
-					if (obj instanceof Registry){
+					if (obj instanceof RegistryBean){
 						this.logging.debug("PreferenceRegistry found in DB ");
-						return (Registry) obj;
+						Registry registry = Registry.fromBean((RegistryBean) obj, idMgr);
+						return registry;
 					}else{
 						this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
 						return new Registry();
@@ -127,6 +135,17 @@ public class PreferenceRetriever {
 				if (obj instanceof IPrivacyPreferenceTreeModel){
 					return (IPrivacyPreferenceTreeModel) obj;
 				}
+				
+				
+				if (obj instanceof PPNPrivacyPreferenceTreeModelBean){
+					return PrivacyPreferenceUtils.toPPNPrivacyPreferenceTreeModel((PPNPrivacyPreferenceTreeModelBean) obj, this.idMgr);
+				}
+				
+				if (obj instanceof IDSPrivacyPreferenceTreeModelBean){
+					return PrivacyPreferenceUtils.toIDSPrivacyPreferenceTreeModel((IDSPrivacyPreferenceTreeModelBean) obj, idMgr);
+				}
+				
+				//TODO: DOBF
 			}
 		}
 		catch (CtxException e) {

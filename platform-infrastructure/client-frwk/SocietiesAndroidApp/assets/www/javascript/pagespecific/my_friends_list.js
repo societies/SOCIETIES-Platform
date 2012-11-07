@@ -11,7 +11,10 @@ var CSSFriendsServices = {
 	 * @returns null
 	 */
 	refreshFriendRequests: function() {
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#myFriendRequests").html(data.length);
+			$("span#myFriendRequests").css({ visibility: "visible"});
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendRequestsListUL').children().length >1 )
 				$('ul#FriendRequestsListUL li:last').remove();
@@ -42,7 +45,10 @@ var CSSFriendsServices = {
 	refreshFriendList: function() {
 		console.log("refreshFriendList");
 
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#myFriendsCount").html(data.length);
+			$("span#myFriendsCount").css({ visibility: "visible"});
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendsListDiv').children().length >1 )
 				$('ul#FriendsListDiv li:last').remove();
@@ -81,6 +87,9 @@ var CSSFriendsServices = {
 	
 	showFriendDetailPage: function(data) {
 		//CSS Record OBJECT
+		var forename = data.foreName;
+		if (forename=="undefined")
+			forename="";
 		var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
 					 "<p>" + data.homeLocation + "</p>" +
 					 "<p>" + data.cssIdentity + "</p><br />"; 
@@ -100,7 +109,11 @@ var CSSFriendsServices = {
 	refreshSuggestedFriendsList: function() {
 		console.log("Refreshing Suggested friends");
 
-		function success(data) {			
+		function success(data) {
+			//UPDATE COUNT
+			$("span#suggestedFriendsCount").html(data.length);
+			$("span#suggestedFriendsCount").css({ visibility: "visible"});			
+			//DISPLAY RECORDS
 			CSSFriendsServices.displayCSSAdvertRecords(data);
 		}
 		
@@ -152,6 +165,9 @@ var CSSFriendsServices = {
 			$('#li' + id).remove().slideUp('slow');
 			//CSSFriendsServices.showFriendDetailPage(data);
 			//$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+			//UPDATE COUNTER
+			var count = parseInt($("span#myFriendRequests").html());
+			$("span#myFriendRequests").html(--count);
 		}
 		
 		function failure(data) {

@@ -155,9 +155,11 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 			LOG.error("time period string was malformed, could not parse long");
 			return ret;
 		}
-        Session session = this.sessionFactory.openSession();
+        Session session = null;
         List<Activity> retList = null;
         try{
+        	session = this.sessionFactory.openSession();
+        	
             retList = session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).add(Restrictions.eq("ownerId",this.getId())).list();
             LOG.info(" list size: "+retList.size()+" no criteria: "+session.createCriteria(Activity.class).list().size());
             LOG.info(" FISK "+session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).list().size());
@@ -166,7 +168,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
             e.printStackTrace();
 
         } finally {
-            session.close();
+        	if (session != null)
+        		session.close();
         }
 
 		LOG.info("time period: "+fromTime+" - " + toTime);
@@ -183,16 +186,19 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	}
     @Override
     public int count(){
-        Session session = this.sessionFactory.openSession();
+        Session session = null;
         LOG.info("in persistedactivityfeedcount");
         int ret = -1;
         try {
+        	session = this.sessionFactory.openSession();
             ret = session.createCriteria(Activity.class).add(Restrictions.eq("ownerId",this.getId())).list().size();
         }catch  (Exception e)
         {
             LOG.error("Error while trying to count activities");
+            e.printStackTrace();
         } finally {
-            session.close();
+        	if (session != null)
+        		session.close();
         }
         return ret;
     }
@@ -200,26 +206,30 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	public void addActivity(IActivity activity) {
 //        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
         boolean err = false;
-		Session session = this.sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		Activity newAct = new Activity(activity);
 		newAct.setPublished(Long.toString(new Date().getTime())); // NOTICE THAT THE TIME IS BEING SET IN THE SERVER
         LOG.info("adding activity with id: "+this.id);
         newAct.setOwnerId(this.id);
         long actv_id = 0;
+		Session session = null;
+		Transaction t = null;
 		try{
+			session = this.sessionFactory.openSession();
+			t = session.beginTransaction();
 			actv_id = (Long) session.save(newAct);
 			t.commit();
 		}catch(Exception e){
 			e.printStackTrace();
-			t.rollback();
+			if (t != null)
+				t.rollback();
 			LOG.warn("Saving activity failed, rolling back");
-			e.printStackTrace();
 			err = true;
 		}finally{
-            session.close();
+			if (session != null)
+				session.close();
 
 		}
+		
 		// SUBSCRIBING TO PUBSUB
 		if(false == err && pubSubcli !=null){
 			try {
@@ -242,16 +252,28 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
 		List<IActivity> toBeDeleted = getActivities(criteria,forever);
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+		Session session = null;
+		Transaction t = null;
 		try{
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+			
 			for(IActivity act : toBeDeleted){
 				session.delete((Activity)act);
 			}
+			
+			t.commit();
 		}catch(Exception e){
-			t.rollback();
+			if (t != null)
+				t.rollback();
+			e.printStackTrace();
 			LOG.warn("deleting activities failed, rolling back");
+		}finally{
+			if (session != null)
+				session.close();
+
 		}
+		
 		return ret;
 	}
 
@@ -275,11 +297,18 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		if(!list.contains(activity))
 			return false;
 		boolean ret = list.remove(activity);
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
+        Session session = null;
+		Transaction t = null;
         try{
+        	session = sessionFactory.openSession();
+      		t = session.beginTransaction();
+      		
             session.delete(activity);
+            t.commit();
         }catch (Exception e){
+			if (t != null)
+				t.rollback();
+			e.printStackTrace();
             LOG.error("Error when trying to delete activity");
         }finally {
             if(session!=null)
@@ -300,11 +329,15 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
-        Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
+        Session session = null;
+		Transaction t = null;
 		try{
+			
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+				
 			for(ActivityEntry act : castedList){
 				pp.setIndex(0);
 				newAct = new Activity();
@@ -319,7 +352,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 			}
 			t.commit();
 		}catch(Exception e){
-			t.rollback();
+			if (t != null)
+				t.rollback();
 			LOG.warn("Importing of activities from social data failed..");
 			e.printStackTrace();
 
@@ -340,14 +374,28 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 			return a.getUrl();
 		return a.getContent();
 	}
+	
+	// TODO: dont we need to use a transaction here
 	public void clear(){
-        Session session = sessionFactory.openSession();
-        try{
-            List<Activity> l = session.createCriteria(Activity.class).list();
+		Session session = null;
+		Transaction t = null;
+		try{
+				
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+        	
+			List<Activity> l = session.createCriteria(Activity.class).list();
             for(Activity a : l)
-                session.delete(a);
+            {
+            	session.delete(a);
+            }		
+            t.commit();
+            
         } catch (Exception e) {
-
+			if (t != null)
+				t.rollback();
+			LOG.warn("clear of activities failed");
+			e.printStackTrace();
         } finally {
             if(session!=null)
                 session.close();

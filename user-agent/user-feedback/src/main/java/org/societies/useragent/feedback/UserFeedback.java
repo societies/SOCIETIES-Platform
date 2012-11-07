@@ -52,6 +52,7 @@ import org.societies.useragent.feedback.guis.AckNackGUI;
 import org.societies.useragent.feedback.guis.CheckBoxGUI;
 import org.societies.useragent.feedback.guis.RadioGUI;
 import org.societies.useragent.feedback.guis.TimedGUI;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UserFeedback implements IUserFeedback, IInternalUserFeedback{

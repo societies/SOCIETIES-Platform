@@ -55,6 +55,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.phonegap.api.LOG;
@@ -617,13 +618,12 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-				
 				//Create Android Notification
-				int notifierflags [] = new int [1];
-				notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-				AndroidNotifier notifier = new AndroidNotifier(PluginCSSManager.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
-
-				notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
+				//int notifierflags [] = new int [1];
+				//notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+				//AndroidNotifier notifier = new AndroidNotifier(PluginCSSManager.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
+				//notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
+				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Login successful", Toast.LENGTH_SHORT).show();
 
 			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);

@@ -301,6 +301,96 @@ public class TestCommsMgmt {
 	}
 
 	/**
+	 * Test the intermittent problem that causes the backing MySQL tables
+	 * to have deleted rows.
+	 * 
+	 * @throws Exception
+	 */
+	public void testCSSMgmtPersistence() throws Exception {
+		int NUM_ATTEMPTS = 10;
+		
+		for (int i = 0; i < NUM_ATTEMPTS; i++) {
+			LOG.info("Testing testCSSMgmtPersistence");
+			
+			this.remoteCSSManager.loginCSS(this.createLoginCSSRecord(), new ICSSManagerCallback() {
+			public void receiveResult(CssManagerResultBean resultBean) {
+					LOG.info("Received result from remote call");
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
+					
+					List<CssNode> nodes = resultBean.getResult().getProfile().getCssNodes();
+					for (CssNode node: nodes) {
+						LOG.info("Received node: " + node.getIdentity() + " status: " + node.getStatus() + " type: " + node.getType());
+					}
+				}
+			});
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			
+			this.remoteCSSManager.logoutCSS(this.createLoginCSSRecord(), new ICSSManagerCallback() {
+			public void receiveResult(CssManagerResultBean resultBean) {
+					LOG.info("Received result from remote call");
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
+					
+					List<CssNode> nodes = resultBean.getResult().getProfile().getCssNodes();
+					for (CssNode node: nodes) {
+						LOG.info("Received node: " + node.getIdentity() + " status: " + node.getStatus() + " type: " + node.getType());
+					}
+				}
+			});
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		}
+
+
+
+	}
+	
+	/**
+	 * Test the intermittent problem that causes the backing MySQL tables
+	 * to have deleted rows by submitting more than one login attempt
+	 * 
+	 * @throws Exception
+	 */
+	public void testCSSMgmtMultipleLogins() throws Exception {
+		int NUM_ATTEMPTS = 2;
+		
+		for (int i = 0; i < NUM_ATTEMPTS; i++) {
+			LOG.info("Testing testCSSMgmtPersistence");
+			
+			this.remoteCSSManager.loginCSS(this.createLoginCSSRecord(), new ICSSManagerCallback() {
+			public void receiveResult(CssManagerResultBean resultBean) {
+					LOG.info("Received result from remote call");
+					LOG.info("Result Status: " + resultBean.getResult().isResultStatus());
+					
+					List<CssNode> nodes = resultBean.getResult().getProfile().getCssNodes();
+					for (CssNode node: nodes) {
+						LOG.info("Received node: " + node.getIdentity() + " status: " + node.getStatus() + " type: " + node.getType());
+					}
+				}
+			});
+
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
 	 * Create a default CSSrecord
 	 * This is a temporary measure until genuine CSSs can be created
 	 * 
@@ -326,6 +416,57 @@ public class TestCommsMgmt {
 		cssProfile.getCssNodes().add(cssNode_2);
 		cssProfile.getArchiveCSSNodes().add(cssNode_1);
 		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+
+		LOG.info("created CSS Record identity: " + cssProfile.getCssIdentity());
+		LOG.info("created CSS Record password: " + cssProfile.getPassword());
+		
+		return cssProfile;
+	}
+
+	
+	/**
+	 * Create a default CSSrecord
+	 * This is a temporary measure until genuine CSSs can be created
+	 * 
+	 * @return CssRecord
+	 */
+	private CssRecord createLoginCSSRecord() {
+		
+    	CssNode cssNode;
+
+		cssNode = new CssNode();
+		cssNode.setIdentity(TEST_IDENTITY_1);
+		cssNode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode.setType(CSSManagerEnums.nodeType.Android.ordinal());
+
+		CssNode cssArchivedNode;
+
+		cssArchivedNode = new CssNode();
+		cssArchivedNode.setIdentity(TEST_IDENTITY_2);
+		cssArchivedNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssArchivedNode.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+
+		CssRecord cssProfile = new CssRecord();
+		cssProfile.getCssNodes().add(cssNode);
+		cssProfile.getArchiveCSSNodes().add(cssArchivedNode);
 		
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);

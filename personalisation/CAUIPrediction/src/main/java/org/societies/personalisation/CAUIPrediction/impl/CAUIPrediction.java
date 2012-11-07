@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -73,7 +76,7 @@ import java.util.concurrent.ExecutionException;
 public class CAUIPrediction implements ICAUIPrediction{
 
 	private static final Logger LOG = LoggerFactory.getLogger(CAUIPrediction.class);
-
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); 
 
 	private ICtxBroker ctxBroker;
 	private IInternalPersonalisationManager persoMgr;
@@ -81,7 +84,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private ICAUIDiscovery cauiDiscovery;
 	private ICommManager commsMgr;
 
+	private  IPerformanceMessage m;
+
 	private Boolean enablePrediction = true;  
+	Date startTime = null;
+	//long startTime = 0;
 
 	// maintains the last 100 actions
 	private List<IAction> lastMonitoredActions = new ArrayList<IAction>();
@@ -179,7 +186,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
 
-		
+
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
 
@@ -195,7 +202,19 @@ public class CAUIPrediction implements ICAUIPrediction{
 			}
 		}
 
+
+
 		if(modelExist == true && enablePrediction == true){
+
+			m = new PerformanceMessage();
+			m.setSourceComponent(this.getClass()+"");
+			m.setD82TestTableName("S19");
+			m.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.Delay");
+			m.setOperationType("IntentPredictionFromIntentModel");//?
+			m.setPerformanceType(IPerformanceMessage.Delay);
+			//startTime = System.currentTimeMillis();
+			startTime = new Date();
+			
 			//LOG.info("1. model exists " +modelExist);
 			//LOG.info("START PREDICTION caui modelExist "+modelExist);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
@@ -225,16 +244,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 						//LOG.info(" ****** prediction map created "+ results);
 					}
 				}			
-			}
-		} else {
-			LOG.info("no CAUI model exist yet ");
-		}
-		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
 
-		if(results.size()>0){
-			for(IUserIntentAction predAction : results){
-				this.recordPrediction(predAction);		
-			}
+			}		
+		} else	LOG.info("no CAUI model exist yet ");
+		
+		if(results.size() > 0){
+			Date endTime = new Date();
+			m.setPerformanceNameValue("Delay=" + (endTime.getTime() - startTime.getTime())); 
+			PERF_LOG.trace(m.toString());
 		}
 
 		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
@@ -261,6 +278,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(lastAction != null && modelExist == true && enablePrediction == true){
+
+			m = new PerformanceMessage();
+			m.setSourceComponent(this.getClass()+"");
+			m.setD82TestTableName("S19");
+			m.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.Delay");
+			m.setOperationType("IntentPredictionFromIntentModel");//?
+			m.setPerformanceType(IPerformanceMessage.Delay);
+			//startTime = System.currentTimeMillis();
+			startTime = new Date();
+			
 			String par = lastAction.getparameterName();
 			String val = lastAction.getvalue();
 			// identify performed action in model
@@ -277,10 +304,23 @@ public class CAUIPrediction implements ICAUIPrediction{
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						results.add(nextAction);
 					}
+					
 				}			
+				
 			}
+	
+		} else 	LOG.info("no CAUI model exist yet ");
+			
+		if(results.size()>0){
+			
+			Date endTime = new Date();
+			m.setPerformanceNameValue("Delay=" + (endTime.getTime() - startTime.getTime())); 
+			
+			//m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime)); 
+			PERF_LOG.trace(m.toString());
 		}
-		LOG.info("ctx update based action prediction:"+ results);		
+		LOG.info("ctx update based action prediction:"+ results);
+				
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
@@ -292,20 +332,39 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
 
-	//	LOG.info("getCurrentIntentAction based on identity and serviceID:"+ serviceID.getServiceInstanceIdentifier() +" identity requestor:"+ownerID+" userActionType:"+userActionType);
+		//	LOG.info("getCurrentIntentAction based on identity and serviceID:"+ serviceID.getServiceInstanceIdentifier() +" identity requestor:"+ownerID+" userActionType:"+userActionType);
 
 		IUserIntentAction predictedAction = null;
 		if(modelExist == true && enablePrediction == true){
-			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getServiceInstanceIdentifier(), userActionType);
+
+			m = new PerformanceMessage();
+			m.setSourceComponent(this.getClass()+"");
+			m.setD82TestTableName("S19");
+			m.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.Delay");
+			m.setOperationType("IntentPredictionFromIntentModel");//?
+			m.setPerformanceType(IPerformanceMessage.Delay);
+			//startTime = System.currentTimeMillis();
+			startTime = new Date();
+			
 			//LOG.info("action LIST "+actionList );
 			// compare current context and choose proper action
+
+			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getServiceInstanceIdentifier(), userActionType);
 			if(actionList.size()>0) predictedAction = findBestMatchingAction(actionList);
+
+
 
 		} else {
 			LOG.info("no model exist - predictionRequestsCounter:" +predictionRequestsCounter);
 		}
 
-		if(predictedAction!= null)	this.recordPrediction(predictedAction);		
+		if(predictedAction != null)	{
+			this.recordPrediction(predictedAction);		
+			Date endTime = new Date();
+			m.setPerformanceNameValue("Delay=" + (endTime.getTime() - startTime.getTime())); 
+			//m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime)); 
+			PERF_LOG.trace(m.toString());
+		}
 		LOG.info("getCurrentIntentAction based on serviceID and actionType : "+predictedAction );
 		return new AsyncResult<IUserIntentAction>(predictedAction);
 	}
@@ -569,6 +628,18 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		return cssOwnerId;
 	}
+
+
+	private void printUIModel(){
+
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> model = this.cauiTaskManager.retrieveModel().getActionModel();
+
+		for(IUserIntentAction action: model.keySet() ){
+			LOG.info("source action "+ action+ " target:"+model.get(action));
+		}
+
+	}
+
 
 	/*
 	private CtxAttributeIdentifier initialiseAttrId(String attrType){

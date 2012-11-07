@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/preferences"
+	xmlns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/preferences"
+	xmlns:ns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:ns1="http://societies.org/api/schema/identity"
+	xmlns:ns2="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
+	xmlns:context="http://societies.org/api/schema/context/model"
+	xmlns:trust="http://societies.org/api/internal/schema/privacytrust/trust/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
+
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
+
+	<xs:import
+		namespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
+		schemaLocation="org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.xsd" />
+
+	<xs:import namespace="http://societies.org/api/schema/context/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.context.model.xsd" />
+
+	<xs:import
+		namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
+		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
+
+
+	<xs:complexType name="PrivacyPreferenceConditionBean">
+		<xs:sequence>
+			<xs:element name="type" type="PrivacyConditionConstantsBean"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="ContextPreferenceConditionBean">
+		<xs:complexContent>
+			<xs:extension base="PrivacyPreferenceConditionBean">
+				<xs:sequence>
+					<xs:element name="ctxID" type="context:ctxAttributeIdentifierBean"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="operator" type="OperatorConstantsBean"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="value" type="xs:string" minOccurs="1"
+						maxOccurs="1" />
+
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="TrustPreferenceConditionBean">
+		<xs:complexContent>
+			<xs:extension base="PrivacyPreferenceConditionBean">
+				<xs:sequence>
+					<xs:element name="trustId" type="trust:trustedEntityIdBean"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="value" type="xs:double" minOccurs="1"
+						maxOccurs="1" />
+
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="PPNPreferenceBean">
+		<xs:sequence>
+			<xs:element name="condition" type="PrivacyPreferenceConditionBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="children" type="PPNPreferenceBean"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="outcome" type="PPNPOutcomeBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="IDSPreferenceBean">
+		<xs:sequence>
+			<xs:element name="condition" type="PrivacyPreferenceConditionBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="children" type="IDSPreferenceBean"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="outcome" type="IdentitySelectionPreferenceOutcomeBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="DObfPreferenceBean">
+		<xs:sequence>
+			<xs:element name="condition" type="PrivacyPreferenceConditionBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="children" type="IDSPreferenceBean"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="outcome" type="IdentitySelectionPreferenceOutcomeBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PPNPrivacyPreferenceTreeModelBean">
+		<xs:sequence>
+			<xs:element name="dataId" type="ns1:dataIdentifier"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="dataType" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="myOutcomeType" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="pref" type="PPNPreferenceBean"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="DObfPrivacyPreferenceTreeModelBean">
+		<xs:sequence>
+			<xs:element name="affectedCtxID" type="context:ctxAttributeIdentifierBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="ctxType" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="myOutcomeType" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="pref" type="DObfPreferenceBean"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="IDSPrivacyPreferenceTreeModelBean">
+		<xs:sequence>
+			<xs:element name="affectedIdentity" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="pref" type="IDSPreferenceBean"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="myPrivacyType" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+
+
+	<xs:complexType name="RuleTargetBean">
+		<xs:sequence>
+			<xs:element name="subjects" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="actions" type="ns2:action" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:element name="resource" type="ns2:resource" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IDSPreferenceDetailsBean">
+		<xs:sequence>
+			<xs:element name="affectedIdentity" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="PPNPreferenceDetailsBean">
+		<xs:sequence>
+			<xs:element name="dataType" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="dataId" type="ns1:dataIdentifier"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="DObfPreferenceDetailsBean">
+		<xs:sequence>
+			<xs:element name="dataType" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="dataId" type="ns1:dataIdentifier"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="PPNPOutcomeBean">
+		<xs:sequence>
+			<xs:element name="effect" type="PrivacyOutcomeConstantsBean"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="rule" type="RuleTargetBean" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="conditions" type="ns2:condition"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="myOutcomeType" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="confidenceLevel" type="xs:int" />
+
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IdentitySelectionPreferenceOutcomeBean">
+		<xs:sequence>
+			<xs:element name="userIdentity" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="type" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="DObfOutcomeBean">
+		<xs:sequence>
+			<xs:element name="obfuscationLevel" type="xs:double"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="type" type="PrivacyPreferenceTypeConstantsBean"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+
+	<xs:simpleType name="PrivacyOutcomeConstantsBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ALLOW" />
+			<xs:enumeration value="BLOCK" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PrivacyPreferenceTypeConstantsBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IDS" />
+			<xs:enumeration value="PPNP" />
+			<xs:enumeration value="DOBF" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PrivacyConditionConstantsBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CONTEXT" />
+			<xs:enumeration value="TRUST" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="OperatorConstantsBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="EQUALS" />
+			<xs:enumeration value="GREATER_THAN" />
+			<xs:enumeration value="GREATER_OR_EQUAL_THAN" />
+			<xs:enumeration value="LESS_THAN" />
+			<xs:enumeration value="LESS_OR_EQUAL_THAN" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	
+	<xs:complexType name="RegistryBean">
+		<xs:sequence>
+			<xs:element name="ppn_index" type="xs:int" minOccurs="1"
+						maxOccurs="1"/>
+			<xs:element name="ids_index" type="xs:int" minOccurs="1"
+						maxOccurs="1"/>
+			<xs:element name="dobf_index" type="xs:int" minOccurs="1"
+						maxOccurs="1"/>	
+			<xs:element name="ppn_Mappings" type="PPNMappings" minOccurs="1"
+						maxOccurs="unbounded"/>	
+			<xs:element name="ids_Mappings" type="IDSMappings" minOccurs="1"
+						maxOccurs="unbounded" />
+			<xs:element name="dobf_Mappings" type="DObfMappings" minOccurs="1"
+						maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="PPNMappings">
+		<xs:sequence>
+			<xs:element name="ppnPrefDetails" type="PPNPreferenceDetailsBean" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="ctxID" type="context:ctxAttributeIdentifierBean" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="IDSMappings">
+		<xs:sequence>
+			<xs:element name="idsPrefDetails" type="IDSPreferenceDetailsBean" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="ctxID" type="context:ctxAttributeIdentifierBean" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="DObfMappings">
+		<xs:sequence>
+			<xs:element name="dobfPrefDetails" type="DObfPreferenceDetailsBean" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="ctxID" type="context:ctxAttributeIdentifierBean" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>	
+</xs:schema>
+

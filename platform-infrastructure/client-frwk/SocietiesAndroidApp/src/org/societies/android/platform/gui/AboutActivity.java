@@ -40,12 +40,28 @@ public class AboutActivity extends Activity {
         setContentView(R.layout.about);
         this.setTitle("About");
         TextView aboutText = (TextView) findViewById(R.id.editText1);
-        aboutText.setText("   Version 0.1 \n\n" + 
-    					  "   SOCIETIES 2011 \n\n" + 
+        aboutText.setText("   Version 0.4.1 \n\n" + 
+    					  "   SOCIETIES 2012 \n\n" + 
     					  "   Legal Stuff \n\n" +
-    					  "\n\n" + 
-    					  "   SOCIETIES FP7 Project: http://www.ict-societies.eu/ \n" +
-    					  "   Bug Reports: http://www.ict-societies.eu/issues/"
+    					  "   Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG),\n" + 
+    					  "   HERIOT-WATT UNIVERSITY (HWU),\n" + 
+    					  "	  SOLUTA.NET (SN),\n" + 
+    					  "   GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR),\n" +
+    					  "   Zavod za varnostne tehnologije informacijske družbe in elektronsko poslovanje (SETCCE),\n" + 
+    					  "   INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS),\n" +
+    					  "   LAKE COMMUNICATIONS (LAKE),\n" + 
+    					  "   INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL),\n" + 
+    					  "   PORTUGAL TELECOM INOVAÇÃO, SA (PTIN),\n" + 
+    					  "   IBM Corp (IBM),\n" + 
+    					  "   INSTITUT TELECOM (ITSUD),\n" + 
+    					  "   AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC),\n" + 
+    					  "   TELECOM ITALIA S.p.a.(TI),\n" + 
+    					  "   TRIALOG (TRIALOG),\n" +
+    					  "   Stiftelsen SINTEF (SINTEF),\n" + 
+    					  "   NEC EUROPE LTD (NEC)) \n" + 
+					  	  "   All rights reserved. \n\n" + 
+    					  "   SOCIETIES FP7 Project: http://www.ict-societies.eu/ \n\n" +
+    					  "   Bug Reports: https://redmine.ict-societies.eu/"
     			);
         Linkify.addLinks(aboutText, Linkify.WEB_URLS);
     }

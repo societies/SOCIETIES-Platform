@@ -45,7 +45,7 @@ public interface ICisManager {
 	public static final String JOIN_CIS      		= "org.societies.android.platform.community.JOIN_CIS";
 	public static final String LEAVE_CIS     		= "org.societies.android.platform.community.LEAVE_CIS";
 	
-	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
+	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, AMembershipCrit criteria, String privacyPolicy)",
 							 		"deleteCis(String client, String cisId)",
 							 		"getCisList(String client, String query)",
 							 		"removeMember(String client, String cisId, String memberJid)",
@@ -63,7 +63,7 @@ public interface ICisManager {
 	 * @param cisCriteria hashtable of {@link membershipCriteria} objects
 	 * @param privacyPolicy privacy policy info 
 	 */
-	public ACommunity createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy);
+	public ACommunity createCis(String client, String cisName, String cisType, String description, AMembershipCrit aMembCrit, String privacyPolicy);
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the

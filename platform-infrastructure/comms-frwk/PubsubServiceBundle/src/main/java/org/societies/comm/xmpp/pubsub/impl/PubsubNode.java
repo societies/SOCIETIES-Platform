@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
@@ -36,7 +38,7 @@ public class PubsubNode extends HostedNode {
 	private Map<String, String> publisherByItemId;
 	// itempublishoptions??? these suck!
 	
-	private Session s;
+	private SessionFactory sf;
 	private IIdentityManager idm;
 	private PubsubNodeDAO dao;
 	
@@ -50,10 +52,9 @@ public class PubsubNode extends HostedNode {
 		publisherByItemId = new HashMap<String, String>();
 	}
 	
-	public PubsubNode(PubsubNodeDAO dao, Session s, IIdentityManager idm) {
+	public PubsubNode(PubsubNodeDAO dao, SessionFactory sf, IIdentityManager idm) {
 		super(dao.getNodeId(), null);
-//		this.sf = sf;
-		this.s = s;
+		this.sf = sf;
 		this.idm = idm;
 		this.dao = dao;
 		
@@ -66,9 +67,9 @@ public class PubsubNode extends HostedNode {
 		loadFromDAO();
 	}
 	
-	public PubsubNodeDAO enablePersistence(Session session, IIdentityManager idm) {
+	public PubsubNodeDAO enablePersistence(SessionFactory sf, IIdentityManager idm) {
 		if (dao==null) {
-			this.s = session;
+			this.sf = sf;
 			this.idm = idm;
 			
 			dao = new PubsubNodeDAO();
@@ -106,16 +107,31 @@ public class PubsubNode extends HostedNode {
 	}
 	
 	private void writeToDAO(String subId) {
-		if (s != null) {
-			if (subscriptionsById.get(subId)!=null) {
-				String subJid = subscriptionsById.get(subId).getBareJid();
-				dao.getSubscriptionsById().put(subId, subJid);
+		if (sf != null) {
+			Session s = sf.openSession();
+			Transaction tx = null;
+			try {
+				tx = s.beginTransaction();
+				dao = (PubsubNodeDAO) s.load(PubsubNodeDAO.class, dao.getHbnId());
+				
+				if (subscriptionsById.get(subId)!=null) {
+					String subJid = subscriptionsById.get(subId).getBareJid();
+					dao.getSubscriptionsById().put(subId, subJid);
+				}
+				else {
+					dao.getSubscriptionsById().remove(subId);
+				}
+				s.update(dao);
+				tx.commit();
 			}
-			else {
-				dao.getSubscriptionsById().remove(subId);
+			catch (HibernateException e) {
+				if (tx!=null)
+					tx.rollback();
+				throw e;
 			}
-			s.update(dao);
-			s.flush();
+			finally {
+				s.close();
+			}
 		}
 	}
 	

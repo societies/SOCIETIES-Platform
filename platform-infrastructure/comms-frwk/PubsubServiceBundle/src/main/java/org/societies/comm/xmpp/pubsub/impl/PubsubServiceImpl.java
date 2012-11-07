@@ -39,8 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
@@ -102,8 +104,8 @@ public class PubsubServiceImpl implements PubsubService {
 	private List<IIdentity> admins; // TODO use!
 	private ICommManager endpoint;
 	private IIdentityManager idm;
-//	private SessionFactory sf;
-	private Session s;
+	private SessionFactory sf;
+//	private Session s;
 	private PubsubServiceDAO dao;
 	
 	public PubsubServiceImpl(ICommManager endpoint) {
@@ -121,45 +123,71 @@ public class PubsubServiceImpl implements PubsubService {
 
 	public PubsubServiceImpl(ICommManager endpoint, SessionFactory sf) {
 		init(endpoint);
-//		this.sf = sf;
-		s = sf.openSession();
-		String pssJid = endpoint.getIdManager().getThisNetworkNode().getJid();
-		List list = s.createCriteria(PubsubServiceDAO.class).add(Restrictions.like("pubsubServiceEndpoint", pssJid)).list();
+		this.sf = sf;
 		
-		if (list.size()>0) {
-			dao = (PubsubServiceDAO) list.get(0);
-			loadFromDAO();
+		Session s = sf.openSession();
+		Transaction tx = null;
+		try {
+			tx = s.beginTransaction();
+			String pssJid = endpoint.getIdManager().getThisNetworkNode().getJid();
+			List list = s.createCriteria(PubsubServiceDAO.class).add(Restrictions.like("pubsubServiceEndpoint", pssJid)).list();
+			
+			if (list.size()>0) {
+				dao = (PubsubServiceDAO) list.get(0);
+				loadFromDAO();
+			}
+			else {
+				dao = new PubsubServiceDAO();
+				dao.setPubsubServiceEndpoint(pssJid);
+				s.save(dao);
+			}
+			tx.commit();
 		}
-		else {
-			dao = new PubsubServiceDAO();
-			dao.setPubsubServiceEndpoint(pssJid);
-			s.save(dao);
-			s.flush();
+		catch (HibernateException e) {
+			if (tx!=null)
+				tx.rollback();
+			throw e;
+		}
+		finally {
+			s.close();
 		}
 	}
 
 	private void loadFromDAO() {
 		for (PubsubNodeDAO pnDao : dao.getNodes()) {
-			PubsubNode psn = new PubsubNode(pnDao, s, idm);
+			PubsubNode psn = new PubsubNode(pnDao, sf, idm);
 			nodes.put(pnDao.getNodeId(),psn);
 			endpoint.addRootNode(psn);
 		}
 	}
 	
 	private void writeToDAO(PubsubNode node) {
-		if (s != null) {
-			if (nodes.containsValue(node)) {
-				// add
-				PubsubNodeDAO pnDao = node.enablePersistence(s, idm);
-				dao.getNodes().add(pnDao);
-				pnDao.setPubsubService(dao);
-				s.save(pnDao);
-				s.flush();
+		if (sf != null) {
+			Session s = sf.openSession();
+			Transaction tx = null;
+			try {
+				tx = s.beginTransaction();
+				if (nodes.containsValue(node)) {
+					// add
+					PubsubNodeDAO pnDao = node.enablePersistence(sf, idm);
+					dao.getNodes().add(pnDao);
+					pnDao.setPubsubService(dao);
+					s.save(pnDao);
+				}
+				else {
+					// remove
+					Object o = s.load(PubsubNodeDAO.class, node.getDAO().getHbnId());
+					s.delete(o);
+				}
+				tx.commit();
 			}
-			else {
-				// remove
-				s.delete(node.getDAO());
-				s.flush();
+			catch (HibernateException e) {
+				if (tx!=null)
+					tx.rollback();
+				throw e;
+			}
+			finally {
+				s.close();
 			}
 		}
 	}

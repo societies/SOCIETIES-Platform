@@ -334,6 +334,20 @@ public class CommsServer implements IFeatureServer {
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.acceptCssFriendRequest(request);
 			break;
+			case DECLINE_CSS_FRIEND_REQUEST:
+				receivedID = stanza.getFrom();
+				//TODO: REPLACE WITH NEW IDENTITY FUNCTION
+				receivedIDcloud =  receivedID.getIdentifier() + "." + receivedID.getDomain();
+				LOG.info("DECLINE_CSS_FRIEND_REQUEST receivedIDcloud result is : " +receivedIDcloud);
+				
+				//SAVE receivedIDcloud TO DATABASE INSTEAD
+				request.setCssIdentity(receivedIDcloud);
+				LOG.info("DECLINE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.declineCssFriendRequest(request);
+			break;
 			}
 		}
 	}
