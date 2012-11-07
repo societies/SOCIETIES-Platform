@@ -11,6 +11,7 @@ import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
+import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.platform.cis.CisDirectoryBase;
 import org.societies.android.platform.cis.CommunityManagementBase;
 import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
@@ -213,14 +214,16 @@ public class TestActivityCIS extends Activity {
     		Log.d(LOG_TAG, ">>>>>>>>serviceCISdirConnected: " + serviceCISdirConnected);
 
     		//TEST: CREATE CIS
+    		AMembershipCrit aCrit = new AMembershipCrit();
 			List<ACriteria> rules = new ArrayList<ACriteria>();
 			ACriteria crit1 = new ACriteria();
 			//ACriteria crit2 = new ACriteria();
 			crit1.setAttrib("Location"); crit1.setOperator("equals"); crit1.setRank(1); crit1.setValue1("Paris");
 			//crit2.setAttrib("Age"); crit2.setOperator(">"); crit2.setRank(2); crit2.setValue1("18");
 			rules.add(crit1);
+			aCrit.setACriteria(rules);
 			//rules.add(crit2);
-			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", rules, "privacy policy stuff");
+			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", aCrit, "privacy policy stuff");
     		
 			//TEST: GET ALL CIS ADVERTISEMENTS FROM DIRECTORY
 			serviceCISdir.findAllCisAdvertisementRecords(CLIENT_PACKAGE);
