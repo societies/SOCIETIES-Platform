@@ -24,38 +24,31 @@ package org.societies.webapp.controller;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.entity.StandardEntityCollection;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.webapp.models.PrivacyAssessmentForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +68,7 @@ public class PrivacyAssessmentController {
 
 	// FIXME: The path should not depend on Virgo version, etc.
 	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-			"global/bundle/societies-webapp/0.4.0/societies-webapp.war/";
+			"global/bundle/societies-webapp/0.4.1/societies-webapp.war/";
 
 	/**
 	 * URL parts without prefix and suffix
@@ -101,12 +94,14 @@ public class PrivacyAssessmentController {
 			public static final String RECEIVER_IDS = "Receiver identities";
 			public static final String SENDER_IDS = "Sender identities";
 			public static final String SENDER_CLASSES = "Sender classes";
-			public static final String DATA_ACCESS_CLASSES = "Data access classes";
+			public static final String DATA_ACCESS_IDS = "Data access by identities";
+			public static final String DATA_ACCESS_CLASSES = "Data access by classes";
 
 			// Keys
 			public static final String RECEIVER_IDS_KEY = "receiverIds";
 			public static final String SENDER_IDS_KEY = "senderIds";
 			public static final String SENDER_CLASSES_KEY = "senderClasses";
+			public static final String DATA_ACCESS_IDS_KEY = "dataAccessIds";
 			public static final String DATA_ACCESS_CLASSES_KEY = "dataAccessClasses";
 		}
 		
@@ -220,12 +215,13 @@ public class PrivacyAssessmentController {
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.RECEIVER_IDS_KEY, Presentation.SubjectTypes.RECEIVER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_IDS_KEY, Presentation.SubjectTypes.SENDER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_CLASSES_KEY, Presentation.SubjectTypes.SENDER_CLASSES);
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY, Presentation.SubjectTypes.DATA_ACCESS_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY, Presentation.SubjectTypes.DATA_ACCESS_CLASSES);
 		model.put("assessmentSubjectTypes", assessmentSubjectTypes);
 
 		Map<String, String> presentationFormats = new LinkedHashMap<String, String>();
-		presentationFormats.put(Presentation.Format.TABLE, Presentation.Format.TABLE);
 		presentationFormats.put(Presentation.Format.CHART, Presentation.Format.CHART);
+		presentationFormats.put(Presentation.Format.TABLE, Presentation.Format.TABLE);
 		model.put("presentationFormats", presentationFormats);
 
 		Map<String, String> assessmentSubjects = new LinkedHashMap<String, String>();
@@ -257,79 +253,133 @@ public class PrivacyAssessmentController {
 		String presentationFormat = assForm.getPresentationFormat();
 		String subjectType = assForm.getAssessmentSubjectType();
 		LOG.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
-		Object assValues;
 		Collection<PrivacyAssessmentForm> charts = new ArrayList<PrivacyAssessmentForm>();
 		
 		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
 			
 			String chartFileName = "chart-1.png";
-			String chart2Filename = "chart-2.png";
-			double[][] data1;
-			double[][] data2;
 			
-			data2 = new double[][] {  // TODO
-					{210, 300, 320, 265, 299},
-					{200, 304, 201, 201, 340}
-					};
+			String title;
+			String xlabel;
+			String ylabel;
+			PlotData[] plotData;
+			String[] plotDataLabels;
 			
-			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
-				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-				assResult = assessment.getAssessmentAllIds();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
-						};
+			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.RECEIVER_IDS;
+				xlabel = "Receiver identity";
+				ylabel = "Number of data transmissions";
+				
+				Map<IIdentity, Integer> identities;
+				identities = assessment.getNumDataTransmissionEventsForAllReceivers(
+						new Date(0), new Date());
+				LOG.debug("Number of identities data has been transmitted to: {}", identities.size());
+				plotData = new PlotData[] {mapToArrays(identities)};
+				plotDataLabels = new String[] {"data"};
 			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
-				// FIXME
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.SENDER_IDS;
+				xlabel = "Sender identity";
+				ylabel = "Correlation of data transmission and data access";
+
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
+
+				int size = assResult.size();
+				IIdentity[] labels = new IIdentity[size];
+				double[][] data = new double[2][size];
+				Iterator<IIdentity> iterator = assResult.keySet().iterator();
+				
+				LOG.debug("privacyAssessment(): size = {}", size);
+				
+				for (int k = 0; k < size; k++) {
+					labels[k] = iterator.next();
+					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
+					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+					
+					LOG.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+					LOG.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+					LOG.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+				}
+				
+				plotData = new PlotData[] {
+						new PlotData(data[0], labels),
+						new PlotData(data[1], labels)
+						};
+				plotDataLabels = new String[] {
+						"Correlation with data access by the sender identity",
+						"Correlation with data access by any identity"
 						};
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
+				
+				title = Presentation.SubjectTypes.SENDER_CLASSES;
+				xlabel = "Sender class";
+				ylabel = "Correlation of data transmission and data access";
+
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
-				assValues = assResult.values();
-				data1 = new double[][] {  // TODO
-						{210, 300, 320, 265, 299},
-						{200, 304, 201, 201, 340}
-						};
 
+				int size = assResult.size();
+				String[] labels = new String[size];
+				double[][] data = new double[2][size];
+				Iterator<String> iterator = assResult.keySet().iterator();
+				for (int k = 0; k < size; k++) {
+					labels[k] = iterator.next();
+					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
+					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+				}
+				
+				plotData = new PlotData[] {
+						new PlotData(data[0], labels),
+						new PlotData(data[1], labels)
+						};
+				plotDataLabels = new String[] {
+						"Correlation with data access by the sender class",
+						"Correlation with data access by any class"
+						};
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
-				Map<IIdentity, Integer> dataAccessIdentities;
+				
+				title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
+				xlabel = "Class";
+				ylabel = "Number of accesses to local data";
+
 				Map<String, Integer> dataAccessClasses;
-				PlotData data;
-				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
-				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
 				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
-				data = mapToArrays(dataAccessIdentities);
-				data1 = new double[][] {data.getData()};
-				data = mapToArrays(dataAccessClasses);
-				data2 = new double[][] {data.getData()};
+				plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
+				plotDataLabels = new String[] {"data"};
+			}
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
+				
+				title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
+				xlabel = "Identity";
+				ylabel = "Number of accesses to local data";
+
+				Map<IIdentity, Integer> identities;
+				identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+				LOG.debug("Number of data access events (by identity): {}", identities.size());
+				plotData = new PlotData[] {mapToArrays(identities)};
+				plotDataLabels = new String[] {"data"};
 			}
 			else {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
 				return privacyAssessment();
 			}
-			//model.put("assessmentResults", assValues);
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
-			form1.setAssessmentSubject("Subject 1");
-			createBarchart(null, "Identity", "Packets per month", data1, chartFileName);
+			form1.setAssessmentSubject(title);
+//			createBarchart(null, xlabel, ylabel, dataLabels, data, chartFileName);
+			createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
-			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
-			form2.setAssessmentSubject("Subject 2");
-			createBarchart(null, "Class", "Correlation with data access by same identity", data2, chart2Filename);
-			form2.setChart(chart2Filename);
-			charts.add(form2);
+//			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
+//			form2.setAssessmentSubject(title + " 2");
+//			form2.setChart(chartFileName);
+//			charts.add(form2);
 			model.put("assessmentResults", charts);
 
 			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
@@ -370,73 +420,58 @@ public class PrivacyAssessmentController {
 		return new PlotData(data, labels);
 	}
 
-	/**
-	 * 
-	 * @param title
-	 * @param categoryLabel
-	 * @param valueLabel
-	 * @param data The data to be displayed. Example: <br/>
-	 *        new double[][] { <br/>
-	 *        {210, 300, 320, 265, 299}, <br/>
-	 *        {200, 304, 201, 201, 340} <br/>
-	 *        };
-	 * @param filename
-	 */
-	private void createBarchart(String title, String categoryLabel, String valueLabel, double[][] data, String filename) {
-
-		LOG.debug("createBarchart({}, ..., {})", title, filename);
+//	private void createBarchart(String title, String categoryLabel, String valueLabel,
+//			PlotData data, String filename) {
+//		
+//		createBarchart(title, categoryLabel, valueLabel, new PlotData[] {data},
+//				new String[] {"data"}, filename);
+//	}
+	
+	private void createBarchart(String title, String categoryLabel, String valueLabel,
+			PlotData[] data, String[] dataLabels, String filename) {
 		
-		final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
-				categoryLabel + " ", "", data);
-
-		JFreeChart chart;
-		BarRenderer renderer;
-		CategoryPlot plot;
-
-		CategoryAxis categoryAxis;
-		ValueAxis valueAxis;
+		DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+		int maxDataLength = 0;
 		
-		if (categoryLabel == null) {
-			categoryAxis = new CategoryAxis();
+		for (int i = 0; i < dataLabels.length; i++) {
+			for (int j = 0; j < data[i].getData().length; j++) {
+				dataSet.addValue(data[i].getData()[j], dataLabels[i], data[i].getLabels()[j]);
+			}
+			if (maxDataLength < data[i].getData().length) {
+				maxDataLength = data[i].getData().length;
+			}
 		}
-		else {
-			categoryAxis = new CategoryAxis(categoryLabel);
+
+		JFreeChart chart = ChartFactory.createBarChart(
+				title,
+				categoryLabel,
+				valueLabel,
+				dataSet,
+				PlotOrientation.VERTICAL,
+				dataLabels.length > 1,  // display legend
+				false,
+				false
+				);
+
+		CategoryPlot plot = (CategoryPlot)chart.getPlot();
+		CategoryAxis xAxis = (CategoryAxis)plot.getDomainAxis();
+		xAxis.setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
+		xAxis.setMaximumCategoryLabelLines(6);
+
+		//chart.setBackgroundPaint(ChartColor.WHITE);
+		int width = 50 + maxDataLength * 170;
+		if (maxDataLength < 3) {
+			width += 170;
 		}
-//		categoryAxis.setTickLabelsVisible(false);
-//		categoryAxis.setVisible(false);
-		if (valueLabel == null) {
-			valueAxis = new NumberAxis();
-		}
-		else {
-			valueAxis = new NumberAxis(valueLabel);
-		}
-		renderer = new BarRenderer();
-
-		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-		plot.setOrientation(PlotOrientation.HORIZONTAL);
-		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-
-//		chart.setBackgroundPaint(new Color(255, 255, 255));
-//
-//		Paint p1 = new GradientPaint(
-//				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
-//		renderer.setSeriesPaint(1, p1);
-//
-//		Paint p2 = new GradientPaint(
-//				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
-//		renderer.setSeriesPaint(2, p2);
-
-		plot.setRenderer(renderer);
-
+		int height = 400;
 		try {
-			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-			final File file1 = new File(contextPath + filename);
-			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
-		} catch (Exception e) {
+			File file = new File(contextPath + filename);
+			ChartUtilities.saveChartAsPNG(file, chart, width, height);
+		} catch(IOException e) {
 			LOG.warn("createBarchart(): ", e);
 		}
 	}
-
+	
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessmentSettings() {
 
