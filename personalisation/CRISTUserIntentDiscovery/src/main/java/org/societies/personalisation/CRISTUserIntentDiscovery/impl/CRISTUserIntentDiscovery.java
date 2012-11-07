@@ -41,7 +41,7 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentDiscovery.class);
-	public static final int MAX_PREDICTION_STEP = 3;
+	public static final int MAX_PREDICTION_STEP = 1;
 
 	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
@@ -91,6 +91,11 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData) {
+		
+		// here we learn from the whole history, so create new intentModel.
+		// further we can learn incrementally.
+		intentModel = new LinkedHashMap<String, Integer>();
+		
 		// TODO Auto-generated method stub
 		//ensure not return null
 		ArrayList<CRISTHistoryData> historyList = historyData;
@@ -103,16 +108,18 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		// Construct User Intent Model based on one's history data
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
+		String lastActionID = "STARTING_ACTION";
 		for (int i = 0; i < historySize; i++) {
 			CRISTHistoryData currentHisData = historyList.get(i);
-			String currentHisAction = ((CRISTUserAction)currentHisData.getAction()).getActionID();
+			
 			String currentHisSituation = currentHisData.getSituation().getSituationID();
-			String currentBehavior = currentHisAction + "@"
+			String currentBehavior = lastActionID + "@"
 					+ currentHisSituation;
 			behaviorRecords.add(currentBehavior);
 			if (!behaviorRecords_unique.contains(currentBehavior)) {
 				behaviorRecords_unique.add(currentBehavior);
 			}
+			lastActionID = ((CRISTUserAction)currentHisData.getAction()).getActionID();
 		}
 
 		// Identify patterns
@@ -123,7 +130,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 			ArrayList<String> cadidateActionList = new ArrayList<String>();
 			for (int j = 0; j < indexList.length; j++) {
 				String currentCadidate = "";
-				for (int k = 1; k <= MAX_PREDICTION_STEP; k++) {
+				for (int k = 0; k < MAX_PREDICTION_STEP; k++) {
 					int currentIndex = indexList[j] + k;
 					if (currentIndex >= historyList.size()) {
 					      break;

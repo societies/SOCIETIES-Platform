@@ -50,8 +50,8 @@ var	SocietiesCISManagerService = {
 			alert("createCIS - failure: " + data);
 		}
 		
-		var cisName = jQuery("#cisNameOnCisCreate").val(),
-            cisType = jQuery("#cisCategoryOnCisCreate").val(),
+		var cisName = $("#cisNameOnCisCreate").val(),
+            cisType = $("#cisCategoryOnCisCreate").val(),
             cisCriteria = [{
                     "attrib": "age",
                     "operator": "greater than",
@@ -61,6 +61,30 @@ var	SocietiesCISManagerService = {
              cisCriteriaEmpty = [],
              cisDescription = jQuery("#cisDescOnCisCreate").val(),
              privacyPolicy = "<RequestPolicy />";
+		//TODO: TEMP WORKAROUND TO CREATE MEMBERS ONLY PRIVACY POLICY
+		if ($("#selPrivacyPolicy").attr('value') == "shared")
+			privacyPolicy = "<RequestPolicy><Target><Resource>" +
+					"    <Attribute AttributeId=\"cis\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+					"       <AttributeValue>cis-member-list</AttributeValue>" +
+					"    </Attribute>" +
+					"</Resource>" +
+					"<Action>" +
+					"    <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" +
+					"               DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+					"        <AttributeValue>READ</AttributeValue>" +
+					"    </Attribute>" +
+					"<optional>false</optional>" +
+					"</Action>" +
+					"<Condition>" +
+					"    <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" +
+					"            DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+					"        <AttributeValue DataType=\"SHARE_WITH_CIS_MEMBERS_ONLY\">1</AttributeValue>" +
+					"    </Attribute>" +
+					"<optional>false</optional>" +
+					"</Condition>" +
+					"<optional>false</optional>" +
+					"</Target></RequestPolicy>";
+		
 		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteriaEmpty, privacyPolicy);
 	},
 	
@@ -230,8 +254,9 @@ var	SocietiesCISManagerService = {
 		}
 		
 		function failure(data) {
-			alert("getJoinResponse - failure: " + data);
+			//alert("getJoinResponse - failure: " + data);
 		}
+		
 		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
 					window.plugins.SocietiesLocalCISManager.joinCis(cisAdvert, success, failure); } );
 	}

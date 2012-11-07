@@ -536,8 +536,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, communityMessage.getJoinResponse().isResult());
 					}
-					
 				}
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
