@@ -47,6 +47,7 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
 
 List<Service> myServices = (List<Service>) request.getAttribute("services");
 List<Service> cisServices = (List<Service>) request.getAttribute("cisservices");
+String myNode = (String) request.getAttribute("myNode");
 
 %>
 <a href="javascript:history.back()">&lt;--back</a>
@@ -111,10 +112,9 @@ function updateForm(serviceID, toDo) {
 		     	<td><%= myService.getServiceDescription() %></td>
 		        <td><%= myService.getServiceType() %></td>
 		        <td><%= myService.getServiceStatus() %></td>      
-		        <td>
-				
+		        <td>			
 		         <%
-		            
+
 				if(!myService.getServiceType().equals(ServiceType.DEVICE)){
 	    			if(myService.getServiceType().equals(ServiceType.THIRD_PARTY_SERVER)){
 	        			%>
@@ -177,16 +177,22 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
     		if(!cisService.getServiceType().equals(ServiceType.DEVICE)){
     			%>
     			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+    			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>', 'Install3PService')" >  			
     			<%		
     		} else{
     			%>
     			Device 
     			<%
+    			if(isMine(cisService,myNode)){
+        			%>
+        			is mine!
+        			<%
+    			} else {
+    				%>
+        			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>', 'Install3PService')" >  			
+					<%
+    			}		
     		}
-    		
-        	%>
-			<input type="button" value="install" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(cisService.getServiceIdentifier())%>', 'Install3PService')" >
-        	<%
         	
         } else{
         	%>
@@ -230,7 +236,12 @@ boolean haveClient(Service sharedService, List<Service> installedServices){
 }
 %>
 
-	
+<%!
+boolean isMine(Service sharedService, String myNode){
+		
+	return sharedService.getServiceInstance().getFullJid().equals(myNode);
+}
+%>
 </form>	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

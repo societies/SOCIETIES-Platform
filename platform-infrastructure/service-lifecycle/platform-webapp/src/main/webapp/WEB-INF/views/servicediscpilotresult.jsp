@@ -41,7 +41,7 @@ function updateForm(serviceID, toDo) {
 } 
 </script>
 
-<form method="POST" action="servicecontrol.html" id="scForm" name="scForm">
+<form method="POST" action="servicecontrol.html" id="scForm" name="scForm" enctype="multipart/form-data">
 <input type="hidden" name="service" id="service">
 <input type="hidden" name="method" id="method">
 <input type="hidden" name="endpoint" id="endpoint"/>
@@ -101,6 +101,11 @@ for(Service myService : myServices ){
 }
 %>
 </table>
+
+<h3>Install new service</h3>
+<input type="file" name="fileData">
+<input type="button" value="Install" onclick="updateForm('NONE', 'InstallService')" >
+
 	
 </form>	
 <!-- .................END PLACE YOUR CONTENT ................ -->
