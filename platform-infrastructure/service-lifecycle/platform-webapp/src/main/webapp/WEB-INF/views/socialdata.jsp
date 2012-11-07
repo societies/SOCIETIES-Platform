@@ -92,38 +92,44 @@ div#addConnector{
 	
 	
      <div id="container">
-     <h1>Social Network Data</h1>
+     <h1>Social Network Management</h1>
     <p> 
-         <strong>Socialdata</strong> is a bundle that manages your social data. Connecting your Social Network <br>
-         by on of the Societies Social Connector, you can use your social activity, friends, profiles and groups to  <br>
-         enrich services and context. This bundle doesn't store anything internally, it just provides <br>
-         a proxy to social data, using OpenSocial (Shindig) data model. Enjoy!
+         <strong>SocialData</strong> links your Social Networks with <strong>SOCIETIES</strong>. 
+         <br>Your social friends, profile preferences, groups and activities 
+         <br>will be then part of your network. Link them and Enjoy!
     
     </p>  
+    
+    
 	      
 <div class="split2">
    <div id="connectors">
-      <h2>Your connectors</h2>
-      <p>Connector list of your social network. </p>
+      <h2>Connected Networks</h2>
+      <p>Below the list of connectors active</p>
        <ul id="listConn">
 		     ${connectors}
 		</ul>
    </div>
    <div>
-      <h2>Get Social data</h2>
+      <h2>Links</h2>
       <p>With those commands it is possible to fetch<br>social data from all the connectors</p>
       <ul>
-         <li><a href="#" onclick="exe('friends');">Get your social network's <strong>Friends </strong></a></li>
-         <li><a href="#" onclick="exe('profiles');">Get your Social <Strong>Profiles</Strong></a></li>
-         <li><a href="#" onclick="exe('activities');">Read the <Strong>Activities</strong> feed</a></li>
-         <li><a href="#" onclick="exe('groups');">Get a list of subscribed <strong>Groups</a></strong></li>
+         <li><a href="#" onclick="exe('friends');">Show Social <strong>Friends </strong></a></li>
+         <li><a href="#" onclick="exe('profiles');">Show connected <Strong>Profiles</Strong></a></li>
+         <li><a href="#" onclick="exe('activities');">Show <Strong>Activities</strong> feed</a></li>
+         <li><a href="#" onclick="exe('groups');">Show subscribed <strong>Groups</a></strong></li>
+         <li><a href="#" onclick="exe('update');"> <strong>Update</strong></a></li>
+         <li>Last update: ${lastupdate}</strong></li>
       </ul>
    </div>
 </div>
+
+
 <div class="wide">
 
  
 
+ 
    <div id="popup" style="visibility:hidden" ><img src="images/loading.gif"> Loading connector data. Please wait... </div><br>
    <p> Connect your social network with Societies <br/>
      <input class="icon" onclick="getToken('http://dev.lucasimone.eu/fb.php', 'facebook');" type="image" src="images/facebook.png">
@@ -132,7 +138,6 @@ div#addConnector{
 	 <input class="icon" onclick="getToken('http://dev.lucasimone.eu/auth.php', 'Linkedin')" type="image" src="images/Linkedin.png">
    </p>
    <div id="addConnector">
-   
   <form:form method="POST" action="socialdata.html" commandName="sdForm" name="sd">
 		     
 	        <p> 

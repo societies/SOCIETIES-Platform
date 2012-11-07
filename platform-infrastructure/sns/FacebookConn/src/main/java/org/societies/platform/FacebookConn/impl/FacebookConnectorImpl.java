@@ -85,16 +85,16 @@ public class FacebookConnectorImpl implements FacebookConnector {
 
 	public String getToken() {
 		
-		facebookClient = new DefaultFacebookClient();
-		String appId		= "368482799848413";
-		String secretKey	= "c1788688a3091638768ed803d6ebdbd0";
-		String sessionKeys  = null;
-		List<AccessToken> tokens = facebookClient.convertSessionKeysToAccessTokens(appId, secretKey, sessionKeys);
-		Iterator<AccessToken>it = tokens.iterator();
-		while(it.hasNext()){
-			AccessToken at= it.next();
-			System.out.println("token:"+at.getAccessToken() + "expires:"+at.getExpires());
-		}
+//		facebookClient = new DefaultFacebookClient();
+//		String appId		= "368482799848413";
+//		String secretKey	= "c1788688a3091638768ed803d6ebdbd0";
+//		String sessionKeys  = null;
+//		List<AccessToken> tokens = facebookClient.convertSessionKeysToAccessTokens(appId, secretKey, sessionKeys);
+//		Iterator<AccessToken>it = tokens.iterator();
+//		while(it.hasNext()){
+//			AccessToken at= it.next();
+//			//System.out.println("token:"+at.getAccessToken() + "expires:"+at.getExpires());
+//		}
 		return access_token;
 	}
 	public void setConnectorName(String name) {

@@ -54,7 +54,7 @@ public class LinkedinConnector implements ISocialConnector {
 		this.name 			= ISocialConnector.LINKEDIN_CONN;
 		this.id				= this.name + "_" + UUID.randomUUID();
 		this.service 		= token.getAuthService();
-		 
+		this.access_token   = access_token;
 //		 Scanner in = new Scanner(System.in);
 //		 
 //		 System.out.println("=== LinkedIn's OAuth Workflow ===");
