@@ -572,7 +572,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID(),i.getOwner()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
 			
@@ -947,7 +947,8 @@ public class JoinCallBack implements ICisManagerCallback{
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()
+						,c.getNotification().getSubscribedTo().getCommunity().getOwnerJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){

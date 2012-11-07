@@ -142,6 +142,10 @@ public class CisSubscribedImp implements ICis {
 		return this.cisRecord.getCisName();
 	}
 
+	@Override
+	public String getOwnerId(){
+		return this.cisRecord.getOwner();
+	}
 	
 	public void startAfterDBretrieval(CisManager cisManag){
 		this.cisManag = cisManag;

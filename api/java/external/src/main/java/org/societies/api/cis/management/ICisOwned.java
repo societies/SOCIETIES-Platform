@@ -89,9 +89,7 @@ public interface ICisOwned extends ICis {
 	public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException;
 	
 	
-	// some getters and setters. TODO: change them to return Future so they can work for both remote and local CISs
-	// as soon as this is done, we will add the javadoc as well
-	public String getOwnerId();
+
 	public String getCisType();
 	public String setCisType(String type);
 	public String getDescription();

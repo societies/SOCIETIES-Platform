@@ -25,6 +25,7 @@
 
 package org.societies.cis.manager;
 
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -175,8 +176,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
-	@Column
-	public String owner;
+	//@Column
+	//public String owner;
 	
 	//@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
 	//@Transient
@@ -400,7 +401,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.description = description;
 		
-		this.owner = cssOwner;
+		//this.owner = cssOwner;
 		this.cisType = cisType;
 
 		
@@ -464,8 +465,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS listener registered");
 		
 		
-		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(cisName, cisIdentity.getJid());
+		cisRecord = new CisRecord(cisName, cisIdentity.getJid(),cssOwner);
 		
 		LOG.info("CIS creating pub sub service");
 		
@@ -484,7 +484,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if(null != this.psc){
 			try {
 				LOG.info("starting activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
 			} catch (InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				LOG.info("starting activ feed without pubsub");
@@ -564,7 +564,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if(null != this.psc){
 			try {
 				LOG.info("restoring activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
 			} catch (InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				LOG.info("restoring activ feed without pubsub");
@@ -931,54 +931,29 @@ public class Cis implements IFeatureServer, ICisOwned {
 				CommunityMethods result = new CommunityMethods();
 				WhoResponse who = new WhoResponse();
 				result.setWhoResponse(who);
-				who.setResult(false);
-				this.getMembersCss();
-		
-				// -- Access control
-				/* TODO
-				 * At the moment, if the requestor is not available, the access control is not done.
-				 */
-				if(null != this.privacyDataManager && null != c.getWhoRequest().getRequestor()){
-					Requestor requestor = null;
-					ResponseItem resp = null;
-					DataIdentifier dataId = null;
-					try {
-						requestor = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
-						dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
-						resp = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
-					} catch (MalformedCtxIdentifierException e) {
-						LOG.error("The identifier of the requested data is malformed", e);
-					} catch (PrivacyException e) {
-						LOG.error("Error during access control of this data", e);
-					} catch (InvalidFormatException e) {
-						LOG.error("The requestor of this data is not identifiable", e);
+				who.setResult(false);		
+				if(null == c.getWhoRequest().getRequestor())return result; // fails if there is no requestor
+				// otherwise we call locally
+				Requestor requestor;
+				try {
+					requestor = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
+					GetListCallBack g = new GetListCallBack();
+					this.getListOfMembers(requestor, g);
+					while(false == g.isDone()){
+						LOG.info("SLEPT!");
+						Thread.sleep(100);
 					}
-					// No permission
-					if(null == resp || !Decision.PERMIT.equals(resp.getDecision())){
-						LOG.info("This requestor: "+requestor);
-						LOG.info("doesn't have the permission to retrieve this data: "+dataId);
-						who.setParticipant(null);
-						return result;
-					}
+					who.setResult(g.getResp());
+					who.setParticipant(g.getList());
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				else{
-					if(null == this.privacyDataManager)LOG.info("privacy data manager is null");
-					else LOG.info("requestor is null");
-				}
-				LOG.info("permission was granted");
-				Set<CisParticipant> s = this.getMembersCss();
-				Iterator<CisParticipant> it = s.iterator();
 				
-				while(it.hasNext()){
-					CisParticipant element = it.next();
-					Participant p = new Participant();
-					p.setJid(element.getMembersJid());
-					p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
-					who.getParticipant().add(p);
-			     }
-				who.setResult(true);
 				
-
 				return result;
 				// END OF WHO
 			}
@@ -1293,6 +1268,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		return new AsyncResult<Set<ICisParticipant>>(s);
 	}
 	
+
+	
+	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
 		LOG.debug("getListOfMembers: callback");
@@ -1302,7 +1280,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		CommunityMethods c = new CommunityMethods();
 		WhoResponse w = new WhoResponse();
 		c.setWhoResponse(w);
-		w.setResult(false);
+		w.setResult(true);
 		
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
@@ -1327,7 +1305,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		CommunityMethods c = new CommunityMethods();
 		
 		// -- Access control
-		if(null != this.privacyDataManager){
+		if(null != this.privacyDataManager && null != requestor){
 			ResponseItem resp = null;
 			DataIdentifier dataId = null;
 			try {
@@ -1347,7 +1325,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}
 		}
 		else{
-			LOG.info("Privacy data manager is null");
+			LOG.info("Privacy data manager or requestor is null");
 		}
 		LOG.info("permission was granted");
 		// -- Retrieve the list of members
@@ -1499,7 +1477,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	@Override
 	public String getOwnerId() {
-		return this.owner;
+		return this.cisRecord.getOwner();
 	}
 
 	@Override
@@ -1721,5 +1699,27 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	} 
 
+	// subclass for local get list callbacks
+	private class GetListCallBack implements ICisManagerCallback{
+		public boolean done = false;
+		public boolean resp = false;
+		public List<Participant> l = null;
+		
+		public GetListCallBack (){super();}
+		 
+		public void receiveResult(CommunityMethods communityResultObject) {
+			if(communityResultObject != null){
+				resp = communityResultObject.getWhoResponse().isResult();
+				l = communityResultObject.getWhoResponse().getParticipant();
+			}
+			
+			this.done=true; 
+			return;
+			
+		}
+		public boolean isDone(){return done;}
+		public boolean getResp(){return resp;}
+		public List<Participant> getList(){return l;}
+	}
 	
 }
