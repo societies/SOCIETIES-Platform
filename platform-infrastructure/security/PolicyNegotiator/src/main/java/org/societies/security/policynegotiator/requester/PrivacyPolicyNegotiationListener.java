@@ -39,6 +39,7 @@ import org.societies.api.internal.security.storage.ISecureStorage;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 
 /**
@@ -55,6 +56,9 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	String slaKey;
 	List<URI> fileUris;
 	
+	String[] eventTypes;
+	IEventMgr eventMgr;
+	
 	//private long timestamp;
 	
 	/**
@@ -65,10 +69,16 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * @param slaKey The key to gather SLA from secure storage using
 	 * {@link ISecureStorage#getDocument(String)}
 	 */
-	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey, List<URI> fileUris) {
+	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey,
+			List<URI> fileUris, IEventMgr eventMgr, String[] eventTypes) {
+		
 		this.finalCallback = finalCallback;
 		this.slaKey = slaKey;
 		this.fileUris = fileUris;
+		
+		this.eventTypes = eventTypes;
+		this.eventMgr = eventMgr;
+		
 		//this.timestamp = System.nanoTime();
 	}
 	
@@ -109,6 +119,9 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	}
 	
 	private void notifySuccess() {
+		
+		eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
+
 		if (finalCallback != null) {
 			LOG.debug("invoking final callback");
 			finalCallback.onNegotiationComplete(slaKey, fileUris);
@@ -121,6 +134,8 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	
 	private void notifyFailure() {
 		LOG.warn("Privacy policy negotiation failed");
+
+		eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
 
 		finalCallback.onNegotiationError("");
 	}
