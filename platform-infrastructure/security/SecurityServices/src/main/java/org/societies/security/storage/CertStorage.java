@@ -49,7 +49,7 @@ public class CertStorage {
 
 	private static final String defaultCertificate = "default_certificate.p12";
 	
-	private static CertStorage instance;
+	//private static CertStorage instance;
 
 	// private XmlManipulator xml = Config.getInstance().getXml();
 	private X509Certificate ourCert;
@@ -57,21 +57,34 @@ public class CertStorage {
 	private String certFile;
 	private String certPassword;
 
-	private CertStorage() throws StorageException {
-		initOurIdentity();
+	public CertStorage() throws StorageException {
+		// Do not call this method until certFile and certPassword are initialised.
+		//initOurIdentity();
 	}
 
-	public void setCertFileName(String certFileName) {
-		LOG.info("Setting certificate file name to {}", certFileName);
-		this.certFile = certFileName;
+	public String getCertFile() {
+		LOG.warn("getCertFile()");
+		return certFile;
 	}
 
-	public void setCertPass(String certPass) {
-		LOG.info("Setting certificate password to {}", certPass);
-		this.certPassword = certPass;
+	public void setCertFile(String certFile) {
+		LOG.info("Setting certificate file name to {}", certFile);
+		this.certFile = certFile;
 	}
 
-	private void initOurIdentity() throws StorageException {
+	public String getCertPassword() {
+		LOG.warn("getCertPassword()");
+		return certPassword;
+	}
+
+	public void setCertPassword(String certPassword) {
+		LOG.info("Setting certificate password to {}", certPassword);
+		this.certPassword = certPassword;
+	}
+
+	public void initOurIdentity() throws StorageException {
+		
+		LOG.info("initOurIdentity()");
 		
 		InputStream ksStream;
 		
@@ -117,9 +130,9 @@ public class CertStorage {
 		return ourKey;
 	}
 
-	public static synchronized CertStorage getInstance() throws StorageException {
-		if (instance == null)
-			instance = new CertStorage();
-		return instance;
-	}
+//	public static synchronized CertStorage getInstance() throws StorageException {
+//		if (instance == null)
+//			instance = new CertStorage();
+//		return instance;
+//	}
 }

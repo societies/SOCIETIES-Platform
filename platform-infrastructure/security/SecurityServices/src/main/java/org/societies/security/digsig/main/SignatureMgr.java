@@ -46,27 +46,31 @@ public class SignatureMgr implements ISignatureMgr {
 
 	private DigSig digSig = new DigSig();
 	private XmlDSig xmlDSig = new XmlDSig();
-	private CertStorage certificates;
+	private CertStorage certStorage;
+
+	public SignatureMgr() {
+	}
 	
-	public SignatureMgr() throws StorageException {
+	public void init() {
 		
 		LOG.info("SignatureMgr()");
 		
-		try {
-			certificates = CertStorage.getInstance();
-		} catch (StorageException e) {
-			LOG.error("Could not initialize storage", e);
-			throw e;
-		}
-		
-		X509Certificate cert = certificates.getOurCert();
-		Key key = certificates.getOurKey();
+		X509Certificate cert = certStorage.getOurCert();
+		Key key = certStorage.getOurKey();
 		PrivateKey privateKey = (PrivateKey) key;
 		PublicKey publicKey = cert.getPublicKey();
 		
 		LOG.debug("Certificate: {}", cert);
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);
+	}
+	
+	public CertStorage getCertStorage() {
+		return certStorage;
+	}
+
+	public void setCertStorage(CertStorage certStorage) {
+		this.certStorage = certStorage;
 	}
 	
 	@Override
@@ -123,21 +127,21 @@ public class SignatureMgr implements ISignatureMgr {
 	public X509Certificate getCertificate(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
 		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only certificate is used.");
-		return certificates.getOurCert();
+		return certStorage.getOurCert();
 	}
 	
 	@Override
 	public PrivateKey getPrivateKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
 		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only private key is used.");
-		return certificates.getOurKey();
+		return certStorage.getOurKey();
 	}
 	
 	private PublicKey getPublicKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
 		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
 		
-		X509Certificate cert = certificates.getOurCert();
+		X509Certificate cert = certStorage.getOurCert();
 		
 		if (cert == null) {
 			LOG.warn("Certificate for {} not found", identity);
