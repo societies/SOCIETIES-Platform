@@ -149,6 +149,7 @@ public interface ICis {
 	 */
     public IActivityFeed getActivityFeed();
     
-    
+	public String getOwnerId();
+
     
 }

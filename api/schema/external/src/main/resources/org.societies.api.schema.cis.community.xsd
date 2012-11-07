@@ -84,6 +84,7 @@
  	 <xs:complexType>
 	 	 <xs:sequence>
 			<xs:element ref='membershipCrit' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='participant' minOccurs='0' maxOccurs='unbounded'/>
 		</xs:sequence>
 	
 		  <xs:attribute name='owner-jid' type='xs:string'/> 

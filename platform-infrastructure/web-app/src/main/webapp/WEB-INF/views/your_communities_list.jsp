@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,22 +82,27 @@
 <header>
 </header>
 <ol class="keyinfolist">
-<li class="keyinfo bypostauthor">
-<figure class="gravatar">
-<a href="community_profile.html"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
-<a class="keyinfo-reply-link" href="community_profile.html">INFO</a>
-</figure>
-<div class="keyinfo_content">
-<div class="clearfix">
-<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
-<br/>
-<cite class="author_name"><a href="community_profile.html">ICT</a></cite>
-</div>
-<div class="keyinfo_text">
-<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
-</div>
-</div>
-</li>
+
+<xc:forEach var="record" items="${cisrecords}">
+		<li class="keyinfo bypostauthor">
+		<figure class="gravatar">
+		<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
+		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}"l">${record.getName()}</a>
+		</figure>
+		<div class="keyinfo_content">
+		<div class="clearfix">
+		
+		<cite class="author_name">Owner: ${record.getOwnerId()}</cite>
+		</div>
+		</div>
+		</li>
+</xc:forEach>
+
+
+
+
+
+
 <li class="keyinfo">
 <figure class="gravatar">
 <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
