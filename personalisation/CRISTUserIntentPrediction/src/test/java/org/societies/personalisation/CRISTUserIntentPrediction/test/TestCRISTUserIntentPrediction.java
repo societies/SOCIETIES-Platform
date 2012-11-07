@@ -143,6 +143,98 @@ public class TestCRISTUserIntentPrediction {
 
 			
 			System.out.println("Start to input mock history: ");
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//0
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//1
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//2
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//3
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//4
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//5		
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//6
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//7
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//8
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//9
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//0
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//1
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//2
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//3
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//4
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//5		
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//6
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//7
+			
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//8
+			
+			location.setStringValue("RoomB"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "1"));
+			Thread.sleep(100);//9
+			
+			
+			//testing
+			location.setStringValue("RoomA"); cristPredictor.getCRISTPrediction(userId, location);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "channel", "2"));
+			Thread.sleep(100);//	
+			
+			
+			
+			
+
+/*			
 			//status.setStringValue("busy"); cristPredictor.getCRISTPrediction(userId, status);
 			location.setStringValue("home"); cristPredictor.getCRISTPrediction(userId, location);
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
@@ -263,10 +355,20 @@ public class TestCRISTUserIntentPrediction {
 			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
 			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_MyTV, "TVService", "volume", "mute"));
 			Thread.sleep(100);//19
-			
+*/			
 			cristMgr.displayHistoryList();
 			cristMgr.displayIntentModel();
 			
+
+			//check the result
+			location.setStringValue("RoomB");
+			Future<List<CRISTUserAction>> results = cristPredictor.getCRISTPrediction(userId, location);
+			for (int i = 0; i < results.get().size(); i++)	{
+				System.out.println("Infer intent by context: (Last Action is channel 2, current location is RoomB)");
+				System.out.println("results.get().get(i).getActionID(): " + results.get().get(i).getActionID());
+				Assert.assertTrue(results.get().get(i).getActionID() != null);
+			}
+/*
 			
 			
 			//check the result
@@ -290,7 +392,7 @@ public class TestCRISTUserIntentPrediction {
 			System.out.println("result: " + result);
 			System.out.println("result.get(): " + result.get());
 			Assert.assertTrue(result != null); //.getActionID()result.get() != null
-
+*/
 /*			
 			verify(ctxBroker).retrieveIndividualEntity(userId);
 			verify(ctxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,

@@ -71,7 +71,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentTaskManager.class);
-	public static final int UPDATE_TRIGGER_THRESHOLD = 10;
+	public static final int UPDATE_TRIGGER_THRESHOLD = 5;
 	public static final int MAX_HISTORY_LENGTH = 1000;
 	public static HashMap<String, CtxAttributeIdentifier> REGISTERED_CONTEXTS = null;
 
@@ -1095,6 +1095,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		System.out.println("This is the intentModel: ");
 		Set<String> modelKeys = intentModel.keySet();
 		Object[] keyArray = modelKeys.toArray();
+		if (keyArray.length == 0)
+		{
+			System.out.println("intentModel is not null, but its length is zero.");
+		}
 		for (int i = 0; i < keyArray.length; i++) {
 			System.out.println(keyArray[i].toString() + ": " + intentModel.get(keyArray[i]));
 		}
