@@ -142,7 +142,7 @@ public class ContextUpdater {
 
 			if(facebook != null){
 
-				List<CtxIdentifier> attributeIdentifiers = this.internalCtxBroker.lookup(facebook.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
+				List<CtxIdentifier> attributeIdentifiers = this.internalCtxBroker.lookup(facebook.getId(), CtxModelType.ATTRIBUTE, type).get();
 				if (attributeIdentifiers.size()>0){
 				//	LOG.info("updating fb profile in context 1");
 					CtxIdentifier attrId = attributeIdentifiers.get(0);
@@ -152,7 +152,7 @@ public class ContextUpdater {
 					attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
 				} else {
 					//LOG.info("updating user profile in context 2");
-					attribute = this.internalCtxBroker.createAttribute(facebook.getId(), CtxAttributeTypes.BOOKS).get();
+					attribute = this.internalCtxBroker.createAttribute(facebook.getId(), type).get();
 					attribute = setAttrValueType(attribute, type,  value);
 					attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
 				}
