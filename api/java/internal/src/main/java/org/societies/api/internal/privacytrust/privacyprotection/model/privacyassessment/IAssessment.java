@@ -132,7 +132,7 @@ public interface IAssessment {
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end);
 
 	/**
-	 * Get number of local data access events in certain time period, grouped by requestor class name.
+	 * Get number of local data access events in certain time period, grouped by requestor identity.
 	 * 
 	 * @param start Match only events after this time
 	 * @param end Match only events before this time
@@ -141,11 +141,36 @@ public interface IAssessment {
 	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end);
 
 	/**
-	 * Get number of local data access events in certain time period, grouped by requestor identity.
+	 * Get number of local data access events in certain time period, grouped by requestor class name.
 	 * 
 	 * @param start Match only events after this time
 	 * @param end Match only events before this time
 	 * @return Number of data access events for each requestor identity
 	 */
 	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
+	
+	/**
+	 * @return All identities the messages have been sent to.
+	 */
+	public List<IIdentity> getDataTransmissionReceivers();
+
+	/**
+	 * Get number of events in certain time period where data has been sent to given receiver.
+	 * 
+	 * @param receiver Identity of the receiver (the one data has been sent to)
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return All events where receiver matches
+	 */
+	public int getNumDataTransmissionEvents(IIdentity receiver, Date start, Date end);
+	
+	/**
+	 * Get number of events in certain time period where data has been sent to any receiver.
+	 * Events are grouped by receiver identity.
+	 * 
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return Number of data transmission events for each receiver
+	 */
+	public Map<IIdentity, Integer> getNumDataTransmissionEventsForAllReceivers(Date start, Date end);
 }

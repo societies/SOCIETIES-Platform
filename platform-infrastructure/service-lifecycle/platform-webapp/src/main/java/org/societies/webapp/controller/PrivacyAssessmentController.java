@@ -268,20 +268,20 @@ public class PrivacyAssessmentController {
 			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
 				
 				title = Presentation.SubjectTypes.RECEIVER_IDS;
-				xlabel = "Identity";
-				ylabel = "Correlation of data transmission and data access";
-
-				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-				assResult = assessment.getAssessmentAllIds();
+				xlabel = "Receiver identity";
+				ylabel = "Number of data transmissions";
 				
-				// FIXME
-				plotData = null;
+				Map<IIdentity, Integer> identities;
+				identities = assessment.getNumDataTransmissionEventsForAllReceivers(
+						new Date(0), new Date());
+				LOG.debug("Number of identities data has been transmitted to: {}", identities.size());
+				plotData = new PlotData[] {mapToArrays(identities)};
 				plotDataLabels = new String[] {"data"};
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
 				
 				title = Presentation.SubjectTypes.SENDER_IDS;
-				xlabel = "Identity";
+				xlabel = "Sender identity";
 				ylabel = "Correlation of data transmission and data access";
 
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
@@ -291,7 +291,9 @@ public class PrivacyAssessmentController {
 				IIdentity[] labels = new IIdentity[size];
 				double[][] data = new double[2][size];
 				Iterator<IIdentity> iterator = assResult.keySet().iterator();
-				LOG.debug("privacyAssessment(): size = {}", assResult.size());
+				
+				LOG.debug("privacyAssessment(): size = {}", size);
+				
 				for (int k = 0; k < size; k++) {
 					labels[k] = iterator.next();
 					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
@@ -314,7 +316,7 @@ public class PrivacyAssessmentController {
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
 				
 				title = Presentation.SubjectTypes.SENDER_CLASSES;
-				xlabel = "Class";
+				xlabel = "Sender class";
 				ylabel = "Correlation of data transmission and data access";
 
 				HashMap<String, AssessmentResultClassName> assResult;
@@ -357,10 +359,10 @@ public class PrivacyAssessmentController {
 				xlabel = "Identity";
 				ylabel = "Number of accesses to local data";
 
-				Map<IIdentity, Integer> dataAccessIdentities;
-				dataAccessIdentities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
-				LOG.debug("Number of data access events (by identity): {}", dataAccessIdentities.size());
-				plotData = new PlotData[] {mapToArrays(dataAccessIdentities)};
+				Map<IIdentity, Integer> identities;
+				identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+				LOG.debug("Number of data access events (by identity): {}", identities.size());
+				plotData = new PlotData[] {mapToArrays(identities)};
 				plotDataLabels = new String[] {"data"};
 			}
 			else {
