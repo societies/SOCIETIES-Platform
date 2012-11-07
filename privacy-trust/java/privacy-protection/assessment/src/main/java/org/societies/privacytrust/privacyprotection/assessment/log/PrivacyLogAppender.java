@@ -135,7 +135,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
 		
-		LOG.debug("logCommsFw()");
+		//LOG.debug("logCommsFw()");
+		LOG.debug("logCommsFw({}, {}, ...)", sender, receiver);
 
 		String dataType;
 		String invokerClass = getInvokerClass();

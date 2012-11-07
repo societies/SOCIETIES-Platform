@@ -41,6 +41,7 @@ public class AssessmentResultClassName extends AssessmentResult {
 	/**
 	 * @return the sender
 	 */
+	@Override
 	public String getSender() {
 		return (String) sender;
 	}

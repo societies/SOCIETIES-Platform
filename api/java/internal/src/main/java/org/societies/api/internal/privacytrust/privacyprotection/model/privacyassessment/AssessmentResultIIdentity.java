@@ -43,6 +43,7 @@ public class AssessmentResultIIdentity extends AssessmentResult {
 	/**
 	 * @return the sender
 	 */
+	@Override
 	public IIdentity getSender() {
 		return (IIdentity) sender;
 	}
