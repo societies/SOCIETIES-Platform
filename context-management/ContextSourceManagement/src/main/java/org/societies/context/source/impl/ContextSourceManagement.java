@@ -378,15 +378,12 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			updateData(data, dataAttr);
 
 			dataAttr.setSourceId(identifier);
-			dataAttr.setHistoryRecorded(true);
+			// TODO why? dataAttr.setHistoryRecorded(true);
 
 			quality = dataAttr.getQuality();
 			quality.setOriginType(CtxOriginType.SENSED);
 
 			if (USE_QOC) {
-				dataAttr.setSourceId(identifier);
-				dataAttr.setHistoryRecorded(true);
-
 				if (inferred)
 					quality.setOriginType(CtxOriginType.INFERRED);
 				quality.setPrecision(precision);
@@ -463,7 +460,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			}
 
 			// Set history recorded flag.
-			dataAttr.setHistoryRecorded(true);
+			// TODO why? dataAttr.setHistoryRecorded(true);
 			// Update attribute.
 			updateData(data, dataAttr);
 
