@@ -235,7 +235,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		
 		//JOptionPane.showMessageDiathis.logging.debug(null, "PolicyManager initialised");
 		this.registerForFailedNegotiationEvent();
-		this.logging.debug("DS: Started PolicyManager");
+		this.logging.debug("Started PrivacyPolicyNegotiationManager");
     }
   
 	
@@ -285,8 +285,11 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	 */
 	@Override
 	public void negotiateCISPolicy(RequestorCis requestor){
+		
 		if (this.negClients.containsKey(requestor)){
+			this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
 			if (!askUserNegotiationStarted(requestor)){
+				this.logging.debug("User has aborted the new negotiation request.");
 				return;
 			}
 			
@@ -295,7 +298,9 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			if (n==JOptionPane.NO_OPTION){	
 				return;
 			}*/
+			
 			this.negClients.remove(requestor);
+			this.logging.debug("User has aborted the previous negotiation request");
 		}
 		this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
 		NegotiationClient negClient = new NegotiationClient(this.negotiationAgentRemote, this);
@@ -345,7 +350,9 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	@Override
 	public void negotiateServicePolicy(RequestorService requestor){
 		if (this.negClients.containsKey(requestor)){
+			this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
 			if (!askUserNegotiationStarted(requestor)){
+				this.logging.debug("User has aborted the new negotiation request.");
 				return;
 			}
 /*			int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with service: \n"
@@ -353,6 +360,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			if (n==JOptionPane.NO_OPTION){	
 				return;
 			}*/
+			this.logging.debug("User has aborted the previous negotiation request");
 			this.negClients.remove(requestor);
 		}
 		this.logging.debug("Starting new negotiation with service: "+requestor.toString());
@@ -417,6 +425,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		if (event.geteventType().equals(EventTypes.FAILED_NEGOTIATION_EVENT)){
 			FailedNegotiationEvent negEvent = (FailedNegotiationEvent) event.geteventInfo();
 			Requestor id = negEvent.getRequestor();
+			this.logging.debug("Received Failed Negotiation event for : "+negEvent.getRequestor().toString());
 			if(this.negClients.containsKey(id)){
 				//INegotiationClient client = this.negClients.get(id);
 				this.negClients.remove(id);
