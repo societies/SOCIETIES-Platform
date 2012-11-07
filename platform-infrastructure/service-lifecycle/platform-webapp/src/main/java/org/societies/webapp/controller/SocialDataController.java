@@ -23,6 +23,7 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,11 +31,16 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
+import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.platform.socialdata.SocialData;
 import org.societies.webapp.models.SocialDataForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,6 +48,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import sun.util.logging.resources.logging;
 
 
 @Controller
@@ -70,7 +78,6 @@ public class SocialDataController {
 		public String id;
 		
 	}
-
 	
 	public ISocialData getSocialData() {
 		return socialdata;
@@ -78,52 +85,45 @@ public class SocialDataController {
 	
 	public void getSocialData(ISocialData socialData) {
 		this.socialdata = socialData;
+		
 	}
 	
+	private static final Logger logger = LoggerFactory.getLogger(SocialDataController.class);
 	
 	private String getIcon(String data){
-		if (data==null) return "";
-		if (data=="")   return "";
 		
-		if (data.contains("facebook"))       return "images/Facebook.png";
-		else if (data.contains("twitter"))   return "images/Twitter.jpg";
-		else if (data.contains("linkedin"))  return "images/Linkedin.png";
-		else return "images/Foursquare.png";
+		if (data==null) return "images/social_network.png";
+		if (data=="")   return "images/social_network.png";
+	
+		if (data.contains("facebook"))      	return "images/Facebook.png";
+		else if (data.contains("twitter"))   	return "images/Twitter.jpg";
+		else if (data.contains("linkedin"))  	return "images/Linkedin.png";
+		else if (data.contains("foursquare"))   return"images/Foursquare.png";
+		else return "images/social_network.png";
+	}
+	
+	private String getBaseURL(String data){
+		if (data==null) return "#";
+		if (data=="")   return "#";
+		
+		data = data.toLowerCase();
+		if (data.contains("facebook"))       return  "http://facebook.com/";
+		else if (data.contains("twitter"))   return  "http://api.twitter.com/1/users/lookup.json?user_id=";
+		else if (data.contains("linkedin"))  return  "http://linkedin.com/";
+		else if (data.contains("foursquare")) return "http://foursquare.com/";
+		else return "#";
 	}
 
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.GET)
 	public ModelAndView SocialDataForm() {
 
-		
-		
-		
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
-		//model.put("message", "Select a Social Newtork");
 		
 //		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		SocialDataForm sdForm = new SocialDataForm();
 		model.put("sdForm", sdForm);
-//		
-//		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-//		Map<String, String> methods = new LinkedHashMap<String, String>();
-//		methods.put(ADD, 		ADD);
-//		methods.put(REMOVE, 	REMOVE);
-//		methods.put(FRIENDS,    FRIENDS);
-//		methods.put(PROFILES,   PROFILES);
-//		methods.put(ACTIVITIES, ACTIVITIES);
-//		methods.put(GROUPS, 	GROUPS);
-//		methods.put(LIST, 	  	LIST);
-//		
-//		model.put("methods",  methods);
-//		
-//		Map<String, String> snName = new LinkedHashMap<String, String>();
-//		snName.put("FB", "Facebook");
-//		snName.put("TW", "Twitter");
-//		snName.put("FQ", "Foursquare");
-//		model.put(SNNAME, snName);
-//		model.put(TOKEN,  "");
-//		model.put(ID, 	"");
+
 		
 		Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
 		String connLI="";
@@ -131,16 +131,27 @@ public class SocialDataController {
 		while (it.hasNext()){
 			ISocialConnector conn = it.next();
 		    
-		    String image="";
-			if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
-			else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
-			else image="images/Foursquare.png";
-			connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
+		   
+			connLI+="<li><img src='"+getSNIcon(conn)+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
 			 
 		}
 		
 		model.put("connectors", connLI);
 		return new ModelAndView("socialdata", model);
+	}
+	
+	
+	private String getSNIcon(ISocialConnector conn){
+		try{
+			if (conn.getConnectorName().equalsIgnoreCase("facebook"))     return "images/Facebook.png";
+			else if (conn.getConnectorName().equalsIgnoreCase("twitter")) return "images/Twitter.jpg";
+			else if (conn.getConnectorName().equalsIgnoreCase("linkedin")) return "images/Linkedin.jpg";
+			else if (conn.getConnectorName().equalsIgnoreCase("foursquare")) return "images/Foursquare.png";
+			else return "images/social_network.png";
+		}
+		catch(Exception ex){}
+		return "images/social_network.png";
+
 	}
 	
 	private ISocialConnector.SocialNetwork getSocialNetowkName(String name){
@@ -152,6 +163,11 @@ public class SocialDataController {
 		if ("TW".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
 		if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
 		if ("FQ".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+		if ("linkedin".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.linkedin;
+		if ("LK".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.linkedin;
+		if ("googleplus".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.googleplus;
+		if ("G+".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.googleplus;
+		
 		
 		return null;
 	}
@@ -184,32 +200,29 @@ public class SocialDataController {
 				HashMap <String, String> params = new HashMap<String, String>();
 				params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
 				
-				String error="no error";
+				String error="";
 				try {
-					error= "unable to create connector";
+					
 					ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
-					error ="unable to add connector:"+con.getConnectorName();
+					error ="We are not able to create "+con.getConnectorName() +" connector!";
 					socialdata.addSocialConnector(con);
-					socialdata.updateSocialData();
+				
 					content   = "<b>Connector</b> ID:"+sdForm.getId() + " for " + sdForm.getSnName() +" with token: "+ sdForm.getToken() + "<br>";
-					
-					
-					
-//					
 					model.put("sdForm", sdForm);
+					
 					Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
 					String connLI="";
 					
 					while (it.hasNext()){
 						ISocialConnector conn = it.next();
 					    
-					    String image="";
-						if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
-						else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
-						else image="images/Foursquare.png";
-						connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
+						connLI+="<li><img src='"+getSNIcon(conn)+"'> "+
+						conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+
+						conn.getID()+"');\">Click here to disconnect</a></li>";
 						 
 					}
+					
+					socialdata.updateSocialData();   // this is required to read all the SN Data.... (can take a while).
 					
 					model.put("connectors", connLI);
 					return new ModelAndView("socialdata", model);
@@ -233,6 +246,7 @@ public class SocialDataController {
 				
 					
 			}
+			// This should be deprecated
 			else if (LIST.equalsIgnoreCase(method)) {
 					
 					// DO add Connectore HERE
@@ -251,12 +265,14 @@ public class SocialDataController {
 			else if (REMOVE.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "<h2> Removed Connector </h2>";
+				res    = "<a href=' socialdata.html'> Back to my Social Area </a>";
 				if ("null".equals(sdForm.getId())){
 					content = "<p> Please set a valid Connector ID</p>";
 				}
 				else {
 					try {
+				
+						content +="<h2> Connector REMOVED</h2>";
 						socialdata.removeSocialConnector(sdForm.getId());
 						content   += "<p> Connector ID:"+sdForm.getId()+  "has been removed correctly</p>";
 					} catch (Exception e) {
@@ -271,21 +287,28 @@ public class SocialDataController {
 			else if (FRIENDS.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "Social Friends";
-				
+				res    = "<a href=' socialdata.html'> Back to my Social Area </a>";
+			
 				List<Person>friends = (List<Person>)socialdata.getSocialPeople();
+				if (friends==null) {
+					logger.debug("Social Friends is Null");
+					friends= new ArrayList<Person>();  // create empty to avoid nullpointerexception
+				}
 				
+				logger.debug(" PRINT Social Friends:"+friends.size());
 				Iterator<Person> it = friends.iterator();
-				content ="<h4> My Social Friends </h4>";
+				content ="<h2> My Social Network frinds </h2>";
 				content +="<ul>";
 				while(it.hasNext()){
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Person p= it.next();
-					String[] id = p.getId().split(":");
-					String name = "";
-					try{
 					
+					String name = "Username NA";;
+					String domain ="";
+					String img = "";
+					String link="";
+					try{
 						if (p.getName()!=null){
 							if (p.getName().getFormatted()!=null)
 								name = p.getName().getFormatted();
@@ -295,14 +318,30 @@ public class SocialDataController {
 									if (name.length()>0)  name+=" ";
 									name +=p.getName().getGivenName();
 								}
-									  
-							
 							}
-								
+							
 						}
-					}catch(Exception ex){name = "- NOT AVAILABLE -";}
+						
+						if (p.getAccounts()!=null){
+							if (p.getAccounts().size()>0) {
+								domain = p.getAccounts().get(0).getDomain();
+							}
+						}
+						String id = p.getId();
+						if (p.getId().contains(":")){
+							id = p.getId().split(":")[1];
+						}
+						img   = "<img width='20px' src='"+getIcon(domain) +"'>";
+						link  = "<a href='"+ getBaseURL(domain) + id + "' sn="+domain+">" + name + "</a>";
+						
+					}
 					
-					content +="<li>[" + id[0] +"] " + name + " id:"+ id[1] + "</li>" ;
+					catch(Exception ex){
+						logger.error("Error while parsing the Person OBJ");
+						ex.printStackTrace();
+					}
+					
+ 					content +="<li> "+ img + "[ID]["+p.getId() +"]"+ link +"]</li>" ;
 					
 					
 				}
@@ -312,19 +351,47 @@ public class SocialDataController {
 			else if (PROFILES.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "Social Profiles";
+				res    = "<a href='socialdata.html'> Back to my Social Area </a>";
 				
 				
 				List<Person> list = (List<Person>)socialdata.getSocialProfiles();
-				Iterator<Person> it = list.iterator();
-				content ="<h4> My Social Profiles </h4>";
+				
+				content ="<h2> My Social Profiles </h2>";
 				content +="<ul>";
-				while(it.hasNext()){
+				for(Person p : list){
 					
-					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-					Person p = it.next();
-					String[] id = p.getId().split(":");
-					content +="<li> [" + id[0] +" Profile] " + p.getName().getFormatted()  + "</li>" ;
+					String link ="";
+					String img  =" --- ";
+					String domain = "";
+					try{
+					
+						if (p.getAccounts()!=null){
+							if (p.getAccounts().size()>0){
+								Account account = p.getAccounts().get(0);
+								if (account.getDomain()!=null) domain = account.getDomain();
+							}
+						}
+						String name = p.getId();
+						if (p.getName()!=null) {
+							if (p.getName().getFormatted() !=null) name= p.getName().getFormatted();
+						}
+						else if (p.getNickname()!=null) name = p.getNickname();
+						
+						String id = p.getId();
+						if (p.getId().contains(":")){
+							id = p.getId().split(":")[1];
+						}
+						
+						img   = "<img width='20px' src='"+getIcon(domain) +"'>";
+						link  = "<a href='"+getBaseURL(domain) + id + "'>" + name + "</a>";
+						
+						content +="<li> "+ img + link +"</li>";
+					}
+					catch(Exception ex){
+						ex.printStackTrace();
+						content +="<li> "+ img + link +"</li>";
+					}
+
 				}
 				content   += "</ul>";
 					
@@ -332,19 +399,26 @@ public class SocialDataController {
 			else if (GROUPS.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "Social Groups";
+				res    = "<a href='socialdata.html'> Back to my Social Area </a>";
 				
 				List<Group>list = (List<Group>)socialdata.getSocialGroups();
 				
 				Iterator<Group> it = list.iterator();
-				content ="<h4> My Social Groups </h4>";
+				content ="<h2> My Social Groups </h2>";
 				content +="<ul>";
 				while(it.hasNext()){
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Group g= it.next();
-					String[] id = g.getId().getGroupId().split(":");
-					content +="<li> "+id[0]+"] ID:" + id[1] +" Title:"+ g.getDescription() + "</li>" ;
+					try{
+						
+						content +="<li> ID:"+g.getId() +" Title:"+ g.getDescription() + "</li>" ;
+					}
+					catch (Exception ex){
+						ex.printStackTrace();
+						content +="<li> Title:"+ g.getDescription() + "</li>" ;
+					}
+					
 				}
 				content   += "</ul>";
 					
@@ -352,24 +426,20 @@ public class SocialDataController {
 			else if (ACTIVITIES.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "Social Activities";
+				res    = "<a href='socialdata.html'> Back to my Social Area </a>";
+				content ="<h2> My Social Activities </h2>";
+				content +="<ul>";
 				
 				List<ActivityEntry>list = (List<ActivityEntry>)socialdata.getSocialActivity();
-				content ="<h4> My Social Activities </h4>";
-				content +="<ul>";
-				Iterator<ActivityEntry> it = list.iterator();
-				
-				while(it.hasNext()){
-					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-					ActivityEntry entry= it.next();
+				for (ActivityEntry entry :list){
 					try{
-						String id[] = entry.getId().split(":");
-//						if (id[0]!=null) 
-//							content +="<li> <img src='"+getIcon(entry.getId())+"'>"+ entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-//						else
- 							content +="<li> <img width='20px' src='"+getIcon(entry.getId().toLowerCase())+"'>" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
-						    //content +="<li> ["+entry.getId()+"]" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
 						
+						content +="<li>"
+								+"<img width='20px' id='"+entry.getId() + "' src='"+getIcon(entry.getId())+"'>" 
+								+ entry.getActor().getDisplayName() + " "
+								+ entry.getVerb() + " --> "
+								+ entry.getContent() +
+								"</li>" ;
 					}
 					catch(Exception ex){
 						content +="<li> " + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;

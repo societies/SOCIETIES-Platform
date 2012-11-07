@@ -108,7 +108,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.setCtxBroker(ctxBroker);
 		this.trustBroker = trustBroker;
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, idm);
-		prefCache = new PrivatePreferenceCache(ctxBroker);
+		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
@@ -116,7 +116,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	
 	public void initialisePrivacyPreferenceManager(){
-		prefCache = new PrivatePreferenceCache(ctxBroker);
+		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
 		contextCache = new PrivateContextCache(ctxBroker);

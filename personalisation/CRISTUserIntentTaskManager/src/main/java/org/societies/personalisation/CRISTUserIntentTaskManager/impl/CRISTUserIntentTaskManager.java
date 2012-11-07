@@ -58,10 +58,21 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.springframework.scheduling.annotation.AsyncResult;
 
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
+
+
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
+    private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); 
+    // to define a dedicated Logger
+    IPerformanceMessage m;
+
+	
+	
 	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentTaskManager.class);
-	public static final int UPDATE_TRIGGER_THRESHOLD = 2;
+	public static final int UPDATE_TRIGGER_THRESHOLD = 10;
+	public static final int MAX_HISTORY_LENGTH = 1000;
 	public static HashMap<String, CtxAttributeIdentifier> REGISTERED_CONTEXTS = null;
 
 	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
@@ -232,6 +243,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public void updateUserSituation(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
+
 		CRISTUserSituation currentUserSituation = inferUserSituation(entityID);
 		if (currentUserSituation != null) {
 			this.currentUserSituationMap.put(entityID, currentUserSituation);
@@ -329,6 +341,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			List<CtxAttribute> attrList = new ArrayList<CtxAttribute>(attrSet);
 			if (attrList.size() > 0) {
 				CtxAttribute attr = attrList.get(0);// the first one
+				//System.out.println("persoMgr="+persoMgr);
 				this.persoMgr.registerForContextUpdate(entityID, PersonalisationTypes.CRISTIntent, attr.getId());
 				return attr.getId();
 			}
@@ -345,7 +358,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 	}
 
-	/* ensure no return null
+	/* ensure no return null. How? Add a "OTHER" situation, if any context is null, it is in "OTHER"
 	 * @param entityID
 	 * @return
 	 */
@@ -354,108 +367,61 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		if (REGISTERED_CONTEXTS == null)
 		{
 			REGISTERED_CONTEXTS = new HashMap<String, CtxAttributeIdentifier>();
-			CtxAttributeIdentifier ctxAttrId = registerContextUpdate(entityID, "LIGHT");
+			CtxAttributeIdentifier ctxAttrId = registerContextUpdate(entityID, CtxAttributeTypes.STATUS);
 			if (ctxAttrId != null) {
-				REGISTERED_CONTEXTS.put("LIGHT", ctxAttrId);
+				//System.out.println("test registered 1");
+				REGISTERED_CONTEXTS.put(CtxAttributeTypes.STATUS, ctxAttrId);
 			}
-			ctxAttrId = registerContextUpdate(entityID, "SOUND");
+			ctxAttrId = registerContextUpdate(entityID, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			if (ctxAttrId != null) {
-				REGISTERED_CONTEXTS.put("SOUND", ctxAttrId);
+				REGISTERED_CONTEXTS.put(CtxAttributeTypes.LOCATION_SYMBOLIC, ctxAttrId);
 			}
-			ctxAttrId = registerContextUpdate(entityID, CtxAttributeTypes.TEMPERATURE);
-			if (ctxAttrId != null) {
-				REGISTERED_CONTEXTS.put(CtxAttributeTypes.TEMPERATURE, ctxAttrId);
-			}
-			ctxAttrId = registerContextUpdate(entityID, CtxAttributeTypes.LOCATION_COORDINATES);
-			if (ctxAttrId != null) {
-				REGISTERED_CONTEXTS.put(CtxAttributeTypes.LOCATION_COORDINATES, ctxAttrId);
-			}
-		
 		}
 		
-		//Study Hall, Outdoor, Shopping Mall, Office, Home
-		double[] likelihood = new double[5];
-		
-
-		if (REGISTERED_CONTEXTS.get("LIGHT") != null) {
-			String currentLightString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get("LIGHT"));
-			if (!currentLightString.equals("")) {
-				double currentLight = Double.parseDouble(currentLightString);
-				if (currentLight >= 120) {
-					likelihood[1] += 0.2;
-					likelihood[2] += 0.2;
-			
-				} else if (currentLight >= 100 ) {
-					likelihood[0] += 0.2;
-					likelihood[3] += 0.2;
-				} else {
-					likelihood[4] += 0.2;
+		CRISTUserSituation situation = new CRISTUserSituation();
+		//System.out.println("test0");
+		if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.STATUS) != null) {
+			String currentStatusString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.STATUS));
+			//System.out.println("test1");
+			if (!currentStatusString.equals("")) {
+				//System.out.println("test2");
+				if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null) {
+					String currentLocationString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+					//System.out.println("test3");
+					if (!currentLocationString.equals("")) {
+						situation.setSituationID(currentStatusString+"_"+currentLocationString);
+						//System.out.println("test4");
+					}
+					else {
+						situation.setSituationID(currentStatusString);
+					}
 				}
-			}
-			
-			
-		}
-		if (REGISTERED_CONTEXTS.get("SOUND") != null) {
-			String currentSoundString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get("SOUND"));
-			if (!currentSoundString.equals("")) {
-				double currentSound = Double.parseDouble(currentSoundString);
-				if (currentSound >= 60) {
-					likelihood[1] += 0.2;
-					likelihood[2] += 0.2;
-				} else if (currentSound >= 40) {
-					likelihood[3] += 0.2;
-					likelihood[4] += 0.2;
-				} else {
-					likelihood[0] += 0.2;
+				else {
+					situation.setSituationID(currentStatusString);
 				}
-					
-			}
-		}
-		if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.TEMPERATURE) != null) {
-			String currentTemperatureString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.TEMPERATURE));
-			if (!currentTemperatureString.equals("")) {
-				double currentTemperature = Double.parseDouble(currentTemperatureString);
-				if (currentTemperature >= 30 || currentTemperature < 5) {
-					likelihood[1] += 0.2;
-				} else if (currentTemperature >= 25) {
-					likelihood[3] += 0.1;
-					likelihood[4] += 0.1;
-				} else {
-					likelihood[0] += 0.1;
-					likelihood[2] += 0.1;
-				}
-			}
-		}
-		if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_COORDINATES) != null) {
-			String currentGpsString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_COORDINATES));
-			if (!currentGpsString.equals("")) {
-				likelihood[1] += 0.6;
 			}
 			else {
-				likelihood[0] += 0.1;
-				likelihood[2] += 0.1;
-				likelihood[3] += 0.1;
-				likelihood[4] += 0.1;
+				if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null) {
+					String currentLocationString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+					if (!currentLocationString.equals("")) {
+						situation.setSituationID(currentLocationString);
+					}
+				}
 			}
 		}
-		 
-		CRISTUserSituation situation = new CRISTUserSituation();
-		int maxIndex = getMaxIndex(likelihood);
-		if (maxIndex == 0) {
-			situation.setSituationID("Study Hall");
+		else {
+			if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null) {
+				String currentLocationString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+				if (!currentLocationString.equals("")) {
+					situation.setSituationID(currentLocationString);
+				}
+			}
 		}
-		else if (maxIndex == 1) {
-			situation.setSituationID("Outdoor");
+		
+		if (situation.getSituationID() == null){
+			situation.setSituationID("OTHER");
 		}
-		else if (maxIndex == 2) {
-			situation.setSituationID("Shopping Mall");
-		}
-		else if (maxIndex == 3) {
-			situation.setSituationID("Office");
-		}
-		else if (maxIndex == 4) {
-			situation.setSituationID("Home");
-		}
+			
 		return situation;
 	}
 	
@@ -512,8 +478,56 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				//@@@
+			    // Logging for test
+			    m = new PerformanceMessage();
+			    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        m.setPerformanceType(IPerformanceMessage.Quanitative);
+				m.setPerformanceNameValue("Size=" + historyList.size());
+				//LOG.info("#2#This is a test log for PerformanceMessage S18!");
+		        PERF_LOG.trace(m.toString());
+				
+		        m = new PerformanceMessage();
+				m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        
+		        m.setPerformanceType(IPerformanceMessage.Delay);
+		        long startTime = System.currentTimeMillis();
+	        
+		        
+		        
+				
+				//@@@ tested method
 				this.intentModel = this.cristDiscovery
 							.generateNewCRISTUIModel(this.historyList);
+				
+		        
+				m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+		        PERF_LOG.trace(m.toString());
+				//Logging end
+		        //@@@
+				
+				
+				
+				
+				
+				
 				
 			}
 			return getNextActions(entityID, userAction, currentUserSituation);
@@ -575,10 +589,51 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
+				// control the max length of history list:
+				if (historyList.size() > MAX_HISTORY_LENGTH + UPDATE_TRIGGER_THRESHOLD){
+					historyList.subList(0, UPDATE_TRIGGER_THRESHOLD).clear();
+				}
+				
+				
+				
+				
+				
+				//@@@
+			    // Logging for test
+			    m = new PerformanceMessage();
+			    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        m.setPerformanceType(IPerformanceMessage.Quanitative);
+				m.setPerformanceNameValue("Size=" + historyList.size());
+				//LOG.info("#1#This is a test log for PerformanceMessage S18!");
+		        PERF_LOG.trace(m.toString());
+				
+		        m = new PerformanceMessage();
+				m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+			    m.setSourceComponent(this.getClass()+"");
+		        m.setOperationType("IntentModelLearningFromActionHistory");//?
+		        m.setD82TestTableName("S18");
+		        
+		        m.setPerformanceType(IPerformanceMessage.Delay);
+		        long startTime = System.currentTimeMillis();
+	        
+		        
+		        
+				
+				//@@@ tested method
 				this.intentModel = this.cristDiscovery
 						.generateNewCRISTUIModel(this.historyList);// ensure not
 																	// return
 																	// null
+		        
+				m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+		        PERF_LOG.trace(m.toString());
+				//Logging end
+		        //@@@
+				
+				
 			}
 
 			return getNextActions(entityID, userAction, currentUserSituation);
@@ -632,8 +687,51 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 				return new CRISTUserAction();
 			}
 			// this.cristDiscovery.enableCRISTUIDiscovery(true);
+			
+			
+			
+			
+			
+			
+			
+			
+			//@@@
+		    // Logging for test
+		    m = new PerformanceMessage();
+		    m.setTestContext("Personalisation.CRISTUserIntent.HistoryList.Size");
+		    m.setSourceComponent(this.getClass()+"");
+	        m.setOperationType("IntentModelLearningFromActionHistory");//?
+	        m.setD82TestTableName("S18");
+	        m.setPerformanceType(IPerformanceMessage.Quanitative);
+			m.setPerformanceNameValue("Size=" + historyList.size());
+			//LOG.info("#3#This is a test log for PerformanceMessage S18!");
+	        PERF_LOG.trace(m.toString());
+			
+	        m = new PerformanceMessage();
+			m.setTestContext("Personalisation.CRISTUserIntent.ModelLearning.Delay");
+		    m.setSourceComponent(this.getClass()+"");
+	        m.setOperationType("IntentModelLearningFromActionHistory");//?
+	        m.setD82TestTableName("S18");
+	        
+	        m.setPerformanceType(IPerformanceMessage.Delay);
+	        long startTime = System.currentTimeMillis();
+        
+	        
+	        
+			
+			//@@@ tested method
 			this.intentModel = this.cristDiscovery
 						.generateNewCRISTUIModel(this.historyList);
+	        
+			m.setPerformanceNameValue("Delay=" + (System.currentTimeMillis()-startTime));
+	        PERF_LOG.trace(m.toString());
+			//Logging end
+	        //@@@
+			
+			
+			
+			
+			
 			
 		}
 

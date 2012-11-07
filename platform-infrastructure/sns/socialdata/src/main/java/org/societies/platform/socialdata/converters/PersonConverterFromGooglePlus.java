@@ -30,12 +30,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.OrganizationImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.core.model.UrlImpl;
+import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
@@ -143,13 +145,24 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 			parseOrganizations(db, person);			
 			parsePlacesLived(db, person);
 			if(db.has(TAGLINE)) person.setStatus(db.getString(TAGLINE));
-			parseEmails(db, person);			
+			parseEmails(db, person);	
+			person.setAccounts(setAccounts());
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
 		
 		return person;
+	}
+	
+	private List<Account> setAccounts(){
+		Account account = new AccountImpl();
+		account.setDomain("foursquare.com");
+		
+		//Add the twitter account
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.add(account);
+		return accounts;
 	}
 	
 	private void parseName(JSONObject json, Person person) throws JSONException { // middleName not supported by shindig

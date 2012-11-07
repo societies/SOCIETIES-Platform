@@ -433,7 +433,8 @@ public class CssRegistry implements ICssRegistry {
 				}
 			}
 
-			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
+			if ((cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) && (cssRequest.getRequestStatus() != CssRequestStatusType.ACCEPTED) && (cssRequest.getRequestStatus() != CssRequestStatusType.DELETEFRIEND)) {
+				log.info("updateCssRequestRecord getRequestStatus() = " +cssRequest.getRequestStatus());
 				filterRegistryEntry.setRequestStatus(cssRequest
 						.getRequestStatus().value());
 
@@ -529,7 +530,7 @@ public class CssRegistry implements ICssRegistry {
 				}
 			}
 
-			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
+			if ((cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED)  && (cssRequest.getRequestStatus() != CssRequestStatusType.DELETEFRIEND)){
 				log.info("updateCssFriendRequestRecord Called: IF Statement for CANCELLED");
 				filterRegistryEntry.setRequestStatus(cssRequest
 						.getRequestStatus().value());

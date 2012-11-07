@@ -70,16 +70,22 @@ for(Service myService : myServices ){
 	 <%
 	
 	if(!myService.getServiceType().equals(ServiceType.DEVICE)){
-		%>
-		<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
-		<%
+		if(myService.getServiceType().equals(ServiceType.THIRD_PARTY_SERVER)){
+			%>
+			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+			<%
+		} else{
+    		%>
+			<a href="service-privacy-policy-show.html?serviceId=<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceInstance().getParentIdentifier())%>&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>	
+			<%
+		}
 		if(myService.getServiceStatus().equals(ServiceStatus.STARTED)){
 			%>
-			<input type="button" value="stop" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StopService')" >
+			<input type="button" value="stop" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'StopService')" >
 			<%
 		} else{
 			%>
-			<input type="button" value="start" onclick="updateForm('<%=ServiceModelUtils.serviceResourceIdentifierToString(myService.getServiceIdentifier())%>', 'StartService')" >
+			<input type="button" value="start" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'StartService')" >
 			<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
 			<%
 		}

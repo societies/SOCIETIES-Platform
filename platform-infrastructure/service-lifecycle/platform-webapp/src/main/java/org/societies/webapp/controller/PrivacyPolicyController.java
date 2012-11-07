@@ -227,7 +227,7 @@ public class PrivacyPolicyController {
 		//Service service = ServiceModelUtils.getServiceFromServiceInstance(serviceId, serviceDiscovery);
 		//service.setServiceName(serviceId);
 		try {
-			ServiceResourceIdentifier serviceIdentity = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceId);
+			ServiceResourceIdentifier serviceIdentity = ServiceModelUtils.getServiceId64Decode(serviceId);
 			IIdentity serviceOwnerIdentity  = commMngrRef.getIdManager().fromJid(ServiceModelUtils.getJidFromServiceIdentifier(serviceIdentity));
 
 			provider = new RequestorService(serviceOwnerIdentity, serviceIdentity);

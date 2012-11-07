@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.test;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -136,6 +137,10 @@ public class TestPCM {
 			Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
 			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), "ppnp_preference_1")).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
 			Mockito.when(ctxBroker.createAttribute(userCtxEntity.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
+			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(registryCtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
+			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(ppnp_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
+			//Mockito.when(ctxBroker.updateAttribute(Mockito.eq(ppnp_2_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(ppnp_2_CtxAttribute));
+			
 		}
 		catch(CtxException e){
 

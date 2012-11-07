@@ -26,7 +26,6 @@ public class TestACisAdvertisementRecord extends AndroidTestCase{
 		aRec.setCssownerid("owner");
 		aRec.setId("id");
 		aRec.setName("name");
-		aRec.setPassword("pwd");
 		aRec.setType("type");
 		
 		assertEquals(0, aRec.describeContents());
@@ -41,7 +40,6 @@ public class TestACisAdvertisementRecord extends AndroidTestCase{
         assertEquals(aRec.getCssownerid(), createFromParcel.getCssownerid());
         assertEquals(aRec.getId(), createFromParcel.getId());
         assertEquals(aRec.getName(), createFromParcel.getName());
-        assertEquals(aRec.getPassword(), createFromParcel.getPassword());
         assertEquals(aRec.getType(), createFromParcel.getType());
 
 		
@@ -52,7 +50,6 @@ public class TestACisAdvertisementRecord extends AndroidTestCase{
 		aRec.setCssownerid("owner");
 		aRec.setId("id");
 		aRec.setName("name");
-		aRec.setPassword("pwd");
 		aRec.setType("type");
 //		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		List<ACriteria> l = new ArrayList<ACriteria>();
@@ -79,7 +76,6 @@ public class TestACisAdvertisementRecord extends AndroidTestCase{
         assertEquals(aRec.getCssownerid(), createFromParcel.getCssownerid());
         assertEquals(aRec.getId(), createFromParcel.getId());
         assertEquals(aRec.getName(), createFromParcel.getName());
-        assertEquals(aRec.getPassword(), createFromParcel.getPassword());
         assertEquals(aRec.getType(), createFromParcel.getType());
 
 //        assertEquals(aRec.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
