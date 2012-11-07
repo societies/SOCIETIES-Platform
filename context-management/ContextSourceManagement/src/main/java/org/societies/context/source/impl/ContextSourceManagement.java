@@ -279,12 +279,11 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			return new AsyncResult<Boolean>(false);
 		}
 
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Sending update: id=" + identifier + ", data=" + data
+		if (LOG.isDebugEnabled())
+			LOG.debug("Sending update: id=" + identifier + ", data=" + data
 					+ ", ownerEntity=" + owner + ", inferred=" + inferred
 					+ ", precision=" + precision + ", frequency=" + frequency);
 
-		Future<List<CtxEntityIdentifier>> shadowEntitiesFuture;
 		List<CtxEntityIdentifier> shadowEntities;
 		CtxEntityIdentifier shadowEntityID = null;
 		Set<CtxAttribute> attrs = null;
@@ -292,13 +291,11 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		try {
 			String type = "";
-			Future<CtxAttribute> dataAttrFuture;
 			CtxAttribute dataAttr;
 			CtxQuality quality;
 
-			shadowEntitiesFuture = ctxBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE,
-					CtxAttributeTypes.ID, identifier, identifier);
-			shadowEntities = shadowEntitiesFuture.get();
+			shadowEntities = ctxBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE,
+					CtxAttributeTypes.ID, identifier, identifier).get();
 			if (shadowEntities.size() > 1) {
 				if (LOG.isErrorEnabled())
 					LOG.error("Sensor-ID " + identifier
@@ -332,9 +329,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			if (attrs != null && attrs.size() > 0)
 				dataAttr = attrs.iterator().next();
 			else {
-				dataAttrFuture = ctxBroker.createAttribute(shadowEntityID,
-						"data");
-				dataAttr = dataAttrFuture.get();
+				dataAttr = this.ctxBroker.createAttribute(shadowEntityID,
+						"data").get();
 			}
 
 			updateData(data, dataAttr);
@@ -352,35 +348,35 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 				quality.setUpdateFrequency(frequency);
 			}
 
-			ctxBroker.update(dataAttr);
+			this.ctxBroker.update(dataAttr);
 
 			/* update Context Information with Information Owner Entity */
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("Acquiring context owner entity for shadow entity " + shadowEntity.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("Acquiring context owner entity for shadow entity " + shadowEntity.getId());
 			if (owner == null) {
 				try {
 					// Check if the shadow entity has an association to an
 					// ctxEntity
 					final Set<CtxAssociationIdentifier> assocIdentifiers = 
 							shadowEntity.getAssociations(CtxAssociationTypes.PROVIDES_UPDATES_FOR);
-					CtxAssociation temp;
-					CtxEntity child;
+					CtxAssociation providesUpdatesForAssoc;
+					CtxEntity childEnt;
 
 					if (assocIdentifiers.size() != 0) {
 						for (final CtxAssociationIdentifier ctxId : assocIdentifiers) {
-							temp = (CtxAssociation) this.ctxBroker.retrieve(ctxId)
+							providesUpdatesForAssoc = (CtxAssociation) this.ctxBroker.retrieve(ctxId)
 									.get();
-							if (temp.parentEntity == null 
-									|| !shadowEntity.getId().equals(temp.getParentEntity())
-									|| temp.getChildEntities().isEmpty()) {
-								if (LOG.isInfoEnabled()) // TODO DEBUG
-									LOG.info("Ignoring association " + temp.getId());
+							if (providesUpdatesForAssoc.parentEntity == null 
+									|| !shadowEntity.getId().equals(providesUpdatesForAssoc.getParentEntity())
+									|| providesUpdatesForAssoc.getChildEntities().isEmpty()) {
+								if (LOG.isDebugEnabled())
+									LOG.debug("Ignoring association " + providesUpdatesForAssoc.getId());
 								continue;
 							}
-							child = (CtxEntity) this.ctxBroker.retrieve(
-									temp.childEntities.iterator().next()).get();
-							if (child != null) {
-								owner = child;
+							childEnt = (CtxEntity) this.ctxBroker.retrieve(
+									providesUpdatesForAssoc.childEntities.iterator().next()).get();
+							if (childEnt != null) {
+								owner = childEnt;
 								break;
 							} else {
 								LOG.error("child is null!!!");
@@ -391,7 +387,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 					if (owner == null)
 						owner = this.ctxBroker.retrieveCssNode(
 							this.commMgr.getIdManager().getThisNetworkNode()).get();
-					// TODO null check!!
+					// TODO null check again!!
 
 				} catch (Exception e) {
 					LOG.error("Could not handle update from " + identifier
@@ -401,8 +397,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 				}
 			}
 
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("Context owner entity for shadow entity " + shadowEntity.getId() + " is " + owner.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("Context owner entity for shadow entity " + shadowEntity.getId() + " is " + owner.getId());
 			attrs = owner.getAttributes(type);
 			if (attrs.size() > 0) {
 				for (final CtxAttribute foundAttr : attrs) {
@@ -415,8 +411,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 				dataAttr = this.ctxBroker.createAttribute(owner.getId(), type).get();
 				dataAttr.setSourceId(identifier);
 			}
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("dataAttr=" + dataAttr.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("dataAttr.getId()=" + dataAttr.getId());
 
 			// Update QoC information.
 			quality = dataAttr.getQuality();
