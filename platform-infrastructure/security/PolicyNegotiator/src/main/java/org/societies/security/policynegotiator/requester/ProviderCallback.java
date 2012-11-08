@@ -165,12 +165,13 @@ public class ProviderCallback implements INegotiationProviderCallback {
 
 		IPrivacyPolicyNegotiationManager ppn = requester.getPrivacyPolicyNegotiationManager();
 		PrivacyPolicyNegotiationListener listener;
-
-		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey, fileUris);
 		
 		String[] eventTypes = new String[] {
 				EventTypes.FAILED_NEGOTIATION_EVENT,
 				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}; 
+
+		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey, fileUris,
+				requester.getEventMgr(), eventTypes);
 		
 		requester.getEventMgr().subscribeInternalEvent(listener, eventTypes, null);
 		
