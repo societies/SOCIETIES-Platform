@@ -422,12 +422,22 @@ public class NegotiationClient implements INegotiationClient {
 	private InternalEvent createFailedNegotiationEvent(Requestor requestor){
 		FailedNegotiationEvent event = new FailedNegotiationEvent(requestor);
 		InternalEvent iEvent = new InternalEvent(EventTypes.FAILED_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
+		this.logging.debug("Failed negotiation Event: \n"+
+		"EventName: "+iEvent.geteventName()+
+		"\nEventSource:"+iEvent.geteventSource()+
+		"\nEventType"+iEvent.geteventType()+
+		"\nEventInfo:"+iEvent.geteventInfo());
 		return iEvent;
 	}
 
 	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) {
 		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL);
 		InternalEvent iEvent = new InternalEvent(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
+		this.logging.debug("Successfull negotiation Event: \n"+
+		"EventName: "+iEvent.geteventName()+
+		"\nEventSource:"+iEvent.geteventSource()+
+		"\nEventType"+iEvent.geteventType()+
+		"\nEventInfo:"+iEvent.geteventInfo());
 		return iEvent;
 	}
 	private ResponsePolicy findMyResponsePolicy(ResponsePolicy providerPolicy){

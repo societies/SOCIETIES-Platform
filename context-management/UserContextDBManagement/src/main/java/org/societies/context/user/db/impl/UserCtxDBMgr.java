@@ -557,6 +557,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (modelObject == null) 
 			throw new NullPointerException("modelObject can't be null");
 		
+		// QND
+		CtxAttribute oldAttribute = null;
+		if (modelObject instanceof CtxAttribute)
+			oldAttribute = (CtxAttribute) this.retrieve(modelObject.getId());
+		
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try {	
@@ -577,7 +582,18 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} 
 		
 		// TODO CtxChangeEventTopic.MODIFIED should only be used if the model object is actually modified
-		final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+		// QND
+		String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+		if (oldAttribute != null) {
+			boolean modified = false;
+			final CtxAttribute newAttribute = (CtxAttribute) modelObject;
+			if ((newAttribute.getStringValue() != null 
+					&& !newAttribute.getStringValue().equals(oldAttribute.getStringValue()))
+					|| (newAttribute.getStringValue() == null && oldAttribute.getStringValue() != null))
+					modified = true;
+			if (!modified)
+				topics = new String[] { CtxChangeEventTopic.UPDATED };
+		}
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(modelObject.getId()), 
 					topics, CtxEventScope.BROADCAST);
