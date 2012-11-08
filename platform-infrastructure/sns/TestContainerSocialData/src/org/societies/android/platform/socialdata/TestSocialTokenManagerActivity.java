@@ -98,7 +98,7 @@ public class TestSocialTokenManagerActivity extends Activity {
     }
 
     private void testGetToken() {
-    	socialTokenMgr.getToken(PACKAGE_NAME, SocialNetwork.Facebook);
+    	socialTokenMgr.getToken(PACKAGE_NAME, SocialNetwork.linkedin);
     }
     
     private class bReceiver extends BroadcastReceiver  {
