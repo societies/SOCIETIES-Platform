@@ -156,13 +156,32 @@
 							org.xml.sax,-->
 							!org.apache.xerces,
 							org.springframework.beans.factory.config;version="[1.0,6.0)",
+							org.societies.api.identity,
+							org.societies.api.security.digsig,
+							org.societies.api.security.storage,
+							org.societies.api.internal.security.storage,
+							java.security,
+							java.security.cert,
+							org.slf4j,
+							java.io,
+							org.bouncycastle.jce.provider,
+							javax.xml.namespace,
+							javax.xml.parsers,
+							javax.xml.transform,
+							javax.xml.transform.dom,
+							javax.xml.transform.stream,
+							javax.xml.xpath,
+							org.w3c.dom,
+							org.xml.sax,
 							*;resolution:=optional
 						</Import-Package>
+<!--
 						<Export-Package>
 							org.societies.api.security.digsig,
 							org.societies.api.security.storage,
 							org.societies.api.internal.security.storage
 						</Export-Package>
+-->
 					</instructions>
 				</configuration>
 			</plugin>
