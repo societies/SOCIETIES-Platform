@@ -153,10 +153,10 @@ var CSSFriendsServices = {
 		//SEND REQUEST
 		if (window.confirm("Send friend request to " + name + "?")) {
 		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-			if (answer) {
+			//if (answer) {
 		    	 $('#li' + id).append("Sending Request...");
 		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-			}
+			//}
 		}
 		//);
 	},
@@ -178,10 +178,10 @@ var CSSFriendsServices = {
 		//ACCEPT REQUEST
 		if (window.confirm("Accept friend request from " + name + "?")) {
 		//jConfirm("Accept friend request from " + name + "?", 'Accept Friend', function(answer) {
-		     if (answer){
+		     //if (answer){
 		    	 $('#li' + id).append("Accepting Request...");
 		 		window.plugins.SocietiesLocalCSSManager.acceptFriendRequest(css_id, success, failure);
-		     }
+		     //}
 		}
 		//);
 	},

@@ -185,10 +185,10 @@ var	SocietiesCISListService = {
 		var activity = mActivities[pos];
 		if (window.confirm("Remove this entry?")) {
 		//jConfirm("Delete this entry?", 'Delete Activity', function(answer) {
-			if (answer) {
+			//if (answer) {
 				$('#li' + mActivities[pos].published).append("Removing...");
 				window.plugins.SocietiesLocalCISManager.deleteActivity(cisId, activity, success, failure);
-			}
+			//}
 		}
 		//);
 	},
@@ -332,9 +332,9 @@ var	SocietiesCISListService = {
 		//SEND REQUEST
 		if (window.confirm("Send friend request to " + name + "?")) {
 		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-		     if (answer){
+		     //if (answer){
 		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-		     }
+		     //}
 		}
 		//);
 	},
@@ -406,15 +406,12 @@ var	SocietiesCISListService = {
 			mCis_id = $('input#cis_id').val();
 			serviceObj = mMyServices[servicePos];
 			if (confirm("Share " + serviceName + " to this community?")) {
-			//jConfirm("Share " + serviceName + " to this community?", 'Share Service', function(answer) {
-			     if (answer){
-					window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
-					//ADD SERVICE TO LIST OF SHARED SERVICES
-					mCisServices.push(serviceObj);
-			     } else
+				window.plugins.ServiceManagementService.shareMyService(mCis_id, serviceObj, success, failure);
+				//ADD SERVICE TO LIST OF SHARED SERVICES
+				mCisServices.push(serviceObj);
+			} else {
 				$('select#selShareService').attr('selectedIndex', 0);
 			}
-			//);
 		}
 		$('select#selShareService').selectmenu('refresh');
 	},
