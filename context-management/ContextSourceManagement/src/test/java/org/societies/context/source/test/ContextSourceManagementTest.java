@@ -160,13 +160,9 @@ public class ContextSourceManagementTest {
 	@Before
 	public void setUp() throws Exception {
 
-
     	csm = new ContextSourceManagement();
     	csm.setCtxBroker(mockBroker);
     	csm.setCommManager(mockCommMgr);
-    	csm.setEventManager(mockEventMgr);
-    	
-    	csm.activate();
 	}
  
     @Test
