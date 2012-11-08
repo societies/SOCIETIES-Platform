@@ -46,12 +46,10 @@ import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.internal.context.broker.*;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
-import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 
@@ -84,37 +82,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	 */
 	@Autowired(required = true)
 	private ICommManager commMgr;
-
-	/**
-	 * The Device Manager service reference
-	 * 
-	 * @see {@link #setDeviceManager(IDeviceManager)}
-	 */
-	@Autowired(required = true)
-	private IDeviceManager deviceManager;
-
-	/**
-	 * The Event Manager service reference.
-	 * 
-	 * @see {@link #getEventManager()}
-	 * @see {@link #setEventManager(IEventMgr)}
-	 */
-	@Autowired(required = true)
-	private IEventMgr eventManager;
-
-	private NewDeviceListener newDeviceListener;
 	
 	private volatile int counter;
-
-	/**
-	 * Sets the Context Broker service reference
-	 * 
-	 * @param ctxBroker
-	 *            the ctxBroker to set
-	 */
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
 
 	@Autowired(required=true)
 	public ContextSourceManagement(ICtxBroker ctxBroker) throws Exception {
@@ -138,36 +107,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	/**
 	 * Empty constructor used for junit testing
 	 */
-	public ContextSourceManagement() {
-//		activate();
-	}
-
-	public void activate() {
-		this.newDeviceListener = new NewDeviceListener(deviceManager,
-				eventManager, this);
-		
-		// newDeviceListener.run();
-		
-		try {
-			List<CtxIdentifier> shadowEntitiesFuture = ctxBroker
-					.lookup(CtxModelType.ENTITY, CtxEntityTypes.CONTEXT_SOURCE).get();
-			counter = shadowEntitiesFuture.size();
-		} catch (CtxException e) {
-			LOG.error(e.getMessage());
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
-		} catch (ExecutionException e) {
-			LOG.error(e.getMessage());
-		}
-		
-		LOG.info("{}", "CSM started");
-	}
-
-	//@PreDestroy
-	public void deactivate() {
-		this.newDeviceListener.stop();
-		LOG.info("CSM + DeviceListener stopped");
-	}
+	public ContextSourceManagement() {}
 
 	/*
 	 * @see org.societies.api.context.source.ICtxSourceMgr#register(java.lang.String, java.lang.String)
@@ -579,23 +519,12 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 	
 	/**
-	 * Sets the Device Manager service reference.
+	 * Sets the Context Broker service reference
 	 * 
-	 * @param deviceManager
-	 *            the Device Manager service reference to set.
+	 * @param ctxBroker
+	 *            the ctxBroker to set
 	 */
-	public void setDeviceManager(IDeviceManager deviceManager) {
-	
-		this.deviceManager = deviceManager;
-	}
-	
-	public IEventMgr getEventManager() {
-
-		return eventManager;
-	}
-
-	public void setEventManager(IEventMgr eventManager) {
-		
-		this.eventManager = eventManager;
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
 }
