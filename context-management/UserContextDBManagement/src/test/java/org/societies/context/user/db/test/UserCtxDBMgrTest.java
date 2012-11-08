@@ -132,7 +132,7 @@ public class UserCtxDBMgrTest {
 	@Test
 	public void testCreateIndividualEntity() throws CtxException {
 
-		final IndividualCtxEntity indEntity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		final IndividualCtxEntity indEntity = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
 
 		assertNotNull(indEntity);
 		assertNotNull(indEntity.getId());
@@ -229,7 +229,7 @@ public class UserCtxDBMgrTest {
 		assertEquals(1, entity.getAssociations(CtxAssociationTypes.USES_DEVICES).size());
 
 		// Set another Parent Entity (Individual)
-		final CtxEntityIdentifier parentEntityId2 = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
+		final CtxEntityIdentifier parentEntityId2 = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
 		association.setParentEntity(parentEntityId2);
 		association = (CtxAssociation) this.userDB.update(association);
 		assertNotNull(association.getParentEntity());
@@ -290,7 +290,7 @@ public class UserCtxDBMgrTest {
 
 		// Create IndividualCtxEntity
 		IndividualCtxEntity indEntity = 
-				this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+				this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
 		assertNotNull(indEntity.getAssociations());
 		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
 		assertTrue(indEntity.getCommunities().isEmpty());
@@ -349,7 +349,7 @@ public class UserCtxDBMgrTest {
 	@Test
 	public void testUpdateAttribute() throws CtxException{
 
-		final CtxEntityIdentifier indEntityId = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
+		final CtxEntityIdentifier indEntityId = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
 		CtxAttribute attribute = this.userDB.createAttribute(indEntityId, CtxAttributeTypes.NAME);
 
 		attribute.setStringValue("Jane Do");
@@ -407,7 +407,7 @@ public class UserCtxDBMgrTest {
 	@Test
 	public void testRemoveIndividualEntity() throws CtxException {
 		
-		final IndividualCtxEntity entity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		final IndividualCtxEntity entity = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
 		final IndividualCtxEntity removedEntity = (IndividualCtxEntity) this.userDB.remove(entity.getId());
 		assertNotNull(removedEntity);
 		assertEquals(entity, removedEntity);
@@ -418,7 +418,7 @@ public class UserCtxDBMgrTest {
 	@Test
 	public void testRemoveAttribute() throws CtxException {
 		
-		final IndividualCtxEntity entity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		final IndividualCtxEntity entity = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
 		final CtxAttribute attribute1 = this.userDB.createAttribute(entity.getId(), CtxAttributeTypes.NAME);
 		final CtxAttribute attribute2 = this.userDB.createAttribute(entity.getId(), CtxAttributeTypes.BIRTHDAY);
 		final CtxAttribute attribute3 = this.userDB.createAttribute(entity.getId(), CtxAttributeTypes.ABOUT);
@@ -442,7 +442,7 @@ public class UserCtxDBMgrTest {
 		List<CtxIdentifier> ids;
        
 		// Create test entities.
-		final CtxEntityIdentifier entId1 = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
+		final CtxEntityIdentifier entId1 = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
 		final CtxEntityIdentifier entId2 = this.userDB.createEntity(CtxEntityTypes.DEVICE).getId();
 		final CtxEntityIdentifier entId3 = this.userDB.createEntity(CtxEntityTypes.DEVICE).getId();
    
@@ -466,7 +466,7 @@ public class UserCtxDBMgrTest {
 		List<CtxIdentifier> ids;
        
 		// Create test entities.
-		final CtxEntityIdentifier entId1 = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
+		final CtxEntityIdentifier entId1 = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
 		final CtxEntityIdentifier entId2 = this.userDB.createEntity(CtxEntityTypes.DEVICE).getId();
 		final CtxEntityIdentifier entId3 = this.userDB.createEntity(CtxEntityTypes.DEVICE).getId();
       
@@ -529,7 +529,7 @@ public class UserCtxDBMgrTest {
 		
 		List<CtxEntityIdentifier> ids;
 
-		final CtxEntityIdentifier entId1 = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON).getId();
+		final CtxEntityIdentifier entId1 = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
 		CtxAttribute attr1 = this.userDB.createAttribute(entId1, CtxAttributeTypes.NAME);
 		final CtxEntityIdentifier entId2 = this.userDB.createEntity(CtxEntityTypes.PERSON).getId();
 		CtxAttribute attr2 = this.userDB.createAttribute(entId2, CtxAttributeTypes.NAME);
@@ -577,7 +577,7 @@ public class UserCtxDBMgrTest {
 		final CtxEntity entityDevice = this.userDB.createEntity(CtxEntityTypes.DEVICE);
 		final CtxEntity entityNode = this.userDB.createEntity(CtxEntityTypes.CSS_NODE);
 		final CtxAttribute attributeName = this.userDB.createAttribute(entityDevice.getId(), CtxAttributeTypes.NAME);
-		final IndividualCtxEntity indEntity = this.userDB.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		final IndividualCtxEntity indEntity = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
 		
 		final CtxAssociation association = this.userDB.createAssociation(CtxAssociationTypes.USES_DEVICES);
 		association.setParentEntity(entityDevice.getId());

@@ -259,14 +259,20 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 	
 	/*
-	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createIndividualEntity(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
+	public IndividualCtxEntity createIndividualEntity(final String ownerId,
+			final String type) throws CtxException {
 
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+			
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
-				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);
+				new CtxEntityIdentifier(ownerId, type, modelObjectNumber);
 		final IndividualCtxEntityDAO entityDAO = new IndividualCtxEntityDAO(id);
 
 		final Session session = sessionFactory.openSession();

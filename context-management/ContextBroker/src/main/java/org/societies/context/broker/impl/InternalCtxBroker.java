@@ -273,8 +273,10 @@ public class InternalCtxBroker implements ICtxBroker {
 				LOG.info("Found CSS owner context entity " + cssOwnerEnt.getId());
 			} else {
 
-				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
+				cssOwnerEnt = this.userCtxDBMgr.createIndividualEntity(
+						cssId.getBareJid(), ownerType); 
 
+				// TODO remove after pilot!
 				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
 						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 

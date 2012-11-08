@@ -84,16 +84,30 @@ public interface IUserCtxDBMgr {
 	public CtxEntity createEntity(String type) throws CtxException;
 
 	/**
-	 * Creates an individual Context Entity that is possible to join or to form a community. 
-	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
-	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
-	 * belong to zero or more CISs, simultaneously. The individual members of a pervasive 
-	 * community do not need to be human beings. They can also be organisations, smart space
-	 * infrastructures, autonomous or semi-autonomous agents, etc.
+	 * Creates an {@link IndividualCtxEntity} with the specified owner id and
+	 * type in the User Context DB. The created <code>IndividualCtxEntity
+	 * </code> is used to represent a single participant (CSS) of a {@link
+	 * CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may
+	 * belong to zero or more CISs, simultaneously. The individual members of a
+	 * CIS do not need to be human beings. They can also be organisations,
+	 * smart space infrastructures, autonomous or semi-autonomous agents, etc.
 	 *  
+	 * @param ownerId 
+	 *            the id of the <code>IndividualCtxEntity</code> to
+	 *            create
 	 * @param type
+	 * 			  the type (e.g. PERSON} of the <code>IndividualCtxEntity</code> to
+	 *            create
+	 * @return the created <code>IndividualCtxEntity</code>
+	 * @throws CtxException 
+	 *             if an <code>IndividualCtxEntity</code> with the specified
+	 *             id and type cannot be added to the Context DB
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
-	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException;
+	public IndividualCtxEntity createIndividualEntity(final String ownerId,
+			final String type) throws CtxException;
 	
 	/**
 	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
