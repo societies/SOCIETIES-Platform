@@ -146,6 +146,10 @@ public class WebActivity extends Activity {
                 		int code = Constants.FB_CODE;
                 		if ("twitter".equalsIgnoreCase(from)) code = Constants.TW_CODE;
                 		if ("foursquare".equalsIgnoreCase(from)) code = Constants.FQ_CODE;
+                		if ("linkedin".equalsIgnoreCase(from)) code = Constants.LK_CODE;
+                		if ("facebook".equalsIgnoreCase(from)) code = Constants.FB_CODE;
+                		if ("googleplus".equalsIgnoreCase(from)) code = Constants.GP_CODE;
+                		
                 		
                 		Intent intent = WebActivity.this.getIntent();
                 		intent.putExtra(Constants.ACCESS_TOKEN, token);

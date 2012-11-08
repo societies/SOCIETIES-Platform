@@ -63,6 +63,10 @@ public class SocialDataCommsUtils {
 			return SocialNetwork.Foursquare;
 		case TWITTER:
 			return SocialNetwork.twitter;
+		case LINKEDIN:
+			return SocialNetwork.linkedin;
+		case GOOGLEPLUS:
+			return SocialNetwork.googleplus;
 		}
 		throw new IllegalArgumentException("Social Network '"+socialNetwork+"' not defined in the internal API.");
 	}
