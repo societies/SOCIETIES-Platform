@@ -1,4 +1,5 @@
-package org.societies.android.platform.events;
+package org.societies.android.platform.eventscontainer;
+
 
 import android.os.Bundle;
 import android.app.Activity;

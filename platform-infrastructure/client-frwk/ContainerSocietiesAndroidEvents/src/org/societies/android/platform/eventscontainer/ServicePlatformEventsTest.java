@@ -22,9 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.events;
+package org.societies.android.platform.eventscontainer;
+
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.platform.events.PlatformEventsBase;
+import org.societies.android.platform.events.mocks.MockClientCommunicationMgr;
+import org.societies.android.platform.events.mocks.MockPubsubClientAndroid;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
@@ -37,17 +41,18 @@ import android.util.Log;
 /**
  * This wrapper class acts as a local wrapper for the Service Utilities Android service.
  * It uses the base service implementation {@link ServiceUtilitiesBase} provide the service functionality
+ * This service is purely for testing purposes but will exercise the base service functionality
  */
 
-public class ServicePlatformEventsLocal extends Service {
+public class ServicePlatformEventsTest extends Service {
 	
-    private static final String LOG_TAG = ServicePlatformEventsLocal.class.getName();
+    private static final String LOG_TAG = ServicePlatformEventsTest.class.getName();
     private IBinder binder = null;
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalPlatformEventsBinder();
-		Log.d(LOG_TAG, "ServicePlatformEventsLocal service starting");
+		this.binder = new TestPlatformEventsBinder();
+		Log.d(LOG_TAG, "ServicePlatformEventsTest service starting");
 	}
 
 	@Override
@@ -56,13 +61,13 @@ public class ServicePlatformEventsLocal extends Service {
 	}
 
 	/**Create Binder object for local service invocation */
-	public class LocalPlatformEventsBinder extends Binder {
+	public class TestPlatformEventsBinder extends Binder {
 		
 		public IAndroidSocietiesEvents getService() {
 			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
-			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this.getApplicationContext(), pubsubClient, ccm, false);
+			PlatformEventsBase serviceBase = new PlatformEventsBase(getApplicationContext(), pubsubClient, ccm, true);
 
 			return serviceBase;
 		}
@@ -78,7 +83,7 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return PubsubClientAndroid
 	 */
 	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new PubsubClientAndroid(getApplicationContext());
+		return new MockPubsubClientAndroid(getApplicationContext());
 	}
 	
 	/**
@@ -86,7 +91,6 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
+		return new MockClientCommunicationMgr(getApplicationContext());
 	}
-
 }
