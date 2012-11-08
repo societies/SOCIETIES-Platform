@@ -309,6 +309,39 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		return (IndividualCtxEntity) this.retrieve(id);
 	}
+	
+	/*
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#retrieveIndividualEntity(java.lang.String)
+	 */
+	@Override
+	public IndividualCtxEntity retrieveIndividualEntity(final String ownerId)
+			throws CtxException {
+
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+			
+		final IndividualCtxEntity entity;
+		
+		final Session session = this.sessionFactory.openSession();
+		try {
+			final Query query = session.getNamedQuery("getIndividualCtxEntityIdByOwnerId");
+			query.setParameter("ownerId", ownerId, Hibernate.STRING);
+			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
+			if (entityId != null)
+				entity = (IndividualCtxEntity) this.retrieve(entityId);
+			else 
+				entity = null;
+      
+        } catch (Exception e) {
+        	throw new UserCtxDBMgrException("Could not retrieve individual entity for CSS '"
+        			+ ownerId + "': "	+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return entity;
+	}
 
 	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(org.societies.api.context.model.CtxModelType, java.lang.String)
