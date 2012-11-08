@@ -76,6 +76,7 @@ public class CisRecord {
 
 	public String cisName;
 	public String cisJID;
+	public String owner;
 	
 
 	public CisRecord(){}
@@ -99,11 +100,12 @@ public class CisRecord {
 	
 
 	
-	public CisRecord(String cisName, String cisJid) {
+	public CisRecord(String cisName, String cisJid, String cisOwner) {
 		super();
 		this.cisName = cisName;
 		
 		this.cisJID = cisJid;
+		this.owner = cisOwner;
 
 	}
 	
@@ -168,6 +170,18 @@ public class CisRecord {
 
 	public void setCisJID(String cisJID) {
 		this.cisJID = cisJID;
+	}
+
+
+
+	public String getOwner() {
+		return owner;
+	}
+
+
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 
