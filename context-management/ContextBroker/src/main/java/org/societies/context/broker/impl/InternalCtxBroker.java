@@ -474,33 +474,21 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<IndividualCtxEntity> retrieveIndividualEntity(
 			final IIdentity cssId) throws CtxException {
-
 
 		if (cssId == null)
 			throw new NullPointerException("cssId can't be null");
 
 		this.logRequest(null, cssId);
 
-		IndividualCtxEntity cssOwner = null;
-		final List<CtxIdentifier> attrIds = this.userCtxDBMgr.lookup(
-				CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID);
-		for (final CtxIdentifier attrId : attrIds) {
-
-			final CtxAttribute cssIdAttr = (CtxAttribute) this.userCtxDBMgr.retrieve(attrId);
-			if (!CtxEntityTypes.CSS_NODE.equals(cssIdAttr.getScope().getType())
-					&& cssId.toString().equals(cssIdAttr.getStringValue())) {
-				final CtxModelObject object = this.userCtxDBMgr.retrieve(cssIdAttr.getScope());
-				if (object instanceof IndividualCtxEntity) {
-					cssOwner = (IndividualCtxEntity) object; 
-					break;
-				}
-			}
-		}
+		final IndividualCtxEntity cssOwner = 
+				this.userCtxDBMgr.retrieveIndividualEntity(cssId.getBareJid());
 
 		return new AsyncResult<IndividualCtxEntity>(cssOwner);
 	}
