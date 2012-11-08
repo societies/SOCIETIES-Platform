@@ -88,7 +88,9 @@
 </figure>
 <div class="keyinfo_content">
 <div class="clearfix">
-<cite class="author_name"><a href="friend_profile.html?cssId=${cisInfo.getOwnerJid()}">Owner</a></cite>
+<cite class="author_name"><a href="friend_profile.html?cssId=${cisInfo.getOwnerJid()}">Owner</a>
+    <!--<input type="submit" id="getPolicyButton"   value="getPolicy"  >-->
+    </cite>
 </div>
 <div class="keyinfo_text">
 <p>${cisInfo.getDescription()}</p>
@@ -168,14 +170,16 @@ ${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${ac
 <div class="hr dotted clearfix">&nbsp;</div>	
 <section>
 <header>
-<h3>Other Apps</h3>
+<h3>Members</h3>
 </header>
 <ul class="sidebar">
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
+<xc:forEach var="participant" items="${cisInfo.getParticipant()}">
+		<li>
+<a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a> 
+		</li>
+</xc:forEach>
+
+
 </ul>
 </section>
 <section>
@@ -202,20 +206,20 @@ ${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${ac
  
 $(document).ready(function(){
 	//startup functionality
-	
- 
- var i = 0;
-
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
 	 };
- 
-
- 
-
+	 
+	 //	 document.getElementById('getPolicyButton').onclick = function createPolicyWindow () { 
+	//		var htmlText = ${priacyPolicyString};
+	//		window.open("data:text/xml;charset=utf-8,<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + htmlText);
+	//	};
 
 });// end of $(document).ready(function()
-	 
+
+		
+
+		 
 </script>
 
 <!-- Footer -->
