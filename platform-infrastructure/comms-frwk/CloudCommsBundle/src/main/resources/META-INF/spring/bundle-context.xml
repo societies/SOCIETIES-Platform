@@ -17,8 +17,61 @@
    for integration testing outside of an OSGi environment -->
 
 	<context:annotation-config />
+		<!-- 
 	<context:property-placeholder properties-ref="componentConfig"/>
+
+	<context:property-placeholder properties-ref="platformConfig"/>
+	 -->
+	 
+	 <bean id="CloudCommsPropConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>file:${CONFIG_DIR}/xc.properties</value>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>	
+	</bean>
+
+	<!-- Hibernate -->
+    <bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO</value>
+				<value>org.societies.comm.xmpp.pubsub.model.PubsubServiceDAO</value>
+			</list>
+		</property>
+
+		<property name="annotatedPackages">
+			<list>				
+				<value>org.societies.comm.xmpp.pubsub.model</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">${show_sql}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
+				<prop key="hibernate.format_sql">${format_sql}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
 	
+	
+	<!-- Bundle Beans -->
 	<bean id="xcCommunication" 
 		 class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr"
 		 init-method="loginFromConfig"
@@ -39,6 +92,7 @@
 
 	<bean id="pubsubService" class="org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter">
 		<constructor-arg ref="xcCommunication"/>
+		<!-- <constructor-arg ref="sessionFactory"/>  -->
     </bean>
 	
 	<bean id="pubsubClient" class="org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl">

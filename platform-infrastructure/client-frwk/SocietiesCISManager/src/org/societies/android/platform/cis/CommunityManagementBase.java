@@ -39,6 +39,7 @@ import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AJoinResponse;
 import org.societies.android.api.cis.management.AParticipant;
+import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -69,6 +70,7 @@ import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -81,8 +83,10 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CommunityManagement extends Service implements ICisManager, ICisSubscribed {
-
+public class CommunityManagementBase implements ICisManager, ICisSubscribed {
+	//LOGGING TAG
+	private static final String LOG_TAG = CommunityManagementBase.class.getName();
+	
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
@@ -92,41 +96,28 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 													    	   "org.societies.api.schema.activityfeed",
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
-    private static final String LOG_TAG = CommunityManagement.class.getName();
-    private IBinder binder = null;
+    private Context androidContext;
     
-    @Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "CommunityManagement service starting");
+    /**
+     * CONSTRUCTOR
+     */
+    public CommunityManagementBase(Context androidContext) {
+    	Log.d(LOG_TAG, "CommunityManagementBase created");
+    	
+    	this.androidContext = androidContext;
+    	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			commMgr = new ClientCommunicationMgr(this);
+			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
-	}
 
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "CommunityManagement service terminating");
-	}
-
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public CommunityManagement getService() {
-			return CommunityManagement.this;
-		}
-	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
+    }
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
-	public ACommunity createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy) {
+	public ACommunity createCis(String client, String cisName, String cisType, String description, AMembershipCrit aMemberShipCrit, String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 		
 		//COMMUNITY INFO
@@ -135,17 +126,17 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		cisinfo.setDescription(description);
 		cisinfo.setCommunityType(cisType);
 		//MEMBERSHIP CRITERIA - CONVERT FROM PARCELABLE VERSION
-		MembershipCrit rules = new MembershipCrit();
-		List<Criteria> listCriteria = new ArrayList<Criteria>();
+		MembershipCrit rules = AMembershipCrit.convertAMembershipCrit(aMemberShipCrit) ;
+		/*List<Criteria> listCriteria = new ArrayList<Criteria>();
 		for(ACriteria acrit: criteria) {
 			listCriteria.add( ACriteria.convertACriteria(acrit));
 		}	
-		rules.setCriteria(listCriteria);
+		rules.setCriteria(listCriteria);*/
 		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX
-		cisinfo.setPrivacyPolicy(privacyPolicy);
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);
+		create.setPrivacyPolicy(privacyPolicy);
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setCreate(create);
@@ -249,64 +240,6 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
         }		
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisManager#subscribeToCommunity(java.lang.String, java.lang.String, java.lang.String)*/
-/*	public void subscribeToCommunity(String client, String name, String cisId) {
-		Log.d(LOG_TAG, "subscribeToCommunity called by client: " + client);
-		
-		//COMMUNIY INFO
-		Community cis = new Community();
-		cis.setCommunityJid(cisId);
-		cis.setCommunityName(name);
-		//SUBSCRIBED TO INFO
-		SubscribedTo subTo = new SubscribedTo();
-		subTo.setCommunity(cis);
-		//NOTIFICATION INFO
-		Notification note = new Notification();
-		note.setSubscribedTo(subTo);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setNotification(note);
-		
-		//COMMS STUFF
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, new CommunityCallback());
-        	commMgr.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-	}*/
-
-	/* @see org.societies.android.api.cis.management.ICisManager#unsubscribeFromCommunity(java.lang.String, java.lang.String)*/
-	/*public void unsubscribeFromCommunity(String client, String cisId) {
-		Log.d(LOG_TAG, "unsubscribeFromCommunity called by client: " + client);
-		
-		//DELETE NOTIFICATION
-		DeleteNotification delNote = new DeleteNotification();
-		delNote.setCommunityJid(cisId);
-		//NOTIFICATION INFO
-		Notification note = new Notification();
-		note.setDeleteNotification(delNote);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setNotification(note);
-		
-		//COMMS STUFF
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, new CommunityCallback());
-        	commMgr.sendMessage(stanza, messageBean);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-	}*/
-	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
 	public String Join(String client, ACisAdvertisementRecord targetCis) {
@@ -608,8 +541,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 					
 				}
 				intent.setPackage(client);
-				CommunityManagement.this.sendBroadcast(intent);
-				CommunityManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
+				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 
@@ -722,8 +655,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 				}
 				
 				intent.setPackage(client);
-				CommunityManagement.this.sendBroadcast(intent);
-				CommunityManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
+				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

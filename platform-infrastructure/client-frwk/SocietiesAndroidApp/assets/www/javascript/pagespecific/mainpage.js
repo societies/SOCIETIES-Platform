@@ -96,12 +96,13 @@ var SocietiesUtility = {
 		//app intercepts button and simulates back button behaviour
 		document.addEventListener("backbutton", SocietiesUtility.backButtonHandler, false);
 
-		SocietiesLogin.displayConnectionInfo();
+		//App behaviour preferences need to be determined asap
+		//Do not attempt to read the values here as the process 
+		//to determine their values is asynchronous.
+		SocietiesAppConfig.isDisplayPassword(SocietiesLogin.displayConnectionInfo);
 		
-
-
 	},
-
+	
 	/**
 	 * @methodOf SocietiesUtility#
 	 * @description Convert an uptime in milliseconds to conventional time units
@@ -149,14 +150,14 @@ jQuery(function() {
 $(document).on('pageinit', '#index', function(event) {
 
 	console.log("jQuery pageinit action(s) for mainpage");
-
+	
 	$('#connectXMPP').off('click').on('click', function(){
 		//DISPLAY PROGRESS AND DISABLE LOGIN BUTTON
 		$('#connectXMPP').val("logging in...");
 		$('#connectXMPP').button('disable');
 		$('#connectXMPP').button('refresh');
 		//LOGIN
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 		//RE-ENABLE LOGIN BUTTON
@@ -170,16 +171,16 @@ $(document).on('pageinit', '#index', function(event) {
 	});
 
 
-	$('#username').off('focus').on('focus', function(){
-		SocietiesLogin.clearElementValue('#username')
+	$('#loginUsername').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#loginUsername')
 	});
 
-	$('#password').off('focus').on('focus', function(){
-		SocietiesLogin.clearElementValue('#password')
+	$('#loginPassword').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#loginPassword')
 	});
 	
 	$("form#login").submit(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 		

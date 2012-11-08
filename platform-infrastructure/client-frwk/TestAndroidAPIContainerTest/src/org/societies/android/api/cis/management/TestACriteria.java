@@ -3,6 +3,7 @@ package org.societies.android.api.cis.management;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
+
 public class TestACriteria extends AndroidTestCase {
 
 	protected void setUp() throws Exception {

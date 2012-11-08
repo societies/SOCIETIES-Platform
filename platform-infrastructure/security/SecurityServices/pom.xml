@@ -124,7 +124,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
 	</dependencies>
 
 	<build>
@@ -156,6 +155,7 @@
 							org.w3c.dom,
 							org.xml.sax,-->
 							!org.apache.xerces,
+							org.springframework.beans.factory.config;version="[1.0,6.0)",
 							*;resolution:=optional
 						</Import-Package>
 					</instructions>

@@ -4,7 +4,7 @@ package org.societies.android.api.internal.cssmanager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
-import org.societies.api.css.directory.ACssAdvertisementRecord;
+import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 
 import com.google.gson.Gson;
 

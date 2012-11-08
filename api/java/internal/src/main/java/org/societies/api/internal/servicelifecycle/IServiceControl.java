@@ -158,4 +158,6 @@ public interface IServiceControl {
 	 */
 	public Future<ServiceControlResult> unshareService(Service service, IIdentity node) throws ServiceControlException;
 	
+	public void cleanAfterRestart();
+	
 }

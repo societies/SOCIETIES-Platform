@@ -162,7 +162,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote = null;
 
-	IServiceDiscoveryRemote iServDiscRemote = null;
+	//IServiceDiscoveryRemote iServDiscRemote = null;
 	IServiceControlRemote iServCtrlRemote = null;
 	private IPrivacyPolicyManager privacyPolicyManager = null;
 	private IEventMgr eventMgr = null;
@@ -217,12 +217,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 		this.internalCtxBroker = internalCtxBroker;
 	}
-	public IServiceDiscoveryRemote getiServDiscRemote() {
+	/*public IServiceDiscoveryRemote getiServDiscRemote() {
 		return iServDiscRemote;
 	}
 	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
 		this.iServDiscRemote = iServDiscRemote;
-	}
+	}*/
 	public IServiceControlRemote getiServCtrlRemote() {
 		return iServCtrlRemote;
 	}
@@ -293,7 +293,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient,
-					 this.iServCtrlRemote, this.privacyDataManager,this.iServDiscRemote);
+					 this.iServCtrlRemote, this.privacyDataManager);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -481,7 +481,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
-		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
+		this.ccmFactory, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
 		,description,cisCriteria,this.pubsubClient);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
@@ -520,11 +520,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//this.persist(cis);
 		//cis.setSessionFactory(sessionFactory);
 
-		// TODO Check what else is required in relation to the CIS Advertisement owner Css Id
 		
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
-		//cisAd.setMode(0);//TODO: update this
 		MembershipCrit m = new MembershipCrit();
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
@@ -574,7 +572,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID(),i.getOwner()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
 			
@@ -724,9 +722,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
 					String pPolicy;
-					if(create.getCommunity().getPrivacyPolicy() != null && 
-							create.getCommunity().getPrivacyPolicy().isEmpty() == false){
-						pPolicy = create.getCommunity().getPrivacyPolicy();
+					if(create.getPrivacyPolicy() != null && 
+							create.getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getPrivacyPolicy();
 					}else{
 						LOG.info("create came with an empty policy");
 						pPolicy = "<RequestPolicy></RequestPolicy>";	
@@ -949,7 +947,8 @@ public class JoinCallBack implements ICisManagerCallback{
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()
+						,c.getNotification().getSubscribedTo().getCommunity().getOwnerJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
@@ -1613,10 +1612,10 @@ public class JoinCallBack implements ICisManagerCallback{
 				return false;
 			}
 			
-			if (null == iServDiscRemote) {
+			/*if (null == iServDiscRemote) {
 				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
 				return false;
-			}
+			}*/
 			if (null == iServCtrlRemote) {
 				LOG.info("[Dependency Injection] Missing IServiceControlRemote");
 				return false;

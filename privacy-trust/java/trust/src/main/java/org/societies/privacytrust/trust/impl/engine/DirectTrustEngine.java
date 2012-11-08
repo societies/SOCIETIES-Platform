@@ -68,6 +68,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	static {
 		
         final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
+        aMap.put(TrustEvidenceType.FRIENDED_USER, +5.0d);
+        aMap.put(TrustEvidenceType.UNFRIENDED_USER, -50.0d);
         aMap.put(TrustEvidenceType.JOINED_COMMUNITY, +5.0d);
         aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
@@ -115,6 +117,18 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				case RATED:
 					// replace previous rating with new one
 					css.getDirectTrust().setRating((Double) evidence.getInfo());
+					break;
+				case FRIENDED_USER:
+					// add FRIENDED_USER score  to previous score
+					css.getDirectTrust().setScore(new Double(
+							css.getDirectTrust().getScore() 
+							+ EVIDENCE_SCORE_MAP.get(evidence.getType())));
+					break;
+				case UNFRIENDED_USER:
+					// add UNFRIENDED_USER score to previous score
+					css.getDirectTrust().setScore(new Double(
+							css.getDirectTrust().getScore() 
+							+ EVIDENCE_SCORE_MAP.get(evidence.getType())));
 					break;
 				default:
 					LOG.warn("Ignoring evidence '" + evidence 

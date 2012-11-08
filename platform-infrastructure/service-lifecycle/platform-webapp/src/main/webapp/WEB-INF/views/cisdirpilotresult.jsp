@@ -42,8 +42,9 @@
         <tr>
         	<td>${cssNice.adrecord.name}</td>
         	<td>${cssNice.cssownername}</td>
-            <td><input type="button" value="join" onclick="updateForm('${cssNice.adrecord.id}', '${cssNice.cssownerid}')" ></td> 
-           
+            <td><input type="button" value="join" onclick="updateForm('${cssNice.adrecord.id}', '${cssNice.cssownerid}')" />
+                <input type="button" value="Privacy Policy" onclick="window.location.href='cis-privacy-policy-show.html?cisId=${cssNice.adrecord.id}&cisOwnerId=${cssNice.cssownerid}'" />
+            </td>
         </tr>
     </xc:forEach>
     	

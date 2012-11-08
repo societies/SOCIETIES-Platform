@@ -66,7 +66,7 @@ public class CisManagerClientCallback implements ICommCallback {
 				if(c.getJoinResponse().isResult() && c.getJoinResponse().getCommunity() != null){
 					// updates the list of CIS where I belong
 					cisManag.subscribeToCis(new CisRecord(c.getJoinResponse().getCommunity().getCommunityName(),
-							c.getJoinResponse().getCommunity().getCommunityJid()));
+							c.getJoinResponse().getCommunity().getCommunityJid(),c.getJoinResponse().getCommunity().getOwnerJid()));
 					LOG.info("subscription worked");
 					if(null != cisManag.getiUsrFeedback()){
 						cisManag.getiUsrFeedback().showNotification("join completed");

@@ -161,7 +161,7 @@ public class Assessment implements IAssessment {
 	public long getNumDataTransmissionEvents() {
 
 		LOG.info("getNumDataTransmissionEvents()");
-		
+
 		return privacyLog.getDataTransmission().size();
 	}
 	
@@ -201,5 +201,20 @@ public class Assessment implements IAssessment {
 	@Override
 	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
 		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
+	}
+	
+	@Override
+	public List<IIdentity> getDataTransmissionReceivers() {
+		return dataTransferAnalyzer.getDataTransmissionReceivers();
+	}
+	
+	@Override
+	public int getNumDataTransmissionEvents(IIdentity receiver, Date start, Date end) {
+		return dataTransferAnalyzer.getNumDataTransmissionEvents(receiver, start, end);
+	}
+
+	@Override
+	public Map<IIdentity, Integer> getNumDataTransmissionEventsForAllReceivers(Date start, Date end) {
+		return dataTransferAnalyzer.getNumDataTransmissionEventsForAllReceivers(start, end);
 	}
 }

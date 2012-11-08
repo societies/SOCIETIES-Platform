@@ -246,5 +246,11 @@ public interface ICSSLocalManager {
 	  */
 	 public void acceptCssFriendRequest(CssRequest request);
 	 
+	 /**
+	  * Decline 
+	  * @param request
+	  */
+	 public void declineCssFriendRequest(CssRequest request);
+	 
  
 }

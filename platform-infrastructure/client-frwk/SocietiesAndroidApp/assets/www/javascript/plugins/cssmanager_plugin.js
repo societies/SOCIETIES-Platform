@@ -93,7 +93,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 	loginCSS: function(successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		var cssIdentity = jQuery("#username").val() + "@" + jQuery("#identitydomain").val();
+		var cssIdentity = jQuery("#loginUsername").val() + "@" + jQuery("#identitydomain").val();
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
 		                    "cssIdentity": cssIdentity ,
@@ -177,7 +177,7 @@ var	SocietiesLocalCSSManager = {
 		var client = "org.societies.android.platform.gui";
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
-		                    "cssIdentity": jQuery("#username").val(),
+		                    "cssIdentity": jQuery("#loginUsername").val(),
 		                    "cssInactivation": null,
 		                    "cssNodes": [],
 		                    "cssRegistration": null,
@@ -191,7 +191,7 @@ var	SocietiesLocalCSSManager = {
 		                    "identityName": null,
 		                    "imID": null,
 		                    "name": null,
-		                    "password": jQuery("#password").val(),
+		                    "password": jQuery("#loginPassword").val(),
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
@@ -218,7 +218,7 @@ var	SocietiesLocalCSSManager = {
 
 	logoutCSS: function(successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		var cssIdentity = jQuery("#username").val() + "@" + jQuery("#identitydomain").val();
+		var cssIdentity = jQuery("#loginUsername").val() + "@" + jQuery("#identitydomain").val();
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
 		                    "cssIdentity": cssIdentity,
@@ -464,6 +464,7 @@ var	SocietiesLocalCSSManagerHelper = {
 		//Until Service connection leakage problem is sorted do not 
 		//unbind from the CSSManager service
 		$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+		SocietiesLogin.displayConnectionInfo();
 
 		console.log(data);
 

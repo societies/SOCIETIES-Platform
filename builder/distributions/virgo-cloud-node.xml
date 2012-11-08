@@ -63,6 +63,7 @@
 		<module>../../css-modules/css-mgmt/cssmgmt</module>
 
 		<!-- CIS Mgmt: 1 bundle (path to be corrected) -->
+		<module>../../cis-modules/cis-management/cis-manager-client</module>
 		<module>../../cis-modules/cis-management/cis-manager/cis-manager</module>
 
 		<!-- Device Mgmt: 3 bundles (to be merged) -->

@@ -130,6 +130,7 @@ public class NominalTestCaseLowerTester {
 		
 		start = Calendar.getInstance().getTimeInMillis();
 		privacyLogAppender.logCommsFw(fromIdentity, toIdentity, payload);
+		privacyLogAppender.logCommsFw(identityManager.getThisNetworkNode(), identityManager.getThisNetworkNode(), payload);
 		end = Calendar.getInstance().getTimeInMillis();
 		dt = end - start;
 		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");

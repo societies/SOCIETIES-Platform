@@ -40,13 +40,13 @@ public class ACommunity extends Community implements Parcelable {
 	
 	private static final long serialVersionUID = 6612786379303369931L;
 
-	//public AMembershipCriteria getMembershipCrit() {
-	//	return AMembershipCriteria.convertMembershipCrit( this.membershipCrit);
-	//}
+	public AMembershipCrit getMembershipCrit() {
+		return AMembershipCrit.convertMembershipCrit( this.membershipCrit);
+	}
 	
-	//public void setMembershipCrit(AMembershipCriteria amembershipCrit) {
-	//	super.setMembershipCrit(amembershipCrit);
-	//}
+	public void setMembershipCrit(AMembershipCrit amembershipCrit) {
+		super.setMembershipCrit(amembershipCrit);
+	}
 	
 	public ACommunity() {
 		super();
@@ -64,8 +64,7 @@ public class ACommunity extends Community implements Parcelable {
 		dest.writeString(this.getCommunityType());
 		dest.writeString(this.getDescription());
 		dest.writeString(this.getOwnerJid());
-		//if (null != this.getMembershipCrit() && null != this.getMembershipCrit().getACriteria() && this.getMembershipCrit().getACriteria().size() > 0){
-		//	dest.writeParcelable(this.getMembershipCrit(), flags);
+		dest.writeParcelable(this.getMembershipCrit(), flags);
 		//}
 	}
 			
@@ -76,8 +75,7 @@ public class ACommunity extends Community implements Parcelable {
 		this.setCommunityType(in.readString());
 		this.setDescription(in.readString());
 		this.setOwnerJid(in.readString());
-		//if(in.dataAvail() >0)
-		//	this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
+		this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
 	}
 
 	public static final Parcelable.Creator<ACommunity> CREATOR = new Parcelable.Creator<ACommunity>() {
@@ -97,6 +95,7 @@ public class ACommunity extends Community implements Parcelable {
 		acommunity.setCommunityType(community.getCommunityType());
 		acommunity.setDescription(community.getDescription());
 		acommunity.setOwnerJid(community.getOwnerJid());
+		acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
 		//if(community.getMembershipCrit()!=null && community.getMembershipCrit().getCriteria() != null && community.getMembershipCrit().getCriteria().isEmpty()== false)
 		//	acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
 		return acommunity;
