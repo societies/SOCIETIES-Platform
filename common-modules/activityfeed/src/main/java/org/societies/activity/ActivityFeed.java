@@ -487,6 +487,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		r.setResult(true); //TODO. add a return on the activity feed method
 				
 		result.setAddActivityResponse(r);
+		LOG.debug("going to call callback from addActivity with result " + r.isResult());
 		c.receiveResult(result);
 		
 	}

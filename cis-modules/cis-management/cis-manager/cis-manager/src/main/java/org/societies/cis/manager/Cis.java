@@ -73,6 +73,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.cis.manager.CisParticipant.MembershipType;
+import org.societies.cis.mgmtClient.CisManagerClient;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 import javax.persistence.*;
@@ -937,21 +938,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 				Requestor requestor;
 				try {
 					requestor = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
-					GetListCallBack g = new GetListCallBack();
-					this.getListOfMembers(requestor, g);
-					while(false == g.isDone()){
-						LOG.info("SLEPT!");
-						Thread.sleep(100);
+					CisManagerClient callbac = new CisManagerClient();
+					this.getListOfMembers(requestor, callbac);
+					CommunityMethods callbackResp = callbac.getComMethObj();
+					if (null != callbackResp){
+						who.setResult(callbackResp.getWhoResponse().isResult());
+						who.setParticipant(callbackResp.getWhoResponse().getParticipant());
 					}
-					who.setResult(g.getResp());
-					who.setParticipant(g.getList());
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				} 
 				
 				
 				return result;
@@ -1033,10 +1030,25 @@ public class Cis implements IFeatureServer, ICisOwned {
 				CommunityMethods result = new CommunityMethods();
 				Community com = new Community();
 				GetInfoResponse r = new GetInfoResponse();
-				this.fillCommmunityXMPPobj(com);
-				r.setResult(true);
+				r.setResult(false);
 				r.setCommunity(com);
-				result.setGetInfoResponse(r);
+				
+				if(null == c.getGetInfo().getRequestor())return result; // fails if there is no requestor
+				// otherwise we call locally
+				Requestor requestor;
+				try {
+					requestor = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
+					CisManagerClient callbac = new CisManagerClient();
+					this.getInfo(requestor, callbac);
+					CommunityMethods callbackResp = callbac.getComMethObj();
+					if (null != callbackResp){
+						return callbackResp;
+					}
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+
 				return result;
 
 			}				// END OF GET INFO
@@ -1309,7 +1321,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			ResponseItem resp = null;
 			DataIdentifier dataId = null;
 			try {
-				dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
+				dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS.value() + "://" + this.getCisId() + "/cis-member-list");
 				resp = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
 			} catch (MalformedCtxIdentifierException e) {
 				LOG.error("The identifier of the requested data is malformed", e);
@@ -1502,6 +1514,28 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.fillCommmunityXMPPobj(c);
 		result.setGetInfoResponse(r);
 		r.setCommunity(c);
+		
+		callback.receiveResult(result);	
+	}
+	
+	@Override
+	public void getInfo(Requestor req, ICisManagerCallback callback){
+		LOG.debug("local client call to get info from this CIS");
+		GetInfoResponse r = new GetInfoResponse();
+		CommunityMethods result = new CommunityMethods();
+		Community c = new Community ();
+		r.setCommunity(c);
+		result.setGetInfoResponse(r);
+		
+		CisManagerClient internalCallback = new CisManagerClient();
+		
+		getListOfMembers(req, internalCallback);
+		CommunityMethods internallCabackResult = internalCallback.getComMethObj();
+		r.setResult(internallCabackResult.getWhoResponse().isResult());
+		if(r.isResult()){
+			c.setParticipant((internallCabackResult.getWhoResponse().getParticipant()));
+			this.fillCommmunityXMPPobj(c);
+		}
 		
 		callback.receiveResult(result);	
 	}
@@ -1700,7 +1734,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	} 
 
 	// subclass for local get list callbacks
-	private class GetListCallBack implements ICisManagerCallback{
+	/*private class GetListCallBack implements ICisManagerCallback{
 		public boolean done = false;
 		public boolean resp = false;
 		public List<Participant> l = null;
@@ -1720,6 +1754,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		public boolean isDone(){return done;}
 		public boolean getResp(){return resp;}
 		public List<Participant> getList(){return l;}
-	}
+	}*/
 	
 }

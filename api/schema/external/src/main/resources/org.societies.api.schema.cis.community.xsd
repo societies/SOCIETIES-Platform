@@ -261,7 +261,14 @@
 	</xs:simpleType>
 	
 	
-	<xs:element name='getInfo' type='empty' />	
+	
+	<xs:element name='getInfo'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='1'>
+			   <xs:element name="requestor" type='ids:requestorBean'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:element name='setInfo'>
 		<xs:complexType>

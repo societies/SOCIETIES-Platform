@@ -33,5 +33,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
+    <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
 <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1" />
 </beans>

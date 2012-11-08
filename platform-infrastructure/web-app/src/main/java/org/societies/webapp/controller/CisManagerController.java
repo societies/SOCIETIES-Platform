@@ -30,16 +30,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.activity.ActivityFeedClient;
+import org.societies.api.activity.IActivity;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.cis.mgmtClient.CisManagerClient;
+import org.societies.webapp.models.AddActivityForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,26 +69,15 @@ public class CisManagerController {
 	
 	@Autowired
 	private ICisManager cisManager;
+	@Autowired
+	private ICommManager commMngrRef;
 	
-	CommunityMethods callbackComMethRed = null;
+	
+	private static Logger LOG = LoggerFactory.getLogger(CisManagerController.class);
 	/**
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
-	
-	// COMMUNITY PROFILE CALLBACK
-	
-	commCallBack icall = new commCallBack();
-	class commCallBack implements ICisManagerCallback{
-			
-		public commCallBack(){
-		}
-		@Override
-		public void receiveResult(CommunityMethods communityResultObject) {
-			callbackComMethRed = communityResultObject;
-		}
-
-	}	
 	
 	@RequestMapping(value="/your_communities_list.html",method = RequestMethod.GET)
 	public ModelAndView yourCommunitiesListPage() {
@@ -90,29 +91,82 @@ public class CisManagerController {
 		return new ModelAndView("your_communities_list", model) ;
 	}
 	
+	
+	
+	
+	
+	/*
+	 * COMMUNITY PROFILE PAGE
+	 * 
+	 * 
+	 * 
+	 *
+	 */
+	
 	@RequestMapping(value="/community_profile.html",method = RequestMethod.GET)
-	public ModelAndView communityPofilePage(@RequestParam(value="cisId", required=true) String cisId){
+	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId){
 		Map<String, Object> model = new HashMap<String, Object>();
 		
 		ICis icis = this.getCisManager().getCis(cisId);
+		CisManagerClient getInfoCallback = new CisManagerClient();
+		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
+		icis.getInfo(req,getInfoCallback);
 		
-		icis.getInfo(icall);
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(null == callbackComMethRed){
-			model.put("message", "timeout");
-		}else{
-			
-		}
+		// TODO, add null checks
+		
+		CommunityMethods getInfResp = new CommunityMethods();
+		getInfResp = getInfoCallback.getComMethObj();
+		model.put("cisInfo", getInfResp.getGetInfoResponse().getCommunity());
+		
+		//getInfResp.getGetInfoResponse().getCommunity().getOwnerJid()
+		
+		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+		icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+		org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+		model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+		
+		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+		AddActivityForm form = new AddActivityForm();
+		model.put("activityForm",form);
+		
 		
 		return new ModelAndView("community_profile", model) ;
 	}
 
 	
+	// TODO: perhaps adapt this so it does not reload the full page
+	//@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	public ModelAndView addActivityInProfilePage(@Valid AddActivityForm addActForm,  BindingResult result, Map model){
+		
+		if(result.hasErrors()){
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+		
+		ICis icis = this.getCisManager().getCis(addActForm.getCisId());
+		
+		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+		
+		IActivity act = icis.getActivityFeed().getEmptyIActivity();
+		act.setActor(this.getCommMngrRef().getIdManager().getThisNetworkNode().getBareJid());
+		act.setObject(addActForm.getObject());
+		act.setVerb(addActForm.getVerb());
+		act.setTarget(addActForm.getCisId());
+		
+		icis.getActivityFeed().addActivity(act, activityFeedCallback);
+		LOG.info("add act");
+		Activityfeed ac= activityFeedCallback.getActivityFeed();
+		if(null != ac && ac.getAddActivityResponse().isResult()){
+			return communityProfilePage(addActForm.getCisId());
+		}
+		else{
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+
+			
+	}
 	
 	
 	
@@ -122,5 +176,14 @@ public class CisManagerController {
 	}
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
+	}
+	
+	public ICommManager getCommMngrRef() {
+		return this.commMngrRef;
+	}
+	
+	
+	public void setCommMngrRef(ICommManager commMngrRef) {
+		this.commMngrRef = commMngrRef;
 	}
 }

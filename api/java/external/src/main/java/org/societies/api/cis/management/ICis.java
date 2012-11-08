@@ -99,7 +99,19 @@ public interface ICis {
 	 * 
 	 * @param callback callback function
 	 */
+	@Deprecated
     public void getInfo(ICisManagerCallback callback);
+	
+	/**
+	 * Get info from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is
+	 * @param callback callback function
+	 */
+    public void getInfo(Requestor req,ICisManagerCallback callback);
     
 
     /**

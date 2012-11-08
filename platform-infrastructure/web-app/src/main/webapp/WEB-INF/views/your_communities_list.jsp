@@ -87,12 +87,17 @@
 		<li class="keyinfo bypostauthor">
 		<figure class="gravatar">
 		<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
-		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}"l">${record.getName()}</a>
+		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
 		</figure>
 		<div class="keyinfo_content">
 		<div class="clearfix">
 		
-		<cite class="author_name">Owner: ${record.getOwnerId()}</cite>
+		<cite class="author_name">${record.getName()}</cite>
+		<div class="keyinfo_text">
+		<p>Owner: ${record.getOwnerId()}</p>
+		</div>
+		
+		
 		</div>
 		</div>
 		</li>

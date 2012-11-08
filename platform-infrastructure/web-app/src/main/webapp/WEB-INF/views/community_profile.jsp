@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@taglib prefix="xc" uri="http://java.sun.com/jsp/jstl/core"  %> 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,11 +66,11 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section  class="grid_12">
 <section>
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a></div>
 </section>
 <div class="websearchbar">
 <div class="websearchtitle">
-<h4 class="profile_title">Community Profile</h4>
+<h4 class="profile_title">${cisInfo.getCommunityName()} Profile</h4>
 </div>
 <div class="groupsearch">
 <form action="" class="websearch-form frame nobtn rsmall">
@@ -82,18 +84,56 @@
 <section>
 <figure class="gravatar">
 <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
-<a class="furtherinfo-link" href="">REMOVE</a>
+<a class="furtherinfo-link" href="delete_community.html?cisId=${cisInfo.getCommunityJid()}">REMOVE</a>
 </figure>
 <div class="keyinfo_content">
 <div class="clearfix">
-<cite class="author_name"><a href="">Details</a></cite>
+<cite class="author_name"><a href="friend_profile.html?cssId=${cisInfo.getOwnerJid()}">Owner</a></cite>
 </div>
 <div class="keyinfo_text">
-<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui. </p>
-<p>Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
+<p>${cisInfo.getDescription()}</p>
 </div>
-<p><strong>Apps Info:</strong></p>
+<p><strong>Activity Feed:</strong></p>
 <!-- Unordered -->
+
+<xc:if test="${acitivityAddError != 'null'}">
+	<div class="error">${acitivityAddError}</div>
+</xc:if>
+
+<form:form method="POST" action="community_profile.html" commandName="activityForm" name="AddActivityForm">
+		<form:errors path="*" cssClass="errorblock" element="div" />
+		
+		<table id="addActivityFormInputs">
+		<tr>
+		<td><form:input path="object" defaultValue="write your activity here"/></td>
+		<td><form:errors path="object" cssClass="error" /></td>
+		</tr>
+		
+		<tr>
+			<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+			<td><form:errors path="cisId" cssClass="error" /></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><form:input path="verb" style="display:none;" value="posted"/></td>
+			<td><form:errors path="verb" cssClass="error" /></td>
+			<td>&nbsp;</td>
+		</tr>
+			<tr>
+				<td colspan="3"><input id="postActButton" type="button" value="PostActivity"/></td>
+			</tr>
+		</table>
+		
+</form:form>
+
+<ul>
+<xc:forEach var="activity" items="${activities}">
+		<li>
+${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${activity.getTarget()} 
+		</li>
+</xc:forEach>
+</ul>
+
 <ul>
 <li>List item example</li>
 <li>List item example
@@ -156,6 +196,28 @@
 </aside>
 <div class="hr grid_12 clearfix">&nbsp;</div>
 </div>
+
+<!-- Button Script -->
+	<script type="text/javascript">
+ 
+$(document).ready(function(){
+	//startup functionality
+	
+ 
+ var i = 0;
+
+ document.getElementById('postActButton').onclick = function() {
+	 document.AddActivityForm.submit();
+	 };
+ 
+
+ 
+
+
+});// end of $(document).ready(function()
+	 
+</script>
+
 <!-- Footer -->
 <footer class="container_12 clearfix">
 <section class="footer">
