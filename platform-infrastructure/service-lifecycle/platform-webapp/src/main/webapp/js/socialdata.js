@@ -65,7 +65,7 @@ function countConnectors(){
   	    document.sd.submit();
   	 }
   	 else{
-  	 	alert("There is any connector available");
+  	 	alert("Add a connector first!");
   	 }
   }
   

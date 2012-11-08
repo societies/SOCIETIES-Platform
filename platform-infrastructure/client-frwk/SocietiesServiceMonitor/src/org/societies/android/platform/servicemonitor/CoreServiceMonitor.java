@@ -274,7 +274,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	public InstalledAppInfo[] getInstalledApplications(String client) {
 		Log.d(LOG_TAG, "Calling getInstalledApplications from client: " + client);
 		
-		List<InstalledAppInfo> apps = getInstalledApps(false, "org.societies."); /* false = no system packages */
+		List<InstalledAppInfo> apps = getInstalledApps(false, "org.societies.thirdpartyservice"); /* false = no system packages */
 		Parcelable returnArray[] = new Parcelable[apps.size()];
 		for (int i=0; i<apps.size(); i++) {
 			InstalledAppInfo tmpApp = apps.get(i); 

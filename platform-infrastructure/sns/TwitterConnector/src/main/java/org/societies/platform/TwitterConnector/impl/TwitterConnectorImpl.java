@@ -56,6 +56,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	private String name;
 	private String id;
 	private String lastUpdate = "yesterday";
+	private String access_token;
+	private String identity;
 
 	// public TwitterConnectorImpl() {
 	// this.twToken = new TwitterToken();
@@ -73,6 +75,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		this.service = twToken.getAuthService();
 		this.name = ISocialConnector.TWITTER_CONN;
 		this.id = this.name + "_" + UUID.randomUUID();
+		this.access_token= access_token;
+		this.identity = identity;
 	}
 
 	public String getUserProfile() {
@@ -262,12 +266,12 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public void setToken(String access_token) {
-		// TODO Auto-generated method stub
+		this.access_token = access_token;
 
 	}
 
 	public void setTokenExpiration(long expires) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -278,7 +282,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 
 	public String getToken() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.access_token;
 	}
 
 	public void setConnectorName(String name) {

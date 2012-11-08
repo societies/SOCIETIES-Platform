@@ -81,14 +81,14 @@
 			</select> 
 			
 			
-			<select context="type" id="entity" style="display: none">
+			<select context="type" id="${entity_label}" style="display: none">
 				<option value="NONE" label="--- Select Entity Type---" />
 				<xc:forEach var="type" items="${entityTypes}">
 					<option value="${type}" label="${type}" />
 				</xc:forEach>
 			</select> 
 			
-			<select context="type" id="attribute"
+			<select context="type" id="${attribute_label}"
 				style="display: none">
 				<option value="NONE" label="--- Select Attribute Type --- " />
 
@@ -99,7 +99,7 @@
 			</select>
 			
 			
-			 <select context="type" id="association"
+			 <select context="type" id="${association_label}"
 				style="display: none">
 				<option value="NONE" label="--- Select Association Type---" />
 				<xc:forEach var="type" items="${associationTypes}">
