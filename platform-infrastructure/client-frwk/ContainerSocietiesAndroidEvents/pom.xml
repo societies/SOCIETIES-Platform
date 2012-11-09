@@ -122,13 +122,13 @@
 				            <goal>emulator-start</goal>
 				        </goals>
 			    	</execution>
-			    	<execution>
+			    	<!--execution>
 				        <id>stopEmulator</id>
 				        <phase>initialize</phase>
 				        <goals>
 				            <goal>emulator-stop</goal>
 				        </goals>
-			    	</execution>
+			    	</execution-->
 			    	
 				</executions>
 				  

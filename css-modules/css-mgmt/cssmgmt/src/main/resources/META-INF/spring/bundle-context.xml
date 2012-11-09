@@ -20,7 +20,7 @@
 
   <bean id="CSSManager" 
   	class="org.societies.css.mgmt.CSSManager" 
-  	init-method="cssManagerInit"
+  	init-method="testAndroidPubsub"
   	depends-on="PubsubClient">
 	  <property name="cssRegistry" ref="CssRegistryBundle"/>
 	  <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
