@@ -15,7 +15,7 @@
 
   <xs:import
       namespace='jabber:x:data'
-      schemaLocation='http://xmpp.org/schemas/x-data.xsd'/>
+      schemaLocation='./dataforms.xsd'/>
 
   <xs:element name='pubsub'>
     <xs:complexType>

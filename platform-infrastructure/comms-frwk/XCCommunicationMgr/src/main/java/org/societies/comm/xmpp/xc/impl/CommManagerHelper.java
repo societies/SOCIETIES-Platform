@@ -112,14 +112,12 @@ public class CommManagerHelper {
 	
 	private final Map<String, HostedNode> localToplevelNodes = new HashMap<String, HostedNode>();
 	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
-	
-	// Classloader magic
-	private final Map<Object, ClassLoader> classloaderMap = new HashMap<Object, ClassLoader>();
 
 	private Serializer s;
-	private final Long thisBundleId;
+	private ClassLoaderManager clm;
 	
 	public CommManagerHelper () {
+		clm = new ClassLoaderManager();
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		s = new Persister(strategy);
@@ -132,8 +130,6 @@ public class CommManagerHelper {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(),e);
 		}
-		
-		thisBundleId = ((BundleDelegatingClassLoader)Thread.currentThread().getContextClassLoader()).getBundle().getBundleId();
 	}
 	
 	public String[] getSupportedNamespaces() {
@@ -279,7 +275,7 @@ public class CommManagerHelper {
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
 			
-			oldCl = classLoaderMagic(callback);
+			oldCl = clm.classLoaderMagic(callback);
 			
 			// payloadless (confirmation) iqs
 			if (element==null) {
@@ -330,7 +326,7 @@ public class CommManagerHelper {
 		ClassLoader oldCl = null;
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
-			oldCl = classLoaderMagic(callback);
+			oldCl = clm.classLoaderMagic(callback);
 			
 //			LOG.warn("dispatchIQError: XMPP ERROR!");
 			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
@@ -395,7 +391,7 @@ public class CommManagerHelper {
 		try {
 			IFeatureServer fs = getFeatureServer(namespace);
 			
-			ClassLoader oldClassloader = classLoaderMagic(fs);
+			ClassLoader oldClassloader = clm.classLoaderMagic(fs);
 			
 			//GET CLASS FIRST
 			String packageStr = getPackage(namespace);  
@@ -438,30 +434,6 @@ public class CommManagerHelper {
 		}
 	}
 
-	private ClassLoader classLoaderMagic(Object o) {
-		LOG.info("getting classloader for object "+o.toString());
-		ClassLoader newClassloader = null;
-		if (o instanceof Thread) {
-			ClassLoader cl = ((Thread)o).getContextClassLoader();
-			if (cl instanceof BundleDelegatingClassLoader) {
-				Long bid = ((BundleDelegatingClassLoader) cl).getBundle().getBundleId();
-				LOG.info("resolved "+o.toString()+" to bundle "+bid);
-				newClassloader = classloaderMap.get(bid);
-			}
-		}
-		
-		if (newClassloader!=null) {
-			ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
-			LOG.info("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
-			Thread.currentThread().setContextClassLoader(newClassloader);
-			return oldClassloader;
-		}
-		else
-			LOG.info("no classloader found!");
-		
-		return null;
-	}
-
 	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
 		String namespace = element.getNamespace().getURI();
@@ -469,10 +441,10 @@ public class CommManagerHelper {
 		try {
 			try {
 				ICommCallback cb = getMessageCommCallback(namespace);
-				oldCl = classLoaderMagic(cb);
+				oldCl = clm.classLoaderMagic(cb);
 			} catch (UnavailableException e) {
 				IFeatureServer fs = getFeatureServer(namespace);
-				oldCl = classLoaderMagic(fs);
+				oldCl = clm.classLoaderMagic(fs);
 			}
 			
 			//GET CLASS FIRST
@@ -546,7 +518,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -555,7 +527,7 @@ public class CommManagerHelper {
 
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
 //		for (String ns : messageCallback.getXMLNamespaces()) {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
@@ -565,21 +537,6 @@ public class CommManagerHelper {
 			LOG.info("registering Callback for namespace " + mainNs);
 			nsCommCallbacks.put(mainNs, messageCallback);
 		}
-	}
-	
-	private void classloaderRegistry(ClassLoader contextClassLoader) {
-		if (contextClassLoader instanceof BundleDelegatingClassLoader) {
-			BundleDelegatingClassLoader bdcl = (BundleDelegatingClassLoader) contextClassLoader;
-			Long id = bdcl.getBundle().getBundleId();
-			if (!id.equals(thisBundleId)) {
-				LOG.info("saving classloader "+contextClassLoader.toString()+" for bundle "+id);
-				classloaderMap.put(id, contextClassLoader);
-			}
-			else
-				LOG.info("this is the local classloader");
-		}
-		else
-			LOG.info("skipping classloader "+contextClassLoader.toString());
 	}
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
