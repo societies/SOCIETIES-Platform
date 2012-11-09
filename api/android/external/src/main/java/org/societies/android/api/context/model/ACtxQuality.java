@@ -24,7 +24,6 @@
  */
 package org.societies.android.api.context.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.societies.api.context.model.CtxOriginType;
@@ -62,9 +61,7 @@ import android.os.Parcelable;
  * @see CtxOriginType
  * @since 0.0.1
  */
-public class ACtxQuality implements Serializable {
-
-	private static final long serialVersionUID = 2596329083367854427L;
+public class ACtxQuality implements Parcelable {
 
 	/** The context attribute this QoC information refers to. */
 	private final ACtxAttribute attribute;

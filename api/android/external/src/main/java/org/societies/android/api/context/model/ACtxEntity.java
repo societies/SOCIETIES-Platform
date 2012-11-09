@@ -203,7 +203,7 @@ public class ACtxEntity extends ACtxModelObject {
         attributes.add(attribute);
     }
 	
-	void addAssociation(ACtxAssociationIdentifier association) {
+	public void addAssociation(ACtxAssociationIdentifier association) {
         associations.add(association);
     }
 
