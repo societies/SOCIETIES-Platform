@@ -26,7 +26,6 @@ package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
@@ -55,9 +53,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
-import org.societies.context.api.event.CtxChangeEventTopic;
-import org.societies.context.api.event.CtxEventScope;
-import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.user.db.impl.model.CtxAssociationDAO;
 import org.societies.context.user.db.impl.model.CtxAttributeDAO;
@@ -85,10 +80,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
-	
-	/** The Context Event Mgmt service reference. */
-	@Autowired(required=true)
-	private ICtxEventMgr ctxEventMgr;
 	
 	private final String privateId;
 
@@ -143,16 +134,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
-
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
 		
 		return (CtxAssociation) this.retrieve(id);
 	}
@@ -204,16 +185,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-
 		return (CtxAttribute) this.retrieve(id);
 	}
 
@@ -243,16 +214,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
-		}
-	
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
 		}
 		
 		return (CtxEntity) this.retrieve(id);
@@ -297,16 +258,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		isMemberOfAssoc.setParentEntity(id);
 		this.update(isMemberOfAssoc);
 		
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-
 		return (IndividualCtxEntity) this.retrieve(id);
 	}
 	
@@ -596,11 +547,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (modelObject == null) 
 			throw new NullPointerException("modelObject can't be null");
 		
-		// QND
-		CtxAttribute oldAttribute = null;
-		if (modelObject instanceof CtxAttribute)
-			oldAttribute = (CtxAttribute) this.retrieve(modelObject.getId());
-		
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try {	
@@ -618,29 +564,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
-		} 
-		
-		// TODO CtxChangeEventTopic.MODIFIED should only be used if the model object is actually modified
-		// QND
-		String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
-		if (oldAttribute != null) {
-			boolean modified = false;
-			final CtxAttribute newAttribute = (CtxAttribute) modelObject;
-			if ((newAttribute.getStringValue() != null 
-					&& !newAttribute.getStringValue().equals(oldAttribute.getStringValue()))
-					|| (newAttribute.getStringValue() == null && oldAttribute.getStringValue() != null))
-					modified = true;
-			if (!modified)
-				topics = new String[] { CtxChangeEventTopic.UPDATED };
-		}
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(modelObject.getId()), 
-					topics, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ Arrays.toString(topics) 
-					+ "' with scope '" + CtxEventScope.BROADCAST 
-					+ "': ICtxEventMgr service is not available");
 		}
 		      
 		return this.retrieve(modelObject.getId());

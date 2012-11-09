@@ -24,15 +24,10 @@
  */
 package org.societies.context.user.db.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -49,19 +44,12 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelBeanTranslator;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
-import org.societies.api.schema.context.model.CtxAssociationBean;
-import org.societies.api.schema.context.model.CtxAttributeBean;
-import org.societies.api.schema.context.model.CtxEntityBean;
-import org.societies.api.schema.context.model.CtxModelObjectBean;
-import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -87,7 +75,6 @@ public class UserCtxDBMgrTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
 	}
 
 	/**
@@ -187,7 +174,7 @@ public class UserCtxDBMgrTest {
 		assertNull(attribute.getSourceId());
 		assertNotNull(attribute.getQuality());
 		assertEquals(attribute, attribute.getQuality().getAttribute());
-		// TODO assertEquals(attribute.getLastModified(), attribute.getQuality().getLastUpdated());
+		assertEquals(attribute.getLastModified().getTime(), attribute.getQuality().getLastUpdated().getTime());
 		assertNull(attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
@@ -354,7 +341,6 @@ public class UserCtxDBMgrTest {
 
 		attribute.setStringValue("Jane Do");
 		attribute.setValueType(CtxAttributeValueType.STRING);
-		Date lastUpdated = attribute.getQuality().getLastUpdated();
 		// verify update
 		attribute = (CtxAttribute) this.userDB.update(attribute);
 		assertEquals("Jane Do", attribute.getStringValue());
@@ -364,8 +350,6 @@ public class UserCtxDBMgrTest {
 		assertEquals(CtxAttributeValueType.STRING, attribute.getValueType());
 		assertNull(attribute.getValueMetric());
 		assertNull(attribute.getSourceId());
-		//problem with Mysql when testing
-		//assertEquals(lastUpdated, attribute.getQuality().getLastUpdated());
 		assertNull(attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
@@ -380,17 +364,46 @@ public class UserCtxDBMgrTest {
 		attribute2.getQuality().setOriginType(CtxOriginType.SENSED);
 		attribute2 = (CtxAttribute) this.userDB.update(attribute2);
 		assertEquals(CtxOriginType.SENSED, attribute2.getQuality().getOriginType());
-		final Date lastModified1 = attribute2.getLastModified();
-		final Date lastUpdated1 = attribute2.getQuality().getLastUpdated();
+		assertTrue(attribute2.getLastModified().getTime() - attribute2.getQuality().getLastUpdated().getTime() < 1000);
+	}
+	
+	@Test
+	public void testUpdateAttributeWithoutModification() throws Exception {
+
+		final CtxEntityIdentifier indEntityId = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON).getId();
+		CtxAttribute attribute = this.userDB.createAttribute(indEntityId, CtxAttributeTypes.NAME);
+
+		attribute.setStringValue("Jane Do");
+		attribute.setValueType(CtxAttributeValueType.STRING);
+		// verify update
+		attribute = (CtxAttribute) this.userDB.update(attribute);
+		final Date lastModified = attribute.getLastModified();
+		assertNotNull(lastModified);
+		final Date lastUpdated = attribute.getQuality().getLastUpdated();
+		assertNotNull(lastUpdated);
+		assertEquals("Jane Do", attribute.getStringValue());
+		assertNull(attribute.getIntegerValue());
+		assertNull(attribute.getDoubleValue());
+		assertNull(attribute.getBinaryValue());
+		assertEquals(CtxAttributeValueType.STRING, attribute.getValueType());
+		assertNull(attribute.getValueMetric());
+		assertNull(attribute.getSourceId());
+		assertTrue(attribute.getLastModified().getTime() - attribute.getQuality().getLastUpdated().getTime() < 1000);
+		assertNull(attribute.getQuality().getOriginType());
+		assertNull(attribute.getQuality().getPrecision());
+		assertNull(attribute.getQuality().getUpdateFrequency());
 		
-		attribute2.setDoubleValue(25.5);
-		attribute2.setValueType(CtxAttributeValueType.DOUBLE);
-		attribute2 = (CtxAttribute) this.userDB.update(attribute2);
-		final Date lastModified2 = attribute2.getLastModified();
-		final Date lastUpdated2 = attribute2.getQuality().getLastUpdated();
-		assertEquals(lastModified1, lastModified2);
-		//problem with Mysql when testing
-		//assertTrue(lastUpdated2.compareTo(lastUpdated1) > 0);
+		final long delay = 1000;
+		Thread.sleep(delay);
+		// update with the same value - only QoC should change
+		attribute.setStringValue("Jane Do");
+		attribute.setValueType(CtxAttributeValueType.STRING);
+		// verify update
+		attribute = (CtxAttribute) this.userDB.update(attribute);
+		final Date lastModified2 = attribute.getLastModified();
+		final Date lastUpdated2 = attribute.getQuality().getLastUpdated();
+		assertEquals(lastModified, lastModified2);
+		assertTrue(lastUpdated2.getTime() - lastUpdated.getTime() >= delay);
 	}
 	
 	@Test
@@ -570,47 +583,6 @@ public class UserCtxDBMgrTest {
 		assertTrue(ids.contains(entId2));
 	}
 
-	@Test
-	public void testBeanTranslator() throws CtxException {
-		
-		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-		final CtxEntity entityDevice = this.userDB.createEntity(CtxEntityTypes.DEVICE);
-		final CtxEntity entityNode = this.userDB.createEntity(CtxEntityTypes.CSS_NODE);
-		final CtxAttribute attributeName = this.userDB.createAttribute(entityDevice.getId(), CtxAttributeTypes.NAME);
-		final IndividualCtxEntity indEntity = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
-		
-		final CtxAssociation association = this.userDB.createAssociation(CtxAssociationTypes.USES_DEVICES);
-		association.setParentEntity(entityDevice.getId());
-		association.addChildEntity(entityNode.getId());
-		
-		try {
-			CtxEntityBean entBean = ctxBeanTranslator.fromCtxEntity(entityDevice);
-			CtxEntity entityRetrieved = ctxBeanTranslator.fromCtxEntityBean(entBean);
-			assertEquals(entityDevice, entityRetrieved);
-			
-			CtxAssociationBean assocBean = ctxBeanTranslator.fromCtxAssociation(association);
-			CtxAssociation assocRetrieved = ctxBeanTranslator.fromCtxAssociationBean(assocBean);
-			assertEquals(association,assocRetrieved);
-	
-			CtxAttributeBean attrBean = ctxBeanTranslator.fromCtxAttribute(attributeName);
-			CtxAttribute attributeRetrieved = ctxBeanTranslator.fromCtxAttributeBean(attrBean);
-			assertEquals(attributeName,attributeRetrieved);
-		
-			IndividualCtxEntityBean indiEntBean = ctxBeanTranslator.fromIndiCtxEntity(indEntity);
-			IndividualCtxEntity indiEntRetrieved = ctxBeanTranslator.fromIndiCtxEntityBean(indiEntBean);
-			assertEquals(indEntity, indiEntRetrieved);
-			
-			CtxModelObjectBean ctxModelObjectBean = ctxBeanTranslator.fromCtxModelObject(indEntity);
-			CtxModelObject ctxModelObject = ctxBeanTranslator.fromCtxModelObjectBean(ctxModelObjectBean);
-			assertEquals(indEntity,ctxModelObject);
-	
-		} catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	}
    /*
 	@Ignore
 	@Test

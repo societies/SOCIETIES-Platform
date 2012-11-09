@@ -62,6 +62,19 @@
 				<value>org.societies.context.userHistory.impl.model</value>
 			</list>
 		</property>
+		<property name="eventListeners">
+			<map>
+				<entry key="post-insert">
+					<bean class="org.societies.context.user.db.impl.event.hibernate.PostInsertUserCtxEventListener" />
+				</entry>
+				<entry key="post-update">
+					<bean class="org.societies.context.user.db.impl.event.hibernate.PostUpdateUserCtxEventListener" />
+				</entry>
+				<entry key="post-delete">
+					<bean class="org.societies.context.user.db.impl.event.hibernate.PostDeleteUserCtxEventListener" />
+				</entry>
+  			</map>
+ 		</property>
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
