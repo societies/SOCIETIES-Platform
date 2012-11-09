@@ -26,6 +26,7 @@ public class AddMemberForm {
 		this.cisJid = cisJid;
 	}
 
+
 	
 	
 

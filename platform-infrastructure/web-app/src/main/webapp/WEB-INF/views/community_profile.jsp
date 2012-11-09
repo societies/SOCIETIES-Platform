@@ -206,13 +206,13 @@ at 	<font color="red">${activity.getTarget()}</font>
 		
 		<table id="addMemberFormInputs">
 		<tr>
-		<td><form:input path="cssId" defaultValue="jid of member to be added"/></td>
-		<td><form:errors path="cssId" cssClass="error" /></td>
+		<td><form:input path="cssJid" defaultValue="jid of member to be added"/></td>
+		<td><form:errors path="cssJid" cssClass="error" /></td>
 		</tr>
 		
 		<tr>
-			<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
-			<td><form:errors path="cisId" cssClass="error" /></td>
+			<td><form:input path="cisJid" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+			<td><form:errors path="cisJid" cssClass="error" /></td>
 		</tr>
 			<tr>
 				<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
@@ -251,6 +251,11 @@ $(document).ready(function(){
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
 	 };
+	 
+	 document.getElementById('addMemberButton').onclick = function() {
+		 document.AddMemberForm.submit();
+		 };
+
 	 
 	 //	 document.getElementById('getPolicyButton').onclick = function createPolicyWindow () { 
 	//		var htmlText = ${priacyPolicyString};

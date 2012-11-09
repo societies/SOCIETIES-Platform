@@ -124,13 +124,14 @@ public class CisManagerController {
 	 */
 	
 	@RequestMapping(value="/community_profile.html",method = RequestMethod.GET)
-	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId){
+	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="response", required=false) String response){
 		Map<String, Object> model = new HashMap<String, Object>();
 		
 		
 		// TODO, add null checks
-
-		
+		if(null!= response && false == response.isEmpty())
+			model.put("response", response);
+			
 		// GET INFO
 		ICis icis = this.getCisManager().getCis(cisId);
 		CisManagerClient getInfoCallback = new CisManagerClient();
@@ -187,7 +188,9 @@ public class CisManagerController {
 		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
 		AddActivityForm form = new AddActivityForm();
 		model.put("activityForm",form);
-		
+
+		AddMemberForm form2 = new AddMemberForm();
+		model.put("memberForm",form2);
 		
 		return new ModelAndView("community_profile", model) ;
 	}
@@ -217,7 +220,7 @@ public class CisManagerController {
 		LOG.info("add act");
 		Activityfeed ac= activityFeedCallback.getActivityFeed();
 		if(null != ac && ac.getAddActivityResponse().isResult()){
-			return communityProfilePage(addActForm.getCisId());
+			return communityProfilePage(addActForm.getCisId(),null);
 		}
 		else{
 			model.put("acitivityAddError", "Error Adding Activity");
@@ -241,7 +244,7 @@ public class CisManagerController {
 			if(icis.addMember(memberForm.getCssJid(), "participant"))
 				operation = true;
 		if(operation){
-			return communityProfilePage(memberForm.getCisJid());
+			return communityProfilePage(memberForm.getCisJid(),null);
 		}
 		else{
 			model.put("acitivityAddError", "Error Adding Activity");
@@ -277,7 +280,7 @@ public class CisManagerController {
 	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
 		
 		
-		// Leave
+		// delete
 		boolean ret = this.getCisManager().deleteCis(cisId);
 		String response;
 		if(ret){
@@ -291,21 +294,22 @@ public class CisManagerController {
 	
 	//////////////////////// DELETE COMMUNITY PAGE
 	
-/*@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
-public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+@RequestMapping(value="/delete_member.html",method = RequestMethod.GET)
+public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="cssId", required=true) String cssId, Map model){
 	
-	
-	// Leave
-	boolean ret = this.getCisManager().deleteCis(cisId);
+	boolean ret = false;
+	ICisOwned i = this.getCisManager().getOwnedCis(cisId);
+	if(null != i)
+		ret = i.removeMemberFromCIS(cssId);
 	String response;
 	if(ret){
-		response = "You just deleted the CIS " + cisId;
+		response = "You just deleted the member " + cssId;
 	}else{
-		response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+		response = "An error occurred when trying to delete the member " + cssId + ". Try again";
 	}
 
-	return yourCommunitiesListPage(response);
-}*/
+	return communityProfilePage(cisId,response);
+}
 	
 	// AUTOWIRING GETTERS AND SETTERS
 	public ICisManager getCisManager() {
