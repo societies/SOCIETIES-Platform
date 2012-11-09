@@ -14,7 +14,7 @@
    <version>${release.version}</version>
    <packaging>apk</packaging>
    <properties>
-        <tested.project.dir>../ContainerSocietiesAndroidEvents</tested.project.dir>
+        <tested.project.dir>${project.basedir}/../ContainerSocietiesAndroidEvents</tested.project.dir>
    </properties>
 
    <developers>

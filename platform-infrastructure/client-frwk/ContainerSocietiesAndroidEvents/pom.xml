@@ -94,6 +94,11 @@
                   <artifactId>android-maven-plugin</artifactId>
 
 				  <configuration>
+				      <emulator>
+						  <avd>Test403Nexus</avd>
+						  <wait>60000</wait>
+						  <options>-no-skin</options>
+					  </emulator>
                       <!-- emma start -->
 					    <emmaEnable>true</emmaEnable>
 					    <emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
@@ -109,6 +114,24 @@
                           <!--  must be set for emma -->
                       </dex>
                   </configuration>
+                  <executions>
+			    	<execution>
+				        <id>startEmulator</id>
+				        <phase>initialize</phase>
+				        <goals>
+				            <goal>emulator-start</goal>
+				        </goals>
+			    	</execution>
+			    	<execution>
+				        <id>stopEmulator</id>
+				        <phase>initialize</phase>
+				        <goals>
+				            <goal>emulator-stop</goal>
+				        </goals>
+			    	</execution>
+			    	
+				</executions>
+				  
                   <extensions>true</extensions>
               </plugin>
           </plugins>
