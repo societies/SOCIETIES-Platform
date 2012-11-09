@@ -279,8 +279,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 						"data").get();
 			}
 
-			updateData(data, dataAttr);
-
 			dataAttr.setSourceId(identifier);
 			// TODO why? dataAttr.setHistoryRecorded(true);
 
@@ -294,7 +292,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 				quality.setUpdateFrequency(frequency);
 			}
 
-			this.ctxBroker.update(dataAttr);
+			this.updateData(data, dataAttr);
 
 			/* update Context Information with Information Owner Entity */
 			if (LOG.isDebugEnabled())
@@ -374,18 +372,19 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			// Set history recorded flag.
 			// TODO why? dataAttr.setHistoryRecorded(true);
 			// Update attribute.
-			updateData(data, dataAttr);
+			this.updateData(data, dataAttr);
 			
 			// performance logging
-			IPerformanceMessage m = new PerformanceMessage();
-			m.setTestContext("CSM_Delay_ComponentInternal");
-			m.setSourceComponent(this.getClass()+"");
-			m.setPerformanceType(IPerformanceMessage.Delay);
-			m.setOperationType("SendUpdate");
-			m.setD82TestTableName("S11");
-			m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
-
-			PERF_LOG.trace(m.toString());
+			if (PERF_LOG.isTraceEnabled()) {
+				IPerformanceMessage m = new PerformanceMessage();
+				m.setTestContext("CSM_Delay_ComponentInternal");
+				m.setSourceComponent(this.getClass()+"");
+				m.setPerformanceType(IPerformanceMessage.Delay);
+				m.setOperationType("SendUpdate");
+				m.setD82TestTableName("S11");
+				m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
+				PERF_LOG.trace(m.toString());
+			}
 
 		} catch (Exception e) {
 			LOG.error("Could not handle update from " + identifier + ": "
@@ -396,10 +395,14 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		return new AsyncResult<Boolean>(true);
 	}
 
+	/*
+	 * @see org.societies.api.context.source.ICtxSourceMgr#sendUpdate(java.lang.String, java.io.Serializable, org.societies.api.context.model.CtxEntity)
+	 */
 	@Override
 	@Async
 	public Future<Boolean> sendUpdate(String identifier, Serializable data,
 			CtxEntity owner) {
+		
 		return completeSendUpdate(identifier, data, owner, false, 0, 0, false);
 	}
 
@@ -420,7 +423,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 
 	private void updateData(Serializable value, CtxAttribute attr)
-			throws CtxException {
+			throws Exception {
+		
 		if (value instanceof String) {
 			attr.setStringValue((String) value);
 			attr.setValueType(CtxAttributeValueType.STRING);
@@ -430,15 +434,13 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		} else if (value instanceof Double) {
 			attr.setDoubleValue((Double) value);
 			attr.setValueType(CtxAttributeValueType.DOUBLE);
-		} else {
-			byte[] blobBytes = null;
-			try {
-				blobBytes = SerialisationHelper.serialise(value);
-			} catch (IOException e) {
-				LOG.error(e.getMessage());
-			}
+		} else if (value instanceof Serializable) {
+			final byte[] blobBytes = SerialisationHelper.serialise(value);
 			attr.setBinaryValue(blobBytes);
 			attr.setValueType(CtxAttributeValueType.BINARY);
+		} else { // if value == null
+			attr.setStringValue(null);
+			attr.setValueType(CtxAttributeValueType.EMPTY);
 		}
 
 		try {
@@ -461,10 +463,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			} else {
 				throw cde;
 			}
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
-		} catch (ExecutionException e) {
-			LOG.error(e.getMessage());
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 
