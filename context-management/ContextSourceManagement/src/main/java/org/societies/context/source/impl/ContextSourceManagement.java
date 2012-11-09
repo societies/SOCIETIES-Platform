@@ -83,7 +83,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	@Autowired(required = true)
 	private ICommManager commMgr;
 	
-	private volatile int counter;
+	private volatile int counter = 0;
 
 	@Autowired(required=true)
 	public ContextSourceManagement(ICtxBroker ctxBroker) throws Exception {
@@ -93,10 +93,16 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		
 		this.ctxBroker = ctxBroker;
 		try {
-			this.counter = this.ctxBroker.lookup(
-					CtxModelType.ENTITY, CtxEntityTypes.CONTEXT_SOURCE).get().size();
+			final List<CtxIdentifier> sourceEntIds = this.ctxBroker.lookup(
+					CtxModelType.ENTITY, CtxEntityTypes.CONTEXT_SOURCE).get();
+			for (final CtxIdentifier sourceEntId : sourceEntIds) {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Removing " + CtxEntityTypes.CONTEXT_SOURCE + " entity " + sourceEntId);
+				this.ctxBroker.remove(sourceEntId);
+			}
 			if (LOG.isInfoEnabled())
-				LOG.info("Found " + this.counter + " registered source(s)");
+				LOG.info("Removed " + sourceEntIds.size() + " obsolete context source registration(s)");
+			
 		} catch (Exception e) {
 			
 			LOG.error("Could not initialise CSM: " + e.getLocalizedMessage(), e);
