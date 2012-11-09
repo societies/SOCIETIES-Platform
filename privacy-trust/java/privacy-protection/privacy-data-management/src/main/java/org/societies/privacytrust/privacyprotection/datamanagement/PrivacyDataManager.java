@@ -311,15 +311,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @return
 	 * @throws PrivacyException 
 	 */
-	private List<ICisParticipant> retrieveCisMemberList(String cisId) throws PrivacyException {
-		Future<Set<ICisParticipant>> ciMemberListFuture = cisManager.getOwnedCis(cisId).getMemberList();
-		try {
-			return new ArrayList<ICisParticipant>(ciMemberListFuture.get());
-		} catch (InterruptedException e) {
-			throw new PrivacyException("[Interrupted Future] Can't retrieve the member list of CIS '"+cisId+"'.", e);
-		} catch (ExecutionException e) {
-			throw new PrivacyException("[Future Execution Error] Can't retrieve the member list of CIS '"+cisId+"'.", e);
-		}
+	private List<ICisParticipant> retrieveCisMemberList(String cisId){
+		Set<ICisParticipant> ciMemberListIncome = cisManager.getOwnedCis(cisId).getMemberList();
+			return new ArrayList<ICisParticipant>(ciMemberListIncome);
 	}
 
 

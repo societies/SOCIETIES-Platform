@@ -145,7 +145,11 @@
 <ul>
 <xc:forEach var="activity" items="${activities}">
 		<li>
-${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${activity.getTarget()} 
+${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
+
+<xc:if test="${activity.getTarget() != 'null'}">
+at 	<font color="red">${activity.getTarget()}</font>
+</xc:if>  
 		</li>
 </xc:forEach>
 </ul>
@@ -189,9 +193,33 @@ ${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${ac
 <ul class="sidebar">
 <xc:forEach var="participant" items="${cisInfo.getParticipant()}">
 		<li>
-<a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a> 
+<a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a>
+<xc:if test="${isOwner == true}">
+		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}?cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
+</xc:if>
+ 
 		</li>
 </xc:forEach>
+
+<form:form method="POST" action="community_profile.html" commandName="memberForm" name="AddMemberForm">
+		<form:errors path="*" cssClass="errorblock" element="div" />
+		
+		<table id="addMemberFormInputs">
+		<tr>
+		<td><form:input path="cssId" defaultValue="jid of member to be added"/></td>
+		<td><form:errors path="cssId" cssClass="error" /></td>
+		</tr>
+		
+		<tr>
+			<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+			<td><form:errors path="cisId" cssClass="error" /></td>
+		</tr>
+			<tr>
+				<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
+			</tr>
+		</table>
+		
+</form:form>
 
 
 </ul>

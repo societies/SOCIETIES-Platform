@@ -627,15 +627,15 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 
 	@Override
-	public Future<Boolean> addMember(String jid, String role){
+	public boolean addMember(String jid, String role){
 		MembershipType typedRole;
 		try{
 			typedRole = MembershipType.valueOf(role);
 		}catch(IllegalArgumentException e) {
-			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
+			return false; //the string was not valid
 		}
 		catch( NullPointerException e) {
-			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
+			return false; //the string was not valid
 		}
 		boolean ret;
 		ret = this.insertMember(jid, typedRole);
@@ -647,7 +647,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.nofityAddedUser( jid,  role);	
 
 		
-		return new AsyncResult<Boolean>(new Boolean(ret));
+		return ret;
 	}
 	
 	
@@ -684,7 +684,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 
 	@Override
-	public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException{
+	public boolean removeMemberFromCIS(String jid) {
 		
 		IIdentity targetCssIdentity;
 		try {
@@ -692,11 +692,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		} catch (InvalidFormatException e) {
 			LOG.warn("bad jid when trying to delete from CIS!");
 			e.printStackTrace();
-			return new AsyncResult<Boolean>(new Boolean(false));
+			return false;
 		}
 		
 		if (!this.removeMember(jid))
-			return new AsyncResult<Boolean>(new Boolean(false));
+			return false;
 		
 		// 2) Notification to deleted user here
 		
@@ -718,17 +718,20 @@ public class Cis implements IFeatureServer, ICisOwned {
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		
-		return new AsyncResult<Boolean>(new Boolean(true));
+		return true;
 		
 	}
 	
 	
 	// true if we were able to remove the user
 	// false if not
-	private boolean removeMember(String jid) throws  CommunicationException{
+	private boolean removeMember(String jid) {
 		
 		//TODO: add a check if it is a valid JID
 		
@@ -913,12 +916,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 				CommunityMethods result = new CommunityMethods();
 				String jid = stanza.getFrom().getBareJid();
 				boolean b = false;
-				try{
-					b = this.removeMember(jid);
-				}catch(CommunicationException e){
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
+				b = this.removeMember(jid);
+
 				
 				LeaveResponse l = new LeaveResponse();
 				l.setCommunityJid(this.getCisId());
@@ -973,7 +972,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 							role = p.getRole().value();
 						
 						try{
-							if(this.addMember(p.getJid(), role).get()){
+							if(this.addMember(p.getJid(), role)){
 								ar.setParticipant(p);
 								ar.setResult(true);
 							}
@@ -1008,7 +1007,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 //					dr.setResult(false);
 //				}else{
 					try{
-						dr.setResult(this.removeMemberFromCIS(p.getJid()).get());
+						dr.setResult(this.removeMemberFromCIS(p.getJid()));
 					}
 					catch(Exception e){
 						e.printStackTrace();
@@ -1273,11 +1272,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	
 	@Override 
-	public Future<Set<ICisParticipant>> getMemberList(){
+	public Set<ICisParticipant> getMemberList(){
 		LOG.debug("local get member list WITHOUT CALLBACK called");
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
-		return new AsyncResult<Set<ICisParticipant>>(s);
+		return s;
 	}
 	
 
