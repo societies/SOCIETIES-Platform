@@ -97,7 +97,13 @@ public class UserLocationRefiner {
 				if (LOG.isDebugEnabled())
 					LOG.debug("attr1 and attr2 fresh");
 
-				if (attr1.getSourceId().contains(CtxSourceNames.PZ)
+				if (attr1.getSourceId() == null && attr2.getSourceId() != null)
+					return -1;
+				else if (attr1.getSourceId() != null && attr2.getSourceId() == null)
+					return +1;
+				else if (attr1.getSourceId() == null && attr2.getSourceId() == null)
+					return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
+				else if (attr1.getSourceId().contains(CtxSourceNames.PZ)
 						&& attr2.getSourceId().contains(CtxSourceNames.RFID))
 					return -1;
 				else if ((attr1.getSourceId().contains(CtxSourceNames.PZ)
@@ -198,16 +204,16 @@ public class UserLocationRefiner {
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "': Entity '" + cssNodeEntId +  "' does not exist");
 			final Set<CtxAttribute> inputAttrs = cssNodeEnt.getAttributes(attrId.getType());
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("inputAttrs.size()=" + inputAttrs.size());
+			if (LOG.isDebugEnabled())
+				LOG.debug("inputAttrs.size()=" + inputAttrs.size());
 			if (inputAttrs.isEmpty())
 				return null; // Cannot refine without attributes of the specified type under the CSS_NODE entity
 			final SortedSet<CtxAttribute> sortedInputAttrs = 
 					new TreeSet<CtxAttribute>(LocationSymbolicComparator);
 			sortedInputAttrs.addAll(inputAttrs);
 			final CtxAttribute optimalInputAttr = sortedInputAttrs.last();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("optimalInputAttr=" + optimalInputAttr.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("optimalInputAttr=" + optimalInputAttr.getId());
 			final CtxAttribute refinedAttr = 
 					this.internalCtxBroker.retrieveAttribute(attrId, false).get();
 			refinedAttr.setStringValue(optimalInputAttr.getStringValue());
