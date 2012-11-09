@@ -378,7 +378,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
-	 * @param mode membership type, e.g 1= read-only.
 	 * TODO define mode better.
 	 * @return link to the {@link ICisEditor} representing the new CIS, or 
 	 * null if the CIS was not created.
