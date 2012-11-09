@@ -67,6 +67,12 @@ public class ICISSimulated implements ICisOwned {
 	}
 
     @Override
+    public void getInfo(Requestor req,ICisManagerCallback callback){
+		// TODO Auto-generated method stub
+
+	}
+    
+    @Override
     public void getListOfMembers(ICisManagerCallback callback) {
     	// TODO Auto-generated method stub
     	

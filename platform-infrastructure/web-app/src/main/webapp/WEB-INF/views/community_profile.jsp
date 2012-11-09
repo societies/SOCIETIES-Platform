@@ -67,8 +67,15 @@
 <section  class="grid_12">
 <section>
 <div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a></div>
+<br>
+<xc:if test="${response != 'null'}">
+	<div class="success">${response}</div>
+</xc:if>
 </section>
 <div class="websearchbar">
+
+
+
 <div class="websearchtitle">
 <h4 class="profile_title">${cisInfo.getCommunityName()} Profile</h4>
 </div>
@@ -84,11 +91,20 @@
 <section>
 <figure class="gravatar">
 <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
-<a class="furtherinfo-link" href="delete_community.html?cisId=${cisInfo.getCommunityJid()}">REMOVE</a>
+
+	<xc:if test="${isOwner == true}">
+		<a class="furtherinfo-link" href="delete_community.html?cisId=${cisInfo.getCommunityJid()}" onclick="return confirm('Are you sure you want to delete the CIS?')">REMOVE</a>
+	</xc:if>
+	<xc:if test="${isOwner == false}">
+		<a class="furtherinfo-link" href="leave_community.html?cisId=${cisInfo.getCommunityJid()}" onclick="return confirm('Are you sure you want to leave the CIS?')">LEAVE</a>
+	</xc:if>
+
 </figure>
 <div class="keyinfo_content">
 <div class="clearfix">
-<cite class="author_name"><a href="friend_profile.html?cssId=${cisInfo.getOwnerJid()}">Owner</a></cite>
+<cite class="author_name"><a href="friend_profile.html?cssId=${cisInfo.getOwnerJid()}">Owner</a>
+    <!--<input type="submit" id="getPolicyButton"   value="getPolicy"  >-->
+    </cite>
 </div>
 <div class="keyinfo_text">
 <p>${cisInfo.getDescription()}</p>
@@ -168,14 +184,16 @@ ${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${ac
 <div class="hr dotted clearfix">&nbsp;</div>	
 <section>
 <header>
-<h3>Other Apps</h3>
+<h3>Members</h3>
 </header>
 <ul class="sidebar">
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
-<li><a href="">App Name</a></li>
+<xc:forEach var="participant" items="${cisInfo.getParticipant()}">
+		<li>
+<a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a> 
+		</li>
+</xc:forEach>
+
+
 </ul>
 </section>
 <section>
@@ -202,20 +220,20 @@ ${activity.getActor()}  ${activity.getVerb()}  ${activity.getObject()}  at  ${ac
  
 $(document).ready(function(){
 	//startup functionality
-	
- 
- var i = 0;
-
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
 	 };
- 
-
- 
-
+	 
+	 //	 document.getElementById('getPolicyButton').onclick = function createPolicyWindow () { 
+	//		var htmlText = ${priacyPolicyString};
+	//		window.open("data:text/xml;charset=utf-8,<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + htmlText);
+	//	};
 
 });// end of $(document).ready(function()
-	 
+
+		
+
+		 
 </script>
 
 <!-- Footer -->
