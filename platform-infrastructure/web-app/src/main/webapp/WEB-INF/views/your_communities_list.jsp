@@ -64,8 +64,13 @@
 <section class="grid_12">
 <section>
 <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<br>
+<xc:if test="${response != 'null'}">
+	<div class="success">${response}</div>
+</xc:if>
 </section>
 <div class="websearchbar">
+
 <div class="websearchtitle">
 <h4 class="form_title">Your Communities</h4>
 </div>

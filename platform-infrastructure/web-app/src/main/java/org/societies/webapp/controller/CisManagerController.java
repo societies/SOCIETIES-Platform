@@ -56,6 +56,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,16 +97,18 @@ public class CisManagerController {
 	
 	
 	@RequestMapping(value="/your_communities_list.html",method = RequestMethod.GET)
-	public ModelAndView yourCommunitiesListPage() {
+	public ModelAndView yourCommunitiesListPage(@RequestParam(value="response", required=false) String incomingResponse) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
+		model.put("response", incomingResponse);
+
 
 		List<ICis> records = this.getCisManager().getCisList();
 		model.put("cisrecords", records);
 		
 		return new ModelAndView("your_communities_list", model) ;
 	}
+	
 	
 	
 	
@@ -133,18 +136,22 @@ public class CisManagerController {
 		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
 		icis.getInfo(req,getInfoCallback);
 		
-				
-		CommunityMethods getInfResp = new CommunityMethods();
-		getInfResp = getInfoCallback.getComMethObj();
-		model.put("cisInfo", getInfResp.getGetInfoResponse().getCommunity());
+		CommunityMethods res = 	getInfoCallback.getComMethObj();	
+		Community getInfResp = res.getGetInfoResponse().getCommunity();
+		model.put("cisInfo", getInfResp);
 		
 
-
+		// CHECK IF IF IM THE OWNER
+		if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
+			model.put("isOwner", true);
+		else
+			model.put("isOwner", false);
+		// GET PRIVACY
 		RequestorCis requestor = null;
 		RequestPolicy privacyPolicy = null;
 		try {
-			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getGetInfoResponse().getCommunity().getOwnerJid())
-					,this.commMngrRef.getIdManager().fromJid(getInfResp.getGetInfoResponse().getCommunity().getCommunityJid())
+			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+					,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
 					);
 			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
 			// GET POLICY
@@ -152,7 +159,7 @@ public class CisManagerController {
 				// got policy locally
 			}else{
 				PrivPolCallBack privCallback = new PrivPolCallBack();
-				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getGetInfoResponse().getCommunity().getOwnerJid())
+				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
 						, privCallback);
 				privacyPolicy = privCallback.getPrivacyPolicy();
 			}
@@ -219,6 +226,44 @@ public class CisManagerController {
 			
 	}
 	
+	
+	//////////////////////// LEAVE COMMUNITY PAGE
+	
+	@RequestMapping(value="/leave_community.html",method = RequestMethod.GET)
+	public ModelAndView leaveCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+		
+		
+		// Leave
+		CisManagerClient leaveCisCallback = new CisManagerClient();
+		this.getCisManager().leaveRemoteCIS(cisId, leaveCisCallback);
+		LeaveResponse l = leaveCisCallback.getComMethObj().getLeaveResponse();
+		String response;
+		if(l.isResult()){
+			response = "You just left the CIS " + l.getCommunityJid();
+		}else{
+			response = "An error occurred when trying to leave the CIS " + cisId + ". Try again";
+		}
+	
+		return yourCommunitiesListPage(response);
+	}
+	
+		//////////////////////// LEAVE COMMUNITY PAGE
+	
+	@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
+	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+		
+		
+		// Leave
+		boolean ret = this.getCisManager().deleteCis(cisId);
+		String response;
+		if(ret){
+			response = "You just deleted the CIS " + cisId;
+		}else{
+			response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+		}
+	
+		return yourCommunitiesListPage(response);
+	}
 	
 	
 	// AUTOWIRING GETTERS AND SETTERS
