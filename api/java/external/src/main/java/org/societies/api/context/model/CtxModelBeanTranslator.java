@@ -65,7 +65,6 @@ public final class CtxModelBeanTranslator {
 		return instance;
 	}
 
-
 	public IndividualCtxEntityBean fromIndiCtxEntity (IndividualCtxEntity indiEntity) throws DatatypeConfigurationException {
 
 		IndividualCtxEntityBean bean=new IndividualCtxEntityBean();
@@ -281,7 +280,7 @@ public final class CtxModelBeanTranslator {
 	}
 
 	public CtxModelObjectBean fromCtxModelObject(CtxModelObject object) {
-		System.out.println("bbb");
+	
 		if (LOG.isDebugEnabled())
 			LOG.debug("Creating CtxModelObject bean from instance " + object);
 
