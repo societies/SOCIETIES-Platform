@@ -100,20 +100,25 @@ public class Assessment implements IAssessment {
 		
 		LOG.info("assessAllNow()");
 		
-		try {
-			// For each sender identity: calculate result and update value in assessmentById
-			for (IIdentity sender : privacyLog.getSenderIds()) {
+		// For each sender identity: calculate result and update value in assessmentById
+		for (IIdentity sender : privacyLog.getSenderIds()) {
+			try {
 				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				LOG.debug("assessAllNow(): updating for identity {}", sender);
 				assessmentById.put(sender, ass);
-			}
-			// For each sender class: calculate result and update value in assessmentByClass
-			for (String sender : privacyLog.getSenderClassNames()) {
-				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-				assessmentByClass.put(sender, ass);
+			} catch (AssessmentException e) {
+				LOG.warn("assessAllNow(): Skipped a sender identity", e);
 			}
 		}
-		catch (AssessmentException e) {
-			LOG.warn("assessAllNow(): Skipped a sender", e);
+		// For each sender class: calculate result and update value in assessmentByClass
+		for (String sender : privacyLog.getSenderClassNames()) {
+			try {
+				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				LOG.debug("assessAllNow(): updating for class {}", sender);
+				assessmentByClass.put(sender, ass);
+			} catch (AssessmentException e) {
+				LOG.warn("assessAllNow(): Skipped a sender class", e);
+			}
 		}
 	}
 	

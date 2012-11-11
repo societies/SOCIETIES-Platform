@@ -90,11 +90,13 @@ public class PrivacyLog implements IPrivacyLog {
 		
 		IIdentity sender = entry.getSender();
 		if (!senderIds.contains(sender)) {
+			LOG.debug("append(): Adding new transmission identity {}", sender);
 			senderIds.add(sender);
 		}
 		
 		String senderClass = entry.getSenderClass();
 		if (!senderClassNames.contains(senderClass)) {
+			LOG.debug("append(): Adding new transmission class {}", sender);
 			senderClassNames.add(senderClass);
 		}
 	}
