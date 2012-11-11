@@ -79,6 +79,7 @@
     					<Export-Package>
     						org.societies.comm.xmpp,
     						org.societies.comm.xmpp.pubsub,
+    						org.societies.comm.xmpp.event,
     						org.societies.comm.xmpp.pubsub.impl
 		           		</Export-Package>
 		           		<!-- Is impl export needed for anything but tests? 
@@ -86,7 +87,6 @@
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
 		           		-->
-		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>

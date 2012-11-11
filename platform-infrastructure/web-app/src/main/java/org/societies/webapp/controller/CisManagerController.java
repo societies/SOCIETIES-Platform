@@ -29,17 +29,41 @@ package org.societies.webapp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.activity.ActivityFeedClient;
+import org.societies.api.activity.IActivity;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
+import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.cis.mgmtClient.CisManagerClient;
+import org.societies.webapp.models.AddActivityForm;
+import org.societies.webapp.models.AddMemberForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,32 +81,28 @@ public class CisManagerController {
 	
 	@Autowired
 	private ICisManager cisManager;
+	@Autowired
+	private ICommManager commMngrRef;
 	
-	CommunityMethods callbackComMethRed = null;
+	@Autowired
+	private IPrivacyPolicyManager privacyPolicyManager;
+	@Autowired
+	private IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
+	
+	//IPrivacyPolicyManager
+	
+	private static Logger LOG = LoggerFactory.getLogger(CisManagerController.class);
 	/**
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
 	
-	// COMMUNITY PROFILE CALLBACK
-	
-	commCallBack icall = new commCallBack();
-	class commCallBack implements ICisManagerCallback{
-			
-		public commCallBack(){
-		}
-		@Override
-		public void receiveResult(CommunityMethods communityResultObject) {
-			callbackComMethRed = communityResultObject;
-		}
-
-	}	
-	
 	@RequestMapping(value="/your_communities_list.html",method = RequestMethod.GET)
-	public ModelAndView yourCommunitiesListPage() {
+	public ModelAndView yourCommunitiesListPage(@RequestParam(value="response", required=false) String incomingResponse) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
+		model.put("response", incomingResponse);
+
 
 		List<ICis> records = this.getCisManager().getCisList();
 		model.put("cisrecords", records);
@@ -90,31 +110,202 @@ public class CisManagerController {
 		return new ModelAndView("your_communities_list", model) ;
 	}
 	
+	
+	
+	
+	
+	
+	/*
+	 * COMMUNITY PROFILE PAGE
+	 * 
+	 * 
+	 * 
+	 *
+	 */
+	
 	@RequestMapping(value="/community_profile.html",method = RequestMethod.GET)
-	public ModelAndView communityPofilePage(@RequestParam(value="cisId", required=true) String cisId){
+	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId){
 		Map<String, Object> model = new HashMap<String, Object>();
 		
-		ICis icis = this.getCisManager().getCis(cisId);
 		
-		icis.getInfo(icall);
+		// TODO, add null checks
+
+		
+		// GET INFO
+		ICis icis = this.getCisManager().getCis(cisId);
+		CisManagerClient getInfoCallback = new CisManagerClient();
+		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
+		icis.getInfo(req,getInfoCallback);
+		
+		CommunityMethods res = 	getInfoCallback.getComMethObj();	
+		Community getInfResp = res.getGetInfoResponse().getCommunity();
+		model.put("cisInfo", getInfResp);
+		
+
+		// CHECK IF IF IM THE OWNER
+		if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
+			model.put("isOwner", true);
+		else
+			model.put("isOwner", false);
+		// GET PRIVACY
+		RequestorCis requestor = null;
+		RequestPolicy privacyPolicy = null;
 		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
+			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+					,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
+					);
+			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
+			// GET POLICY
+			if(null != privacyPolicy){
+				// got policy locally
+			}else{
+				PrivPolCallBack privCallback = new PrivPolCallBack();
+				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+						, privCallback);
+				privacyPolicy = privCallback.getPrivacyPolicy();
+			}
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(null == callbackComMethRed){
-			model.put("message", "timeout");
-		}else{
-			
-		}
+
+		// TODO: find the best way to display the policy
+		//if( null != privacyPolicy)
+		//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
+		//else
+		//	model.put("priacyPolicyString","no policy");
+		
+		// GET ACIVITIES
+		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+		icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+		org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+		model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+		
+		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+		AddActivityForm form = new AddActivityForm();
+		model.put("activityForm",form);
+		
 		
 		return new ModelAndView("community_profile", model) ;
 	}
 
 	
+	// TODO: perhaps adapt this so it does not reload the full page
+	//@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	public ModelAndView addActivityInProfilePage(@Valid AddActivityForm addActForm,  BindingResult result, Map model){
+		
+		if(result.hasErrors()){
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+		
+		ICis icis = this.getCisManager().getCis(addActForm.getCisId());
+		
+		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+		
+		IActivity act = icis.getActivityFeed().getEmptyIActivity();
+		act.setActor(this.getCommMngrRef().getIdManager().getThisNetworkNode().getBareJid());
+		act.setObject(addActForm.getObject());
+		act.setVerb(addActForm.getVerb());
+		act.setTarget(addActForm.getCisId());
+		
+		icis.getActivityFeed().addActivity(act, activityFeedCallback);
+		LOG.info("add act");
+		Activityfeed ac= activityFeedCallback.getActivityFeed();
+		if(null != ac && ac.getAddActivityResponse().isResult()){
+			return communityProfilePage(addActForm.getCisId());
+		}
+		else{
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+
+			
+	}
 	
 	
+	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	public ModelAndView addMemberInProfilePage(@Valid AddMemberForm memberForm,  BindingResult result, Map model){
+		
+		if(result.hasErrors()){
+			model.put("response", "Error Adding Member");
+			return new ModelAndView("community_profile", model);
+		}
+		boolean operation = false;
+		ICisOwned icis = this.getCisManager().getOwnedCis(memberForm.getCisJid());
+		if(null != icis)
+			if(icis.addMember(memberForm.getCssJid(), "participant"))
+				operation = true;
+		if(operation){
+			return communityProfilePage(memberForm.getCisJid());
+		}
+		else{
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+
+			
+	}
+	
+	//////////////////////// LEAVE COMMUNITY PAGE
+	
+	@RequestMapping(value="/leave_community.html",method = RequestMethod.GET)
+	public ModelAndView leaveCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+		
+		
+		// Leave
+		CisManagerClient leaveCisCallback = new CisManagerClient();
+		this.getCisManager().leaveRemoteCIS(cisId, leaveCisCallback);
+		LeaveResponse l = leaveCisCallback.getComMethObj().getLeaveResponse();
+		String response;
+		if(l.isResult()){
+			response = "You just left the CIS " + l.getCommunityJid();
+		}else{
+			response = "An error occurred when trying to leave the CIS " + cisId + ". Try again";
+		}
+	
+		return yourCommunitiesListPage(response);
+	}
+	
+		//////////////////////// DELETE COMMUNITY PAGE
+	
+	@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
+	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+		
+		
+		// Leave
+		boolean ret = this.getCisManager().deleteCis(cisId);
+		String response;
+		if(ret){
+			response = "You just deleted the CIS " + cisId;
+		}else{
+			response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+		}
+	
+		return yourCommunitiesListPage(response);
+	}
+	
+	//////////////////////// DELETE COMMUNITY PAGE
+	
+/*@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
+public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+	
+	
+	// Leave
+	boolean ret = this.getCisManager().deleteCis(cisId);
+	String response;
+	if(ret){
+		response = "You just deleted the CIS " + cisId;
+	}else{
+		response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+	}
+
+	return yourCommunitiesListPage(response);
+}*/
 	
 	// AUTOWIRING GETTERS AND SETTERS
 	public ICisManager getCisManager() {
@@ -123,4 +314,103 @@ public class CisManagerController {
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
 	}
+	
+	public ICommManager getCommMngrRef() {
+		return this.commMngrRef;
+	}
+	
+	
+	public void setCommMngrRef(ICommManager commMngrRef) {
+		this.commMngrRef = commMngrRef;
+	}
+
+
+
+
+
+	public IPrivacyPolicyManager getPrivacyPolicyManager() {
+		return privacyPolicyManager;
+	}
+
+
+
+
+
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+	}
+
+
+
+
+
+	public IPrivacyPolicyManagerRemote getPrivacyPolicyManagerRemote() {
+		return privacyPolicyManagerRemote;
+	}
+
+
+
+
+
+	public void setPrivacyPolicyManagerRemote(
+			IPrivacyPolicyManagerRemote privacyPolicyManagerRemote) {
+		this.privacyPolicyManagerRemote = privacyPolicyManagerRemote;
+	}
+	
+	
+	// callbacks
+	private class PrivPolCallBack implements IPrivacyPolicyManagerListener {
+		private RequestPolicy privacyPolicy;
+
+		private final long TIMEOUT = 50;
+		private BlockingQueue<RequestPolicy> returnList;	
+		
+		public PrivPolCallBack(){
+			returnList = new ArrayBlockingQueue<RequestPolicy>(1);
+		}
+		@Override
+		public void onPrivacyPolicyRetrieved(RequestPolicy p) {
+			this.privacyPolicy = p;
+			insertComObjInQueue(this.privacyPolicy);
+		}
+
+		public RequestPolicy getPrivacyPolicy(){
+			try {
+				return returnList.poll(TIMEOUT, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		private void insertComObjInQueue(RequestPolicy obj){
+			try {
+				returnList.put(obj);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		
+		@Override
+		public void onOperationSucceed(String msg) {
+			LOG.error("privCallback onOperationSucceed");
+
+		}
+
+		@Override
+		public void onOperationCancelled(String msg) {
+			LOG.error("privCallback onOperationCancelled");
+
+		}
+
+		@Override
+		public void onOperationAborted(String msg, Exception e) {
+			LOG.error("privCallback onOperationAborted: "+e.getMessage(), e);
+
+		}
+	}
+	
 }

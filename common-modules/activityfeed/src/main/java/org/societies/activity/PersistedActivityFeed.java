@@ -230,7 +230,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 
 		}
 		
-		// SUBSCRIBING TO PUBSUB
+		// Publishing TO PUBSUB
 		if(false == err && pubSubcli !=null){
 			try {
 				LOG.info("going to call pubsub");
@@ -243,6 +243,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 				e.printStackTrace();
 			}
 		}
+		LOG.info("done publishing activity on pubsub");
 		
 	}
 

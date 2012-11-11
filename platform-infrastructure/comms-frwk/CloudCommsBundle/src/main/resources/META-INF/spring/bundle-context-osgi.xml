@@ -18,26 +18,6 @@
 	
 	<!-- Get DataSource reference -->
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	
-	<!-- Load xc.properties with default values -->
-	<!-- 
-	<osgi-compendium:cm-properties id="componentConfig" persistent-id="xc">
-    	<prop key="host">societies.local</prop>
-    	<prop key="subDomain">xcmanager.societies.local</prop>
-    	<prop key="secretKey">password.societies.local</prop>
-    	<prop key="daNode">admin.societies.local</prop>
-    </osgi-compendium:cm-properties>
-     -->
-    
-    <!-- Load org.societies.platform.properties with default values -->
-    <!-- 
-	<osgi-compendium:cm-properties id="platformConfig" persistent-id="org.societies.platform" >
-    	<prop key="show_sql">true</prop>
-		<prop key="cache.use_second_level_cache">false</prop>
-		<prop key="hbm2ddl.auto">update</prop>
-		<prop key="format_sql">true</prop>
-    </osgi-compendium:cm-properties>
-     -->
 
 	<!-- XCCommMgr Service -->
 	<osgi:service ref="xcCommunication"> 
@@ -54,7 +34,7 @@
 	<osgi:service ref="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" depends-on="pubsubService"/>
 	
 	<!-- Privacy Logging Service -->
-	<!--osgi:reference id="privacyLog" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" cardinality="0..1" /-->
+	<osgi:reference id="privacyLog" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" cardinality="0..1"  timeout="30"/>
 	
 	
 </beans>

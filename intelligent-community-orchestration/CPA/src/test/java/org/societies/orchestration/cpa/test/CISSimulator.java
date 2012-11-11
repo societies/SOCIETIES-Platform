@@ -113,12 +113,7 @@ public class CISSimulator implements IActivityFeedCallback {
 		ret.setFeed(actFeed);
         actFeed.setId("simId");
 		for(String user : userToUserMap.keySet()){
-			try {
 				ret.addMember(user,"member");
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 		//sample every "minute"
 		long daysGone=0;

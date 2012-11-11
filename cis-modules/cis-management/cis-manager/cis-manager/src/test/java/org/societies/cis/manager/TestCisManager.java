@@ -71,6 +71,7 @@ import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
@@ -120,6 +121,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICtxBroker mockContextBroker;
 	private INegotiation mockNegotiation;
 	
+	
+	//private ResponseItem positiveResp;
 	private PubsubClient mockPubSubClient;
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
@@ -255,6 +258,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockEventMgr = mock(IEventMgr.class);
 		mockNegotiation = mock(INegotiation.class);
 		mockIPrivacyDataManager = mock(IPrivacyDataManager.class);
+		
+		//positiveResp =  new ResponseItem(null, Decision.PERMIT);
+		
 		
 		mockPubSubClient = mock(PubsubClient.class);
 		
@@ -566,16 +572,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 
-		try {
-			assertEquals(true,Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get());
-			assertEquals(true,Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get());
-			assertEquals(false,Iciss.addMember(MEMBER_JID_3, INVALID_ROLE).get());
-			// assertEquals(false,Iciss.addMember(INVALID_USER_JID, MEMBER_ROLE_3).get());  NOT USE OF TESTING THAT AS IDENTITY MANAGER HAS BEEN MOCKED
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 		
 	
+			assertEquals(true,Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1));
+			assertEquals(true,Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2));
+			assertEquals(false,Iciss.addMember(MEMBER_JID_3, INVALID_ROLE));
+			// assertEquals(false,Iciss.addMember(INVALID_USER_JID, MEMBER_ROLE_3).get());  NOT USE OF TESTING THAT AS IDENTITY MANAGER HAS BEEN MOCKED
+		
 		
 		// CLEANING UP
 		cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
@@ -597,7 +599,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		
 
-		try {
+	
 			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1);
 			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2);
 			
@@ -605,7 +607,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			
 			int memberCheck = 0;
 			
-			Set<ICisParticipant> l = (Iciss.getMemberList()).get();
+			Set<ICisParticipant> l = Iciss.getMemberList();
 			Iterator<ICisParticipant> it = l.iterator();
 			
 			// search if member is still there
@@ -618,10 +620,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			// check if it found all matching CISs
 				assertEquals(memberCheck, 0);
 			
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 		
+			
 	
 		
 		// CLEANING UP
@@ -727,19 +726,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 				
-		try {
-			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
-			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get();
-			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3).get();
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1);
+			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2);
+			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3);
+		
 		
 		
 		int[] memberCheck = {0,0,0};
 		
-		Set<ICisParticipant> l = (Iciss.getMemberList()).get();
+		Set<ICisParticipant> l = Iciss.getMemberList();
 		Iterator<ICisParticipant> it = l.iterator();
 		 
 		while(it.hasNext()){
@@ -791,16 +787,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		iActivity2.setPublished((System.currentTimeMillis() -500) + "");
 		iActivity2.setVerb("verb2");
 
-		class DummyActFeedCback implements IActivityFeedCallback {
+		class DummyAddActFeedCback implements IActivityFeedCallback {
 
 			public void receiveResult(Activityfeed activityFeedObject){
-				
+				assertEquals(activityFeedObject.getAddActivityResponse().isResult(),true);
 			}
 		}
 		
 		
-		Iciss.getActivityFeed().addActivity(iActivity, new DummyActFeedCback());
-		Iciss.getActivityFeed().addActivity(iActivity2,new DummyActFeedCback());
+		Iciss.getActivityFeed().addActivity(iActivity, new DummyAddActFeedCback());
+		Iciss.getActivityFeed().addActivity(iActivity2,new DummyAddActFeedCback());
 		System.out.println((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis());
 		
 		
@@ -866,14 +862,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		String cisJid = Iciss.getCisId();
 				
-		try {
-			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
-			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get();
-			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3).get();
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1);
+			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2);
+			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3);
+
 		
 		// callback that will do the real test
 
@@ -978,6 +971,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					// check between non-callback interface
 					assertEquals(c.getCommunityName(), IcissOwned.getName());
 					assertEquals(c.getCommunityJid(), IcissOwned.getCisId());
+					
+					assertEquals(c.getParticipant().size(),1);
+					assertEquals(c.getParticipant().get(0).getJid(),CIS_MANAGER_CSS_ID);
+					assertEquals(c.getParticipant().get(0).getRole(), ParticipantRole.OWNER);
+					
 				}
 				
 				
@@ -988,7 +986,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		}		
 		// end of callback
 		// call and wait for callback
-		 icssRemote.getInfo(new GetInfoCallBack(IcissOwned));
+		 Requestor req = new Requestor(testCisManagerId);
+		 icssRemote.getInfo(req,new GetInfoCallBack(IcissOwned));
 	
 	}
 	//@Ignore

@@ -1088,7 +1088,7 @@ public class JoinCallBack implements ICisManagerCallback{
 	public List<ICisOwned> searchCisByMember(IIdentity css) throws InterruptedException, ExecutionException{
 		List<ICisOwned> l = new ArrayList<ICisOwned>();
 		for (ICisOwned temp : this.ownedCISs) {
-			if(temp.getMemberList().get().contains(new CisParticipant(css.getBareJid())))
+			if(temp.getMemberList().contains(new CisParticipant(css.getBareJid())))
 				l.add(temp);
 		}
 		return l;
