@@ -112,11 +112,11 @@
 <p><strong>Activity Feed:</strong></p>
 <!-- Unordered -->
 
-<xc:if test="${acitivityAddError != 'null'}">
+<xc:if test="${acitivityAddError != null}">
 	<div class="error">${acitivityAddError}</div>
 </xc:if>
 
-<form:form method="POST" action="community_profile.html" commandName="activityForm" name="AddActivityForm">
+<form:form method="POST" action="add_activity_cis_profile_page.html" commandName="activityForm" name="AddActivityForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		
 		<table id="addActivityFormInputs">
@@ -147,7 +147,7 @@
 		<li>
 ${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
 
-<xc:if test="${activity.getTarget() != 'null'}">
+<xc:if test="${activity.getTarget() != null}">
 at 	<font color="red">${activity.getTarget()}</font>
 </xc:if>  
 		</li>
@@ -201,7 +201,7 @@ at 	<font color="red">${activity.getTarget()}</font>
 		</li>
 </xc:forEach>
 
-<form:form method="POST" action="community_profile.html" commandName="memberForm" name="AddMemberForm">
+<form:form method="POST" action="add_member_cis_profile_page.html" commandName="memberForm" name="AddMemberForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		
 		<table id="addMemberFormInputs">

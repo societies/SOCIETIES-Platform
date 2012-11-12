@@ -96,6 +96,16 @@ public class CisManagerController {
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
+	@RequestMapping(value="/create_community.html",method = RequestMethod.GET)
+	public ModelAndView showCreateCommunityPage() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		
+		return new ModelAndView("create_community", model) ;
+		
+	}
+
+	
 	
 	@RequestMapping(value="/your_communities_list.html",method = RequestMethod.GET)
 	public ModelAndView yourCommunitiesListPage(@RequestParam(value="response", required=false) String incomingResponse) {
@@ -198,7 +208,7 @@ public class CisManagerController {
 	
 	// TODO: perhaps adapt this so it does not reload the full page
 	//@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/add_activity_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addActivityInProfilePage(@Valid AddActivityForm addActForm,  BindingResult result, Map model){
 		
 		if(result.hasErrors()){
@@ -231,7 +241,7 @@ public class CisManagerController {
 	}
 	
 	
-	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/add_member_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addMemberInProfilePage(@Valid AddMemberForm memberForm,  BindingResult result, Map model){
 		
 		if(result.hasErrors()){

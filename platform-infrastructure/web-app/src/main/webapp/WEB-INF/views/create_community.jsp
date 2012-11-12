@@ -64,19 +64,20 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <!-- Left Column -->
 <section id="left_col" class="grid_8">
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="create_community.html">Create community</a></div>
 <!-- Form -->
 <section id="form_style_main">
-<form action="" method="" id="">	
+<form:form method="POST" action="create_community.html" commandName="createCISform" name="CreateCISForm">
+		<form:errors path="*" cssClass="errorblock" element="div" />
+	
 <h4 class="form_title">Create a Community</h4>
 <div class="hr dotted clearfix">&nbsp;</div>
 <ul>						
 <li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<label for="">Community Name</label>
+<form:input path="cisName" />
 <div class="clear"></div>
-<p class="error">Please, insert ...</p>
-</li> 
+<form:errors path="cisName" cssClass="error" /></li> 
 <li class="clearfix">
 <label for="">Text</label>
 <input type="text" name="" id="smalltext" />
@@ -154,7 +155,7 @@
 </div>				
 </li> 
 </ul> 
-</form>
+</form:form>
 </section>
 </section>
 <!-- Right Column / Sidebar -->
