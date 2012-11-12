@@ -458,8 +458,8 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE RESPONSE FROM Parcel
 					boolean bJoined = intent.getBooleanExtra(ICisManager.INTENT_RETURN_BOOLEAN, false);
-					Parcelable parcel = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					if (bJoined) {
+						Parcelable parcel = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 						AJoinResponse response = (AJoinResponse) parcel;
 						//RETURN A JSON OBJECT
 						PluginResult result = new PluginResult(PluginResult.Status.OK, createJoinResponseJSON(response));
@@ -475,7 +475,7 @@ public class PluginCISFunctions extends Plugin {
 						PluginResult result = new PluginResult(PluginResult.Status.ERROR);
 						result.setKeepCallback(false);
 						PluginCISFunctions.this.error(result, methodCallbackId);
-					}					
+					}
 					//CLEAN UP: remove callback ID for given method invocation
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
