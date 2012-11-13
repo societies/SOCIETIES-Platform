@@ -94,10 +94,16 @@ public class UserLocationRefiner {
 
 			if (isAttr1Fresh && isAttr2Fresh) { // both attributes are fresh
 				
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("attr1 and attr2 fresh");
+				if (LOG.isDebugEnabled())
+					LOG.debug("attr1 and attr2 fresh");
 
-				if (attr1.getSourceId().contains(CtxSourceNames.PZ)
+				if (attr1.getSourceId() == null && attr2.getSourceId() != null)
+					return -1;
+				else if (attr1.getSourceId() != null && attr2.getSourceId() == null)
+					return +1;
+				else if (attr1.getSourceId() == null && attr2.getSourceId() == null)
+					return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
+				else if (attr1.getSourceId().contains(CtxSourceNames.PZ)
 						&& attr2.getSourceId().contains(CtxSourceNames.RFID))
 					return -1;
 				else if ((attr1.getSourceId().contains(CtxSourceNames.PZ)
@@ -119,22 +125,22 @@ public class UserLocationRefiner {
 			
 			} else if (isAttr1Fresh) { // a1 is fresh
 				
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("attr1 fresh");
+				if (LOG.isDebugEnabled())
+					LOG.debug("attr1 fresh");
 
 				return +1;
 
 			} else if (isAttr2Fresh) { // a2 is fresh
 				
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("attr2 fresh");
+				if (LOG.isDebugEnabled())
+					LOG.debug("attr2 fresh");
 
 				return -1;
 
 			} else { // none of the attributes is fresh
 				
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("attr1 and attr2 NOT fresh");
+				if (LOG.isDebugEnabled())
+					LOG.debug("attr1 and attr2 NOT fresh");
 
 				return attr1.getQuality().getLastUpdated().compareTo(attr2.getQuality().getLastUpdated());
 			}
@@ -159,15 +165,15 @@ public class UserLocationRefiner {
 	public CtxAttribute refineOnDemand(final CtxAttributeIdentifier attrId) 
 			throws UserCtxInferenceException {
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Refining attribute '" + attrId + "' on-demand");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Refining attribute '" + attrId + "' on-demand");
 		if (!CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "': Unsupported attribute type: " + attrId.getType());
 		
 		final CtxEntityIdentifier ownerEntId = attrId.getScope();
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("ownerEntId=" + ownerEntId);
+		if (LOG.isDebugEnabled())
+			LOG.debug("ownerEntId=" + ownerEntId);
 		try {
 			final CtxEntity ownerEnt = (CtxEntity) this.internalCtxBroker.retrieve(ownerEntId).get();
 			if (ownerEnt == null)
@@ -177,8 +183,8 @@ public class UserLocationRefiner {
 				return null; // Cannot refine without OWNS_CSS_NODES association
 			final CtxAssociationIdentifier ownsCssNodesAssocId = 
 					ownerEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("ownsCssNodesAssocId=" + ownsCssNodesAssocId);
+			if (LOG.isDebugEnabled())
+				LOG.debug("ownsCssNodesAssocId=" + ownsCssNodesAssocId);
 			final CtxAssociation ownsCssNodesAssoc = (CtxAssociation) 
 					this.internalCtxBroker.retrieve(ownsCssNodesAssocId).get();
 			if (ownsCssNodesAssoc == null)
@@ -190,24 +196,24 @@ public class UserLocationRefiner {
 				return null; // Cannot refine without CSS_NODE entities
 			// TODO select User Interaction Node; pick first for now
 			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("cssNodeEntId=" + cssNodeEntId);
+			if (LOG.isDebugEnabled())
+				LOG.debug("cssNodeEntId=" + cssNodeEntId);
 			final CtxEntity cssNodeEnt = (CtxEntity) 
 					this.internalCtxBroker.retrieve(cssNodeEntId).get();
 			if (cssNodeEnt == null)
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "': Entity '" + cssNodeEntId +  "' does not exist");
 			final Set<CtxAttribute> inputAttrs = cssNodeEnt.getAttributes(attrId.getType());
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("inputAttrs.size()=" + inputAttrs.size());
+			if (LOG.isDebugEnabled())
+				LOG.debug("inputAttrs.size()=" + inputAttrs.size());
 			if (inputAttrs.isEmpty())
 				return null; // Cannot refine without attributes of the specified type under the CSS_NODE entity
 			final SortedSet<CtxAttribute> sortedInputAttrs = 
 					new TreeSet<CtxAttribute>(LocationSymbolicComparator);
 			sortedInputAttrs.addAll(inputAttrs);
 			final CtxAttribute optimalInputAttr = sortedInputAttrs.last();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("optimalInputAttr=" + optimalInputAttr.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("optimalInputAttr=" + optimalInputAttr.getId());
 			final CtxAttribute refinedAttr = 
 					this.internalCtxBroker.retrieveAttribute(attrId, false).get();
 			refinedAttr.setStringValue(optimalInputAttr.getStringValue());
@@ -231,19 +237,19 @@ public class UserLocationRefiner {
 		
 		// TODO handle updateFrequency
 		
-		if (LOG.isInfoEnabled()) // DEBUG
-			LOG.info("Refining attribute " + attrId + " continuously");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Refining attribute " + attrId + " continuously");
 		if (!CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "': Unsupported attribute type: " + attrId.getType());
 		if (this.continuoulsyRefinedAttrIds.contains(attrId)) {
-			if (LOG.isInfoEnabled()) // DEBUG
+			if (LOG.isInfoEnabled())
 				LOG.info("Attribute " + attrId + " already continuously inferred");
 			return;
 		}
 		final CtxEntityIdentifier ownerEntId = attrId.getScope();
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("ownerEntId=" + ownerEntId);
+		if (LOG.isDebugEnabled())
+			LOG.debug("ownerEntId=" + ownerEntId);
 		try {
 			final CtxEntity ownerEnt = (CtxEntity) this.internalCtxBroker.retrieve(ownerEntId).get();
 			if (ownerEnt == null)
@@ -253,8 +259,8 @@ public class UserLocationRefiner {
 				return; // Cannot refine without OWNS_CSS_NODES association
 			final CtxAssociationIdentifier ownsCssNodesAssocId = 
 					ownerEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("ownsCssNodesAssocId=" + ownsCssNodesAssocId);
+			if (LOG.isDebugEnabled())
+				LOG.debug("ownsCssNodesAssocId=" + ownsCssNodesAssocId);
 			final CtxAssociation ownsCssNodesAssoc = (CtxAssociation) 
 					this.internalCtxBroker.retrieve(ownsCssNodesAssocId).get();
 			if (ownsCssNodesAssoc == null)
@@ -264,12 +270,12 @@ public class UserLocationRefiner {
 				return; // Cannot refine without CSS_NODE entities
 			// TODO select User Interaction Node; pick first for now
 			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("cssNodeEntId=" + cssNodeEntId);
+			if (LOG.isDebugEnabled())
+				LOG.debug("cssNodeEntId=" + cssNodeEntId);
 			this.internalCtxBroker.registerForChanges(
 					new LocationSymbolicChangeListener(attrId), cssNodeEntId, attrId.getType());
-			if (LOG.isInfoEnabled()) // DEBUG
-				LOG.info("Adding " + attrId + " to set of continuously inferred attributes");
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding " + attrId + " to set of continuously inferred attributes");
 			this.continuoulsyRefinedAttrIds.add(attrId);
 			
 		} catch (Exception e) {
@@ -321,8 +327,8 @@ public class UserLocationRefiner {
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("LocationSymbolicChangeListener received event " + event);
+			if (LOG.isDebugEnabled()) // TODO DEBUG
+				LOG.debug("LocationSymbolicChangeListener received event " + event);
 			executorService.execute(new LocationSymbolicChangeHandler(this.attrId));
 		}
 	}
@@ -342,12 +348,12 @@ public class UserLocationRefiner {
 		@Override
 		public void run() {
 			
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("Handling LOCATION_SYMBOLIC update to refine attribute " + this.attrId);
+			if (LOG.isDebugEnabled())
+				LOG.debug("Handling LOCATION_SYMBOLIC update to refine attribute " + this.attrId);
 			try {
 				final CtxAttribute refinedAttr = refineOnDemand(this.attrId);
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("Refined attribute " + refinedAttr);
+				if (LOG.isDebugEnabled())
+					LOG.debug("Refined attribute " + refinedAttr);
 				// TODO send refinedAttr to UserCtxInferenceMgr
 				if (refinedAttr != null)
 					internalCtxBroker.update(refinedAttr);

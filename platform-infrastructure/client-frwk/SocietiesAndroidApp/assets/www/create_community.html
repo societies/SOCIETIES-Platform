@@ -41,22 +41,26 @@
 			</div>
 			<div id="ldescDiv" data-role="fieldcontain">
 				<label for="cisDescOnCisCreate">Description:</label>
-				<input id="cisDescOnCisCreate" type="text"/>
+				<!-- <input id="cisDescOnCisCreate" type="text"/> -->
+				<textarea id="cisDescOnCisCreate"></textarea>
 			</div>
-			<!--<div id="community-typeDiv" data-role="fieldcontain">
-				<label for="select-choice-0" class="select">Comunity Type:</label>
-				<select name="select-choice-0" id="select-choice-0">
-					<option value="open">Open</option>
-					<option value="invite">Invite Only</option>
+			<div id="community-typeDiv" data-role="fieldcontain">
+				<label for="selPrivacyPolicy" class="select">Privacy Policy:</label>
+				<select name="selPrivacyPolicy" id="selPrivacyPolicy">
+					<option value="private">Private</option>
+					<option value="shared">Shared</option>
+					<option value="public">Public</option>
 				</select>
-			</div>-->
+			</div>
+			<!-- 
 			<div data-role="fieldcontain">
 				<fieldset data-role="controlgroup">
 					<legend>Agree to the terms:</legend>
 					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
 					<label for="checkbox-1">I agree</label>
 				</fieldset>
-			</div>	
+			</div>
+			 -->	
 			<p align="center"><input id="createCISbutton" type="button" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/></p>
 			
 		</form>
