@@ -326,10 +326,17 @@ public class PrivacyAssessmentController {
 				String[] labels = new String[size];
 				double[][] data = new double[2][size];
 				Iterator<String> iterator = assResult.keySet().iterator();
+				
+				LOG.debug("privacyAssessment(): size = {}", size);
+
 				for (int k = 0; k < size; k++) {
 					labels[k] = iterator.next();
 					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
 					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+					
+					LOG.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+					LOG.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+					LOG.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
 				}
 				
 				plotData = new PlotData[] {

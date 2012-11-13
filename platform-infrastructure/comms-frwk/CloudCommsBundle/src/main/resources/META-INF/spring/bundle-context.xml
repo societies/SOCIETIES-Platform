@@ -80,7 +80,7 @@
 	    <constructor-arg value="${subDomain}"/>
 	    <constructor-arg value="${secretKey}"/>
 	    <constructor-arg value="${daNode}"/>
-		<!--property name="privacyLog" ref="privacyLog"/-->
+		<property name="privacyLog" ref="privacyLog"/>
     </bean>
     
     <bean id="cisCommMgrFactory" 
@@ -95,7 +95,7 @@
 		<!-- <constructor-arg ref="sessionFactory"/>  -->
     </bean>
 	
-	<bean id="pubsubClient" class="org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl">
+	<bean id="pubsubClient" class="org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl" depends-on="pubsubService">
 		<constructor-arg ref="xcCommunication"/>
     </bean>
 	

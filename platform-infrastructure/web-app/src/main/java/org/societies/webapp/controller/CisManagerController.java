@@ -59,6 +59,7 @@ import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
+import org.societies.webapp.models.AddMemberForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -227,6 +228,29 @@ public class CisManagerController {
 	}
 	
 	
+	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	public ModelAndView addMemberInProfilePage(@Valid AddMemberForm memberForm,  BindingResult result, Map model){
+		
+		if(result.hasErrors()){
+			model.put("response", "Error Adding Member");
+			return new ModelAndView("community_profile", model);
+		}
+		boolean operation = false;
+		ICisOwned icis = this.getCisManager().getOwnedCis(memberForm.getCisJid());
+		if(null != icis)
+			if(icis.addMember(memberForm.getCssJid(), "participant"))
+				operation = true;
+		if(operation){
+			return communityProfilePage(memberForm.getCisJid());
+		}
+		else{
+			model.put("acitivityAddError", "Error Adding Activity");
+			return new ModelAndView("community_profile", model);
+		}
+
+			
+	}
+	
 	//////////////////////// LEAVE COMMUNITY PAGE
 	
 	@RequestMapping(value="/leave_community.html",method = RequestMethod.GET)
@@ -247,7 +271,7 @@ public class CisManagerController {
 		return yourCommunitiesListPage(response);
 	}
 	
-		//////////////////////// LEAVE COMMUNITY PAGE
+		//////////////////////// DELETE COMMUNITY PAGE
 	
 	@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
 	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
@@ -265,6 +289,23 @@ public class CisManagerController {
 		return yourCommunitiesListPage(response);
 	}
 	
+	//////////////////////// DELETE COMMUNITY PAGE
+	
+/*@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
+public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+	
+	
+	// Leave
+	boolean ret = this.getCisManager().deleteCis(cisId);
+	String response;
+	if(ret){
+		response = "You just deleted the CIS " + cisId;
+	}else{
+		response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+	}
+
+	return yourCommunitiesListPage(response);
+}*/
 	
 	// AUTOWIRING GETTERS AND SETTERS
 	public ICisManager getCisManager() {
