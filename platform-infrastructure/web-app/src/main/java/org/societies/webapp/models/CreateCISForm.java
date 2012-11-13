@@ -1,11 +1,33 @@
 package org.societies.webapp.models;
 
+import java.util.List;
+
+import org.societies.api.cis.attributes.Rule;
+import org.springframework.util.AutoPopulatingList;
+
 public class CreateCISForm {
 
 	private String cisName;
 	private String cisDescription;
 	private String cisType;
 	
+	private String dummyAtr;
+	private String dummyOperation;
+	private String dummyValue;
+	private String dummyValue2;
+	
+	private AutoPopulatingList<MembershipCriteriaForm> ruleArray = new AutoPopulatingList<MembershipCriteriaForm>(MembershipCriteriaForm.class);
+	
+	
+	
+	public AutoPopulatingList<MembershipCriteriaForm> getRuleArray() {
+		return ruleArray;
+	}
+
+	public void setRuleArray(AutoPopulatingList<MembershipCriteriaForm> ruleArray) {
+		this.ruleArray = ruleArray;
+	}
+
 	public CreateCISForm() {
 		// TODO Auto-generated constructor stub
 
@@ -35,7 +57,37 @@ public class CreateCISForm {
 		this.cisType = cisType;
 	}
 
-	
+	public String getDummyAtr() {
+		return dummyAtr;
+	}
+
+	public void setDummyAtr(String dummyAtr) {
+		this.dummyAtr = dummyAtr;
+	}
+
+	public String getDummyOperation() {
+		return dummyOperation;
+	}
+
+	public void setDummyOperation(String dummyOperation) {
+		this.dummyOperation = dummyOperation;
+	}
+
+	public String getDummyValue() {
+		return dummyValue;
+	}
+
+	public void setDummyValue(String dummyValue) {
+		this.dummyValue = dummyValue;
+	}
+
+	public String getDummyValue2() {
+		return dummyValue2;
+	}
+
+	public void setDummyValue2(String dummyValue2) {
+		this.dummyValue2 = dummyValue2;
+	}
 	
 
 }

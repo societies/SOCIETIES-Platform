@@ -26,6 +26,9 @@ package org.societies.webapp.controller;
 
 
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +42,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
+import org.societies.api.cis.attributes.Rule.OperationType;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -60,9 +65,11 @@ import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
 import org.societies.webapp.models.AddMemberForm;
+import org.societies.webapp.models.CreateCISForm;
+import org.societies.webapp.models.MembershipCriteriaForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -100,10 +107,52 @@ public class CisManagerController {
 	public ModelAndView showCreateCommunityPage() {
 		Map<String, Object> model = new HashMap<String, Object>();
 		
+		CreateCISForm form = new CreateCISForm();
+		model.put("createCISform", form);
 		
+		List<OperationType> nonFormatedOpList = new ArrayList<OperationType>( Arrays.asList(OperationType.values() ) );
+		List<String> operatorsList = new ArrayList<String>(nonFormatedOpList.size());
+		for (int i=0; i<nonFormatedOpList.size(); i++) operatorsList.add(nonFormatedOpList.get(i).name());
+
+		model.put("listOfOperators", operatorsList);
+		
+		Field[] f = CtxAttributeTypes.class.getDeclaredFields();
+		List<String> attributes = new ArrayList<String>(f.length); 
+		for (int i=0; i<f.length; i++) attributes.add(f[i].getName());
+		model.put("listOfAttributes", attributes);
+		
+		//AutoPopulatingList<MembershipCriteriaForm> ruleArray = new AutoPopulatingList<MembershipCriteriaForm>(MembershipCriteriaForm.class);
+		//ruleArray.add( new MembershipCriteriaForm(attributes.get(0), operatorsList.get(0),
+		//	"","", true));
+		//model.put("ruleArray",ruleArray);
 		return new ModelAndView("create_community", model) ;
 		
 	}
+	
+
+		@RequestMapping(value = "/create_community.html", method = RequestMethod.POST)
+		public ModelAndView createCommunityPost(@Valid CreateCISForm createCISform,  BindingResult result, Map model){
+			
+			if(result.hasErrors()){
+				
+				//model.put("acitivityAddError", "Error Adding Activity");
+				return new ModelAndView("create_community", model) ;
+			}
+			String str = createCISform.getCisName();
+			
+			if( createCISform.getRuleArray().size() >0){
+				for (MembershipCriteriaForm temp :  createCISform.getRuleArray()) {
+					if(false == temp.isDeleted())
+						str += ", " + temp.getAttribute();
+				}
+			}else{
+				LOG.debug("empty rules");
+				str += ", empty rules";
+			}
+
+			return yourCommunitiesListPage(str);
+			//return new ModelAndView("create_community", model) ;
+		}
 
 	
 	

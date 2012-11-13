@@ -1,8 +1,14 @@
 package org.societies.webapp.models;
 
+import javax.validation.constraints.Pattern;
+
 public class AddMemberForm {
 
+	@Pattern(regexp="cis[A-Za-z0-9._-]+.[A-Za-z0-9._-]",
+			message="Invalid jid.")
 	private String cssJid;
+	@Pattern(regexp="cis[A-Za-z0-9._-]+.[A-Za-z0-9._-]",
+			message="Invalid jid.")
 	private String cisJid;
 	
 	public AddMemberForm() {

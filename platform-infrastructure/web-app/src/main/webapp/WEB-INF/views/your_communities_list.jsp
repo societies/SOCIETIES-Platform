@@ -63,11 +63,14 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section class="grid_12">
 <section>
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a>
 <br>
-<xc:if test="${response != 'null'}">
+<xc:if test="${not empty response}">
 	<div class="success">${response}</div>
 </xc:if>
+
+</div>
+
 </section>
 <div class="websearchbar">
 

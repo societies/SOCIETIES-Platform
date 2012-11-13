@@ -66,11 +66,14 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section  class="grid_12">
 <section>
-<div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a>
 <br>
-<xc:if test="${response != 'null'}">
+<xc:if test="${not empty response}">
 	<div class="success">${response}</div>
 </xc:if>
+
+</div>
+
 </section>
 <div class="websearchbar">
 
@@ -112,7 +115,7 @@
 <p><strong>Activity Feed:</strong></p>
 <!-- Unordered -->
 
-<xc:if test="${acitivityAddError != null}">
+<xc:if test="${not empty acitivityAddError}">
 	<div class="error">${acitivityAddError}</div>
 </xc:if>
 
@@ -201,25 +204,29 @@ at 	<font color="red">${activity.getTarget()}</font>
 		</li>
 </xc:forEach>
 
-<form:form method="POST" action="add_member_cis_profile_page.html" commandName="memberForm" name="AddMemberForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		
-		<table id="addMemberFormInputs">
-		<tr>
-		<td><form:input path="cssJid" defaultValue="jid of member to be added"/></td>
-		<td><form:errors path="cssJid" cssClass="error" /></td>
-		</tr>
-		
-		<tr>
-			<td><form:input path="cisJid" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
-			<td><form:errors path="cisJid" cssClass="error" /></td>
-		</tr>
-			<tr>
-				<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
-			</tr>
-		</table>
-		
-</form:form>
+
+
+	<xc:if test="${isOwner == true}">
+		<form:form method="POST" action="add_member_cis_profile_page.html" commandName="memberForm" name="AddMemberForm">
+				<form:errors path="*" cssClass="errorblock" element="div" />
+				
+				<table id="addMemberFormInputs">
+				<tr>
+				<td><form:input path="cssJid" defaultValue="jid of member to be added"/></td>
+				<td><form:errors path="cssJid" cssClass="error" /></td>
+				</tr>
+				
+				<tr>
+					<td><form:input path="cisJid" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+					<td><form:errors path="cisJid" cssClass="error" /></td>
+				</tr>
+					<tr>
+						<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
+					</tr>
+				</table>
+				
+		</form:form>		
+	</xc:if>
 
 
 </ul>
