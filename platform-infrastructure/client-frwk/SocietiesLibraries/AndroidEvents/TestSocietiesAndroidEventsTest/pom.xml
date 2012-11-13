@@ -76,10 +76,19 @@
 			<type>apklib</type>
 		</dependency-->
 		<dependency>
-		   <groupId>org.societies.android.platform.eventscontainer</groupId>
+		   	<groupId>org.societies.android.platform.eventscontainer</groupId>
    			<artifactId>ContainerSocietiesPlatformEvents</artifactId>
    			<version>${release.version}</version>
+			<scope>provided</scope>
+			<type>jar</type>
 		</dependency>
+                <dependency>
+                        <groupId>org.societies.android.platform.eventscontainer</groupId>
+                        <artifactId>ContainerSocietiesPlatformEvents</artifactId>
+                        <version>${release.version}</version>
+                        <type>apk</type>
+                </dependency>
+
            <dependency>
                <groupId>emma</groupId>
                <artifactId>emma</artifactId>
