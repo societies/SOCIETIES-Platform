@@ -437,11 +437,11 @@ public class CommManagerHelper {
 		} catch (InvalidFormatException e) {
 			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
-			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.error(m);
+			String m = e.getClass().getName() + "Error finding class: " + e.getMessage();
+			LOG.error(m, e);
 		} catch (Exception e) {
-			String m = e.getClass().getName() + "Error de-serializing the message:" + e.getMessage();
-			LOG.error(m);
+			String m = e.getClass().getName() + "Error de-serializing the message: " + e.getMessage();
+			LOG.error(m, e);
 		}
 	}
 
