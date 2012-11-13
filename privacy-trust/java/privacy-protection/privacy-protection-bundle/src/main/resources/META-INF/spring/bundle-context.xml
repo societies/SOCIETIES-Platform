@@ -140,7 +140,7 @@
 
 	<bean name="PrivacyNegotiationManagerCommServer"
 		class="org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommServer"
-		depends-on="commManager, negotiationAgent">
+		depends-on="commManager, negotiationAgent" init-method="initBean">
 		<property name="commManager" ref="commManager" />
 		<property name="negAgent" ref="negotiationAgent" />
 	</bean>

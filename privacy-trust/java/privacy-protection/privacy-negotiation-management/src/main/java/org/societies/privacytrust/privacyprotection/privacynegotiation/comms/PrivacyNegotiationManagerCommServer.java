@@ -31,12 +31,18 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.comms;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -59,8 +65,14 @@ import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 
 
-public class PrivacyNegotiationManagerCommServer {
+public class PrivacyNegotiationManagerCommServer implements IFeatureServer{
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyNegotiationManagerCommServer.class);
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
+					"http://societies.org/api/schema/servicelifecycle/model"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
+					"org.societies.api.schema.servicelifecycle.model"));
 
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
@@ -87,13 +99,22 @@ public class PrivacyNegotiationManagerCommServer {
 		this.idMgr = this.commManager.getIdManager();
 	}
 
-
+	public void initBean(){
+		try {
+			this.commManager.register(this);
+			this.LOG.debug("Registered "+this.getClass().toString()+" as FeatureServer");
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	//METHODS
 	public PrivacyNegotiationManagerCommServer() {
 	}
 
 
+	
 	public Object getQuery(Stanza stanza, NegotiationAgentBean bean){
 		try {
 			this.LOG.debug("Received Query");
@@ -199,6 +220,39 @@ public class PrivacyNegotiationManagerCommServer {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public List<String> getJavaPackages() {
+		return PACKAGES;
+	}
+
+	@Override
+	public Object getQuery(Stanza stanza, Object bean) throws XMPPError {
+		if (bean instanceof NegotiationAgentBean){
+				return this.getQuery(stanza, bean);
+		}else{
+			this.LOG.error("Received unknown object: "+bean.getClass()+". Expected :"+NegotiationAgentBean.class.toString());
+			return "";
+			
+		}
+	}
+
+	@Override
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
+	}
+
+	@Override
+	public void receiveMessage(Stanza arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
