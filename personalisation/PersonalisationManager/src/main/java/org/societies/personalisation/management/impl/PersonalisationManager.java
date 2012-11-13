@@ -542,50 +542,50 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		this.logging.debug("Received context event: "+event.getId().getType());
 
 		new Thread(){
-			
+
 			public void run(){
-			CtxIdentifier ctxIdentifier = event.getId();
+				CtxIdentifier ctxIdentifier = event.getId();
 
-			try {
-				Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(ctxIdentifier);
+				try {
+					Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(ctxIdentifier);
 
-				CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
+					CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
 
-				if (null!=ctxAttribute){
-					if (ctxAttribute instanceof CtxAttribute) {
-						CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
-						IIdentity userId = idm.fromJid(ctxId.getOperatorId());
-						List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute);
-						List<IOutcome> intentOutcomes = processIntent(userId, ctxAttribute);
+					if (null!=ctxAttribute){
+						if (ctxAttribute instanceof CtxAttribute) {
+							CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
+							IIdentity userId = idm.fromJid(ctxId.getOperatorId());
+							List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute);
+							List<IOutcome> intentOutcomes = processIntent(userId, ctxAttribute);
 
-						if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
-							logging.debug("Nothing to send to decisionMaker");
-							return;
-						}else{
-							for (int i =0; i<preferenceOutcomes.size(); i++){
-								logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
+							if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
+								logging.debug("Nothing to send to decisionMaker");
+								return;
+							}else{
+								for (int i =0; i<preferenceOutcomes.size(); i++){
+									logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
+								}
+								for (int i =0; i<intentOutcomes.size(); i++){
+									logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
+								}
 							}
-							for (int i =0; i<intentOutcomes.size(); i++){
-								logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
-							}
+							logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
+							decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
 						}
-						logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
-						decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
 					}
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			}
 		}.start();
 	}
@@ -867,140 +867,143 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	}
 
 	@Override
-	public void handleInternalEvent(InternalEvent event) {
+	public void handleInternalEvent(final InternalEvent event) {
 		this.logging.debug("Received UIM event:");
 		this.logging.debug("Event name "+event.geteventName()+
 				"Event info: "+event.geteventInfo().toString()+
 				"Event source: "+event.geteventSource()+
 				"Event type: "+event.geteventType());
-		try {
+		new Thread(){
 
-			if (event.geteventType().equals(EventTypes.UIM_EVENT)){
-				UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
-				Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested caui prediction");
-				List<IUserIntentAction> cauiActions = futureCauiActions.get();
-				logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
+			public void run(){
+				try {
 
-				Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested crist prediction");
-				List<CRISTUserAction> cristActions = futureCristActions.get();
-				logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
-				for (CRISTUserAction action: cristActions){
-					logging.debug("Crist outcome - parameter: "+action.getparameterName()+" - value: "+action.getvalue());
-				}
+					if (event.geteventType().equals(EventTypes.UIM_EVENT)){
+						UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
+						Future<List<IUserIntentAction>> futureCauiActions = cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested caui prediction");
+						List<IUserIntentAction> cauiActions = futureCauiActions.get();
+						logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
 
-
-
-
-				/**
-				 * get intent outcomes 
-				 */
-
-
-				Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
-				List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
+						Future<List<CRISTUserAction>> futureCristActions = cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested crist prediction");
+						List<CRISTUserAction> cristActions = futureCristActions.get();
+						logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
+						for (CRISTUserAction action: cristActions){
+							logging.debug("Crist outcome - parameter: "+action.getparameterName()+" - value: "+action.getvalue());
+						}
 
 
 
 
-				for (IUserIntentAction caui : cauiActions){
-					CRISTUserAction crist = this.exists(cristActions, caui);
-					if (null==crist){
-						intentNonOverlapping.add(caui);
+						/**
+						 * get intent outcomes 
+						 */
+
+
+						Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
+						List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
+
+
+
+
+						for (IUserIntentAction caui : cauiActions){
+							CRISTUserAction crist = exists(cristActions, caui);
+							if (null==crist){
+								intentNonOverlapping.add(caui);
+							}else{
+								overlapping.put(caui, crist);
+							}
+						}
+
+						for (CRISTUserAction crist: cristActions){
+							IUserIntentAction caui = exists(cauiActions, crist);
+							if (null==caui){
+								intentNonOverlapping.add(crist);
+							}
+						}
+
+						Enumeration<IUserIntentAction> cauiEnum = overlapping.keys();
+
+						while (cauiEnum.hasMoreElements()){
+							IUserIntentAction caui = cauiEnum.nextElement();
+							CRISTUserAction crist = overlapping.get(caui);
+							intentNonOverlapping.add(resolveIntentConflicts(crist,caui));
+						}
+
+
+						/**
+						 * get preference outcomes
+						 */
+
+						Future<List<IDIANNEOutcome>> futureDianneActions = dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested outcome from dianne");
+						List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
+						logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
+
+
+						Future<List<IPreferenceOutcome>> futurePreferenceActions = pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested preference outcome");
+						List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
+						logging.debug("PCM returned: "+prefActions.size()+" outcomes");
+
+
+
+						Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
+						List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
+
+						for (IDIANNEOutcome d : dianneActions){
+							IPreferenceOutcome p = exists(prefActions, d);
+							if (null==p){
+								prefNonOverlapping.add(d);
+							}else{
+								prefOverlapping.put(p, d);
+							}
+						}
+
+						for (IPreferenceOutcome p : prefActions){
+							IDIANNEOutcome d = exists(dianneActions, p);
+							if (null==d){
+								prefNonOverlapping.add(p);
+							}
+						}
+
+						Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
+
+						while(prefEnum.hasMoreElements()){
+							IPreferenceOutcome pref = prefEnum.nextElement();
+							IDIANNEOutcome dianne = prefOverlapping.get(pref);
+							prefNonOverlapping.add(resolvePreferenceConflicts(dianne, pref));
+						}
+
+						if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
+							logging.debug("Action Event-> Nothing to send to decisionMaker");
+							return;
+						}else{
+							for (int i=0; i<prefNonOverlapping.size(); i++){
+								logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
+							}
+							for (int i=0; i<intentNonOverlapping.size(); i++){
+								logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
+							}
+						}
+						decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 					}else{
-						overlapping.put(caui, crist);
+						logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);
 					}
-				}
 
-				for (CRISTUserAction crist: cristActions){
-					IUserIntentAction caui = this.exists(cauiActions, crist);
-					if (null==caui){
-						intentNonOverlapping.add(crist);
-					}
-				}
-
-				Enumeration<IUserIntentAction> cauiEnum = overlapping.keys();
-
-				while (cauiEnum.hasMoreElements()){
-					IUserIntentAction caui = cauiEnum.nextElement();
-					CRISTUserAction crist = overlapping.get(caui);
-					intentNonOverlapping.add(this.resolveIntentConflicts(crist,caui));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 
-				/**
-				 * get preference outcomes
-				 */
 
-				Future<List<IDIANNEOutcome>> futureDianneActions = this.dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested outcome from dianne");
-				List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
-				logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
-
-
-				Future<List<IPreferenceOutcome>> futurePreferenceActions = this.pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested preference outcome");
-				List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
-				logging.debug("PCM returned: "+prefActions.size()+" outcomes");
-
-
-
-				Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
-				List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
-
-				for (IDIANNEOutcome d : dianneActions){
-					IPreferenceOutcome p = this.exists(prefActions, d);
-					if (null==p){
-						prefNonOverlapping.add(d);
-					}else{
-						prefOverlapping.put(p, d);
-					}
-				}
-
-				for (IPreferenceOutcome p : prefActions){
-					IDIANNEOutcome d = this.exists(dianneActions, p);
-					if (null==d){
-						prefNonOverlapping.add(p);
-					}
-				}
-
-				Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
-
-				while(prefEnum.hasMoreElements()){
-					IPreferenceOutcome pref = prefEnum.nextElement();
-					IDIANNEOutcome dianne = prefOverlapping.get(pref);
-					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
-				}
-
-				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
-					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
-					return;
-				}else{
-					for (int i=0; i<prefNonOverlapping.size(); i++){
-						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
-					}
-					for (int i=0; i<intentNonOverlapping.size(); i++){
-						this.logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
-					}
-				}
-				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
-			}else{
-				logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);
 			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-
-
-
+		}.start();
 
 	}
 
