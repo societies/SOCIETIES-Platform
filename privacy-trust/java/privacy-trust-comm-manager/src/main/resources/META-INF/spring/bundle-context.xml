@@ -122,21 +122,7 @@
 
 
 
-	<!-- Privacy Policy Negotiation Management Configuration -->
-	
-	<bean name="PrivacyNegotiationManagerCommClient"
-		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommClient"
-		depends-on="commManager"
-		init-method="initBean">
-		<property name="commManager" ref="commManager" />
-	</bean>
 
-	<bean name="PrivacyNegotiationManagerCommServer"
-		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer"
-		depends-on="commManager, privacyNegotiationAgentLocalService">
-		<property name="commManager" ref="commManager" />
-		<property name="negAgent" ref="privacyNegotiationAgentLocalService" />
-	</bean>
 
 
 

@@ -48,8 +48,8 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommServer;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
-import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer;
 import org.societies.privacytrust.remote.trust.TrustBrokerCommServer;
