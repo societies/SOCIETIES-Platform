@@ -234,16 +234,27 @@ public class ClientResponsePolicyGenerator {
 										+"\nAllow?";
 							}
 
-							int n = JOptionPane.showConfirmDialog(null, question, 
+							try {
+								List<String> responses = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{"Yes","No"})).get();
+								if (responses.get(0).equalsIgnoreCase("yes")){
+									newActions.add(action);
+
+								}else{
+									changed = true;
+									isExactMatch = false;
+								}
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+						/*	int n = JOptionPane.showConfirmDialog(null, question, 
 									"Privacy Policy Negotiation",
 									JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);	
-							if (n==JOptionPane.YES_OPTION){
-								newActions.add(action);
-
-							}else{
-								changed = true;
-								isExactMatch = false;
-							}
+*/
 						}
 					}	
 				}
@@ -271,14 +282,31 @@ public class ClientResponsePolicyGenerator {
 										+"requests to add the condition: "+condition.getConditionName()+"\n"
 										+" to the Negotiation Agreement. Agree?";
 							}
-							int n = JOptionPane.showConfirmDialog(null, question, 
+							
+							try {
+								List<String> responses = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{"Yes", "No"})).get();
+								if (responses.get(0).equalsIgnoreCase("yes")){
+									newConditionsList.add(condition);
+								}else{
+									changed=true;
+									isExactMatch=false;
+								}
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+/*							int n = JOptionPane.showConfirmDialog(null, question, 
 									"Privacy Policy Negotiation",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 							if (n == JOptionPane.YES_OPTION){//if the user accepts the provider's condition, add it to the new list
 								newConditionsList.add(condition);
 							}else{//else don't add it to the list but flag that the provider's policy and the user's are not 100% match
 								changed = true;
 								isExactMatch = false;
-							}
+							}*/
 						}else{//if it's optional, don't add it to the list but flag that the provider's policy and the user's are not 100% match
 							changed = true;
 							isExactMatch = false;
@@ -304,7 +332,26 @@ public class ClientResponsePolicyGenerator {
 											+"requests to replace the value of condition: "+condition.getConditionName()+"\n"
 											+"with current value: "+myCondition.getValueAsString()+" with the value of: "+condition.getValueAsString();
 								}
-								int n = JOptionPane.showConfirmDialog(null, question, 
+								
+								List<String> responses;
+								try {
+									responses = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{"Yes", "No"})).get();
+									if (responses.get(0).equalsIgnoreCase("Yes")){ //if the user agrees, add the provider's condition to the list
+										newConditionsList.add(condition);
+									}else{ //otherwise, add the user's version of the condition
+										newConditionsList.add(myCondition);
+										changed = true;
+										isExactMatch = false;
+									}
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+/*								int n = JOptionPane.showConfirmDialog(null, question, 
 										"Privacy Policy Negotiation",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 								if (n==JOptionPane.YES_OPTION){ //if the user agrees, add the provider's condition to the list
 									newConditionsList.add(condition);
@@ -312,7 +359,7 @@ public class ClientResponsePolicyGenerator {
 									newConditionsList.add(myCondition);
 									changed = true;
 									isExactMatch = false;
-								}
+								}*/
 							}
 						}
 					}
