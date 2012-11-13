@@ -42,13 +42,13 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommServer;
+
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer;
@@ -64,7 +64,6 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
-					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
 			  		"http://societies.org/api/schema/servicelifecycle/model",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/model",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker",
@@ -74,7 +73,6 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
-					"org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
 			  		"org.societies.api.schema.servicelifecycle.model",
 			  		"org.societies.api.internal.schema.privacytrust.trust.model",
 			  		"org.societies.api.internal.schema.privacytrust.trust.broker",
@@ -84,7 +82,7 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 	private PrivacyDataManagerCommServer privacyDataManagerCommServer;
 	private PrivacyPolicyManagerCommServer privacyPolicyManagerCommServer;
 	private PrivacyAgreementManagerCommServer privacyAgreementManagerCommServer;
-	private PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer;
+
 	private TrustBrokerCommServer trustBrokerCommServer;
 	private TrustEvidenceCollectorCommServer trustEvidenceCollectorCommServer;
 	
@@ -139,10 +137,6 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		
 		// -- Privacy Preference Management
 
-		// -- Privacy Policy Negotiation Management
-		else if (payload instanceof NegotiationAgentBean){
-			return privacyNegotiationManagerCommServer.getQuery(stanza, (NegotiationAgentBean) payload);
-		}
 
 		// -- Assessment Management
 
@@ -223,11 +217,7 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		this.privacyDataManagerCommServer = privacyDataManagerCommServer;
 		LOG.info("[DependencyInjection] PrivacyDataManagerCommServer injected");
 	}
-	public void setPrivacyNegotiationManagerCommServer(
-			PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer) {
-		this.privacyNegotiationManagerCommServer = privacyNegotiationManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyNegotiationManagerCommServer injected");
-	}
+
 	public void setPrivacyPolicyManagerCommServer(
 			PrivacyPolicyManagerCommServer privacyPolicyManagerCommServer) {
 		this.privacyPolicyManagerCommServer = privacyPolicyManagerCommServer;

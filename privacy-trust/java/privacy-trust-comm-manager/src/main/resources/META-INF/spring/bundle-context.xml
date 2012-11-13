@@ -39,7 +39,6 @@
 		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
 		<property name="privacyPolicyManagerCommServer" ref="PrivacyPolicyManagerCommServer" />
 		<property name="privacyAgreementManagerCommServer" ref="PrivacyAgreementManagerCommServer" />
-		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
 		<property name="trustBrokerCommServer" ref="trustBrokerCommServer" />
 		<property name="trustEvidenceCollectorCommServer" ref="trustEvidenceCollectorCommServer" />
 	</bean>
