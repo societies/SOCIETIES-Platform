@@ -99,6 +99,7 @@
 	                        <testCoverage>true</testCoverage>
 	                    	<testCreateReport>true</testCreateReport>
 	                 		<testTestSize>medium</testTestSize>
+	                 		<testCoverageFile>/data/data/org.societies.android.platform.eventscontainer/files/coverage.ec</testCoverageFile>
                             <!--test>
                                 <coverage>true</coverage>
                                 <createReport>true</createReport>
