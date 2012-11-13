@@ -999,9 +999,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-
-
+				
+				logging.debug("Thread of handleInternalEvent finished executing");
 			}
 		}.start();
 

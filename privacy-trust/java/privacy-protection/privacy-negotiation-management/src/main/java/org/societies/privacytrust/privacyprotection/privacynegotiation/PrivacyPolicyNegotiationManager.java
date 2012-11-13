@@ -439,13 +439,14 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			
 			Requestor requestor = ppnEvent.getAgreement().getRequestor();
 			this.logging.debug("Received successfull Negotiation event for : "+requestor.toString());
-			if (this.negClients.contains(requestor)){
+			if (this.negClients.containsKey(requestor)){
 				this.negClients.remove(requestor);
 				this.logging.debug("Destroying NegotiationClient instance");
 			}
 			
 		}
 		
+		this.logging.debug("Finished executing handleInternalEvent");
 	}
 	
 
