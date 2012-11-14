@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
@@ -53,6 +54,9 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.context.api.event.CtxChangeEventTopic;
+import org.societies.context.api.event.CtxEventScope;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.user.db.impl.model.CtxAssociationDAO;
 import org.societies.context.user.db.impl.model.CtxAttributeDAO;
@@ -65,6 +69,8 @@ import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
 import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import cern.colt.Arrays;
 
 /**
  * Implementation of the {@link IUserCtxDBMgr} interface.
@@ -80,6 +86,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	/** The Context Event Mgmt service reference. */
+	@Autowired(required=true)
+	private ICtxEventMgr ctxEventMgr;
 	
 	private final String privateId;
 
@@ -564,6 +574,30 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
+		}
+		
+		final CtxIdentifier eventId = modelObject.getId();
+		final String[] eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
+		final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+		if (this.ctxEventMgr != null) {
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Sending context change event for '" + eventId
+							+ "' to topics '" + Arrays.toString(eventTopics) 
+							+ "' with scope '" + eventScope + "'");
+				this.ctxEventMgr.post(new CtxChangeEvent(eventId), eventTopics, eventScope);
+			} catch (Exception e) {
+				
+				LOG.error("Could not send context change event for '" + eventId 
+						+ "' to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ e.getLocalizedMessage(), e);
+			}
+		} else {
+			LOG.error("Could not send context change event for '" + eventId
+					+ "' to topics '" + Arrays.toString(eventTopics) 
+					+ "' with scope '" + eventScope + "': "
+					+ "ICtxEventMgr service is not available");
 		}
 		      
 		return this.retrieve(modelObject.getId());

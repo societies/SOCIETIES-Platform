@@ -33,9 +33,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.user.db.impl.model.CtxAttributeDAO;
 import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
-import org.societies.context.user.db.impl.model.CtxQualityDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +52,8 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateUserCtxEventListener.class);
+	
+	private static final String[] EVENT_TOPICS = new String[] { CtxChangeEventTopic.MODIFIED };
 	
 	private static final CtxEventScope EVENT_SCOPE = CtxEventScope.BROADCAST;
 	
@@ -76,38 +76,28 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 		if (LOG.isTraceEnabled())
 			LOG.trace("Received PostUpdateEvent for context hibernate entity " + event.getId());
 		
-		String[] eventTopics = null;
-		CtxIdentifier ctxId = null;
-		if (event.getEntity() instanceof CtxModelObjectDAO) {
-			ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-			if (event.getEntity() instanceof CtxAttributeDAO)
-				eventTopics = new String[] { CtxChangeEventTopic.MODIFIED };
-			else // if event.getEntity() instanceof CtxEntityDAO or CtxAssociationDAO 
-				eventTopics = new String[] { CtxChangeEventTopic.MODIFIED, CtxChangeEventTopic.UPDATED};
-		} else if (event.getEntity() instanceof CtxQualityDAO) {
-			ctxId = ((CtxQualityDAO) event.getEntity()).getAttribute().getId();
-			eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
-		} else {
+		// Ignore events for non CtxModelObjects
+		if (!(event.getEntity() instanceof CtxModelObjectDAO))
 			return;
-		}
 		
+		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
 		if (this.ctxEventMgr != null) {
 			try {
 				if (LOG.isDebugEnabled())
 					LOG.debug("Sending context change event for '" + ctxId
-							+ "' to topics '" + Arrays.toString(eventTopics) 
+							+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
 							+ "' with scope '" + EVENT_SCOPE + "'");
-				this.ctxEventMgr.post(new CtxChangeEvent(ctxId), eventTopics, EVENT_SCOPE);
+				this.ctxEventMgr.post(new CtxChangeEvent(ctxId), EVENT_TOPICS, EVENT_SCOPE);
 			} catch (Exception e) {
 				
 				LOG.error("Could not send context change event for '" + ctxId 
-						+ "' to topics '" + Arrays.toString(eventTopics) 
+						+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
 						+ "' with scope '" + EVENT_SCOPE + "': "
 						+ e.getLocalizedMessage(), e);
 			}
 		} else {
 			LOG.error("Could not send context change event for '" + ctxId
-					+ "' to topics '" + Arrays.toString(eventTopics) 
+					+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
 					+ "' with scope '" + EVENT_SCOPE + "': "
 					+ "ICtxEventMgr service is not available");
 		}
