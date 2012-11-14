@@ -96,6 +96,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 			for(final String inferrableType: this.inferrableTypes) {
 				if (ownerEntity.getAttributes(inferrableType).size() == 0) {
 					CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(ownerEntity.getId(), inferrableType).get();
+					ctxAttr.setHistoryRecorded(true);
+					this.internalCtxBroker.update(ctxAttr);
 					if (LOG.isDebugEnabled())
 						LOG.debug("Inferrable attribute created: "+ ctxAttr.getId());
 				}
