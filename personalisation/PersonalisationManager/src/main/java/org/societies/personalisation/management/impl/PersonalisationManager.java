@@ -403,6 +403,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	@Override
 	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
+		this.logging.debug("Processing request for preference: "+preferenceName+" for serviceType: "+serviceType+" and serviceID "+serviceID.getServiceInstanceIdentifier());
+		
 		Future<List<IDIANNEOutcome>> futureDianneOuts;
 
 		futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
@@ -414,6 +416,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		Future<IOutcome> futurePrefOuts;
 
 		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		
 
 		if (futurePrefOuts==null){
 			futurePrefOuts = new AsyncResult<IOutcome>(null);
@@ -448,8 +451,10 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			}else{
 
 				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
-				this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: "+prefOut.toString());
-				return new AsyncResult<IAction>(prefOut);
+				if (prefOut!=null){
+					this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: "+prefOut.toString());
+					return new AsyncResult<IAction>(prefOut);
+				}
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -458,7 +463,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		this.logging.debug(".getPreference(...): Returning null action");
 		return new AsyncResult<IAction>(null);
 	}
 
