@@ -584,6 +584,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 				CtxIdentifier ctxIdentifier = event.getId();
 
 				try {
+					Thread.sleep(10);
 					Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(ctxIdentifier);
 
 					CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
