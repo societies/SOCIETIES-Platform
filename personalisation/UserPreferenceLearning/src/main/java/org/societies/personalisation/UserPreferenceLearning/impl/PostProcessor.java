@@ -25,6 +25,8 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
@@ -36,6 +38,8 @@ import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 
 public class PostProcessor 
 {
+	Logger LOG = LoggerFactory.getLogger(this.getClass());
+	
 	public IPreferenceTreeModel process(
 			String paramName, 
 			String treeString, 
@@ -43,7 +47,7 @@ public class PostProcessor
 			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
-		System.out.println("Converting String to tree: "+treeString);
+		LOG.debug("Converting String to tree: "+treeString);
 
 		//create root node
 		IPreference root = new PreferenceTreeNode();
@@ -194,7 +198,7 @@ public class PostProcessor
 
 	private IPreferenceCondition createCondition(String temp, CtxIdentifierCache cache){
 
-		System.out.println("Creating condition from String: "+temp);
+		LOG.debug("Creating condition from String: "+temp);
 		String noBars = removeChar(temp, '|');
 		noBars.trim();
 		String[] tuple = noBars.split("=");
@@ -206,7 +210,7 @@ public class PostProcessor
 
 	private IOutcome createOutcome(String paramName, String value, ServiceResourceIdentifier serviceId, String serviceType){
 
-		System.out.println("Creating outcome from String: "+value);
+		LOG.debug("Creating outcome from String: "+value);
 		IOutcome outcome = new PreferenceOutcome(serviceId, serviceType, paramName, value);
 
 		return outcome;
