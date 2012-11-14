@@ -7,7 +7,7 @@
 	 
 	<bean id="ClientTest" 
   		class="org.societies.css.mgmt.testcomms.TestCommsMgmt"
-  		init-method="testCSSMgmtMultipleLogins"
+  		init-method="testAndroidPubsub"
   		>
   		<property name="remoteCSSManager" ref="CSSRemoteManagerBundle"/>
  		<property name="remoteCSSDirectory" ref="CSSRemoteDirectoryBundle"/>
