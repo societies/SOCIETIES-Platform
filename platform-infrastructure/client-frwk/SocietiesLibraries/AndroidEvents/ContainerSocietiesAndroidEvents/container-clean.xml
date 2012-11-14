@@ -31,19 +31,34 @@
 
 	<!-- Setup the identity of this builder -->
 	<groupId>org.societies</groupId>
-	<artifactId>android-builder</artifactId>
+	<artifactId>events-container-source</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1</version>
-	<name>Android Builder</name>
+	<name>Events Container Source Include</name>
 
-	<!-- All Android projects to be included in nightly builds -->
-	<modules>
-		<module>../../parent/version.xml</module>
-		<module>../../parent/android.xml</module>
 
-		<!-- Societies Android Events -->
-		<module>../../platform-infrastructure/client-frwk/ContainerSocietiesAndroidEvents</module>
-		<module>../../platform-infrastructure/client-frwk/TestSocietiesAndroidEventsTest</module>
+    <build>
+    	<plugins>
+        	<plugin>
+        		<artifactId>maven-antrun-plugin</artifactId>
+        		<version>1.7</version>
+        		<executions>
+          			<execution>
+            				<phase>clean</phase>
+            				<configuration>
+              					<target>
+							<ant antfile="${basedir}/ant-include-apklib-source.xml">
+                  						<target name="copy"/>
+                					</ant>
+              					</target>
+            				</configuration>
+            				<goals>
+              					<goal>run</goal>
+            				</goals>
+          			</execution>
+        		</executions>
+      		</plugin>
+    	</plugins>
+  </build>
 
-	</modules>
 </project>

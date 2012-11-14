@@ -3,6 +3,7 @@ package org.societies.css.mgmt.testcomms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -15,6 +16,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
@@ -33,6 +35,8 @@ import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.utilities.DBC.Dbc;
+import java.util.Random;
 
 public class TestCommsMgmt {
 
@@ -42,6 +46,7 @@ public class TestCommsMgmt {
     private ICommManager commManager;
     private IIdentity pubsubID;
     private ICssDirectoryRemote remoteCSSDirectory;
+    private Random randomGenerator;
 
 	
 	private static Logger LOG = LoggerFactory.getLogger(TestCommsMgmt.class);
@@ -84,7 +89,33 @@ public class TestCommsMgmt {
 	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
     private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
 
+    /**
+     * Create pubsub nodes for consumption by Android and other CSS non-cloud nodes
+     * @throws InterruptedException 
+     * 
+     */
+    public void testAndroidPubsub() throws InterruptedException {
+    	LOG.info("Testing testAndroidPubsub");
+        this.randomGenerator = new Random();
 
+    	createPubSubNodes();
+    	//Allow some time to load Android app
+    	Thread.sleep(120000);
+    	
+		CssEvent event = new CssEvent();
+		event.setType(CSSManagerEnums.ADD_CSS_NODE);
+		event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
+
+		publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+		
+		CssEvent event_1 = new CssEvent();
+		event_1.setType(CSSManagerEnums.DEPART_CSS_NODE);
+		event_1.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+		
+		this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event_1);
+
+    }
+    
 	public void testPubSub() {
 		LOG.info("Testing Login/Pubsub");
 		
@@ -489,6 +520,77 @@ public class TestCommsMgmt {
 		LOG.info("created CSS Record password: " + cssProfile.getPassword());
 		
 		return cssProfile;
+	}
+
+	
+	/**
+	 * Create Pubsub nodes
+	 */
+	private void createPubSubNodes() {
+        
+            LOG.debug("Creating PubsubNode(s) for CSSManager");
+
+            try {
+    			pubSubManager.addSimpleClasses(cssPubsubClassList);
+
+    			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
+    	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+    	        
+    		} catch (XMPPError e) {
+    			e.printStackTrace();
+    		} catch (CommunicationException e) {
+    			e.printStackTrace();
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		} finally {
+    	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + " PubsubNode created for CSSManager");
+    	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + " PubsubNode created for CSSManager");
+    		}
+    }
+
+	/**
+	 * Create an event for a given Pubsub node
+	 * 
+	 * @param pubsubNodeName
+	 */
+	private void publishEvent(String pubsubNodeName, CssEvent event) {
+		Dbc.require("Pubsub Node name must be valid", pubsubNodeName != null && pubsubNodeName.length() > 0);
+		Dbc.require("Pubsub event must be valid", event !=  null);
+		
+	    LOG.debug("Publish event node: " + pubsubNodeName);
+
+	    
+	    try {
+			Map <IIdentity, SubscriptionState> subscribers = this.pubSubManager.ownerGetSubscriptions(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+			for (IIdentity identity : subscribers.keySet()) {
+				LOG.debug("Subscriber : " + identity + " subscribed to: " + CSSManagerEnums.DEPART_CSS_NODE);
+			}
+			subscribers = this.pubSubManager.ownerGetSubscriptions(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
+			for (IIdentity identity : subscribers.keySet()) {
+				LOG.debug("Subscriber : " + identity + " subscribed to: " + CSSManagerEnums.ADD_CSS_NODE);
+			}
+		} catch (XMPPError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CommunicationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    
+	    
+	    try {
+	    	String status = this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), event);
+			LOG.debug("Event published: " + status);
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	private CssAdvertisementRecord createCssAdvertisement() {

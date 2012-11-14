@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.platform" version="0.3.0" scoped="false" atomic="false"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+	
+	<!-- Deprecated since fix to issue #1588
+	<artifact type="configuration" name="xc"/>
+	-->
+	
+	<artifact type="plan" name="org.societies.css.commfrwk"/>
+	
+	<artifact type="plan" name="org.societies.common.modules"/>
+	
+</plan>
