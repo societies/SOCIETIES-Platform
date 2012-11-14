@@ -48,6 +48,7 @@ public class PostProcessor
 			String serviceType){
 
 		LOG.debug("Converting String to tree: "+treeString);
+		System.out.println("Converting String to tree: "+treeString);
 
 		//create root node
 		IPreference root = new PreferenceTreeNode();
@@ -66,21 +67,32 @@ public class PostProcessor
 					//check for leaf
 					if(containsLeaf(nextLine)){
 						String[] tmp = nextLine.split(":");
-						String branchString = tmp[0].trim();
-						String leafString = tmp[1].trim();
+						if(tmp.length>1){ //there is a condition for this leaf
+							String branchString = tmp[0].trim();
+							String leafString = tmp[1].trim();
 
-						IPreference branch = 
-								new PreferenceTreeNode(createCondition(branchString, cache));
-						IPreference leaf = 
-								new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+							IPreference branch = 
+									new PreferenceTreeNode(createCondition(branchString, cache));
+							IPreference leaf = 
+									new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
-						//add branch and leaf
-						currentNode.add(branch);
-						currentNode = branch;
-						currentLevel = level;
-						currentNode.add(leaf);
-						currentNode = leaf;
-						currentLevel ++;
+							//add branch and leaf
+							currentNode.add(branch);
+							currentNode = branch;
+							currentLevel = level;
+							currentNode.add(leaf);
+							currentNode = leaf;
+							currentLevel ++;
+						}else{ //there is no condition for this leaf
+							String leafString = tmp[0].trim();
+							
+							IPreference leaf = 
+									new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+							currentLevel = level;
+							currentNode.add(leaf);
+							currentNode = leaf;
+							currentLevel ++;
+						}
 					}else{
 						IPreference branch = 
 								new PreferenceTreeNode(createCondition(nextLine, cache));
@@ -94,24 +106,35 @@ public class PostProcessor
 					if(level == currentLevel){
 						if(containsLeaf(nextLine)){
 							String[] tmp = nextLine.split(":");
-							String branchString = tmp[0].trim();
-							String leafString = tmp[1].trim();
+							if(tmp.length>1){  //condition for this leaf
+								String branchString = tmp[0].trim();
+								String leafString = tmp[1].trim();
 
-							IPreference branch = 
-									new PreferenceTreeNode(createCondition(branchString, cache));
-							IPreference leaf = 
-									new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+								IPreference branch = 
+										new PreferenceTreeNode(createCondition(branchString, cache));
+								IPreference leaf = 
+										new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
-							//get parent node to add branch and leaf
-							currentNode = 
-									(IPreference)
-									currentNode.getParent();
-							currentNode.add(branch);
-							currentNode = branch;
-							currentLevel = level;
-							currentNode.add(leaf);
-							currentNode = leaf;
-							currentLevel ++;
+								//get parent node to add branch and leaf
+								currentNode = 
+										(IPreference)
+										currentNode.getParent();
+								currentNode.add(branch);
+								currentNode = branch;
+								currentLevel = level;
+								currentNode.add(leaf);
+								currentNode = leaf;
+								currentLevel ++;
+							}else{ //no condition for this leaf
+								String leafString = tmp[0].trim();
+								
+								IPreference leaf = 
+										new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+								currentLevel = level;
+								currentNode.add(leaf);
+								currentNode = leaf;
+								currentLevel++;
+							}
 						}else{
 							IPreference branch = 
 									new PreferenceTreeNode(createCondition(nextLine, cache));
@@ -128,31 +151,49 @@ public class PostProcessor
 						if(level < currentLevel){
 							if(containsLeaf(nextLine)){
 								String[] tmp = nextLine.split(":");
-								String branchString = tmp[0].trim();
-								String leafString = tmp[1].trim();
+								if(tmp.length>1){ //condtion for this leaf
+									String branchString = tmp[0].trim();
+									String leafString = tmp[1].trim();
 
-								IPreference branch = 
-										new PreferenceTreeNode(createCondition(branchString, cache));
-								IPreference leaf = 
-										new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+									IPreference branch = 
+											new PreferenceTreeNode(createCondition(branchString, cache));
+									IPreference leaf = 
+											new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
-								//move back up the tree
-								while(currentLevel > level){
-									currentNode = (IPreference)
+									//move back up the tree
+									while(currentLevel > level){
+										currentNode = (IPreference)
+												currentNode.getParent();
+										currentLevel --;
+									}
+
+									//get parent node to add branch and leaf
+									currentNode = 
+											(IPreference)
 											currentNode.getParent();
-									currentLevel --;
+									currentNode.add(branch);
+									currentNode = branch;
+									currentLevel = level;
+									currentNode.add(leaf);
+									currentNode = leaf;
+									currentLevel ++;
+								}else{ //no condition for this leaf
+									String leafString = tmp[0].trim();
+									
+									IPreference leaf = 
+											new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
+									
+									//move back up the tree
+									while(currentLevel > level){
+										currentNode = (IPreference)
+												currentNode.getParent();
+										currentLevel--;
+									}
+									currentLevel = level;
+									currentNode.add(leaf);
+									currentNode = leaf;
+									currentLevel++;
 								}
-
-								//get parent node to add branch and leaf
-								currentNode = 
-										(IPreference)
-										currentNode.getParent();
-								currentNode.add(branch);
-								currentNode = branch;
-								currentLevel = level;
-								currentNode.add(leaf);
-								currentNode = leaf;
-								currentLevel ++;
 							}else{
 								IPreference branch = 
 										new PreferenceTreeNode(createCondition(nextLine, cache));
