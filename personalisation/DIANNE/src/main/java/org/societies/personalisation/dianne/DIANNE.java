@@ -100,7 +100,8 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		}else{
 			LOG.info("No DIANNE exists for this ownerId: "+ownerId.getBareJid()+"...cannot return result");
 		}
-		return new AsyncResult<List<IDIANNEOutcome>>(results);
+		//return new AsyncResult<List<IDIANNEOutcome>>(results);
+		return new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
 	}
 
 	@Override
@@ -145,7 +146,8 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 			LOG.debug("Not performing context update - context update contained null element: "+attribute.getType()+"="+attribute.getStringValue());
 		}
 		
-		return new AsyncResult<List<IDIANNEOutcome>>(results);
+		//return new AsyncResult<List<IDIANNEOutcome>>(results);
+		return new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
 	}
 
 	@Override
