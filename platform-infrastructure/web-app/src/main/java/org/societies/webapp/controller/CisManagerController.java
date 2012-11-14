@@ -26,11 +26,17 @@ package org.societies.webapp.controller;
 
 
 
+import java.lang.reflect.Field;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
@@ -39,11 +45,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
+import org.societies.api.cis.attributes.Rule.OperationType;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -60,9 +70,11 @@ import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
 import org.societies.webapp.models.AddMemberForm;
+import org.societies.webapp.models.CreateCISForm;
+import org.societies.webapp.models.MembershipCriteriaForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -96,6 +108,101 @@ public class CisManagerController {
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
+	// SHOW CREATE COMMUNITY
+	
+	@RequestMapping(value="/create_community.html",method = RequestMethod.GET)
+	public ModelAndView showCreateCommunityPage() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		CreateCISForm form = new CreateCISForm();
+		model.put("createCISform", form);
+		
+		List<OperationType> nonFormatedOpList = new ArrayList<OperationType>( Arrays.asList(OperationType.values() ) );
+		List<String> operatorsList = new ArrayList<String>(nonFormatedOpList.size());
+		for (int i=0; i<nonFormatedOpList.size(); i++) operatorsList.add(nonFormatedOpList.get(i).name());
+
+		model.put("listOfOperators", operatorsList);
+		
+		Field[] f = CtxAttributeTypes.class.getDeclaredFields();
+		List<String> attributes = new ArrayList<String>(f.length); 
+		for (int i=0; i<f.length; i++) attributes.add(f[i].getName());
+		model.put("listOfAttributes", attributes);
+		
+
+		return new ModelAndView("create_community", model) ;
+		
+	}
+	
+
+	// CREATE COMMUNITY POST
+	
+		@RequestMapping(value = "/create_community.html", method = RequestMethod.POST)
+		public ModelAndView createCommunityPost(@Valid CreateCISForm createCISform,  BindingResult result, Map model){
+			
+			String response = "model error creating community";
+			
+			if(result.hasErrors()){
+				
+				return new ModelAndView("create_community", model) ;
+			}
+			
+
+
+			
+			String cisName = createCISform.getCisName();
+			String cisDescription = createCISform.getCisDescription();
+			String cisType = createCISform.getCisType();
+			
+			// building the criteria
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+			
+			if( createCISform.getRuleArray().size() >0){
+				for (MembershipCriteriaForm temp :  createCISform.getRuleArray()) {
+					if(false == temp.isDeleted()){
+						// adding the criteria to the list
+						MembershipCriteria m = new MembershipCriteria();
+						try{
+							ArrayList<String> values = new ArrayList<String>();
+							values.add(temp.getValue1());
+							if (null != temp.getValue2() && false == temp.getValue2().isEmpty())
+								values.add(temp.getValue2());
+							
+							Rule r = new Rule(temp.getOperator(),values);
+							m.setRule(r);
+							cisCriteria.put(temp.getAttribute(), m);
+						}catch(InvalidParameterException e){
+							LOG.debug("error addng rule on webapp!");
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}else{
+				LOG.debug("empty rules on webapp cis manager controller");
+			}
+
+			// real creation of the CIS
+			ICisOwned icis = null;
+			try {
+				icis = this.cisManager.createCis(cisName, cisType, cisCriteria, cisDescription).get();
+			} catch (InterruptedException e) {
+				response = "failure creating cis";
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				response = "failure creating cis";
+				e.printStackTrace();
+			}
+			if(null != icis)
+				response = "CIS " + icis.getCisId() + " created";
+			else
+				response = "failure creating cis";
+			
+
+			return yourCommunitiesListPage(response);
+
+		}
+
+	
 	
 	@RequestMapping(value="/your_communities_list.html",method = RequestMethod.GET)
 	public ModelAndView yourCommunitiesListPage(@RequestParam(value="response", required=false) String incomingResponse) {
@@ -124,13 +231,14 @@ public class CisManagerController {
 	 */
 	
 	@RequestMapping(value="/community_profile.html",method = RequestMethod.GET)
-	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId){
+	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="response", required=false) String response){
 		Map<String, Object> model = new HashMap<String, Object>();
 		
 		
 		// TODO, add null checks
-
-		
+		if(null!= response && false == response.isEmpty())
+			model.put("response", response);
+			
 		// GET INFO
 		ICis icis = this.getCisManager().getCis(cisId);
 		CisManagerClient getInfoCallback = new CisManagerClient();
@@ -187,7 +295,9 @@ public class CisManagerController {
 		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
 		AddActivityForm form = new AddActivityForm();
 		model.put("activityForm",form);
-		
+
+		AddMemberForm form2 = new AddMemberForm();
+		model.put("memberForm",form2);
 		
 		return new ModelAndView("community_profile", model) ;
 	}
@@ -195,7 +305,7 @@ public class CisManagerController {
 	
 	// TODO: perhaps adapt this so it does not reload the full page
 	//@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/add_activity_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addActivityInProfilePage(@Valid AddActivityForm addActForm,  BindingResult result, Map model){
 		
 		if(result.hasErrors()){
@@ -217,7 +327,7 @@ public class CisManagerController {
 		LOG.info("add act");
 		Activityfeed ac= activityFeedCallback.getActivityFeed();
 		if(null != ac && ac.getAddActivityResponse().isResult()){
-			return communityProfilePage(addActForm.getCisId());
+			return communityProfilePage(addActForm.getCisId(),null);
 		}
 		else{
 			model.put("acitivityAddError", "Error Adding Activity");
@@ -228,7 +338,7 @@ public class CisManagerController {
 	}
 	
 	
-	@RequestMapping(value = "/community_profile.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/add_member_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addMemberInProfilePage(@Valid AddMemberForm memberForm,  BindingResult result, Map model){
 		
 		if(result.hasErrors()){
@@ -241,7 +351,7 @@ public class CisManagerController {
 			if(icis.addMember(memberForm.getCssJid(), "participant"))
 				operation = true;
 		if(operation){
-			return communityProfilePage(memberForm.getCisJid());
+			return communityProfilePage(memberForm.getCisJid(),null);
 		}
 		else{
 			model.put("acitivityAddError", "Error Adding Activity");
@@ -277,7 +387,7 @@ public class CisManagerController {
 	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
 		
 		
-		// Leave
+		// delete
 		boolean ret = this.getCisManager().deleteCis(cisId);
 		String response;
 		if(ret){
@@ -291,21 +401,22 @@ public class CisManagerController {
 	
 	//////////////////////// DELETE COMMUNITY PAGE
 	
-/*@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
-public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
+@RequestMapping(value="/delete_member.html",method = RequestMethod.GET)
+public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="cssId", required=true) String cssId, Map model){
 	
-	
-	// Leave
-	boolean ret = this.getCisManager().deleteCis(cisId);
+	boolean ret = false;
+	ICisOwned i = this.getCisManager().getOwnedCis(cisId);
+	if(null != i)
+		ret = i.removeMemberFromCIS(cssId);
 	String response;
 	if(ret){
-		response = "You just deleted the CIS " + cisId;
+		response = "You just deleted the member " + cssId;
 	}else{
-		response = "An error occurred when trying to delete the CIS " + cisId + ". Try again";
+		response = "An error occurred when trying to delete the member " + cssId + ". Try again";
 	}
 
-	return yourCommunitiesListPage(response);
-}*/
+	return communityProfilePage(cisId,response);
+}
 	
 	// AUTOWIRING GETTERS AND SETTERS
 	public ICisManager getCisManager() {

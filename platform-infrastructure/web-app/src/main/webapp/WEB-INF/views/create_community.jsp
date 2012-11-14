@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@taglib prefix="xc" uri="http://java.sun.com/jsp/jstl/core"  %> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +10,65 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dialog.css">
 <script>!window.jQuery && document.write('<script src="js/jquery-v1.8.1.js"><\/script>')</script>
+<!-- Button Script -->
+	<script type="text/javascript">
+		  function operationSelection(){
+			  var areEqual = $('#operatorValue').val().toUpperCase() === "RANGE";
+		     if( areEqual){
+		    	 $('#criteriaValue2').show();	
+		    } else {
+		      $('#criteriaValue2').val("");
+		      $('#criteriaValue2').hide();
+		    }
+		  }
+	
+	
+	$(document).ready(function(){
+		//startup functionality
+	 $('#criteriaValue2').hide();
+
+	 var i = 0;
+
+	 
+	 document.getElementById('createCISbutton').onclick = function() {
+		 document.CreateCISForm.submit();
+     }
+		                 
+	 
+
+	 
+
+	 
+	 document.getElementById("addCriteria").onclick = function() {
+
+		 // test log string
+
+
+
+			// add the row
+			var row = $('<tr/>', {class: "critRow", id:i}).appendTo("#existingCriteria");
+			// column 
+			var column = $('<td/>', {text: $('#attributeValue').val() + "    " + $('#operatorValue').val() + "    " + $('#criteriaValue').val() }).appendTo(row);
+			if($('#criteriaValue2').is(":visible") )
+				column.text(column.text() + "    " + $('#criteriaValue2').val()); 
+			var inputAttribute = $('<input/>', {id:"ruleArray"+i+".attribute", value: $('#attributeValue').val(), name:"ruleArray["+i+"].attribute", type:"hidden"}).appendTo(row);
+			var inputOperator = $('<input/>', {id:"ruleArray"+i+".operator", value: $('#operatorValue').val(), name:"ruleArray["+i+"].operator", type:"hidden"}).appendTo(row);
+			var inputValue = $('<input/>',  {id:"ruleArray"+i+".value1", value: $('#criteriaValue').val(), name:"ruleArray["+i+"].value1", type:"hidden"}).appendTo(row);
+			var inputValue2 = $('<input/>', {id:"ruleArray"+i+".value2", value: $('#criteriaValue2').val(), name:"ruleArray["+i+"].value2", type:"hidden"}).appendTo(row);
+			var inputDeleted = $('<input/>', {id:"ruleArray"+i+".deleted", value: false, name:"ruleArray["+i+"].deleted", type:"hidden"}).appendTo(row);
+			// button
+			var f = function () {row.remove(); $('#ruleArray'+i+".deleted").val(true)};
+			var b = $('<button/>',{		  text: "Delete", type: "button", 
+				  click: f
+			}).appendTo(column);
+
+			i++;
+	};// end of document.getElementById("addCriteria").onclick = function() {
+
+	});// end of $(document).ready(function()
+			
+	</script>
+
 <!--[if IE]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]--> 
 <!--[if lt IE 7]>
@@ -64,49 +125,70 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <!-- Left Column -->
 <section id="left_col" class="grid_8">
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="create_community.html">Create community</a></div>
+
+<div id="msgid">
+</div>
+
 <!-- Form -->
 <section id="form_style_main">
-<form action="" method="" id="">	
+<form:form method="POST" action="create_community.html" commandName="createCISform" name="CreateCISForm">
+		<form:errors path="*" cssClass="errorblock" element="div" />
+	
 <h4 class="form_title">Create a Community</h4>
 <div class="hr dotted clearfix">&nbsp;</div>
 <ul>						
 <li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<label for="">Community Name</label>
+<form:input path="cisName" />
 <div class="clear"></div>
-<p class="error">Please, insert ...</p>
-</li> 
+<form:errors path="cisName" cssClass="error" /></li> 
+
+
 <li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<label for="">Community type</label>
+<form:input path="cisType" />
 <div class="clear"></div>
-<p class="error">Please, insert...</p>
+<form:errors path="cisType" cssClass="error" />
 </li> 
-<li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, insert ...</p>
-</li> 
+
+
+
+
 <li class="clearfix"> 
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<label for="">Description</label>
+<form:textarea path="cisDescription" rows="30" cols="30"/>
 <div class="clear"></div>
-<p  class="error">Please, enter ...</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, enter ...</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Lrge Text Area</label>
-<textarea name="" id="largetextarea" rows="30" cols="30"></textarea>
-<div class="clear"></div>
-<p class="error">Please, enter ...</p>
+<form:errors path="cisDescription" cssClass="cisDescription" />
 </li>
+
+<li class="clearfix"> 
+<label for="">Criteira</label>
+<p><p>
+<table id="existingCriteria"></table>
+<p>
+				<table id="critTable">
+					<tbody>
+					<tr id="critFistRow"><td>Attribute</td><td>Operator</td><td>Values</td></tr>
+
+					<tr>
+					<td><form:select id="attributeValue" path="dummyAtr" cssClass="select-wrapper"><form:options items="${listOfAttributes}"/></form:select></td>
+					<td><form:select id="operatorValue" path="dummyOperation" cssClass="select-wrapper" onclick="operationSelection();" onkeypress="operationSelection();"><form:options items="${listOfOperators}"/></form:select></td>
+					<td><form:input id="criteriaValue" path="dummyValue" /></td>
+					<td><form:input id="criteriaValue2" path="dummyValue2" /></td>
+					<td><button type="button" id="addCriteria">Add Criteria</button></td>
+									
+
+					</tr>
+
+
+					</tbody>
+				</table>
+
+
+
+</li>
+<!--
 <li class="clearfix"> 
 <label for="">Choose an option</label>
 <div class="select-wrapper">
@@ -133,6 +215,7 @@
 <div class="clear"></div>
 <p id="option" class="error">Please, select an option</p>
 </li> 
+
 <li class="clearfix"> 
 <label for="option">Choose check </label>
 <div class="option-group check">
@@ -148,20 +231,22 @@
 </li> 
 <li class="clearfix"> 
 <p class="success">Thank you! Success Message here.</p>
-<p class="error">Sorry, an error has occured. Please try again later.</p>	
+<p class="error">Sorry, an error has occured. Please try again later.</p>	-->
 <div id="button">
-<input type="submit" id="send_message" class="sendButton" value="Send" />
+<input type="submit" id="createCISbutton" class="sendButton" value="Create Community" />
 </div>				
 </li> 
 </ul> 
-</form>
+</form:form>
+
+
 </section>
 </section>
 <!-- Right Column / Sidebar -->
 <aside id="sidebar_right" class="grid_4">
 <div class="sidebar_top_BG"></div>
 <div class="hr dotted clearfix">&nbsp;</div>
-<section>
+<!-- <section>
 <header>
 <h3>Other Communities...</h3>
 </header>
@@ -189,11 +274,16 @@
 <li>Other Link - <a href="#">Link 3</a></li>
 </ul> 
 </section>
+-->
 <div class="hr dotted clearfix">&nbsp;</div>
 <div class="sidebar_bottom_BG"></div>
 </aside>
 <div class="hr grid_12 clearfix">&nbsp;</div>
 </div>
+
+
+
+
 <!-- #Main Content -->	
 <!-- Footer -->
 <footer class="container_12 clearfix">

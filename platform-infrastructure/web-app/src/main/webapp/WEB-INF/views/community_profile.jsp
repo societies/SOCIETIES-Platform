@@ -66,11 +66,14 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section  class="grid_12">
 <section>
-<div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="community_profile.html?cisId=${cisInfo.getCommunityJid()}">${cisInfo.getCommunityName()}</a>
 <br>
-<xc:if test="${response != 'null'}">
+<xc:if test="${not empty response}">
 	<div class="success">${response}</div>
 </xc:if>
+
+</div>
+
 </section>
 <div class="websearchbar">
 
@@ -112,11 +115,11 @@
 <p><strong>Activity Feed:</strong></p>
 <!-- Unordered -->
 
-<xc:if test="${acitivityAddError != 'null'}">
+<xc:if test="${not empty acitivityAddError}">
 	<div class="error">${acitivityAddError}</div>
 </xc:if>
 
-<form:form method="POST" action="community_profile.html" commandName="activityForm" name="AddActivityForm">
+<form:form method="POST" action="add_activity_cis_profile_page.html" commandName="activityForm" name="AddActivityForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		
 		<table id="addActivityFormInputs">
@@ -147,7 +150,7 @@
 		<li>
 ${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
 
-<xc:if test="${activity.getTarget() != 'null'}">
+<xc:if test="${activity.getTarget() != null}">
 at 	<font color="red">${activity.getTarget()}</font>
 </xc:if>  
 		</li>
@@ -174,10 +177,31 @@ at 	<font color="red">${activity.getTarget()}</font>
 <article class="post">
 &nbsp;
 </article>
-<p><em>Further Information:</em></p> 
-<p><strong>Location:</strong> Dublin, Ireland - 53°20' 52" N 6°1' 3" W</p>
-<p><strong>Related:</strong> Details</p>
-<p><strong>Other Title:</strong> Information</p>
+
+
+<p><em>Membership Criteria:</em></p> 
+
+<table id="membership Criteria" class="table">
+
+	<xc:if test="${cisInfo.getMembershipCrit().getCriteria().size() > 0}">
+		<tr id="critFistRow"><td>Attribute</td><td>Operator</td><td>Values</td></tr>
+		<xc:forEach var="criteria" items="${cisInfo.getMembershipCrit().getCriteria()}">
+			<tr>
+			<td>${criteria.getAttrib()}</td>
+			<td>${criteria.getOperator()}</td>
+			<td>${criteria.getValue1()}</td>
+			<xc:if test="${criteria.getValue2() != null}">
+				<td>${criteria.getValue2()}</td>
+			</xc:if>  
+			</tr>
+		</xc:forEach>
+	</xc:if>
+</table>
+
+<xc:if test="${cisInfo.getMembershipCrit().getCriteria().size() == 0}">
+<p>No membership criteria for this community</p> 
+</xc:if>
+
 </div>
 <div class="hr dotted clearfix">&nbsp;</div>
 </section>
@@ -194,32 +218,36 @@ at 	<font color="red">${activity.getTarget()}</font>
 <xc:forEach var="participant" items="${cisInfo.getParticipant()}">
 		<li>
 <a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a>
-<xc:if test="${isOwner == true}">
+<xc:if test="${isOwner == true && cisInfo.getOwnerJid() != participant.getJid()}">
 		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}?cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
 </xc:if>
  
 		</li>
 </xc:forEach>
 
-<form:form method="POST" action="community_profile.html" commandName="memberForm" name="AddMemberForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		
-		<table id="addMemberFormInputs">
-		<tr>
-		<td><form:input path="cssId" defaultValue="jid of member to be added"/></td>
-		<td><form:errors path="cssId" cssClass="error" /></td>
-		</tr>
-		
-		<tr>
-			<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
-			<td><form:errors path="cisId" cssClass="error" /></td>
-		</tr>
-			<tr>
-				<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
-			</tr>
-		</table>
-		
-</form:form>
+
+
+	<xc:if test="${isOwner == true}">
+		<form:form method="POST" action="add_member_cis_profile_page.html" commandName="memberForm" name="AddMemberForm">
+				<form:errors path="*" cssClass="errorblock" element="div" />
+				
+				<table id="addMemberFormInputs">
+				<tr>
+				<td><form:input path="cssJid" defaultValue="jid of member to be added"/></td>
+				<td><form:errors path="cssJid" cssClass="error" /></td>
+				</tr>
+				
+				<tr>
+					<td><form:input path="cisJid" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+					<td><form:errors path="cisJid" cssClass="error" /></td>
+				</tr>
+					<tr>
+						<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
+					</tr>
+				</table>
+				
+		</form:form>		
+	</xc:if>
 
 
 </ul>
@@ -251,6 +279,11 @@ $(document).ready(function(){
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
 	 };
+	 
+	 document.getElementById('addMemberButton').onclick = function() {
+		 document.AddMemberForm.submit();
+		 };
+
 	 
 	 //	 document.getElementById('getPolicyButton').onclick = function createPolicyWindow () { 
 	//		var htmlText = ${priacyPolicyString};
