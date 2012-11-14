@@ -2,11 +2,14 @@ package org.societies.webapp.models;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.societies.api.cis.attributes.Rule;
 import org.springframework.util.AutoPopulatingList;
 
 public class CreateCISForm {
 
+	@NotNull
 	private String cisName;
 	private String cisDescription;
 	private String cisType;

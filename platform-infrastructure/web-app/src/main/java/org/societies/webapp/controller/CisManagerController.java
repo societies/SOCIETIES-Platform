@@ -27,13 +27,16 @@ package org.societies.webapp.controller;
 
 
 import java.lang.reflect.Field;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
@@ -42,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.attributes.Rule.OperationType;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
@@ -133,24 +138,65 @@ public class CisManagerController {
 		@RequestMapping(value = "/create_community.html", method = RequestMethod.POST)
 		public ModelAndView createCommunityPost(@Valid CreateCISForm createCISform,  BindingResult result, Map model){
 			
+			String response = "model error creating community";
+			
 			if(result.hasErrors()){
 				
-				//model.put("acitivityAddError", "Error Adding Activity");
 				return new ModelAndView("create_community", model) ;
 			}
-			String str = createCISform.getCisName();
+			
+
+
+			
+			String cisName = createCISform.getCisName();
+			String cisDescription = createCISform.getCisDescription();
+			String cisType = createCISform.getCisType();
+			
+			// building the criteria
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
 			
 			if( createCISform.getRuleArray().size() >0){
 				for (MembershipCriteriaForm temp :  createCISform.getRuleArray()) {
-					if(false == temp.isDeleted())
-						str += ", " + temp.getAttribute();
+					if(false == temp.isDeleted()){
+						// adding the criteria to the list
+						MembershipCriteria m = new MembershipCriteria();
+						try{
+							ArrayList<String> values = new ArrayList<String>();
+							values.add(temp.getValue1());
+							if (null != temp.getValue2() && false == temp.getValue2().isEmpty())
+								values.add(temp.getValue2());
+							
+							Rule r = new Rule(temp.getOperator(),values);
+							m.setRule(r);
+							cisCriteria.put(temp.getAttribute(), m);
+						}catch(InvalidParameterException e){
+							LOG.debug("error addng rule on webapp!");
+							e.printStackTrace();
+						}
+						
+					}
 				}
 			}else{
-				LOG.debug("empty rules");
-				str += ", empty rules";
+				LOG.debug("empty rules on webapp cis manager controller");
 			}
 
-			return yourCommunitiesListPage(str);
+			ICisOwned icis = null;
+			try {
+				icis = this.cisManager.createCis(cisName, cisType, cisCriteria, cisDescription).get();
+			} catch (InterruptedException e) {
+				response = "failure creating cis";
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				response = "failure creating cis";
+				e.printStackTrace();
+			}
+			if(null != icis)
+				response = "CIS " + icis.getCisId() + " created";
+			else
+				response = "failure creating cis";
+			
+
+			return yourCommunitiesListPage(response);
 			//return new ModelAndView("create_community", model) ;
 		}
 
