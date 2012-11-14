@@ -321,8 +321,12 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	public void registerForContextUpdate(IIdentity id,
 			PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId) {
 		try {
-			this.ctxBroker.registerForChanges(this, ctxAttributeId);
-			this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType());
+			if (isAlreadyRegistered(ctxAttributeId)){
+				this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType()+" but I'm already registered for it.");
+			}else{
+				this.ctxBroker.registerForChanges(this, ctxAttributeId);
+				this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType());
+			}
 
 		} catch (CtxException e) {
 			logging.error(e.getMessage());
@@ -347,6 +351,33 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 	}
 
+	private boolean isAlreadyRegistered(CtxAttributeIdentifier id){
+		for (CtxAttributeIdentifier ctxAttrId : this.prefMgrList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.dianneList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.cauiList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.cristList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+		return false;
+
+	}
 	private void addtoList(CtxAttributeIdentifier ctxId,
 			List<CtxAttributeIdentifier> list) {
 		for (CtxAttributeIdentifier Id : list) {
@@ -999,7 +1030,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 				logging.debug("Thread of handleInternalEvent finished executing");
 			}
 		}.start();
