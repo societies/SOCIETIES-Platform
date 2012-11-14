@@ -226,10 +226,12 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public void storeHoCAttributeTuples(CtxAttribute ctxAttribute){
 
 		//String tupleAttrType = "tuple_"+primaryAttr.getType().toString();
-		//LOG.info("storing hoc tuples for " +ctxAttribute.getId());
+		if (LOG.isDebugEnabled())
+			LOG.debug("storing hoc tuples for " +ctxAttribute.getId());
 
 		String tupleAttrType = "tuple_"+ctxAttribute.getId().getType().toString()+"_"+ctxAttribute.getId().getObjectNumber().toString();
-		//LOG.info("store: tuple attr type "+ tupleAttrType);
+		if (LOG.isDebugEnabled())
+			LOG.debug("store: tuple attr type "+ tupleAttrType);
 		// the attr that will maintain the tuples; 
 		CtxAttribute tupleAttr = null;
 		List<CtxHistoryAttribute> tupleValueList = new ArrayList<CtxHistoryAttribute>();
@@ -240,14 +242,16 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 			List<CtxIdentifier> tupleAttrIDsList = this.userCtxDBMgr.lookup(CtxModelType.ATTRIBUTE, tupleAttrType);
 			if(tupleAttrIDsList.size() > 0){
-				//		LOG.info("retrieved: "+ tupleAttrType);
+				if (LOG.isDebugEnabled())
+					LOG.debug("retrieved: "+ tupleAttrType);
 				//tuple_status retrieved
 
 				CtxAttributeIdentifier ctxAttrId = (CtxAttributeIdentifier) tupleAttrIDsList.get(0);
 
 				tupleAttr = (CtxAttribute) this.userCtxDBMgr.retrieve(ctxAttrId);
 			} else {
-				//	LOG.info("created: "+ tupleAttrType);
+				if (LOG.isDebugEnabled())
+					LOG.debug("created: "+ tupleAttrType);
 				//tuple_status created, dead code, the attribute is created by setHocTuples
 				tupleAttr = this.userCtxDBMgr.createAttribute(ctxAttribute.getScope(), tupleAttrType);
 			} 
@@ -255,14 +259,22 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			//prepare value of ctxAttribute
 			for (CtxAttributeIdentifier tupleAttrID : tupleListIds) {
 				//for one of the escorting attrIds retrieve all history and find the latest value
-
+				if (LOG.isDebugEnabled())
+					LOG.debug("Retrieving history for escorting attribute " + tupleAttrID);
+				
 				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, null, null);
+				if (LOG.isDebugEnabled())
+					LOG.debug("Retrieved history " + allValues);
 				if (allValues != null){
 					//finding latest hoc value
 					int size = allValues.size();
+					if (LOG.isDebugEnabled())
+						LOG.debug("Retrieved history size " + size);
 					int last = 0;
 					if (size >= 1){
-						last = size-1;    
+						last = size-1;
+						if (LOG.isDebugEnabled())
+							LOG.debug("Retrieved history last " + last);
 						CtxHistoryAttribute latestHoCAttr2 = allValues.get(last);
 						if (latestHoCAttr2 != null )tupleValueList.add(latestHoCAttr2);
 					}
