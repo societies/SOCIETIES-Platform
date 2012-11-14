@@ -177,10 +177,31 @@ at 	<font color="red">${activity.getTarget()}</font>
 <article class="post">
 &nbsp;
 </article>
-<p><em>Further Information:</em></p> 
-<p><strong>Location:</strong> Dublin, Ireland - 53°20' 52" N 6°1' 3" W</p>
-<p><strong>Related:</strong> Details</p>
-<p><strong>Other Title:</strong> Information</p>
+
+
+<p><em>Membership Criteria:</em></p> 
+
+<table id="membership Criteria" class="table">
+
+	<xc:if test="${cisInfo.getMembershipCrit().getCriteria().size() > 0}">
+		<tr id="critFistRow"><td>Attribute</td><td>Operator</td><td>Values</td></tr>
+		<xc:forEach var="criteria" items="${cisInfo.getMembershipCrit().getCriteria()}">
+			<tr>
+			<td>${criteria.getAttrib()}</td>
+			<td>${criteria.getOperator()}</td>
+			<td>${criteria.getValue1()}</td>
+			<xc:if test="${criteria.getValue2() != null}">
+				<td>${criteria.getValue2()}</td>
+			</xc:if>  
+			</tr>
+		</xc:forEach>
+	</xc:if>
+</table>
+
+<xc:if test="${cisInfo.getMembershipCrit().getCriteria().size() == 0}">
+<p>No membership criteria for this community</p> 
+</xc:if>
+
 </div>
 <div class="hr dotted clearfix">&nbsp;</div>
 </section>
@@ -197,7 +218,7 @@ at 	<font color="red">${activity.getTarget()}</font>
 <xc:forEach var="participant" items="${cisInfo.getParticipant()}">
 		<li>
 <a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a>
-<xc:if test="${isOwner == true}">
+<xc:if test="${isOwner == true && cisInfo.getOwnerJid() != participant.getJid()}">
 		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}?cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
 </xc:if>
  

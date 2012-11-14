@@ -108,6 +108,8 @@ public class CisManagerController {
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
+	// SHOW CREATE COMMUNITY
+	
 	@RequestMapping(value="/create_community.html",method = RequestMethod.GET)
 	public ModelAndView showCreateCommunityPage() {
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -126,15 +128,14 @@ public class CisManagerController {
 		for (int i=0; i<f.length; i++) attributes.add(f[i].getName());
 		model.put("listOfAttributes", attributes);
 		
-		//AutoPopulatingList<MembershipCriteriaForm> ruleArray = new AutoPopulatingList<MembershipCriteriaForm>(MembershipCriteriaForm.class);
-		//ruleArray.add( new MembershipCriteriaForm(attributes.get(0), operatorsList.get(0),
-		//	"","", true));
-		//model.put("ruleArray",ruleArray);
+
 		return new ModelAndView("create_community", model) ;
 		
 	}
 	
 
+	// CREATE COMMUNITY POST
+	
 		@RequestMapping(value = "/create_community.html", method = RequestMethod.POST)
 		public ModelAndView createCommunityPost(@Valid CreateCISForm createCISform,  BindingResult result, Map model){
 			
@@ -180,6 +181,7 @@ public class CisManagerController {
 				LOG.debug("empty rules on webapp cis manager controller");
 			}
 
+			// real creation of the CIS
 			ICisOwned icis = null;
 			try {
 				icis = this.cisManager.createCis(cisName, cisType, cisCriteria, cisDescription).get();
@@ -197,7 +199,7 @@ public class CisManagerController {
 			
 
 			return yourCommunitiesListPage(response);
-			//return new ModelAndView("create_community", model) ;
+
 		}
 
 	
