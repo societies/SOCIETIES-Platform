@@ -38,7 +38,7 @@
 	<!-- All Societies Android poms -->
 	<modules>
 		<module>SocietiesAndroidEvents/pom.xml</module>
-		<module>ContainerSocietiesAndroidEvents/container-clean.xml</module>
+		<!--module>ContainerSocietiesAndroidEvents/container-clean.xml</module-->
 		<module>ContainerSocietiesAndroidEvents/pom.xml</module>
 		<module>TestSocietiesAndroidEventsTest/pom.xml</module>
 	</modules>

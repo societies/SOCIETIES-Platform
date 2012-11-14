@@ -88,7 +88,14 @@
                         <version>${release.version}</version>
                         <type>apk</type>
                 </dependency>
-
+		<dependency>
+			<groupId>org.societies.android.platform.events</groupId>
+   			<artifactId>SocietiesPlatformEvents</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+   			<scope>provided</scope>
+		</dependency>
+                
            <dependency>
                <groupId>emma</groupId>
                <artifactId>emma</artifactId>
