@@ -587,9 +587,11 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(ctxIdentifier);
 
 					CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
-
+					
 					if (null!=ctxAttribute){
+						
 						if (ctxAttribute instanceof CtxAttribute) {
+							logging.debug("Received event and retrieved value "+ctxAttribute.getStringValue()+" for context attribute: "+ctxAttribute.getType());
 							CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
 							IIdentity userId = idm.fromJid(ctxId.getOperatorId());
 							List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute);
@@ -608,7 +610,11 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 							}
 							logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
 							decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
+						}else{
+							logging.debug("retrieved attribute but was not instanceof CtxAttribute");
 						}
+					}else{
+						logging.debug("Tried to retrieve ctxAttribute from ctxDB onModification() but the attribute is null");
 					}
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
