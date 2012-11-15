@@ -37,7 +37,11 @@
 //GET THE METHOD CALLED FROM THE FORM
 Map model = request.getParameterMap();
 String[] methodCalledArr = (String[]) model.get("method");
-String methodCalled = methodCalledArr[0];
+String methodCalled;
+if(methodCalledArr != null)
+	methodCalled = methodCalledArr[0];
+else
+	methodCalled = "GetLocalServices";
 
 String node = "";
 if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
@@ -52,6 +56,7 @@ String myNode = (String) request.getAttribute("myNode");
 %>
 <a href="javascript:history.back()">&lt;--back</a>
 <h4>${result}</h4>
+
 <script language="javascript">
 function updateForm(serviceID, toDo) {
 	document.forms["scForm"]["service"].value = serviceID;
@@ -60,7 +65,7 @@ function updateForm(serviceID, toDo) {
 } 
 </script>
 
-<form method="POST" action="servicecontrol.html" id="scForm" name="scForm">
+<form method="POST" action="servicecontrol.html" id="scForm" name="scForm" enctype="multipart/form-data">
 <input type="hidden" name="service" id="service">
 <input type="hidden" name="method" id="method">
 <input type="hidden" name="endpoint" id="endpoint"/>
@@ -110,7 +115,7 @@ function updateForm(serviceID, toDo) {
 				<tr>
 		    	<td><%= myService.getServiceName() %></td>
 		     	<td><%= myService.getServiceDescription() %></td>
-		        <td><%= myService.getServiceType() %></td>
+		        <td><%= myService.getAuthorSignature() %></td>
 		        <td><%= myService.getServiceStatus() %></td>      
 		        <td>			
 		         <%
@@ -136,6 +141,10 @@ function updateForm(serviceID, toDo) {
 						<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
 						<%
 					}
+					%>
+					<input type="button" value="uninstall" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'UninstallService')" >
+					<%
+					
 				}
 				else{
 					%>
@@ -207,6 +216,13 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
 	%>
 	</table>
 	<% 
+} else{
+
+	%>
+	<h3>Install new service</h3>
+	<input type="file" name="fileData">
+	<input type="button" value="Install" onclick="updateForm('NONE', 'InstallService')" >
+	<%
 }
 %>
 

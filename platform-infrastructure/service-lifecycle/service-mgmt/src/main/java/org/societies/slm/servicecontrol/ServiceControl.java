@@ -64,6 +64,7 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
@@ -295,16 +296,17 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				logger.info("Service " + service.getServiceName() + " has been started.");				
 				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
 			}
 			else{
 				logger.info("Service " + service.getServiceName() + " has NOT been started successfully.");	
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
 			}
-			
-			synchronized(this){
-				installServiceMap.remove(bundleId);
-			}
-			
+
 			return new AsyncResult<ServiceControlResult>(returnResult);
 			
 		} catch(Exception ex){
@@ -401,7 +403,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Now we need to stop the bundle
 			if(logger.isDebugEnabled())
 				logger.debug("Attempting to stop the bundle: " + serviceBundle.getSymbolicName());
-
+			
+			//Before we start the bundle we prepare the entry on the hashmap
+			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
+			Long bundleId = new Long(serviceBundle.getBundleId());
+			
+			synchronized(this){		
+				installServiceMap.put(bundleId, idList);
+			}
+			
 			serviceBundle.stop();
 			
 			if(logger.isDebugEnabled())
@@ -410,6 +420,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(serviceBundle.getState() == Bundle.RESOLVED ){
 				logger.info("Service " + service.getServiceName() + " has been stopped.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+				Service serviceStopped = idList.take();
+				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			else{
@@ -743,16 +760,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
 				}
 				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
 			}
 			else{
 				logger.info("Bundle " + newBundle.getSymbolicName()  + " has been installed, but not activated.");
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);				
 			}
 
-			synchronized(this){
-				installServiceMap.remove(bundleId);
-			}
-			
 			return new AsyncResult<ServiceControlResult>(returnResult);
 			
 		} catch (Exception ex) {
@@ -963,7 +979,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
-				sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+				if(service.getServiceStatus().equals(ServiceStatus.STARTED))
+					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+				
 				sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service);
 				
 				return new AsyncResult<ServiceControlResult>(returnResult);
@@ -982,15 +1000,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			logger.info("Uninstalling service " + service.getServiceName());
 			
-			/*
+			
 			//Before we uninstall the bundle we prepare the entry on the hashmap
 			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
 			Long bundleId = new Long(serviceBundle.getBundleId());
 			
-			synchronized(this){		
+			synchronized(this){
 				uninstallServiceMap.put(bundleId, idList);
 			}
-				*/
+				
 			
 			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: " + serviceBundle.getSymbolicName());
 			
@@ -1000,6 +1018,31 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Bundle: " + serviceBundle.getSymbolicName() + " has been uninstalled.");
 
 				returnResult.setMessage(ResultMessage.SUCCESS);
+
+				Service serviceUninstalled = idList.take();
+				
+				synchronized(this){
+					uninstallServiceMap.remove(bundleId);
+				}
+				
+				if(logger.isDebugEnabled())
+					logger.debug("Now we need to delete the file: " + service.getServiceLocation());
+				
+				String serviceLocation = service.getServiceLocation();
+				int index = serviceLocation.indexOf('@');	
+				String newServiceLocation = serviceLocation.substring(index+1);
+
+				URI bundleLocation = new URI(newServiceLocation);
+	
+				File localBundle = new File(bundleLocation);
+				if(localBundle.isFile()){
+					boolean delete = localBundle.delete();
+					if(logger.isDebugEnabled())
+						logger.debug("Deleting file result: " + delete);
+					if(!delete)
+						localBundle.deleteOnExit();
+				}
+				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 				
 			} else{
@@ -1040,13 +1083,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	protected static boolean installingBundle(long bundleId){
-		if(logger.isDebugEnabled()) logger.debug("installingBundle Called");
+		if(logger.isDebugEnabled()) logger.debug("installingBundle Called for bundleId: " + bundleId );
 		return installServiceMap.containsKey(new Long(bundleId));
 	}
 	
 	protected static boolean uninstallingBundle(long bundleId){
-		if(logger.isDebugEnabled()) logger.debug("uninstallingBundle Called");
-		return installServiceMap.containsKey(new Long(bundleId));
+		if(logger.isDebugEnabled()) logger.debug("uninstallingBundle Called for bundleId: " + bundleId );
+		return uninstallServiceMap.containsKey(new Long(bundleId));
 	}	
 	
 	protected static void serviceInstalled(long bundleIdentifier, Service newService){

@@ -89,6 +89,9 @@ for(Service myService : myServices ){
 			<!-- 		<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" > -->
 			<%
 		}
+		%>
+		<input type="button" value="uninstall" onclick="updateForm('<%=ServiceModelUtils.getServiceId64Encode(myService.getServiceIdentifier())%>', 'UninstallService')" >
+		<%
 	} else{
 		%>
 		Device Management
