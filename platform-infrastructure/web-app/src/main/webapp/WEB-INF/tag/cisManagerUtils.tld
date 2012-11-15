@@ -7,7 +7,7 @@
     <uri>http://cisUtils</uri>
     <function>
       <name>isJidOnCommunityCollection</name>
-      <function-class>isJidOnCommunityCollection.CisManagerUtils</function-class>
+      <function-class>org.societies.webapp.service.CisManagerUtils</function-class>
       <function-signature>boolean isJidOnCommunityCollection(java.util.Collection,
           java.lang.String)</function-signature>
   </function>

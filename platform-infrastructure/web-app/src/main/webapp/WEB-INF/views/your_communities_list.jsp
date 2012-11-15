@@ -189,12 +189,12 @@
 <ul class="sidebar">
 <xc:forEach var="advertisement" items="${cisAdverts}" varStatus="stats">
 
-	
+<xc:if test="${cisUtils:isJidOnCommunityCollection(cisrecords, advertisement.getId()) == false}">	
 		<li>
 		<a href="community_profile.html?cisId=${advertisement.getId()}">${advertisement.getName()}</a>
 			<a class="furtherinfo-link" onclick="javascript:submitJoin(${stats.count -1})" >Join</a>
 		</li>
-	
+</xc:if>	
 
 
 
