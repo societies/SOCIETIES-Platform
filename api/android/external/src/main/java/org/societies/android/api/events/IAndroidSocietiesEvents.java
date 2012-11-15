@@ -13,6 +13,24 @@ package org.societies.android.api.events;
  *
  */
 public interface IAndroidSocietiesEvents {
+	
+	/**
+	 * Societies Events intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.events.ReturnValue";
+
+	public static final String PUBLISH_EVENT = "org.societies.android.platform.events.PUBLISH_EVENT";
+	public static final String SUBSCRIBE_TO_ALL_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_ALL_EVENTS";
+	public static final String SUBSCRIBE_TO_EVENT = "org.societies.android.platform.events.SUBSCRIBE_TO_EVENT";
+	public static final String SUBSCRIBE_TO_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_EVENTS";
+	public static final String UNSUBSCRIBE_FROM_ALL_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_ALL_EVENTS";
+	public static final String UNSUBSCRIBE_FROM_EVENT = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENT";
+	public static final String UNSUBSCRIBE_FROM_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENTS";
+	public static final String NUM_EVENT_LISTENERS = "org.societies.android.platform.events.NUM_EVENT_LISTENERS";
+
 	/**
 	 * Android intent Societies platform events. The Pubsub event nodes are the final part of the intent 
 	 * 
@@ -47,9 +65,9 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param societiesIntent specific event intent
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean subscribeToEvent(String client, String societiesIntent);
+	int subscribeToEvent(String client, String societiesIntent);
 	
 	/**
 	 * Subscribe to Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -57,26 +75,26 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param intentFilter event filter
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean subscribeToEvents(String client, String intentFilter);
+	int subscribeToEvents(String client, String intentFilter);
 	
 	/**
 	 * Subscribe to all platform events. This should only be used if really required.
 	 * 
 	 * @param client app package 
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean subscribeToAllEvents(String client);
+	int subscribeToAllEvents(String client);
 	
 	/**
 	 * Un-subscribe from a specified Societies platform event (Android Intent)
 	 * 
 	 * @param client app package 
 	 * @param societiesIntent specific event intent
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean unSubscribeFromEvent(String client, String societiesIntent);
+	int unSubscribeFromEvent(String client, String societiesIntent);
 	
 	/**
 	 * Un-subscribe from Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -84,17 +102,17 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param intentFilter event filter
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean unSubscribeFromEvents(String client, String intentFilter);
+	int unSubscribeFromEvents(String client, String intentFilter);
 	
 	/**
 	 * Un-subscribe from all current platform event subscriptions.
 	 * 
 	 * @param client app package 
-	 * @return boolean - returned via Android intent
+	 * @return int - number of subscribed events
 	 */
-	boolean unSubscribeFromAllEvents(String client);
+	int unSubscribeFromAllEvents(String client);
 	
 	/**
 	 * Publish an event to the Societies platform for consumption by other CSS nodes

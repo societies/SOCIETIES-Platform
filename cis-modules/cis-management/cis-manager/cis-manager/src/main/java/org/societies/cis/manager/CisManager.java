@@ -175,7 +175,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
-	
+	private boolean privacyPolicyNegotiationIncluded;
 	
 	public IUserFeedback getiUsrFeedback() {
 		return iUsrFeedback;
@@ -378,7 +378,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
-	 * @param mode membership type, e.g 1= read-only.
 	 * TODO define mode better.
 	 * @return link to the {@link ICisEditor} representing the new CIS, or 
 	 * null if the CIS was not created.
@@ -1649,6 +1648,15 @@ public class JoinCallBack implements ICisManagerCallback{
 			
 		}
 		return true;
+	}
+
+	public boolean isPrivacyPolicyNegotiationIncluded() {
+		return privacyPolicyNegotiationIncluded;
+	}
+
+	public void setPrivacyPolicyNegotiationIncluded(
+			boolean privacyPolicyNegotiationIncluded) {
+		this.privacyPolicyNegotiationIncluded = privacyPolicyNegotiationIncluded;
 	}
 
 
