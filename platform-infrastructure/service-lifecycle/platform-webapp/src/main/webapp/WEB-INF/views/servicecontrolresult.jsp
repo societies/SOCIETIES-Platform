@@ -26,7 +26,7 @@
 <br/>
 -->
 
-<h4>Waiting...</h4>
+<h4>${result}</h4>
 
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

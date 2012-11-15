@@ -38,13 +38,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.CtxModelObject;
@@ -89,6 +89,11 @@ public class ContextController {
 	private static final String CTX_AVAILABLE_ID	= "idList";
 	
 	private static final String PARENT				= "parent";
+
+	private static final String ATTRIBUTE_LABEL 	= "attribute_label";
+	private static final String ENTITY_LABEL 		= "entity_label";
+	private static final String ASSOCIATION_LABEL 	= "association_label";
+	
 	
 	@Autowired
 	private ICtxBroker internalCtxBroker;
@@ -109,14 +114,37 @@ public class ContextController {
 	 * @return List of Strings that compose the enumeration class.
 	 */
 	private List<String> getTypesList(Class name) {
-		 Field[] 	fields = name.getDeclaredFields();
+		logger.info("Extracting parmas from: " + name.getCanonicalName());
+		Field[] 	fields = name.getDeclaredFields();
 		 List<String> results = new ArrayList<String>();
 		 for (Field field: fields){
-			 results.add(field.getName().toLowerCase());
+//			 if (field.isEnumConstant()){
+//				 results.add(field.getName());
+//				 logger.info("add  Enum: " + field.getName());
+//			 } 
+//			 else 
+				try {
+					//logger.info("This is not an Enumeration!!! " + field.get(null));
+					logger.info("add " + field.get(null));
+					String field_string = ""+field.get(null);
+					results.add(field_string);
+				} catch (IllegalArgumentException e) {
+					logger.error("Error casting to String:"+e.getLocalizedMessage());
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					logger.error("Error casting to String:"+e.getLocalizedMessage());
+					e.printStackTrace();
+				}
+			 
+			 
 			 //logger.info("add fields "+field.getName());
 		 }
+		 
+		 logger.info(" Return " + results.size() + "elements");
 		 return results;
 	}
+	
+	
 	
 	
 
@@ -128,13 +156,30 @@ public class ContextController {
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(CTX_FORM, new ContextForm());
+		
 		model.put(CTX_MODELS, getTypesList(CtxModelType.class));
-		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
-		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
-		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+		
+		List<String> values =  getTypesList(org.societies.api.context.model.CtxAttributeTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxAttributeTypes.class));
+		model.put(ATTRIBUTE_TYPES, values);
+		
+		
+		values =  getTypesList(org.societies.api.context.model.CtxEntityTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxEntityTypes.class));
+		model.put(ENTITY_TYPES, values);
+		
+		
+		values =  getTypesList(org.societies.api.context.model.CtxAssociationTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxAssociationTypes.class));
+		model.put(ASSOCITATION_TYPES, values);	
+		
+		
 		model.put(CTX_RESULTS, getAllCtxEntityData());
-		model.put(CTX_AVAILABLE_ID, getAllIDs());			
+		model.put(CTX_AVAILABLE_ID, getAllIDs());		
 		model.put(PARENT, "<a href='#' onclick='javascript:location.href=\"context.html\"'> ROOT </a>");
+		model.put(ATTRIBUTE_LABEL, CtxModelType.ATTRIBUTE.name().toString());
+		model.put(ASSOCIATION_LABEL, CtxModelType.ASSOCIATION.name().toString());
+		model.put(ENTITY_LABEL, CtxModelType.ENTITY.name().toString());
 		model.put(ACTIONS, ACTION_LIST);
 
 
@@ -380,16 +425,31 @@ public class ContextController {
 		else if (elm.getModelType().equals(CtxModelType.ASSOCIATION)){
 			CtxAssociation assoc = (CtxAssociation) elm;
 			String childs = "";
+			
+			int index= 1;
 			for(CtxEntityIdentifier assocID: assoc.getChildEntities()){
-				if (childs.length()>0) childs +=",";
-				childs += assocID.getUri();
+				
+				childs += "[Child] " +genLink(assocID.getUri(),  assocID.getUri()) + "\n";
+				index++;
 			}
-			ctxBean.setValue("owner:" +assoc.getOwnerId() + "-->" +childs);
+			
+			String print_value  ="";
+			
+			if (assoc.getParentEntity()!=null){
+				print_value = "[Parent] "+genLink(assoc.getParentEntity().getUri(), assoc.getParentEntity().getUri())+ "\n\n";
+			}
+			
+			print_value +=  childs; 
+			ctxBean.setValue(print_value);
 			
 		}
 		return ctxBean;
 		
 	}	
+	
+	private String genLink(String id, String label){
+		return "<a href='#' onclick='retrieve(\""+ id +"\");'>"+label+"</a>";
+	}
 
 	private String generateParent(String id){
 		
@@ -423,11 +483,29 @@ public class ContextController {
 		logger.info("====== CONTEXT GUI --> POST");
 		
 		model.put(CTX_MODELS, getTypesList(CtxModelType.class));
-		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
-		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
-		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
-		model.put(CTX_AVAILABLE_ID, getAllIDs());
 		
+//		model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
+//		model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
+//		model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+//		
+		List<String> values =  getTypesList(org.societies.api.context.model.CtxAttributeTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxAttributeTypes.class));
+		model.put(ATTRIBUTE_TYPES, values);
+		
+		
+		values =  getTypesList(org.societies.api.context.model.CtxEntityTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxEntityTypes.class));
+		model.put(ENTITY_TYPES, values);
+		
+		
+		values =  getTypesList(org.societies.api.context.model.CtxAssociationTypes.class);
+		values.addAll(         getTypesList(org.societies.api.internal.context.model.CtxAssociationTypes.class));
+		model.put(ASSOCITATION_TYPES, values);	
+		
+		model.put(CTX_AVAILABLE_ID, getAllIDs());
+		model.put(ATTRIBUTE_LABEL, CtxModelType.ATTRIBUTE.name().toString());
+		model.put(ASSOCIATION_LABEL, CtxModelType.ASSOCIATION.name().toString());
+		model.put(ENTITY_LABEL, CtxModelType.ENTITY.name().toString());
 		
 		
 		model.put(PARENT, generateParent(ctxForm.getCtxID()));

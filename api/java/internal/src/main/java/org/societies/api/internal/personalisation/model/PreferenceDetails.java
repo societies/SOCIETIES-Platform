@@ -113,13 +113,13 @@ public class PreferenceDetails implements Serializable {
 	@Override
 	public boolean equals(Object details){
 		if (details instanceof PreferenceDetails){
-			if (compareServiceType(((PreferenceDetails) details).getServiceType())){
-				if (compareServiceID(((PreferenceDetails) details).getServiceID())){
-					if (comparePreferenceName(((PreferenceDetails) details).getPreferenceName())){
-						return true;
-					}
+			//does not compare serviceTypes anymore
+			if (compareServiceID(((PreferenceDetails) details).getServiceID())){
+				if (comparePreferenceName(((PreferenceDetails) details).getPreferenceName())){
+					return true;
 				}
 			}
+
 		}
 		return false;
 	}
@@ -129,15 +129,15 @@ public class PreferenceDetails implements Serializable {
 	 * @param details
 	 */
 	public boolean equalsServiceOnlyDetails(PreferenceDetails details){
-		
-			if (compareServiceType(((PreferenceDetails) details).getServiceType())){
-				if (compareServiceID(((PreferenceDetails) details).getServiceID())){
-					
-						return true;
-					
-				}
+
+		if (compareServiceType(((PreferenceDetails) details).getServiceType())){
+			if (compareServiceID(((PreferenceDetails) details).getServiceID())){
+
+				return true;
+
 			}
-		
+		}
+
 		return false;
 	}
 
@@ -149,13 +149,13 @@ public class PreferenceDetails implements Serializable {
 	public boolean equalsServiceOnlyDetails(String serviceType, ServiceResourceIdentifier serviceID){
 		if (compareServiceType(serviceType)){
 			if (compareServiceID(serviceID)){
-				
-					return true;
-				
+
+				return true;
+
 			}
 		}
-	
-	return false;
+
+		return false;
 	}
 
 	public String getPreferenceName(){
@@ -201,18 +201,18 @@ public class PreferenceDetails implements Serializable {
 		}else{
 			st = this.serviceType;
 		}
-		
+
 		String sID;
 		if (this.serviceID==null){
 			sID="GenericID";
 		}else{
 			sID = this.serviceID.getServiceInstanceIdentifier();
 		}
-		
-		
+
+
 		return "ServiceType: "+st+"\n"
-				+ "ServiceID: "+sID+"\n"
-				+ "PreferenceName: "+this.preferenceName+"\n";
+		+ "ServiceID: "+sID+"\n"
+		+ "PreferenceName: "+this.preferenceName+"\n";
 	}
 
 }

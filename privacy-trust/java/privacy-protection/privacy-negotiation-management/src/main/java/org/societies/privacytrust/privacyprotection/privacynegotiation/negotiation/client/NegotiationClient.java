@@ -121,10 +121,6 @@ public class NegotiationClient implements INegotiationClient {
 		
 	}
 	
-	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
-	}
-	
 
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
@@ -134,8 +130,8 @@ public class NegotiationClient implements INegotiationClient {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		log("Received Provider RequestPolicy!");
-		log(policy.toString());
+		this.logging.debug("Received Provider RequestPolicy!");
+		//this.logging.debug(policy.toString());
 		this.requestPolicy = policy;
 		List<String> notFoundTypes = this.dataTypesExist(policy);
 		String str = "";
@@ -143,7 +139,7 @@ public class NegotiationClient implements INegotiationClient {
 			str = str.concat(s+"\n");
 		}
 		if (notFoundTypes.size()>0){
-			log("Service requires these contextTypes\n"+str+"which don't exist");
+			this.logging.debug("Service requires these contextTypes\n"+str+"which don't exist");
 			this.userFeedback.showNotification("Error starting service\n Service requires these data types\n"+str+"which don't exist in your profile");
 			//JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
@@ -157,12 +153,14 @@ public class NegotiationClient implements INegotiationClient {
 		}
 		ClientResponsePolicyGenerator policyGen = new ClientResponsePolicyGenerator(this.policyMgr);
 		ResponsePolicy response = policyGen.generatePolicy(policy); 
-
+		this.logging.debug("Generated ResponsePolicy. Negotiating with other party");
 		Future<ResponsePolicy> responsePolicy = this.negotiationAgentRemote.negotiate(policy.getRequestor(), response);
+		this.logging.debug("Received reply ResponsePolicy");
 		this.myPolicies.put(response.getRequestor(), response);
 		try {
 			
 			this.receiveNegotiationResponse(responsePolicy.get());
+			
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -178,9 +176,10 @@ public class NegotiationClient implements INegotiationClient {
 
 	@Override
 	public void receiveNegotiationResponse(ResponsePolicy policy) {
-		log("Received response policy from Provider!");
-		log(policy.toString());
+		this.logging.debug("Received response policy from Provider!");
+		//this.logging.debug(policy.toString());
 		if (policy.getStatus().equals(NegotiationStatus.FAILED)){
+			this.logging.debug("Negotiation Failed by provider");
 			String requestorStr = "";
 			if (policy.getRequestor() instanceof RequestorCis){
 				requestorStr = "Cis administrator";
@@ -205,8 +204,10 @@ public class NegotiationClient implements INegotiationClient {
 				new TimedNotificationGUI().showGUI("Ignoring an invalid response policy", "message from: Privacy Policy Negotiation Client");
 				return;
 			}
+			this.logging.debug("Checking other party's response policy against user's response policy");
 			ClientResponseChecker checker = new ClientResponseChecker();
 			if (checker.checkResponse(myResponsePolicy, policy)){
+				this.logging.debug("ResponsePolicy is OK, creating agreement");
 				IAgreement agreement = new NegotiationAgreement(policy);
 				agreement.setUserPublicIdentity(this.userIdentity);
 				
@@ -218,9 +219,11 @@ public class NegotiationClient implements INegotiationClient {
 				List<IIdentityOption> idOptions  = this.idS.processIdentityContext(agreement);
 				IIdentity selectedIdentity = this.selectIdentity(idOptions, agreement);
 				//this.privacyCallback.setInitialAgreement(agreement);
+				this.logging.debug("Identity selected: "+selectedIdentity.getJid());
 				this.setFinalIdentity(selectedIdentity, policy.getRequestor());
 
 			}else{
+				this.logging.debug("Received ResponsePolicy does not match user's ResponsePolicy, failing negotiation");
 				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
 						+"did not match user response policy.\n"
 						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");
@@ -292,15 +295,17 @@ public class NegotiationClient implements INegotiationClient {
 				byte[] signature = finaliser.signAgreement(agreement);
 				Key publicKey = finaliser.getPublicKey();
 				AgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
-				
+				this.logging.debug("Sending agreement to other party");
 				Future<Boolean> ack = this.negotiationAgentRemote.acknowledgeAgreement(envelope);
+				this.logging.debug("Received acknowledgement of agreement from other party");
 				if (null==ack){
 					this.userFeedback.showNotification("Negotiation error: Did not receive acknowledgement for receiving Negotiation Agreement from service or CIS");
 					//JOptionPane.showMessageDialog(null, "ack is null");
 				}
+				//TODO: is this line needed? shouldn't this be called by the remoteComm when it receives the result of the acknowledgeAgreement(envelope) method?
 				this.acknowledgeAgreement(requestor, envelope, ack.get());
 			}else{
-				log("Agreement not found for requestor: "+requestor.toString()+"\nIs this negotiation process obsolete? Ignoring call to setFinalIdentity()");
+				this.logging.debug("Agreement not found for requestor: "+requestor.toString()+"\nIs this negotiation process obsolete? Ignoring call to setFinalIdentity()");
 				
 			}
 		}
@@ -319,7 +324,7 @@ public class NegotiationClient implements INegotiationClient {
 	@Override
 	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b) {
 		if (b){
-			log("Acknowledged Agreement - creating access control objects");			
+			this.logging.debug("Acknowledged Agreement - creating access control objects");			
 			try {
 				//TODO: uncomment lines
 				if (requestor instanceof RequestorCis){
@@ -329,33 +334,37 @@ public class NegotiationClient implements INegotiationClient {
 				}else{
 					this.policyAgreementMgr.updateAgreement(envelope.getAgreement().getRequestor(), envelope);
 				}
-
+				this.logging.debug("Agreement stored");
 				List<ResponseItem> requests = envelope.getAgreement().getRequestedItems();
 				for (ResponseItem responseItem : requests){
 					privacyDataManager.updatePermission(requestor, responseItem);
 				}
-				
+				this.logging.debug("Permissions updated");
 				InternalEvent event = this.createSuccessfulNegotiationEvent(envelope);
 				try {
+					this.logging.debug("Sending successful negotiation event");
 					this.eventMgr.publishInternalEvent(event);
+					this.logging.debug("Successful negotiation event sent");
 				} catch (EMSException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					this.log("Unable to post "+event.geteventType()+" event");
+					this.logging.debug("Unable to post "+event.geteventType()+" event");
 				}
 			} catch (PrivacyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
-			log("DID NOT Acknowledge Agreement");
+			this.logging.debug("Provider DID NOT Acknowledge Agreement");
 			InternalEvent event = this.createFailedNegotiationEvent(requestor);
 			try {
+				this.logging.debug("Sending failed negotiation event");
 				this.eventMgr.publishInternalEvent(event);
+				this.logging.debug("Failed negotiation event sent");
 			} catch (EMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				this.log("Unable to post "+event.geteventType()+" event");
+				this.logging.debug("Unable to post "+event.geteventType()+" event");
 			}
 		}
 
@@ -369,7 +378,7 @@ public class NegotiationClient implements INegotiationClient {
 	 */
 	public void startNegotiation(Requestor requestor){
 		
-		log("Starting negotiation with: "+requestor.toString());
+		this.logging.debug("Starting negotiation with: "+requestor.toString());
 		try {
 			this.receiveProviderPolicy(this.negotiationAgentRemote.getPolicy(requestor).get());
 		} catch (InterruptedException e) {
@@ -413,12 +422,22 @@ public class NegotiationClient implements INegotiationClient {
 	private InternalEvent createFailedNegotiationEvent(Requestor requestor){
 		FailedNegotiationEvent event = new FailedNegotiationEvent(requestor);
 		InternalEvent iEvent = new InternalEvent(EventTypes.FAILED_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
+		this.logging.debug("Failed negotiation Event: \n"+
+		"EventName: "+iEvent.geteventName()+
+		"\nEventSource:"+iEvent.geteventSource()+
+		"\nEventType"+iEvent.geteventType()+
+		"\nEventInfo:"+iEvent.geteventInfo());
 		return iEvent;
 	}
 
 	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) {
 		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL);
 		InternalEvent iEvent = new InternalEvent(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
+		this.logging.debug("Successfull negotiation Event: \n"+
+		"EventName: "+iEvent.geteventName()+
+		"\nEventSource:"+iEvent.geteventSource()+
+		"\nEventType"+iEvent.geteventType()+
+		"\nEventInfo:"+iEvent.geteventInfo());
 		return iEvent;
 	}
 	private ResponsePolicy findMyResponsePolicy(ResponsePolicy providerPolicy){
@@ -458,9 +477,12 @@ public class NegotiationClient implements INegotiationClient {
 
 	@Override
 	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy) {
+		this.logging.debug("Starting new negotiation with: "+requestor.toString());
 		if (policy==null){
+			this.logging.debug("RequestPolicy not provided, retrieving privacy policy from provider");
 			this.startNegotiation(requestor);
 		}else{
+			this.logging.debug("RequestPolicy provided, processing policy");
 			this.receiveProviderPolicy(policy);
 			
 		}

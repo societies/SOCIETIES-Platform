@@ -82,7 +82,20 @@
 			<value>org.societies.context.api.user.inference.IUserCtxInferenceMgr</value>
 		</osgi:interfaces>
 	</osgi:service>
-
+	
+	<!-- usr ctx refiner -->
+	<osgi:service ref="userCtxRefiner">
+		<osgi:interfaces>
+			<value>org.societies.context.api.user.refinement.IUserCtxRefiner</value>
+		</osgi:interfaces>
+	</osgi:service>
+	
+	<!-- usr location refiner -->
+	<osgi:service ref="userLocationRefiner">
+		<osgi:interfaces>
+			<value>org.societies.context.user.refinement.impl.location.UserLocationRefiner</value>
+		</osgi:interfaces>
+	</osgi:service>
 
 	<!-- community ctx inference mgmt -->
 	<osgi:service ref="communityCtxInferenceMgr">

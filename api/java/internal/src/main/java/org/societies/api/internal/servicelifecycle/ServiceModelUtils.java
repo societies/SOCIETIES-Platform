@@ -143,7 +143,7 @@ public class ServiceModelUtils {
 		for(Service service: listServices){
 			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
-			if(bundleSymbolic == bundle.getSymbolicName()){
+			if(bundleSymbolic.equals(bundle.getSymbolicName())){
 				result = service;
 				break;
 			}

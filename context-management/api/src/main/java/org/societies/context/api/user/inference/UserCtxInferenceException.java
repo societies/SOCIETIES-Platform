@@ -24,34 +24,69 @@
  */
 package org.societies.context.api.user.inference;
 
-import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.CtxException;
 
 /**
- * This exception is thrown whenever a CtxRefinement algorithm
- * is not able to infer a value for a Ctx Attribute.
+ * Thrown to indicate exceptions during user context inference.
  * 
- * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.5
  */
-public class NotInferredException extends Exception {
-    
-    private static final long serialVersionUID = 1L;
+public class UserCtxInferenceException extends CtxException {
+ 
+	private static final long serialVersionUID = -2490872382562481000L;
 
-    public NotInferredException(CtxAttribute unrefinedAttr) {
-        super();
-        this.unrefinedAttr = unrefinedAttr;
-    }
-    
-    private CtxAttribute unrefinedAttr = null;
-    
-    /** 
-     * Returns the Ctx Attribute whose value has not been set
-     * through CtxInference
-     * 
-     * @return unrefined Context Attribute
-     * @since 0.0.1
+	/**
+     * Constructs a <code>UserCtxInferenceException</code> with no detail message.
      */
-    public synchronized CtxAttribute getUnrefinedAttr() {
-        return unrefinedAttr;
+    public UserCtxInferenceException() {
+    	
+        super();
     }
-    
+
+    /**
+     * Constructs a <code>UserCtxInferenceException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public UserCtxInferenceException(String message) {
+
+        super(message);
+    }
+
+    /**
+     * Creates a <code>UserCtxInferenceException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public UserCtxInferenceException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>UserCtxInferenceException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public UserCtxInferenceException(Throwable cause) {
+
+        super(cause);
+    }
 }

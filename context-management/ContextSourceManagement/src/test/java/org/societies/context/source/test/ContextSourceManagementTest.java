@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.context.source.impl.ContextSourceManagement;
 
@@ -99,10 +103,10 @@ public class ContextSourceManagementTest {
 	public static void setUpBeforeClass() throws Exception {
 		mockCtxEntity = mock(CtxEntity.class);
 
-		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", null, null)).thenReturn(mockFutureEntityIDs);
-		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "TemperatureSensor0", "TemperatureSensor0")).thenReturn(mockFutureEntityIDs);
-		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "IamAnewID", "IamAnewID")).thenReturn(mockFutureEntityIDsEmpty);
-		when(mockBroker.lookup(CtxModelType.ASSOCIATION, "providesUpdatesFor")).thenReturn(mockFutureIDs);
+		when(mockBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.CONTEXT_SOURCE)).thenReturn(mockFutureIDs);
+		when(mockBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE, CtxAttributeTypes.ID, "TemperatureSensor0", "TemperatureSensor0")).thenReturn(mockFutureEntityIDs);
+		when(mockBroker.lookupEntities(CtxEntityTypes.CONTEXT_SOURCE, CtxAttributeTypes.ID, "IamAnewID", "IamAnewID")).thenReturn(mockFutureEntityIDsEmpty);
+		when(mockBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.PROVIDES_UPDATES_FOR)).thenReturn(mockFutureIDs);
 		when(mockFutureEntityIDs.get()).thenReturn(mockEntityIDs);
 		when(mockEntityIDs.get(0)).thenReturn(mockEntityID);
 		
@@ -114,15 +118,15 @@ public class ContextSourceManagementTest {
 		when(mockFutureModelObject.get()).thenReturn(mockCtxEntity);
 
 		when(mockBroker.createAttribute(mockEntityID, "data")).thenReturn(mockFutureAttribute);
-		when(mockBroker.createAttribute(mockEntityID, "CtxSourceId")).thenReturn(mockFutureAttribute);
-		when(mockBroker.createAttribute(mockEntityID, "CtxType")).thenReturn(mockFutureAttribute);
+		when(mockBroker.createAttribute(mockEntityID, CtxAttributeTypes.ID)).thenReturn(mockFutureAttribute);
+		when(mockBroker.createAttribute(mockEntityID, CtxAttributeTypes.TYPE)).thenReturn(mockFutureAttribute);
 		when(mockFutureAttribute.get()).thenReturn(mockAttribute);
 
-		when(mockBroker.createEntity("CONTEXT_SOURCE")).thenReturn(mockFutureEntity);
+		when(mockBroker.createEntity(CtxEntityTypes.CONTEXT_SOURCE)).thenReturn(mockFutureEntity);
 		when(mockFutureEntity.get()).thenReturn(mockCtxEntity);
 		when(mockCtxEntity.getId()).thenReturn(mockEntityID);
 
-		when(mockBroker.createAssociation("providesUpdatesFor")).thenReturn(mockFutureAssociation);
+		when(mockBroker.createAssociation(CtxAssociationTypes.PROVIDES_UPDATES_FOR)).thenReturn(mockFutureAssociation);
 		when(mockFutureAssociation.get()).thenReturn(mockAssociation);
 
 		when(mockBroker.update(mockAttribute)).thenReturn(mockFutureModelObjectAttribute);
@@ -156,13 +160,9 @@ public class ContextSourceManagementTest {
 	@Before
 	public void setUp() throws Exception {
 
-
     	csm = new ContextSourceManagement();
     	csm.setCtxBroker(mockBroker);
     	csm.setCommManager(mockCommMgr);
-    	csm.setEventManager(mockEventMgr);
-    	
-    	csm.activate();
 	}
  
     @Test
@@ -191,6 +191,7 @@ public class ContextSourceManagementTest {
     	assert(result);
     }
  
+    @Ignore
     @Test
     public void testWithRegistrationWithEntity() {
     	boolean result =false;

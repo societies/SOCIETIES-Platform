@@ -122,6 +122,8 @@ public class WebActivity extends Activity {
        
     	public boolean onConsoleMessage(ConsoleMessage cmsg)
         {
+    		
+    		Log.i("HTML", "ConsoleMessge:" +cmsg);
             // check secret prefix
             if (cmsg.message().startsWith("MAGIC"))
             {
@@ -144,19 +146,25 @@ public class WebActivity extends Activity {
                 		int code = Constants.FB_CODE;
                 		if ("twitter".equalsIgnoreCase(from)) code = Constants.TW_CODE;
                 		if ("foursquare".equalsIgnoreCase(from)) code = Constants.FQ_CODE;
+                		if ("linkedin".equalsIgnoreCase(from)) code = Constants.LK_CODE;
+                		if ("facebook".equalsIgnoreCase(from)) code = Constants.FB_CODE;
+                		if ("googleplus".equalsIgnoreCase(from)) code = Constants.GP_CODE;
+                		
                 		
                 		Intent intent = WebActivity.this.getIntent();
                 		intent.putExtra(Constants.ACCESS_TOKEN, token);
                 		intent.putExtra(Constants.TOKEN_EXPIRATION, expires);
                 		setResult(code, intent);
+                		finish();
 					} 
                 	
                 	catch (JSONException e) {
-						e.printStackTrace();
+                		Log.w("HTML", " Not the right moment to parse the token!");
+						//e.printStackTrace();
 					}
                 			
                 	
-                	finish();
+                	
                     
                 }
                 

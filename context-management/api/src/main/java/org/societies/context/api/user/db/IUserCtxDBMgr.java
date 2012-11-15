@@ -84,16 +84,71 @@ public interface IUserCtxDBMgr {
 	public CtxEntity createEntity(String type) throws CtxException;
 
 	/**
-	 * Creates an individual Context Entity that is possible to join or to form a community. 
-	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
-	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
-	 * belong to zero or more CISs, simultaneously. The individual members of a pervasive 
-	 * community do not need to be human beings. They can also be organisations, smart space
-	 * infrastructures, autonomous or semi-autonomous agents, etc.
+	 * Creates an {@link IndividualCtxEntity} with the specified owner id and
+	 * type in the User Context DB. The created <code>IndividualCtxEntity
+	 * </code> is used to represent a single participant (CSS) of a {@link
+	 * CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may
+	 * belong to zero or more CISs, simultaneously. The individual members of a
+	 * CIS do not need to be human beings. They can also be organisations,
+	 * smart space infrastructures, autonomous or semi-autonomous agents, etc.
 	 *  
+	 * @param ownerId 
+	 *            the id of the <code>IndividualCtxEntity</code> to
+	 *            create
 	 * @param type
+	 * 			  the type (e.g. PERSON} of the <code>IndividualCtxEntity</code> to
+	 *            create
+	 * @return the created <code>IndividualCtxEntity</code>
+	 * @throws CtxException 
+	 *             if an <code>IndividualCtxEntity</code> with the specified
+	 *             id and type cannot be added to the Context DB
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
-	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException;
+	public IndividualCtxEntity createIndividualEntity(final String ownerId,
+			final String type) throws CtxException;
+
+	/**
+	 * Retrieves the specified context model object.
+	 * 
+	 * @param identifier
+	 */
+	public CtxModelObject retrieve(CtxIdentifier identifier) throws CtxException;
+	
+	/**
+	 * Retrieves the {@link IndividualCtxEntity} with the specified owner id 
+	 * from the User Context DB. The method returns <code>null</code> if the DB
+	 * does not contain an <code>IndividualCtxEntity</code> with the specified
+	 * owner id.
+	 *  
+	 * @param ownerId 
+	 *            the id of the <code>IndividualCtxEntity</code> to
+	 *            retrieve.
+	 * @return the <code>IndividualCtxEntity</code> with the specified owner id
+	 * @throws CtxException 
+	 *             if the <code>IndividualCtxEntity</code> with the specified
+	 *             id exists but cannot be retrieved the Context DB
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
+	 */
+	public IndividualCtxEntity retrieveIndividualEntity(final String ownerId)
+			throws CtxException;
+
+	/**
+	 * Updates a single context model object.
+	 * 
+	 * @param modelObject
+	 */
+	public CtxModelObject update(CtxModelObject modelObject) throws CtxException;
+	
+	/**
+	 * Removes the specified context model object.
+	 * 
+	 * @param identifier
+	 */
+	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
 	
 	/**
 	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
@@ -114,25 +169,4 @@ public interface IUserCtxDBMgr {
 	 * @param maxAttribValue
 	 */
 	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
-
-	/**
-	 * Removes the specified context model object.
-	 * 
-	 * @param identifier
-	 */
-	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
-
-	/**
-	 * Retrieves the specified context model object.
-	 * 
-	 * @param identifier
-	 */
-	public CtxModelObject retrieve(CtxIdentifier identifier) throws CtxException;
-
-	/**
-	 * Updates a single context model object.
-	 * 
-	 * @param modelObject
-	 */
-	public CtxModelObject update(CtxModelObject modelObject) throws CtxException;
 }

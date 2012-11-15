@@ -41,26 +41,28 @@ public class ConnectorTester {
 			//System.out.println("Friends:"+ friends.toString(1));
 			
 			// make the json payload using json-simple
-			JSONObject jsonMap = new JSONObject();
-			jsonMap.put("comment", "Posting from the API using JSON");
-			 
-			JSONObject contentObject = new JSONObject();
-			contentObject.put("title", "A title for your share");
-			contentObject.put("submitted-url","http://www.linkedin.com");
-			contentObject.put("submitted-image-url", "http://lnkd.in/Vjc5ec");
-			 
-			jsonMap.put("content", contentObject);
-			 
-			JSONObject visibilityObject = new JSONObject();
-			visibilityObject.put("code", "anyone");
-			 
-			jsonMap.put("visibility", visibilityObject);
+//			JSONObject jsonMap = new JSONObject();
+//			jsonMap.put("comment", "Posting from the API using JSON");
+//			 
+//			JSONObject contentObject = new JSONObject();
+//			contentObject.put("title", "A title for your share");
+//			contentObject.put("submitted-url","http://www.linkedin.com");
+//			contentObject.put("submitted-image-url", "http://lnkd.in/Vjc5ec");
+//			 
+//			jsonMap.put("content", contentObject);
+//			 
+//			JSONObject visibilityObject = new JSONObject();
+//			visibilityObject.put("code", "anyone");
+//			 
+//			jsonMap.put("visibility", visibilityObject);
+//			
+//			
+//			System.out.println(jsonMap.toString(2));
+//			connector.post(jsonMap.toString(2));
+			System.out.println("Friends:\n"+connector.getUserFriends());
 			
 			
-			System.out.println(jsonMap.toString(2));
-			connector.post(jsonMap.toString(2));
-			
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
