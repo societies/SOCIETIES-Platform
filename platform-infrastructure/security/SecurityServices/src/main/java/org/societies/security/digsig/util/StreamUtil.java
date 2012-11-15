@@ -32,6 +32,7 @@ import java.io.OutputStream;
  * @author Miroslav Pavleski, Mitja Vardjan
  */
 public class StreamUtil {
+
 	public static void copyStream(InputStream is, OutputStream os) {
 		try {
 			byte buf[] = new byte[8192];
