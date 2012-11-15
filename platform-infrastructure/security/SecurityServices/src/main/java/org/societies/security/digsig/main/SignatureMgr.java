@@ -32,7 +32,6 @@ import java.security.cert.X509Certificate;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.api.security.storage.StorageException;
 import org.societies.security.storage.CertStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class SignatureMgr implements ISignatureMgr {
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
 	private DigSig digSig = new DigSig();
-	private XmlDSig xmlDSig = new XmlDSig();
+	private XmlDSig xmlDSig;
 	private CertStorage certStorage;
 
 	public SignatureMgr() {
@@ -59,7 +58,8 @@ public class SignatureMgr implements ISignatureMgr {
 		Key key = certStorage.getOurKey();
 		PrivateKey privateKey = (PrivateKey) key;
 		PublicKey publicKey = cert.getPublicKey();
-		
+		xmlDSig = new XmlDSig(certStorage);
+		 
 		LOG.debug("Certificate: {}", cert);
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);

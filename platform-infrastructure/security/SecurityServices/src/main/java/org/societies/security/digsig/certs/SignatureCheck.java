@@ -32,6 +32,8 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.util.XmlManipulator;
 import org.societies.security.storage.CertStorage;
@@ -45,6 +47,8 @@ import org.w3c.dom.NodeList;
  */
 public class SignatureCheck {
 
+	private static Logger LOG = LoggerFactory.getLogger(SignatureCheck.class);
+	
 	private Document doc;
 	private XmlManipulator xml;
 
@@ -75,13 +79,14 @@ public class SignatureCheck {
 
 		String sopElemId = sopElem.getAttribute("Id");
 
-		if (sopElemId == null)
-			throw new DigsigException("BAD_REQUEST"); // <serviceOperaitonPolicy>
-														// element must have an
-														// Id
+		if (sopElemId == null) {
+			// <serviceOperaitonPolicy> element must have an Id
+			throw new DigsigException("BAD_REQUEST");
+		}
 		String sopElemRef = "#" + sopElemId;
 
-		extractSignatures(); // Make sure signatures were extracted
+		// Make sure signatures were extracted
+		extractSignatures();
 
 		X509Certificate ourCert;
 		ourCert = certStorage.getOurCert();
@@ -92,11 +97,12 @@ public class SignatureCheck {
 				try {
 					KeyInfo keyInfo = sig.getKeyInfo();
 					X509Certificate sigCert = keyInfo.getX509Certificate();
-					if (sigCert == null)
+					if (sigCert == null) {
 						throw new DigsigException("BAD_REQUEST");
+					}
 
-					if (sigCert.equals(ourCert)) { // This is a provider
-													// signature
+					if (sigCert.equals(ourCert)) {
+						// This is a provider signature
 						boolean result = sig.checkSignatureValue(sigCert
 								.getPublicKey());
 						if (!result)
@@ -125,18 +131,20 @@ public class SignatureCheck {
 	 * @throws DigsigException
 	 */
 	public Element getReferencedSOP() throws DigsigException {
-		extractSignatures(); // make sure the signatures are extracted
+		
+		// make sure the signatures are extracted
+		extractSignatures();
 
-		Element sopElem = extractSOPElement(); // we'll need this in order to
-												// establish SOP correct
-												// structure
+		// we'll need this in order to establish SOP correct structure
+		Element sopElem = extractSOPElement();
 
 		String sopElemId = sopElem.getAttribute("Id");
 
-		if (sopElemId == null)
-			throw new DigsigException("BAD_REQUEST"); // <serviceOperaitonPolicy>
-														// element must have an
-														// Id
+		if (sopElemId == null) {
+			// <serviceOperaitonPolicy> element must have an Id
+			throw new DigsigException("BAD_REQUEST");
+		}
+
 		String sopElemRef = "#" + sopElemId;
 
 		for (XMLSignature sig : signatures) {
@@ -154,9 +162,10 @@ public class SignatureCheck {
 				Node sopNode = xml.getNode(String.format(
 						"/societies/serviceOperationPolicy/sop[@Id='%s']",
 						refId));
-				if (sopNode == null || !(sopNode instanceof Element))
-					throw new DigsigException("BAD_REQUEST"); // check that this
-																// is actual SOP
+				if (sopNode == null || !(sopNode instanceof Element)) {
+					// check that this is actual SOP
+					throw new DigsigException("BAD_REQUEST");
+				}
 
 				try {
 					X509Certificate sigCert = sig.getKeyInfo()
@@ -294,8 +303,10 @@ public class SignatureCheck {
 
 		// Loop through all reference nodes
 		NodeList list = si.getElement().getChildNodes();
-		if (list == null)
-			return null; // only one reference
+		if (list == null) {
+			// only one reference
+			return null;
+		}
 
 		int refElements = 0;
 		String result = null;
@@ -310,9 +321,12 @@ public class SignatureCheck {
 					.getNamespaceURI())
 					&& "Reference".equals(elem.getLocalName())) {
 
-				refElements++; // count elements
-				if (refElements > 1)
-					return null; // if more than one it is an error
+				// count elements
+				refElements++;
+				if (refElements > 1) {
+					// if more than one it is an error
+					return null;
+				}
 				result = elem.getAttribute("URI");
 			}
 		}

@@ -24,9 +24,23 @@
  */
 package org.societies.security.digsig.main;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.UUID;
+
+import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.security.digsig.certs.SignatureCheck;
+import org.societies.security.digsig.util.DOMHelper;
+import org.societies.security.storage.CertStorage;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * 
@@ -38,11 +52,44 @@ public class XmlDSig {
 
 	private static Logger LOG = LoggerFactory.getLogger(XmlDSig.class);
 
+	private CertStorage certStorage;
+	
+	public XmlDSig(CertStorage certStorage) {
+		this.certStorage = certStorage;
+	}
+	
 	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
 		
 		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
 
 		return xml;  // FIXME
+	}
+
+	public Document signXml(Document doc, String xmlNodeId, IIdentity identity) {
+		
+		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
+		SignatureCheck check = new SignatureCheck(doc, certStorage);
+		
+		try {
+			XMLSignature finalSig = new XMLSignature(doc, null,
+					XMLSignature.ALGO_ID_SIGNATURE_RSA);
+			doc.getDocumentElement().appendChild(finalSig.getElement());
+
+			Transforms transforms = new Transforms(doc);
+			// Also must use c14n
+			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
+
+			String customerSigId = check.getCustomerSignature().getElement().getAttribute("Id");
+			
+			finalSig.addDocument("#" + customerSigId, transforms,
+					MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);
+			finalSig.addKeyInfo(certStorage.getOurCert());
+			finalSig.sign(certStorage.getOurKey());
+		} catch (Exception e) {
+			LOG.warn("signXml()", e);
+		}
+						
+		return doc;
 	}
 
 	public boolean verifyXml(String xml) {

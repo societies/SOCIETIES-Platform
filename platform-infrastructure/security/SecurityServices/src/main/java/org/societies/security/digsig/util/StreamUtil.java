@@ -24,9 +24,11 @@
  */
 package org.societies.security.digsig.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Miroslav Pavleski, Mitja Vardjan
@@ -64,5 +66,13 @@ public class StreamUtil {
 			os.close();
 		} catch (IOException e) {
 		}
+	}
+	
+	public static InputStream str2stream(String str) throws UnsupportedEncodingException {
+		
+		byte[] bytes = str.getBytes("UTF-8");
+		InputStream is = new ByteArrayInputStream(bytes);
+		
+		return is;
 	}
 }
