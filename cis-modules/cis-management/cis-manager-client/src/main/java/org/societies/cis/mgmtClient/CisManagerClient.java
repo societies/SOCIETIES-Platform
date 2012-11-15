@@ -47,7 +47,7 @@ public class CisManagerClient implements ICisManagerCallback {
 	private static Logger logger = LoggerFactory.getLogger(CisManagerClient.class);
 	
 	public CisManagerClient() {
-		logger.info("CisManagerClient called ###########: ");
+		logger.debug("CisManagerClient called ###########: ");
 		
 		returnList = new ArrayBlockingQueue<CommunityMethods>(1);
 	}
@@ -63,7 +63,7 @@ public class CisManagerClient implements ICisManagerCallback {
 		try {
 			return returnList.poll(TIMEOUT, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			logger.error("interrupted exception on CisManagerClient ");
 			e.printStackTrace();
 			return null;
 		}
