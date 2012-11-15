@@ -219,7 +219,7 @@ at 	<font color="red">${activity.getTarget()}</font>
 		<li>
 <a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a>
 <xc:if test="${isOwner == true && cisInfo.getOwnerJid() != participant.getJid()}">
-		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}?cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
+		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}&cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
 </xc:if>
  
 		</li>
