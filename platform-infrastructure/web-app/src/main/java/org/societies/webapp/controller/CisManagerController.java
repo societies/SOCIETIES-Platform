@@ -48,6 +48,7 @@ import org.societies.api.activity.IActivity;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.attributes.Rule.OperationType;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -66,19 +67,25 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
 import org.societies.webapp.models.AddMemberForm;
 import org.societies.webapp.models.CreateCISForm;
+import org.societies.webapp.models.JoinCISForm;
 import org.societies.webapp.models.MembershipCriteriaForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -88,6 +95,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 
 @Controller
+@SessionAttributes("cisAdverts")
 public class CisManagerController {
 
 	
@@ -95,6 +103,9 @@ public class CisManagerController {
 	private ICisManager cisManager;
 	@Autowired
 	private ICommManager commMngrRef;
+	
+	@Autowired
+	private ICisDirectoryRemote cisDirectoryRemote;
 	
 	@Autowired
 	private IPrivacyPolicyManager privacyPolicyManager;
@@ -210,9 +221,20 @@ public class CisManagerController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("response", incomingResponse);
 
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 
+		getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		model.put("cisAdverts", adverts);
+		
+
+		
 		List<ICis> records = this.getCisManager().getCisList();
 		model.put("cisrecords", records);
+		
+		
+		//JoinCISForm jform = new JoinCISForm();
+		//model.put("joinForm", jform);
 		
 		return new ModelAndView("your_communities_list", model) ;
 	}
@@ -361,6 +383,30 @@ public class CisManagerController {
 			
 	}
 	
+	
+	// join CIS 
+	@RequestMapping(value = "/join_cis.html", method = RequestMethod.POST)
+	public ModelAndView joinCISfromCommunitiesPage(@RequestParam("position") final int position, @ModelAttribute("cisAdverts") List<CisAdvertisementRecord> adverts,  BindingResult result,  Map model){
+		
+		//if(result.hasErrors()){
+		//	return yourCommunitiesListPage("Error joining");
+		//}
+		
+		if(null != adverts && null!= adverts.get(position)){
+			CisManagerClient joinCallback = new CisManagerClient();
+			this.getCisManager().joinRemoteCIS(adverts.get(position), joinCallback);
+			
+			JoinResponse j = joinCallback.getComMethObj().getJoinResponse();
+			
+			return yourCommunitiesListPage("joining towards " + j.getCommunity() + " is " + j.isResult());
+		}			
+		else{
+			return yourCommunitiesListPage("null advertisement on join");
+		}
+
+			
+	}
+	
 	//////////////////////// LEAVE COMMUNITY PAGE
 	
 	@RequestMapping(value="/leave_community.html",method = RequestMethod.GET)
@@ -469,6 +515,25 @@ public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) Str
 	}
 	
 	
+	
+	public ICisDirectoryRemote getCisDirectoryRemote() {
+		return cisDirectoryRemote;
+	}
+
+
+	public void setCisDirectoryRemote(ICisDirectoryRemote cisDirectoryRemote) {
+		this.cisDirectoryRemote = cisDirectoryRemote;
+	}
+
+
+
+
+
+
+
+
+
+
 	// callbacks
 	private class PrivPolCallBack implements IPrivacyPolicyManagerListener {
 		private RequestPolicy privacyPolicy;

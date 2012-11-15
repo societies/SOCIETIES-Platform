@@ -175,7 +175,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
-	
+	private boolean privacyPolicyNegotiationIncluded;
 	
 	public IUserFeedback getiUsrFeedback() {
 		return iUsrFeedback;
@@ -1648,6 +1648,15 @@ public class JoinCallBack implements ICisManagerCallback{
 			
 		}
 		return true;
+	}
+
+	public boolean isPrivacyPolicyNegotiationIncluded() {
+		return privacyPolicyNegotiationIncluded;
+	}
+
+	public void setPrivacyPolicyNegotiationIncluded(
+			boolean privacyPolicyNegotiationIncluded) {
+		this.privacyPolicyNegotiationIncluded = privacyPolicyNegotiationIncluded;
 	}
 
 
