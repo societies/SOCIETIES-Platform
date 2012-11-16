@@ -99,6 +99,7 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+		<!-- TODO get org.eclipse.gemini.web.tomcat.internal.loading.BundleWebappClassLoader class reference
 		<dependency>
 			<groupId>org.eclipse.gemini.web</groupId>
 			<artifactId>org.eclipse.gemini.web.tomcat</artifactId>
@@ -106,6 +107,7 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -119,7 +121,7 @@
 			<scope>provided</scope>
 		</dependency>
     </dependencies>
-    
+    <!-- 
     <repositories>
 		<repository>
 		    <id>virgo-repository</id>
@@ -127,4 +129,5 @@
 		    <url>http://build.eclipse.org/rt/virgo/maven/bundles/release</url>
 		</repository>
 	</repositories>
+	 -->
 </project>

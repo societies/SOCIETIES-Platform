@@ -3,12 +3,10 @@ package org.societies.comm.xmpp.xc.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
+//import org.eclipse.gemini.web.tomcat.internal.loading.BundleWebappClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
-import org.eclipse.gemini.web.tomcat.internal.loading.BundleWebappClassLoader;
 
 public class ClassLoaderManager {
 	
@@ -22,8 +20,8 @@ public class ClassLoaderManager {
 		ClassLoader hcl = Thread.currentThread().getContextClassLoader();
 		if (hcl instanceof BundleDelegatingClassLoader)
 			thisBundleId = ((BundleDelegatingClassLoader)hcl).getBundle().getBundleId();
-		if (hcl instanceof BundleWebappClassLoader)
-			thisBundleId = ((BundleWebappClassLoader)hcl).getBundle().getBundleId();
+//		if (hcl instanceof BundleWebappClassLoader)
+//			thisBundleId = ((BundleWebappClassLoader)hcl).getBundle().getBundleId();
 		if (thisBundleId==null)
 			notSupported(hcl);
 		classloaderMap = new HashMap<Long, ClassLoader>();
@@ -37,8 +35,8 @@ public class ClassLoaderManager {
 			Long bid = null;
 			if (cl instanceof BundleDelegatingClassLoader)
 				bid = ((BundleDelegatingClassLoader) cl).getBundle().getBundleId();
-			if (cl instanceof BundleWebappClassLoader)
-				bid = ((BundleWebappClassLoader)cl).getBundle().getBundleId();
+//			if (cl instanceof BundleWebappClassLoader)
+//				bid = ((BundleWebappClassLoader)cl).getBundle().getBundleId();
 			
 			LOG.info("resolved "+o.toString()+" to bundle "+bid);
 			if (bid!=null)
@@ -67,8 +65,8 @@ public class ClassLoaderManager {
 		Long id = null;
 		if (contextClassLoader instanceof BundleDelegatingClassLoader)
 			id = ((BundleDelegatingClassLoader)contextClassLoader).getBundle().getBundleId();
-		if (contextClassLoader instanceof BundleWebappClassLoader)
-			id = ((BundleWebappClassLoader)contextClassLoader).getBundle().getBundleId();
+//		if (contextClassLoader instanceof BundleWebappClassLoader)
+//			id = ((BundleWebappClassLoader)contextClassLoader).getBundle().getBundleId();
 		
 		if (id==null)
 			notSupported(contextClassLoader);
