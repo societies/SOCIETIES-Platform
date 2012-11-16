@@ -225,6 +225,7 @@ public class CisManagerController {
 
 		getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
 		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		if(null == adverts) adverts = new ArrayList<CisAdvertisementRecord>();//create an empty list if it doesnt exist or spring will fail 
 		model.put("cisAdverts", adverts);
 		
 
