@@ -416,12 +416,12 @@ public class CommManagerHelper {
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message);
+			LOG.warn(message,e);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (InvalidFormatException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message);
+			LOG.warn(message,e);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (ClassNotFoundException e) {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
@@ -467,10 +467,10 @@ public class CommManagerHelper {
 			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
 			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.error(m);
+			LOG.error(m,e);
 		} catch (Exception e) {
-			String m = e.getClass().getName() + "Error de-serializing the message:" + e.getMessage();
-			LOG.error(m);
+			String m = e.getClass().getName() + "Error processing the message:" + e.getMessage();
+			LOG.error(m,e);
 		}
 		
 		if (oldCl!=null)

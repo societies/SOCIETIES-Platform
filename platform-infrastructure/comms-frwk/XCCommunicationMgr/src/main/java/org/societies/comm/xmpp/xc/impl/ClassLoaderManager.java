@@ -18,6 +18,8 @@ public class ClassLoaderManager {
 	
 	public ClassLoaderManager() {
 		ClassLoader hcl = Thread.currentThread().getContextClassLoader();
+		LOG.info("Thread class: "+Thread.currentThread().getClass().getCanonicalName());
+		
 		if (hcl instanceof BundleDelegatingClassLoader)
 			thisBundleId = ((BundleDelegatingClassLoader)hcl).getBundle().getBundleId();
 //		if (hcl instanceof BundleWebappClassLoader)
