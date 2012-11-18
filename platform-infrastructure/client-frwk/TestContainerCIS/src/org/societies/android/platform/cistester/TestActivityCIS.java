@@ -8,13 +8,13 @@ import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
-import org.societies.android.api.cis.management.AJoinResponse;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
-import org.societies.android.platform.cis.CisDirectoryRemote;
-import org.societies.android.platform.cis.CommunityManagement;
-import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
+import org.societies.android.api.cis.management.AMembershipCrit;
+import org.societies.android.platform.cis.CisDirectoryBase;
+import org.societies.android.platform.cis.CommunityManagementBase;
+import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
@@ -24,7 +24,6 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.api.identity.INetworkNode;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -61,46 +60,42 @@ public class TestActivityCIS extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
-        
-     
         Log.d(LOG_TAG, "before intents");
         
         //CREATE INTENT FOR CIS MANAGER SERVICE AND BIND
-        Intent intentCisManager = new Intent(this.getApplicationContext(), CommunityManagement.class);
+        Intent intentCisManager = new Intent(this.getApplicationContext(), CommunityManagementBase.class);
         this.getApplicationContext().bindService(intentCisManager, cisManagerConnection, Context.BIND_AUTO_CREATE);
         
         //CREATE INTENT FOR CIS SUBSCRIBE AND BIND
-        Intent intentCisSubscribe = new Intent(this.getApplicationContext(), CommunityManagement.class);
+        Intent intentCisSubscribe = new Intent(this.getApplicationContext(), CommunityManagementBase.class);
         this.getApplicationContext().bindService(intentCisSubscribe, cisSubscribeConnection, Context.BIND_AUTO_CREATE);
                 
         //CREATE INTENT FOR CIS DIRECTORY AND BIND
-        Intent intentCisDir = new Intent(this.getApplicationContext(), CisDirectoryRemote.class);
+        Intent intentCisDir = new Intent(this.getApplicationContext(), CisDirectoryBase.class);
         this.getApplicationContext().bindService(intentCisDir, cisDirConnection, Context.BIND_AUTO_CREATE);
         
         Log.d(LOG_TAG, "before registering broadcasts");
 
-        
         //REGISTER BROADCAST
         //CIS Manager
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(CommunityManagement.CREATE_CIS);
-        intentFilter.addAction(CommunityManagement.DELETE_CIS);
-        intentFilter.addAction(CommunityManagement.GET_CIS_LIST);
+        intentFilter.addAction(ICisManager.CREATE_CIS);
+        intentFilter.addAction(ICisManager.DELETE_CIS);
+        intentFilter.addAction(ICisManager.GET_CIS_LIST);
+        intentFilter.addAction(ICisManager.JOIN_CIS);
         //CIS Subscriber
-        intentFilter.addAction(CommunityManagement.JOIN_CIS);
-        intentFilter.addAction(CommunityManagement.GET_MEMBERS);
-        intentFilter.addAction(CommunityManagement.GET_ACTIVITY_FEED);
-        intentFilter.addAction(CommunityManagement.ADD_ACTIVITY);
+        intentFilter.addAction(ICisSubscribed.GET_MEMBERS);
+        intentFilter.addAction(ICisSubscribed.GET_ACTIVITY_FEED);
+        intentFilter.addAction(ICisSubscribed.ADD_ACTIVITY);
         //CIS DIRECTORY
-        intentFilter.addAction(CisDirectoryRemote.FIND_ALL_CIS);
-        intentFilter.addAction(CisDirectoryRemote.FILTER_CIS);
-        intentFilter.addAction(CisDirectoryRemote.FIND_CIS_ID);
+        intentFilter.addAction(ICisDirectory.FIND_ALL_CIS);
+        intentFilter.addAction(ICisDirectory.FILTER_CIS);
+        intentFilter.addAction(ICisDirectory.FIND_CIS_ID);
 
         Log.d(LOG_TAG, "gonna register receiver");
         this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
         
-        //TEST THE SLM COMPONENT
+        //TEST THE CIS COMPONENT
         Log.d(LOG_TAG, "gonna create test");
         TestCIS task = new TestCIS(this);
         Log.d(LOG_TAG, "gonna execute test");
@@ -163,7 +158,7 @@ public class TestActivityCIS extends Activity {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to ICisDirectory service");
         	//get a local binder
-        	org.societies.android.platform.cis.CisDirectoryRemote.LocalBinder binder = (org.societies.android.platform.cis.CisDirectoryRemote.LocalBinder) service;
+        	org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder binder = (org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder) service;
             //obtain the service's API
         	serviceCISdir = (ICisDirectory) binder.getService();
         	serviceCISdirConnected = true;
@@ -219,17 +214,19 @@ public class TestActivityCIS extends Activity {
     		Log.d(LOG_TAG, ">>>>>>>>serviceCISdirConnected: " + serviceCISdirConnected);
 
     		//TEST: CREATE CIS
+    		AMembershipCrit aCrit = new AMembershipCrit();
 			List<ACriteria> rules = new ArrayList<ACriteria>();
 			ACriteria crit1 = new ACriteria();
 			//ACriteria crit2 = new ACriteria();
 			crit1.setAttrib("Location"); crit1.setOperator("equals"); crit1.setRank(1); crit1.setValue1("Paris");
 			//crit2.setAttrib("Age"); crit2.setOperator(">"); crit2.setRank(2); crit2.setValue1("18");
 			rules.add(crit1);
+			aCrit.setACriteria(rules);
 			//rules.add(crit2);
-			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", rules, "privacy policy stuff");
+			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", aCrit, "privacy policy stuff");
     		
 			//TEST: GET ALL CIS ADVERTISEMENTS FROM DIRECTORY
-			//serviceCISdir.findAllCisAdvertisementRecords(CLIENT_PACKAGE);
+			serviceCISdir.findAllCisAdvertisementRecords(CLIENT_PACKAGE);
 			
 			return null;
     	}
@@ -285,12 +282,10 @@ public class TestActivityCIS extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
-			if (intent.getAction().equals(CommunityManagement.CREATE_CIS)) {
+			if (intent.getAction().equals(ICisManager.CREATE_CIS)) {
 				boolean result = intent.getBooleanExtra(ICisManager.INTENT_RETURN_BOOLEAN,false);
 				Log.d(LOG_TAG, ">>>>>CIS Creation RESULT:\n>>>>>: " + result);
 				if(true == result){
-	
-					
 					//UNMARSHALL THE COMMUNITY FROM Parcel BACK TO COMMUNITY
 					Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					ACommunity cis =  (ACommunity) parcel;
@@ -301,7 +296,7 @@ public class TestActivityCIS extends Activity {
 				
 			}
 			
-			if (intent.getAction().equals(CisDirectoryRemote.FIND_ALL_CIS)) {
+			if (intent.getAction().equals(ICisDirectory.FIND_ALL_CIS)) {
 				//UNMARSHALL THE ADVERTS FROM THE RETURNED PARCELS
 				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
@@ -311,7 +306,7 @@ public class TestActivityCIS extends Activity {
 				}
 			}
 			
-			if (intent.getAction().equals(CommunityManagement.GET_CIS_LIST)) {
+			if (intent.getAction().equals(ICisManager.GET_CIS_LIST)) {
 				//UNMARSHALL THE ID FROM THE RETURNED PARCEL
 				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
@@ -320,7 +315,7 @@ public class TestActivityCIS extends Activity {
 				}
 			}
 			
-			if (intent.getAction().equals(CommunityManagement.JOIN_CIS)) {
+			if (intent.getAction().equals(ICisManager.JOIN_CIS)) {
 				//UNMARSHALL THE result
 				boolean result = intent.getBooleanExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN,false);
 				Log.d(LOG_TAG, ">>>>>CIS JOIN RESULT:\n>>>>>Allowed to join: " + result);
@@ -332,7 +327,7 @@ public class TestActivityCIS extends Activity {
 				}
 			}
 			
-			if (intent.getAction().equals(CommunityManagement.GET_MEMBERS)) {
+			if (intent.getAction().equals(ICisSubscribed.GET_MEMBERS)) {
 				//UNMARSHALL THE PARTICIPANTS FROM THE RETURNED PARCELS
 				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
@@ -342,13 +337,13 @@ public class TestActivityCIS extends Activity {
 				}
 			}
 			
-			if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
+			if (intent.getAction().equals(ICisSubscribed.ADD_ACTIVITY)) {
 				//UNMARSHALL THE RESULT FROM Parcel 
 				Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				Log.d(LOG_TAG, ">>>>>ADD ACTIVIY RESULTS:\npublished: " + parcel.toString());
 			}
 			
-			if (intent.getAction().equals(CommunityManagement.GET_ACTIVITY_FEED)) {
+			if (intent.getAction().equals(ICisSubscribed.GET_ACTIVITY_FEED)) {
 				//UNMARSHALL THE ACTIVITIES FROM Parcels 
 				Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {

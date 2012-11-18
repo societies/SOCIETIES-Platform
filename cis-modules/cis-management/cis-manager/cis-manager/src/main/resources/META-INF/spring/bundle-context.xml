@@ -23,9 +23,11 @@
 	<bean id="ServiceRegPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="locations">
 			<list>
 			<!-- 	<value>classpath:META-INF/spring/derby_database.properties</value> -->
+			    <value>classpath:META-INF/spring/org.societies.local.properties</value>
 				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
@@ -81,7 +83,6 @@
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
         <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
-        <property name="iServDiscRemote" ref="servDiscRemote"/>
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
         <property name="privacyDataManager" ref="PrivacyDataManager"/>
@@ -91,7 +92,8 @@
         <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
          <property name="pubsubClient" ref="PubsubClient"/>       
-        <property name="iUsrFeedback" ref="userFeedback"/>  
+        <property name="iUsrFeedback" ref="userFeedback"/>
+        <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />  
         
     </bean>
     

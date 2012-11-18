@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
+<%@ taglib prefix="cisUtils" uri="http://cisUtils"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,6 +19,15 @@
 <link rel="stylesheet" type="text/css" media="all" href="css/ie7.css" /><![endif]-->
 <!-- Menu -->
 <script src="js/webmenu_nav.js"></script>
+
+	<script type="text/javascript">
+		  function submitJoin(position){
+			  $('#joinForm').attr("action","join_cis.html?position="+position);
+		    document.JoinCISForm.submit();
+		  }
+	
+	</script>
+
 </head>
 <body>
 <div id="wrapper" class="clearfix">
@@ -62,9 +73,17 @@
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section class="grid_12">
 <section>
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a>
+<br>
+<xc:if test="${not empty response}">
+	<div class="success">${response}</div>
+</xc:if>
+
+</div>
+
 </section>
 <div class="websearchbar">
+
 <div class="websearchtitle">
 <h4 class="form_title">Your Communities</h4>
 </div>
@@ -81,22 +100,32 @@
 <header>
 </header>
 <ol class="keyinfolist">
-<li class="keyinfo bypostauthor">
-<figure class="gravatar">
-<a href="community_profile.html"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
-<a class="keyinfo-reply-link" href="community_profile.html">INFO</a>
-</figure>
-<div class="keyinfo_content">
-<div class="clearfix">
-<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
-<br/>
-<cite class="author_name"><a href="community_profile.html">ICT</a></cite>
-</div>
-<div class="keyinfo_text">
-<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
-</div>
-</div>
-</li>
+
+<xc:forEach var="record" items="${cisrecords}">
+		<li class="keyinfo bypostauthor">
+		<figure class="gravatar">
+		<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
+		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
+		</figure>
+		<div class="keyinfo_content">
+		<div class="clearfix">
+		
+		<cite class="author_name">${record.getName()}</cite>
+		<div class="keyinfo_text">
+		<p>Owner: ${record.getOwnerId()}</p>
+		</div>
+		
+		
+		</div>
+		</div>
+		</li>
+</xc:forEach>
+
+
+
+
+
+
 <li class="keyinfo">
 <figure class="gravatar">
 <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
@@ -158,11 +187,24 @@
 <h3>Suggested Communities...</h3>
 </header>
 <ul class="sidebar">
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
+<xc:forEach var="advertisement" items="${cisAdverts}" varStatus="stats">
+
+<xc:if test="${cisUtils:isJidOnCommunityCollection(cisrecords, advertisement.getId()) == false}">	
+		<li>
+		<a href="community_profile.html?cisId=${advertisement.getId()}">${advertisement.getName()}</a>
+			<a class="furtherinfo-link" onclick="javascript:submitJoin(${stats.count -1})" >Join</a>
+		</li>
+</xc:if>	
+
+
+
+</xc:forEach>
+<form:form id="joinForm" method="POST" action="join_cis.html" modelAttribute="cisAdverts" name="JoinCISForm">
+</form:form>	
+
+
+
+
 </ul>
 </section>
 <section>

@@ -1,0 +1,6 @@
+Usage: java -jar batch-utils.jar <domain authority host and port> <operation> <accounts file> [<secret>]
+
+Tool for adding and removing users from Openfire. Just create a user accounts file like accounts.txt with one line per user and having the parameters comma-separated:
+username,password,name,email
+
+The valid operations are 'add', 'delete', 'update', 'enable', 'disable' and 'login'.

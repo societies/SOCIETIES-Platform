@@ -33,6 +33,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 var SocietiesXMPPRegistration = {
 	/**
 	 * @methodOf SocietiesXMPPRegistration#
+	 * @description Determine the app preference value for display passwords on entry
+	 * and set the login password input accordingly
+	 * @returns null
+	 */
+
+	displayRegisterPassword: function() {
+		console.log("isDisplayRegisterPassword");
+			
+		if (SocietiesAppConfig.DISPLAY_PASSWORDS_ON_ENTRY) {
+			$('#regUserpass').get(0).type = 'text';
+			$('#repeatRegUserpass').get(0).type = 'text';
+			console.log("Set Identity Registration passwords to read");
+		} else {
+			$('#regUserpass').get(0).type = 'password';
+			$('#repeatRegUserpass').get(0).type = 'password';
+			console.log("Set Identity Registration passwords to obscure");
+		}
+	},
+
+	/**
+	 * @methodOf SocietiesXMPPRegistration#
 	 * @description Validate that viable registration credentials have been entered
 	 * @param {Object} username
 	 * @param {Object} password
@@ -104,8 +125,8 @@ var SocietiesXMPPRegistration = {
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daServerURI", jQuery("#domainServer").val());
 		
 		//Update the login page with XMPP registered values
-		jQuery("#username").val(jQuery("#regUsername").val());
-		jQuery("#password").val(jQuery("#regUserpass").val());
+		jQuery("#loginUsername").val(jQuery("#regUsername").val());
+		jQuery("#loginPassword").val(jQuery("#regUserpass").val());
 		jQuery("#identitydomain").val(jQuery("#domainServer").val());
 
 	},
@@ -141,6 +162,9 @@ var SocietiesXMPPRegistration = {
 $(document).on('pageinit', '#new-identity', function(event) {
 
 	console.log("jQuery pageinit action(s) for registerxmpp");
+	
+	//Configure password inputs
+	SocietiesAppConfig.isDisplayPassword(SocietiesXMPPRegistration.displayRegisterPassword);
 
 	$('#registerXMPP').off('click').on('click', function(){
 		if (SocietiesXMPPRegistration.validateRegistrationCredentials(jQuery("#regUsername").val(), jQuery("#regUserpass").val(), jQuery("#repeatRegUserpass").val(), jQuery("#regSocietiesTerms").val())) {

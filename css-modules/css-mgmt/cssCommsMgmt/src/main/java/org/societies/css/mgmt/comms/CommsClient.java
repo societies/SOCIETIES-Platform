@@ -830,4 +830,45 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+	public void declineCssFriendRequest(CssRequest request) {
+		// TODO Auto-generated method stub
+				LOG.info("Remote call on DeclineCssFriendRequest");
+
+				try {
+
+					Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
+							request.getCssIdentity()));
+					IIdentity receivedID = stanza.getFrom();
+					CssManagerMessageBean messageBean = new CssManagerMessageBean();
+					
+					LOG.info("commManager.getIdManager().fromJid(request.getCssIdentity()) =  " +commManager.getIdManager().fromJid(
+							request.getCssIdentity()));
+					
+					LOG.info("(receivedID) = " +receivedID);
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					
+					messageBean.setMethod(MethodType.DECLINE_CSS_FRIEND_REQUEST);
+					messageBean.setRequestStatus(request.getRequestStatus());
+					
+					if(receivedID == null) {
+						messageBean.setTargetCssId("");
+					} else {
+						messageBean.setTargetCssId(receivedID.getJid());
+					}
+							
+
+					try {
+						this.commManager.sendMessage(stanza, messageBean);
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} catch (InvalidFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		
+	}
 }

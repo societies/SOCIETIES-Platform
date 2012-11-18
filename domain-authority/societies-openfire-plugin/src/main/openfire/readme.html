@@ -74,7 +74,19 @@ TODO
 <h2>Using the Plugin</h2>
 
 <p>
-Access http://localhost:9090/plugins/societies/public/signup.html to test if the plugin is working.
+Access http://localhost:9090/plugins/societies/public/signup.html to test if the plugin is working. This is the GUI for user account creation.
+</p>
+
+<p>
+There is a programmatic HTTP interface available for doing batch provisioning and ad-hoc integration. The interface responds with an XML message describing success or some error. It can be accessed @ http://localhost:9090/plugins/societies/societies
+</p>
+
+<p>
+For example to create a user call http://localhost:9090/plugins/societies/societies?username=jmgonc&password=jmgonc&type=add&secret=defaultSecret&name=joao
+</p>
+
+<p>
+The allowed parameters for the programmatic interface are 'username', 'password', 'type', 'name', 'email', 'secret' and 'groups'. The valid values for 'type' are 'add', 'delete', 'update', 'enable', 'disable' and 'login'.
 </p>
 
 </body>

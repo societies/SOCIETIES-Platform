@@ -392,9 +392,32 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 						situation.setSituationID(currentStatusString+"_"+currentLocationString);
 						//System.out.println("test4");
 					}
+					else {
+						situation.setSituationID(currentStatusString);
+					}
+				}
+				else {
+					situation.setSituationID(currentStatusString);
+				}
+			}
+			else {
+				if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null) {
+					String currentLocationString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+					if (!currentLocationString.equals("")) {
+						situation.setSituationID(currentLocationString);
+					}
 				}
 			}
 		}
+		else {
+			if (REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null) {
+				String currentLocationString = retrieveCurrentUserContext(REGISTERED_CONTEXTS.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+				if (!currentLocationString.equals("")) {
+					situation.setSituationID(currentLocationString);
+				}
+			}
+		}
+		
 		if (situation.getSituationID() == null){
 			situation.setSituationID("OTHER");
 		}

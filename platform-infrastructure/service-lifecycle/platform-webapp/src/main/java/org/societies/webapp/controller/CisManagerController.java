@@ -93,6 +93,8 @@ public class CisManagerController {
 	/**
 	 * OSGI service get auto injected
 	 */
+
+	
 	@Autowired
 	private ICisManager cisManager;
 	@Autowired(required=false)
@@ -409,7 +411,7 @@ public class CisManagerController {
 					model.put("method", "GetMemberListRemote");
 					res = "CIS==null: " + cisForm.getMethod();
 				} else {
-					Set<ICisParticipant> records = thisCis.getMemberList().get();
+					Set<ICisParticipant> records = thisCis.getMemberList();
 					model.put("memberRecords", records);
 					res = "CIS is not null";
 				}
@@ -462,7 +464,7 @@ public class CisManagerController {
 				if(thisCis == null){
 					res +="CIS not found: " + cisForm.getCssId();
 				}else{
-					if (thisCis.addMember(cisForm.getCssId(), cisForm.getRole()).get())
+					if (thisCis.addMember(cisForm.getCssId(), cisForm.getRole()))
 						res += "member added ";
 					else
 						res += "error when adding member";					

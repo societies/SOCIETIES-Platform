@@ -53,7 +53,14 @@
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		<dependency>
+		  <groupId>org.societies.cis</groupId>
+		  <artifactId>cis-management-client</artifactId>
+		  <version>${version.cis}</version>
+		  <scope>provided</scope>
+		</dependency>
+		  
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>

@@ -33,7 +33,6 @@ import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.societies.api.security.digsig.DigsigException;
-import org.societies.api.security.storage.StorageException;
 import org.societies.security.digsig.util.XmlManipulator;
 import org.societies.security.storage.CertStorage;
 import org.w3c.dom.Document;
@@ -54,8 +53,11 @@ public class SignatureCheck {
 	private XMLSignature customerSignature;
 	private X509Certificate customerCert;
 	
-	public SignatureCheck(Document doc) {
+	private CertStorage certStorage;
+	
+	public SignatureCheck(Document doc, CertStorage certStorage) {
 		this.doc = doc;
+		this.certStorage = certStorage;
 		
 		xml = new XmlManipulator();
 		xml.setDocument(doc);
@@ -78,11 +80,7 @@ public class SignatureCheck {
 		extractSignatures(); // Make sure signatures were extracted
 		
 		X509Certificate ourCert;
-		try {
-			ourCert = CertStorage.getInstance().getOurCert();
-		} catch (StorageException e1) {
-			throw new DigsigException(e1);
-		}
+		ourCert = certStorage.getOurCert();
 		
 		for (XMLSignature sig : signatures) {
 			if (hasReference(sig, sopElemRef)) {

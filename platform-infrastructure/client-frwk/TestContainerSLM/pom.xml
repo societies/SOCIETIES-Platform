@@ -27,8 +27,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidAgent</artifactId>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
 		</dependency>
 		<dependency>

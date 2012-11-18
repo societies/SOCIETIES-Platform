@@ -39,15 +39,16 @@ import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AJoinResponse;
+import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
-import org.societies.android.platform.cis.CisDirectoryRemote;
-import org.societies.android.platform.cis.CommunityManagement;
-import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
+import org.societies.android.platform.cis.CisDirectoryLocal;
+import org.societies.android.platform.cis.CommunityManagementLocal;
+import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
 
 import android.app.Notification;
 import android.content.BroadcastReceiver;
@@ -148,7 +149,7 @@ public class PluginCISFunctions extends Plugin {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to ICisDirectory service");
         	//get a local binder
-        	org.societies.android.platform.cis.CisDirectoryRemote.LocalBinder binder = (org.societies.android.platform.cis.CisDirectoryRemote.LocalBinder) service;
+        	org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder binder = (org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder) service;
             //obtain the service's API
         	serviceCISdir = (ICisDirectory) binder.getService();
         	serviceCISdirConnected = true;
@@ -166,9 +167,9 @@ public class PluginCISFunctions extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//CREATE INTENT FOR EACH SERVICE
-    	Intent intentCisManager = new Intent(this.ctx.getContext(), CommunityManagement.class);
-    	Intent intentCisSubscribe = new Intent(this.ctx.getContext(), CommunityManagement.class);
-    	Intent intentCisDir = new Intent(this.ctx.getContext(), CisDirectoryRemote.class);
+    	Intent intentCisManager = new Intent(this.ctx.getContext(), CommunityManagementLocal.class);
+    	Intent intentCisSubscribe = new Intent(this.ctx.getContext(), CommunityManagementLocal.class);
+    	Intent intentCisDir = new Intent(this.ctx.getContext(), CisDirectoryLocal.class);
     	
     	//BIND TO SERVICES
     	this.ctx.getContext().bindService(intentCisManager, cisManagerConnection, Context.BIND_AUTO_CREATE);
@@ -247,7 +248,9 @@ public class PluginCISFunctions extends Plugin {
 				try { //CREATE CIS
 					JSONArray jArray = data.getJSONArray(4); //ListCriteria
 					List<ACriteria> criteriaList = CreateCriteriaList(jArray);
-					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), criteriaList, data.getString(5));
+					AMembershipCrit aMembCrit = new AMembershipCrit();
+					aMembCrit.setACriteria(criteriaList);
+					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), aMembCrit, data.getString(5));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

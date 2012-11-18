@@ -23,6 +23,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.identity.IdentityManagerImpl;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.IQ;
@@ -366,12 +367,20 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
 	public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
 		this.privacyLog = privacyLog;
-		privacyLogEnabled = true;
+		if (privacyLog!=null)
+			privacyLogEnabled = true;
 	}
 	
 	private void privacyLog(Stanza stanza, Object payload) {
-		if (privacyLogEnabled) {
-			privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
+		try {
+			if (privacyLogEnabled) {
+				privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
+			}
+		} catch (ServiceUnavailableException e) {
+			// When societies platform plan is started, some components invoke comms-fw
+			// immediately, before the privacy protection bundle is started and this
+			// exception occurs. If the container is still starting, it is harmless.
+			log.info("Harmless ServiceUnavailableException for PrivacyLog...");
 		}
 	}
 }

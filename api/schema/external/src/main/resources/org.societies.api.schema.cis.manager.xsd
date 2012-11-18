@@ -124,6 +124,7 @@
 	<xs:complexType>
 		<xs:sequence>
 			<xs:element ref='ins:community'/>
+			<xs:element name='privacyPolicy' type='xs:string' minOccurs='1' maxOccurs='1'/>
 		</xs:sequence>
 		<xs:attribute name='result' type='xs:boolean'/>
 	</xs:complexType>

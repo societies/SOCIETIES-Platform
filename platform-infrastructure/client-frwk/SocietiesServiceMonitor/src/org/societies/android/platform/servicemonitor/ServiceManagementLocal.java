@@ -43,12 +43,12 @@ public class ServiceManagementLocal extends Service {
     @Override
 	public void onCreate () {
 		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ServiceDiscoveryLocal service starting");
+		Log.d(LOG_TAG, "ServiceManagementLocal service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "ServiceDiscoveryLocal service terminating");
+		Log.d(LOG_TAG, "ServiceManagementLocal service terminating");
 	}
 
 	/**Create Binder object for local service invocation */

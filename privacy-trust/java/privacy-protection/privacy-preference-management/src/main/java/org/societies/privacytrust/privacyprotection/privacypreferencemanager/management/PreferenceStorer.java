@@ -47,8 +47,16 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
+import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
 
 
 
@@ -70,13 +78,19 @@ public class PreferenceStorer {
 	public void deletePreference(CtxIdentifier id){
 		CtxAttribute attrPreference;
 		try {
-			attrPreference = (CtxAttribute) ctxBroker.retrieve(id);
+			attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference == null){
 				this.logging.debug("Cannot delete preference. Doesn't exist");
 			}else{
 				ctxBroker.remove(id);
 			}
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -86,11 +100,23 @@ public class PreferenceStorer {
 	public boolean storeExisting(CtxIdentifier id, IPrivacyPreferenceTreeModel p){
 		this.logging.debug("Request to store preference to id:"+id.toUriString());
 		try {
+			Future<CtxAttribute> futureAttr;
+			CtxAttribute attr = null;
+			if (p instanceof PPNPrivacyPreferenceTreeModel){
+				PPNPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toPPNPrivacyPreferenceTreeModelBean((PPNPrivacyPreferenceTreeModel) p);
+				 futureAttr = ctxBroker.updateAttribute(((CtxAttributeIdentifier) id), SerialisationHelper.serialise(bean));
+				 attr = futureAttr.get();
+			}
+			else if (p instanceof IDSPrivacyPreferenceTreeModel){
+				IDSPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toIDSPreferenceTreeModelBean((IDSPrivacyPreferenceTreeModel) p);
+				 futureAttr = ctxBroker.updateAttribute(((CtxAttributeIdentifier) id), SerialisationHelper.serialise(bean));
+				attr = futureAttr.get();
+			}
 			
-			Future<CtxAttribute> futureAttr = ctxBroker.updateAttribute(((CtxAttributeIdentifier) id), SerialisationHelper.serialise(p));
 			
-			CtxAttribute attr = futureAttr.get();
-			
+			else if (p instanceof DObfPrivacyPreferenceTreeModelBean){
+				//TODO:!!!!
+			}
 			if (null==attr){
 				this.logging.debug("Id doesn't exist in DB. Returning error");
 				return false;	
@@ -185,7 +211,18 @@ public class PreferenceStorer {
 				ctxBroker.update(assoc);
 				//JOptionPane.showMessageDialog(null, "key is: "+key);
 				CtxAttribute attr = ctxBroker.createAttribute(preferenceEntity.getId(), key).get();
-				ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
+				
+				if (iptm instanceof PPNPrivacyPreferenceTreeModel){
+					PPNPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toPPNPrivacyPreferenceTreeModelBean((PPNPrivacyPreferenceTreeModel) iptm);
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
+				}
+				else if (iptm instanceof IDSPrivacyPreferenceTreeModel){
+					IDSPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toIDSPreferenceTreeModelBean((IDSPrivacyPreferenceTreeModel) iptm);
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
+				}
+				else if (iptm instanceof DObfPreferenceTreeModel){
+					//TODO:!!!
+				}
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();
 			}else{
@@ -194,7 +231,17 @@ public class PreferenceStorer {
 				}
 				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
 				CtxAttribute attr = ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key).get();
-				ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
+				if (iptm instanceof PPNPrivacyPreferenceTreeModel){
+					PPNPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toPPNPrivacyPreferenceTreeModelBean((PPNPrivacyPreferenceTreeModel) iptm);
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
+				}
+				else if (iptm instanceof IDSPrivacyPreferenceTreeModel){
+					IDSPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toIDSPreferenceTreeModelBean((IDSPrivacyPreferenceTreeModel) iptm);
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
+				}
+				else if (iptm instanceof DObfPreferenceTreeModel){
+					//TODO:!!!
+				}
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();
 			}
@@ -225,7 +272,9 @@ public class PreferenceStorer {
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
 					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
-					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(registry)).get();
+					
+					RegistryBean bean = registry.toRegistryBean();
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
 					if (null==attr){
 						this.logging.debug("Preference Registry not updated.");
 					}else{
@@ -250,7 +299,8 @@ public class PreferenceStorer {
 					}
 					
 					CtxAttribute attr = ctxBroker.createAttribute(person.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
-					attr.setBinaryValue(SerialisationHelper.serialise(registry));
+					RegistryBean bean = registry.toRegistryBean();
+					attr.setBinaryValue(SerialisationHelper.serialise(bean));
 					ctxBroker.update(attr);
 					
 					

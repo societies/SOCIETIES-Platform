@@ -62,14 +62,16 @@ public class CisManagerClientCallback implements ICommCallback {
 			
 			// join response
 			if(c.getJoinResponse() != null){
-				LOG.info("Join response received");
+				LOG.debug("Join response received");
 				if(c.getJoinResponse().isResult() && c.getJoinResponse().getCommunity() != null){
 					// updates the list of CIS where I belong
 					cisManag.subscribeToCis(new CisRecord(c.getJoinResponse().getCommunity().getCommunityName(),
-							c.getJoinResponse().getCommunity().getCommunityJid()));
-					LOG.info("subscription worked");
+							c.getJoinResponse().getCommunity().getCommunityJid(),c.getJoinResponse().getCommunity().getOwnerJid()));
+					LOG.debug("subscription worked");
 					if(null != cisManag.getiUsrFeedback()){
-						cisManag.getiUsrFeedback().showNotification("join completed");
+						if(cisManag.isPrivacyPolicyNegotiationIncluded())
+							cisManag.getiUsrFeedback().showNotification("join completed");
+						//LOG.debug("usr feedback component called on join");
 					}
 	
 				}
@@ -85,12 +87,12 @@ public class CisManagerClientCallback implements ICommCallback {
 			
 			// leave response
 			if(c.getLeaveResponse() != null){
-				LOG.info("Leave response received");
+				LOG.debug("Leave response received");
 				if(c.getLeaveResponse().isResult() ){
 					// updates the list of CIS where I belong
 					if (!cisManag.unsubscribeToCis(stanza.getFrom().getBareJid()))
-						LOG.info("unsubscription did not worked");
-						LOG.info("unsubscription worked");
+						LOG.debug("unsubscription did not worked");
+						LOG.debug("unsubscription worked");
 
 					
 				}
@@ -104,9 +106,9 @@ public class CisManagerClientCallback implements ICommCallback {
 
 			// get info response
 			if(c.getGetInfoResponse() != null){
-				LOG.info("Get info response received");
+				LOG.debug("Get info response received");
 				if(c.getGetInfoResponse().isResult()  ){
-					LOG.info("get info arrived fine");
+					LOG.debug("get info arrived fine");
 	
 				}
 				else{ // there is no result field

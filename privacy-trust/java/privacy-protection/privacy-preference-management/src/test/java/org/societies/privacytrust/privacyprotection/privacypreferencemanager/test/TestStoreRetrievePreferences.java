@@ -139,6 +139,8 @@ public class TestStoreRetrievePreferences {
 			//Mockito.when(myMsgBox.showConfirmDialog(Mockito.anyString(),Mockito.anyString(), Mockito.eq(JOptionPane.YES_NO_OPTION))).thenReturn(JOptionPane.YES_OPTION);		
 			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(ppnp_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(ppnp_1_CtxAttribute));
 			Mockito.when(ctxBroker.retrieve(locationAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.locationAttribute));
+			Mockito.when(ctxBroker.retrieve(Mockito.eq(ppnp_1_CtxAttribute.getId()))).thenReturn(new AsyncResult<CtxModelObject>(ppnp_1_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(Mockito.eq(ppnp_2_CtxAttribute.getId()))).thenReturn(new AsyncResult<CtxModelObject>(ppnp_2_CtxAttribute));
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

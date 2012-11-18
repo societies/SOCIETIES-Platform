@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	 </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -28,35 +28,25 @@
     	<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-    		<artifactId>PubsubClientBundle</artifactId>
+    		<artifactId>PubsubClient</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-    		<artifactId>PubsubServiceBundle</artifactId>
+    		<artifactId>PubsubService</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
-		
-		<!-- Commons # only to support hardcoded destination -->
-    	<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
 		</dependency>
 		
 		<dependency>
@@ -85,7 +75,7 @@
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
 			<version>2.6.4</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			<exclusions>
 			    <!-- StAX is not available on Android -->
 			    <exclusion>
@@ -103,12 +93,6 @@
 			    </exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-		    <groupId>org.societies.maven.converters</groupId>
-		    <artifactId>SimpleXMLConverters</artifactId>
-		    <version>0.1</version>
-		    <scope>compile</scope>
-		</dependency>	
     </dependencies>
 
     <build>
@@ -116,12 +100,32 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.7.5</version>
+				<version>0.8.0</version>
 				<executions>
 					<execution>
+						<id>main-generate</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						<configuration>
+							<schemaIncludes>
+								<include>test.xsd</include>
+							</schemaIncludes>
+							<generateDirectory>${project.build.directory}/generated-sources/test</generateDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>event-generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaIncludes>
+								<include>test#event.xsd</include>
+							</schemaIncludes>
+							<generatePackage>org.societies.test.event</generatePackage>
+							<generateDirectory>${project.build.directory}/generated-sources/event</generateDirectory>
+						</configuration>
 					</execution>
 				</executions>
 				<configuration>
@@ -131,11 +135,19 @@
 					<readOnly>yes</readOnly>
 					<removeOldOutput>true</removeOldOutput>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>net.java.dev.vcc.thirdparty</groupId>
+						<artifactId>collection-setter-injector</artifactId>
+						<version>0.5.0-1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
+			
 			<plugin>
-					<groupId>org.societies.maven</groupId>
+				<groupId>org.societies.maven</groupId>
 				<artifactId>jaxb2simple-maven-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>1.0</version>
 				<executions>
 					<execution>
 						<phase>process-sources</phase>
@@ -168,10 +180,11 @@
     						!com.sun.xml.fastinfoset.*,
     						!com.sun.msv.*,
     						org.societies.api.identity,
-							*;resolution:=optional
+							*
     					</Import-Package>
     					<Export-Package>
-    						org.societies.test
+    						org.societies.test,
+    						org.societies.test.event
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
@@ -179,5 +192,59 @@
 	       		</configuration>
 			</plugin>		
 		</plugins>
-	</build>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.societies.maven
+										</groupId>
+										<artifactId>
+											jaxb2simple-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0,)
+										</versionRange>
+										<goals>
+											<goal>convert</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.jvnet.jaxb2.maven2
+										</groupId>
+										<artifactId>
+											maven-jaxb2-plugin
+										</artifactId>
+										<versionRange>
+											[0.7.5,)
+										</versionRange>
+										<goals>
+											<goal>generate</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+    </build>
 </project>

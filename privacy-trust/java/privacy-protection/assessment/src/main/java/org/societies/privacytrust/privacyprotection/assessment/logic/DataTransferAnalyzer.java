@@ -24,8 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,74 @@ public class DataTransferAnalyzer {
 		correlation = new Correlation(privacyLog);
 	}
 	
+	public List<DataTransmissionLogEntry> getDataTransmission(IIdentity receiver, Date start, Date end) {
+		
+		List<DataTransmissionLogEntry> matchedEntries = new ArrayList<DataTransmissionLogEntry>();
+		String jid;
+		IIdentity identity;
+		
+		if (receiver == null || receiver.getJid() == null) {
+			LOG.warn("getDataTransmission({}): receiver or receiver JID is null", receiver);
+			return matchedEntries;
+		}
+		
+		jid = receiver.getJid();
+		for (DataTransmissionLogEntry d : privacyLog.getDataTransmission()) {
+			identity = d.getReceiver();
+			if (identity == null) {
+				continue;
+			}
+			if (jid.equals(identity.getJid()) &&
+					d.getTime().after(start) && d.getTime().before(end)) {
+				matchedEntries.add(d);
+			}
+		}
+		return matchedEntries;
+	}
+	
+	
+	public Map<IIdentity, Integer> getNumDataTransmissionEventsForAllReceivers(Date start, Date end) {
+		
+		Map<IIdentity, Integer> result = new HashMap<IIdentity, Integer>();
+		List<IIdentity> receivers = getDataTransmissionReceivers();
+		
+		for (IIdentity receiver : receivers) {
+			result.put(receiver, getNumDataTransmissionEvents(receiver, start, end));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Get number of events in certain time period where data has been sent to given receiver.
+	 * 
+	 * @param receiver Identity of the receiver (the one data has been sent to)
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return All events where receiver matches
+	 */
+	public int getNumDataTransmissionEvents(IIdentity receiver, Date start, Date end) {
+		
+		List<DataTransmissionLogEntry> matchedEntries = getDataTransmission(receiver, start, end);
+		
+		return matchedEntries.size();
+	}
+
+	public List<IIdentity> getDataTransmissionReceivers() {
+		
+		List<IIdentity> matches = new ArrayList<IIdentity>();
+		IIdentity receiver;
+		
+		for (DataTransmissionLogEntry d : privacyLog.getDataTransmission()) {
+			receiver = d.getReceiver();
+			if (!matches.contains(receiver) && receiver != null) {
+				LOG.debug("getDataTransmissionReceivers(): Adding identity {}", receiver);
+				matches.add(receiver);
+			}
+		}
+		return matches;
+	}
+
 	public AssessmentResultIIdentity estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
 		
 		if (sender == null || sender.getJid() == null) {

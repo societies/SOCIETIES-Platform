@@ -44,6 +44,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
@@ -135,9 +136,10 @@ public class ServiceControlController {
 			while(servIt.hasNext()){
 				Service next = servIt.next();
 				
-				String serviceId = next.getServiceIdentifier().getServiceInstanceIdentifier()+ "_" +next.getServiceIdentifier().getIdentifier().toString();
+				String serviceId = ServiceModelUtils.getServiceId64Encode(next.getServiceIdentifier());
 				
-				if(logger.isDebugEnabled()) logger.debug("Service: " + serviceId);
+				if(logger.isDebugEnabled())
+					logger.debug("Service: " + serviceId);
 				
 				services.put(serviceId, next.getServiceName());
 				
@@ -165,7 +167,7 @@ public class ServiceControlController {
 	public ModelAndView serviceControlPost(@Valid ServiceControlForm scForm,
 			BindingResult result, Map model) {
 
-		String returnPage = "servicecontrolresult";
+		String returnPage = "servicediscoveryresult";
 		if (result.hasErrors()) {
 			model.put("result", "service control form error");
 			return new ModelAndView("servicecontrol", model);
@@ -189,7 +191,7 @@ public class ServiceControlController {
 			logger.debug("node =  " + node );
 			logger.debug("method=" + method );
 			logger.debug("url: " + url );
-			logger.debug("Service Id:" + serviceUri );
+			logger.debug("Service Id (encoded): " + serviceUri );
 			logger.debug("Endpoint: " + endpoint);
 		}
 		
@@ -200,8 +202,11 @@ public class ServiceControlController {
 			return new ModelAndView("servicecontrolresult", model);
 		}
 		
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		
+		ServiceResourceIdentifier serviceId = null;
+		if(serviceUri != null && !serviceUri.equals("NONE"))
+			serviceId = ServiceModelUtils.getServiceId64Decode(serviceUri);
+
+		/*
 		if(!serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
 			int index = serviceUri.indexOf('_');	
 			String bundleExtract = serviceUri.substring(0, index);
@@ -217,6 +222,7 @@ public class ServiceControlController {
 				e1.printStackTrace();
 			}
 		}
+		*/
 		
 		if(!method.equalsIgnoreCase("InstallService") && !endpoint.isEmpty() && (serviceUri.equals("REMOTE") || serviceUri.equals("NONE"))){
 			if(logger.isDebugEnabled()) logger.debug("It's a remote service, so we need to check it: " + endpoint);
@@ -255,7 +261,12 @@ public class ServiceControlController {
 		
 		try {
 	
-	
+			if (returnPage.equals("servicediscoveryresult")) {
+				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
+				List<Service> services = asynchServices.get();
+				model.put("services", services);	
+			}
+			
 			if (method.equalsIgnoreCase("InstallService")) {
 				
 				URL serviceUrl = new URL(url);
@@ -422,12 +433,7 @@ public class ServiceControlController {
 				res="error unknown method";
 			}
 		
-			if (returnPage.equals("servicediscoveryresult")) {
-				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
-				List<Service> services = asynchServices.get();
-				model.put("services", services);	
-			}
-			
+
 		} catch (ServiceControlException e) {
 			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
 		} catch (Exception ex) {

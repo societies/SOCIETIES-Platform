@@ -1,63 +1,48 @@
-<!-- A pre-requisite is to create $ANDROID_HOME and ensure that 
-	$ANDROID_HOME/tools is included on the $PATH.
-	Alternatively, create property to determine path 
-	to Android emulator command
--->
-<project name="android-coverage-build" default="build" basedir=".">
-    <description>
-        builds all Android applications, tests and gets coverage
-    </description>
-  <!-- set global properties for this build -->
-  <property name="android-root" location="../platform-infrastructure/client-frwk"/>
-  <property name="test-avd" value="Test22Device"/>
-  <property name="societies-main-build-root" location="." ></property>
-  <property name="societies-coverage-report" value="true" ></property>
+<!-- Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY 
+	(TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET (SN), GERMAN AEROSPACE CENTRE 
+	(Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne 
+	tehnologije informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE 
+	OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE COMMUNICATIONS (LAKE), 
+	INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, 
+	SA (PTIN), IBM Corp., INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI 
+	KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI), 
+	TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC)) All 
+	rights reserved. Redistribution and use in source and binary forms, with 
+	or without modification, are permitted provided that the following conditions 
+	are met: 1. Redistributions of source code must retain the above copyright 
+	notice, this list of conditions and the following disclaimer. 2. Redistributions 
+	in binary form must reproduce the above copyright notice, this list of conditions 
+	and the following disclaimer in the documentation and/or other materials 
+	provided with the distribution. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT 
+	HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
+	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+	HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+	OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
+	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+	OF SUCH DAMAGE. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+			http://maven.apache.org/maven-v4_0_0.x">
+	<modelVersion>4.0.0</modelVersion>
 
-  <target name="build">
-	<antcall target="start-emulator-wait"></antcall>  
-	<antcall target="TestIPCServiceExample"></antcall>  
-  </target>
+	<!-- Setup the identity of this builder -->
+	<groupId>org.societies</groupId>
+	<artifactId>android-builder</artifactId>
+	<packaging>pom</packaging>
+	<version>0.1</version>
+	<name>Android Builder</name>
 
-	<!-- This task will build the test app, install and run tests and generate the coverage report -->
-  <target name="IPCServiceExample"  description="build IPCServiceExample">
-	 <ant antfile="build.xml" dir="${android-root}/IPCServiceExample" useNativeBasedir="true">
-		<target name="all"/>
-		<target name="clean"/>
-		<target name="emma"/>
-		<target name="debug"/>
-		<target name="install"/>
-	 </ant>
-  </target>
-	<!-- This task will build the test app, install and run tests and generate the coverage report -->
-  <target name="TestIPCServiceExample"  description="test IPCServiceExample" depends="IPCServiceExample" >
-	 <ant antfile="build.xml" dir="${android-root}/TestIPCServices" useNativeBasedir="true">
-		<target name="all"/>
-		<target name="clean"/>
-		<target name="emma"/>
-		<target name="debug"/>
-		<target name="install"/>
-		<target name="test"/>
-	 </ant>
-  </target>
-	<!-- Start Android emulator AVD as daemon. Emulator will cease when ant script terminates
-		N.B. loads emulator as a headless or non GUI application. Required for 
-		build server environments where OS is a server version -->
-  <target name="start-test-emulator">
-	<parallel>
-		<daemons>
-			<exec executable="emulator">
-                                        <arg value="-no-window"/>
-					<arg value="-avd"/>
-					<arg value="${test-avd}"/>
-			 </exec>
-		</daemons>
-	</parallel>
-   </target>
-	<!-- Delay ant to allow Android emulator AVD to start and configure itself.
-		Adjust sleep duration if default value is too short-->
-   <target name="start-emulator-wait" depends="start-test-emulator">
-	<sleep seconds="60"/>
-   </target>
+	<!-- All Android projects to be included in nightly builds -->
+	<modules>
+		<module>../../parent/version.xml</module>
+		<module>../../parent/android.xml</module>
 
+		<!-- Societies Android Events -->
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/android-events-builder.xml</module>
+
+	</modules>
 </project>
-

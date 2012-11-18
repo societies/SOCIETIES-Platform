@@ -64,7 +64,8 @@ public interface ICisOwned extends ICis {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Future<Set<ICisParticipant>> getMemberList();
+	//public Future<Set<ICisParticipant>> getMemberList();
+	public Set<ICisParticipant> getMemberList();
 	
 	
 	/**
@@ -76,8 +77,12 @@ public interface ICisOwned extends ICis {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException;
+	//public Future<Boolean> addMember(String jid, String role) throws  CommunicationException;
 
+	
+	public boolean addMember(String jid, String role);
+
+	
 	/**
 	 * remove a member from the CIS 
 	 * 
@@ -86,12 +91,11 @@ public interface ICisOwned extends ICis {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException;
+	public boolean removeMemberFromCIS(String jid);
+	//public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException;
 	
 	
-	// some getters and setters. TODO: change them to return Future so they can work for both remote and local CISs
-	// as soon as this is done, we will add the javadoc as well
-	public String getOwnerId();
+
 	public String getCisType();
 	public String setCisType(String type);
 	public String getDescription();

@@ -67,6 +67,12 @@ public class ICISSimulated implements ICisOwned {
 	}
 
     @Override
+    public void getInfo(Requestor req,ICisManagerCallback callback){
+		// TODO Auto-generated method stub
+
+	}
+    
+    @Override
     public void getListOfMembers(ICisManagerCallback callback) {
     	// TODO Auto-generated method stub
     	
@@ -97,28 +103,20 @@ public class ICISSimulated implements ICisOwned {
 
 
 	@Override
-	public Future<Set<ICisParticipant>> getMemberList() {
+	public Set<ICisParticipant> getMemberList() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<Boolean> addMember(String jid, String role)
-			throws CommunicationException {
-		final boolean ret = this.members.add(jid);
-		return new FutureTask<Boolean>(new Callable<Boolean>() {
-		@Override
-		public Boolean call() throws Exception {
-			// TODO Auto-generated method stub
-			return ret;
-		}});
+	public boolean addMember(String jid, String role) {
+		return this.members.add(jid);
 	}
 
 	@Override
-	public Future<Boolean> removeMemberFromCIS(String jid)
-			throws CommunicationException {
+	public boolean removeMemberFromCIS(String jid){
 		// TODO Auto-generated method stub
-		return null;
+		return true;
 	}
 
 	@Override

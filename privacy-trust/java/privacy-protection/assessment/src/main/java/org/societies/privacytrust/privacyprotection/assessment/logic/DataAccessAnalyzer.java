@@ -104,7 +104,9 @@ public class DataAccessAnalyzer {
 	 * @return All events where requestor matches
 	 */
 	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end) {
+		
 		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestor, start, end);
+		
 		return matchedEntries.size();
 	}
 	
@@ -117,7 +119,9 @@ public class DataAccessAnalyzer {
 	 * @return All events where requestor matches
 	 */
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
+		
 		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestorClass, start, end);
+		
 		return matchedEntries.size();
 	}
 	
