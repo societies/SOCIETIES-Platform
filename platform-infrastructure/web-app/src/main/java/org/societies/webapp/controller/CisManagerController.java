@@ -120,6 +120,16 @@ public class CisManagerController {
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
 	
+	
+	// probably going to be deleted
+	@RequestMapping(value="/manage_communities.html",method = RequestMethod.GET)
+	public ModelAndView showManagerCommunitiesPage() {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		return new ModelAndView("manage_communities", model) ;
+		
+	}
+	
 	// SHOW CREATE COMMUNITY
 	
 	@RequestMapping(value="/create_community.html",method = RequestMethod.GET)

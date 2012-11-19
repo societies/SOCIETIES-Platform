@@ -150,7 +150,7 @@
 	
 	<ul>
 	<xc:forEach var="activity" items="${activities}">
-			<li>
+			<li class="activity_item_class">
 	${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
 	
 	<xc:if test="${activity.getTarget() != null}">
@@ -220,13 +220,14 @@
 </header>
 <ul class="sidebar">
 <xc:forEach var="participant" items="${cisInfo.getParticipant()}">
-		<li>
+		<li class="member_item_class">
 <a href="friend_profile.html?cssId=${participant.getJid()}">${participant.getJid()}</a>
 <xc:if test="${isOwner == true && cisInfo.getOwnerJid() != participant.getJid()}">
 		<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}&cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
 </xc:if>
  
 		</li>
+		<li><a id="linkBrowseNExtMembers" class="furtherinfo-link" onclick="nextMembers();">Next</a> <a id="linkBrowsePreviousMembers" class="furtherinfo-link" onclick="previoustMembers();">Previous</a></li>
 </xc:forEach>
 
 
@@ -280,6 +281,57 @@
  
 $(document).ready(function(){
 	//startup functionality
+	
+	
+	//managing member list display
+	
+	// initial setup
+	var member_pagination = 5;
+	
+	var memberListFirstIndex = 0;
+	var memberSet = $(".member_item_class");
+	var memberSetSize = memberSet.length;
+	var lastPaginationSize = memberSetSize/member_pagination; 
+	
+	memberSet.slice(0,memberSetSize).hide();
+	if(memberSetSize <= member_pagination){
+		$("#linkBrowseNExtMembers").hide();
+		memberSet.slice(0,memberSetSize).show();
+	}
+	else{
+		memberSet.slice(0,member_pagination).show();
+	}
+	$("#linkBrowsePreviousMembers").hide();
+	
+	// Next function
+	function nextMembers(){
+		memberSet.slice(memberListFirstIndex,member_pagination +1).hide();
+		$("#linkBrowsePreviousMembers").show();
+		memberListFirstIndex = memberListFirstIndex + member_pagination;
+		if( (memberListFirstIndex + member_pagination) < lastPaginationSize ){
+			memberSet.slice(memberListFirstIndex,member_pagination +1).show();
+			$("#linkBrowseNExtMembers").show();
+		}else{
+			memberSet.slice(memberListFirstIndex,member_pagination +1).show();
+			$("#linkBrowseNExtMembers").hide();			
+		}
+	}
+	// Prev function
+	function previoustMembers(){
+		memberSet.slice(memberListFirstIndex,member_pagination +1).hide();
+		$("#linkBrowseNExtMembers").show();
+		memberListFirstIndex = memberListFirstIndex - member_pagination;
+		memberSet.slice(memberListFirstIndex,member_pagination +1).show();
+		if( (memberListFirstIndex - member_pagination) == 0){
+			$("#linkBrowsePreviousMembers").hide();
+		}
+	}
+	
+	
+	// managing activity list display
+	
+	
+	
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
 	 };
