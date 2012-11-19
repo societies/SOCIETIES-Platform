@@ -594,13 +594,18 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
-		for (String c : classList) {
-			Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(c);
-			Root rootAnnotation = clazz.getAnnotation(Root.class);
-			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
-			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try {
+			for (String c : classList) {
+				Class<?> clazz = cl.loadClass(c);
+				Root rootAnnotation = clazz.getAnnotation(Root.class);
+				Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+				if (rootAnnotation!=null && namespaceAnnotation!=null) {
+					elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+				}
 			}
+		} catch (ClassNotFoundException e) {
+			throw new ClassNotFoundException("Unable to load class using classloader "+cl.toString(), e);
 		}
 	}
 }
