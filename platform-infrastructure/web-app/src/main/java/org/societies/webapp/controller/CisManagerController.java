@@ -53,6 +53,7 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
@@ -263,10 +264,14 @@ public class CisManagerController {
 			model.put("response", response);
 			
 		// GET INFO
-		ICis icis = this.getCisManager().getCis(cisId);
+		ICis icis = this.getCisManager().getCis(cisId); // handler in case it is a owned/joined CIS
+		ICisRemote icisRemote= icis;
+		if(null == icisRemote){
+			icisRemote = this.getCisManager().getHandlerToRemoteCis(cisId); // basic CIS handler
+		}
 		CisManagerClient getInfoCallback = new CisManagerClient();
 		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
-		icis.getInfo(req,getInfoCallback);
+		icisRemote.getInfo(req,getInfoCallback);
 		
 		CommunityMethods res = 	getInfoCallback.getComMethObj();	
 		Community getInfResp = res.getGetInfoResponse().getCommunity();
@@ -309,18 +314,24 @@ public class CisManagerController {
 		//else
 		//	model.put("priacyPolicyString","no policy");
 		
-		// GET ACIVITIES
-		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
-		icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
-		org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
-		model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
 		
-		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
-		AddActivityForm form = new AddActivityForm();
-		model.put("activityForm",form);
-
-		AddMemberForm form2 = new AddMemberForm();
-		model.put("memberForm",form2);
+		// if its a CIS which we own or participate
+		
+		if( null != icis){
+		
+			// GET ACIVITIES
+			ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+			icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+			org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+			model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+			
+			//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+			AddActivityForm form = new AddActivityForm();
+			model.put("activityForm",form);
+	
+			AddMemberForm form2 = new AddMemberForm();
+			model.put("memberForm",form2);
+		}
 		
 		return new ModelAndView("community_profile", model) ;
 	}

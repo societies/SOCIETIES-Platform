@@ -119,43 +119,47 @@
 	<div class="error">${acitivityAddError}</div>
 </xc:if>
 
-<form:form method="POST" action="add_activity_cis_profile_page.html" commandName="activityForm" name="AddActivityForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		
-		<table id="addActivityFormInputs">
-		<tr>
-		<td><form:input path="object" defaultValue="write your activity here"/></td>
-		<td><form:errors path="object" cssClass="error" /></td>
-		</tr>
-		
-		<tr>
-			<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
-			<td><form:errors path="cisId" cssClass="error" /></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td><form:input path="verb" style="display:none;" value="posted"/></td>
-			<td><form:errors path="verb" cssClass="error" /></td>
-			<td>&nbsp;</td>
-		</tr>
+
+<xc:if test="${activities != null}"><!--list activities just if it is an owned or joined CIS-->
+	
+	<form:form method="POST" action="add_activity_cis_profile_page.html" commandName="activityForm" name="AddActivityForm">
+			<form:errors path="*" cssClass="errorblock" element="div" />
+			
+			<table id="addActivityFormInputs">
 			<tr>
-				<td colspan="3"><input id="postActButton" type="button" value="PostActivity"/></td>
+			<td><form:input path="object" defaultValue="write your activity here"/></td>
+			<td><form:errors path="object" cssClass="error" /></td>
 			</tr>
-		</table>
-		
-</form:form>
-
-<ul>
-<xc:forEach var="activity" items="${activities}">
-		<li>
-${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
-
-<xc:if test="${activity.getTarget() != null}">
-at 	<font color="red">${activity.getTarget()}</font>
-</xc:if>  
-		</li>
-</xc:forEach>
-</ul>
+			
+			<tr>
+				<td><form:input path="cisId" style="display:none;" value="${cisInfo.getCommunityJid()}"/></td>
+				<td><form:errors path="cisId" cssClass="error" /></td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td><form:input path="verb" style="display:none;" value="posted"/></td>
+				<td><form:errors path="verb" cssClass="error" /></td>
+				<td>&nbsp;</td>
+			</tr>
+				<tr>
+					<td colspan="3"><input id="postActButton" type="button" value="PostActivity"/></td>
+				</tr>
+			</table>
+			
+	</form:form>
+	
+	<ul>
+	<xc:forEach var="activity" items="${activities}">
+			<li>
+	${activity.getActor()} <font color="red"> ${activity.getVerb()} </font> ${activity.getObject()}  
+	
+	<xc:if test="${activity.getTarget() != null}">
+	at 	<font color="red">${activity.getTarget()}</font>
+	</xc:if>  
+			</li>
+	</xc:forEach>
+	</ul>
+</xc:if>
 
 <ul>
 <li>List item example</li>
