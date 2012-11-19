@@ -1313,8 +1313,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback){
 		LOG.debug("local get member list WITH CALLBACK called");
 
-		CommunityMethods c = new CommunityMethods();
-		
+		CommunityMethods c = new CommunityMethods(); // object to be returned in case of failure
+		WhoResponse w = new WhoResponse();
+		c.setWhoResponse(w);
+		w.setResult(false);
 		// -- Access control
 		if(null != this.privacyDataManager && null != requestor){
 			ResponseItem resp = null;
