@@ -78,9 +78,11 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	
 	HashSet<String> registeredDevices = new HashSet<String>();
 	
+	private int contextUpdateInterval;
+	
 	@SuppressWarnings("unused")
 	private void init(){
-		int updateCycle;
+		
 		try{
 			locationInference = new LocationManagementContextAccessor();
 			locationInference.init(contextSourceManagement, contextBroker, commManager);
@@ -88,9 +90,9 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 			LMConfiguratorImpl lmConfiguratorImpl = new LMConfiguratorImpl();
 			lmConfiguratorImpl.init(pubSubManager, commManager,commMngrController, this);
 			
-			updateCycle = PzPropertiesReader.instance().getUpdateCycle();
+			contextUpdateInterval = PzPropertiesReader.instance().getUpdateCycle();
 			
-			timer.scheduleAtFixedRate(new UpdateTask(),updateCycle, updateCycle);
+			timer.scheduleAtFixedRate(new UpdateTask(),contextUpdateInterval, contextUpdateInterval);
 			
 		}catch (Exception e) {
 			log.error("Exception msg: "+e.getMessage()+" ; Cause: "+e.getCause(),e);
@@ -195,7 +197,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 					userLocation = getEntityFullLocation(networkNode.getJid());
 					if (userLocation != null){
 						log.debug("update CSM node - "+networkNode.getJid()+" \t location: "+userLocation.toString());
-						locationInference.updateCSM(userLocation, networkNode);
+						locationInference.updateCSM(userLocation, networkNode,contextUpdateInterval);
 					}else{
 						log.debug("update CSM node - entity '"+networkNode.getJid()+"' wasn't identified by the LM system - can't perform update");
 					}

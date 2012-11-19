@@ -166,8 +166,11 @@ public class LocationManagementContextAccessor {
 		}
 	}
 	
-	public void updateCSM(IUserLocation userLocation,INetworkNode networkNode){
+	public void updateCSM(IUserLocation userLocation,INetworkNode networkNode,int contextUpdateInterval){
 		try{
+			
+			float contextUpdateIntervalHz = 1/(float)contextUpdateInterval ;
+			
 			String locationString = LMDataEncoding.encodeCoordinates(userLocation);
 			String symbolicLocationString = LMDataEncoding.encodeLocationSymbolic(userLocation);
 			DeviceInternalObject deviceInternalObject = getNodeObject(networkNode);
@@ -175,8 +178,8 @@ public class LocationManagementContextAccessor {
 			
 			String csmLocationTypeGlobal = deviceInternalObject.csmLocationTypeGlobal_internalId;
 			String csmLocationTypeSymbolic = deviceInternalObject.csmLocationTypeSymbolic_internalId;
-			contextSourceManagement.sendUpdate(csmLocationTypeGlobal,locationString, ctxEntity,false , 0, 0);
-			contextSourceManagement.sendUpdate(csmLocationTypeSymbolic,symbolicLocationString, ctxEntity,false , 0, 0);
+			contextSourceManagement.sendUpdate(csmLocationTypeGlobal,locationString, ctxEntity,false , 0, contextUpdateIntervalHz);
+			contextSourceManagement.sendUpdate(csmLocationTypeSymbolic,symbolicLocationString, ctxEntity,false , 0, contextUpdateIntervalHz);
 			
 			
 			String presonalTagValue = LMDataEncoding.encodePersonalTags(userLocation);
@@ -191,11 +194,11 @@ public class LocationManagementContextAccessor {
 			String csmLocationType_zoneType = 	deviceInternalObject.csmLocationTypeZoneType_internalId;
 			String csmLocationType_parentId = 	deviceInternalObject.csmLocationTypeParent_internalId;
 			
-			contextSourceManagement.sendUpdate(csmLocationType_personalTag,presonalTagValue, ctxEntity,false , 0, 0);
-			contextSourceManagement.sendUpdate(csmLocationType_tags,tagsValue, ctxEntity,false , 0, 0);
-			contextSourceManagement.sendUpdate(csmLocationType_zonesId,zonesValue, ctxEntity,false , 0, 0);
-			contextSourceManagement.sendUpdate(csmLocationType_zoneType,zoneTypeValue, ctxEntity,false , 0, 0);
-			contextSourceManagement.sendUpdate(csmLocationType_parentId,parentZoneValue, ctxEntity,false , 0, 0);
+			contextSourceManagement.sendUpdate(csmLocationType_personalTag,presonalTagValue, ctxEntity,false , 0, contextUpdateIntervalHz);
+			contextSourceManagement.sendUpdate(csmLocationType_tags,tagsValue, ctxEntity,false , 0, contextUpdateIntervalHz);
+			contextSourceManagement.sendUpdate(csmLocationType_zonesId,zonesValue, ctxEntity,false , 0, contextUpdateIntervalHz);
+			contextSourceManagement.sendUpdate(csmLocationType_zoneType,zoneTypeValue, ctxEntity,false , 0, contextUpdateIntervalHz);
+			contextSourceManagement.sendUpdate(csmLocationType_parentId,parentZoneValue, ctxEntity,false , 0, contextUpdateIntervalHz);
 			
 		}catch (Exception e) {
 			log.error("Exception msg: "+e.getMessage()+" \t exception cause: "+e.getCause(),e);
