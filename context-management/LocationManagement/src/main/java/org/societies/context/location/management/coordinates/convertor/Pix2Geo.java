@@ -91,7 +91,7 @@ public class Pix2Geo {
 					(pzX3*pzY1-pzX2*pzY1+pzX2*pzY3-pzX1*pzY3+pzX1*pzY2-pzX3*pzY2);
 			
 			
-			log.info("in Pix2Geo Ctor values are - A="+A+" ; B="+B+" ; C="+C+" ; D="+D+" ; E="+E+" ; F="+F);
+			log.debug("in Pix2Geo Ctor values are - A="+A+" ; B="+B+" ; C="+C+" ; D="+D+" ; E="+E+" ; F="+F);
 			
 		} catch (JSONException e) {
 			log.error("JSONException in Ctor; Exception msg: "+e.getMessage()+"\t ; cause: "+e.getCause());
@@ -141,7 +141,7 @@ public class Pix2Geo {
 		for (PointPair pointPair : arr){
 			logMsg += pointPair.toString() +"\n";
 		}
-		log.info(logMsg);
+		log.debug(logMsg);
 		
 		return arr;
 	}
