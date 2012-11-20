@@ -129,11 +129,11 @@ public class LoginController {
 		
 		// check that user was redirected to correct webapp by cloud controller
 		
-		if ((cssId != null) && (cssId.contains(this.getCommManager().getIdManager().getThisNetworkNode().getBareJid())))
+		if ((cssId != null) && (cssId.toLowerCase().contains(this.getCommManager().getIdManager().getThisNetworkNode().getBareJid().toLowerCase())))
 		{
 			//all okay, we're in the correct container
 			model.put("message", "Welcome to your Societies account");
-			session.setAttribute("User", cssId);
+			session.setAttribute("User", this.getCommManager().getIdManager().getThisNetworkNode().getBareJid());
 			return new ModelAndView("loginviada", model) ;
 		}
 		/*return modelandview object and passing login (jsp page name) and model object as
