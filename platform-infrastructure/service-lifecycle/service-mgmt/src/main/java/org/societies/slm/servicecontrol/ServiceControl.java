@@ -64,6 +64,7 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
@@ -99,6 +100,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private IDeviceManager deviceMngr;
 	private IUserFeedback userFeedback;
 	private IEventMgr eventMgr;
+	protected static boolean restart;
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private final long TIMEOUT = 5;
@@ -271,6 +273,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
+			//Before we start the bundle we prepare the entry on the hashmap
+			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
+			Long bundleId = new Long(serviceBundle.getBundleId());
+			
+			synchronized(this){		
+				installServiceMap.put(bundleId, idList);
+			}
+			
 			// Now we need to start the bundle
 			if(logger.isDebugEnabled())
 				logger.debug("Attempting to start the bundle: " + serviceBundle.getSymbolicName());
@@ -281,16 +291,24 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + ServiceModelUtils.getBundleStateName(serviceBundle.getState()));
 			
 			if(serviceBundle.getState() == Bundle.ACTIVE ){
-				logger.info("Service " + service.getServiceName() + " has been started.");
 				
+				service = idList.take();
+				
+				logger.info("Service " + service.getServiceName() + " has been started.");				
 				returnResult.setMessage(ResultMessage.SUCCESS);
-				return new AsyncResult<ServiceControlResult>(returnResult);
+				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
 			}
 			else{
-				logger.info("Service " + service.getServiceName() + " has NOT been started successfully.");
+				logger.info("Service " + service.getServiceName() + " has NOT been started successfully.");	
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
-				return new AsyncResult<ServiceControlResult>(returnResult);
-			}						
+			}
+
+			return new AsyncResult<ServiceControlResult>(returnResult);
+			
 		} catch(Exception ex){
 			logger.error("Exception occured while starting Service: " + ex.getMessage());
 			throw new ServiceControlException("Exception occured while starting Service.", ex);
@@ -385,7 +403,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Now we need to stop the bundle
 			if(logger.isDebugEnabled())
 				logger.debug("Attempting to stop the bundle: " + serviceBundle.getSymbolicName());
-
+			
+			//Before we start the bundle we prepare the entry on the hashmap
+			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
+			Long bundleId = new Long(serviceBundle.getBundleId());
+			
+			synchronized(this){		
+				installServiceMap.put(bundleId, idList);
+			}
+			
 			serviceBundle.stop();
 			
 			if(logger.isDebugEnabled())
@@ -394,6 +420,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(serviceBundle.getState() == Bundle.RESOLVED ){
 				logger.info("Service " + service.getServiceName() + " has been stopped.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+				Service serviceStopped = idList.take();
+				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			else{
@@ -589,7 +622,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					newServiceInstance.setParentIdentifier(serviceToInstall.getServiceIdentifier());
 
 					ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
-					newServImpl.setServiceClient(jarLocation.toString());
+					//newServImpl.setServiceClient(jarLocation.toString());
 					newServiceInstance.setServiceImpl(newServImpl);
 					newService.setServiceInstance(newServiceInstance);
 					
@@ -717,32 +750,26 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				//TODO Something to assure the other function is called first...
 				Service service = idList.take();
-				//Service service = idList.poll(TIMEOUT, TimeUnit.SECONDS);
-				
-				synchronized(this){
-					installServiceMap.remove(bundleId);
-				}
-				
-				//Service service = getServiceFromBundle(newBundle);
-				
+
 				if(service != null){
 					if(logger.isDebugEnabled()) logger.debug("Found service: " + service.getServiceName() + " so install was success!");
 					returnResult.setServiceId(service.getServiceIdentifier());
 					returnResult.setMessage(ResultMessage.SUCCESS);
-					return new AsyncResult<ServiceControlResult>(returnResult);
 				} else{
 					if(logger.isDebugEnabled()) logger.debug("Couldn't find the service!");
 					returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
-					return new AsyncResult<ServiceControlResult>(returnResult);
 				}
 				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
 			}
 			else{
 				logger.info("Bundle " + newBundle.getSymbolicName()  + " has been installed, but not activated.");
-				
-				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
-				return new AsyncResult<ServiceControlResult>(returnResult);
+				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);				
 			}
+
+			return new AsyncResult<ServiceControlResult>(returnResult);
 			
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
@@ -807,14 +834,21 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("It's the local node, installing...");
 				
-				Future<ServiceControlResult> asyncResult = null;
+				URI jarLocation = ServiceDownloader.downloadJar(bundleLocation);
 				
-				asyncResult = installService(bundleLocation);
+				if(jarLocation == null){
+					if(logger.isDebugEnabled())
+						logger.debug("Problem with downloading jar, no file available!");
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					sendUserNotification("Service not installed: Failure to download jar!");
+					return new AsyncResult<ServiceControlResult>(returnResult);	
+				}
+				
+				Future<ServiceControlResult> asyncResult = installService(jarLocation.toURL());
 				ServiceControlResult result = asyncResult.get();
-				
+
 				return new AsyncResult<ServiceControlResult>(result);
-			}
-					
+			}		
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
@@ -945,7 +979,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
-				sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+				if(service.getServiceStatus().equals(ServiceStatus.STARTED))
+					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+				
 				sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service);
 				
 				return new AsyncResult<ServiceControlResult>(returnResult);
@@ -964,15 +1000,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			logger.info("Uninstalling service " + service.getServiceName());
 			
-			/*
+			
 			//Before we uninstall the bundle we prepare the entry on the hashmap
 			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
 			Long bundleId = new Long(serviceBundle.getBundleId());
 			
-			synchronized(this){		
+			synchronized(this){
 				uninstallServiceMap.put(bundleId, idList);
 			}
-				*/
+				
 			
 			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: " + serviceBundle.getSymbolicName());
 			
@@ -982,6 +1018,31 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Bundle: " + serviceBundle.getSymbolicName() + " has been uninstalled.");
 
 				returnResult.setMessage(ResultMessage.SUCCESS);
+
+				Service serviceUninstalled = idList.take();
+				
+				synchronized(this){
+					uninstallServiceMap.remove(bundleId);
+				}
+				
+				if(logger.isDebugEnabled())
+					logger.debug("Now we need to delete the file: " + service.getServiceLocation());
+				
+				String serviceLocation = service.getServiceLocation();
+				int index = serviceLocation.indexOf('@');	
+				String newServiceLocation = serviceLocation.substring(index+1);
+
+				URI bundleLocation = new URI(newServiceLocation);
+	
+				File localBundle = new File(bundleLocation);
+				if(localBundle.isFile()){
+					boolean delete = localBundle.delete();
+					if(logger.isDebugEnabled())
+						logger.debug("Deleting file result: " + delete);
+					if(!delete)
+						localBundle.deleteOnExit();
+				}
+				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 				
 			} else{
@@ -1022,13 +1083,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	protected static boolean installingBundle(long bundleId){
-		if(logger.isDebugEnabled()) logger.debug("installingBundle Called");
+		if(logger.isDebugEnabled()) logger.debug("installingBundle Called for bundleId: " + bundleId );
 		return installServiceMap.containsKey(new Long(bundleId));
 	}
 	
 	protected static boolean uninstallingBundle(long bundleId){
-		if(logger.isDebugEnabled()) logger.debug("uninstallingBundle Called");
-		return installServiceMap.containsKey(new Long(bundleId));
+		if(logger.isDebugEnabled()) logger.debug("uninstallingBundle Called for bundleId: " + bundleId );
+		return uninstallServiceMap.containsKey(new Long(bundleId));
 	}	
 	
 	protected static void serviceInstalled(long bundleIdentifier, Service newService){
@@ -1322,6 +1383,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								servicesList.add(service);
 								getServiceReg().unregisterServiceList(servicesList);
 							} else{
+								getServiceReg().removeServiceSharingInCIS(ourService.getServiceIdentifier(), node.getJid());
 								updateActivityFeed(node,"Unshared",service);
 								sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
 							}
@@ -1389,132 +1451,119 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public void cleanAfterRestart(){
 		
 		if(logger.isDebugEnabled())
-			logger.debug("Cleaning and Restarting. First we try to restore already installed third party client!");
+			logger.debug("Cleaning and Restarting. First we try to restore already installed servers!");
+		
+		String fullJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+		List<Service> deleteServices = new ArrayList<Service>();
+
+		if(logger.isDebugEnabled()) 
+			logger.debug("The JID of this node is: " + fullJid);
 		
 		try{
-			Service filter = ServiceModelUtils.generateEmptyFilter();
-			filter.setServiceType(ServiceType.THIRD_PARTY_CLIENT);
+			//Service filter = ServiceModelUtils.generateEmptyFilter();
+			//filter.setServiceType(ServiceType.THIRD_PARTY_CLIENT);
 			
-			List<Service> thirdPartyClients = getServiceReg().findServices(filter);
+			List<Service> oldServices = getServiceReg().retrieveServicesSharedByCSS(fullJid);
 			
-			for(Service thirdPartyClient : thirdPartyClients){
+			for(Service oldService : oldServices){
 
-				String serviceLocation = thirdPartyClient.getServiceLocation();
+				if(oldService.getServiceType().equals(ServiceType.DEVICE) || oldService.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
+					if(logger.isDebugEnabled()) 
+						logger.debug("Service is a device or Android, so we don't reinstall...");
+					continue;
+				}
+
+				String serviceLocation = oldService.getServiceLocation();
 				
 				if(logger.isDebugEnabled())
 					logger.debug("Checking if Bundle with location: " + serviceLocation + " exists in OSGI...");
 				
 				Bundle thisBundle = this.bundleContext.getBundle(serviceLocation);
 				
-				if(thisBundle == null || (thisBundle != null && !(thisBundle.getSymbolicName().equals(thirdPartyClient.getServiceInstance().getServiceImpl().getServiceNameSpace())))){
+				if(thisBundle == null || (thisBundle != null && !(thisBundle.getSymbolicName().equals(oldService.getServiceInstance().getServiceImpl().getServiceNameSpace())))){
 					if(logger.isDebugEnabled()){
 						logger.debug("Bundle doesn't exist, or isn't our service! We need to install!");
-						logger.debug("Attempting to reinstall 3p client: " + thirdPartyClient.getServiceName());
-						logger.debug("Parent is: " + ServiceModelUtils.serviceResourceIdentifierToString(thirdPartyClient.getServiceInstance().getParentIdentifier()));
+						logger.debug("Attempting to reinstall service: " + oldService.getServiceName() + " from " + oldService.getServiceLocation());
+						//logger.debug("Parent is: " + ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceInstance().getParentIdentifier()));
 					}
-							
-					URI bundleLocation = new URI(thirdPartyClient.getServiceLocation());
+					
+					int index = serviceLocation.indexOf('@');	
+					String newServiceLocation = serviceLocation.substring(index+1);
+	
+					if(logger.isDebugEnabled())
+						logger.debug("ServiceLocation: " + serviceLocation);
+					
+					URI bundleLocation = new URI(newServiceLocation);
 		
 					File localBundle = new File(bundleLocation);
-					if(localBundle.exists()){
+					if(localBundle.isFile()){
 						Future<ServiceControlResult> asyncResult = installService(bundleLocation.toURL());
 						ServiceControlResult result = asyncResult.get();
 									
 						if(result.getMessage() == ResultMessage.SUCCESS){
 								
-							// We get the service from the registry
 							Service newService = getServiceReg().retrieveService(result.getServiceId());
+
+							if(newService.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT)){
+								// We get the service from the registry
+								ServiceInstance newServiceInstance = newService.getServiceInstance();
+								newServiceInstance.setParentJid(oldService.getServiceInstance().getParentJid());
+								newServiceInstance.setParentIdentifier(oldService.getServiceInstance().getParentIdentifier());
 								
-							ServiceInstance newServiceInstance = newService.getServiceInstance();
-							newServiceInstance.setParentJid(thirdPartyClient.getServiceInstance().getParentJid());
-							newServiceInstance.setParentIdentifier(thirdPartyClient.getServiceInstance().getParentIdentifier());
-							
-							ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
-							newServImpl.setServiceClient(bundleLocation.toString());
-							newServiceInstance.setServiceImpl(newServImpl);
-							newService.setServiceInstance(newServiceInstance);
-							
-							getServiceReg().updateRegisteredService(newService);
+								ServiceImplementation newServImpl = newServiceInstance.getServiceImpl();
+								newServiceInstance.setServiceImpl(newServImpl);
+								newService.setServiceInstance(newServiceInstance);
+								
+								getServiceReg().updateRegisteredService(newService);
+							}
 							
 							sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
 							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
 							
 							if(logger.isDebugEnabled())
-								logger.debug("Installed shared third-party service client for " + newService.getServiceName());
+								logger.debug("Installed service " + newService.getServiceName());
 							
 						} else{
-							if(logger.isDebugEnabled())
-								logger.debug("Installation of client for "+ thirdPartyClient.getServiceName() +" was not successful");
+							if(logger.isDebugEnabled()){
+								logger.debug("Installation of "+ ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()) +" was not successful");
+								logger.debug("Deleting the service from database: " + oldService);
+							}
+								deleteServices.add(oldService);
 						}
 					} else{
-						if(logger.isDebugEnabled())
-							logger.debug("Bundle for " + thirdPartyClient.getServiceName() + " can't be found at: " + bundleLocation);
+						if(logger.isDebugEnabled()){
+							logger.debug("Bundle for " + ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()) + " can't be found at: " + bundleLocation);
+							logger.debug("Deleting the service from database: " + oldService);
+						}
+							deleteServices.add(oldService);
 					}
 					
-				} 
-				 
-				
-
+				} else{
+					if(logger.isDebugEnabled()){
+						logger.debug("Bundle for " + ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()) + " is installed!");
+					}
+				}
+				 	
 			}
+			
 		} catch(Exception ex){
 			logger.error("Error on cleanAfterRestart, not able to restart installed 3rd party service clients");
 			ex.printStackTrace();
 		}
 		
 		if(logger.isDebugEnabled()) 
-			logger.debug("Checking database and cleaning services that are no longer installed");
-		
-		String fullJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
-		
-		if(logger.isDebugEnabled()) 
-			logger.debug("The JID of this node is: " + fullJid);
-		
-		try{
-		 	List<Service> oldServices = getServiceReg().retrieveServicesSharedByCSS(fullJid);
-			List<Service> deleteServices = new ArrayList<Service>();
-					
-			for(int i = 0; i < oldServices.size(); i++){
-				Service oldService = oldServices.get(i);
+			logger.debug("Cleaning services that are no longer installed");
 				
-				if(logger.isDebugEnabled())
-					logger.debug("Checking if Service " + oldService.getServiceName() + " exists!");
-			
-				if(!oldService.getServiceType().equals(ServiceType.DEVICE) && !oldService.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
-					
-					String serviceLocation = oldService.getServiceLocation();
-					
-					if(logger.isDebugEnabled())
-						logger.debug("Checking if Bundle with location: " + serviceLocation + " exists in OSGI...");
-					
-					Bundle thisBundle = this.bundleContext.getBundle(serviceLocation);
-
-					if(thisBundle == null){
-						if(logger.isDebugEnabled())
-							logger.debug("Bundle doesn't exist, so we delete the service!");
-						
-						deleteServices.add(oldService);
-					} else{
-						if(!(thisBundle.getSymbolicName().equals(oldService.getServiceInstance().getServiceImpl().getServiceNameSpace()))){
-							if(logger.isDebugEnabled())
-								logger.debug("Bundle exists but isn't our service, removing the service!");
-							
-							deleteServices.add(oldService);
-						}
-					}
-				} else{
-					if(logger.isDebugEnabled())
-						logger.debug("Service is a device or android...");
-				}
-					
-			}
-			
+		try{
+		 	
 			getServiceReg().unregisterServiceList(deleteServices);
-					
-			
+						
 		} catch(Exception ex){
 			ex.printStackTrace();
 			logger.error("Exception while cleaning database: " + ex);
 		}
+		
+		restart = false;
 		
 	}
 	

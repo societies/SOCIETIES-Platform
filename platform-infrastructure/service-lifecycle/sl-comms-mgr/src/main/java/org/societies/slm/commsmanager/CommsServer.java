@@ -252,7 +252,7 @@ public class CommsServer implements IFeatureServer {
 					{
 						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: INSTALL SERVICE");
 								
-						controlResult = getServiceControl().installService(serviceMessage.getURL().toURL());
+						controlResult = getServiceControl().installService(serviceMessage.getURL().toURL(),stanza.getTo());
 						ServiceControlResult result = controlResult.get();
 						
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());

@@ -358,6 +358,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 				}
 			}
 			
+			//The service is now registered, so we update the hashmap
+			if(ServiceControl.installingBundle(serBndl.getBundleId())){
+				if(log.isDebugEnabled())
+					log.debug("ServiceControl is stopping the bundle, so we need to tell it it's done");
+				ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
+			}
+			
 		}
 	}
 
@@ -427,10 +434,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
 			
 			sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,serviceToRemove,event.getBundle());
-			
+						
 		} catch (ServiceRegistrationException e) {
 			e.printStackTrace();
 			log.error("Exception while unregistering service: " + e.getMessage());
+		}
+		
+		//The service is now registered, so we update the hashmap
+		if(ServiceControl.uninstallingBundle(event.getBundle().getBundleId())){
+			if(log.isDebugEnabled())
+				log.debug("ServiceControl is uninstalling the bundle, so we need to tell it it's done");
+			ServiceControl.serviceUninstalled(event.getBundle().getBundleId(), serviceToRemove);
 		}
 		
 	}

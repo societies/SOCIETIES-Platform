@@ -23,6 +23,9 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -47,6 +50,7 @@ import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.webapp.models.ServiceControlForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +58,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -184,15 +189,20 @@ public class ServiceControlController {
 		//Service service = scForm.getService();
 		String serviceUri = scForm.getService();
 		String endpoint = scForm.getEndpoint();
-		
+		CommonsMultipartFile filePart = scForm.getFileData();
 
-		
 		if(logger.isDebugEnabled()){
 			logger.debug("node =  " + node );
 			logger.debug("method=" + method );
 			logger.debug("url: " + url );
 			logger.debug("Service Id (encoded): " + serviceUri );
 			logger.debug("Endpoint: " + endpoint);
+			logger.debug("filePart: " + filePart);
+			if(filePart != null){
+				logger.debug("filePart.getName: " + filePart.getName());
+				logger.debug("filePart.getOriginalFilename: " + filePart.getOriginalFilename());
+				logger.debug("filePart.getStorageDescription: " + filePart.getStorageDescription());
+			}
 		}
 		
 		if(method.equalsIgnoreCase("NONE")){
@@ -253,40 +263,76 @@ public class ServiceControlController {
 			
 		}
 		
-		
 		Future<ServiceControlResult> asynchResult = null;
 		ServiceControlResult scresult;
 		
 		String res = "";
 		
 		try {
-			
+			model.put("myNode", getCommManager().getIdManager().getThisNetworkNode().getJid());
+
 			if (method.equalsIgnoreCase("InstallService")) {
 				
-				URL serviceUrl = new URL(url);
-				
-				/*
-				if(logger.isDebugEnabled()) logger.debug("InstallService Method on:" + serviceUrl);
-				
-				asynchResult=this.getSCService().installService(serviceUrl);
-				
-				res="ServiceControl Result Installing in Local Node: ";
-				*/
-				
-				if(logger.isDebugEnabled()) logger.debug("InstallService Remote Method on:" + serviceUrl +" on node " + node);
-				
-				asynchResult=this.getSCService().installService(serviceUrl, node);
-				if(!node.isEmpty())
-					res="ServiceControl Result for Node : [" + node + "]";
-				else
-					res="ServiceControl Result Installing in Local Node: ";
+				if(filePart != null && !filePart.isEmpty()){
 					
-				scresult = asynchResult.get();
-				
-				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
-				
-				model.put("serviceResult", scresult.getMessage());
-				
+					InputStream is = filePart.getFileItem().getInputStream();
+					String originalFileName = filePart.getOriginalFilename();
+					
+					File tmpFile = new File("3p-services/server/"+originalFileName);
+					File directory = tmpFile.getParentFile();
+					
+					if (!directory.isDirectory()) {
+						if(logger.isDebugEnabled())
+							logger.debug("folder " + directory + " doesn't exist yet, creating it...");
+						directory.mkdirs();
+					}
+					FileOutputStream os = new FileOutputStream(tmpFile);
+					
+					// Read in the bytes and write on the fly
+					int numRead = 0;
+					byte[] bytes = new byte[1024 * 1024];
+					
+					while ((bytes.length > 0) && (numRead = is.read(bytes, 0, bytes.length)) >= 0) {
+						os.write(bytes, 0, numRead);
+					}
+	
+					// Close input and output streams
+					is.close();
+					os.close();
+					
+					URL serviceUrl = tmpFile.toURI().toURL();
+
+					if(logger.isDebugEnabled()) logger.debug("InstallService Remote Method on: " + serviceUrl +" on node " + node);
+					
+					asynchResult=this.getSCService().installService(serviceUrl);					
+					scresult = asynchResult.get();
+					
+					if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+
+					/*
+					if(node != null && !node.isEmpty())
+						res="ServiceControl Result for Node : [" + node + "]: " + scresult.getMessage();
+					else
+						res="ServiceControl Result Installing in Local Node: " + scresult.getMessage();
+					*/
+					model.put("serviceResult", scresult.getMessage());
+
+					if(scresult.getMessage().equals(ResultMessage.SUCCESS)){
+						res = "My Services: ";
+						returnPage = "servicediscoveryresult";
+					} else{
+						res = "Problem installing service!";
+						returnPage = "servicecontrolresult";
+						if(tmpFile.exists())
+							if(!tmpFile.delete())
+								tmpFile.deleteOnExit();
+					}
+					
+				} else{
+					res="Couldn't upload file!";
+					returnPage = "servicecontrolresult";
+				}
+
 			}else if (method.equalsIgnoreCase("InstallServiceRemote")) {
 				
 				URL serviceUrl = new URL(url);
@@ -313,7 +359,11 @@ public class ServiceControlController {
 				
 				model.put("serviceResult", scresult.getMessage());
 				
-				res="Started service: " + serviceId;
+				Future<Service> asyncService =getSDService().getService(serviceId);
+				Service myService = asyncService.get();
+				
+				res="Started service: " + myService.getServiceName();
+				
 				returnPage = "servicediscoveryresult";
 				
 			} else if (method.equalsIgnoreCase("UnshareService")){
@@ -332,14 +382,15 @@ public class ServiceControlController {
 				//GET REMOTE SERVICES
 				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
 				List<Service> cisServices = asynchServices.get();
+				if(logger.isDebugEnabled())
+					logger.debug("CIS has " + cisServices.size() + " services shared.");
 				model.put("cisservices", cisServices);
-				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
 
 				//Get CIS Name
 				ICis cis = this.getCisManager().getCis(node);
 				model.put("cis", cis);
 				
-				res = "Success";//scresult.getMessage().toString();
+				res = "My Services to Share: ";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("StopService")){
@@ -353,21 +404,31 @@ public class ServiceControlController {
 				
 				model.put("serviceResult", scresult.getMessage());
 				
-				res="Stopped service: " + serviceId;
+				Future<Service> asyncService =getSDService().getService(serviceId);
+				Service myService = asyncService.get();
+				
+				res="Stopped service: " + myService.getServiceName();
 				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("UninstallService")){
 				
 				if(logger.isDebugEnabled()) logger.debug("UninstallService:" + serviceId);
 
-				asynchResult=this.getSCService().uninstallService(serviceId);
+				Future<Service> asyncService =getSDService().getService(serviceId);
+				Service myService = asyncService.get();
+				
+				asynchResult = this.getSCService().uninstallService(serviceId);
 				scresult = asynchResult.get();
 				
 				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
 				
 				model.put("serviceResult", scresult.getMessage());
 				
-				res="Uninstall service: " + serviceId;
+				if(scresult.getMessage().equals(ResultMessage.SUCCESS))
+					res="Uninstalled service: " + myService.getServiceName();
+				else
+					res="My Services: ";
+				
 				returnPage = "servicediscoveryresult";
 	
 			//>>>>>>>>>>>> SHARE SERVICE <<<<<<<<<<<<<<<
@@ -387,14 +448,15 @@ public class ServiceControlController {
 				//GET REMOTE SERVICES
 				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
 				List<Service> cisServices = asynchServices.get();
+				if(logger.isDebugEnabled())
+					logger.debug("CIS has " + cisServices.size() + " services shared.");		
 				model.put("cisservices", cisServices);
-				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
 
 				//Get CIS Name
 				ICis cis = this.getCisManager().getCis(node);
 				model.put("cis", cis);
 				
-				res = "Success";//scresult.getMessage().toString();
+				res = "My Services to Share: ";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("Install3PService")){
@@ -435,9 +497,11 @@ public class ServiceControlController {
 			}
 			
 		} catch (ServiceControlException e) {
+			e.printStackTrace();
 			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
 			returnPage = "servicecontrolresult";
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			res = "Oops!!!! " +ex.getMessage() +" <br/>";
 			returnPage = "servicecontrolresult";
 		};
