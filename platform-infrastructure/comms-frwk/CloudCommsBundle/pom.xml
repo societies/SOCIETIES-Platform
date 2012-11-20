@@ -17,6 +17,13 @@
     <version>${version.comm}</version>
 
     <dependencies>
+    
+    	<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
     	<!-- Embedded Dependency -->
    		<dependency>
 			<groupId>org.igniterealtime</groupId>
@@ -68,12 +75,12 @@
 				<configuration>
     				<instructions>
     					<Import-Package>
-    						org.osgi.framework,
+    						org.osgi.framework;resolution:=optional,
     						!org.jvnet.staxex,
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
-    						org.slf4j*;version="1.5.8",
-    						org.simpleframework.xml.stream,
+    						org.slf4j*;version="1.5.8";resolution:=optional,
+    						org.simpleframework.xml.stream;resolution:=optional,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
