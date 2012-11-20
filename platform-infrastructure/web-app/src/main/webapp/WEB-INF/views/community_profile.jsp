@@ -3,36 +3,28 @@
 <%@taglib prefix="xc" uri="http://java.sun.com/jsp/jstl/core"  %> 
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<title>Societies</title>
-<meta charset="utf-8">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/dialog.css">
-<script>!window.jQuery && document.write('<script src="js/jquery-v1.8.1.js"><\/script>')</script>
-<!--[if IE]>
-<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]--> 
-<!--[if lt IE 7]>
-<link rel="stylesheet" type="text/css" media="all" href="css/ie7.css" />
-<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script><![endif]-->
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" media="all" href="css/ie7.css" /><![endif]-->
-<!-- Menu -->
-<script src="js/webmenu_nav.js"></script>
+  <title>Societies</title>
+	<!-- JAVASCRIPT INCLUDES -->
+	<jsp:include page="js_includes.jsp" />
+	<!-- END JAVASCRIPT INCLUDES  -->
+</head>
+<body>
+  <div id="wrapper" class="clearfix">
+  <div id="container" class="container_12 clearfix">
+  <!-- HEADER -->
+  <jsp:include page="header.jsp" />
+  <!-- END HEADER -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->  
 
-
-	<script type="text/javascript" src="js/jquery-v1.8.1.js">
- 
-
+<script type="text/javascript" >
 var nextMembers;
 var previoustMembers;
 
-
-
-
 $(document).ready(function(){
 	//startup functionality
-	
 	
 	//managing member list display
 	// initial setup
@@ -42,7 +34,6 @@ $(document).ready(function(){
 	var memberSet = $(".member_item_class");
 	var memberSetSize = memberSet.length;
 	var lastPaginationSize = memberSetSize/member_pagination; 
-	
 
 	// initial layout
 	memberSet.slice(0,memberSetSize).hide();
@@ -84,8 +75,7 @@ $(document).ready(function(){
 	$("#linkBrowsePreviousMembers").onclick = previoustMembers;
 	
 	// managing activity list display
-	*/
-	
+	*/	
 	
  document.getElementById('postActButton').onclick = function() {
 	 document.AddActivityForm.submit();
@@ -102,57 +92,8 @@ $(document).ready(function(){
 	//	};
 
 });// end of $(document).ready(function()
-
-		
-
-		 
 </script>
 
-
-</head>
-<body>
-<div id="wrapper" class="clearfix">
-<div id="container" class="container_12 clearfix">
-<!-- Header -->
-<header id="header" class="grid_12">
-<div class="login-form">   
-</div>
-<!-- Logo -->
-<h1 id="logo" class="logo-pos">
-<a href="index.html"><img src="images/societies_logo.jpg" alt="Logo" /></a>
-</h1>
-<!--WebMenu -->
-<nav id="webmenu_nav">
-<ul id="navigation" class="grid_8">
-<li><a href="myProfile.html"><br />My Account</a>
-<ul class="sub-menu"> 
-<li><a href="myProfile.html">My Profile</a></li>
-<li><a href="profilesettings.html">Profile Settings</a></li>
-<li><a href="settings.html">Security Settings</a></li>
-<li><a href="privacysettings.html">Privacy Settings</a></li>
-</ul>
-</li>
-<li><a href="your_installed_apps.html"><br />Apps</a>
-</li>
-<li><a href="your_societies_friends_list.html"><br />Friends</a>
-<ul class="sub-menu"> 
-<li><a href="your_societies_friends_list.html">Your Friends</a></li>
-<li><a href="suggested_societies_friends_list.html">Suggested Friends</a></li>
-</ul>
-</li>
-<li><a href="your_communities_list.html"><br />Communities</a>
-<ul class="sub-menu"> 
-<li><a href="your_communities_list.html">Your Communities</a></li>
-<li><a href="manage_communities.html">Manage your Communities</a></li>
-<li><a href="create_community.html">Create a Community</a></li>
-<li><a href="your_suggested_communities_list.html">Suggested Communities</a></li>
-</ul>
-</li>
-<li><a href="index.html"><br />Home</a></li>
-</ul>
-</nav><!-- #webmenu -->
-<div class="clear"></div>
-</header><!-- #header -->
 <div class="hr grid_12 clearfix">&nbsp;</div>
 <section  class="grid_12">
 <section>
@@ -170,8 +111,6 @@ $(document).ready(function(){
 
 </section>
 <div class="websearchbar">
-
-
 
 <div class="websearchtitle">
 <xc:if test="${cisInfo != null}">
@@ -283,9 +222,7 @@ $(document).ready(function(){
 	&nbsp;
 	</article>
 	
-	
 	<p><em>Membership Criteria:</em></p> 
-	
 	<table id="membership Criteria" class="table">
 	
 		<xc:if test="${cisInfo.getMembershipCrit().getCriteria().size() > 0}">
@@ -329,17 +266,13 @@ $(document).ready(function(){
 	<xc:if test="${isOwner == true && cisInfo.getOwnerJid() != participant.getJid()}">
 			<a class="furtherinfo-link" href="delete_member.html?cisId=${cisInfo.getCommunityJid()}&cssId=${participant.getJid()}" onclick="return confirm('Are you sure you want to delete this member?')">Delete Member</a>
 	</xc:if>
-	 
 			</li>
-			
 	</xc:forEach>
+
 	<li><button id="linkBrowseNExtMembers" hidden="false">Next</button> <button id="linkBrowsePreviousMembers" class="furtherinfo-link" hidden="false">Previous</button></li>
-	
-	
 		<xc:if test="${isOwner == true}">
 			<form:form method="POST" action="add_member_cis_profile_page.html" commandName="memberForm" name="AddMemberForm">
 					<form:errors path="*" cssClass="errorblock" element="div" />
-					
 					<table id="addMemberFormInputs">
 					<tr>
 					<td><form:input path="cssJid" defaultValue="jid of member to be added"/></td>
@@ -354,11 +287,8 @@ $(document).ready(function(){
 							<td colspan="2"><input id="addMemberButton" type="button" value="AddMember"/></td>
 						</tr>
 					</table>
-					
 			</form:form>		
-		</xc:if>
-	
-	
+		</xc:if>	
 	</ul>
 	</section>
 </xc:if>
@@ -381,16 +311,11 @@ $(document).ready(function(){
 <div class="hr grid_12 clearfix">&nbsp;</div>
 </div>
 
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 
-<!-- Footer -->
-<footer class="container_12 clearfix">
-<section class="footer">
-<p class="footer-links">
-<span><a href="termsofuse.html">Terms of Use</a> | <a href="disclaimer.html">Disclaimer</a> | <a href="privacy.html">Privacy</a> | <a href="help.html">Help</a> | <a href="about.html">About</a></span>
-<a class="float right toplink" href="#">top</a>
-</p>
-</section>
-</footer>
 </div> 	
 </body>
 </html>
