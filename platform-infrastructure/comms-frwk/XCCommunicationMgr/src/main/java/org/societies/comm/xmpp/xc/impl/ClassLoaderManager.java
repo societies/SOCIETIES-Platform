@@ -17,19 +17,20 @@ public class ClassLoaderManager {
 	
 	private Long thisBundleId;
 	private Map<Long, ClassLoader> classloaderMap;
+	private Map<Object, Long> objectToBundle;
 	
 	public ClassLoaderManager(Object commMgrBean) {
-		Bundle b = getBundle(commMgrBean);
-		thisBundleId = b.getBundleId();
+		thisBundleId = getBundleId(commMgrBean);
 		classloaderMap = new HashMap<Long, ClassLoader>();
+		objectToBundle = new HashMap<Object, Long>();
 	}
 
 	public ClassLoader classLoaderMagic(Object targetBean) {
 		LOG.info("getting classloader for object "+targetBean.toString());
 		ClassLoader newClassloader = null;
 	
-		Bundle b = getBundle(targetBean);
-		newClassloader = classloaderMap.get(b.getBundleId());
+		Long id = getBundleId(targetBean);
+		newClassloader = classloaderMap.get(id);
 		
 		if (newClassloader!=null) {
 			ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
@@ -44,10 +45,11 @@ public class ClassLoaderManager {
 	}
 
 	public void classloaderRegistry(Object targetBean) {
-		Bundle b = getBundle(targetBean);
-		Long id = b.getBundleId();
+		Long id = getBundleId(targetBean);
 			
 		if (!id.equals(thisBundleId)) {
+			LOG.info("saving object "+targetBean.toString()+" for bundle "+id);
+			objectToBundle.put(targetBean, id);
 			LOG.info("saving classloader "+Thread.currentThread().getContextClassLoader().toString()+" for bundle "+id);
 			classloaderMap.put(id, Thread.currentThread().getContextClassLoader());
 		}
@@ -59,14 +61,27 @@ public class ClassLoaderManager {
 		throw new RuntimeException("Unable to get bundle for class: "+cs.toString()+" with context classloader "+cl.toString());
 	}
 	
-	private Bundle getBundle(Object o) {
+	private Long getBundleId(Object o) {
 		Bundle b = null;
-		ClassLoader hcl = Thread.currentThread().getContextClassLoader();
-		if (hcl instanceof BundleDelegatingClassLoader)
-			b = ((BundleDelegatingClassLoader)hcl).getBundle(); // prioritize classloader-based resolution
+		ClassLoader hcl = null;
 		
+		// priority to registered references (the request is incoming, thread belongs to CommsFwrk)
+		Long l = objectToBundle.get(o);
+		if (l!=null)
+			return l;
+		
+		// call from a different bundle: get bundleId from BundleDelegatingClassLoader if possible
+		if (o instanceof Thread)
+			hcl = ((Thread)o).getContextClassLoader();
+		else
+			hcl = Thread.currentThread().getContextClassLoader();
+		
+		if (hcl instanceof BundleDelegatingClassLoader)
+			b = ((BundleDelegatingClassLoader)hcl).getBundle();
+		
+		// fallback to frameworkUtils resolution
 		if (b==null)
-			b = FrameworkUtil.getBundle(o.getClass()); // fallback to frameworkUtils resolution
+			b = FrameworkUtil.getBundle(o.getClass()); 
 		
 		if (b!=null) {
 			LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"'");
@@ -74,6 +89,6 @@ public class ClassLoaderManager {
 		else
 			notFound(o.getClass(),Thread.currentThread().getContextClassLoader());
 		
-		return b;
+		return b.getBundleId();
 	}
 }
