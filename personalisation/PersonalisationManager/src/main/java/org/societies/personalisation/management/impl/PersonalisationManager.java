@@ -138,7 +138,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		retrieveConfidenceLevels();
 		this.dianne.registerContext();
 		this.logging.debug("initialisePersonalisationManager()");
-		
+
 	}
 
 
@@ -321,8 +321,12 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	public void registerForContextUpdate(IIdentity id,
 			PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId) {
 		try {
-			this.ctxBroker.registerForChanges(this, ctxAttributeId);
-			this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType());
+			if (isAlreadyRegistered(ctxAttributeId)){
+				this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType()+" but I'm already registered for it.");
+			}else{
+				this.ctxBroker.registerForChanges(this, ctxAttributeId);
+				this.logging.debug(type.toString()+" requested event registration for: "+ctxAttributeId.getType());
+			}
 
 		} catch (CtxException e) {
 			logging.error(e.getMessage());
@@ -347,6 +351,33 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 	}
 
+	private boolean isAlreadyRegistered(CtxAttributeIdentifier id){
+		for (CtxAttributeIdentifier ctxAttrId : this.prefMgrList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.dianneList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.cauiList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+
+		for (CtxAttributeIdentifier ctxAttrId : this.cristList){
+			if (ctxAttrId.equals(id)){
+				return true;
+			}
+		}
+		return false;
+
+	}
 	private void addtoList(CtxAttributeIdentifier ctxId,
 			List<CtxAttributeIdentifier> list) {
 		for (CtxAttributeIdentifier Id : list) {
@@ -372,18 +403,21 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	@Override
 	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
+		this.logging.debug("Processing request for preference: "+preferenceName+" for serviceType: "+serviceType+" and serviceID "+serviceID.getServiceInstanceIdentifier());
+		
 		Future<List<IDIANNEOutcome>> futureDianneOuts;
-		
+
 		futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-		
+
 		if (futureDianneOuts==null){
 			futureDianneOuts = new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
 			this.logging.debug(".getPreference(...): DIANNE returned null list");
 		}
 		Future<IOutcome> futurePrefOuts;
-		
+
 		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		
+
 		if (futurePrefOuts==null){
 			futurePrefOuts = new AsyncResult<IOutcome>(null);
 			this.logging.debug(".getPreference(...): PCM returned null list");
@@ -392,33 +426,35 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		try {
 			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
 			if (dianneOutList.size()>0){
-				
-			IDIANNEOutcome dianneOut = dianneOutList.get(0);
-			this.logging.debug(".getPreference(...): DIANNE returned an outcome: "+dianneOut.toString());
-			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 
-			if (null==prefOut){
-				this.logging.debug(".getPreference(...): PCM didn't return an outcome. Returning DIANNE's outcome: "+dianneOut.toString());
-				return new AsyncResult<IAction>(dianneOut);
-			}
-			
-			this.logging.debug(".getPreference(...): PCM returned an outcome "+prefOut.toString());
-			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
-				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
-				action.setServiceID(serviceID);
-				action.setServiceType(serviceType);
-				this.logging.debug(".getPreference(...): returning action: "+action.toString());
-				return new AsyncResult<IAction>(action);
-			}else{
-				this.logging.debug(".getPreference(...): conflict between pcm and dianne.");
-				return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
-			}
-			
-			}else{
-				
+				IDIANNEOutcome dianneOut = dianneOutList.get(0);
+				this.logging.debug(".getPreference(...): DIANNE returned an outcome: "+dianneOut.toString());
 				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
-				this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: "+prefOut.toString());
-				return new AsyncResult<IAction>(prefOut);
+
+				if (null==prefOut){
+					this.logging.debug(".getPreference(...): PCM didn't return an outcome. Returning DIANNE's outcome: "+dianneOut.toString());
+					return new AsyncResult<IAction>(dianneOut);
+				}
+
+				this.logging.debug(".getPreference(...): PCM returned an outcome "+prefOut.toString());
+				if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
+					action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
+					action.setServiceID(serviceID);
+					action.setServiceType(serviceType);
+					this.logging.debug(".getPreference(...): returning action: "+action.toString());
+					return new AsyncResult<IAction>(action);
+				}else{
+					this.logging.debug(".getPreference(...): conflict between pcm and dianne.");
+					return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
+				}
+
+			}else{
+
+				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+				if (prefOut!=null){
+					this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: "+prefOut.toString());
+					return new AsyncResult<IAction>(prefOut);
+				}
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -427,7 +463,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		this.logging.debug(".getPreference(...): Returning null action");
 		return new AsyncResult<IAction>(null);
 	}
 
@@ -444,15 +481,15 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	@Override
 	public Future<IAction> getIntentAction(Requestor requestor, IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) 
-	{
+			{
 		return this.getIntentAction(ownerID, serviceID, preferenceName);
-	}
+			}
 
 
-/*
- * (non-Javadoc)
- * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
- */
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
 	public Future<IAction> getPreference(Requestor requestor, IIdentity ownerID,
 			String serviceType, ServiceResourceIdentifier serviceID,
@@ -462,10 +499,10 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 	}
 
-/*
- * (non-Javadoc)
- * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
- */
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
 	public Future<IAction> getIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
@@ -479,7 +516,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		}
 		Future<CRISTUserAction> futureCRISTOuts;
 		try{
-		futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
+			futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
 		}catch(Exception e){
 			e.printStackTrace();
 			futureCRISTOuts = new AsyncResult<CRISTUserAction>(null);
@@ -501,8 +538,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					return new AsyncResult<IAction>(cauiOut);
 				}
 			}
-			
-			
+
+
 			if (cauiOut.getvalue().equalsIgnoreCase(cristOut.getvalue())){
 				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
 				return new AsyncResult<IAction>(action);
@@ -538,50 +575,63 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	}
 
 	@Override
-	public void onModification(CtxChangeEvent event) {
+	public void onModification(final CtxChangeEvent event) {
 		this.logging.debug("Received context event: "+event.getId().getType());
-		CtxIdentifier ctxIdentifier = event.getId();
 
-		try {
-			Future<CtxModelObject> futureAttribute = this.ctxBroker.retrieve(ctxIdentifier);
+		new Thread(){
 
-			CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
+			public void run(){
+				CtxIdentifier ctxIdentifier = event.getId();
 
-			if (null!=ctxAttribute){
-				if (ctxAttribute instanceof CtxAttribute) {
-					CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
-					IIdentity userId = this.idm.fromJid(ctxId.getOperatorId());
-					List<IOutcome> preferenceOutcomes = this.processPreferences(userId, ctxAttribute);
-					List<IOutcome> intentOutcomes = this.processIntent(userId, ctxAttribute);
+				try {
+					Thread.sleep(10);
+					Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(ctxIdentifier);
+
+					CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
 					
-					if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
-						this.logging.debug("Nothing to send to decisionMaker");
-						return;
+					if (null!=ctxAttribute){
+						
+						if (ctxAttribute instanceof CtxAttribute) {
+							logging.debug("Received event and retrieved value "+ctxAttribute.getStringValue()+" for context attribute: "+ctxAttribute.getType());
+							CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
+							IIdentity userId = idm.fromJid(ctxId.getOperatorId());
+							List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute);
+							List<IOutcome> intentOutcomes = processIntent(userId, ctxAttribute);
+
+							if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
+								logging.debug("Nothing to send to decisionMaker");
+								return;
+							}else{
+								for (int i =0; i<preferenceOutcomes.size(); i++){
+									logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
+								}
+								for (int i =0; i<intentOutcomes.size(); i++){
+									logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
+								}
+							}
+							logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
+							decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
+						}else{
+							logging.debug("retrieved attribute but was not instanceof CtxAttribute");
+						}
 					}else{
-						for (int i =0; i<preferenceOutcomes.size(); i++){
-							this.logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
-						}
-						for (int i =0; i<intentOutcomes.size(); i++){
-							this.logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
-						}
+						logging.debug("Tried to retrieve ctxAttribute from ctxDB onModification() but the attribute is null");
 					}
-					this.logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
-					this.decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		}.start();
 	}
 
 	private List<IOutcome> processIntent(IIdentity userId,	CtxAttribute ctxAttribute) {
@@ -735,7 +785,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 	private List<IOutcome> comparePreferenceConflicts(List<IDIANNEOutcome> dOuts, List<IPreferenceOutcome> pOuts){
 		this.logging.debug("Finding conflicts between dianne and pcm");
-		
+
 		List<IOutcome> result = new ArrayList<IOutcome>();
 		for (IDIANNEOutcome dOut: dOuts){
 			boolean matches = false;
@@ -861,140 +911,142 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	}
 
 	@Override
-	public void handleInternalEvent(InternalEvent event) {
+	public void handleInternalEvent(final InternalEvent event) {
 		this.logging.debug("Received UIM event:");
 		this.logging.debug("Event name "+event.geteventName()+
 				"Event info: "+event.geteventInfo().toString()+
 				"Event source: "+event.geteventSource()+
 				"Event type: "+event.geteventType());
-		try {
+		new Thread(){
 
-			if (event.geteventType().equals(EventTypes.UIM_EVENT)){
-				UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
-				Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested caui prediction");
-				List<IUserIntentAction> cauiActions = futureCauiActions.get();
-				logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
+			public void run(){
+				try {
 
-				Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested crist prediction");
-				List<CRISTUserAction> cristActions = futureCristActions.get();
-				logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
-				for (CRISTUserAction action: cristActions){
-					logging.debug("Crist outcome - parameter: "+action.getparameterName()+" - value: "+action.getvalue());
-				}
-				
-				
+					if (event.geteventType().equals(EventTypes.UIM_EVENT)){
+						UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
+						Future<List<IUserIntentAction>> futureCauiActions = cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested caui prediction");
+						List<IUserIntentAction> cauiActions = futureCauiActions.get();
+						logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
 
-
-				/**
-				 * get intent outcomes 
-				 */
-
-
-				Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
-				List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
+						Future<List<CRISTUserAction>> futureCristActions = cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested crist prediction");
+						List<CRISTUserAction> cristActions = futureCristActions.get();
+						logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
+						for (CRISTUserAction action: cristActions){
+							logging.debug("Crist outcome - parameter: "+action.getparameterName()+" - value: "+action.getvalue());
+						}
 
 
 
 
-				for (IUserIntentAction caui : cauiActions){
-					CRISTUserAction crist = this.exists(cristActions, caui);
-					if (null==crist){
-						intentNonOverlapping.add(caui);
+						/**
+						 * get intent outcomes 
+						 */
+
+
+						Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
+						List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
+
+
+
+
+						for (IUserIntentAction caui : cauiActions){
+							CRISTUserAction crist = exists(cristActions, caui);
+							if (null==crist){
+								intentNonOverlapping.add(caui);
+							}else{
+								overlapping.put(caui, crist);
+							}
+						}
+
+						for (CRISTUserAction crist: cristActions){
+							IUserIntentAction caui = exists(cauiActions, crist);
+							if (null==caui){
+								intentNonOverlapping.add(crist);
+							}
+						}
+
+						Enumeration<IUserIntentAction> cauiEnum = overlapping.keys();
+
+						while (cauiEnum.hasMoreElements()){
+							IUserIntentAction caui = cauiEnum.nextElement();
+							CRISTUserAction crist = overlapping.get(caui);
+							intentNonOverlapping.add(resolveIntentConflicts(crist,caui));
+						}
+
+
+						/**
+						 * get preference outcomes
+						 */
+
+						Future<List<IDIANNEOutcome>> futureDianneActions = dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested outcome from dianne");
+						List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
+						logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
+
+
+						Future<List<IPreferenceOutcome>> futurePreferenceActions = pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+						logging.debug("Requested preference outcome");
+						List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
+						logging.debug("PCM returned: "+prefActions.size()+" outcomes");
+
+
+
+						Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
+						List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
+
+						for (IDIANNEOutcome d : dianneActions){
+							IPreferenceOutcome p = exists(prefActions, d);
+							if (null==p){
+								prefNonOverlapping.add(d);
+							}else{
+								prefOverlapping.put(p, d);
+							}
+						}
+
+						for (IPreferenceOutcome p : prefActions){
+							IDIANNEOutcome d = exists(dianneActions, p);
+							if (null==d){
+								prefNonOverlapping.add(p);
+							}
+						}
+
+						Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
+
+						while(prefEnum.hasMoreElements()){
+							IPreferenceOutcome pref = prefEnum.nextElement();
+							IDIANNEOutcome dianne = prefOverlapping.get(pref);
+							prefNonOverlapping.add(resolvePreferenceConflicts(dianne, pref));
+						}
+
+						if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
+							logging.debug("Action Event-> Nothing to send to decisionMaker");
+							return;
+						}else{
+							for (int i=0; i<prefNonOverlapping.size(); i++){
+								logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
+							}
+							for (int i=0; i<intentNonOverlapping.size(); i++){
+								logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
+							}
+						}
+						decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 					}else{
-						overlapping.put(caui, crist);
+						logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);
 					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
-				for (CRISTUserAction crist: cristActions){
-					IUserIntentAction caui = this.exists(cauiActions, crist);
-					if (null==caui){
-						intentNonOverlapping.add(crist);
-					}
-				}
-
-				Enumeration<IUserIntentAction> cauiEnum = overlapping.keys();
-
-				while (cauiEnum.hasMoreElements()){
-					IUserIntentAction caui = cauiEnum.nextElement();
-					CRISTUserAction crist = overlapping.get(caui);
-					intentNonOverlapping.add(this.resolveIntentConflicts(crist,caui));
-				}
-
-
-				/**
-				 * get preference outcomes
-				 */
-
-				Future<List<IDIANNEOutcome>> futureDianneActions = this.dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested outcome from dianne");
-				List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
-				logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
-
-
-				Future<List<IPreferenceOutcome>> futurePreferenceActions = this.pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
-				this.logging.debug("Requested preference outcome");
-				List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
-				logging.debug("PCM returned: "+prefActions.size()+" outcomes");
-
-
-
-				Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
-				List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
-
-				for (IDIANNEOutcome d : dianneActions){
-					IPreferenceOutcome p = this.exists(prefActions, d);
-					if (null==p){
-						prefNonOverlapping.add(d);
-					}else{
-						prefOverlapping.put(p, d);
-					}
-				}
-
-				for (IPreferenceOutcome p : prefActions){
-					IDIANNEOutcome d = this.exists(dianneActions, p);
-					if (null==d){
-						prefNonOverlapping.add(p);
-					}
-				}
-
-				Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
-
-				while(prefEnum.hasMoreElements()){
-					IPreferenceOutcome pref = prefEnum.nextElement();
-					IDIANNEOutcome dianne = prefOverlapping.get(pref);
-					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
-				}
-
-				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
-					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
-					return;
-				}else{
-					for (int i=0; i<prefNonOverlapping.size(); i++){
-						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
-					}
-					for (int i=0; i<intentNonOverlapping.size(); i++){
-						this.logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
-					}
-				}
-				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
-			}else{
-				logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);
+				logging.debug("Thread of handleInternalEvent finished executing");
 			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-
-
-
+		}.start();
 
 	}
 

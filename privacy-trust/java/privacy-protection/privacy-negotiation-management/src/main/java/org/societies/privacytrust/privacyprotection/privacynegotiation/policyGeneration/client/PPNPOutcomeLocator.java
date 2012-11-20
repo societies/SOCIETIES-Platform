@@ -42,6 +42,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
@@ -476,7 +477,7 @@ public class PPNPOutcomeLocator {
 			String proposalText = "Implement Effect: PERMIT\n"
 					+ "for resource:"+contextType+"?";
 			try {
-				return this.policyMgr.getUserFeedback().getImplicitFB(ExpProposalType.ACKNACK, new ImpProposalContent(proposalText, 3000)).get();
+				return this.policyMgr.getUserFeedback().getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 3000)).get();
 				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

@@ -88,6 +88,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	@Override
 	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content){
 		LOG.debug("Received request for explicit feedback");
+		LOG.debug("Content: "+content.getProposalText());
 		List<String> result = null;
 		//create feedback form
 		FeedbackForm fbForm = generateExpFeedbackForm(type, content);
@@ -125,6 +126,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	@Override
 	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
 		LOG.debug("Received request for implicit feedback");
+		LOG.debug("Content: "+ content.getProposalText());
 		Boolean result = false;
 		//create feedback form
 		FeedbackForm fbForm = generateImpFeedbackForm(type, content);

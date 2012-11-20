@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.Test;
@@ -74,6 +75,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 	//Date startDate;
 	List<CtxAttributeIdentifier> emptyList;
 	Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> history;
+	Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> sparseHistory;
 	List<IC45Output> results;
 
 	public void setUp() throws Exception {
@@ -92,6 +94,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 		emptyList = new ArrayList<CtxAttributeIdentifier>();
 		ng = new NumberGenerator();
 		history = new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(this.getDataset());
+		sparseHistory = new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(this.getSparseDataset());
 		results = null;
 	}
 
@@ -108,11 +111,45 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 		results = null;
 	}
 
+	//test condition situation for all actions and all identities
+	@Test
+	public void testNoCondition(){
+		System.out.println("Running test 1...");
+		try {
+			printDataset(sparseHistory.get());
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
+		}
+		Date startDate = new Date();
+		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
+		.thenReturn(sparseHistory);
+		
+		prefLearning.runC45Learning(this, startDate);
+		
+		//check return
+		
+		int counter = 10;
+		while (results == null && counter > 0){
+			try{
+				Thread.sleep(1000);
+				counter--;
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		
+		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
+		
+		Assert.assertNotNull(results);
+		printResults();
+	}
 
 	//test all actions and all identities
 	@Test
 	public void testAA_AI(){
-		System.out.println("Running test 1...");
+		System.out.println("Running test 2...");
 		Date startDate = new Date();
 		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
 		.thenReturn(history);
@@ -139,7 +176,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 	//test all actions and specific identity
 	@Test
 	public void testAA_SI(){
-		System.out.println("Running test 2...");
+		System.out.println("Running test 3...");
 		Date startDate = new Date();
 		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
 		.thenReturn(history);
@@ -156,7 +193,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 				e.printStackTrace();
 			}
 		}
-		
+
 		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
 
 		Assert.assertNotNull(results);
@@ -166,7 +203,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 	//test specific action and all identities
 	@Test
 	public void testSA_AI(){
-		System.out.println("Running test 3...");
+		System.out.println("Running test 4...");
 		Date startDate = new Date();
 		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
 		.thenReturn(history);
@@ -183,7 +220,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 				e.printStackTrace();
 			}
 		}
-		
+
 		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
 
 		Assert.assertNotNull(results);
@@ -193,7 +230,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 	//test specific action and specific identity
 	@Test
 	public void testSA_SI(){
-		System.out.println("Running test 4...");
+		System.out.println("Running test 5...");
 		Date startDate = new Date();
 		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
 		.thenReturn(history);
@@ -210,14 +247,12 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 				e.printStackTrace();
 			}
 		}
-		
+
 		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
 
 		Assert.assertNotNull(results);
 		printResults();
 	}
-
-
 
 	private void printResults(){
 		for(IC45Output nextOutput: results){
@@ -543,6 +578,38 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 		return fulldataset;
 	}
 
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getSparseDataset(){
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> sparseDataset = 
+				new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+
+		try{
+			//Create EntityIdentifier
+			CtxEntityIdentifier entityId = new CtxEntityIdentifier(mockCssOperator, "testEntity", new Long(12345));
+
+			//create context CtxHistoryAttribute attribute
+			ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
+			CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "locationSymbolic", new Long(12345));
+			CtxAttribute context_attribute = new CtxAttribute(context_attrId);
+			context_attribute.setStringValue("screen1");
+			CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
+			context.add(nextContext);
+			
+			for(int i=0; i<3; i++){
+				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(i));
+				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
+				Action value = new Action(mockServiceID_A, "testService", "channel", "1");
+				byte[] blobValue = SerialisationHelper.serialise(value);
+				action_attribute.setBinaryValue(blobValue);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
+				sparseDataset.put(action, context);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+		return sparseDataset;
+	}
+
 	@Override
 	public void handleC45Output(List<IC45Output> results) {
 		this.results = results;
@@ -676,7 +743,7 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 		return null;
 	}*/
 
-	/*private void printDataset(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset){
+	private void printDataset(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset){
 		//printout full dataset test
 		for(Iterator<CtxHistoryAttribute> dataset_it = dataset.keySet().iterator(); dataset_it.hasNext();){
 			CtxHistoryAttribute printAction = dataset_it.next();
@@ -693,5 +760,5 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 				e.printStackTrace();
 			}
 		}
-	}*/
+	}
 }

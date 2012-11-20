@@ -149,6 +149,7 @@ public class SA_AI extends Thread{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
 			System.out.println("No rules could be learned from the current history set");
+			e.printStackTrace();
 			return null;
 		}
 

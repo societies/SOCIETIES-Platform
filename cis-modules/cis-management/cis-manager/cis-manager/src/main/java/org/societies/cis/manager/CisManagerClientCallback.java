@@ -98,8 +98,8 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("unsubscription response was mallformed");
-					this.sourceCallback.receiveResult( (CommunityMethods)null);
-					return;
+					//this.sourceCallback.receiveResult( (CommunityMethods)null);
+					//return;
 				}
 			}
 			// end of join response
@@ -113,8 +113,8 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("get info failed");
-					this.sourceCallback.receiveResult( (CommunityMethods)null);
-					return;
+					//this.sourceCallback.receiveResult( (CommunityMethods)null);
+					//return;
 				}
 			}
 

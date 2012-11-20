@@ -260,12 +260,6 @@ public class ServiceControlController {
 		String res = "";
 		
 		try {
-	
-			if (returnPage.equals("servicediscoveryresult")) {
-				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
-				List<Service> services = asynchServices.get();
-				model.put("services", services);	
-			}
 			
 			if (method.equalsIgnoreCase("InstallService")) {
 				
@@ -433,11 +427,19 @@ public class ServiceControlController {
 				res="error unknown method";
 			}
 		
-
+			
+			if (returnPage.equals("servicediscoveryresult")) {
+				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
+				List<Service> services = asynchServices.get();
+				model.put("services", services);	
+			}
+			
 		} catch (ServiceControlException e) {
 			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
+			returnPage = "servicecontrolresult";
 		} catch (Exception ex) {
 			res = "Oops!!!! " +ex.getMessage() +" <br/>";
+			returnPage = "servicecontrolresult";
 		};
 		
 		model.put("result", res);		

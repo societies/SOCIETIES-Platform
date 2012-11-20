@@ -2,9 +2,7 @@ package org.societies.android.platform.socialdata;
 
 import org.societies.android.api.internal.sns.AConnectorBean;
 import org.societies.android.api.internal.sns.ISocialData;
-import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialData.LocalBinder;
-import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 
 import android.app.Activity;

@@ -71,6 +71,7 @@ public class Tester {
 
 	//private IIdentity cssOwnerId;
 
+	boolean modelExist = false;
 
 	public void setUp(){
 
@@ -79,113 +80,146 @@ public class Tester {
 	@Test
 	public void TestMonitorActionsContext() {
 		System.out.println("Test 1109 started : ContextStorageTest");
-		//create actions
 
-		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-		ServiceResourceIdentifier serviceIdRandom = new ServiceResourceIdentifier();
+
+		CtxAttributeIdentifier uiModelAttributeId = null;
+		List<CtxIdentifier> ls;
+
 		try {
-			//	IIdentity cssOwnerId = getOwnerId();
+			ls = TestCase1109.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 
-			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+			if (ls.size()>0) {
+				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
+				CtxAttribute uiModelAttr = (CtxAttribute) TestCase1109.ctxBroker.retrieve(uiModelAttributeId).get();
 
-			serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
-			serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
+				if(uiModelAttr != null) {
 
+					if(uiModelAttr.getBinaryValue() != null) {
+						modelExist = true;						
+					}
+				}
+			} 
 
-			serviceIdRandom.setIdentifier(new URI("css://nikosk@societies.org/randomService"));
-			serviceIdRandom.setServiceInstanceIdentifier("css://nikosk@societies.org/randomService");
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} 
-
-		//create actions
-		//task1
-		IAction action1 = new Action(serviceId1, "serviceType1", "setRadio", "on");
-		IAction action2 = new Action(serviceId1, "serviceType1", "setVolume", "medium");
-		IAction action3 = new Action(serviceId1, "serviceType1", "setTuner", "favoriteChannel1");
-		//task2
-		IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
-		IAction action5 = new Action(serviceId2, "serviceType2", "setDestination", "office");
-		IAction action6 = new Action(serviceId2, "serviceType2", "getInfo", "traffic");
-		//task3
-		IAction action7 = new Action(serviceId1, "serviceType1", "setRadio", "off");
-		IAction action8 = new Action(serviceId2, "serviceType2", "setDestinator", "off");
-
-		// random action 1
-		IAction actionRandom1 = new Action(serviceIdRandom, "serviceIdRandom", "random", "xxx");
-		IAction actionRandom2 = new Action(serviceIdRandom, "serviceIdRandom", "random", "yyy");
-		IAction actionRandom3 = new Action(serviceIdRandom, "serviceIdRandom", "random", "zzz");
-		IAction actionRandom4 = new Action(serviceIdRandom, "serviceIdRandom", "random", "ooo");
-
-		//set context data
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
-		//setContext(CtxAttributeTypes.TEMPERATURE, 25);
-		setContext(CtxAttributeTypes.STATUS, "free");
-
-		//send actions - 2 second delay
-		LOG.info("Monitor services #1109 - sending mock actions for storage");
-
-		actionsTask1(action1,action2,action3);
-		randomAction(actionRandom1);
-		actionsTask2(action4,action5,action6);
-		randomAction(actionRandom2);
-		actionsTask3(action7,action8);
-		
-		actionsTask1(action1,action2,action3);
-		randomAction(actionRandom2);
-		randomAction(actionRandom1);
-		actionsTask2(action4,action5,action6);
-		randomAction(actionRandom2);
-
-
-		randomAction(actionRandom1);
-
-		//actionsTask3(action7,action8);
-	
-
-		actionsTask1(action1,action2,action3);
-		randomAction(actionRandom3);
-		randomAction(actionRandom1);
-		actionsTask2(action4,action5,action6);
-		randomAction(actionRandom3);
-		randomAction(actionRandom2);
-		randomAction(actionRandom2);
-		actionsTask3(action7,action8);
-
-		actionsTask1(action1,action2,action3);
-		randomAction(actionRandom2);
-
-		actionsTask2(action4,action5,action6);
-		randomAction(actionRandom1);
-		randomAction(actionRandom3);
-		actionsTask3(action7,action8);
-
-		randomAction(actionRandom4);
-		randomAction(actionRandom2);
-		randomAction(actionRandom4);
-		
-		/*
-		 * CHECK HISTORY DATA
-		 */
-
-		LOG.info("*********** ACTIONS SEND WAITING FOR MODEL CREATION ************");
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (ExecutionException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (CtxException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
 		}
-		//LOG.info("*********** CHECK HISTORY DATA ************");
-		//Assert.assertTrue(tupleResults.size() == 5);
+
+
+		if(modelExist == false)	{	
+
+			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+			ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+			ServiceResourceIdentifier serviceIdRandom = new ServiceResourceIdentifier();
+			try {
+				//	IIdentity cssOwnerId = getOwnerId();
+
+				serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
+				serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+
+				serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
+				serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
+
+
+				serviceIdRandom.setIdentifier(new URI("css://nikosk@societies.org/randomService"));
+				serviceIdRandom.setServiceInstanceIdentifier("css://nikosk@societies.org/randomService");
+
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			} 
+
+			//create actions
+			//task1
+			IAction action1 = new Action(serviceId1, "serviceType1", "setRadio", "on");
+			IAction action2 = new Action(serviceId1, "serviceType1", "setVolume", "medium");
+			IAction action3 = new Action(serviceId1, "serviceType1", "setTuner", "favoriteChannel1");
+			//task2
+			IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
+			IAction action5 = new Action(serviceId2, "serviceType2", "setDestination", "office");
+			IAction action6 = new Action(serviceId2, "serviceType2", "getInfo", "traffic");
+			//task3
+			IAction action7 = new Action(serviceId1, "serviceType1", "setRadio", "off");
+			IAction action8 = new Action(serviceId2, "serviceType2", "setDestinator", "off");
+
+			// random action 1
+			IAction actionRandom1 = new Action(serviceIdRandom, "serviceIdRandom", "random", "xxx");
+			IAction actionRandom2 = new Action(serviceIdRandom, "serviceIdRandom", "random", "yyy");
+			IAction actionRandom3 = new Action(serviceIdRandom, "serviceIdRandom", "random", "zzz");
+			IAction actionRandom4 = new Action(serviceIdRandom, "serviceIdRandom", "random", "ooo");
+
+			//set context data
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
+			//setContext(CtxAttributeTypes.TEMPERATURE, 25);
+			//setContext(CtxAttributeTypes.STATUS, "free");
+
+			//send actions - 2 second delay
+			LOG.info("Monitor services #1109 - sending mock actions for storage");
+
+			actionsTask1(action1,action2,action3);
+			randomAction(actionRandom1);
+			actionsTask2(action4,action5,action6);
+			randomAction(actionRandom2);
+			actionsTask3(action7,action8);
+
+			actionsTask1(action1,action2,action3);
+			randomAction(actionRandom2);
+			randomAction(actionRandom1);
+			actionsTask2(action4,action5,action6);
+			randomAction(actionRandom2);
+
+
+			randomAction(actionRandom1);
+
+			//actionsTask3(action7,action8);
+
+
+			actionsTask1(action1,action2,action3);
+			randomAction(actionRandom3);
+			randomAction(actionRandom1);
+			actionsTask2(action4,action5,action6);
+			randomAction(actionRandom3);
+			randomAction(actionRandom2);
+			randomAction(actionRandom2);
+			actionsTask3(action7,action8);
+
+			actionsTask1(action1,action2,action3);
+			randomAction(actionRandom2);
+
+			actionsTask2(action4,action5,action6);
+			randomAction(actionRandom1);
+			randomAction(actionRandom3);
+			actionsTask3(action7,action8);
+
+			randomAction(actionRandom4);
+			randomAction(actionRandom2);
+			randomAction(actionRandom4);
+
+			/*
+			 * CHECK HISTORY DATA
+			 */
+
+			LOG.info("*********** ACTIONS SEND WAITING FOR MODEL CREATION ************");
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+
+
+		}
 	}
-
-
 
 
 	@Test
 	public void TestHistoryDataRetrieval() {
+
+		LOG.info("TestHistoryDataRetrieval ");
 
 		List<CtxAttributeIdentifier> ls = new ArrayList<CtxAttributeIdentifier>();
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults;
@@ -194,8 +228,8 @@ public class Tester {
 			boolean success = false;
 			if(tupleResults.size() >=0 )success= true;
 			Assert.assertTrue(success);
-			
-			
+
+
 			printHocTuplesDB(tupleResults);
 			LOG.info("number of actions in history "+ tupleResults.size());
 
@@ -257,7 +291,7 @@ public class Tester {
 				if(context.get(CtxAttributeTypes.STATUS)!= null){
 					String status = (String) context.get(CtxAttributeTypes.STATUS);
 					LOG.info("String context status value :"+ status);
-					Assert.assertEquals("driving", status);
+					//Assert.assertEquals("driving", status);
 				}
 
 			}
@@ -273,7 +307,7 @@ public class Tester {
 		} 
 	}
 
-	@Ignore
+
 	@Test
 	public void TestPerformContinuousPrediction(){
 
@@ -321,27 +355,27 @@ public class Tester {
 
 			serviceId3.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
 			serviceId3.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
-			
+
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
-						
+			//setContext(CtxAttributeTypes.STATUS, "driving");
+
 			LOG.info("print current context");
 			printOperatorAttr();
 
 			IUserIntentAction currentAction = TestCase1109.cauiPrediction.getCurrentIntentAction(cssOwnerId, serviceId3, "setVolume").get();
-			
-			
+
+
 			LOG.info("currentAction "+currentAction.getActionID());
 			LOG.info("currentAction context: "+currentAction.getActionContext());
 			LOG.info("confidence level of predicted action: "+currentAction.getConfidenceLevel());
 			// predictedAction css://nikosk@societies.org/navigatorService#setDestination=gasStation/4 
 			// predictedAction context: {location=High_way, status=driving}
 			//Assert.assertEquals("css://nikosk@societies.org/navigatorService#setDestination=gasStation/4",predictedAction.getActionID());
-			
+
 			Assert.assertEquals("medium",currentAction.getvalue());
-		// no null
-			
+			// no null
+
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -356,6 +390,61 @@ public class Tester {
 
 	}
 
+	@Test
+	public void TestGetPredictionByAttrUpdate(){
+
+		LOG.info("Test 1109 : TestGetPredictionByAttrUpdate");
+		IIdentity cssOwnerId = getOwnerId();
+
+		CtxAttribute updatedlocAttr =  setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Gas_station");
+
+		try {
+			List<IUserIntentAction> currentActionList = TestCase1109.cauiPrediction.getPrediction(cssOwnerId, updatedlocAttr).get();
+			
+
+			//Hashmap<Integer, IUserIntentAction> resultsRates = new Hashmap<Integer, IUserIntentAction>();
+			if(currentActionList.size()>0){
+				
+				IUserIntentAction maxAction = null;
+				
+				int maxConfLevel = 0;
+				for(IUserIntentAction userAction : currentActionList){
+
+					int confLevel = userAction.getConfidenceLevel();
+					LOG.info("userAction: "+confLevel);
+					LOG.info("confLevel: "+confLevel);
+					
+					
+					if(confLevel > maxConfLevel) {
+						maxConfLevel = confLevel;
+						maxAction = userAction;
+						LOG.info("maxConfLevel: "+maxConfLevel);
+						LOG.info("maxAction: "+maxAction); 
+						
+					}
+					
+				}
+				
+				LOG.info("currentAction "+currentActionList);
+				
+				Assert.assertEquals("setDestination",maxAction.getparameterName());
+				Assert.assertEquals("office",maxAction.getvalue());
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+
+	}
+
+
 
 	//********************************************
 	//           helper classes 
@@ -366,7 +455,7 @@ public class Tester {
 
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
 		//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
-		setContext(CtxAttributeTypes.STATUS, "randomStatus");
+		//setContext(CtxAttributeTypes.STATUS, "randomStatus");
 
 		TestCase1109.uam.monitor(cssOwnerId, action);
 		try {
@@ -384,29 +473,29 @@ public class Tester {
 			IIdentity cssOwnerId = getOwnerId();
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action1 + " time "+date.getTime());
+			LOG.info("monitor action1 "+action1 + " time "+date.getTime());
 
 			TestCase1109.uam.monitor(cssOwnerId, action1);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action2 + " time "+date.getTime());
+			LOG.info("monitor action2 "+action2 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action2);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action3 + " time "+date.getTime());
+			LOG.info("monitor action3 "+action3 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action3);
 			Thread.sleep(5000);
 
@@ -425,28 +514,28 @@ public class Tester {
 		try {
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"High_way");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(22));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action4 + " time "+date.getTime());
+			LOG.info("monitor action4 "+action4 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action4);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Gas_station");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(28));
-			setContext(CtxAttributeTypes.STATUS, "stopped");
+			//setContext(CtxAttributeTypes.STATUS, "stopped");
 
 			date= new Date();
-			LOG.info("monitor action "+action5 + " time "+date.getTime());
+			LOG.info("monitor action5 "+action5 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action5);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"high_way_junction");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(30));
-			setContext(CtxAttributeTypes.STATUS, "driving");
+			//setContext(CtxAttributeTypes.STATUS, "driving");
 
 			date= new Date();
-			LOG.info("monitor action "+action6 + " time "+date.getTime());
+			LOG.info("monitor action6 "+action6 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action6);
 			Thread.sleep(5000);
 		} catch (InterruptedException e1) {
@@ -463,15 +552,15 @@ public class Tester {
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"office_parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(22));
-			setContext(CtxAttributeTypes.STATUS, "stopped");
+			//setContext(CtxAttributeTypes.STATUS, "stopped");
 
 			Date date= new Date();
-			LOG.info("monitor action "+action7 + " time "+date.getTime());
+			LOG.info("monitor action7 "+action7 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action7);
 
 			date= new Date();
 			Thread.sleep(5000);
-			LOG.info("monitor action "+action8 + " time "+date.getTime());
+			LOG.info("monitor action8 "+action8 + " time "+date.getTime());
 			TestCase1109.uam.monitor(cssOwnerId, action8);
 
 			Thread.sleep(5000);
@@ -626,77 +715,5 @@ public class Tester {
 } 
 	 */
 
-	// ****************** Dead moon ***********************
 
-	/*
-	private CtxAttribute retrieveOperatorsCtx(String type){
-		CtxAttribute ctxAttr = null;
-		try {
-			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
-			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
-			if(ctxAttrSet.size()>0){
-				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
-				ctxAttr = ctxAttrList.get(0);
-			}
-		} catch (InterruptedException e) {
-			// 
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// 
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// 
-			e.printStackTrace();
-		}
-		return ctxAttr;
-	}
-	 */
-
-	/*
-	void printOperatorsCurrentContext(){
-
-		IndividualCtxEntity operator = TestCase1109.ctxBroker.retrieveIndividualEntity(getOwnerId()).get();
-		Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
-
-		//CtxAttribute locationAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.LOCATION_SYMBOLIC);
-
-		Set<CtxAttribute> ctxAttrLocSet = operator.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<CtxAttribute> ctxAttrLocList = new ArrayList<CtxAttribute>(ctxAttrLocSet);
-		if(ctxAttrLocList.size()>0){
-			//LOG.info("location value type "+ ctxAttrLocList.get(0).getValueType());
-			LOG.info("current location symbolic value "+ ctxAttrLocList.get(0).getStringValue());
-		}
-		CtxAttribute temperatureAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.TEMPERATURE);
-		LOG.info("temperature value type "+ temperatureAttr.getValueType());
-		LOG.info("current temperature integer value "+ temperatureAttr.getIntegerValue());
-		CtxAttribute statusAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.STATUS);
-		LOG.info(" status value type "+ statusAttr.getValueType());
-		LOG.info("current  status  value "+ statusAttr.getStringValue());
-	}
-	 */
-
-	/*
-	protected CtxAttribute lookupRetrieveAttrHelp(String type){
-		CtxAttribute ctxAttr = null;
-		try {
-			List<CtxIdentifier> tupleAttrList = TestCase1109.ctxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
-			if(tupleAttrList.size() >0 ){
-				CtxIdentifier ctxId = tupleAttrList.get(0);
-				ctxAttr =  (CtxAttribute) TestCase1109.ctxBroker.retrieve(ctxId).get();	
-				System.out.println("lookupRetrieveAttrHelp "+ ctxAttr.getId());
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ctxAttr;
-	}
-
-	 */
 }

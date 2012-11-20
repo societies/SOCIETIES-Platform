@@ -103,7 +103,8 @@ var SocietiesCSSRecord = {
 				"imID": jQuery("#cssrecordimdetails").val(),
 				"name": jQuery("#cssrecordname").val(),
 				"sex": jQuery("#cssrecordsextype").val(),
-				"entity": jQuery("#cssrecordorgtype").val()
+				"entity": jQuery("#cssrecordorgtype").val(),
+				"homeLocation": jQuery("#cssrecorduserlocation").val()
 		};
 		
 		

@@ -416,12 +416,12 @@ public class CommManagerHelper {
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message,e);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (InvalidFormatException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message,e);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (ClassNotFoundException e) {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
@@ -466,11 +466,11 @@ public class CommManagerHelper {
 		} catch (InvalidFormatException e) {
 			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
-			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.error(m,e);
+			String m = e.getClass().getName() + "Error finding class: " + e.getMessage();
+			LOG.error(m, e);
 		} catch (Exception e) {
-			String m = e.getClass().getName() + "Error processing the message:" + e.getMessage();
-			LOG.error(m,e);
+			String m = e.getClass().getName() + "Error de-serializing the message: " + e.getMessage();
+			LOG.error(m, e);
 		}
 		
 		if (oldCl!=null)
@@ -518,7 +518,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		clm.classloaderRegistry(fs);
+		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -527,7 +527,7 @@ public class CommManagerHelper {
 
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		clm.classloaderRegistry(messageCallback);
+		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
 //		for (String ns : messageCallback.getXMLNamespaces()) {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);

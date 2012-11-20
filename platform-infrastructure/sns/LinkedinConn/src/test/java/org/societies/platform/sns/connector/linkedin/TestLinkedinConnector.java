@@ -20,7 +20,7 @@ public class TestLinkedinConnector {
     
 	
 	// get your token at http://dev.lucasimone.eu
-	private String TEST_TOKEN = "";
+	private String TEST_TOKEN = "f2333695-f25e-4a35-92f1-12508c6f5ad6,4bba1adc-aaf5-4e3f-801c-f8c11beedd5a";
 	
 	@Before
 	public void setUp() {
