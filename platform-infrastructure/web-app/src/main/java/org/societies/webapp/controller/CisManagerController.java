@@ -48,10 +48,12 @@ import org.societies.api.activity.IActivity;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.attributes.Rule.OperationType;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
@@ -66,19 +68,25 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.webapp.models.AddActivityForm;
 import org.societies.webapp.models.AddMemberForm;
 import org.societies.webapp.models.CreateCISForm;
+import org.societies.webapp.models.JoinCISForm;
 import org.societies.webapp.models.MembershipCriteriaForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -88,6 +96,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 
 @Controller
+@SessionAttributes("cisAdverts")
 public class CisManagerController {
 
 	
@@ -95,6 +104,9 @@ public class CisManagerController {
 	private ICisManager cisManager;
 	@Autowired
 	private ICommManager commMngrRef;
+	
+	@Autowired
+	private ICisDirectoryRemote cisDirectoryRemote;
 	
 	@Autowired
 	private IPrivacyPolicyManager privacyPolicyManager;
@@ -107,6 +119,16 @@ public class CisManagerController {
 	/**
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
+	
+	
+	// probably going to be deleted
+	@RequestMapping(value="/manage_communities.html",method = RequestMethod.GET)
+	public ModelAndView showManagerCommunitiesPage() {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		return new ModelAndView("manage_communities", model) ;
+		
+	}
 	
 	// SHOW CREATE COMMUNITY
 	
@@ -210,9 +232,21 @@ public class CisManagerController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("response", incomingResponse);
 
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 
+		getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		if(null == adverts) adverts = new ArrayList<CisAdvertisementRecord>();//create an empty list if it doesnt exist or spring will fail 
+		model.put("cisAdverts", adverts);
+		
+
+		
 		List<ICis> records = this.getCisManager().getCisList();
 		model.put("cisrecords", records);
+		
+		
+		//JoinCISForm jform = new JoinCISForm();
+		//model.put("joinForm", jform);
 		
 		return new ModelAndView("your_communities_list", model) ;
 	}
@@ -240,65 +274,82 @@ public class CisManagerController {
 			model.put("response", response);
 			
 		// GET INFO
-		ICis icis = this.getCisManager().getCis(cisId);
+		ICis icis = this.getCisManager().getCis(cisId); // handler in case it is a owned/joined CIS
+		ICisRemote icisRemote= icis;
+		if(null == icisRemote){
+			icisRemote = this.getCisManager().getHandlerToRemoteCis(cisId); // basic CIS handler
+		}
 		CisManagerClient getInfoCallback = new CisManagerClient();
 		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
-		icis.getInfo(req,getInfoCallback);
+		icisRemote.getInfo(req,getInfoCallback);
 		
-		CommunityMethods res = 	getInfoCallback.getComMethObj();	
-		Community getInfResp = res.getGetInfoResponse().getCommunity();
-		model.put("cisInfo", getInfResp);
-		
+		CommunityMethods res = 	getInfoCallback.getComMethObj();
 
-		// CHECK IF IF IM THE OWNER
-		if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
-			model.put("isOwner", true);
-		else
-			model.put("isOwner", false);
-		// GET PRIVACY
-		RequestorCis requestor = null;
-		RequestPolicy privacyPolicy = null;
-		try {
-			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-					,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
-					);
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
-			// GET POLICY
-			if(null != privacyPolicy){
-				// got policy locally
-			}else{
-				PrivPolCallBack privCallback = new PrivPolCallBack();
-				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-						, privCallback);
-				privacyPolicy = privCallback.getPrivacyPolicy();
+		if(res.getGetInfoResponse().isResult() == false){
+			model.put("response", "could not fetch information about the community");
+		}else{
+
+			
+			Community getInfResp = res.getGetInfoResponse().getCommunity();
+			model.put("cisInfo", getInfResp);
+			
+	
+			// CHECK IF IF IM THE OWNER
+			if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
+				model.put("isOwner", true);
+			else
+				model.put("isOwner", false);
+			// GET PRIVACY
+			RequestorCis requestor = null;
+			RequestPolicy privacyPolicy = null;
+			try {
+				requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+						,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
+						);
+				privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
+				// GET POLICY
+				if(null != privacyPolicy){
+					// got policy locally
+				}else{
+					PrivPolCallBack privCallback = new PrivPolCallBack();
+					this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+							, privCallback);
+					privacyPolicy = privCallback.getPrivacyPolicy();
+				}
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
+			// TODO: find the best way to display the policy
+			//if( null != privacyPolicy)
+			//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
+			//else
+			//	model.put("priacyPolicyString","no policy");
+			
+			
+			// if its a CIS which we own or participate
+			
+			if( null != icis){
+			
+				// GET ACIVITIES
+				ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+				icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+				org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+				model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+				
+				//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+				AddActivityForm form = new AddActivityForm();
+				model.put("activityForm",form);
+		
+				AddMemberForm form2 = new AddMemberForm();
+				model.put("memberForm",form2);
+			}
+
 		}
-
-		// TODO: find the best way to display the policy
-		//if( null != privacyPolicy)
-		//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
-		//else
-		//	model.put("priacyPolicyString","no policy");
-		
-		// GET ACIVITIES
-		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
-		icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
-		org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
-		model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
-		
-		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
-		AddActivityForm form = new AddActivityForm();
-		model.put("activityForm",form);
-
-		AddMemberForm form2 = new AddMemberForm();
-		model.put("memberForm",form2);
-		
 		return new ModelAndView("community_profile", model) ;
 	}
 
@@ -356,6 +407,30 @@ public class CisManagerController {
 		else{
 			model.put("acitivityAddError", "Error Adding Activity");
 			return new ModelAndView("community_profile", model);
+		}
+
+			
+	}
+	
+	
+	// join CIS 
+	@RequestMapping(value = "/join_cis.html", method = RequestMethod.POST)
+	public ModelAndView joinCISfromCommunitiesPage(@RequestParam("position") final int position, @ModelAttribute("cisAdverts") List<CisAdvertisementRecord> adverts,  BindingResult result,  Map model){
+		
+		//if(result.hasErrors()){
+		//	return yourCommunitiesListPage("Error joining");
+		//}
+		
+		if(null != adverts && null!= adverts.get(position)){
+			CisManagerClient joinCallback = new CisManagerClient();
+			this.getCisManager().joinRemoteCIS(adverts.get(position), joinCallback);
+			
+			JoinResponse j = joinCallback.getComMethObj().getJoinResponse();
+			
+			return yourCommunitiesListPage("joining towards " + j.getCommunity() + " is " + j.isResult());
+		}			
+		else{
+			return yourCommunitiesListPage("null advertisement on join");
 		}
 
 			
@@ -469,6 +544,25 @@ public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) Str
 	}
 	
 	
+	
+	public ICisDirectoryRemote getCisDirectoryRemote() {
+		return cisDirectoryRemote;
+	}
+
+
+	public void setCisDirectoryRemote(ICisDirectoryRemote cisDirectoryRemote) {
+		this.cisDirectoryRemote = cisDirectoryRemote;
+	}
+
+
+
+
+
+
+
+
+
+
 	// callbacks
 	private class PrivPolCallBack implements IPrivacyPolicyManagerListener {
 		private RequestPolicy privacyPolicy;

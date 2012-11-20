@@ -95,6 +95,17 @@ public interface ICisManager {
 	
 	
 	/**
+	 * Get a handler to communicate with a Remote CIS which may not be owned by the CSS
+	 * The handle offer a limited api but may be used with a CIS in which the user is not a member
+	 * of
+	 * 
+	 * @param cisId The ID (jabber ID) of the CIS to get.
+	 * @return the {@link ICisRemote} matching the input cisID
+	 * 
+	 */
+	public ICisRemote getHandlerToRemoteCis(String cisId);
+	
+	/**
 	 * Get a CIS Record with the ID cisId.
 	 * The one calling the api must be aware that he will get a {@link ICis} which
 	 * will not implement all the methods for the case of CIS that the user owns

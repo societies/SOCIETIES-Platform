@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
+<%@ taglib prefix="cisUtils" uri="http://cisUtils"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +19,15 @@
 <link rel="stylesheet" type="text/css" media="all" href="css/ie7.css" /><![endif]-->
 <!-- Menu -->
 <script src="js/webmenu_nav.js"></script>
+
+	<script type="text/javascript">
+		  function submitJoin(position){
+			  $('#joinForm').attr("action","join_cis.html?position="+position);
+		    document.JoinCISForm.submit();
+		  }
+	
+	</script>
+
 </head>
 <body>
 <div id="wrapper" class="clearfix">
@@ -91,25 +101,26 @@
 </header>
 <ol class="keyinfolist">
 
-<xc:forEach var="record" items="${cisrecords}">
-		<li class="keyinfo bypostauthor">
-		<figure class="gravatar">
-		<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
-		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
-		</figure>
-		<div class="keyinfo_content">
-		<div class="clearfix">
-		
-		<cite class="author_name">${record.getName()}</cite>
-		<div class="keyinfo_text">
-		<p>Owner: ${record.getOwnerId()}</p>
-		</div>
-		
-		
-		</div>
-		</div>
-		</li>
-</xc:forEach>
+
+	<xc:forEach var="record" items="${cisrecords}">
+			<li class="keyinfo bypostauthor">
+			<figure class="gravatar">
+			<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
+			<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
+			</figure>
+			<div class="keyinfo_content">
+			<div class="clearfix">
+			
+			<cite class="author_name">${record.getName()}</cite>
+			<div class="keyinfo_text">
+			<p>Owner: ${record.getOwnerId()}</p>
+			</div>
+			
+			
+			</div>
+			</div>
+			</li>
+	</xc:forEach>
 
 
 
@@ -177,11 +188,24 @@
 <h3>Suggested Communities...</h3>
 </header>
 <ul class="sidebar">
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
-<li><a href="">Community name</a></li>
+<xc:forEach var="advertisement" items="${cisAdverts}" varStatus="stats">
+
+<xc:if test="${cisUtils:isJidOnCommunityCollection(cisrecords, advertisement.getId()) == false}">	
+		<li>
+		<a href="community_profile.html?cisId=${advertisement.getId()}">${advertisement.getName()}</a>
+			<a class="furtherinfo-link" onclick="javascript:submitJoin(${stats.count -1})" >Join</a>
+		</li>
+</xc:if>	
+
+
+
+</xc:forEach>
+<form:form id="joinForm" method="POST" action="join_cis.html" modelAttribute="cisAdverts" name="JoinCISForm">
+</form:form>	
+
+
+
+
 </ul>
 </section>
 <section>

@@ -56,6 +56,7 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisRemote;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 
@@ -175,7 +176,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
-	
+	private boolean privacyPolicyNegotiationIncluded;
 	
 	public IUserFeedback getiUsrFeedback() {
 		return iUsrFeedback;
@@ -198,6 +199,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setPubsubClient(PubsubClient pubsubClient) {
 		LOG.info("pubsub set on CIS Manager");
 		this.pubsubClient = pubsubClient;
+		List<String> classList = Collections 
+				.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
+		
+    	try {
+    		pubsubClient.addSimpleClasses(classList);
+		} catch (ClassNotFoundException e1) {
+			LOG.warn("error adding classes at pubsub at activityfeed pubsub");
+			e1.printStackTrace();
+			
+		}
 	}
 
 	public IPrivacyDataManager getPrivacyDataManager() {
@@ -1386,6 +1397,13 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 	}
 	
+	public ICisRemote getHandlerToRemoteCis(String cisId){
+		CisSubscribedImp i = new CisSubscribedImp();
+		CisRecord r = new CisRecord(cisId);
+		i.setCisRecord(r);
+		i.setCisManag(this);
+		return i;
+	}
 	
 	@Override
 	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback) {
@@ -1648,6 +1666,15 @@ public class JoinCallBack implements ICisManagerCallback{
 			
 		}
 		return true;
+	}
+
+	public boolean isPrivacyPolicyNegotiationIncluded() {
+		return privacyPolicyNegotiationIncluded;
+	}
+
+	public void setPrivacyPolicyNegotiationIncluded(
+			boolean privacyPolicyNegotiationIncluded) {
+		this.privacyPolicyNegotiationIncluded = privacyPolicyNegotiationIncluded;
 	}
 
 

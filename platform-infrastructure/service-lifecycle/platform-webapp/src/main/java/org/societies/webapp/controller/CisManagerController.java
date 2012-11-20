@@ -93,6 +93,8 @@ public class CisManagerController {
 	/**
 	 * OSGI service get auto injected
 	 */
+
+	
 	@Autowired
 	private ICisManager cisManager;
 	@Autowired(required=false)

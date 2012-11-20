@@ -117,7 +117,7 @@ public class CommManagerHelper {
 	private ClassLoaderManager clm;
 	
 	public CommManagerHelper () {
-		clm = new ClassLoaderManager();
+		clm = new ClassLoaderManager(this);
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		s = new Persister(strategy);

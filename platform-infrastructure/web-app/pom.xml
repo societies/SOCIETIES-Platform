@@ -116,12 +116,12 @@
 			<artifactId>org.springframework.osgi.web</artifactId>
 			<version>1.2.1</version>
 		</dependency>
-		<dependency>
+		<!--   <dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>XCCommunicationMgr</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>

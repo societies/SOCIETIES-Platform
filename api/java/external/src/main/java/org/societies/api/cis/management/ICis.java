@@ -43,7 +43,7 @@ import org.societies.api.identity.Requestor;
 
 
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICis {
+public interface ICis extends ICisRemote{
 
     
 	/**
@@ -102,17 +102,7 @@ public interface ICis {
 	@Deprecated
     public void getInfo(ICisManagerCallback callback);
 	
-	/**
-	 * Get info from a CIS.
-	 * The callback must be able to retrieve a community object
-	 * defined at org.societies.api.schema.cis.community 
-	 * it has the  info from the CIS
-	 * 
-	 * @param {@link Requestor} requestor object identifying if the user is
-	 * @param callback callback function
-	 */
-    public void getInfo(Requestor req,ICisManagerCallback callback);
-    
+
 
     /**
      * Get list of members from a CIS.
@@ -124,16 +114,7 @@ public interface ICis {
      */
     @Deprecated
     public void getListOfMembers(ICisManagerCallback callback);
-	/**
-	 * Get list of members from a CIS.
-	 * The callback must be able to retrieve a community object
-	 * defined at org.societies.api.schema.cis.community 
-	 * which will have a Who with a list of Participant objects
-	 * 
-	 * @param {@link Requestor} requestor object identifying if the user is 
-	 * @param callback callback function
-	 */
-    public void getListOfMembers(Requestor req, ICisManagerCallback callback);
+
 
     
 	/**

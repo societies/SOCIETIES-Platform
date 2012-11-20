@@ -204,7 +204,7 @@ public class PZWrapperImpl implements PZWrapper  {
 			
 			userLocation.setZones(zonesList);
 			
-			log.info("finish method 'toIUserLocation' \t Json: "+jsonObject);
+			log.debug("finish method 'toIUserLocation' \t Json: "+jsonObject);
 			
 		}catch (Exception e) {
 			log.error("Exception was caught: JSON object- "+jsonObject, e);
