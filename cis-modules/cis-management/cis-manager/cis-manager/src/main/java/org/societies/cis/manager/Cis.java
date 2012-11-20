@@ -1311,7 +1311,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback){
-		LOG.debug("local get member list WITH CALLBACK called");
+		LOG.debug("local get member list WITH CALLBACK called with requestor");
 
 		CommunityMethods c = new CommunityMethods(); // object to be returned in case of failure
 		WhoResponse w = new WhoResponse();
@@ -1506,7 +1506,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getInfo(ICisManagerCallback callback){
-		LOG.debug("local client call to get info from this CIS");
+		LOG.debug("local client call to get info from this CIS without requestor");
 
 		CommunityMethods result = new CommunityMethods();
 		Community c = new Community();
@@ -1521,7 +1521,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getInfo(Requestor req, ICisManagerCallback callback){
-		LOG.debug("local client call to get info from this CIS");
+		LOG.debug("local client call to get info from this CIS with requestor");
 		GetInfoResponse r = new GetInfoResponse();
 		CommunityMethods result = new CommunityMethods();
 		Community c = new Community ();
@@ -1532,10 +1532,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		getListOfMembers(req, internalCallback);
 		CommunityMethods internallCabackResult = internalCallback.getComMethObj();
-		r.setResult(internallCabackResult.getWhoResponse().isResult());
-		if(r.isResult()){
+		r.setResult(true);
+		this.fillCommmunityXMPPobj(c); // TODO: move the filling of the object to be conditional with privacy
+		if(internallCabackResult.getWhoResponse().isResult()){
 			c.setParticipant((internallCabackResult.getWhoResponse().getParticipant()));
-			this.fillCommmunityXMPPobj(c);
 		}
 		
 		callback.receiveResult(result);	

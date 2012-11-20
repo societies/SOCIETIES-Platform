@@ -199,6 +199,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setPubsubClient(PubsubClient pubsubClient) {
 		LOG.info("pubsub set on CIS Manager");
 		this.pubsubClient = pubsubClient;
+		List<String> classList = Collections 
+				.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
+		
+    	try {
+    		pubsubClient.addSimpleClasses(classList);
+		} catch (ClassNotFoundException e1) {
+			LOG.warn("error adding classes at pubsub at activityfeed pubsub");
+			e1.printStackTrace();
+			
+		}
 	}
 
 	public IPrivacyDataManager getPrivacyDataManager() {

@@ -283,66 +283,73 @@ public class CisManagerController {
 		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
 		icisRemote.getInfo(req,getInfoCallback);
 		
-		CommunityMethods res = 	getInfoCallback.getComMethObj();	
-		Community getInfResp = res.getGetInfoResponse().getCommunity();
-		model.put("cisInfo", getInfResp);
-		
+		CommunityMethods res = 	getInfoCallback.getComMethObj();
 
-		// CHECK IF IF IM THE OWNER
-		if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
-			model.put("isOwner", true);
-		else
-			model.put("isOwner", false);
-		// GET PRIVACY
-		RequestorCis requestor = null;
-		RequestPolicy privacyPolicy = null;
-		try {
-			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-					,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
-					);
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
-			// GET POLICY
-			if(null != privacyPolicy){
-				// got policy locally
-			}else{
-				PrivPolCallBack privCallback = new PrivPolCallBack();
-				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-						, privCallback);
-				privacyPolicy = privCallback.getPrivacyPolicy();
-			}
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		if(res.getGetInfoResponse().isResult() == false){
+			model.put("response", "could not fetch information about the community");
+		}else{
 
-		// TODO: find the best way to display the policy
-		//if( null != privacyPolicy)
-		//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
-		//else
-		//	model.put("priacyPolicyString","no policy");
-		
-		
-		// if its a CIS which we own or participate
-		
-		if( null != icis){
-		
-			// GET ACIVITIES
-			ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
-			icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
-			org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
-			model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
 			
-			//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
-			AddActivityForm form = new AddActivityForm();
-			model.put("activityForm",form);
+			Community getInfResp = res.getGetInfoResponse().getCommunity();
+			model.put("cisInfo", getInfResp);
+			
 	
-			AddMemberForm form2 = new AddMemberForm();
-			model.put("memberForm",form2);
-		}
+			// CHECK IF IF IM THE OWNER
+			if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
+				model.put("isOwner", true);
+			else
+				model.put("isOwner", false);
+			// GET PRIVACY
+			RequestorCis requestor = null;
+			RequestPolicy privacyPolicy = null;
+			try {
+				requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+						,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
+						);
+				privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
+				// GET POLICY
+				if(null != privacyPolicy){
+					// got policy locally
+				}else{
+					PrivPolCallBack privCallback = new PrivPolCallBack();
+					this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+							, privCallback);
+					privacyPolicy = privCallback.getPrivacyPolicy();
+				}
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
+			// TODO: find the best way to display the policy
+			//if( null != privacyPolicy)
+			//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
+			//else
+			//	model.put("priacyPolicyString","no policy");
+			
+			
+			// if its a CIS which we own or participate
+			
+			if( null != icis){
+			
+				// GET ACIVITIES
+				ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+				icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+				org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+				model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+				
+				//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+				AddActivityForm form = new AddActivityForm();
+				model.put("activityForm",form);
 		
+				AddMemberForm form2 = new AddMemberForm();
+				model.put("memberForm",form2);
+			}
+
+		}
 		return new ModelAndView("community_profile", model) ;
 	}
 
