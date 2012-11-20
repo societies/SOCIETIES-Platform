@@ -20,9 +20,9 @@ public class ClassLoaderManager {
 	private Map<Object, Long> objectToBundle;
 	
 	public ClassLoaderManager(Object commMgrBean) {
-		thisBundleId = getBundleId(commMgrBean);
 		classloaderMap = new HashMap<Long, ClassLoader>();
 		objectToBundle = new HashMap<Object, Long>();
+		thisBundleId = getBundleId(commMgrBean);
 	}
 
 	public ClassLoader classLoaderMagic(Object targetBean) {
