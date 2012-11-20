@@ -19,29 +19,17 @@ public class ClassLoaderManager {
 	private Map<Long, ClassLoader> classloaderMap;
 	
 	public ClassLoaderManager(Object commMgrBean) {
-		Bundle b = FrameworkUtil.getBundle(commMgrBean.getClass());
-		
-		if (b!=null) {
-			thisBundleId = b.getBundleId();
-		}
-		else
-			notFound(commMgrBean.getClass());
-		
+		Bundle b = getBundle(commMgrBean);
+		thisBundleId = b.getBundleId();
 		classloaderMap = new HashMap<Long, ClassLoader>();
 	}
-	
+
 	public ClassLoader classLoaderMagic(Object targetBean) {
 		LOG.info("getting classloader for object "+targetBean.toString());
 		ClassLoader newClassloader = null;
 	
-		Bundle b = FrameworkUtil.getBundle(targetBean.getClass());
-		
-		if (b!=null) {
-			LOG.info("resolved "+targetBean.toString()+" to bundle "+b.getBundleId());
-			newClassloader = classloaderMap.get(b.getBundleId());
-		}
-		else
-			notFound(targetBean.getClass());
+		Bundle b = getBundle(targetBean);
+		newClassloader = classloaderMap.get(b.getBundleId());
 		
 		if (newClassloader!=null) {
 			ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
@@ -56,11 +44,7 @@ public class ClassLoaderManager {
 	}
 
 	public void classloaderRegistry(Object targetBean) {
-		Bundle b = FrameworkUtil.getBundle(targetBean.getClass());
-		
-		if (b==null)
-			notFound(targetBean.getClass());
-		
+		Bundle b = getBundle(targetBean);
 		Long id = b.getBundleId();
 			
 		if (!id.equals(thisBundleId)) {
@@ -71,7 +55,25 @@ public class ClassLoaderManager {
 			LOG.info("this is the local classloader: skipping...");
 	}
 	
-	private void notFound(Class<?> cl) {
-		throw new RuntimeException("Unable to get bundle for class: "+cl.toString());
+	private void notFound(Class<?> cs, ClassLoader cl) {
+		throw new RuntimeException("Unable to get bundle for class: "+cs.toString()+" with context classloader "+cl.toString());
+	}
+	
+	private Bundle getBundle(Object o) {
+		Bundle b = null;
+		ClassLoader hcl = Thread.currentThread().getContextClassLoader();
+		if (hcl instanceof BundleDelegatingClassLoader)
+			b = ((BundleDelegatingClassLoader)hcl).getBundle(); // prioritize classloader-based resolution
+		
+		if (b==null)
+			b = FrameworkUtil.getBundle(o.getClass()); // fallback to frameworkUtils resolution
+		
+		if (b!=null) {
+			LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"'");
+		}
+		else
+			notFound(o.getClass(),Thread.currentThread().getContextClassLoader());
+		
+		return b;
 	}
 }
