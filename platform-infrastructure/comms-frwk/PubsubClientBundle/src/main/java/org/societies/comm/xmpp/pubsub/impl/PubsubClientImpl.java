@@ -605,7 +605,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("Unable to load class using classloader "+cl.toString(), e);
+			throw new ClassNotFoundException(e.getMessage()+" from classloader "+cl.toString(), e);
 		}
 	}
 }
