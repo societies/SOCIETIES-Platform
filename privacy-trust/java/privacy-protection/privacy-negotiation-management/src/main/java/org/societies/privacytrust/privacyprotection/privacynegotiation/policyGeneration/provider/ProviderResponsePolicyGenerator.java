@@ -112,7 +112,7 @@ public class ProviderResponsePolicyGenerator {
 					//clientResponseItems.remove(responseItem);
 					itemsToRemove.add(responseItem);
 				}else{
-					JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 2");
+					//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 2");
 					return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
 				}
 			}else if (responseItem.getDecision().equals(Decision.INDETERMINATE)){
@@ -133,7 +133,7 @@ public class ProviderResponsePolicyGenerator {
 					for (Action action : myActions){ 
 						if (!(containsAction(clientActions,action))){
 							if (!(action.isOptional())){
-								JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 3");
+								//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 3");
 								return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(),NegotiationStatus.FAILED);
 							}
 						}
@@ -169,7 +169,7 @@ public class ProviderResponsePolicyGenerator {
 									//TODO: use rules - no user
 									Boolean response = true;
 									if (!response.booleanValue()){
-										JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 4");
+										//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 4");
 										return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
 									}
 								}
@@ -186,7 +186,7 @@ public class ProviderResponsePolicyGenerator {
 								Boolean response = true;
 								//Boolean response = (Boolean) this.getFeedbackManager().getExplicitFB(FeedbackGUITypes.NEGOTIATION, params);
 								if (!response){
-									JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 5");
+									//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 5");
 									return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
 								}
 							}
@@ -207,7 +207,7 @@ public class ProviderResponsePolicyGenerator {
 								Boolean response = true;
 								//Boolean response = (Boolean) this.getFeedbackManager().getExplicitFB(FeedbackGUITypes.NEGOTIATION, params);
 								if (!response.booleanValue()){
-									JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 6");
+									//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 6");
 									return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
 								}
 							}

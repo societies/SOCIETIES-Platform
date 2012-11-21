@@ -140,7 +140,7 @@ public final class CtxModelDAOTranslator {
 		mo.setSourceId(dao.getSourceId());
 		mo.getQuality().setOriginType(dao.getQuality().getOriginType());
 		mo.getQuality().setPrecision(dao.getQuality().getPrecision());
-		mo.getQuality().setPrecision(dao.getQuality().getUpdateFrequency());
+		mo.getQuality().setUpdateFrequency(dao.getQuality().getUpdateFrequency());
 		
 		return mo;
 	}

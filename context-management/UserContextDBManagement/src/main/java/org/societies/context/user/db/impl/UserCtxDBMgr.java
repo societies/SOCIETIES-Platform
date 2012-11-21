@@ -26,7 +26,6 @@ package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +69,8 @@ import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
 import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import cern.colt.Arrays;
 
 /**
  * Implementation of the {@link IUserCtxDBMgr} interface.
@@ -143,16 +144,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
-
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
 		
 		return (CtxAssociation) this.retrieve(id);
 	}
@@ -204,16 +195,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-
 		return (CtxAttribute) this.retrieve(id);
 	}
 
@@ -244,29 +225,25 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
-	
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
 		
 		return (CtxEntity) this.retrieve(id);
 	}
 	
 	/*
-	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createIndividualEntity(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
+	public IndividualCtxEntity createIndividualEntity(final String ownerId,
+			final String type) throws CtxException {
 
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+			
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
-				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);
+				new CtxEntityIdentifier(ownerId, type, modelObjectNumber);
 		final IndividualCtxEntityDAO entityDAO = new IndividualCtxEntityDAO(id);
 
 		final Session session = sessionFactory.openSession();
@@ -291,17 +268,40 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		isMemberOfAssoc.setParentEntity(id);
 		this.update(isMemberOfAssoc);
 		
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-
 		return (IndividualCtxEntity) this.retrieve(id);
+	}
+	
+	/*
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#retrieveIndividualEntity(java.lang.String)
+	 */
+	@Override
+	public IndividualCtxEntity retrieveIndividualEntity(final String ownerId)
+			throws CtxException {
+
+		if (ownerId == null)
+			throw new NullPointerException("ownerId can't be null");
+			
+		final IndividualCtxEntity entity;
+		
+		final Session session = this.sessionFactory.openSession();
+		try {
+			final Query query = session.getNamedQuery("getIndividualCtxEntityIdByOwnerId");
+			query.setParameter("ownerId", ownerId, Hibernate.STRING);
+			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
+			if (entityId != null)
+				entity = (IndividualCtxEntity) this.retrieve(entityId);
+			else 
+				entity = null;
+      
+        } catch (Exception e) {
+        	throw new UserCtxDBMgrException("Could not retrieve individual entity for CSS '"
+        			+ ownerId + "': "	+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return entity;
 	}
 
 	/*
@@ -574,18 +574,30 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
-		} 
+		}
 		
-		// TODO CtxChangeEventTopic.MODIFIED should only be used if the model object is actually modified
-		final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+		final CtxIdentifier eventId = modelObject.getId();
+		final String[] eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
+		final CtxEventScope eventScope = CtxEventScope.BROADCAST;
 		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(modelObject.getId()), 
-					topics, CtxEventScope.BROADCAST);
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Sending context change event for '" + eventId
+							+ "' to topics '" + Arrays.toString(eventTopics) 
+							+ "' with scope '" + eventScope + "'");
+				this.ctxEventMgr.post(new CtxChangeEvent(eventId), eventTopics, eventScope);
+			} catch (Exception e) {
+				
+				LOG.error("Could not send context change event for '" + eventId 
+						+ "' to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ e.getLocalizedMessage(), e);
+			}
 		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ Arrays.toString(topics) 
-					+ "' with scope '" + CtxEventScope.BROADCAST 
-					+ "': ICtxEventMgr service is not available");
+			LOG.error("Could not send context change event for '" + eventId
+					+ "' to topics '" + Arrays.toString(eventTopics) 
+					+ "' with scope '" + eventScope + "': "
+					+ "ICtxEventMgr service is not available");
 		}
 		      
 		return this.retrieve(modelObject.getId());

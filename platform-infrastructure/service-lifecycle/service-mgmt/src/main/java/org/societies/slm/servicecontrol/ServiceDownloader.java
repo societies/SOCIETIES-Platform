@@ -47,7 +47,8 @@ public class ServiceDownloader {
 	/** Size of buffer */
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	
-	private static final String CLIENTFOLDER = "3p-client";
+	private static final String CLIENTFOLDER = "3p-services/client";
+	private static final String SERVERFOLDER = "3p-services/server";
 	
 	private static byte[] bytes = new byte[BUFFER_SIZE];  
 
@@ -64,8 +65,30 @@ public class ServiceDownloader {
 		
 		String serviceName = service.getServiceName().replace(' ', '-');
 		String version = service.getServiceInstance().getServiceImpl().getServiceVersion();
-		String fileName = serviceName+"-"+version+"-client.jar";
-		String filePath = CLIENTFOLDER+"/"+fileName;
+		String fileName = serviceName+"-"+version;
+		String filePath = CLIENTFOLDER+"/"+fileName +"/" + serviceName +"-client.jar";
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Trying to download " + jarURL.toString() + " to " + filePath);
+		
+		try {
+			File downloadedClient = writeFile(jarURL.openStream(),filePath);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
+			
+			return downloadedClient.toURI();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static URI downloadJar(URL jarURL){
+		
+		String filePath = SERVERFOLDER+"/"+jarURL.getFile();
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Trying to download " + jarURL.toString() + " to " + filePath);

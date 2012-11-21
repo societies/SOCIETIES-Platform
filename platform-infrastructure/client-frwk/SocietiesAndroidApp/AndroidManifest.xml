@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.societies.android.platform.gui"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" 
+    android:debuggable="true">
 
     <uses-sdk
         android:minSdkVersion="8"/>
@@ -54,7 +55,10 @@
         <activity android:name=".AboutActivity"
 			android:label="@string/app_name">
 		</activity>
-		
+        
+        <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
+        		
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
 		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
@@ -65,9 +69,12 @@
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
         <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
         <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
-        
-        <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
-        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
+       <service
+        	android:name="org.societies.android.platform.events.ServicePlatformEventsLocal">
+        </service>
+        <service
+        	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote">
+        </service>
         
           <!-- this needs to be copied manualy  -->
     <!--provider

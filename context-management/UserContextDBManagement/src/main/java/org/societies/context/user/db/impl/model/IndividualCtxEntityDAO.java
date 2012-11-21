@@ -31,6 +31,8 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -41,6 +43,12 @@ import org.societies.api.context.model.CtxEntityIdentifier;
  * @author nlia
  *
  */
+@NamedQueries({
+	@NamedQuery(
+			name = "getIndividualCtxEntityIdByOwnerId",
+			query = "select entity.ctxId from IndividualCtxEntityDAO as entity where entity.ctxId.owner_id = :ownerId"
+	)
+})
 @Entity
 @org.hibernate.annotations.Entity(
 		dynamicUpdate=true

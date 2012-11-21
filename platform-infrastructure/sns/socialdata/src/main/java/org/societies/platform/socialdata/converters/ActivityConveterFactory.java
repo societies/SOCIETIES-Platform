@@ -13,6 +13,8 @@ public class ActivityConveterFactory{
 			return new ActivityConverterFromTwitter();
 		else if (connector.getConnectorName().equals(ISocialConnector.FOURSQUARE_CONN))
 			return new ActivityConverterFromFoursquare();
+		else if (connector.getConnectorName().equals(ISocialConnector.LINKEDIN_CONN))
+			return new ActivityConverterFromLinkedin();
 		else 
 			return new ActivityConverterFromSN();
 		

@@ -27,17 +27,13 @@ package org.societies.context.api.user.inference;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-//import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.context.api.user.prediction.PredictionMethod;
-//import org.societies.context.user.prediction.api.platform.*;
+import org.societies.api.context.model.CtxQuality;
 
 /**
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
@@ -45,12 +41,15 @@ import org.societies.context.api.user.prediction.PredictionMethod;
 public interface IUserCtxInferenceMgr {
 
 	/**
-	 * Checks the quality of an indicated Context Model Object.
+	 * Returns <code>true</code> if the specified quality is poor; 
+	 * <code>false</code> otherwise.
 	 * 
-	 * @param object
-	 * @since 0.0.1
+	 * @param quality
+	 * @return <code>true</code> if the specified quality is poor; 
+	 *         <code>false</code> otherwise
+	 * @since 0.5
 	 */
-	public void checkQuality(CtxModelObject object);
+	public boolean isPoorQuality(final CtxQuality quality);
 
 	/**
 	 * Evaluates the similatiry of two indicated Context Attributes.
@@ -73,7 +72,6 @@ public interface IUserCtxInferenceMgr {
 	 */
 	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
-
 	/**
 	 * Inherits the Context Attribute belonging to a CIS.
 	 * 
@@ -82,35 +80,51 @@ public interface IUserCtxInferenceMgr {
 	 * @param cisid
 	 * @since 0.0.1
 	 */
-	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, IIdentity cisid);
+	public void inheritContext(CtxAttributeIdentifier attrId, CtxAttributeValueType type, IIdentity cisid);
 
 	/**
 	 * Predicts context using indicated date. 
 	 * 
-	 * @param ctxAttrID
+	 * @param attrId
 	 * @param date
 	 * @returns context attribute with predicted context
 	 * @since 0.0.1
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrId, Date date);
 
 	/**
 	 * Predicts context using indicated index.
 	 * 
-	 * @param ctxAttrID
+	 * @param attrId
 	 * @param index
 	 * @returns context attribute with predicted context
 	 * @since 0.0.1
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrId, int index);
 
 	/**
-	 * Refines context for an indicate Context Attribute. 
+	 * Refines the identified context attribute. The method returns 
+	 * <code>null</code> if the identified attribute cannot be refined.
 	 * 
-	 * @param ctxAttrId
-	 * @since 0.0.1
+	 * @param attrId
+	 *            the identifier of the context attribute to be refined.
+	 * @return the refined context attribute or <code>null</code> if the
+	 *         identified attribute cannot be refined.
+	 * @since 0.5
 	 */
-	public CtxAttribute refineContext(CtxAttributeIdentifier ctxAttrId);
+	public CtxAttribute refineOnDemand(final CtxAttributeIdentifier attrId) 
+			throws UserCtxInferenceException;
+	
+	/**
+	 * Refines the identified context attribute. 
+	 * 
+	 * @param attrId
+	 * 			the identifier of the context attribute to refine.
+	 * @param updateFrequency
+	 * @since 0.5
+	 */
+	public void refineContinuously(final CtxAttributeIdentifier attrId, 
+			final Double updateFrequency) throws UserCtxInferenceException;
 
 	/**
 	 * Returns a list of CtxAttributeTypes that can be inferred. 
@@ -121,10 +135,18 @@ public interface IUserCtxInferenceMgr {
 	public List<String> getInferrableTypes();
 	
 	/**
-	 * Sets a list of CtxAttributeTypes that can be inferred. 
+	 * Adds the specified type to the list of CtxAttributeTypes that can be inferred. 
 	 * 
-	 *  @param Set of ctxAttributeTypes
-	 *  @since 0.0.8
+	 *  @param the new type of inferrable attribute
+	 *  @since 0.5
 	 */
-	public void setInferrableTypes(List<String> inferableTypes);
+	public void addInferrableType(final String attrType);
+	
+	/**
+	 * Removes the specified type from the list of CtxAttributeTypes that can be inferred. 
+	 * 
+	 *  @param the new type of inferrable attribute
+	 *  @since 0.5
+	 */
+	public void removeInferrableType(final String attrType);
 }

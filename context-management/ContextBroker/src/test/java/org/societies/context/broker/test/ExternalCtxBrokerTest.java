@@ -135,7 +135,7 @@ public class ExternalCtxBrokerTest {
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
 		internalCtxBroker.createIndividualEntity(mockIdentityLocal, CtxEntityTypes.PERSON); // TODO remove?
-		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
+		//internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 		internalCtxBroker.setCtxAccessController(mockCtxAccessController);
 		
 		ctxBroker = new CtxBroker(internalCtxBroker);

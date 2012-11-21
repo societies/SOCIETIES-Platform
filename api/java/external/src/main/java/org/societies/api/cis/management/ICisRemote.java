@@ -22,36 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.inference;
+package org.societies.api.cis.management;
 
-import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.Requestor;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 
 /**
- * This exception is thrown whenever a CtxRefinement algorithm
- * is not able to infer a value for a Ctx Attribute.
- * 
- * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @author thomas.vilarinho@sintef.no
+ *
  */
-public class NotInferredException extends Exception {
-    
-    private static final long serialVersionUID = 1L;
 
-    public NotInferredException(CtxAttribute unrefinedAttr) {
-        super();
-        this.unrefinedAttr = unrefinedAttr;
-    }
+
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
+public interface ICisRemote {
+	
+	/**
+	 * Get info from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is
+	 * @param callback callback function
+	 */
+    public void getInfo(Requestor req,ICisManagerCallback callback);
     
-    private CtxAttribute unrefinedAttr = null;
-    
-    /** 
-     * Returns the Ctx Attribute whose value has not been set
-     * through CtxInference
-     * 
-     * @return unrefined Context Attribute
-     * @since 0.0.1
-     */
-    public synchronized CtxAttribute getUnrefinedAttr() {
-        return unrefinedAttr;
-    }
-    
+	/**
+	 * Get list of members from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * which will have a Who with a list of Participant objects
+	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is 
+	 * @param callback callback function
+	 */
+    public void getListOfMembers(Requestor req, ICisManagerCallback callback);
+
 }

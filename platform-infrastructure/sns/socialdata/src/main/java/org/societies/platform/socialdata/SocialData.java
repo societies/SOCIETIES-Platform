@@ -1,5 +1,6 @@
 package org.societies.platform.socialdata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -7,24 +8,32 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
+import org.societies.platform.sns.connecor.linkedin.LinkedinConnector;
 import org.societies.platform.socialdata.converters.ActivityConverter;
 import org.societies.platform.socialdata.converters.ActivityConveterFactory;
 import org.societies.platform.socialdata.converters.FriendsConverter;
@@ -36,6 +45,7 @@ import org.societies.platform.socialdata.converters.PersonConverterFactory;
 import org.springframework.stereotype.Service;
 
 import com.restfb.json.JsonObject;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 
 @Service
@@ -46,7 +56,7 @@ public class SocialData implements ISocialData{
 	
 	private INetworkNode 	cssNodeId;
 	private IIdentity 		cssOwnerId;
-	
+	private boolean			restoreState = false;
 	// css user is modeled as individualCtxEntity
 	private IndividualCtxEntity individualCtxEntity;
 	
@@ -109,7 +119,7 @@ public class SocialData implements ISocialData{
 		
 	}
 
-	
+	HashMap <String,CtxAttributeIdentifier> connectorsInCtxBroker = new HashMap<String, CtxAttributeIdentifier>();
 
 	 private void initSocialData(){
 		
@@ -139,7 +149,11 @@ public class SocialData implements ISocialData{
 	    	
 	    	
 	    	logger.info("SocialData Bundle is started");
-	    	/*
+	    	
+	    	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	    	
 	    	// Save data into the context
 			try {
 				logger.info(internalCtxBroker.toString());
@@ -148,32 +162,38 @@ public class SocialData implements ISocialData{
 				individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 				logger.info("Indivudual Context Entity: " + individualCtxEntity.getId().toString());
 				
-				CtxAttribute connector = null;
+				
 				// Restore the connected connector
 				Set<CtxAttribute> connectors= individualCtxEntity.getAttributes(CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR);
-				if (connectors != null ){
-					List<CtxAttribute> connectorList = new ArrayList<CtxAttribute>(connectors);
-					for(CtxAttribute conn : connectorList){
-						ISocialConnector connectoBlob;
+				if (connectors != null && !connectors.isEmpty()){
+					
+					restoreState = true;
+					for(CtxAttribute ctxConn : connectors){
+						ConnectorBean connectorBlob;
 						try {
-							connectoBlob = (ISocialConnector) SerialisationHelper.deserialise(connector.getBinaryValue(), this.getClass().getClassLoader());
-							this.addSocialConnector(connectoBlob);
-							connectorsInCtxBroker.put(connectoBlob.getID(), conn.getId().toString());
-							logger.info("Restore Connector: "+connectoBlob.getID());
+							connectorBlob = (ConnectorBean) SerialisationHelper.deserialise(ctxConn.getBinaryValue(), this.getClass().getClassLoader());
+							logger.info("connector bean:"+connectorBlob);
+							
+							HashMap<String, String> params = new HashMap<String, String>();
+							params.put(ISocialConnector.AUTH_TOKEN, connectorBlob.getToken());
+							params.put(ISocialConnector.IDENTITY, connectorBlob.getIdentity());
+							
+							connectorsInCtxBroker.put(connectorBlob.getId(), ctxConn.getId());
+							this.addSocialConnector(createConnector(getSocialNetowkName(connectorBlob.getSnName()), params));
+							
+							logger.info("Restore Connector: "+connectorBlob.getId()+ " for "+connectorBlob.getSnName());
+							
 						} 
-						catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						catch (Exception e) {
+							logger.error(e.getLocalizedMessage(), e);
+							
 						}
 						
+					updateSocialData();
+						
 					}
-				}else logger.warn("No SocialNetworkConnector stored in the Broker!");
+				}
+				else logger.warn("No SocialNetworkConnector stored in the Broker!");
 				
 			}
 			catch (CtxException e) {
@@ -186,18 +206,65 @@ public class SocialData implements ISocialData{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			*/
+			finally{
+				restoreState=false;
+			}
+
 	 }
+	 
+	 
+	 private ISocialConnector.SocialNetwork getSocialNetowkName(String name){
+			
+			
+			if ("facebook".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Facebook;
+			if ("twitter".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
+			if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+			if ("linkedin".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.linkedin;
+			if ("googleplus".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.googleplus;
+			
+			
+			return null;
+		}
+	 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	 
 	
 	@Override
 	public void addSocialConnector(ISocialConnector socialConnector) throws Exception {
+		
 		if (connectors.containsKey(socialConnector.getID())){
+			logger.warn("the connector id :"+socialConnector.getID() +" is already loaded");
 			throw new Exception("this connetor already exists");
 		}
-
-
+		
 		connectors.put(socialConnector.getID(), socialConnector);
-
+		if (!connectorsInCtxBroker.containsKey(socialConnector.getID())){
+			
+			
+			if (socialConnector.getToken()!=null && !restoreState){
+				
+				ConnectorBean bean = new ConnectorBean();
+				bean.setExipres(socialConnector.getTokenExpiration());
+				bean.setToken(socialConnector.getToken());
+				bean.setId(socialConnector.getID());
+				bean.setSnName(socialConnector.getConnectorName());
+				bean.setIdentity("");
+				
+				logger.info("[ADD] Connector ID:"+socialConnector.getID()+ " for "+socialConnector.getConnectorName() + " in CtxBroker");
+				logger.info("connector bean:"+bean);
+				CtxAttribute connectorCtxAttr = internalCtxBroker.createAttribute(individualCtxEntity.getId(), CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR).get();
+				connectorCtxAttr.setBinaryValue(SerialisationHelper.serialise(bean));
+				internalCtxBroker.update(connectorCtxAttr);
+				connectorsInCtxBroker.put(socialConnector.getID(), connectorCtxAttr.getId());
+				logger.info("Stored into the CtxBroker with id:"+connectorCtxAttr.getId());
+			}
+			else{
+				logger.error("Missing TOKEN in the connector bean!!!!");
+			}
+		}
+		
 		log("Add connector "+socialConnector.getID());
 	}
 
@@ -208,6 +275,13 @@ public class SocialData implements ISocialData{
 
 		if (connectors.containsKey(connectorId)){
 			connectors.remove(connectorId);
+			
+			if (connectorsInCtxBroker.containsKey(connectorId)){
+				internalCtxBroker.remove(connectorsInCtxBroker.get(connectorId));
+				connectorsInCtxBroker.remove(connectorId);
+				logger.info("Removed Connector ID:"+connectorId + " from CtxBroker");
+			}
+			
 		}
 		else throw new Exception("This connector not found");
 
@@ -386,23 +460,33 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public ISocialConnector createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
-
-
+		
+		String name="me";
+		try{
+			name=this.cssOwnerId.getJid();
+			if (params.containsKey(ISocialConnector.IDENTITY)) name=params.get(ISocialConnector.IDENTITY);
+		}
+		catch(Exception ex){}
 
 		logger.info("Create a new connector with "+snName + " name");
 		switch(snName){
-		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		case twitter:    
 			// Just for now that we don't have a way to use our persona token
 			//return (ISocialConnector) new TwitterConnectorImpl();
-			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
+			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		case Foursquare: 
 
 			// Just for now ...
 			// return (ISocialConnector) new FoursquareConnectorImpl();
-			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
+
+		case linkedin: 
+
+
+			return (ISocialConnector) new LinkedinConnector(params.get(ISocialConnector.AUTH_TOKEN), name);
 
 		default : return null;
 		}

@@ -42,4 +42,16 @@ public class CtxSourceNames {
 	 * 
 	 */
 	public final static String PZ = "PZ";
+	
+	/**
+	 * 
+	 * @since 0.5
+	 */
+	public final static String RFID = "RFID";
+	
+	/**
+	 * 
+	 * @since 0.5
+	 */
+	public final static String NONE = "None";
 }

@@ -32,13 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.util.SerialisationHelper;
-
 
 public class CtxBrokerUtils {
 
-	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerUtils.class);
 	
@@ -46,7 +43,6 @@ public class CtxBrokerUtils {
      * String representation of binary large object
      */
     public static final String BLOB_STRING = "_BLOB_";
-
     
     /**
      * Returns an attribute value as a String.
@@ -68,45 +64,6 @@ public class CtxBrokerUtils {
         return BLOB_STRING;
     }
 
-    /**
-     * Checks if the quality of the inferred attribute value is poor.
-     * 
-     * The quality is poor if an update is overdue based on the freshness
-     * (milliseconds since last update) and the expected update frequency
-     * (in Hertz i.e. number of expected updates per second).
-     * 
-     * If the update frequency is not specified (is null) then the quality
-     * is not poor.
-     * 
-     * For inferred attributes, the update frequency will never be null
-     * because the reasoning manager will always set it.
-     * 
-     * @param quality The ICtxQuality associated with the ICtxAttribute.
-     * 
-     * @return true if the quality is poor, false otherwise.
-     */
-    public static boolean isPoorQuality(CtxQuality quality)  {
-    	   	
-       boolean isPoorQuality;
-
-       LOG.debug("freshness = " + quality.getFreshness() + " updateFrequency = " + quality.getUpdateFrequency());
-                
-        if (null == quality.getUpdateFrequency()) {
-
-            isPoorQuality = false;
-
-        } else {
-            
-            final double timeBetweenUpdatesMillis = (1.0 / quality.getUpdateFrequency()) * 1000.0;
-            LOG.debug("time between updates (in milliseconds) = " +timeBetweenUpdatesMillis);
-            isPoorQuality = (double) quality.getFreshness() > timeBetweenUpdatesMillis;
-        }
-        LOG.debug("is poor quality = " + isPoorQuality);
-    
-        return isPoorQuality;
-    }
-    
-    
     public static CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;
@@ -161,14 +118,11 @@ public class CtxBrokerUtils {
     public static Boolean hasValue(CtxAttribute ctxAttribute){
     	Boolean hasValue = false; 
     	
-    	if(ctxAttribute.getDoubleValue() != null) return true;
-    	if(ctxAttribute.getIntegerValue() != null) return true;
     	if(ctxAttribute.getStringValue() != null) return true;
-    	if(ctxAttribute.getBinaryValue() != null) return true;
-    	if(ctxAttribute.getBinaryValue() != null) return true;
-    	
+    	if(ctxAttribute.getIntegerValue() != null) return true;
+    	if(ctxAttribute.getDoubleValue() != null) return true;
+    	if(ctxAttribute.getBinaryValue() != null) return true;	
     	
     	return hasValue;
     }
-    
 }

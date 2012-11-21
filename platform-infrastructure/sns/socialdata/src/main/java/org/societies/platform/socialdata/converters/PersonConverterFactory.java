@@ -12,6 +12,8 @@ public class PersonConverterFactory{
 			return new PersonConverterFromTwitter();
 		else if (ISocialConnector.FOURSQUARE_CONN.equals(connector.getConnectorName()))
 			return new PersonConverterFromFoursquare();
+		else if (ISocialConnector.LINKEDIN_CONN.equals(connector.getConnectorName()))
+			return new PersonConverterFromLinkedin();
 		else if (ISocialConnector.GOOGLEPLUS_CONN.equals(connector.getConnectorName())) 
 			return new PersonConverterFromGooglePlus();
 		else 

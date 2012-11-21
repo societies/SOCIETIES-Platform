@@ -12,6 +12,7 @@ public class Constants {
 	public static final int TW_CODE =  1002;
 	public static final int FQ_CODE =  1003;
 	public static final int LK_CODE =  1004;
+	public static final int GP_CODE =  1005;
 	
 	public static final String FB_URL = "http://dev.lucasimone.eu/fbMobile.php";
 	public static final String LK_URL = "http://dev.lucasimone.eu/auth.php";

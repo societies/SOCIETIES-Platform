@@ -55,6 +55,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	private String id;
 	private String lastUpdate = "yesterday";
 	private long tokenExpiration = 0;
+	
 
 	private String apiKey = "LTNRV3JPEKSFUCMOF4HY05GZHW4BWIZ1Y2YGBJCLMGEXZFG4";
 	private String apiSecret = "2Y0YDIH5XQV13P2ZE3EWZDGEAIHXXQNMOUAEVU4XIWRYRBBS";
@@ -67,6 +68,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	public FoursquareConnectorImpl(String access_token, String identity) {
 		this.accessTokenString = access_token;
 		this.identity = identity;
+		
 		this.name = ISocialConnector.FOURSQUARE_CONN;
 		this.id = this.name + "_" + UUID.randomUUID();
 		this.service = new ServiceBuilder()

@@ -83,13 +83,15 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
         this.ownerCSS = ownerCSS;
         
         // pubsub code
+        LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
-        	try {
-				pubSubcli.addSimpleClasses(classList);
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+//        	try {
+//				pubSubcli.addSimpleClasses(classList);
+//			} catch (ClassNotFoundException e1) {
+//				LOG.warn("error adding classes at pubsub at activityfeed pubsub");
+//				e1.printStackTrace();
+//				
+//			}
 			List<String> l = null;
 			try {
 				l = pubSubcli.discoItems(ownerCSS, null);

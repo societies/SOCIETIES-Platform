@@ -3,10 +3,8 @@ package org.societies.platform.sns.connecor.linkedin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.model.OAuthRequest;
@@ -56,14 +54,14 @@ public class LinkedinConnector implements ISocialConnector {
 		this.name 			= ISocialConnector.LINKEDIN_CONN;
 		this.id				= this.name + "_" + UUID.randomUUID();
 		this.service 		= token.getAuthService();
-		 
-		 Scanner in = new Scanner(System.in);
-		 
-		 System.out.println("=== LinkedIn's OAuth Workflow ===");
-		 System.out.println();
-		 
-		 System.out.println("=== LinkedIn's OAuth Workflow ===");
-		 System.out.println();
+		this.access_token   = access_token;
+//		 Scanner in = new Scanner(System.in);
+//		 
+//		 System.out.println("=== LinkedIn's OAuth Workflow ===");
+//		 System.out.println();
+//		 
+//		 System.out.println("=== LinkedIn's OAuth Workflow ===");
+//		 System.out.println();
 
 		
 		

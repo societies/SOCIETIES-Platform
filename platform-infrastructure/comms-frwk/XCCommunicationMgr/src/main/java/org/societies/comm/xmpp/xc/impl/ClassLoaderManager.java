@@ -3,6 +3,9 @@ package org.societies.comm.xmpp.xc.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+//import org.eclipse.gemini.web.tomcat.internal.loading.BundleWebappClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -14,23 +17,20 @@ public class ClassLoaderManager {
 	
 	private Long thisBundleId;
 	private Map<Long, ClassLoader> classloaderMap;
+	private Map<Object, Long> objectToBundle;
 	
-	public ClassLoaderManager() {
-		thisBundleId = ((BundleDelegatingClassLoader)Thread.currentThread().getContextClassLoader()).getBundle().getBundleId();
+	public ClassLoaderManager(Object commMgrBean) {
 		classloaderMap = new HashMap<Long, ClassLoader>();
+		objectToBundle = new HashMap<Object, Long>();
+		thisBundleId = getBundleId(commMgrBean);
 	}
-	
-	public ClassLoader classLoaderMagic(Object o) {
-		LOG.info("getting classloader for object "+o.toString());
+
+	public ClassLoader classLoaderMagic(Object targetBean) {
+		LOG.info("getting classloader for object "+targetBean.toString());
 		ClassLoader newClassloader = null;
-		if (o instanceof Thread) {
-			ClassLoader cl = ((Thread)o).getContextClassLoader();
-			if (cl instanceof BundleDelegatingClassLoader) {
-				Long bid = ((BundleDelegatingClassLoader) cl).getBundle().getBundleId();
-				LOG.info("resolved "+o.toString()+" to bundle "+bid);
-				newClassloader = classloaderMap.get(bid);
-			}
-		}
+	
+		Long id = getBundleId(targetBean);
+		newClassloader = classloaderMap.get(id);
 		
 		if (newClassloader!=null) {
 			ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
@@ -44,18 +44,51 @@ public class ClassLoaderManager {
 		return null;
 	}
 
-	public void classloaderRegistry(ClassLoader contextClassLoader) {
-		if (contextClassLoader instanceof BundleDelegatingClassLoader) {
-			BundleDelegatingClassLoader bdcl = (BundleDelegatingClassLoader) contextClassLoader;
-			Long id = bdcl.getBundle().getBundleId();
-			if (!id.equals(thisBundleId)) {
-				LOG.info("saving classloader "+contextClassLoader.toString()+" for bundle "+id);
-				classloaderMap.put(id, contextClassLoader);
-			}
-			else
-				LOG.info("this is the local classloader");
+	public void classloaderRegistry(Object targetBean) {
+		Long id = getBundleId(targetBean);
+			
+		if (!id.equals(thisBundleId)) {
+			LOG.info("saving object "+targetBean.toString()+" for bundle "+id);
+			objectToBundle.put(targetBean, id);
+			LOG.info("saving classloader "+Thread.currentThread().getContextClassLoader().toString()+" for bundle "+id);
+			classloaderMap.put(id, Thread.currentThread().getContextClassLoader());
 		}
 		else
-			LOG.info("skipping classloader "+contextClassLoader.toString());
+			LOG.info("this is the local classloader: skipping...");
+	}
+	
+	private void notFound(Class<?> cs, ClassLoader cl) {
+		throw new RuntimeException("Unable to get bundle for class: "+cs.toString()+" with context classloader "+cl.toString());
+	}
+	
+	private Long getBundleId(Object o) {
+		Bundle b = null;
+		ClassLoader hcl = null;
+		
+		// priority to registered references (the request is incoming, thread belongs to CommsFwrk)
+		Long l = objectToBundle.get(o);
+		if (l!=null)
+			return l;
+		
+		// call from a different bundle: get bundleId from BundleDelegatingClassLoader if possible
+		if (o instanceof Thread)
+			hcl = ((Thread)o).getContextClassLoader();
+		else
+			hcl = Thread.currentThread().getContextClassLoader();
+		
+		if (hcl instanceof BundleDelegatingClassLoader)
+			b = ((BundleDelegatingClassLoader)hcl).getBundle();
+		
+		// fallback to frameworkUtils resolution
+		if (b==null)
+			b = FrameworkUtil.getBundle(o.getClass()); 
+		
+		if (b!=null) {
+			LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"'");
+		}
+		else
+			notFound(o.getClass(),Thread.currentThread().getContextClassLoader());
+		
+		return b.getBundleId();
 	}
 }

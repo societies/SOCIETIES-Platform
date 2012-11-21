@@ -113,7 +113,7 @@
 		<property name="commsMgr" ref="commManager" />
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal" />
-		<property name="negotiationAgentRemote" ref="negotiationAgentRemote" />
+		<property name="negotiationAgentRemote" ref="PrivacyNegotiationManagerCommClient" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
@@ -129,7 +129,21 @@
 		<property name="commsMgr" ref="commManager" />
 	</bean>
 
+	<!-- Privacy Policy Negotiation Comms Configuration -->
+	
+	<bean name="PrivacyNegotiationManagerCommClient"
+		class="org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommClient"
+		depends-on="commManager"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+	</bean>
 
+	<bean name="PrivacyNegotiationManagerCommServer"
+		class="org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommServer"
+		depends-on="commManager, negotiationAgent" init-method="initBean">
+		<property name="commManager" ref="commManager" />
+		<property name="negAgent" ref="negotiationAgent" />
+	</bean>
 
 	<!-- Privacy Preference Manager Configuration -->
 
