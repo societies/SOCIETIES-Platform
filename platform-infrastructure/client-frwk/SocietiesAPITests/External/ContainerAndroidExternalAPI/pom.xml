@@ -8,9 +8,9 @@
         <version>RELEASE</version>
    </parent>
 
-   <groupId>org.societies.android.api.internal.container</groupId>
-   <artifactId>ContainerAndroidInternalAPI</artifactId>
-   <name>APIInternalContainer</name>
+   <groupId>org.societies.android.api.external.container</groupId>
+   <artifactId>ContainerAndroidExternalAPI</artifactId>
+   <name>APIExternalContainer</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 
@@ -36,28 +36,29 @@
 		         </exclusion>
 		        </exclusions>
 			</dependency>
-			<dependency>
-			   	<groupId>org.societies.api.internal</groupId>
-			   	<artifactId>societies-api-internal</artifactId>
-				<version>${release.version}</version>
-        	</dependency>
-			<dependency>
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+			<!--dependency>
 				<groupId>org.societies.android.api.external</groupId>
 				<artifactId>societies-android-api</artifactId>
 				<version>${release.version}</version>
-			</dependency>
-			
-			<!--dependency>
-				<groupId>org.societies.api.external</groupId>
-				<artifactId>societies-api</artifactId>
-				<version>${release.version}</version>
 			</dependency-->
 			
-			<dependency>
+			<!--dependency>
 				<groupId>org.societies.api.schema</groupId>
 				<artifactId>societies-api-schema</artifactId>
 				<version>${release.version}</version>
-			</dependency>
+			</dependency-->
+		<dependency>
+  			<groupId>org.societies.utilities</groupId>
+  			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+            <scope>compile</scope>
+        </dependency>
+			
     </dependencies>
 
     <build>

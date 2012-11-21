@@ -1,4 +1,6 @@
-package org.societies.android.api.internal.container;
+package org.societies.android.api.container;
+
+import org.societies.android.api.internal.container.R;
 
 import android.os.Bundle;
 import android.app.Activity;

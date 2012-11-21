@@ -275,24 +275,38 @@ public class ServiceMethodTranslator {
 		} else if (arrayContains(JAVA_LANG_CLASSES, paramType)) {
 			result.append(capitaliseString(paramType));
 		} else {
-			Class paramClassType = null;
+			Class<?> paramClassType = null;
 			try {
-				paramClassType = Class.forName(paramType);
+				Class<?>[] implementedInterfaces = Class.forName(paramType).getInterfaces();
+
+				for (int i = 0; i < implementedInterfaces.length; i++) {
+					if (implementedInterfaces[i].equals(Parcelable.class)) {
+						result.append("Parcelable");
+						break;
+					} else if (implementedInterfaces[i].equals(Serializable.class)) {
+						result.append("Serializable");
+						break;
+					}
+				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			Class[] implementedInterfaces = paramClassType.getInterfaces();
-			for(Class implementedInterface : implementedInterfaces) {
-				System.out.println(implementedInterface.getSimpleName());
-				if (implementedInterface.equals(Parcelable.class)) {
-					result.append("Parcelable");
-					break;
-				}
-				else if (implementedInterface.equals(Serializable.class)) {
-					result.append("Serializable");
-					break;
-				}
-			}
+			//Causes a problem when testing:
+//			[INFO] EXCEPTION FROM SIMULATION:
+//			[INFO] local variable type mismatch: attempt to set or access a value of type java.lang.Class 
+//			using a local variable of type java.lang.Class[]. 
+//			This is symptomatic of .class transformation tools that ignore local variable information.
+
+//			for(Class implementedInterface : implementedInterfaces) {
+//				if (implementedInterface.equals(Parcelable.class)) {
+//					result.append("Parcelable");
+//					break;
+//				}
+//				else if (implementedInterface.equals(Serializable.class)) {
+//					result.append("Serializable");
+//					break;
+//				}
+//			}
 		}
 		return result.toString();
 	}
