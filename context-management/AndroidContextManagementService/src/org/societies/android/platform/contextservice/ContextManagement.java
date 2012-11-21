@@ -33,22 +33,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.android.api.internal.context.broker.ICtxClientBroker;
+import org.societies.android.api.context.model.ACtxAssociation;
+import org.societies.android.api.context.model.ACtxAssociationIdentifier;
+import org.societies.android.api.context.model.ACtxAttribute;
+import org.societies.android.api.context.model.ACtxAttributeIdentifier;
+import org.societies.android.api.context.model.ACtxEntity;
+import org.societies.android.api.context.model.ACtxEntityIdentifier;
+import org.societies.android.api.context.model.ACtxIdentifier;
+import org.societies.android.api.context.model.ACtxModelObject;
+import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxBond;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
@@ -64,9 +59,9 @@ import android.util.Log;
  * @author pkosmides
  *
  */
-public class ContextManagement extends Service implements ICtxClientBroker {
+public class ContextManagement extends Service implements IInternalCtxClient {
 
-	private static ExpiringCache<CtxIdentifier, CtxModelObject> cache = new ExpiringCache();
+	private static ExpiringCache<ACtxIdentifier, ACtxModelObject> cache = new ExpiringCache();
 
 	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
@@ -105,23 +100,23 @@ public class ContextManagement extends Service implements ICtxClientBroker {
 		return this.binder;
 	}
 
-	public CtxAssociation createAssociation(String type) throws CtxException {
+	public ACtxAssociation createAssociation(String client, String type) throws CtxException {
 
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final CtxAssociationIdentifier identifier;
+		final ACtxAssociationIdentifier identifier;
 
-		identifier = new CtxAssociationIdentifier(this.privateIdtoString, 
+		identifier = new ACtxAssociationIdentifier(this.privateIdtoString, 
 				type, CtxModelObjectNumberGenerator.getNextValue());
 
-		final CtxAssociation association = new  CtxAssociation(identifier);
+		final ACtxAssociation association = new  ACtxAssociation(identifier);
 		cache.put(association.getId(), association);		
 
 		return association;
 	}
 
-	public CtxAttribute createAttribute(CtxEntityIdentifier scope, String type)
+	public ACtxAttribute createAttribute(String client, ACtxEntityIdentifier scope, String type)
 			throws CtxException {
 
 		if (scope == null)
@@ -130,13 +125,13 @@ public class ContextManagement extends Service implements ICtxClientBroker {
 			throw new NullPointerException("type can't be null");
 
 //		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
-		final CtxEntity entity = (CtxEntity) cache.get(scope);
+		final ACtxEntity entity = (ACtxEntity) cache.get(scope);
 
 		if (entity == null)	
 			throw new NullPointerException("Scope not found: " + scope);
 
-		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
-		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
+		ACtxAttributeIdentifier attrIdentifier = new ACtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
+		final ACtxAttribute attribute = new ACtxAttribute(attrIdentifier);
 
 //		this.modelObjects.put(attribute.getId(), attribute);
 		cache.put(attribute.getId(), attribute);
@@ -146,14 +141,14 @@ public class ContextManagement extends Service implements ICtxClientBroker {
 		return attribute;
 	}
 
-	public CtxEntity createEntity(String type) throws CtxException {
+	public ACtxEntity createEntity(String client, String type) throws CtxException {
 
-		final CtxEntityIdentifier identifier;
+		final ACtxEntityIdentifier identifier;
 
-		identifier = new CtxEntityIdentifier(this.privateIdtoString, 
+		identifier = new ACtxEntityIdentifier(this.privateIdtoString, 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 
-		final CtxEntity entity = new  CtxEntity(identifier);
+		final ACtxEntity entity = new  ACtxEntity(identifier);
 		if (entity.getId()!=null)
 			Log.d(LOG_TAG, "Maps key is OK!!");
 		else
@@ -165,27 +160,15 @@ public class ContextManagement extends Service implements ICtxClientBroker {
 		return entity;
 	}
 
-	public void disableCtxMonitoring(CtxAttributeValueType type)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void enableCtxMonitoring(CtxAttributeValueType type)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public List<CtxEntityIdentifier> lookupEntities(String entityType,
+	public List<ACtxEntityIdentifier> lookupEntities(String client, String entityType,
 			String attribType, Serializable minAttribValue,
 			Serializable maxAttribValue) throws CtxException {
 
-        final List<CtxEntityIdentifier> foundList = new ArrayList<CtxEntityIdentifier>();
-        for (CtxIdentifier identifier : cache.keySet()) {
+        final List<ACtxEntityIdentifier> foundList = new ArrayList<ACtxEntityIdentifier>();
+        for (ACtxIdentifier identifier : cache.keySet()) {
             if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)
                     && identifier.getType().equals(attribType)) {
-                final CtxAttribute attribute = (CtxAttribute) cache.get(identifier);
+                final ACtxAttribute attribute = (ACtxAttribute) cache.get(identifier);
 //                if (attribute.getScope().getType().equals(entityType) && attribute.getValue().equals(minAttribValue)) {
                 if (attribute.getScope().getType().equals(entityType)) {
                 	if (minAttribValue instanceof String && maxAttribValue instanceof String) {
@@ -229,12 +212,12 @@ public class ContextManagement extends Service implements ICtxClientBroker {
         return foundList;
 	}
 
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type)
+	public List<ACtxIdentifier> lookup(String client, CtxModelType modelType, String type)
 			throws CtxException {
 
-		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		final List<ACtxIdentifier> foundList = new ArrayList<ACtxIdentifier>();
 
-		for (CtxIdentifier identifier : cache.keySet()) {
+		for (ACtxIdentifier identifier : cache.keySet()) {
 			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
 				foundList.add(identifier);
 			}		
@@ -242,148 +225,58 @@ public class ContextManagement extends Service implements ICtxClientBroker {
 		return foundList;
 	}
 
-	public void registerForChanges(CtxChangeEventListener listener,
-			CtxIdentifier ctxId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void unregisterFromChanges(CtxChangeEventListener listener,
-			CtxIdentifier ctxId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void registerForChanges(CtxChangeEventListener listener,
-			CtxEntityIdentifier scope, String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void unregisterFromChanges(CtxChangeEventListener listener,
-			CtxEntityIdentifier scope, String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException {
+	public ACtxModelObject remove(String client, ACtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public CtxModelObject retrieve(CtxIdentifier id)
+	public ACtxModelObject retrieve(String client, ACtxIdentifier id)
 			throws CtxException {
 
 		return this.cache.get(id);
 	}
 	//modelObject - identity in api
-	public CtxModelObject update(CtxModelObject modelObject) throws CtxException {
+	public ACtxModelObject update(String client, ACtxModelObject modelObject) throws CtxException {
 
 		if (cache.keySet().contains(modelObject.getId())) {
 			cache.put(modelObject.getId(), modelObject);
 		}
 
-		 if (modelObject instanceof CtxAssociation) {
+		 if (modelObject instanceof ACtxAssociation) {
 
-			   CtxEntity ent = null;
-			   CtxEntityIdentifier entId;
+			   ACtxEntity ent = null;
+			   ACtxEntityIdentifier entId;
 
 			   // Add association to parent entity
-			   entId = ((CtxAssociation) modelObject).getParentEntity();
+			   entId = ((ACtxAssociation) modelObject).getParentEntity();
 			   if (entId != null)
-			     ent = (CtxEntity) this.retrieve(entId);
+			     ent = (ACtxEntity) this.retrieve(client, entId);
 			     if (ent != null)
-			       ent.addAssociation(((CtxAssociation) modelObject).getId());
+			       ent.addAssociation(((ACtxAssociation) modelObject).getId());
 
 			    // Add association to child entities
-			    Set<CtxEntityIdentifier> entIds = ((CtxAssociation) modelObject).getChildEntities();
-			    for (CtxEntityIdentifier entIdent : entIds) {
+			    Set<ACtxEntityIdentifier> entIds = ((ACtxAssociation) modelObject).getChildEntities();
+			    for (ACtxEntityIdentifier entIdent : entIds) {
 			    	//entIdent = ((CtxAssociation) modelObject).getParentEntity();
-			    	ent = (CtxEntity) this.retrieve(entIdent);
+			    	ent = (ACtxEntity) this.retrieve(client, entIdent);
 			    	if (ent != null)
-			    		ent.addAssociation(((CtxAssociation) modelObject).getId());
+			    		ent.addAssociation(((ACtxAssociation) modelObject).getId());
 			    }
 		}
 
 		return modelObject;
 	}
 
-	public CtxAttribute updateAttribute(CtxAttributeIdentifier attributeId,
+	public ACtxAttribute updateAttribute(String client, ACtxAttributeIdentifier attributeId,
 			Serializable value) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public CtxAttribute updateAttribute(CtxAttributeIdentifier attributeId,
+	public ACtxAttribute updateAttribute(String client, ACtxAttributeIdentifier attributeId,
 			Serializable value, String valueMetric) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public IndividualCtxEntity retrieveAdministratingCSS(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Set<CtxBond> retrieveBonds(CtxEntityIdentifier community)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<CtxEntityIdentifier> retrieveSubCommunities(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<CtxEntityIdentifier> retrieveCommunityMembers(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Boolean setHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<CtxAttributeIdentifier> getHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<CtxAttributeIdentifier> updateHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Boolean removeHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void enableCtxRecording() throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void disableCtxRecording() throws CtxException {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

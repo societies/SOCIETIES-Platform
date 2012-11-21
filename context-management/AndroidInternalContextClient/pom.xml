@@ -8,7 +8,7 @@
         	<version>RELEASE</version>
 	</parent>
 
-	<groupId>org.societies.android.platform.ctxclient</groupId>
+	<groupId>org.societies.android.platform.internalctxclient</groupId>
 	<artifactId>InternalCtxClient</artifactId>
 	<name>AndroidInternalContextClient</name>
 	<version>${version.cm}</version>

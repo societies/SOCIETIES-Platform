@@ -1,4 +1,4 @@
-package org.societies.android.platform.internalctxclient;
+package org.societies.android.platform.ctxclient;
 
 import android.app.Service;
 import android.content.Intent;
