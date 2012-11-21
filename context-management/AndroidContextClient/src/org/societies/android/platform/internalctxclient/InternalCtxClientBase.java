@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.contextbroker;
+package org.societies.android.platform.internalctxclient;
 
 
 //import java.net.URL;
@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.android.api.context.broker.IExternalCtxBroker;
 import org.societies.android.api.context.model.ACtxAssociation;
 import org.societies.android.api.context.model.ACtxAssociationIdentifier;
 import org.societies.android.api.context.model.ACtxAttribute;
@@ -42,19 +41,14 @@ import org.societies.android.api.context.model.ACtxEntity;
 import org.societies.android.api.context.model.ACtxEntityIdentifier;
 import org.societies.android.api.context.model.ACtxIdentifier;
 import org.societies.android.api.context.model.ACtxModelObject;
-import org.societies.api.context.model.CtxModelType;
+import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -66,7 +60,7 @@ import android.util.Log;
  * @author pkosmides
  *
  */
-public class ContextBroker extends Service implements IExternalCtxBroker {
+public class InternalCtxClientBase implements IInternalCtxClient {
 
 	private static ExpiringCache<ACtxIdentifier, ACtxModelObject> cache = new ExpiringCache();
 
@@ -74,102 +68,44 @@ public class ContextBroker extends Service implements IExternalCtxBroker {
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
 
     private ClientCommunicationMgr commMgr;
-
-	/**
-	 * The IIdentity Mgmt service reference.
-	 *
-	 * @see {@link #setIdentityMgr(IIdentityManager)}
-	 */
-	private IIdentityManager idMgr;
-
-    private static final String LOG_TAG = ContextBroker.class.getName();
-    private IBinder binder = null;
+    private Context androidContext;
     
-    @Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ContextBroker service starting");
+    private static final String LOG_TAG = InternalCtxClientBase.class.getName();
+//    private IBinder binder = null;
+    
+    public InternalCtxClientBase(Context androidContext) {
+    	Log.d(LOG_TAG, "InternalCtxClientBase created");
+    	
+    	this.androidContext = androidContext;
+    	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			commMgr = new ClientCommunicationMgr(this);
+			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
 	}
 
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "ContextBroker service terminating");
+    // Internal Ctx Client 
+    
+	public ACtxAssociation createAssociation(String client, String type) throws CtxException {
+
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final ACtxAssociationIdentifier identifier;
+
+		identifier = new ACtxAssociationIdentifier(this.privateIdtoString, 
+				type, CtxModelObjectNumberGenerator.getNextValue());
+
+		final ACtxAssociation association = new  ACtxAssociation(identifier);
+		cache.put(association.getId(), association);		
+
+		return association;
 	}
 
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public ContextBroker getService() {
-			return ContextBroker.this;
-		}
-	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
-
-	public ACtxEntity createEntity(String client, String type) throws CtxException {
-
-
-		return this.createEntity(client, null, null, type);
-	}
-
-	public ACtxEntity createEntity(String client, Requestor requestor,
-			IIdentity targetCss, String type) throws CtxException {
-
-		
-		if (requestor == null) requestor = this.getLocalRequestor();
-		if (targetCss == null) targetCss = this.getLocalIdentity();
-
-		ACtxEntity entityResult = null;
-
-		if (idMgr.isMine(targetCss)) {
-
-			entityResult = this.userCtxDBMgr.createEntity(type);
-
-		}else {
-
-			final CreateEntityCallback callback = new CreateEntityCallback();
-			this.ctxBrokerClient.createEntity(requestor, targetCss, type, callback);
-
-			synchronized (callback) {
-				try {
-					callback.wait();
-					entityResult = callback.getResult();
-				} catch (InterruptedException e) {
-
-					throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
-				}
-			}
-		}
-
-		return new AsyncResult<CtxEntity>(entityResult);
-////////////////////////
-		final ACtxEntityIdentifier identifier;
-
-		identifier = new ACtxEntityIdentifier(this.privateIdtoString, 
-					type, CtxModelObjectNumberGenerator.getNextValue());
-
-		final ACtxEntity entity = new  ACtxEntity(identifier);
-		if (entity.getId()!=null)
-			Log.d(LOG_TAG, "Maps key is OK!!");
-		else
-			Log.d(LOG_TAG, "Problem with maps key!!");
-	//	modelObjects.put(entity.getId(), entity);
-		cache.put(entity.getId(), entity);
-		Log.d(LOG_TAG, "Entity cached - " + entity);
-
-		return entity;
-	}
-
-	public ACtxAttribute createAttribute(String client, Requestor requestor,
-			ACtxEntityIdentifier scope, String type) throws CtxException {
+	public ACtxAttribute createAttribute(String client, ACtxEntityIdentifier scope, String type)
+			throws CtxException {
 
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
@@ -191,51 +127,28 @@ public class ContextBroker extends Service implements IExternalCtxBroker {
 		Log.d(LOG_TAG, "Attribute cached - " + attribute);
 
 		return attribute;
-
 	}
 
-	public ACtxAssociation createAssociation(String client,
-			Requestor requestor, IIdentity targetCss, String type)
-			throws CtxException {
+	public ACtxEntity createEntity(String client, String type) throws CtxException {
 
-		if (type == null)
-			throw new NullPointerException("type can't be null");
+		final ACtxEntityIdentifier identifier;
 
-		final ACtxAssociationIdentifier identifier;
+		identifier = new ACtxEntityIdentifier(this.privateIdtoString, 
+					type, CtxModelObjectNumberGenerator.getNextValue());
 
-		identifier = new ACtxAssociationIdentifier(this.privateIdtoString, 
-				type, CtxModelObjectNumberGenerator.getNextValue());
+		final ACtxEntity entity = new  ACtxEntity(identifier);
+		if (entity.getId()!=null)
+			Log.d(LOG_TAG, "Maps key is OK!!");
+		else
+			Log.d(LOG_TAG, "Problem with maps key!!");
+	//	modelObjects.put(entity.getId(), entity);
+		cache.put(entity.getId(), entity);
+		Log.d(LOG_TAG, "Entity cached - " + entity);
 
-		final ACtxAssociation association = new  ACtxAssociation(identifier);
-		cache.put(association.getId(), association);		
-
-		return association;
-
+		return entity;
 	}
 
-	public List<ACtxIdentifier> lookup(String client, Requestor requestor,
-			IIdentity target, CtxModelType modelType, String type)
-			throws CtxException {
-
-		final List<ACtxIdentifier> foundList = new ArrayList<ACtxIdentifier>();
-
-		for (ACtxIdentifier identifier : cache.keySet()) {
-			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
-				foundList.add(identifier);
-			}		
-		}
-		return foundList;
-	}
-
-	public List<ACtxIdentifier> lookup(String client, Requestor requestor,
-			ACtxEntityIdentifier entityId, CtxModelType modelType, String type)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<ACtxEntityIdentifier> lookupEntities(String client,
-			Requestor requestor, IIdentity targetCss, String entityType,
+	public List<ACtxEntityIdentifier> lookupEntities(String client, String entityType,
 			String attribType, Serializable minAttribValue,
 			Serializable maxAttribValue) throws CtxException {
 
@@ -285,35 +198,33 @@ public class ContextBroker extends Service implements IExternalCtxBroker {
             }
         }
         return foundList;
-
 	}
 
-	public ACtxModelObject remove(String client, Requestor requestor,
-			ACtxIdentifier identifier) throws CtxException {
+	public List<ACtxIdentifier> lookup(String client, CtxModelType modelType, String type)
+			throws CtxException {
+
+		final List<ACtxIdentifier> foundList = new ArrayList<ACtxIdentifier>();
+
+		for (ACtxIdentifier identifier : cache.keySet()) {
+			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
+				foundList.add(identifier);
+			}		
+		}
+		return foundList;
+	}
+
+	public ACtxModelObject remove(String client, ACtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ACtxModelObject retrieve(String client, Requestor requestor,
-			ACtxIdentifier identifier) throws CtxException {
+	public ACtxModelObject retrieve(String client, ACtxIdentifier id)
+			throws CtxException {
 
-		return this.cache.get(identifier);
+		return this.cache.get(id);
 	}
-
-	public ACtxEntityIdentifier retrieveIndividualEntityId(String client,
-			Requestor requestor, IIdentity cssId) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ACtxEntityIdentifier retrieveCommunityEntityId(String client,
-			Requestor requestor, IIdentity cisId) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ACtxModelObject update(String client, Requestor requestor,
-			ACtxModelObject modelObject) throws CtxException {
+	//modelObject - identity in api
+	public ACtxModelObject update(String client, ACtxModelObject modelObject) throws CtxException {
 
 		if (cache.keySet().contains(modelObject.getId())) {
 			cache.put(modelObject.getId(), modelObject);
@@ -327,7 +238,7 @@ public class ContextBroker extends Service implements IExternalCtxBroker {
 			   // Add association to parent entity
 			   entId = ((ACtxAssociation) modelObject).getParentEntity();
 			   if (entId != null)
-			     ent = (ACtxEntity) this.retrieve(entId);
+			     ent = (ACtxEntity) this.retrieve(client, entId);
 			     if (ent != null)
 			       ent.addAssociation(((ACtxAssociation) modelObject).getId());
 
@@ -335,48 +246,25 @@ public class ContextBroker extends Service implements IExternalCtxBroker {
 			    Set<ACtxEntityIdentifier> entIds = ((ACtxAssociation) modelObject).getChildEntities();
 			    for (ACtxEntityIdentifier entIdent : entIds) {
 			    	//entIdent = ((CtxAssociation) modelObject).getParentEntity();
-			    	ent = (ACtxEntity) this.retrieve(entIdent);
+			    	ent = (ACtxEntity) this.retrieve(client, entIdent);
 			    	if (ent != null)
 			    		ent.addAssociation(((ACtxAssociation) modelObject).getId());
 			    }
 		}
 
 		return modelObject;
-
-	}
-	
-	public Requestor getLocalRequestor() throws CtxBrokerException {
-
-		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
-
-		IIdentity cssOwnerId;
-		Requestor requestor = null;
-		try {
-			cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
-			requestor = new Requestor(cssOwnerId);
-		} catch (InvalidFormatException e) {
-
-			throw new CtxBrokerException(" requestor could not be set: " + e.getLocalizedMessage(), e);
-
-		}	
-
-		return requestor;
 	}
 
+	public ACtxAttribute updateAttribute(String client, ACtxAttributeIdentifier attributeId,
+			Serializable value) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	private IIdentity getLocalIdentity() throws CtxBrokerException {
-
-		IIdentity cssOwnerId = null;
-		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
-
-		try {
-			cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
-
-		} catch (InvalidFormatException e) {
-			throw new CtxBrokerException(" cssOwnerId could not be set: " + e.getLocalizedMessage(), e);
-		}
-
-		return cssOwnerId;	
+	public ACtxAttribute updateAttribute(String client, ACtxAttributeIdentifier attributeId,
+			Serializable value, String valueMetric) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

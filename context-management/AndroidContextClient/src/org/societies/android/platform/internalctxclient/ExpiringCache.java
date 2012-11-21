@@ -1,4 +1,4 @@
-package org.societies.android.platform.contextbroker;
+package org.societies.android.platform.internalctxclient;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;

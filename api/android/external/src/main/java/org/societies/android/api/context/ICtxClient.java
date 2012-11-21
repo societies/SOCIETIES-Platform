@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.context.broker;
+package org.societies.android.api.context;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,8 +40,6 @@ import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -55,24 +53,24 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IExternalCtxBroker {
+
+public interface ICtxClient {
 	
 	//Intents
-	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxbroker.ReturnValue";
-	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.ctxbroker.ReturnStatus";
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxclient.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.ctxclient.ReturnStatus";
 
-	public static final String CREATE_ENTITY = "org.societies.android.platform.ctxBroker.CREATE_ENTITY";
-	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.ctxBroker.CREATE_ATTRIBUTE";
-	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.ctxBroker.CREATE_ASSOCIATION";
-	public static final String LOOKUP = "org.societies.android.platform.ctxBroker.LOOKUP";
-	public static final String LOOKUP_CTX_ENTITY = "org.societies.android.platform.ctxBroker.LOOKUP_CTX_ENTITY";
-	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.ctxBroker.LOOKUP_ENTITIES";
-	public static final String REMOVE = "org.societies.android.platform.ctxBroker.REMOVE";
-	public static final String RETRIEVE = "org.societies.android.platform.ctxBroker.RETRIEVE";
-	public static final String RETRIEVE_INDIVIDUAL_ENTITY_ID = "org.societies.android.platform.ctxBroker.RETRIEVE_INDIVIDUAL_ENTITY_ID";
-	public static final String RETRIEVE_COMMUNITY_ENTITY_ID = "org.societies.android.platform.ctxBroker.RETRIEVE_COMMUNITY_ENTITY_ID";
-	public static final String UPDATE = "org.societies.android.platform.ctxBroker.UPDATE";
+	public static final String CREATE_ENTITY = "org.societies.android.platform.ctxclient.CREATE_ENTITY";
+	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.ctxclient.CREATE_ATTRIBUTE";
+	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.ctxclient.CREATE_ASSOCIATION";
+	public static final String LOOKUP = "org.societies.android.platform.ctxclient.LOOKUP";
+	public static final String LOOKUP_CTX_ENTITY = "org.societies.android.platform.ctxclient.LOOKUP_CTX_ENTITY";
+	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.ctxclient.LOOKUP_ENTITIES";
+	public static final String REMOVE = "org.societies.android.platform.ctxclient.REMOVE";
+	public static final String RETRIEVE = "org.societies.android.platform.ctxclient.RETRIEVE";
+	public static final String RETRIEVE_INDIVIDUAL_ENTITY_ID = "org.societies.android.platform.ctxclient.RETRIEVE_INDIVIDUAL_ENTITY_ID";
+	public static final String RETRIEVE_COMMUNITY_ENTITY_ID = "org.societies.android.platform.ctxclient.RETRIEVE_COMMUNITY_ENTITY_ID";
+	public static final String UPDATE = "org.societies.android.platform.ctxclient.UPDATE";
 	
 	//Array of interface method signatures
 	String methodsArray [] = {"createEntity(String client, final Requestor requestor, final IIdentity targetCss, final String type)",

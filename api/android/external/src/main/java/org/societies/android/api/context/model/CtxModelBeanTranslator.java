@@ -325,6 +325,8 @@ public final class CtxModelBeanTranslator {
 		return CtxAttributeValueType.valueOf(valueTypeBean.toString());	
 	}
 
+	
+	//ticket issue 1310 (runtime exception)
 	public XMLGregorianCalendar DateToXMLGregorianCalendar(Date myDate) throws DatatypeConfigurationException {
 
 		GregorianCalendar c = new GregorianCalendar();
