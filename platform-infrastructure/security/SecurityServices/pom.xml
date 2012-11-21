@@ -175,6 +175,7 @@
 							org.xml.sax,
 							*;resolution:=optional
 						</Import-Package>
+						<Export-Package>!*</Export-Package>
 <!--
 						<Export-Package>
 							org.societies.api.security.digsig,
