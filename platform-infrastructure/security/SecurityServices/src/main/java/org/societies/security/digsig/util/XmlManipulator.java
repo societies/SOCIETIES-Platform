@@ -61,67 +61,64 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-
 /**
  * @author Miroslav Pavleski, Mitja Vardjan
  */
-public class XmlManipulator {	
-	private DocumentBuilderFactory factory;	
+public class XmlManipulator {
+
+	private DocumentBuilderFactory factory;
 	private DocumentBuilder builder;
 	private XPath xpath;
-	
-	private Map<String, XPathExpression> expCache;	
+
+	private Map<String, XPathExpression> expCache;
 	private Document doc;
 	private DOMSource docSource;
-	
+
 	private Transformer transformer;
-		
+
 	public void setDocument(Document inDoc) {
 		doc = inDoc;
-		
+
 		expCache = new HashMap<String, XPathExpression>();
-		if (xpath==null) {
-        	XPathFactory xpathFactory = XPathFactory.newInstance();
-        	xpath = xpathFactory.newXPath();            	            	
-        }
-		
+		if (xpath == null) {
+			XPathFactory xpathFactory = XPathFactory.newInstance();
+			xpath = xpathFactory.newXPath();
+		}
+
 		docSource = new DOMSource(doc);
 	}
-	
+
 	public void load(InputStream fis) {
 		doc = null;
-        try
-        {
-            if (factory==null) {
-            	factory = DocumentBuilderFactory.newInstance();
-            	factory.setNamespaceAware(true); 
-            	
-            	builder = factory.newDocumentBuilder();            	
-            	expCache = new HashMap<String, XPathExpression>();
-            }
-            
-            if (xpath==null) {
-            	XPathFactory xpathFactory = XPathFactory.newInstance();
-            	xpath = xpathFactory.newXPath();            	            	
-            }
-                                    
-            doc = builder.parse(fis);
-            docSource = new DOMSource(doc);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to parse XML.",e);
-        }
+		try {
+			if (factory == null) {
+				factory = DocumentBuilderFactory.newInstance();
+				factory.setNamespaceAware(true);
+
+				builder = factory.newDocumentBuilder();
+				expCache = new HashMap<String, XPathExpression>();
+			}
+
+			if (xpath == null) {
+				XPathFactory xpathFactory = XPathFactory.newInstance();
+				xpath = xpathFactory.newXPath();
+			}
+
+			doc = builder.parse(fis);
+			docSource = new DOMSource(doc);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to parse XML.", e);
+		}
 	}
-	
+
 	public void load(String xmlStr) {
 		try {
 			load(new ByteArrayInputStream(xmlStr.getBytes("utf-8")));
 		} catch (UnsupportedEncodingException e) {
-			// should not happen	
+			// should not happen
 		}
 	}
-	
+
 	public void load(File file) {
 		FileInputStream fis = null;
 		try {
@@ -129,47 +126,50 @@ public class XmlManipulator {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Failed to load file!", e);
 		} finally {
-			if (fis!=null)
-				try { fis.close(); } catch (IOException e) {}
+			if (fis != null)
+				try {
+					fis.close();
+				} catch (IOException e) {
+				}
 		}
 	}
-	
+
 	public Document getDocument() {
 		return doc;
 	}
-			
+
 	public Element getDocumentElement() {
 		return doc.getDocumentElement();
 	}
-	
-	public Node getNode(Node start,String strXPath) {
+
+	public Node getNode(Node start, String strXPath) {
 		XPathExpression exp = getExpression(strXPath);
-		
+
 		try {
-			return (Node) exp.evaluate(start,XPathConstants.NODE);
+			return (Node) exp.evaluate(start, XPathConstants.NODE);
 		} catch (XPathExpressionException e) {
-			throw new RuntimeException("GetNode failed",e);
-		}		
+			throw new RuntimeException("GetNode failed", e);
+		}
 	}
-	
+
 	public Node getNode(String strXPath) {
-		return getNode(doc.getDocumentElement(),strXPath);				
+		return getNode(doc.getDocumentElement(), strXPath);
 	}
-	
+
 	public NodeList getNodes(Node start, String strXPath) {
 		XPathExpression exp = getExpression(strXPath);
-		
+
 		try {
-			return (NodeList) exp.evaluate(start,XPathConstants.NODESET);
+			return (NodeList) exp.evaluate(start, XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
-			throw new RuntimeException("GetNodes failed",e);
-		}		
+			throw new RuntimeException("GetNodes failed", e);
+		}
 	}
-	
+
 	public NodeList getNodes(String strXPath) {
-		return getNodes(doc.getDocumentElement(),strXPath);
+		return getNodes(doc.getDocumentElement(), strXPath);
 	}
-	
+
 	/**
 	 * Gets the String content of the element at the specified XPath
 	 * 
@@ -178,21 +178,21 @@ public class XmlManipulator {
 	 */
 	public String getElementContent(Node start, String strXPath) {
 		XPathExpression exp = getExpression(strXPath);
-		
+
 		try {
 			return exp.evaluate(start);
 		} catch (XPathExpressionException e) {
-			throw new RuntimeException("getElementContent failed",e);
-		}		
-	}	
-	
-	public String getElementContent(String strXPath) {
-		return getElementContent(doc.getDocumentElement(),strXPath);
+			throw new RuntimeException("getElementContent failed", e);
+		}
 	}
-	
+
+	public String getElementContent(String strXPath) {
+		return getElementContent(doc.getDocumentElement(), strXPath);
+	}
+
 	/**
-	 * Sets the content of the element elementName, at strXPath parent.  
-	 * If replace is true then the first found elementName under the parent element 
+	 * Sets the content of the element elementName, at strXPath parent. If
+	 * replace is true then the first found elementName under the parent element
 	 * is replaced with the content. Otherwise a new element is always created.
 	 * 
 	 * @param strXPath
@@ -200,11 +200,13 @@ public class XmlManipulator {
 	 * @param content
 	 * @param replace
 	 */
-	public void setElementContent(String strXPath, String elementName, String content, boolean replace) {
+	public void setElementContent(String strXPath, String elementName,
+			String content, boolean replace) {
 		Element parentElement = (Element) getNode(strXPath);
 		Element reqElement = null;
 		if (replace) {
-			reqElement = (Element) parentElement.getElementsByTagName(elementName).item(0);
+			reqElement = (Element) parentElement.getElementsByTagName(
+					elementName).item(0);
 			if (reqElement == null) {
 				reqElement = doc.createElement(elementName);
 				parentElement.appendChild(reqElement);
@@ -213,109 +215,118 @@ public class XmlManipulator {
 			reqElement = doc.createElement(elementName);
 			parentElement.appendChild(reqElement);
 		}
-		reqElement.setTextContent(content);			
+		reqElement.setTextContent(content);
 	}
-		
+
 	/**
-	 * Imports the XML content at the location specified by the XPath expression. If replace is true and
-	 * the specified elementName is child of the XPath specified element, the first such element content
-	 * is replaced with the imported XML.
+	 * Imports the XML content at the location specified by the XPath
+	 * expression. If replace is true and the specified elementName is child of
+	 * the XPath specified element, the first such element content is replaced
+	 * with the imported XML.
 	 * 
 	 * @param strXPath
 	 * @param elementName
 	 * @param content
 	 * @param replace
 	 */
-	public void importElementContent(String strXPath, String elementName, String content,boolean replace) {
-		Element element = (Element) getNode(strXPath);		
-		
+	public void importElementContent(String strXPath, String elementName,
+			String content, boolean replace) {
+		Element element = (Element) getNode(strXPath);
+
 		NodeList elements = element.getElementsByTagName(elementName);
-		Element reqElement = (Element) ((elements != null && elements.getLength()>0) ? elements.item(0) : null); 
-		
+		Element reqElement = (Element) ((elements != null && elements
+				.getLength() > 0) ? elements.item(0) : null);
+
 		try {
-			Document importedDoc = builder.parse(new InputSource(new StringReader(content)));
-			Node imported = doc.importNode(importedDoc.getDocumentElement(), true);
-			
-			if (replace && reqElement!=null)
-				element.replaceChild(imported,reqElement);
+			Document importedDoc = builder.parse(new InputSource(
+					new StringReader(content)));
+			Node imported = doc.importNode(importedDoc.getDocumentElement(),
+					true);
+
+			if (replace && reqElement != null)
+				element.replaceChild(imported, reqElement);
 			else
 				element.appendChild(imported);
 		} catch (Exception e) {
-			throw new RuntimeException("importElementContent failed",e);
+			throw new RuntimeException("importElementContent failed", e);
 		}
 	}
-	
-	public void writeTo(OutputStream os) {		
+
+	public void writeTo(OutputStream os) {
 		OutputStreamWriter writer = new OutputStreamWriter(os);
-        Result result = new StreamResult(writer);
-        
-        transform(result);        
+		Result result = new StreamResult(writer);
+
+		transform(result);
 	}
-	
+
 	public void writeTo(File f) {
 		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(f);
 			writeTo(fos);
-		} catch (Exception e) {			
+		} catch (Exception e) {
 		} finally {
-			if (fos!=null)
-				try { fos.close(); } catch (IOException e) {}
-		}		
+			if (fos != null)
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+		}
 	}
-	
+
 	public void writeTo(String fn) {
 		writeTo(new File(fn));
 	}
+
 	public byte[] getDocumentAsBytes() {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		OutputStreamWriter writer = new OutputStreamWriter(os);
-		Result result = new StreamResult(writer);		
+		Result result = new StreamResult(writer);
 		transform(result);
 		return os.toByteArray();
 	}
-	
-	public String getDocumentAsString() {		
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);        
-        transform(result);
-        return stringWriter.getBuffer().toString();
+
+	public String getDocumentAsString() {
+		StringWriter stringWriter = new StringWriter();
+		Result result = new StreamResult(stringWriter);
+		transform(result);
+		return stringWriter.getBuffer().toString();
 	}
-	
+
 	/**
-	 * Gets the cached compiled XPath expression from cache, or compiles a new one and 
-	 * puts it in the cache. 
+	 * Gets the cached compiled XPath expression from cache, or compiles a new
+	 * one and puts it in the cache.
 	 * 
 	 * @param strXPath
-	 * @return	
+	 * @return
 	 */
 	private XPathExpression getExpression(String strXPath) {
 		XPathExpression exp = expCache.get(strXPath);
-		if (exp==null) { // expresion not found in cache
+		if (exp == null) { // expresion not found in cache
 			try {
 				exp = xpath.compile(strXPath);
 			} catch (XPathExpressionException e) {
-				throw new RuntimeException("getExpression failed",e);
-			}			
+				throw new RuntimeException("getExpression failed", e);
+			}
 			expCache.put(strXPath, exp);
 		}
 		return exp;
 	}
-	
+
 	private void transform(Result target) {
-		if (transformer==null) {		
+		if (transformer == null) {
 			TransformerFactory factory = TransformerFactory.newInstance();
 			try {
 				transformer = factory.newTransformer();
 			} catch (TransformerConfigurationException e) {
-				throw new RuntimeException("transform failed",e);
-			}		
+				throw new RuntimeException("transform failed", e);
+			}
 		}
-		
+
 		try {
 			transformer.transform(docSource, target);
 		} catch (TransformerException e) {
-			throw new RuntimeException("transform failed",e);
+			throw new RuntimeException("transform failed", e);
 		}
 	}
 }

@@ -215,9 +215,19 @@ public class PilotController {
 			DaUserRecord userRecord = new DaUserRecord();
 			userRecord = daRegistry.getXmppIdentityDetails(userName);
 			
-			if (userRecord.getStatus().contentEquals("new")) {
+			if ((userRecord != null) && (userRecord.getStatus() != null))
+			{
+				if (!userRecord.getStatus().contentEquals("active") 
+					|| userRecord.getHost().isEmpty() 
+					|| userRecord.getPort().isEmpty()) 
+				{
+					//CLOUD NODE NOT SETUP YET
+					model.put("loginError", "Cloud node creation not completed");
+					return new ModelAndView("pilot", model);
+				}
+			} else { // account doesn't exist
 				//CLOUD NODE NOT SETUP YET
-				model.put("loginError", "Cloud node creation not completed");
+				model.put("loginError", "User Acount Not Found");
 				return new ModelAndView("pilot", model);
 			}
 			
