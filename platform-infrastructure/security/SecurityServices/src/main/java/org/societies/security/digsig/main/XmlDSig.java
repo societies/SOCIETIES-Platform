@@ -75,31 +75,13 @@ public class XmlDSig {
 		return xml; // FIXME
 	}
 
-	public Document signXml(Document doc, String xmlNodeId, IIdentity identity) {
+	// TODO: move to PolicyNegotiator
+	public String getRequesterSignatureId(Document doc) {
 
-		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
 		SignatureCheck check = new SignatureCheck(doc, certStorage);
+		String sigId = check.getCustomerSignature().getElement().getAttribute("Id");
 
-		try {
-			XMLSignature finalSig = new XMLSignature(doc, null,
-					XMLSignature.ALGO_ID_SIGNATURE_RSA);
-			doc.getDocumentElement().appendChild(finalSig.getElement());
-
-			Transforms transforms = new Transforms(doc);
-			// Also must use c14n
-			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-
-			String customerSigId = check.getCustomerSignature().getElement().getAttribute("Id");
-
-			finalSig.addDocument("#" + customerSigId, transforms,
-					MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);
-			finalSig.addKeyInfo(certStorage.getOurCert());
-			finalSig.sign(certStorage.getOurKey());
-		} catch (Exception e) {
-			LOG.warn("signXml()", e);
-		}
-
-		return doc;
+		return sigId;
 	}
 
 	public Document signXml(Document doc, ArrayList<String> idsToSign) throws DigsigException {
