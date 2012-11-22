@@ -24,18 +24,11 @@
  */
 package org.societies.security.digsig.main;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.xerces.dom.DOMImplementationImpl;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
@@ -43,13 +36,11 @@ import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.certs.SignatureCheck;
+import org.societies.security.digsig.util.XmlManipulator;
 import org.societies.security.storage.CertStorage;
-import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.SAXException;
 
 /**
  * 
@@ -63,11 +54,6 @@ public class XmlDSig {
 
 	private CertStorage certStorage;
 
-	private DocumentBuilderFactory dbf;
-	private DocumentBuilder docBuilder;
-	private DOMImplementationImpl domImpl;
-	private LSSerializer serializer;
-
 	public XmlDSig(CertStorage certStorage) {
 		this.certStorage = certStorage;
 
@@ -75,19 +61,8 @@ public class XmlDSig {
 			if (!Init.isInitialized()) {
 				Init.init();
 			}
-
-			dbf = DocumentBuilderFactory.newInstance();
-			dbf.setNamespaceAware(true);
-
-			docBuilder = dbf.newDocumentBuilder();
-
-			domImpl = new DOMImplementationImpl();
-
-			serializer = domImpl.createLSSerializer();
-			DOMConfiguration config = serializer.getDomConfig();
-			config.setParameter("comments", new Boolean(true));
 		} catch (Exception e) {
-			LOG.error("SignActivity", "Failed to initialize", e);
+			LOG.error("XmlDSig", "Failed to initialize", e);
 			return;
 		}
 
@@ -127,48 +102,7 @@ public class XmlDSig {
 		return doc;
 	}
 
-	/**
-	 * Transform XML from byte[] to {@link Document}
-	 * 
-	 * @param xml
-	 *            The XML in form of byte array
-	 * @return XML {@link Document} or null on error
-	 */
-	private Document byteArray2doc(byte[] xml) {
-
-		Document doc = null;
-
-		try {
-			doc = docBuilder.parse(new ByteArrayInputStream(xml));
-		} catch (SAXException e) {
-			LOG.warn("byteArray2doc(" + xml + ")", e);
-		} catch (IOException e) {
-			LOG.warn("byteArray2doc(" + xml + ")", e);
-		}
-
-		return doc;
-	}
-
-	/**
-	 * Transform XML from {@link Document} to byte[]
-	 * 
-	 * @param xml
-	 *            The XML in form of {@link Document}
-	 * @return XML byte array or null on error
-	 */
-	private byte[] doc2byteArray(Document doc) {
-
-		LSOutput domOutput = domImpl.createLSOutput();
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-		domOutput.setByteStream(output);
-		domOutput.setEncoding("UTF-8");
-		serializer.write(doc, domOutput);
-
-		return output.toByteArray();
-	}
-
-	public Document signXml(Document doc, ArrayList<String> idsToSign) {
+	public Document signXml(Document doc, ArrayList<String> idsToSign) throws DigsigException {
 
 		X509Certificate cert;
 		Key key;
@@ -179,8 +113,8 @@ public class XmlDSig {
 		cert = certStorage.getOurCert();
 		key = certStorage.getOurKey();
 		if (cert == null || key == null) {
-			LOG.error("SignActivity", "Retrieved empty identity from storage!");
-			return null;
+			LOG.error("signXml: cert and key must not be null: cert = {}, key = {}", cert, key);
+			throw new DigsigException("Cert or key is null");
 		}
 
 		try {
@@ -203,9 +137,27 @@ public class XmlDSig {
 			sig.getElement().setAttribute("Id",	"Signature-" + UUID.randomUUID().toString());
 			return doc;
 		} catch (Exception e) {
-			LOG.error("SignActivity", "Failed while signing!", e);
-			return null;
+			LOG.error("signXml", "Failed while signing!", e);
+			throw new DigsigException(e);
 		}
+	}
+
+	public String signXml(String xml, ArrayList<String> idsToSign) throws DigsigException {
+		
+		Document doc;
+		String str;
+		XmlManipulator xmlManipulator = new XmlManipulator();
+		
+		xmlManipulator.load(xml);
+		doc = xmlManipulator.getDocument();
+		
+		doc = signXml(doc, idsToSign);
+
+		xmlManipulator = new XmlManipulator();
+		xmlManipulator.setDocument(doc);
+		str = xmlManipulator.getDocumentAsString();
+
+		return str;
 	}
 
 	public boolean verifyXml(String xml) {

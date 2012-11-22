@@ -24,9 +24,11 @@
  */
 package org.societies.security.digsig.main;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.security.Key;
 import java.security.PrivateKey;
@@ -34,6 +36,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
+import org.apache.commons.io.IOUtils;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
@@ -73,32 +76,48 @@ public class SignatureMgr implements ISignatureMgr {
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);
 		
-		//test();
+		//testXmlString();
 	}
 	
-	private void test() {
+	private void testXmlDocument() {
 		
 		URL resource = SignatureMgr.class.getClassLoader().getResource("PrintService.xml");
 		Document doc;
 		ArrayList<String> idsToSign = new ArrayList<String>();
+		OutputStream os;
 		
+		idsToSign.add("Container");
+
 		try {
 			doc = DOMHelper.parseDocument(resource.openStream());
+			doc = xmlDSig.signXml(doc, idsToSign);
+			os = new FileOutputStream("PrintService.signed.xml");
 		} catch (Exception e) {
 			LOG.error("test()", e);
 			return;
 		}
+		DOMHelper.outputDocument(doc, os);
+	}
+	
+	private void testXmlString() {
+		
+		InputStream resource = SignatureMgr.class.getClassLoader().getResourceAsStream("PrintService.xml");
+		ArrayList<String> idsToSign = new ArrayList<String>();
+		OutputStream os;
 		
 		idsToSign.add("Container");
-		doc = xmlDSig.signXml(doc, idsToSign);
-		OutputStream os;
+
+		String xml;
 		try {
+			StringWriter writer = new StringWriter();
+			IOUtils.copy(resource, writer, "UTF-8");
+			xml = writer.toString();
+			xml = xmlDSig.signXml(xml, idsToSign);
 			os = new FileOutputStream("PrintService.signed.xml");
-		} catch (FileNotFoundException e) {
-			LOG.error("test(): file not found", e);
-			return;
+			os.write(xml.getBytes());
+		} catch (Exception e) {
+			LOG.error("test()", e);
 		}
-		DOMHelper.outputDocument(doc, os);
 	}
 	
 	public CertStorage getCertStorage() {

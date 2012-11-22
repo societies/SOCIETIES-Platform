@@ -1,5 +1,8 @@
 package org.societies.security.digsig.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -40,7 +43,7 @@ public class DOMHelper {
 			docBuilder = dbf.newDocumentBuilder();
 			
 			domRegistry = DOMImplementationRegistry.newInstance();
-			domImpl = (DOMImplementationLS)domRegistry.getDOMImplementation("LS");
+			domImpl = (DOMImplementationLS) domRegistry.getDOMImplementation("LS");
 			serializer = domImpl.createLSSerializer();
 			domConfig = serializer.getDomConfig();
 			
@@ -71,4 +74,47 @@ public class DOMHelper {
          
          serializer.write(doc, domOutput); 
 	}
+	
+
+	/**
+	 * Transform XML from byte[] to {@link Document}
+	 * 
+	 * @param xml
+	 *            The XML in form of byte array
+	 * @return XML {@link Document} or null on error
+	 */
+	public static Document byteArray2doc(byte[] xml) {
+
+		Document doc = null;
+
+		try {
+			doc = docBuilder.parse(new ByteArrayInputStream(xml));
+		} catch (SAXException e) {
+			LOG.warn("byteArray2doc(" + xml + ")", e);
+		} catch (IOException e) {
+			LOG.warn("byteArray2doc(" + xml + ")", e);
+		}
+
+		return doc;
+	}
+
+	/**
+	 * Transform XML from {@link Document} to byte[]
+	 * 
+	 * @param xml
+	 *            The XML in form of {@link Document}
+	 * @return XML byte array or null on error
+	 */
+	public static byte[] doc2byteArray(Document doc) {
+
+		LSOutput domOutput = domImpl.createLSOutput();
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		domOutput.setByteStream(output);
+		domOutput.setEncoding("UTF-8");
+		serializer.write(doc, domOutput);
+
+		return output.toByteArray();
+	}
+
 }
