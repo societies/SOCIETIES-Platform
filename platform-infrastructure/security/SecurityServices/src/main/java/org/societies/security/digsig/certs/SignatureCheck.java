@@ -32,6 +32,8 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.util.XmlManipulator;
 import org.societies.security.storage.CertStorage;
@@ -44,55 +46,65 @@ import org.w3c.dom.NodeList;
  * @author Miroslav Pavleski, Mitja Vardjan
  */
 public class SignatureCheck {
+
+	private static Logger LOG = LoggerFactory.getLogger(SignatureCheck.class);
+	
 	private Document doc;
 	private XmlManipulator xml;
 
 	private List<XMLSignature> signatures = new ArrayList<XMLSignature>();
 	private boolean signaturesExtracted = false;
-	
+
 	private XMLSignature customerSignature;
 	private X509Certificate customerCert;
-	
+
 	private CertStorage certStorage;
-	
+
 	public SignatureCheck(Document doc, CertStorage certStorage) {
 		this.doc = doc;
 		this.certStorage = certStorage;
-		
+
 		xml = new XmlManipulator();
 		xml.setDocument(doc);
 	}
-	
+
 	/**
 	 * Checks that the provider signature is valid
 	 * 
 	 * @return
-	 * @throws DigsigException 
+	 * @throws DigsigException
 	 */
 	public void checkProviderSignature() throws DigsigException {
 		Element sopElem = extractSOPElement();
-		
+
 		String sopElemId = sopElem.getAttribute("Id");
-		
-		if (sopElemId==null) throw new DigsigException("BAD_REQUEST"); // <serviceOperaitonPolicy> element must have an Id
-		String sopElemRef = "#"+sopElemId;
-				
-		extractSignatures(); // Make sure signatures were extracted
-		
+
+		if (sopElemId == null) {
+			// <serviceOperaitonPolicy> element must have an Id
+			throw new DigsigException("BAD_REQUEST");
+		}
+		String sopElemRef = "#" + sopElemId;
+
+		// Make sure signatures were extracted
+		extractSignatures();
+
 		X509Certificate ourCert;
 		ourCert = certStorage.getOurCert();
-		
+
 		for (XMLSignature sig : signatures) {
 			if (hasReference(sig, sopElemRef)) {
-				
-				try {										
+
+				try {
 					KeyInfo keyInfo = sig.getKeyInfo();
 					X509Certificate sigCert = keyInfo.getX509Certificate();
-					if (sigCert==null) 
+					if (sigCert == null) {
 						throw new DigsigException("BAD_REQUEST");
-										
-					if (sigCert.equals(ourCert)) { // This is a provider signature
-						boolean result = sig.checkSignatureValue(sigCert.getPublicKey());						
+					}
+
+					if (sigCert.equals(ourCert)) {
+						// This is a provider signature
+						boolean result = sig.checkSignatureValue(sigCert
+								.getPublicKey());
 						if (!result)
 							throw new DigsigException("BAD_REQUEST");
 						else
@@ -101,74 +113,89 @@ public class SignatureCheck {
 				} catch (DigsigException e) {
 					throw e;
 				} catch (XMLSignatureException e) {
-					throw new DigsigException(e,"BAD_REQUEST");					
-				} catch (Exception e) {
-					throw new DigsigException(e,"INTERNAL_SERVER_ERROR");
-				}
-			}
-		}
-		
-		throw new DigsigException("BAD_REQUEST");
-	}	
-	
-	
-	/**
-	 * Verifies consumer identity, validates the signature and returns the selected SOP element
-	 * 
-	 * @return
-	 * @throws DigsigException 
-	 */
-	public Element getReferencedSOP() throws DigsigException {
-		extractSignatures(); // make sure the signatures are extracted
-		
-		Element sopElem = extractSOPElement(); // we'll need this in order to establish SOP correct structure
-		
-		String sopElemId = sopElem.getAttribute("Id");
-		
-		if (sopElemId==null) throw new DigsigException("BAD_REQUEST"); // <serviceOperaitonPolicy> element must have an Id
-		String sopElemRef = "#"+sopElemId;
-				
-		for (XMLSignature sig : signatures) {
-			if (!hasReference(sig, sopElemRef)) {							
-				// Signature must have only one reference referencing the selected SOP
-				String ref = extractSOPReference(sig);
-				
-				// The sig element must have and Id
-				String sigId = sig.getElement().getAttribute("Id");
-				if (sigId==null) throw new DigsigException("BAD_REQUEST");
-				
-				String refId = ref.substring(1);
-				Node sopNode = xml.getNode(String.format("/societies/serviceOperationPolicy/sop[@Id='%s']",refId));
-				if (sopNode == null || !(sopNode instanceof Element))
-					throw new DigsigException("BAD_REQUEST"); // check that this is actual SOP
-				
-				try {
-					X509Certificate sigCert = sig.getKeyInfo().getX509Certificate();
-					if (sigCert==null) 
-						throw new DigsigException("BAD_REQUEST");
-					
-					// TODO check consumer identity...
-					
-					boolean result = sig.checkSignatureValue(sigCert.getPublicKey());
-					customerSignature = sig;
-					customerCert = sigCert;
-					if (result)
-						return (Element) sopNode;
-				} catch(XMLSignatureException e) {
 					throw new DigsigException(e, "BAD_REQUEST");
-				} catch(Exception e) {
+				} catch (Exception e) {
 					throw new DigsigException(e, "INTERNAL_SERVER_ERROR");
 				}
 			}
 		}
+
+		throw new DigsigException("BAD_REQUEST");
+	}
+
+	/**
+	 * Verifies consumer identity, validates the signature and returns the
+	 * selected SOP element
+	 * 
+	 * @return
+	 * @throws DigsigException
+	 */
+	public Element getReferencedSOP() throws DigsigException {
 		
-		throw new DigsigException("BAD_REQUEST");		
-	}	
-		
+		// make sure the signatures are extracted
+		extractSignatures();
+
+		// we'll need this in order to establish SOP correct structure
+		Element sopElem = extractSOPElement();
+
+		String sopElemId = sopElem.getAttribute("Id");
+
+		if (sopElemId == null) {
+			// <serviceOperaitonPolicy> element must have an Id
+			throw new DigsigException("BAD_REQUEST");
+		}
+
+		String sopElemRef = "#" + sopElemId;
+
+		for (XMLSignature sig : signatures) {
+			if (!hasReference(sig, sopElemRef)) {
+				// Signature must have only one reference referencing the
+				// selected SOP
+				String ref = extractSOPReference(sig);
+
+				// The sig element must have and Id
+				String sigId = sig.getElement().getAttribute("Id");
+				if (sigId == null)
+					throw new DigsigException("BAD_REQUEST");
+
+				String refId = ref.substring(1);
+				Node sopNode = xml.getNode(String.format(
+						"/societies/serviceOperationPolicy/sop[@Id='%s']",
+						refId));
+				if (sopNode == null || !(sopNode instanceof Element)) {
+					// check that this is actual SOP
+					throw new DigsigException("BAD_REQUEST");
+				}
+
+				try {
+					X509Certificate sigCert = sig.getKeyInfo()
+							.getX509Certificate();
+					if (sigCert == null)
+						throw new DigsigException("BAD_REQUEST");
+
+					// TODO check consumer identity...
+
+					boolean result = sig.checkSignatureValue(sigCert
+							.getPublicKey());
+					customerSignature = sig;
+					customerCert = sigCert;
+					if (result)
+						return (Element) sopNode;
+				} catch (XMLSignatureException e) {
+					throw new DigsigException(e, "BAD_REQUEST");
+				} catch (Exception e) {
+					throw new DigsigException(e, "INTERNAL_SERVER_ERROR");
+				}
+			}
+		}
+
+		throw new DigsigException("BAD_REQUEST");
+	}
+
 	public XMLSignature getCustomerSignature() {
 		return customerSignature;
 	}
-		
+
 	public X509Certificate getCustomerCert() {
 		return customerCert;
 	}
@@ -177,55 +204,62 @@ public class SignatureCheck {
 	 * Extracts all detached signatures under the document element
 	 * 
 	 * @return true if successful
-	 * @throws DigsigException 
+	 * @throws DigsigException
 	 */
 	private void extractSignatures() throws DigsigException {
-		if (signaturesExtracted) return;
-		
-		if (doc==null || doc.getDocumentElement()==null) 
+		if (signaturesExtracted)
+			return;
+
+		if (doc == null || doc.getDocumentElement() == null)
 			throw new DigsigException("BAD_REQUEST");
-		
+
 		NodeList childNodes = doc.getDocumentElement().getChildNodes();
-		if (childNodes==null || childNodes.getLength()==0) 
+		if (childNodes == null || childNodes.getLength() == 0)
 			throw new DigsigException("BAD_REQUEST");
-		
+
 		int numServiceOperationPolicyNodes = 0;
-		
-		// This loop ensures that all subelements to the document element are either serviceOperationPolicy or ds:Signature
-		for (int i=0;i<childNodes.getLength();i++) {
+
+		// This loop ensures that all subelements to the document element are
+		// either serviceOperationPolicy or ds:Signature
+		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node childNode = childNodes.item(i);
-			if (!(childNode instanceof Element)) continue;
-			
+			if (!(childNode instanceof Element))
+				continue;
+
 			Element elem = (Element) childNode;
 			String elemName = elem.getLocalName();
 			String elemNS = elem.getNamespaceURI();
-			if ("http://www.w3.org/2000/09/xmldsig#".equals(elemNS) && 
-					"Signature".equals(elemName)) {
+			if ("http://www.w3.org/2000/09/xmldsig#".equals(elemNS)
+					&& "Signature".equals(elemName)) {
 				try {
-					XMLSignature sig = new XMLSignature(elem,null);
-					signatures.add(sig);								
+					XMLSignature sig = new XMLSignature(elem, null);
+					signatures.add(sig);
 				} catch (Exception e) {
-					throw new DigsigException(e, "BAD_REQUEST");					
-				}							
-			} else if ("serviceOperationPolicy".equals(elemName) && elemNS==null) {
+					throw new DigsigException(e, "BAD_REQUEST");
+				}
+			} else if ("serviceOperationPolicy".equals(elemName)
+					&& elemNS == null) {
 				numServiceOperationPolicyNodes++;
-				if (numServiceOperationPolicyNodes>1) throw new DigsigException("BAD_REQUEST");				
+				if (numServiceOperationPolicyNodes > 1)
+					throw new DigsigException("BAD_REQUEST");
 			} else {
 				throw new DigsigException("BAD_REQUEST");
 			}
-		}		
-		
-		signaturesExtracted=true;		
+		}
+
+		signaturesExtracted = true;
 	}
-	
+
 	private Element extractSOPElement() throws DigsigException {
 		Node node = xml.getNode("/societies/serviceOperationPolicy");
-		if (node==null) throw new DigsigException("BAD_REQUEST");
-		if (!(node instanceof Element)) throw new DigsigException("BAD_REQUEST");
-		
+		if (node == null)
+			throw new DigsigException("BAD_REQUEST");
+		if (!(node instanceof Element))
+			throw new DigsigException("BAD_REQUEST");
+
 		return (Element) node;
 	}
-	
+
 	/**
 	 * Checks if given XML Digital Signature references an Id element
 	 * 
@@ -235,55 +269,68 @@ public class SignatureCheck {
 	 */
 	private static boolean hasReference(XMLSignature sig, String ref) {
 		SignedInfo si = sig.getSignedInfo();
-		if (si==null || si.getElement()==null) return false;
-		
+		if (si == null || si.getElement() == null)
+			return false;
+
 		// Loop through all reference nodes
 		NodeList list = si.getElement().getChildNodes();
-		if (list==null || list.getLength()==0) return false;
-		
-		for (int i=0;i<list.getLength();i++) {
+		if (list == null || list.getLength() == 0)
+			return false;
+
+		for (int i = 0; i < list.getLength(); i++) {
 			Node node = list.item(i);
-			if (node == null || !(node instanceof Element)) continue;
+			if (node == null || !(node instanceof Element))
+				continue;
 			Element elem = (Element) node;
-			
-			if ("http://www.w3.org/2000/09/xmldsig#".equals(elem.getNamespaceURI()) &&
-					"Reference".equals(elem.getLocalName())) {
-				
-				if (ref.equals(elem.getAttribute("URI"))) 
-						return true;				
+
+			if ("http://www.w3.org/2000/09/xmldsig#".equals(elem
+					.getNamespaceURI())
+					&& "Reference".equals(elem.getLocalName())) {
+
+				if (ref.equals(elem.getAttribute("URI")))
+					return true;
 			}
-			
+
 		}
-		
+
 		return false;
-	}	
-	
+	}
+
 	private static String extractSOPReference(XMLSignature sig) {
 		SignedInfo si = sig.getSignedInfo();
-		if (si==null || si.getElement()==null) return null;
-		
+		if (si == null || si.getElement() == null)
+			return null;
+
 		// Loop through all reference nodes
 		NodeList list = si.getElement().getChildNodes();
-		if (list==null) return null; // only one reference
-		
+		if (list == null) {
+			// only one reference
+			return null;
+		}
+
 		int refElements = 0;
 		String result = null;
-		
-		for (int i=0;i<list.getLength();i++) {
+
+		for (int i = 0; i < list.getLength(); i++) {
 			Node node = list.item(i);
-			if (node == null || !(node instanceof Element)) continue;
+			if (node == null || !(node instanceof Element))
+				continue;
 			Element elem = (Element) node;
-			
-			if ("http://www.w3.org/2000/09/xmldsig#".equals(elem.getNamespaceURI()) &&
-					"Reference".equals(elem.getLocalName())) {
-		
-				refElements++; // count elements
-				if (refElements>1) return null; // if more than one it is an error
-				result = elem.getAttribute("URI"); 									
+
+			if ("http://www.w3.org/2000/09/xmldsig#".equals(elem
+					.getNamespaceURI())
+					&& "Reference".equals(elem.getLocalName())) {
+
+				// count elements
+				refElements++;
+				if (refElements > 1) {
+					// if more than one it is an error
+					return null;
+				}
+				result = elem.getAttribute("URI");
 			}
 		}
-		
-		
+
 		return result;
 	}
 }
