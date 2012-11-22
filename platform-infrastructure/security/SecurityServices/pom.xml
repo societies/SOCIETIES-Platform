@@ -75,6 +75,12 @@
 			<artifactId>xmlsec</artifactId>
 			<version>1.4.5</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -135,7 +141,7 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>
 							!org.apache.xerces,
 							org.springframework.beans.factory.config;version="[1.0,6.0)";resolution:=optional,
