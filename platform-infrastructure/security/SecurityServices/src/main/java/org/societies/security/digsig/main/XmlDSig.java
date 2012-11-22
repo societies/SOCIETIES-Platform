@@ -24,23 +24,15 @@
  */
 package org.societies.security.digsig.main;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.UUID;
-
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.certs.SignatureCheck;
-import org.societies.security.digsig.util.DOMHelper;
 import org.societies.security.storage.CertStorage;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * 

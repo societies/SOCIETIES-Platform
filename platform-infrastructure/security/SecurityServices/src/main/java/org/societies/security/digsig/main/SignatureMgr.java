@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Wrapper around {@link DigSig} and {@link XmlDSig}
+ * 
  * @author Mitja Vardjan
  */
 public class SignatureMgr implements ISignatureMgr {
