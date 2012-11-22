@@ -17,11 +17,11 @@ public class ClassLoaderManager {
 	
 	private Long thisBundleId;
 	private Map<Long, ClassLoader> classloaderMap;
-	private Map<Object, Long> objectToBundle;
+	private Map<String, Long> classToBundle;
 	
 	public ClassLoaderManager(Object commMgrBean) {
 		classloaderMap = new HashMap<Long, ClassLoader>();
-		objectToBundle = new HashMap<Object, Long>();
+		classToBundle = new HashMap<String, Long>();
 		thisBundleId = getBundleId(commMgrBean);
 	}
 
@@ -44,12 +44,13 @@ public class ClassLoaderManager {
 		return null;
 	}
 
+	// when this is called the Thread is from the target bundle
 	public void classloaderRegistry(Object targetBean) {
 		Long id = getBundleId(targetBean);
-			
+		
+		LOG.info("saving class "+targetBean.getClass().getCanonicalName()+" for bundle "+id);
+		classToBundle.put(targetBean.getClass().getCanonicalName(), id);
 		if (!id.equals(thisBundleId)) {
-			LOG.info("saving object "+targetBean.toString()+" for bundle "+id);
-			objectToBundle.put(targetBean, id);
 			LOG.info("saving classloader "+Thread.currentThread().getContextClassLoader().toString()+" for bundle "+id);
 			classloaderMap.put(id, Thread.currentThread().getContextClassLoader());
 		}
@@ -66,9 +67,11 @@ public class ClassLoaderManager {
 		ClassLoader hcl = null;
 		
 		// priority to registered references (the request is incoming, thread belongs to CommsFwrk)
-		Long l = objectToBundle.get(o);
-		if (l!=null)
+		Long l = classToBundle.get(o.getClass().getCanonicalName());
+		if (l!=null) {
+			LOG.info("resolved "+o.toString()+" via class registry to bundle id '"+l+"'");
 			return l;
+		}
 		
 		// call from a different bundle: get bundleId from BundleDelegatingClassLoader if possible
 		if (o instanceof Thread)
@@ -80,14 +83,16 @@ public class ClassLoaderManager {
 			b = ((BundleDelegatingClassLoader)hcl).getBundle();
 		
 		// fallback to frameworkUtils resolution
-		if (b==null)
-			b = FrameworkUtil.getBundle(o.getClass()); 
-		
-		if (b!=null) {
-			LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"'");
+		if (b==null) {
+			b = FrameworkUtil.getBundle(o.getClass());
+			if (b!=null) {
+				LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"' via FrameworkUtil");
+			}
+			else
+				notFound(o.getClass(),Thread.currentThread().getContextClassLoader());
 		}
 		else
-			notFound(o.getClass(),Thread.currentThread().getContextClassLoader());
+			LOG.info("resolved "+o.toString()+" to bundle '"+b.toString()+"' with id '"+b.getBundleId()+"' via context Classloader");
 		
 		return b.getBundleId();
 	}

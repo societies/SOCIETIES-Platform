@@ -518,7 +518,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(fs);
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -527,7 +527,7 @@ public class CommManagerHelper {
 
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(messageCallback);
 //		for (String ns : messageCallback.getXMLNamespaces()) {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
