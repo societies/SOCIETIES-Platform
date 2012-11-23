@@ -43,7 +43,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.ITrustMgr;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -89,7 +89,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	private ITrustRepository trustRepo;
 	
 	@Mock
-	private ITrustMgr mockTrustMgr;
+	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -122,7 +122,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-		when(mockTrustMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
+		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
 	}
 
 	/**

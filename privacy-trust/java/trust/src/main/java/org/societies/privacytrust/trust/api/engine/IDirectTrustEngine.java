@@ -24,12 +24,10 @@
  */
 package org.societies.privacytrust.trust.api.engine;
 
-import java.util.List;
+import java.util.Set;
 
-import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
-import org.societies.privacytrust.trust.api.model.ITrustedCis;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.model.ITrustedService;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 /**
  * This interface provides methods to evaluate the trustworthiness of 
@@ -39,8 +37,30 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @since 0.3
  */
 public interface IDirectTrustEngine {
-
+	
 	/**
+	 * TODO
+	 * 
+	 * @param evidence
+	 * @return
+	 * @throws TrustEngineException
+	 * @since 0.5
+	 */
+	public Set<ITrustedEntity> evaluate(final IDirectTrustEvidence evidence)
+			throws TrustEngineException;
+	
+	/**
+	 * TODO
+	 * 
+	 * @param evidenceSet
+	 * @return
+	 * @throws TrustEngineException
+	 * @since 0.5
+	 */
+	public Set<ITrustedEntity> evaluate(final Set<IDirectTrustEvidence> evidenceSet)
+			throws TrustEngineException;
+	
+	/*
 	 * Evaluates the trustworthiness of the specified list of 
 	 * {@link ITrustedCss} based on the supplied list of {@link ITrustEvidence}.
 	 *  
@@ -53,7 +73,7 @@ public interface IDirectTrustEngine {
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
-	 */
+	 *
 	public void evaluateCss(final List<ITrustedCss> cssList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
@@ -70,7 +90,7 @@ public interface IDirectTrustEngine {
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
-	 */
+	 *
 	public void evaluateCis(final List<ITrustedCis> cisList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
@@ -87,7 +107,8 @@ public interface IDirectTrustEngine {
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
-	 */
+	 *
 	public void evaluateService(final List<ITrustedService> serviceList, 
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
+	*/
 }

@@ -25,8 +25,7 @@
 package org.societies.privacytrust.trust.impl;
 
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -34,13 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.ITrustMgr;
-import org.societies.privacytrust.trust.api.TrustMgrException;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.TrustedEntityIdMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,19 +48,16 @@ import org.springframework.stereotype.Service;
  * @since 0.4.1
  */
 @Service
-public class TrustMgr implements ITrustMgr {
+public class TrustedEntityIdMgr implements ITrustedEntityIdMgr {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TrustMgr.class);
-	
-	@Autowired(required=false)
-	private ITrustRepository trustRepo;
+	private static final Logger LOG = LoggerFactory.getLogger(TrustedEntityIdMgr.class);
 	
 	private ICommManager commMgr;
 	
 	private final Collection<TrustedEntityId> myTEIDs = new CopyOnWriteArraySet<TrustedEntityId>();
 	
 	@Autowired
-	public TrustMgr(ICommManager commMgr) throws Exception {
+	public TrustedEntityIdMgr(ICommManager commMgr) throws Exception {
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
@@ -82,84 +76,25 @@ public class TrustMgr implements ITrustMgr {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.ITrustMgr#isLocalId(org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.ITrustedEntityIdMgr#isLocalId(org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
 	public boolean isLocalId(final TrustedEntityId teid)
-			throws TrustMgrException {
-		
-		final String trustorIdStr = teid.getTrustorId();
-		try {
-			final IIdentity trustorId = this.commMgr.getIdManager().fromJid(trustorIdStr);
-			return this.commMgr.getIdManager().isMine(trustorId); // TODO compare with cloud node id???
-		} catch (InvalidFormatException ife) {
-			
-			throw new TrustMgrException("Could not check if trustor id is local: "
-					+ ife.getLocalizedMessage(), ife);
-		}
+			throws TrustedEntityIdMgrException {
+
+		// TODO multiple CSSs per node?
+		final INetworkNode localNode = this.commMgr.getIdManager().getThisNetworkNode();
+		final INetworkNode cloudNode = this.commMgr.getIdManager().getCloudNode();
+		return localNode.equals(cloudNode);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.ITrustMgr#getMyIds()
+	 * @see org.societies.privacytrust.trust.api.ITrustedEntityIdMgr#getMyIds()
 	 */
 	@Override
 	public Collection<TrustedEntityId> getMyIds()
-			throws TrustMgrException {
+			throws TrustedEntityIdMgrException {
 		
-		return new HashSet<TrustedEntityId>(this.myTEIDs);
-	}
-	
-	/**
-	 * This method is called when the {@link ITrustRepository} service is bound.
-	 * 
-	 * @param trustRepo
-	 *            the {@link ITrustRepository} service that was bound
-	 * @param props
-	 *            the set of properties that the {@link ITrustRepository} service
-	 *            was registered with
-	 */
-	public void bindTrustRepository(ITrustRepository trustRepo,	Dictionary<Object,Object> props) {
-		
-		if (LOG.isInfoEnabled())
-			LOG.info("Binding service reference " + trustRepo);
-		new Thread() {
-			/*
-			 * @see java.lang.Thread#run()
-			 */
-			@Override
-		    public void run() {
-				
-				for (final TrustedEntityId myTeid : myTEIDs) {
-					try {
-						if (TrustMgr.this.trustRepo.retrieveEntity(myTeid) == null) {
-							ITrustedCss myCss = (ITrustedCss) TrustMgr.this.trustRepo.createEntity(myTeid);
-							myCss.getDirectTrust().setScore(1d); // TODO check
-							myCss.getDirectTrust().setRating(1d);
-							myCss = (ITrustedCss) TrustMgr.this.trustRepo.updateEntity(myCss);
-							if (LOG.isInfoEnabled())
-								LOG.info("Created my CSS entity: " + myCss);
-						} 
-					} catch (Exception e) {
-						LOG.error("Could not create trusted CSS entity for TEID '"
-								+ myTeid + "': " + e.getLocalizedMessage(), e);
-					}
-					
-				}
-		    }
-		}.start();
-	}
-	
-	/**
-	 * This method is called when the {@link ITrustRepository} service is unbound.
-	 * 
-	 * @param trustRepo
-	 *            the {@link ITrustRepository} service that was unbound
-	 * @param props
-	 *            the set of properties that the {@link ITrustRepository} service
-	 *            was registered with
-	 */
-	public void unbindTrustRepository(ITrustRepository trustRepo, Dictionary<Object,Object> props) {
-		
-		LOG.info("Unbinding service reference " + trustRepo);
+		return Collections.unmodifiableCollection(this.myTEIDs);
 	}
 }

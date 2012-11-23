@@ -36,8 +36,8 @@ import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCa
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.ITrustMgr;
-import org.societies.privacytrust.trust.api.TrustMgrException;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.TrustedEntityIdMgrException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -62,7 +62,7 @@ public class TrustBroker implements ITrustBroker {
 	
 	/** The Trust Mgr service reference. */
 	@Autowired(required=true)
-	private ITrustMgr trustMgr;
+	private ITrustedEntityIdMgr trustMgr;
 	
 	/** The Trust Event Mgr service reference. */
 	@Autowired(required=true)
@@ -106,7 +106,7 @@ public class TrustBroker implements ITrustBroker {
 		boolean doLocal;
 		try {
 			doLocal = this.trustMgr.isLocalId(teid);
-		} catch (TrustMgrException teidme) {
+		} catch (TrustedEntityIdMgrException teidme) {
 			throw new TrustBrokerException("Could not determine if the retrieve request needs remote handling: "
 					+ teidme.getLocalizedMessage());
 		}

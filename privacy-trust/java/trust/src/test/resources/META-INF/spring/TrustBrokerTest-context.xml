@@ -24,8 +24,8 @@
 	
 	<bean id="trustRepository" class="org.societies.privacytrust.trust.impl.repo.TrustRepository"/>
 	
-	<bean id="mockTrustMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
-		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.api.ITrustMgr" />
+	<bean id="mockTrustedEntityIdMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
+		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.api.ITrustedEntityIdMgr" />
 	</bean>
 
 	<bean id="mockTrustEventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">

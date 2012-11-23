@@ -33,6 +33,16 @@ package org.societies.privacytrust.trust.api.model;
  * @since 0.0.7
  */
 public interface IDirectTrust extends ITrust {
+	
+	public static final double MIN_RATING = 0.0d;
+	
+	public static final double MAX_RATING = 1.0d;
+	
+	public static final double INIT_SCORE = 0.0d;
+	
+	public static final double MIN_SCORE = Double.MIN_VALUE;
+	
+	public static final double MAX_SCORE = Double.MAX_VALUE;
 
 	/**
 	 * 

@@ -39,7 +39,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.trust.api.ITrustMgr;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
@@ -61,7 +61,7 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	
 	/** The Trust Mgr service reference. */
 	@Autowired(required=true)
-	private ITrustMgr trustMgr;
+	private ITrustedEntityIdMgr trustMgr;
 	
 	@Autowired(required=false)
 	/** The Trust Evidence Repository service reference. */
