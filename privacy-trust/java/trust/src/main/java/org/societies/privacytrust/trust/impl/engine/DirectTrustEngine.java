@@ -246,17 +246,25 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	public Set<ITrustedEntity> evaluate(final Set<IDirectTrustEvidence> evidenceSet)
 			throws TrustEngineException {
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating direct trust evidence set " + evidenceSet);
+		
 		if (evidenceSet == null)
 			throw new NullPointerException("evidenceSet can't be null");
 		
-		final Set<ITrustedEntity> result = new HashSet<ITrustedEntity>();
+		final Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		// create sorted evidence set based on the evidence timestamps
 		final SortedSet<IDirectTrustEvidence> sortedEvidenceSet =
 				new TreeSet<IDirectTrustEvidence>(evidenceSet);
-		for (final IDirectTrustEvidence evidence : sortedEvidenceSet)
-			result.addAll(this.evaluate(evidence));
+		if (LOG.isDebugEnabled())
+			LOG.debug("Sorted direct trust evidence set " + sortedEvidenceSet);
+		for (final IDirectTrustEvidence evidence : sortedEvidenceSet) {
+			final Set<ITrustedEntity> newResultSet = this.evaluate(evidence);  
+			resultSet.removeAll(newResultSet);
+			resultSet.addAll(newResultSet);
+		}
 		
-		return result;
+		return resultSet;
 	}
 	
 	private void evaluateUsers(final Set<ITrustedCss> cssSet) throws TrustEngineException {
@@ -299,7 +307,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			// 1A. Reset CIS trust if empty  
 			if (cis.getMembers().size() == 0) {
 				cis.getDirectTrust().setScore(IDirectTrust.INIT_SCORE);
-				cis.getDirectTrust().setRating(null);
+				// TODO re-consider cis.getDirectTrust().setRating(null);
 				if (LOG.isInfoEnabled()) // TODO DEBUG
 					LOG.info("CIS '" + cis.getTeid() + "' direct trust after rating/score re-evaluation: " 
 							+ cis.getDirectTrust());
