@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-//import org.eclipse.gemini.web.tomcat.internal.loading.BundleWebappClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -44,18 +43,27 @@ public class ClassLoaderManager {
 		return null;
 	}
 
-	// when this is called the Thread is from the target bundle
+	// when this is called the Thread is from the target bundle... not always!
 	public void classloaderRegistry(Object targetBean) {
 		Long id = getBundleId(targetBean);
 		
 		LOG.info("saving class "+targetBean.getClass().getCanonicalName()+" for bundle "+id);
 		classToBundle.put(targetBean.getClass().getCanonicalName(), id);
 		if (!id.equals(thisBundleId)) {
-			LOG.info("saving classloader "+Thread.currentThread().getContextClassLoader().toString()+" for bundle "+id);
-			classloaderMap.put(id, Thread.currentThread().getContextClassLoader());
+			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+			LOG.info("saving classloader "+ccl.toString()+" for bundle "+id);
+			classloaderMap.put(id, ccl);
 		}
 		else
 			LOG.info("this is the local classloader: skipping...");
+	}
+	
+	public boolean classloaderRegistryVerify(Object targetBean) {
+		if (!classToBundle.containsKey(targetBean.getClass().getCanonicalName())){
+			classloaderRegistry(targetBean);
+			return false;
+		}
+		return true;
 	}
 	
 	private void notFound(Class<?> cs, ClassLoader cl) {

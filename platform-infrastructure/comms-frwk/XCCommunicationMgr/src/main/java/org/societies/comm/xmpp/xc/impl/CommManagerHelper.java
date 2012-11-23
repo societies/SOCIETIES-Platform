@@ -490,6 +490,8 @@ public class CommManagerHelper {
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			iqCommCallbacks.put(iq.getID(), callback);
+			if (!clm.classloaderRegistryVerify(callback))
+				LOG.warn("Got sendIQ call from unregistered ICommCallback: "+callback.toString()+"... forced registry...");
 			return iq;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
@@ -532,10 +534,12 @@ public class CommManagerHelper {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
-		String mainNs = messageCallback.getXMLNamespaces().get(0);
-		if (mainNs.indexOf("#")>-1) {
-			LOG.info("registering Callback for namespace " + mainNs);
-			nsCommCallbacks.put(mainNs, messageCallback);
+		if (messageCallback.getXMLNamespaces().size()>0) {
+			String mainNs = messageCallback.getXMLNamespaces().get(0);
+			if (mainNs.indexOf("#")>-1) {
+				LOG.info("registering Callback for namespace " + mainNs);
+				nsCommCallbacks.put(mainNs, messageCallback);
+			}
 		}
 	}
 	
