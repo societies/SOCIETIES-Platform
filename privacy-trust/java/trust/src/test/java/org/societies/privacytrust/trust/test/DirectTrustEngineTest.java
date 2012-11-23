@@ -29,8 +29,10 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,18 +46,14 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
-import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
-import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
+import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
-import org.societies.privacytrust.trust.impl.engine.DirectTrustEngine;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -86,19 +84,17 @@ public class DirectTrustEngineTest {
 	private static final int TRUSTED_SERVICE_TYPE_LIST_SIZE = 10;
 	private static final String TRUSTED_SERVICE_TYPE_BASE = BASE_ID + "ServiceType";
 	
-	private static ITrustedCss myCss;
+	private static TrustedEntityId myCssTeid;
 	
-	private static List<ITrustedCss> trustedCssList;
+	private static List<TrustedEntityId> trustedCssTeidList;
 	
-	private static List<ITrustedCis> trustedCisList;
+	private static List<TrustedEntityId> trustedCisTeidList;
 	
-	private static List<ITrustedService> trustedServiceList;
+	private static List<TrustedEntityId> trustedServiceTeidList;
 	
 	private static List<String> trustedServiceTypeList;
 	
 	private static ITrustedEntityIdMgr mockTrustedEntityIdMgr = mock(ITrustedEntityIdMgr.class);
-	
-	private static ITrustEventMgr mockTrustEventMgr = mock(ITrustEventMgr.class);
 	
 	/** The ITrustRepo service reference. */
 	@Autowired
@@ -113,6 +109,37 @@ public class DirectTrustEngineTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		
+		myCssTeid =	new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTOR_ID);
+		
+		trustedCssTeidList = new ArrayList<TrustedEntityId>(TRUSTED_CSS_LIST_SIZE);
+		for (int i = 0; i < TRUSTED_CSS_LIST_SIZE; ++i) {
+			final TrustedEntityId cssTeid = 
+					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID_BASE+i);
+			trustedCssTeidList.add(cssTeid);
+		}
+		
+		trustedCisTeidList = new ArrayList<TrustedEntityId>(TRUSTED_CIS_LIST_SIZE);
+		for (int i = 0; i < TRUSTED_CIS_LIST_SIZE; ++i) {
+			final TrustedEntityId cisTeid =
+					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID_BASE+i);
+			trustedCisTeidList.add(cisTeid);
+		}
+		
+		trustedServiceTypeList = new ArrayList<String>(TRUSTED_SERVICE_TYPE_LIST_SIZE);
+		for (int i = 0; i < TRUSTED_SERVICE_TYPE_LIST_SIZE; ++i)
+			trustedServiceTypeList.add(TRUSTED_SERVICE_TYPE_BASE+i);
+	
+		trustedServiceTeidList = new ArrayList<TrustedEntityId>(TRUSTED_SERVICE_LIST_SIZE);
+		for (int i = 0; i < TRUSTED_SERVICE_LIST_SIZE; ++i) {
+			final TrustedEntityId serviceTeid = 
+					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID_BASE+i);
+			trustedServiceTeidList.add(serviceTeid);
+		}
+		
+		final Set<TrustedEntityId> myTeids = new HashSet<TrustedEntityId>();
+		myTeids.add(myCssTeid);
+		when(mockTrustedEntityIdMgr.getMyIds()).thenReturn(myTeids);
 	}
 
 	/**
@@ -120,6 +147,11 @@ public class DirectTrustEngineTest {
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		myCssTeid = null;
+		trustedCssTeidList = null;
+		trustedCisTeidList = null;
+		trustedServiceTypeList = null;
+		trustedServiceTeidList = null;
 	}
 
 	/**
@@ -127,36 +159,6 @@ public class DirectTrustEngineTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
-		final TrustedEntityId myTeid = 
-				new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTOR_ID);
-		myCss = new TrustedCss(myTeid);
-		trustedCssList = new ArrayList<ITrustedCss>(TRUSTED_CSS_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_CSS_LIST_SIZE; ++i) {
-			final TrustedEntityId cssTeid = 
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID_BASE+i);
-			trustedCssList.add(new TrustedCss(cssTeid));
-		}
-		
-		trustedCisList = new ArrayList<ITrustedCis>(TRUSTED_CIS_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_CIS_LIST_SIZE; ++i) {
-			final TrustedEntityId cisTeid =
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID_BASE+i);
-			trustedCisList.add(new TrustedCis(cisTeid));
-		}
-		
-		trustedServiceTypeList = new ArrayList<String>(TRUSTED_SERVICE_TYPE_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_SERVICE_TYPE_LIST_SIZE; ++i)
-			trustedServiceTypeList.add(TRUSTED_SERVICE_TYPE_BASE+i);
-	
-		trustedServiceList = new ArrayList<ITrustedService>(TRUSTED_SERVICE_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_SERVICE_LIST_SIZE; ++i) {
-			final TrustedEntityId serviceTeid = 
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID_BASE+i);
-			trustedServiceList.add(new TrustedService(serviceTeid));
-		}
-		
-		this.engine = new DirectTrustEngine(mockTrustEventMgr);
 	}
 
 	/**
@@ -164,34 +166,29 @@ public class DirectTrustEngineTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		
-		trustedCssList = null;
-		trustedCisList = null;
-		trustedServiceTypeList = null;
-		trustedServiceList = null;
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateCss(List, List)}.
+	 * Test method for {@link org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(IDirectTrustEvidence)}.
 	 * @throws TrustEngineException 
 	 */
 	@Test
-	public void testEvaluateOneCssOneTrustRating() throws TrustEngineException {
+	public void testEvaluateOneCssTrustRating() throws TrustEngineException {
 		
-		final ITrustedCss trustedCss = trustedCssList.get(0);
-		final List<ITrustedCss> trustedCssSubList = new ArrayList<ITrustedCss>();
-		trustedCssSubList.add(trustedCss);
-		
-		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
 		// trust rating
+		final TrustedEntityId cssTeid = trustedCssTeidList.get(0);
 		final Double rating = new Double(0.5d);
 		final Date timestamp = new Date();
-		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCss.getTeid(),
+		final IDirectTrustEvidence evidence = new DirectTrustEvidence(cssTeid,
 				TrustEvidenceType.RATED, timestamp, rating);
-		evidenceList.add(evidence1);}
-		/*
-		this.engine.evaluateCss(trustedCssSubList, evidenceList);
-		final ITrustedCss evaluatedCss = trustedCssSubList.get(0);
+		
+		final Set<ITrustedEntity> resultSet = this.engine.evaluate(evidence);
+		// verify
+		assertNotNull(resultSet);
+		assertTrue(!resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedCss);
+		final ITrustedCss evaluatedCss = (ITrustedCss) resultSet.iterator().next();
 		assertNotNull(evaluatedCss.getDirectTrust().getLastModified());
 		assertNotNull(evaluatedCss.getDirectTrust().getLastUpdated());
 		assertEquals(evaluatedCss.getDirectTrust().getLastModified(), 
@@ -206,40 +203,43 @@ public class DirectTrustEngineTest {
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateCssTrustValues(List, List).
+	 * Test method for {@link org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(Set)}.
 	 * @throws TrustEngineException 
-	 *
+	 */
 	@Test
-	public void testEvaluateOneCssMultipleTrustRatings() throws TrustEngineException {
+	public void testEvaluateMultipleCssTrustRatings() throws TrustEngineException {
 		
-		final ITrustedCss trustedCss = trustedCssList.get(0);
-		final List<ITrustedCss> trustedCssSubList = new ArrayList<ITrustedCss>();
-		trustedCssSubList.add(trustedCss);
+		final TrustedEntityId cssTeid = trustedCssTeidList.get(0);
 		
-		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
+		final Set<IDirectTrustEvidence> evidenceSet = new HashSet<IDirectTrustEvidence>();
 		// trust rating
 		final Double rating = new Double(0.4d);
 		final Date timestamp = new Date();
-		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCss.getTeid(),
+		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(cssTeid,
 				TrustEvidenceType.RATED, timestamp, rating);
-		evidenceList.add(evidence1);
+		evidenceSet.add(evidence1);
 		
 		// trust rating2
 		final Double rating2 = new Double(0.5d);
 		final Date timestamp2 = new Date(timestamp.getTime()+1000);
-		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(trustedCss.getTeid(),
+		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(cssTeid,
 				TrustEvidenceType.RATED, timestamp2, rating2);
-		evidenceList.add(evidence2);
+		evidenceSet.add(evidence2);
 		
 		// trust rating3
 		final Double rating3 = new Double(0.6d);
 		final Date timestamp3 = new Date(timestamp.getTime()-1000);
-		final IDirectTrustEvidence evidence3 = new DirectTrustEvidence(trustedCss.getTeid(),
+		final IDirectTrustEvidence evidence3 = new DirectTrustEvidence(cssTeid,
 				TrustEvidenceType.RATED, timestamp3, rating3);
-		evidenceList.add(evidence3);
+		evidenceSet.add(evidence3);
 		
-		this.engine.evaluateCss(trustedCssSubList, evidenceList);
-		final ITrustedCss evaluatedCss = trustedCssSubList.get(0);
+		final Set<ITrustedEntity> resultSet = this.engine.evaluate(evidenceSet);
+		// verify
+		assertNotNull(resultSet);
+		assertTrue(!resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedCss);
+		final ITrustedCss evaluatedCss = (ITrustedCss) resultSet.iterator().next();
 		assertNotNull(evaluatedCss.getDirectTrust().getLastModified());
 		assertNotNull(evaluatedCss.getDirectTrust().getLastUpdated());
 		assertEquals(evaluatedCss.getDirectTrust().getLastModified(), 
@@ -247,7 +247,7 @@ public class DirectTrustEngineTest {
 		assertNotNull(evaluatedCss.getDirectTrust().getRating());
 		assertEquals(rating2, evaluatedCss.getDirectTrust().getRating());
 		assertNotNull(evaluatedCss.getDirectTrust().getScore());
-		assertEquals(new Double(0.0d), evaluatedCss.getDirectTrust().getScore());
+		assertEquals(new Double(IDirectTrust.INIT_SCORE), evaluatedCss.getDirectTrust().getScore());
 		assertNotNull(evaluatedCss.getDirectTrust().getValue());
 		//System.out.println(evaluatedCss.getDirectTrust().getValue());
 		assertTrue(evaluatedCss.getDirectTrust().getValue() >= rating2);
@@ -328,74 +328,56 @@ public class DirectTrustEngineTest {
 		assertNotNull(evaluatedCis.getDirectTrust().getValue());
 		//System.out.println(evaluatedCis.getDirectTrust().getValue());
 		assertTrue(evaluatedCis.getDirectTrust().getValue() >= rating);
-	}
+	}*/
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateCis(List, List)}.
-	 *
+	 * Test method for {@link org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(IDirectTrustEvidence)}.
+	 * @throws TrustEngineException 
+	 */
 	@Test
-	public void testEvaluateOneCisMultipleTrustRatings() throws TrustEngineException {
+	public void testEvaluateOneCisTrustRating() throws TrustEngineException {
 		
-		final ITrustedCis trustedCis = trustedCisList.get(0);
-		final List<ITrustedCis> trustedCisSubList = new ArrayList<ITrustedCis>();
-		trustedCisSubList.add(trustedCis);
-		
-		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
 		// trust rating
-		final Double rating = new Double(0.4d);
+		final TrustedEntityId cisTeid = trustedCisTeidList.get(0);
+		final Double rating = new Double(0.5d);
 		final Date timestamp = new Date();
-		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCis.getTeid(),
+		final IDirectTrustEvidence evidence = new DirectTrustEvidence(cisTeid,
 				TrustEvidenceType.RATED, timestamp, rating);
-		evidenceList.add(evidence1);
 		
-		// trust rating2
-		final Double rating2 = new Double(0.5d);
-		final Date timestamp2 = new Date(timestamp.getTime()+1000);
-		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(trustedCis.getTeid(),
-				TrustEvidenceType.RATED, timestamp2, rating2);
-		evidenceList.add(evidence2);
-		
-		// trust rating3
-		final Double rating3 = new Double(0.6d);
-		final Date timestamp3 = new Date(timestamp.getTime()-1000);
-		final IDirectTrustEvidence evidence3 = new DirectTrustEvidence(trustedCis.getTeid(),
-				TrustEvidenceType.RATED, timestamp3, rating3);
-		evidenceList.add(evidence3);
-		
-		this.engine.evaluateCis(trustedCisSubList, evidenceList);
-		final ITrustedCis evaluatedCis = trustedCisSubList.get(0);
+		final Set<ITrustedEntity> resultSet = this.engine.evaluate(evidence);
+		// verify
+		assertNotNull(resultSet);
+		assertTrue(!resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedCis);
+		final ITrustedCis evaluatedCis = (ITrustedCis) resultSet.iterator().next();
 		assertNotNull(evaluatedCis.getDirectTrust().getLastModified());
 		assertNotNull(evaluatedCis.getDirectTrust().getLastUpdated());
 		assertEquals(evaluatedCis.getDirectTrust().getLastModified(), 
 				evaluatedCis.getDirectTrust().getLastUpdated());
 		assertNotNull(evaluatedCis.getDirectTrust().getRating());
-		assertEquals(rating2, evaluatedCis.getDirectTrust().getRating());
+		assertEquals(rating, evaluatedCis.getDirectTrust().getRating());
 		assertNotNull(evaluatedCis.getDirectTrust().getScore());
 		assertEquals(new Double(0.0d), evaluatedCis.getDirectTrust().getScore());
 		assertNotNull(evaluatedCis.getDirectTrust().getValue());
 		//System.out.println(evaluatedCis.getDirectTrust().getValue());
-		//assertEquals(???, evaluatedCis.getDirectTrust().getValue()); // TODO
+		assertTrue(evaluatedCis.getDirectTrust().getValue() >= rating);
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateCis(List, List)}.
+	 * Test method for {@link org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(Set)}.
 	 *
 	@Test
-	public void testEvaluateOneCisMultipleLifecycleEvents() throws TrustEngineException {
+	public void testEvaluateMultipleCisLifecycleEvents() throws TrustEngineException {
 		
-		final ITrustedCis trustedCis = trustedCisList.get(0);
-		final List<ITrustedCis> trustedCisSubList = new ArrayList<ITrustedCis>();
-		trustedCisSubList.add(trustedCis);
+		final TrustedEntityId cisTeid = trustedCisTeidList.get(0);
 		
-		myCss.getDirectTrust().setScore(1d);
-		myCss.getDirectTrust().setRating(1d);
-		myCss.addCommunity(trustedCis);
-		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
+		final Set<IDirectTrustEvidence> evidenceSet = new HashSet<IDirectTrustEvidence>();
 		// Joined Community evidence
 		final Date timestamp = new Date();
-		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCis.getTeid(),
+		final IDirectTrustEvidence evidence = new DirectTrustEvidence(cisTeid,
 				TrustEvidenceType.JOINED_COMMUNITY, timestamp, null);
-		evidenceList.add(evidence1);
+		evidenceSet.add(evidence);
 		
 		this.engine.evaluateCis(trustedCisSubList, evidenceList);
 		ITrustedCis evaluatedCis = trustedCisSubList.get(0);
@@ -483,28 +465,29 @@ public class DirectTrustEngineTest {
 			//System.out.println(evaluatedCis.getDirectTrust().getValue());
 			//assertEquals(???, evaluatedCis.getDirectTrust().getValue()); // TODO
 		}
-	}
+	}*/
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateService(List, List)}.
-	 *
+	 * Test method for {@link org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(IDirectTrustEvidence)}.
+	 * @throws TrustEngineException 
+	 */
 	@Test
-	public void testEvaluateOneServiceOneTrustRating() throws TrustEngineException {
+	public void testEvaluateOneServiceTrustRating() throws TrustEngineException {
 		
-		final ITrustedService trustedService = trustedServiceList.get(0);
-		final List<ITrustedService> trustedServiceSubList = new ArrayList<ITrustedService>();
-		trustedServiceSubList.add(trustedService);
-		
-		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
 		// trust rating
+		final TrustedEntityId serviceTeid = trustedServiceTeidList.get(0);
 		final Double rating = new Double(0.5d);
 		final Date timestamp = new Date();
-		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedService.getTeid(),
+		final IDirectTrustEvidence evidence = new DirectTrustEvidence(serviceTeid,
 				TrustEvidenceType.RATED, timestamp, rating);
-		evidenceList.add(evidence1);
 		
-		this.engine.evaluateService(trustedServiceSubList, evidenceList);
-		final ITrustedService evaluatedService = trustedServiceSubList.get(0);
+		final Set<ITrustedEntity> resultSet = this.engine.evaluate(evidence);
+		// verify
+		assertNotNull(resultSet);
+		assertTrue(!resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedService);
+		final ITrustedService evaluatedService = (ITrustedService) resultSet.iterator().next();
 		assertNotNull(evaluatedService.getDirectTrust().getLastModified());
 		assertNotNull(evaluatedService.getDirectTrust().getLastUpdated());
 		assertEquals(evaluatedService.getDirectTrust().getLastModified(), 
@@ -515,7 +498,7 @@ public class DirectTrustEngineTest {
 		assertEquals(new Double(0.0d), evaluatedService.getDirectTrust().getScore());
 		assertNotNull(evaluatedService.getDirectTrust().getValue());
 		//System.out.println(evaluatedService.getDirectTrust().getValue());
-		//assertEquals(???, evaluatedService.getDirectTrust().getValue()); // TODO
+		assertTrue(evaluatedService.getDirectTrust().getValue() >= rating);
 	}
 	
 	/**
