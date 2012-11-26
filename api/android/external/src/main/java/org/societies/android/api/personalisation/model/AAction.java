@@ -33,6 +33,9 @@ import android.os.Parcelable;
 
 public class AAction extends Action implements Parcelable{
 	
+	private static final long serialVersionUID = 1L;
+	AServiceResourceIdentifier aServiceID;
+		
 	public AAction() {
 		super();
 	}
@@ -42,7 +45,7 @@ public class AAction extends Action implements Parcelable{
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeParcelable(this.getServiceID(), flags);
+		dest.writeParcelable(AServiceResourceIdentifier.convertServiceResourceIdentifier(this.getServiceID()), flags);
 		dest.writeString(this.getServiceType());
 		dest.writeString(this.getparameterName());
 		dest.writeString(this.getvalue());
@@ -50,7 +53,7 @@ public class AAction extends Action implements Parcelable{
 	
 	private AAction(Parcel in) {
 		super();
-		this.setServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		this.setAServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
 		this.setServiceType(in.readString());
 		this.setparameterName(in.readString());
 		this.setvalue(in.readString());
@@ -65,9 +68,9 @@ public class AAction extends Action implements Parcelable{
 		}
 	};
 	
-	public static AAction convertActivity(Action action) {
+	public static AAction convertAction(Action action) {
 		AAction aaction = new AAction();
-		aaction.setServiceID(action.getServiceID());
+		aaction.setAServiceID(AServiceResourceIdentifier.convertServiceResourceIdentifier(action.getServiceID()));
 		aaction.setServiceType(action.getServiceType());
 		aaction.setparameterName(action.getparameterName());
 		aaction.setvalue(action.getvalue());
@@ -75,13 +78,21 @@ public class AAction extends Action implements Parcelable{
 		return aaction;
 	}
 	
-	public static Action convertAActivity(Action aaction) {
+	public static Action convertAAction(AAction aaction) {
 		Action action = new Action();
-		action.setServiceID(aaction.getServiceID());
+		action.setServiceID(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aaction.getAServiceID()));
 		action.setServiceType(aaction.getServiceType());
 		action.setparameterName(aaction.getparameterName());
 		action.setvalue(aaction.getvalue());
 		
 		return action;
+	}
+	
+	private void setAServiceID(AServiceResourceIdentifier aServiceID){
+		this.aServiceID = aServiceID;
+	}
+	
+	private AServiceResourceIdentifier getAServiceID(){
+		return this.aServiceID;
 	}
 }
