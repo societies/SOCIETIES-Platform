@@ -21,6 +21,12 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IPersonalisationManagerAndroid {
 
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.personalisation.ReturnValue";
+	public static final String GET_INTENT_ACTION = "org.societies.android.api.personalisation.getIntentAction";
+	public static final String GET_PREFERENCE = "org.societies.android.api.personalisation.getPreference";
+	
+	public String methodsArray[] = {"getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName)",
+			"getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName)"};
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return TODO
@@ -33,7 +39,7 @@ public interface IPersonalisationManagerAndroid {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getIntentAction(Requestor requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IAction getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -47,5 +53,5 @@ public interface IPersonalisationManagerAndroid {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getPreference(Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IAction getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 }
