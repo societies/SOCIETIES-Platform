@@ -2,10 +2,10 @@ package org.societies.android.api.personalisation;
 
 import java.util.concurrent.Future;
 
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -25,8 +25,8 @@ public interface IPersonalisationManagerAndroid {
 	public static final String GET_INTENT_ACTION = "org.societies.android.api.personalisation.getIntentAction";
 	public static final String GET_PREFERENCE = "org.societies.android.api.personalisation.getPreference";
 	
-	public String methodsArray[] = {"getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName)",
-			"getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName)"};
+	public String methodsArray[] = {"getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName)",
+			"getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName)"};
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return TODO
@@ -39,7 +39,7 @@ public interface IPersonalisationManagerAndroid {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IAction getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -53,5 +53,5 @@ public interface IPersonalisationManagerAndroid {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IAction getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName);
 }
