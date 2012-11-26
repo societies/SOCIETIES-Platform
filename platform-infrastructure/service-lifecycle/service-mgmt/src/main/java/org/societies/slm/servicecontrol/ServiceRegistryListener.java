@@ -269,6 +269,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 								log.warn("Adding security and privacy failed!");
 								return;
 							}
+						} else{
+							if(log.isDebugEnabled())
+								log.debug("It's a restart, but this service doesn't need security & privacy updates");
 						}
 						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
 						
@@ -355,6 +358,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 				}
 			}
 			
+			//The service is now registered, so we update the hashmap
+			if(ServiceControl.installingBundle(serBndl.getBundleId())){
+				if(log.isDebugEnabled())
+					log.debug("ServiceControl is stopping the bundle, so we need to tell it it's done");
+				ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
+			}
+			
 		}
 	}
 
@@ -424,10 +434,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
 			
 			sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,serviceToRemove,event.getBundle());
-			
+						
 		} catch (ServiceRegistrationException e) {
 			e.printStackTrace();
 			log.error("Exception while unregistering service: " + e.getMessage());
+		}
+		
+		//The service is now registered, so we update the hashmap
+		if(ServiceControl.uninstallingBundle(event.getBundle().getBundleId())){
+			if(log.isDebugEnabled())
+				log.debug("ServiceControl is uninstalling the bundle, so we need to tell it it's done");
+			ServiceControl.serviceUninstalled(event.getBundle().getBundleId(), serviceToRemove);
 		}
 		
 	}
@@ -441,7 +458,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	 */
 	private Service getServiceFromBundle(Bundle bundle) {
 		
-		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName() + " with Id " + bundle.getBundleId());
+		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
 		
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
@@ -469,7 +486,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		for(Service service: listServices){
 			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
-			if(bundleSymbolic == bundle.getSymbolicName()){
+			if(bundleSymbolic.equals(bundle.getSymbolicName())){
 				result = service;
 				break;
 			}
@@ -494,6 +511,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 			URI clientJar = null;
 			INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
 			
+			if(log.isDebugEnabled())
+				log.debug("serviceClient: "+ service.getServiceInstance().getServiceImpl().getServiceClient());
+			
 			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB))
 				clientJar= new URI("http://www.societies.org/webapp/webservice.test");
 			else{
@@ -512,9 +532,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 					log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
 			
 				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
-			} else
-				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, (String) null, callback);
-
+			} else{
+				getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, new ArrayList<String>(), callback);
+			}
 			//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());	
 			
 		} catch(Exception ex){

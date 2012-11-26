@@ -23,7 +23,10 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,12 +38,10 @@ import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.SocialData;
 import org.societies.webapp.models.SocialDataForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,8 +49,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
-import sun.util.logging.resources.logging;
 
 
 @Controller
@@ -64,10 +63,15 @@ public class SocialDataController {
 	private static final String PROFILES		= "profiles";
 	private static final String GROUPS			= "groups";
 	private static final String ACTIVITIES		= "activities";
+	private static final String UPDATE			= "update";
+	
 	private static final String LIST			= "list";
 	private static final String ID  	= "id";
 	private static final String SNNAME  = "snName";
 	private static final String TOKEN   = "token";
+	private String lastUpdate =  "-- NA -- ";
+	
+	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	
 	/**
 	 * OSGI service get auto injected
@@ -102,15 +106,16 @@ public class SocialDataController {
 		else return "images/social_network.png";
 	}
 	
-	private String getBaseURL(String data){
+	private String getBaseURL(String data, String id){
 		if (data==null) return "#";
 		if (data=="")   return "#";
 		
+		
 		data = data.toLowerCase();
-		if (data.contains("facebook"))       return  "http://facebook.com/";
-		else if (data.contains("twitter"))   return  "http://api.twitter.com/1/users/lookup.json?user_id=";
-		else if (data.contains("linkedin"))  return  "http://linkedin.com/";
-		else if (data.contains("foursquare")) return "http://foursquare.com/";
+		if (data.contains("facebook"))       return  "http://facebook.com/"+id;
+		else if (data.contains("twitter"))   return  "http://api.twitter.com/1/users/lookup.json?user_id="+id;
+		else if (data.contains("linkedin"))  return  "http://linkedin.com/"+id;
+		else if (data.contains("foursquare")) return "http://foursquare.com/"+id;
 		else return "#";
 	}
 
@@ -130,12 +135,11 @@ public class SocialDataController {
 		
 		while (it.hasNext()){
 			ISocialConnector conn = it.next();
-		    
-		   
 			connLI+="<li><img src='"+getSNIcon(conn)+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
 			 
 		}
 		
+		model.put("lastupdate", lastUpdate);
 		model.put("connectors", connLI);
 		return new ModelAndView("socialdata", model);
 	}
@@ -145,7 +149,7 @@ public class SocialDataController {
 		try{
 			if (conn.getConnectorName().equalsIgnoreCase("facebook"))     return "images/Facebook.png";
 			else if (conn.getConnectorName().equalsIgnoreCase("twitter")) return "images/Twitter.jpg";
-			else if (conn.getConnectorName().equalsIgnoreCase("linkedin")) return "images/Linkedin.jpg";
+			else if (conn.getConnectorName().equalsIgnoreCase("linkedin")) return "images/Linkedin.png";
 			else if (conn.getConnectorName().equalsIgnoreCase("foursquare")) return "images/Foursquare.png";
 			else return "images/social_network.png";
 		}
@@ -178,11 +182,14 @@ public class SocialDataController {
 	public ModelAndView serviceDiscovery(@Valid SocialDataForm sdForm, BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
+			
+			model.put("lastupdate", lastUpdate);
 			model.put("result", "Social Data Form error");
 			return new ModelAndView("socialdata", model);
 		}
 
 		if (getSocialData() == null) {
+			model.put("lastupdate", lastUpdate);
 			model.put("errormsg", "Social Data reference not avaiable");
 			return new ModelAndView("error", model);
 		}
@@ -223,7 +230,8 @@ public class SocialDataController {
 					}
 					
 					socialdata.updateSocialData();   // this is required to read all the SN Data.... (can take a while).
-					
+					lastUpdate = dateFormat.format( new Date());
+					model.put("lastupdate", lastUpdate);
 					model.put("connectors", connLI);
 					return new ModelAndView("socialdata", model);
 				}
@@ -245,6 +253,21 @@ public class SocialDataController {
 				
 				
 					
+			}
+			else if (UPDATE.equalsIgnoreCase(method)) {
+				lastUpdate = dateFormat.format( new Date());
+				socialdata.updateSocialData();
+				
+				Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
+				String connLI="";
+				while (it.hasNext()){
+					ISocialConnector conn = it.next();
+					connLI+="<li><img src='"+getSNIcon(conn)+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
+					 
+				}
+				
+				model.put("lastupdate", lastUpdate);
+				model.put("connectors", connLI);
 			}
 			// This should be deprecated
 			else if (LIST.equalsIgnoreCase(method)) {
@@ -332,7 +355,7 @@ public class SocialDataController {
 							id = p.getId().split(":")[1];
 						}
 						img   = "<img width='20px' src='"+getIcon(domain) +"'>";
-						link  = "<a href='"+ getBaseURL(domain) + id + "' sn="+domain+">" + name + "</a>";
+						link  = "<a href='"+ getBaseURL(domain,id)  + "' sn="+domain+">" + name + "</a>";
 						
 					}
 					
@@ -382,8 +405,8 @@ public class SocialDataController {
 							id = p.getId().split(":")[1];
 						}
 						
-						img   = "<img width='20px' src='"+getIcon(domain) +"'>";
-						link  = "<a href='"+getBaseURL(domain) + id + "'>" + name + "</a>";
+						img   = "<img width='20px' src='"+getIcon(p.getId()) +"'>";
+						link  = "<a href='"+getBaseURL(domain,id) + "'>" + name + "</a>";
 						
 						content +="<li> "+ img + link +"</li>";
 					}
@@ -449,10 +472,10 @@ public class SocialDataController {
 				content   += "</ul>";
 			}
 			else {
-				content = "<p> Request method:"+method+ " that is not yet implmented [TBD]</p>";
+				content = "<p>Method:"+method+ " NOT IMPLEMENTED/p>";
 			}
 
-		
+			model.put("lastupdate", lastUpdate);
 			model.put("result_title", 	res);
 			model.put("result_content", content);
 			

@@ -28,32 +28,24 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttribute;
-
+import org.societies.context.api.user.inference.UserCtxInferenceException;
 
 /**
  * @author fran_ko
  */
 public interface IUserCtxRefiner {
-
+	
 	/**
 	 * Refines context for an indicate Context Attribute identifier.
 	 * The CtxAttribute object related to the parameter attrId is manipulated according to the refiner and returned. 
 	 * 
 	 * @param attrId ID of context attribute to be inferred/refined.
+	 * @return the refined context attribute or <code>null</code> if the 
+	 *         identified attribute cannot be refined.
 	 * @since 0.3
 	 */
-	public CtxAttribute refineContext(CtxAttributeIdentifier attrId);
+	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException;
 	
-
-	/**
-	 * Called by the Context Inference Manager. The return parameter List contains strings
-	 * with the names of the context types for which rules exist in the IUserCtxRefiner.
-	 * 
-	 * @since 0.3
-	 */
-	public List <String> getInferableTypes( );
-	
-
 	/**
 	 * Starts continuous inference process of context attributes a user has registered for. 
 	 * 
@@ -61,7 +53,13 @@ public interface IUserCtxRefiner {
 	 * @param updateFreq Frequency of re-evaluation of inference/refinement algorithms.
 	 * @since 0.3
 	 */
-	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq);
-
-
+	public void refineContinuously(CtxAttributeIdentifier id, double updateFreq) throws UserCtxInferenceException;
+	
+	/**
+	 * Called by the Context Inference Manager. The return parameter List contains strings
+	 * with the names of the context types for which rules exist in the IUserCtxRefiner.
+	 * 
+	 * @since 0.3
+	 */
+	public List<String> getInferrableTypes( );
 }

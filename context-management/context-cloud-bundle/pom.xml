@@ -106,10 +106,14 @@
 			<artifactId>context-source-mgmt</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-inference-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-refinement</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
 		<dependency>

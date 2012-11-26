@@ -24,29 +24,30 @@
  */
 package org.societies.context.user.inference.impl;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
+import org.societies.context.api.user.inference.UserCtxInferenceException;
+import org.societies.context.api.user.refinement.IUserCtxRefiner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 @Service
 public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
@@ -54,87 +55,86 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserCtxInferenceMgr.class);
 
-	IndividualCtxEntity ownerEntity;
-	List<String> inferableTypesList = new ArrayList<String>();
-	private INetworkNode cssNodeId;
+	private final List<String> inferrableTypes = new CopyOnWriteArrayList<String>();
+	
 	private IIdentity cssOwnerId;
 
-
+	@Autowired(required=false)
+	private IUserCtxRefiner userCtxRefiner;
+	
 	private ICtxBroker internalCtxBroker;
-	ICommManager commMgr;
-
-	UserCtxInferenceMgr(){
-		
-	}
+	
+	private ICommManager commMgr;
 	
 	@Autowired(required=true)
-	UserCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr){
+	UserCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr) {
+		
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 
 		this.internalCtxBroker = internalCtxBroker;
-		LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
-
 		this.commMgr = commMgr;
-		LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
-
-		this.assignInfAttributeTypes();
-		LOG.info(this.getClass() + " instantiated broker " +internalCtxBroker);	
+		this.assignInfAttributeTypes(); // TODO remove!!	
 	}
-
 
 	private void assignInfAttributeTypes(){
 		
-		LOG.info ("inside assignInfAttributeTypes type: " + this.getInferrableTypes());
-		inferableTypesList.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		inferableTypesList.add(CtxAttributeTypes.LOCATION_COORDINATES);
-		inferableTypesList.add(CtxAttributeTypes.STATUS);
-		inferableTypesList.add(CtxAttributeTypes.TEMPERATURE);
-		this.setInferrableTypes(inferableTypesList);
+		// TODO should be added by individual inference algorithms 
+		this.inferrableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.inferrableTypes.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		//inferrableTypes.add(CtxAttributeTypes.STATUS);
+		//inferrableTypes.add(CtxAttributeTypes.TEMPERATURE);
 		
-		LOG.info ("getInferrableTypes " + this.getInferrableTypes());
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info ("Inferrable Types=" + this.getInferrableTypes());
 		try {
-			this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
-			LOG.debug("*** cssNodeId = " + this.cssNodeId);
-
-			final String cssOwnerStr = this.cssNodeId.getBareJid();
-			this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-			LOG.debug("*** cssOwnerId = " + this.cssOwnerId);
-
-			this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-			LOG.debug("*** cssOwnerId = " + this.cssOwnerId);
-
-			this.ownerEntity = this.internalCtxBroker.retrieveIndividualEntity(cssOwnerId).get();
-			List<String> infTypesList = this.getInferrableTypes();
+			final String cssOwnerStr = this.commMgr.getIdManager().getThisNetworkNode().getBareJid();
+			this.cssOwnerId = this.commMgr.getIdManager().fromJid(cssOwnerStr);
+			final IndividualCtxEntity ownerEntity = 
+					this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			
-			for(String inferableType: infTypesList){
-				
-				LOG.debug("now checking inf type 1 "+inferableType+" size: " +this.ownerEntity.getAttributes(inferableType).size());
-				LOG.debug("get attributes2  : "+this.ownerEntity.getAttributes());
-				LOG.debug("get attributes3 : "+this.ownerEntity.getAttributes(inferableType));
-				
-				if (this.ownerEntity.getAttributes(inferableType).size() == 0) {
-					CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(this.ownerEntity.getId(), inferableType).get();
-					LOG.debug("inf Attr created "+ ctxAttr.getId());
+			for(final String inferrableType: this.inferrableTypes) {
+				if (ownerEntity.getAttributes(inferrableType).size() == 0) {
+					CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(ownerEntity.getId(), inferrableType).get();
+					ctxAttr.setHistoryRecorded(true);
+					this.internalCtxBroker.update(ctxAttr);
+					if (LOG.isDebugEnabled())
+						LOG.debug("Inferrable attribute created: "+ ctxAttr.getId());
 				}
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOG.error("Could not initialise inferrable attributes: "
+					+ e.getLocalizedMessage(), e);
 		}
 	}
 
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#isPoorQuality(org.societies.api.context.model.CtxQuality)
+	 */
 	@Override
-	public void checkQuality(CtxModelObject arg0) {
-		// TODO Auto-generated method stub
+	public boolean isPoorQuality(CtxQuality quality) {
+		
+		boolean isPoorQuality;
 
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("freshness = " + quality.getFreshness() + " updateFrequency = " 
+					+ quality.getUpdateFrequency());
+
+		if (null == quality.getUpdateFrequency()) {
+
+			isPoorQuality = false;
+
+		} else {
+
+			final double timeBetweenUpdatesMillis = (1.0 / quality.getUpdateFrequency()) * 1000.0;
+			if (LOG.isInfoEnabled()) // TODO DEBUG
+				LOG.info("time between updates (in milliseconds) = " +timeBetweenUpdatesMillis);
+			isPoorQuality = (double) quality.getFreshness() > timeBetweenUpdatesMillis;
+		}
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("is poor quality = " + isPoorQuality);
+
+		return isPoorQuality;
 	}
 
 	@Override
@@ -188,24 +188,81 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		return ctxAttribute;
 	}
 
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineOnDemand(org.societies.api.context.model.CtxAttributeIdentifier)
+	 */
 	@Override
-	public CtxAttribute refineContext(CtxAttributeIdentifier arg0) {
-		CtxAttribute ctxAttribute = null;
+	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException {
 
-		return ctxAttribute;
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute '" + attrId + "'");
+		CtxAttribute refinedAttribute;
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			refinedAttribute = this.userCtxRefiner.refineOnDemand(attrId);
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
+		
+		if (refinedAttribute != null)
+			try {
+				refinedAttribute = (CtxAttribute) this.internalCtxBroker.update(refinedAttribute).get();
+			} catch (Exception e) {
+				throw new UserCtxInferenceException("Could not update refined attribute in the database:"
+					+ e.getLocalizedMessage(), e);
+			}
+
+		return refinedAttribute;
+	}
+	
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#refineContinuously(org.societies.api.context.model.CtxAttributeIdentifier, java.lang.Double)
+	 */
+	@Override
+	public void refineContinuously(final CtxAttributeIdentifier attrId, 
+			final Double updateFrequency) throws UserCtxInferenceException {
+		
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("Refining attribute '" + attrId + "'");
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+			this.userCtxRefiner.refineContinuously(attrId, 0d); // TODO handle updateFrequency
+		else
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "' continuously: Unsupported attribute type: " + attrId.getType());
 	}
 
-	@Override
-	public void setInferrableTypes(List<String> inferableTypes){
-
-		LOG.debug("setInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
-		this.inferableTypesList = inferableTypes;
-	}
-
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#getInferrableTypes()
+	 */
 	@Override
 	public List<String> getInferrableTypes(){
 
-		LOG.debug("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
-		return this.inferableTypesList;
+		if (LOG.isDebugEnabled())
+			LOG.debug("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		return Collections.unmodifiableList(this.inferrableTypes);
+	}
+	
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#addInferrableType(java.lang.String)
+	 */
+	@Override
+	public void addInferrableType(String attrType){
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding '" + attrType + "' to list of inferrable attributes");
+		if (!this.inferrableTypes.contains(attrType)) {
+			this.inferrableTypes.add(attrType);
+		}
+	}
+	
+	/*
+	 * @see org.societies.context.api.user.inference.IUserCtxInferenceMgr#removeInferrableType(java.lang.String)
+	 */
+	@Override
+	public void removeInferrableType(String attrType){
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Removing '" + attrType + "' from list of inferrable attributes");
+		if (this.inferrableTypes.contains(attrType))
+			this.inferrableTypes.remove(attrType);
 	}
 }

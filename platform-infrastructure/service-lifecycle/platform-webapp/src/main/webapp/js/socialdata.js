@@ -65,7 +65,7 @@ function countConnectors(){
   	    document.sd.submit();
   	 }
   	 else{
-  	 	alert("There is any connector available");
+  	 	alert("Add a connector first!");
   	 }
   }
   
@@ -76,7 +76,8 @@ function countConnectors(){
     // setTimeout(CheckLoginStatus(), 3000);
     document.getElementById("method").value  = "add";
     document.getElementById("snName").value  = title;
-    document.getElementById("token").value   = "";
+    document.getElementById("token").value  = "";
+ 
   }
   
   

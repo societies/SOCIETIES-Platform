@@ -264,6 +264,11 @@ public class CtxAttributeTypes {
      * @since 0.0.8
      */
     public static final String TEMPERATURE = "temperature";
+    
+    /**
+     * @since 0.5
+     */
+    public static final String TYPE = "type";
    
     /**
      * @since 0.0.8

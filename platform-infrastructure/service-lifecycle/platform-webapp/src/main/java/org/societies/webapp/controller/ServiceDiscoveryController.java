@@ -32,6 +32,9 @@ import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.webapp.models.ServiceControlForm;
 import org.societies.webapp.models.ServiceDiscoveryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,6 +45,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -49,7 +53,9 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 
 @Controller
 public class ServiceDiscoveryController {
-
+		
+	static final Logger logger = LoggerFactory.getLogger(ServiceDiscoveryController.class);
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -64,6 +70,20 @@ public class ServiceDiscoveryController {
 		this.sdService = sdService;
 	}
 
+	/**
+	 * OSGI service get auto injected
+	 */
+	@Autowired
+	private ICommManager commManager;
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -123,7 +143,8 @@ public class ServiceDiscoveryController {
 		String res = "";
 		
 		try {
-		
+			model.put("myNode", getCommManager().getIdManager().getThisNetworkNode().getJid());
+			
 			if (method.equalsIgnoreCase("GetLocalServices")) {
 				asynchResult=this.getSDService().getLocalServices();
 				res="ServiceDiscovery Result For Local Node ";
@@ -141,14 +162,18 @@ public class ServiceDiscoveryController {
 					
 			} else if (method.equalsIgnoreCase("GetServicesCis")) {
 				//LOCAL
-				res="My Services: ";
+				res="My Services to Share: ";
 				asynchResult=this.getSDService().getLocalServices();
 				services = asynchResult.get();
 				model.put("services", services);
+				if(logger.isDebugEnabled())
+					logger.debug("GetServicesCis: Found "+ services.size()+ " services in our local node.");
 				//REMOTE
 				asynchResult=this.getSDService().getServices(node);
 				services = asynchResult.get();
 				model.put("cisservices", services);
+				if(logger.isDebugEnabled())
+					logger.debug("GetServicesCis: Found "+ services.size()+ " services in CIS: " + node);
 				
 				//Get CIS Name
 				ICis cis = this.getCisManager().getCis(node);
@@ -173,8 +198,8 @@ public class ServiceDiscoveryController {
 		
 		return new ModelAndView("servicediscoveryresult", model);
 		
-
 	}
+	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/servdiscpilot.html", method = RequestMethod.GET)
@@ -190,12 +215,19 @@ public class ServiceDiscoveryController {
 		try {
 		
 			asynchResult=this.getSDService().getLocalServices();
-			res="Your Services";
+			res="My Services: ";
 				
 			services = asynchResult.get();
 			model.put("services", services);
 			model.put("result", res);
-			
+			ServiceControlForm scForm = new ServiceControlForm();
+			Map<String, String> methods = new LinkedHashMap<String, String>();
+			model.put("method","GetLocalServices");
+			model.put("methods", methods);
+			scForm.setNode(getCommManager().getIdManager().getThisNetworkNode().getJid());
+			scForm.setMethod("GetLocalServices");
+			model.put("scForm", scForm);
+			model.put("myNode", getCommManager().getIdManager().getThisNetworkNode().getJid());
 		}
 		catch (ServiceDiscoveryException e)
 		{
@@ -209,7 +241,7 @@ public class ServiceDiscoveryController {
 		};
 		
 		
-		return new ModelAndView("servicediscpilotresult", model);
+		return new ModelAndView("servicediscoveryresult", model);
 
 	}
 	

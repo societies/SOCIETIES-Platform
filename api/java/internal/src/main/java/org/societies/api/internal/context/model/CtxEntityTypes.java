@@ -36,6 +36,15 @@ import org.societies.api.context.model.CtxEntity;
 public class CtxEntityTypes extends
 		org.societies.api.context.model.CtxEntityTypes {
 
+	
+	/**
+	 * Used to represent shadow entities, i.e. entities acting as sources of
+	 * context information. 
+	 * 
+     * @since 0.5
+     */
+    public static final String CONTEXT_SOURCE = "contextSource";
+	
 	/**
      * @since 0.0.8 
      */

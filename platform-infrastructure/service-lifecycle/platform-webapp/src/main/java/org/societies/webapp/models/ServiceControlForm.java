@@ -24,6 +24,8 @@
  */
 package org.societies.webapp.models;
 
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 
 /**
  * This is a data model class for data input from html Service Control page.
@@ -38,6 +40,7 @@ public class ServiceControlForm {
 	private String url;
 	private String service;
 	private String endpoint;
+	private CommonsMultipartFile fileData;
 	
 	public String getNode() {
 		return node;
@@ -76,5 +79,15 @@ public class ServiceControlForm {
 	public void setService(String service) {
 		this.service = service;
 	}
+	
+	 public CommonsMultipartFile getFileData()
+	 {
+	    return fileData;
+	 }
+	 
+	 public void setFileData(CommonsMultipartFile fileData)
+	 {
+	    this.fileData = fileData;
+	 }
 	
 }

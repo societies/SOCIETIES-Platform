@@ -36,17 +36,28 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 */
 	//Device Manager events
-	String DEVICE_MANAGER_DEVICE_REGISTERED = "org.societies.android.device.manager.DEVICE_REGISTERED";
+//	String DEVICE_MANAGER_DEVICE_REGISTERED = "org.societies.android.device.manager.DEVICE_CONNECTED";
+//	String DEVICE_MANAGER_DEVICE_DISCONNECTED = "org.societies.android.device.manager.DEVICE_DISCONNECTED";
+//	String DEVICE_MANAGER_EVENTING_NODE_NAME = "org.societies.android.device.manager.EVENTING_NODE_NAME";
 
 	//CSS Manager events
 	String CSS_MANAGER_ADD_CSS_NODE = "org.societies.android.css.manager.addCSSNode";
 	String CSS_MANAGER_DEPART_CSS_NODE = "org.societies.android.css.manager.departCSSNode";
 	
+	//Context Manager events
+	String CONTEXT_MANAGER_CREATED = "org.societies.android.context.org/societies/context/change/event/CREATED";
+	String CONTEXT_MANAGER_UPDATED = "org.societies.android.context.org/societies/context/change/event/UPDATED";
+	String CONTEXT_MANAGER_MODIFIED = "org.societies.android.context.org/societies/context/change/event/MODIFIED";
+	String CONTEXT_MANAGER_REMOVED = "org.societies.android.context.org/societies/context/change/event/REMOVED";
+	
+	
 	//Array of Societies events
-	String societiesEvents [] = {DEVICE_MANAGER_DEVICE_REGISTERED, 
-								CSS_MANAGER_ADD_CSS_NODE,
-								CSS_MANAGER_DEPART_CSS_NODE
-			};
+	String societiesEvents [] = {CONTEXT_MANAGER_CREATED,
+								 CONTEXT_MANAGER_UPDATED,
+								 CSS_MANAGER_ADD_CSS_NODE,
+								 CONTEXT_MANAGER_MODIFIED,
+								 CONTEXT_MANAGER_REMOVED,
+								 CSS_MANAGER_DEPART_CSS_NODE};
 	
 	//Array of interface method signatures
 	String methodsArray [] = {"subscribeToEvent(String client, String societiesIntent)",

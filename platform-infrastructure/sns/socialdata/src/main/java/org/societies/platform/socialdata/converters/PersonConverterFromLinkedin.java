@@ -8,26 +8,32 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.shindig.social.core.model.AccountImpl;
+import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
+import org.apache.shindig.social.core.model.OrganizationImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
+import org.apache.shindig.social.opensocial.model.Name;
+import org.apache.shindig.social.opensocial.model.Organization;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PersonConverterFromLinkedin implements PersonConverter {
 
 	public static String STATUS_COUNT 	= "statuses_count";
-	public static String LANGUAGE		= "lang";
+	public static String LANGUAGE		= "languages";
 	public static String ID 			= "id";
 	
 	public static String FIRST_NAME		= "firstName";
-	public static String LAST_NAME		= "firstName";
+	public static String LAST_NAME		= "lastName";
 	
 	
 	public static String SCREEN_NAME	= "screen_name";
@@ -63,19 +69,114 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 
 		try{
 			db = new JSONObject(data);
+			
 			if (db.has("error"))
 				return person;
-			person.setId(db.getString(ID));
-			//			System.out.println("id: "+db.getString(ID));
-			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			String name = "";
-			if (db.has(FIRST_NAME))			name = db.getString(FIRST_NAME);
-			if (db.has(LAST_NAME))			{
-				if (name.length()>0) name+=" ";
-				name = db.getString(LAST_NAME);
+			
+			
+			person.setId("linkedin:" + db.getString(ID));
+	
+			ActivityObject providerObj = new ActivityObjectImpl();
+			providerObj.setUrl("www.linkedin.com");
+			providerObj.setId("linkedin.com");
+			providerObj.setDisplayName("Linkedin");
+			
+			/// SET NAME
+			Name name = new NameImpl();
+			String formattedName= "";
+			if (db.has("firstName")){
+				name.setGivenName(db.getString("firstName"));
+				formattedName=name.getGivenName();
+			}
+			else 
+				name.setGivenName(db.getString("--"));
+			
+			if (db.has("lastName")){
+				name.setFamilyName(db.getString("lastName"));
+				if (formattedName.length()>0) formattedName += " ";
+				formattedName += name.getFamilyName();
+			}
+			else
+				name.setFamilyName("--");
+			if (db.has("formattedName"))
+				name.setFormatted(db.getString("formattedName"));
+			else
+				name.setFormatted(formattedName);
+			person.setName(name);
+			
+			
+			if (db.has("summary")){
+				
 			}
 			
-			person.setName(new NameImpl(name));
+			if (db.has("skills")){
+				JSONObject jSkills = db.getJSONObject("skills");
+				JSONArray list = jSkills.getJSONArray("values");
+				String skills="";
+				for(int i=0; i<list.length();i++){
+					if (skills.length()>0) skills+=",";
+					skills+=list.getJSONObject(i).getJSONObject("skill").getString("name");
+				}
+				person.setJobInterests(skills);
+			}
+			
+			if (db.has("dateOfBirth")){
+				
+			}
+			
+			if (db.has("headline")){
+				
+			}
+			
+			if (db.has("honors")){
+				
+			}
+			
+			if (db.has("specialties")){
+				
+			}
+			
+			if (db.has("pictureUrl")){
+				
+			}
+			
+			if (db.has("associations")){
+				
+			}
+			
+			if (db.has("educations")){
+				
+			}
+			
+			if(db.has("industry")){
+				List<Organization> orgs = new ArrayList<Organization>();
+				Organization org = new OrganizationImpl();
+				org.setName(db.getString("industry"));
+				orgs.add(org);
+				person.setOrganizations(orgs);
+			}
+
+			
+			if (db.has("interests"))  {
+				List<String> interests = new ArrayList<String>();
+				try{
+					for (String i : db.getString("interests").split(",")) 
+						interests.add(i);
+				}catch(Exception e){};
+				person.setInterests(interests);
+			}
+			
+			if (db.has("emailAddress")){
+				getMails(db.getString("emailAddress"));
+			}
+			
+			if (db.has("publicProfileUrl")){
+				person.setProfileUrl(db.getString("publicProfileUrl"));
+			}
+			
+			if (db.has("languages")) genLanguages();
+			
+			
 //			
 //			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
 //			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
@@ -101,17 +202,21 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 
 		ArrayList<String> langs = new ArrayList<String>();
 		try {
-			if(!db.has(LANGUAGE)) 
-				return null;
-			langs.add(db.getString(LANGUAGE));
-		} catch (JSONException e) {}
+			JSONArray list = db.getJSONObject("languages").getJSONArray("values");
+			for (int i=0; i<list.length(); i++){
+				JSONObject lang = list.getJSONObject(i);
+				langs.add(lang.getJSONObject("language").getString("name"));
+			}
+		
+		}
+		catch (JSONException e) {}
 		return langs;
 	}
 
 	private void setAccount(){
 		Account account = new AccountImpl();
 		try{
-			account.setDomain("twitter.com");
+			account.setDomain("linkedin.com");
 			account.setUsername("me");
 			account.setUserId(db.getString(ID));
 		}

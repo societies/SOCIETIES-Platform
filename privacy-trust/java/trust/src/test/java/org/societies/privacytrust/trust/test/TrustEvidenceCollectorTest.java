@@ -25,6 +25,7 @@
 package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
@@ -36,6 +37,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -46,9 +50,9 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
-import org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -60,7 +64,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 0.2
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
+@ContextConfiguration(locations = {"classpath:META-INF/spring/TrustEvidenceCollectorTest-context.xml"})
 public class TrustEvidenceCollectorTest {
 	
 	private static final String BASE_ID = "tect";
@@ -91,10 +95,14 @@ public class TrustEvidenceCollectorTest {
 	private static ServiceResourceIdentifier mockServiceResourceIdentifier2 = mock(ServiceResourceIdentifier.class);
 	
 	@Autowired
+	@InjectMocks
 	private ITrustEvidenceCollector trustEvidenceCollector;
 	
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
+	
+	@Mock
+	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -139,7 +147,8 @@ public class TrustEvidenceCollectorTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		((TrustEvidenceCollector) this.trustEvidenceCollector).setCommMgr(mockCommMgr);
+		MockitoAnnotations.initMocks(this);
+		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
 	}
 
 	/**

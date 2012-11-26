@@ -236,7 +236,7 @@ var SocietiesLogin = {
 		}
 		
 		function failure(data) {
-			alert("successfulCSSCloudLogin - failure: " + data);
+			//alert("successfulCSSCloudLogin - failure: " + data);
 			success(data);
 		}
 		

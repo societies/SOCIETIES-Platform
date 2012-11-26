@@ -53,6 +53,7 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
@@ -118,6 +119,16 @@ public class CisManagerController {
 	/**
 	 *http://localhost:8080/societies/your_communities_list.html
 	 */
+	
+	
+	// probably going to be deleted
+	@RequestMapping(value="/manage_communities.html",method = RequestMethod.GET)
+	public ModelAndView showManagerCommunitiesPage() {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		return new ModelAndView("manage_communities", model) ;
+		
+	}
 	
 	// SHOW CREATE COMMUNITY
 	
@@ -225,6 +236,7 @@ public class CisManagerController {
 
 		getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
 		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		if(null == adverts) adverts = new ArrayList<CisAdvertisementRecord>();//create an empty list if it doesnt exist or spring will fail 
 		model.put("cisAdverts", adverts);
 		
 
@@ -262,65 +274,82 @@ public class CisManagerController {
 			model.put("response", response);
 			
 		// GET INFO
-		ICis icis = this.getCisManager().getCis(cisId);
+		ICis icis = this.getCisManager().getCis(cisId); // handler in case it is a owned/joined CIS
+		ICisRemote icisRemote= icis;
+		if(null == icisRemote){
+			icisRemote = this.getCisManager().getHandlerToRemoteCis(cisId); // basic CIS handler
+		}
 		CisManagerClient getInfoCallback = new CisManagerClient();
 		Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
-		icis.getInfo(req,getInfoCallback);
+		icisRemote.getInfo(req,getInfoCallback);
 		
-		CommunityMethods res = 	getInfoCallback.getComMethObj();	
-		Community getInfResp = res.getGetInfoResponse().getCommunity();
-		model.put("cisInfo", getInfResp);
-		
+		CommunityMethods res = 	getInfoCallback.getComMethObj();
 
-		// CHECK IF IF IM THE OWNER
-		if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
-			model.put("isOwner", true);
-		else
-			model.put("isOwner", false);
-		// GET PRIVACY
-		RequestorCis requestor = null;
-		RequestPolicy privacyPolicy = null;
-		try {
-			requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-					,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
-					);
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
-			// GET POLICY
-			if(null != privacyPolicy){
-				// got policy locally
-			}else{
-				PrivPolCallBack privCallback = new PrivPolCallBack();
-				this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
-						, privCallback);
-				privacyPolicy = privCallback.getPrivacyPolicy();
+		if(res.getGetInfoResponse().isResult() == false){
+			model.put("response", "could not fetch information about the community");
+		}else{
+
+			
+			Community getInfResp = res.getGetInfoResponse().getCommunity();
+			model.put("cisInfo", getInfResp);
+			
+	
+			// CHECK IF IF IM THE OWNER
+			if(this.commMngrRef.getIdManager().getThisNetworkNode().getBareJid().equalsIgnoreCase(getInfResp.getOwnerJid()))
+				model.put("isOwner", true);
+			else
+				model.put("isOwner", false);
+			// GET PRIVACY
+			RequestorCis requestor = null;
+			RequestPolicy privacyPolicy = null;
+			try {
+				requestor = new RequestorCis(this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+						,this.commMngrRef.getIdManager().fromJid(getInfResp.getCommunityJid())
+						);
+				privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
+				// GET POLICY
+				if(null != privacyPolicy){
+					// got policy locally
+				}else{
+					PrivPolCallBack privCallback = new PrivPolCallBack();
+					this.getPrivacyPolicyManagerRemote().getPrivacyPolicy(requestor, this.commMngrRef.getIdManager().fromJid(getInfResp.getOwnerJid())
+							, privCallback);
+					privacyPolicy = privCallback.getPrivacyPolicy();
+				}
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
+			// TODO: find the best way to display the policy
+			//if( null != privacyPolicy)
+			//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
+			//else
+			//	model.put("priacyPolicyString","no policy");
+			
+			
+			// if its a CIS which we own or participate
+			
+			if( null != icis){
+			
+				// GET ACIVITIES
+				ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
+				icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
+				org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
+				model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+				
+				//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
+				AddActivityForm form = new AddActivityForm();
+				model.put("activityForm",form);
+		
+				AddMemberForm form2 = new AddMemberForm();
+				model.put("memberForm",form2);
+			}
+
 		}
-
-		// TODO: find the best way to display the policy
-		//if( null != privacyPolicy)
-		//	model.put("priacyPolicyString",privacyPolicy.toXMLString());
-		//else
-		//	model.put("priacyPolicyString","no policy");
-		
-		// GET ACIVITIES
-		ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
-		icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
-		org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
-		model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
-		
-		//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
-		AddActivityForm form = new AddActivityForm();
-		model.put("activityForm",form);
-
-		AddMemberForm form2 = new AddMemberForm();
-		model.put("memberForm",form2);
-		
 		return new ModelAndView("community_profile", model) ;
 	}
 

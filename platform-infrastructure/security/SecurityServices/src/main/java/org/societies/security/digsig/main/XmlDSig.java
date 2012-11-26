@@ -24,29 +24,126 @@
  */
 package org.societies.security.digsig.main;
 
+import java.security.Key;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import org.apache.xml.security.Init;
+import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.security.digsig.certs.SignatureCheck;
+import org.societies.security.digsig.util.XmlManipulator;
+import org.societies.security.storage.CertStorage;
+import org.w3c.dom.Document;
 
 /**
  * 
- *
- * @author Mitja Vardjan
- *
+ * 
+ * @author Mitja Vardjan, based on code by Miroslav Pavleski
+ * 
  */
 public class XmlDSig {
 
 	private static Logger LOG = LoggerFactory.getLogger(XmlDSig.class);
 
+	private CertStorage certStorage;
+
+	public XmlDSig(CertStorage certStorage) {
+		this.certStorage = certStorage;
+
+		try {
+			if (!Init.isInitialized()) {
+				Init.init();
+			}
+		} catch (Exception e) {
+			LOG.error("XmlDSig", "Failed to initialize", e);
+			return;
+		}
+
+	}
+
 	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
-		
+
 		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
 
-		return xml;  // FIXME
+		return xml; // FIXME
+	}
+
+	// TODO: move to PolicyNegotiator
+	public String getRequesterSignatureId(Document doc) {
+
+		SignatureCheck check = new SignatureCheck(doc, certStorage);
+		String sigId = check.getCustomerSignature().getElement().getAttribute("Id");
+
+		return sigId;
+	}
+
+	public Document signXml(Document doc, ArrayList<String> idsToSign) throws DigsigException {
+
+		X509Certificate cert;
+		Key key;
+		XMLSignature sig;
+		
+		LOG.debug("signXml({}, {})", doc, idsToSign);
+		
+		cert = certStorage.getOurCert();
+		key = certStorage.getOurKey();
+		if (cert == null || key == null) {
+			LOG.error("signXml: cert and key must not be null: cert = {}, key = {}", cert, key);
+			throw new DigsigException("Cert or key is null");
+		}
+
+		try {
+			sig = new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA);
+
+			doc.getDocumentElement().appendChild(sig.getElement());
+
+			Transforms transforms = new Transforms(doc);
+			// Also must use c14n
+			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
+
+			for (String id : idsToSign) {
+				LOG.debug("signXml(): adding URI of the resource to be signed: \"{}\"", id);
+				sig.addDocument("#" + id, transforms,
+						MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);
+			}
+
+			sig.addKeyInfo(cert);
+			sig.sign(key);
+			sig.getElement().setAttribute("Id",	"Signature-" + UUID.randomUUID().toString());
+			return doc;
+		} catch (Exception e) {
+			LOG.error("signXml", "Failed while signing!", e);
+			throw new DigsigException(e);
+		}
+	}
+
+	public String signXml(String xml, ArrayList<String> idsToSign) throws DigsigException {
+		
+		Document doc;
+		String str;
+		XmlManipulator xmlManipulator = new XmlManipulator();
+		
+		xmlManipulator.load(xml);
+		doc = xmlManipulator.getDocument();
+		
+		doc = signXml(doc, idsToSign);
+
+		xmlManipulator = new XmlManipulator();
+		xmlManipulator.setDocument(doc);
+		str = xmlManipulator.getDocumentAsString();
+
+		return str;
 	}
 
 	public boolean verifyXml(String xml) {
 		LOG.debug("verifyXml()");
-		return true;  // FIXME
+		return true; // FIXME
 	}
 }

@@ -101,25 +101,26 @@
 </header>
 <ol class="keyinfolist">
 
-<xc:forEach var="record" items="${cisrecords}">
-		<li class="keyinfo bypostauthor">
-		<figure class="gravatar">
-		<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
-		<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
-		</figure>
-		<div class="keyinfo_content">
-		<div class="clearfix">
-		
-		<cite class="author_name">${record.getName()}</cite>
-		<div class="keyinfo_text">
-		<p>Owner: ${record.getOwnerId()}</p>
-		</div>
-		
-		
-		</div>
-		</div>
-		</li>
-</xc:forEach>
+
+	<xc:forEach var="record" items="${cisrecords}">
+			<li class="keyinfo bypostauthor">
+			<figure class="gravatar">
+			<a href="community_profile.html?cisId=${record.getCisId()}"><img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" /></a>
+			<a class="keyinfo-reply-link" href="community_profile.html?cisId=${record.getCisId()}">INFO</a>
+			</figure>
+			<div class="keyinfo_content">
+			<div class="clearfix">
+			
+			<cite class="author_name">${record.getName()}</cite>
+			<div class="keyinfo_text">
+			<p>Owner: ${record.getOwnerId()}</p>
+			</div>
+			
+			
+			</div>
+			</div>
+			</li>
+	</xc:forEach>
 
 
 
@@ -228,15 +229,12 @@
 </aside>
 <div class="hr grid_12 clearfix">&nbsp;</div>
 </div>
-<!-- Footer -->
-<footer class="container_12 clearfix">
-<section class="footer">
-<p class="footer-links">
-<span><a href="termsofuse.html">Terms of Use</a> | <a href="disclaimer.html">Disclaimer</a> | <a href="privacy.html">Privacy</a> | <a href="help.html">Help</a> | <a href="about.html">About</a></span>
-<a class="float right toplink" href="#">top</a>
-</p>
-</section><!-- footer -->
-</footer>
+
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
+
 </div>
 </body>
 </html>

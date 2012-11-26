@@ -117,7 +117,7 @@ public class CommManagerHelper {
 	private ClassLoaderManager clm;
 	
 	public CommManagerHelper () {
-		clm = new ClassLoaderManager();
+		clm = new ClassLoaderManager(this);
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		s = new Persister(strategy);
@@ -416,12 +416,12 @@ public class CommManagerHelper {
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message,e);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (InvalidFormatException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message,e);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (ClassNotFoundException e) {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
@@ -466,11 +466,11 @@ public class CommManagerHelper {
 		} catch (InvalidFormatException e) {
 			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
-			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.error(m,e);
+			String m = e.getClass().getName() + "Error finding class: " + e.getMessage();
+			LOG.error(m, e);
 		} catch (Exception e) {
-			String m = e.getClass().getName() + "Error processing the message:" + e.getMessage();
-			LOG.error(m,e);
+			String m = e.getClass().getName() + "Error de-serializing the message: " + e.getMessage();
+			LOG.error(m, e);
 		}
 		
 		if (oldCl!=null)
@@ -490,6 +490,8 @@ public class CommManagerHelper {
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			iqCommCallbacks.put(iq.getID(), callback);
+			if (!clm.classloaderRegistryVerify(callback))
+				LOG.warn("Got sendIQ call from unregistered ICommCallback: "+callback.toString()+"... forced registry...");
 			return iq;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
@@ -518,7 +520,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(fs);
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -527,15 +529,17 @@ public class CommManagerHelper {
 
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(messageCallback);
 //		for (String ns : messageCallback.getXMLNamespaces()) {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
-		String mainNs = messageCallback.getXMLNamespaces().get(0);
-		if (mainNs.indexOf("#")>-1) {
-			LOG.info("registering Callback for namespace " + mainNs);
-			nsCommCallbacks.put(mainNs, messageCallback);
+		if (messageCallback.getXMLNamespaces().size()>0) {
+			String mainNs = messageCallback.getXMLNamespaces().get(0);
+			if (mainNs.indexOf("#")>-1) {
+				LOG.info("registering Callback for namespace " + mainNs);
+				nsCommCallbacks.put(mainNs, messageCallback);
+			}
 		}
 	}
 	

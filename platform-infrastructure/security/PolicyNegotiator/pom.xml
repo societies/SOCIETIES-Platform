@@ -127,6 +127,7 @@
 							org.societies.api.security.digsig;version="0",
 							*;resolution:=optional
 						</Import-Package>
+						<Export-Package>!*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -67,4 +67,14 @@ public class MathUtils {
 		
 		return stanines;
 	}
+	
+	public static double min(double[] input) {
+		
+		return StatUtils.min(input);
+	}
+	
+	public static double max(double[] input) {
+		
+		return StatUtils.max(input);
+	}
 }

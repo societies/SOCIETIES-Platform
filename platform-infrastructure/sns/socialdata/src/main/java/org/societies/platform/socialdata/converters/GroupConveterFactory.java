@@ -11,6 +11,10 @@ public class GroupConveterFactory{
 			return new GroupConverterFromFacebook();
 		else if (connector.getConnectorName().equals(ISocialConnector.TWITTER_CONN))
 			return new GroupConverterFromTwitter();
+		else if (connector.getConnectorName().equals(ISocialConnector.LINKEDIN_CONN))
+			return new GroupConverterFromLinkedin();
+		else if (connector.getConnectorName().equals(ISocialConnector.FOURSQUARE_CONN))
+			return new GroupConverterFromFoursquare();
 		else 
 			return new GroupConverterFromSN();
 		

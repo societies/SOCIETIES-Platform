@@ -167,6 +167,7 @@ public class SocialDataServer implements IFeatureServer {
 				long validity = messageBean.getValidity(); // TODO if 0 remove connector
 				Map<String, String> params = new HashMap<String, String>();
 				params.put(ISocialConnector.AUTH_TOKEN, messageBean.getToken());
+				params.put(ISocialConnector.IDENTITY,   messageBean.getIdentity());
 
 				ISocialConnector connector = socialData.createConnector(socialNetwork, params);
 				connector.setTokenExpiration(validity);

@@ -67,6 +67,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -200,9 +201,22 @@ public class InternalCtxBroker implements ICtxBroker {
 		final IIdentity localCssId = this.idMgr.fromJid(localCssNodeId.getBareJid());
 		LOG.info("Found local CSS ID " + localCssId);
 
-		this.createIndividualEntity(localCssId, CtxEntityTypes.PERSON); // TODO remove? 
-		// don't hardcode the cssOwner type
-		this.createCssNode(localCssNodeId); // TODO remove?
+		//new Thread() { // Do not hang in the bundle activator. 
+		//	           // Spawn a new thread if the bundle is not completely event-driven.
+			/*
+			 * @see java.lang.Thread#run()
+			 */
+		//	@Override
+		//	public void run() {
+		//		try {
+					createIndividualEntity(localCssId, CtxEntityTypes.PERSON); // TODO don't hardcode the cssOwner type
+					createCssNode(localCssNodeId);
+		//		} catch (Exception e) {
+		//			throw new RuntimeException("Could not initialise Internal Context Broker: "
+		//					+ e.getLocalizedMessage(), e);
+		//		}
+		//	}
+		//}.start();
 	}
 
 	/*
@@ -259,8 +273,10 @@ public class InternalCtxBroker implements ICtxBroker {
 				LOG.info("Found CSS owner context entity " + cssOwnerEnt.getId());
 			} else {
 
-				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
+				cssOwnerEnt = this.userCtxDBMgr.createIndividualEntity(
+						cssId.getBareJid(), ownerType); 
 
+				// TODO remove after pilot!
 				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
 						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 
@@ -370,9 +386,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		return this.retrieve(null, identifier);
 	}	
 
-
-
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveAttribute(org.societies.api.context.model.CtxAttributeIdentifier, boolean)
+	 */
 	@Override
 	@Async
 	public Future<CtxAttribute> retrieveAttribute(
@@ -382,80 +398,97 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (identifier == null)
 			throw new NullPointerException("identifier can't be null");
 
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving context attribute with id " +  identifier);
+		
+		CtxAttribute attribute = null;
 
-		final CtxAttribute ctxAttrReturn;
-		//final CtxAttribute inferedAttrReturn;
-
-		//	LOG.info("identifier " + identifier);
-		//	LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
-
-		IIdentity targetCss;
+		final IIdentity target;
 		try {
-			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.idMgr.fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 
-		this.logRequest(null, targetCss);
+		this.logRequest(null, target);
+		
+		// if target is a CSS
+		if (IdentityType.CSS.equals(target.getType()) 
+				|| IdentityType.CSS_RICH.equals(target.getType())
+				|| IdentityType.CSS_LIGHT.equals(target.getType())) {
+			
+			// if target is local CSS
+			if (this.idMgr.isMine(target)) {
 
-		if (IdentityType.CSS.equals(targetCss.getType()) 
-				|| IdentityType.CSS_RICH.equals(targetCss.getType())
-				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
+				try {
+					attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);
+					// Check if inference is required:
+					// 1. enableInference flag set to true AND 
+					// 2. inferrable attribute type AND
+					// 3. either has no value OR a value of poor quality
+					try {
+						if (enableInference 
+								&& this.userCtxInferenceMgr.getInferrableTypes().contains(attribute.getType())
+								&& (!CtxBrokerUtils.hasValue(attribute) || 
+										this.userCtxInferenceMgr.isPoorQuality(attribute.getQuality()))) {
+							if (LOG.isInfoEnabled()) // TODO DEBUG
+								LOG.info("Inferring context attribute " + attribute.getId());
+							final CtxAttribute refinedAttribute = 
+									this.userCtxInferenceMgr.refineOnDemand(attribute.getId());
+							if (LOG.isInfoEnabled()) // TODO DEBUG
+								LOG.info("Refined attribute " + attribute);
+							if (refinedAttribute != null)
+								attribute = refinedAttribute;
+						}
+					} catch (ServiceUnavailableException sue) {
 
-			//	LOG.info("retrieving css " + targetCss.getType());
-			ctxAttrReturn = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);	
+						LOG.warn("Could not check if attribute requires inference: "
+								+ "User Context Inference Mgr is not available");
+					}
 
-		}else if (IdentityType.CIS.equals(targetCss.getType())){
+				} catch (Exception e) {
+					throw new CtxBrokerException(
+							"Platform context broker failed to retrieve context attribute with id " 
+									+ identifier + ": " +  e.getLocalizedMessage(), e);
+				}
 
-			//	LOG.info("retrieving cis " + targetCss.getType());
-			ctxAttrReturn = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
+			// if target is remote CSS
+			} else {
+				// TODO handle remote call
+				new CtxBrokerException(
+						"Platform context broker failed to retrieve context attribute with id " 
+								+ identifier + ": Remote method call is not implemented yet");
+			}
 
-		} else throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
+		// if target is a CIS
+		} else if (IdentityType.CIS.equals(target.getType())) {
 
-		// inference code
-		// TO DO following lines initiate inference, uncomment when inference code is ready
+			// TODO check if CIS is locally maintained or a remote call is necessary
+			attribute = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
+			// TODO integrate with Community Inference Mgr
 
-		if(enableInference == true){
+		} else 
+			throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
 
-			// check if value is null and if yes estimate community context 
-			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
-
-				// LOG.info("initiate inference for "+ ctxAttrReturn.getId());
-				// inferedAttrReturn = this.initiateInference((CtxAttribute) ctxAttrReturn);
-			}   // TO DO integrate inference outcome with returned value
-		}
-
-		return new AsyncResult<CtxAttribute>(ctxAttrReturn);
+		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<IndividualCtxEntity> retrieveIndividualEntity(
 			final IIdentity cssId) throws CtxException {
-
 
 		if (cssId == null)
 			throw new NullPointerException("cssId can't be null");
 
 		this.logRequest(null, cssId);
 
-		IndividualCtxEntity cssOwner = null;
-		final List<CtxIdentifier> attrIds = this.userCtxDBMgr.lookup(
-				CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID);
-		for (final CtxIdentifier attrId : attrIds) {
-
-			final CtxAttribute cssIdAttr = (CtxAttribute) this.userCtxDBMgr.retrieve(attrId);
-			if (!CtxEntityTypes.CSS_NODE.equals(cssIdAttr.getScope().getType())
-					&& cssId.toString().equals(cssIdAttr.getStringValue())) {
-				final CtxModelObject object = this.userCtxDBMgr.retrieve(cssIdAttr.getScope());
-				if (object instanceof IndividualCtxEntity) {
-					cssOwner = (IndividualCtxEntity) object; 
-					break;
-				}
-			}
-		}
+		final IndividualCtxEntity cssOwner = 
+				this.userCtxDBMgr.retrieveIndividualEntity(cssId.getBareJid());
 
 		return new AsyncResult<IndividualCtxEntity>(cssOwner);
 	}
@@ -558,7 +591,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 
 		if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-			if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
+			if (this.userCtxInferenceMgr.isPoorQuality(ctxAttr.getQuality())) 
+				inferValue = true;
 		}
 		//	LOG.info("inferValue: "+ inferValue);
 
@@ -700,26 +734,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void registerForChanges(final CtxChangeEventListener listener,
 			final CtxIdentifier ctxId) throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (ctxId == null)
-			throw new NullPointerException("ctxId can't be null");
-
-		final String[] topics = new String[] {
-				CtxChangeEventTopic.UPDATED,
-				CtxChangeEventTopic.MODIFIED,
-				CtxChangeEventTopic.REMOVED,
-		};
-		if (this.ctxEventMgr != null) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering context change event listener for object '"
-						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
-			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
-		} else {
-			throw new CtxBrokerException("Could not register context change event listener for object '"
-					+ ctxId + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
-		}
+		this.registerForChanges(null, listener, ctxId);
 	}
 
 	/*
@@ -745,28 +760,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			final CtxEntityIdentifier scope, final String attrType)
 					throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (scope == null)
-			throw new NullPointerException("scope can't be null");
-
-		final String[] topics = new String[] {
-				CtxChangeEventTopic.CREATED,
-				CtxChangeEventTopic.UPDATED,
-				CtxChangeEventTopic.MODIFIED,
-				CtxChangeEventTopic.REMOVED,
-		};
-		if (this.ctxEventMgr != null) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering context change event listener for attributes with scope '"
-						+ scope + "' and type '" + attrType + "' to topics '" 
-						+ Arrays.toString(topics) + "'");
-			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
-		} else {
-			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
-					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
-		}
+		this.registerForChanges(null, listener, scope, attrType);
 	}
 
 	/*
@@ -1163,7 +1157,6 @@ public class InternalCtxBroker implements ICtxBroker {
 					// retrieve historic attrs of type "tuple_action"
 					// each hoc attr contains a value (blob) list of historic attrs store together
 					List<CtxHistoryAttribute> hocResults = retrieveHistory(tupleAttrTypeID,startDate,endDate).get();            
-					LOG.info("retrieve history "+ hocResults);
 
 					// for each "tuple_status" hoc attr 
 					for (CtxHistoryAttribute hocAttr : hocResults) {
@@ -1414,22 +1407,30 @@ public class InternalCtxBroker implements ICtxBroker {
 	//  service refs used by junit tests
 	//******************************************
 
-
-
-
-	// TODO remove
-	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
+	private void createCssNode(INetworkNode cssNodeId) throws CtxException {
 
 		try {
 			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
-			CtxEntity cssNodeEnt = this.retrieveCssNode(cssNodeId).get();
-			if (cssNodeEnt != null) {
+			final List<CtxEntityIdentifier> cssNodeEntIds = this.userCtxDBMgr.lookupEntities(
+					CtxEntityTypes.CSS_NODE, CtxAttributeTypes.ID, cssNodeId.toString(), cssNodeId.toString());
+			if (!cssNodeEntIds.isEmpty()) {
 
-				LOG.info("Found CSS node context entity " + cssNodeEnt.getId());
+				LOG.info("Found CSS node context entity " + cssNodeEntIds.get(0));
 				return;
 			}
-
-			cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
+			
+			final IIdentity cssId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
+			final CtxAssociation ownsCssNodesAssoc;
+			if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+				ownsCssNodesAssoc = this.createAssociation(CtxAssociationTypes.OWNS_CSS_NODES).get();
+			else
+				ownsCssNodesAssoc = (CtxAssociation) this.retrieve(
+						cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next()).get();
+			ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
+			final CtxEntity cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
+			ownsCssNodesAssoc.addChildEntity(cssNodeEnt.getId());
+			this.update(ownsCssNodesAssoc);
 			final CtxAttribute cssNodeIdAttr = this.createAttribute(cssNodeEnt.getId(), CtxAttributeTypes.ID).get();
 			this.updateAttribute(cssNodeIdAttr.getId(), cssNodeId.toString());
 			LOG.info("Created CSS node context entity " + cssNodeEnt.getId());
@@ -1564,11 +1565,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				// remote call
 				final CreateAttributeCallback callback = new CreateAttributeCallback();
-
-				LOG.info("createAttribute perform remote call targetCSS:"+scopeID +" type:"+type);
 				ctxBrokerClient.createAttribute(requestor, scopeID, scope, type, callback);
-				//LOG.info("createAttribute remote call performed ");
-
 				synchronized (callback) {
 					try {
 						//LOG.info("Attribute creation Callback wait");
@@ -1836,7 +1833,6 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
-
 			if (this.idMgr.isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
@@ -1845,7 +1841,30 @@ public class InternalCtxBroker implements ICtxBroker {
 							new CtxPermission(identifier, CtxPermission.READ));
 				}
 				try {
-					objectResult = this.userCtxDBMgr.retrieve(identifier);	
+					objectResult = this.userCtxDBMgr.retrieve(identifier);
+					// Check if inference is required:
+					// 1. inferrable attribute type AND
+					// 2. either has no value OR a value of poor quality
+					if (objectResult instanceof CtxAttribute) {
+						try {
+							CtxAttribute attributeResult = (CtxAttribute) objectResult;
+							if (this.userCtxInferenceMgr.getInferrableTypes().contains(attributeResult.getType())
+									&& (!CtxBrokerUtils.hasValue(attributeResult) || 
+											this.userCtxInferenceMgr.isPoorQuality(attributeResult.getQuality()))) {
+								if (LOG.isInfoEnabled()) // TODO DEBUG
+									LOG.info("Inferring context attribute " + attributeResult.getId());
+								attributeResult = this.userCtxInferenceMgr.refineOnDemand(attributeResult.getId());
+								if (LOG.isInfoEnabled()) // TODO DEBUG
+									LOG.info("Refined attribute " + attributeResult);
+								if (attributeResult != null)
+									objectResult = attributeResult;
+							}
+						} catch (ServiceUnavailableException sue) {
+							
+							LOG.warn("Could not check if attribute requires inference: "
+									+ "User Context Inference Mgr is not available");
+						}
+					}
 
 				} catch (Exception e) {
 					throw new CtxBrokerException(
@@ -1999,12 +2018,51 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.Requestor, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	public void registerForChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxIdentifier ctxId)
 					throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for object '"
+						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
+			
+			try {
+				if (ctxId instanceof CtxAttributeIdentifier 
+						&& this.userCtxInferenceMgr.getInferrableTypes().contains(ctxId.getType())) {
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Triggering continuous inference of attribute '" + ctxId + "'");
+					this.userCtxInferenceMgr.refineContinuously(
+							(CtxAttributeIdentifier) ctxId, new Double(0)); // TODO handle updateFreq
+				}
+			} catch (ServiceUnavailableException sue) {
+
+				LOG.warn("Could not check if attribute requires inference: "
+						+ "User Context Inference Mgr is not available");
+			}
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for object '"
+					+ ctxId + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	@Override
@@ -2019,8 +2077,32 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void registerForChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for attributes with scope '"
+						+ scope + "' and type '" + attrType + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
+					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	@Override
@@ -2328,22 +2410,16 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public Requestor getLocalRequestor() throws CtxBrokerException {
 
-		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
-
-		IIdentity cssOwnerId;
-		Requestor requestor = null;
+		final INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
 		try {
-			cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
-			requestor = new Requestor(cssOwnerId);
+			final IIdentity cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			return new Requestor(cssOwnerId);
 		} catch (InvalidFormatException e) {
 
-			throw new CtxBrokerException(" requestor could not be set: " + e.getLocalizedMessage(), e);
-
+			throw new CtxBrokerException("requestor could not be set for local network node '" 
+					+ cssNodeId + "': " + e.getLocalizedMessage(), e);
 		}	
-
-		return requestor;
 	}
-
 
 	private IIdentity getLocalIdentity() throws CtxBrokerException {
 
