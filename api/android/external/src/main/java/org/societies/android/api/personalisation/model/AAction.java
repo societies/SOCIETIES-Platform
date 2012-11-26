@@ -23,16 +23,65 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.useragent;
+package org.societies.android.api.personalisation.model;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.api.personalisation.model.Action;
 
-public interface IAndroidUserAgent {
+import android.os.Parcel;
+import android.os.Parcelable;
 
-	//Array of interface method signatures
-	String methodsArray [] = {"monitor(String client, IIdentity identity, IAction action)"};
+public class AAction extends Action implements Parcelable{
+	
+	public AAction() {
+		super();
+	}
 
-	public void monitor(String client, IIdentity identity, IAction action);
+	public int describeContents() {
+		return 0;
+	}
 
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeParcelable(this.getServiceID(), flags);
+		dest.writeString(this.getServiceType());
+		dest.writeString(this.getparameterName());
+		dest.writeString(this.getvalue());
+	}
+	
+	private AAction(Parcel in) {
+		super();
+		this.setServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		this.setServiceType(in.readString());
+		this.setparameterName(in.readString());
+		this.setvalue(in.readString());
+	}
+	
+	public static final Parcelable.Creator<AAction> CREATOR = new Parcelable.Creator<AAction>() {
+		public AAction createFromParcel(Parcel in) {
+			return new AAction(in);
+		}
+		public AAction[] newArray(int size) {
+			return new AAction[size];
+		}
+	};
+	
+	public static AAction convertActivity(Action action) {
+		AAction aaction = new AAction();
+		aaction.setServiceID(action.getServiceID());
+		aaction.setServiceType(action.getServiceType());
+		aaction.setparameterName(action.getparameterName());
+		aaction.setvalue(action.getvalue());
+		
+		return aaction;
+	}
+	
+	public static Action convertAActivity(Action aaction) {
+		Action action = new Action();
+		action.setServiceID(aaction.getServiceID());
+		action.setServiceType(aaction.getServiceType());
+		action.setparameterName(aaction.getparameterName());
+		action.setvalue(aaction.getvalue());
+		
+		return action;
+	}
 }
