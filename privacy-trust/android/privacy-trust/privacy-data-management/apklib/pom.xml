@@ -29,10 +29,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.android</groupId>
-	<artifactId>privacytrusttester</artifactId>
-	<name>Privacy Protection Tester (Light Client)</name>
-	<packaging>apk</packaging>
-	<version>1.0</version>
+	<artifactId>privacytrust</artifactId>
+	<name>Privacy Protection (Light Client)</name>
+	<packaging>apklib</packaging>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -55,35 +55,22 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidAgent</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
-		<!-- Platform Lib -->
+		<!-- Comm -->
 		<dependency>
-			<groupId>org.societies.android</groupId>
-			<artifactId>privacytrust</artifactId>
-			<version>${version.pt}</version>
-			<type>apklib</type>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
 		</dependency>
 		<!-- Android -->
 		<dependency>
@@ -98,14 +85,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
-			<scope>compile</scope>
 			<exclusions>
 				<!-- StAX is not available on Android -->
 				<exclusion>
@@ -123,13 +104,19 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>com.phonegap</groupId> <artifactId>phonegap</artifactId> 
-			</dependency> -->
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>cordova</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
-		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>

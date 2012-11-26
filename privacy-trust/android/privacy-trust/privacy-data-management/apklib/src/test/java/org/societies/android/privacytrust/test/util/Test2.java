@@ -22,8 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.test;
+package org.societies.android.privacytrust.test.util;
 
+import java.lang.reflect.Method;
+
+import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 
 /**
  * Describe your class here...
@@ -31,13 +34,29 @@ package org.test;
  * @author olivierm
  *
  */
-public class Test {
-	public void testTest() {
-		try {
-			Class name = Class.forName("org.societies.api.schema.identity.RequestorBean");
-			System.out.println("RequestorBean: "+name.getName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+public class Test2 {
+	public void  testMethods() {
+		int length = PrivacyDataManager.class.getMethods().length;
+//		Paranamer paranamer = new BytecodeReadingParanamer();
+		String[] methods = new String[length];
+		int j = 0;
+		for(Method method : PrivacyDataManager.class.getMethods()) {
+//			String[] parameterNames = null;
+//			parameterNames = paranamer.lookupParameterNames(method);
+//			System.out.println(parameterNames.length);
+			StringBuffer func = new StringBuffer(method.getName()+"(");
+			int i = 0;
+			for(Class<?> parameter : method.getParameterTypes()) {
+				func.append((i != 0 ? ", " : "")+parameter.getSimpleName()+" param"+i);
+				i++;
+			}
+			func.append(")");
+			methods[j] = new String(func.toString());
+			j++;
+		}
+		
+		for(String method : methods) {
+			System.out.println(method);
 		}
 	}
 }
