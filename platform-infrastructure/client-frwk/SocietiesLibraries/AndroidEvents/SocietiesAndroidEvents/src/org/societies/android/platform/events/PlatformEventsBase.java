@@ -31,8 +31,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	//Pubsub packages
     //TODO: Insert all known event classes
 	private static final String CSS_MANAGER_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
-    private static final List<String> classList = Collections.singletonList(CSS_MANAGER_CLASS);
-    
+	private static final String CONTEXT_CLASS = "org.societies.api.schema.context.model.CtxIdentifierBean";
+	    
     private static final String ALL_EVENT_FILTER = "org.societies";
     private static final String KEY_DIVIDER = "$";
 
@@ -51,6 +51,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
+    private List<String> classList;
 
     /**
      * Default constructor
@@ -66,6 +67,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	this.subscribedClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
     	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, Subscriber>());
     	
+    	//create list of event classes for Pubsub registration 
+        this.classList = new ArrayList<String>();
+
+		this.classList.add(CONTEXT_CLASS);
+		this.classList.add(CSS_MANAGER_CLASS);
 		
 		this.assignConnectionParameters();
 		this.registerForPubsub();
