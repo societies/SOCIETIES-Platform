@@ -29,7 +29,10 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 
 public interface IAndroidUserAgent {
-	
-	public void monitor(IIdentity indentity, IAction action);
+
+	//Array of interface method signatures
+	String methodsArray [] = {"monitor(String client, IIdentity identity, IAction action)"};
+
+	public void monitor(String client, IIdentity identity, IAction action);
 
 }
