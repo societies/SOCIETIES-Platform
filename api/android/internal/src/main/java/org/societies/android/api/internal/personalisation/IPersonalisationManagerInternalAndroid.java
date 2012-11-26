@@ -47,7 +47,7 @@ public interface IPersonalisationManagerInternalAndroid extends IPersonalisation
 	public static final String GET_PREFERENCE = "org.societies.android.api.internal.personalisation.getPreference";
 	
 	public String methodsArray[] = {"getIntentAction(String clientID, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName)",
-			"getPreference(String clientID, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName)"}
+			"getPreference(String clientID, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName)"};
 	/**
 	 * 
 	 * @param ownerID
