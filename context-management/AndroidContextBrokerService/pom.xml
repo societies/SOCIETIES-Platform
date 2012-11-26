@@ -8,9 +8,9 @@
         	<version>RELEASE</version>
 	</parent>
 
-	<groupId>org.societies.android.platform.contextservice</groupId>
-	<artifactId>ContextService</artifactId>
-	<name>AndroidContextManagementService</name>
+	<groupId>org.societies.android.platform.contextbroker</groupId>
+	<artifactId>ContextBroker</artifactId>
+	<name>AndroidContextBrokerService</name>
 	<version>${version.cm}</version>
 	<packaging>apklib</packaging>
 	
@@ -33,7 +33,7 @@
 		<dependency>
 	    	<groupId>com.google.android</groupId>
 	        <artifactId>android</artifactId> 
-	        <exclusions>
+ 	        <exclusions>
 				<!-- Provided by Android -->
 				<exclusion>
 					<artifactId>xpp3</artifactId>
@@ -41,11 +41,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
+<!-- 		<dependency>
+			<groupId>org.societies.comm.android</groupId>
+			<artifactId>AndroidAgent</artifactId>
 			<version>${version.comm}</version>
-		</dependency>
+		</dependency> -->
+		<!-- which one? -->
+        <dependency>
+			<groupId>org.societies.comm.android</groupId>
+			<artifactId>AndroidPubsubApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>		
 		<dependency>
 	    <groupId>org.societies.api.external</groupId>
 		    <artifactId>societies-api</artifactId>
@@ -61,6 +67,28 @@
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		        <dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+			<!--exclusions>
+		   		<exclusion>
+					<groupId>org.societies.android.jaxb</groupId>
+					<artifactId>jaxb-android-societies</artifactId>
+	 	   		</exclusion>
+			</exclusions-->
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		
     	<dependency>
     		<groupId>com.google.code.gson</groupId>
         	<artifactId>gson</artifactId>
@@ -85,7 +113,8 @@
 			        <groupId>xpp3</groupId>
 			    </exclusion>
 			</exclusions>
-		</dependency>
+		</dependency>		
+		
     </dependencies>
 
     <build>

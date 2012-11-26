@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.contextservice;
+package org.societies.android.platform.internalctxclient;
 
 
 //import java.net.URL;
@@ -48,6 +48,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -59,7 +60,7 @@ import android.util.Log;
  * @author pkosmides
  *
  */
-public class ContextManagement extends Service implements IInternalCtxClient {
+public class InternalCtxClientBase implements IInternalCtxClient {
 
 	private static ExpiringCache<ACtxIdentifier, ACtxModelObject> cache = new ExpiringCache();
 
@@ -67,39 +68,26 @@ public class ContextManagement extends Service implements IInternalCtxClient {
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
 
     private ClientCommunicationMgr commMgr;
+    private Context androidContext;
     
-    private static final String LOG_TAG = ContextManagement.class.getName();
-    private IBinder binder = null;
+    private static final String LOG_TAG = InternalCtxClientBase.class.getName();
+//    private IBinder binder = null;
     
-    @Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ContextManagement service starting");
+    public InternalCtxClientBase(Context androidContext) {
+    	Log.d(LOG_TAG, "InternalCtxClientBase created");
+    	
+    	this.androidContext = androidContext;
+    	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			commMgr = new ClientCommunicationMgr(this);
+			this.commMgr = new ClientCommunicationMgr(androidContext);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
 	}
 
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "ContextManagement service terminating");
-	}
-
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public ContextManagement getService() {
-			return ContextManagement.this;
-		}
-	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
-
+    // Internal Ctx Client 
+    
 	public ACtxAssociation createAssociation(String client, String type) throws CtxException {
 
 		if (type == null)

@@ -29,16 +29,16 @@ package org.societies.android.platform.contextclient;
 
 import java.util.List;
 
-import org.societies.android.api.internal.context.broker.ICtxClientBroker;
+import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.android.api.context.model.ACtxAssociationIdentifier;
+import org.societies.android.api.context.model.ACtxAttribute;
+import org.societies.android.api.context.model.ACtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
+import org.societies.android.api.context.model.ACtxEntity;
+import org.societies.android.api.context.model.ACtxAssociation;
+import org.societies.android.api.context.model.ACtxEntityIdentifier;
+import org.societies.android.api.context.model.ACtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.android.platform.contextservice.ContextManagement;
 import org.societies.android.platform.contextservice.ContextManagement.LocalBinder;
@@ -59,12 +59,12 @@ public class GUI_UserContext extends Activity implements OnClickListener{
     
 	private static final String LOG_TAG = GUI_UserContext.class.getName();
 
-	ICtxClientBroker contextMgmt;
+	IInternalCtxClient contextMgmt;
 	boolean contextMgmtConnected = false;
 
-	CtxEntity entity;
-	CtxAttribute attribute;
-	CtxAssociation association;
+	ACtxEntity entity;
+	ACtxAttribute attribute;
+	ACtxAssociation association;
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -106,7 +106,7 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 			if(v.getId() == R.id.button3){
 				Log.d(LOG_TAG, "Running Create Entity method.");
 				if(contextMgmtConnected){
-					contextMgmt.createEntity("person");
+					contextMgmt.createEntity("contextClient", "person");
 					Log.d(LOG_TAG, "Successfully Created Entity.");
 				}
 				else {
@@ -115,8 +115,8 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 			} else if(v.getId() == R.id.button4){
 				Log.d(LOG_TAG, "Running Create Attribute method.");
 				if(contextMgmtConnected){
-					entity = contextMgmt.createEntity("house");
-					contextMgmt.createAttribute(entity.getId(), "flat");
+					entity = contextMgmt.createEntity("contextClient", "house");
+					contextMgmt.createAttribute("contextClient", entity.getId(), "flat");
 					Log.d(LOG_TAG, "Successfully Created Attribute.");
 				}
 				else {
@@ -125,7 +125,7 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 			} else if(v.getId() == R.id.button5){
 				Log.d(LOG_TAG, "Running Create Association method.");
 				if(contextMgmtConnected){
-					association = contextMgmt.createAssociation("isRelatedTo");
+					association = contextMgmt.createAssociation("contextClient", "isRelatedTo");
 					Log.d(LOG_TAG, "Successfully Created Association.");
 				}
 				else {
@@ -135,54 +135,54 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 				Log.d(LOG_TAG, "Running Lookup method.");
 				if(contextMgmtConnected){
                     
-					List<CtxIdentifier> ids;
+					List<ACtxIdentifier> ids;
                     
 					// Create test entities.
-					final CtxEntityIdentifier entId1 = contextMgmt.createEntity("FooBar").getId();
-					final CtxEntityIdentifier entId2 = contextMgmt.createEntity("Foo").getId();
-					final CtxEntityIdentifier entId3 = contextMgmt.createEntity("Bar").getId();
+					final ACtxEntityIdentifier entId1 = contextMgmt.createEntity("contextClient", "FooBar").getId();
+					final ACtxEntityIdentifier entId2 = contextMgmt.createEntity("contextClient", "Foo").getId();
+					final ACtxEntityIdentifier entId3 = contextMgmt.createEntity("contextClient", "Bar").getId();
                     
 					// Create test attributes.
-					final CtxAttributeIdentifier attrId1 = contextMgmt.createAttribute(entId1, "FooBar").getId();
-					final CtxAttributeIdentifier attrId2 = contextMgmt.createAttribute(entId1, "Foo").getId();
-					final CtxAttributeIdentifier attrId3 = contextMgmt.createAttribute(entId1, "Bar").getId();
+					final ACtxAttributeIdentifier attrId1 = contextMgmt.createAttribute("contextClient", entId1, "FooBar").getId();
+					final ACtxAttributeIdentifier attrId2 = contextMgmt.createAttribute("contextClient", entId1, "Foo").getId();
+					final ACtxAttributeIdentifier attrId3 = contextMgmt.createAttribute("contextClient", entId1, "Bar").getId();
                     
 					// Create test attributes.
-					final CtxAssociationIdentifier assocId1 = contextMgmt.createAssociation("FooBar").getId();
-					final CtxAssociationIdentifier assocId2 = contextMgmt.createAssociation("Foo").getId();
-					final CtxAssociationIdentifier assocId3 = contextMgmt.createAssociation("Bar").getId();
+					final ACtxAssociationIdentifier assocId1 = contextMgmt.createAssociation("contextClient", "FooBar").getId();
+					final ACtxAssociationIdentifier assocId2 = contextMgmt.createAssociation("contextClient", "Foo").getId();
+					final ACtxAssociationIdentifier assocId3 = contextMgmt.createAssociation("contextClient", "Bar").getId();
                     
 					//
 					// Lookup entities
 					//
                     
-					ids =contextMgmt.lookup(CtxModelType.ENTITY, "FooBar");
+					ids =contextMgmt.lookup("contextClient", CtxModelType.ENTITY, "FooBar");
 					Log.d(LOG_TAG, "Looking up Entity FooBar - " + ids.contains(entId1));
-					ids = contextMgmt.lookup(CtxModelType.ENTITY, "Foo");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ENTITY, "Foo");
 					Log.d(LOG_TAG, "Looking up Entity Foo - " + ids.contains(entId2));
-					ids = contextMgmt.lookup(CtxModelType.ENTITY, "Bar");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ENTITY, "Bar");
 					Log.d(LOG_TAG, "Looking up Entity Bar - " + ids.contains(entId3));
                     
 					//
 					// Lookup attributes
 					//
                     
-					ids = contextMgmt.lookup(CtxModelType.ATTRIBUTE, "FooBar");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ATTRIBUTE, "FooBar");
 					Log.d(LOG_TAG, "Looking up Attribute FooBar - " + ids.contains(attrId1));
-					ids = contextMgmt.lookup(CtxModelType.ATTRIBUTE, "Foo");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ATTRIBUTE, "Foo");
 					Log.d(LOG_TAG, "Looking up Attribute Foo - " + ids.contains(attrId2));
-					ids = contextMgmt.lookup(CtxModelType.ATTRIBUTE, "Bar");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ATTRIBUTE, "Bar");
 					Log.d(LOG_TAG, "Looking up Attribute Bar - " + ids.contains(attrId3));
                     
 					//
 					// Lookup associations.
 					//
                     
-					ids = contextMgmt.lookup(CtxModelType.ASSOCIATION, "FooBar");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ASSOCIATION, "FooBar");
 					Log.d(LOG_TAG, "Looking up Association FooBar - " + ids.contains(assocId1));
-					ids = contextMgmt.lookup(CtxModelType.ASSOCIATION, "Foo");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ASSOCIATION, "Foo");
 					Log.d(LOG_TAG, "Looking up Association Foo - " + ids.contains(assocId2));
-					ids = contextMgmt.lookup(CtxModelType.ASSOCIATION, "Bar");
+					ids = contextMgmt.lookup("contextClient", CtxModelType.ASSOCIATION, "Bar");
 					Log.d(LOG_TAG, "Looking up Association Bar - " + ids.contains(assocId3));
                     
 					Log.d(LOG_TAG, "Successfully LookedUp.");
@@ -194,34 +194,34 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 				Log.d(LOG_TAG, "Running Lookup Entities method.");
 				if(contextMgmtConnected){
                     
-					List<CtxEntityIdentifier> identifiers;
-					CtxEntity entity, entity2;
-					CtxAttribute attribute, attribute2;
-					CtxEntityIdentifier entityId;
+					List<ACtxEntityIdentifier> identifiers;
+					ACtxEntity entity, entity2;
+					ACtxAttribute attribute, attribute2;
+					ACtxEntityIdentifier entityId;
                     
-					entity = contextMgmt.createEntity("NUMBER");
-					attribute = contextMgmt.createAttribute((CtxEntityIdentifier)entity.getId(), "BOOKS");
-					entity2 = contextMgmt.createEntity("NUMBER");
-					attribute2 = contextMgmt.createAttribute((CtxEntityIdentifier)entity2.getId(), "BOOKS");
+					entity = contextMgmt.createEntity("contextClient", "NUMBER");
+					attribute = contextMgmt.createAttribute("contextClient", (ACtxEntityIdentifier)entity.getId(), "BOOKS");
+					entity2 = contextMgmt.createEntity("contextClient", "NUMBER");
+					attribute2 = contextMgmt.createAttribute("contextClient", (ACtxEntityIdentifier)entity2.getId(), "BOOKS");
                     
 					// lookup by name attribute
-					identifiers = contextMgmt.lookupEntities("NUMBER", "BOOKS", 1, 10);
+					identifiers = contextMgmt.lookupEntities("contextClient", "NUMBER", "BOOKS", 1, 10);
 					Log.d(LOG_TAG, "Size should be 0 and is - " + identifiers.size());
 					attribute.setIntegerValue(5);
 					attribute.setValueType(CtxAttributeValueType.INTEGER);
-					contextMgmt.update(attribute);
+					contextMgmt.update("contextClient", attribute);
 					attribute2.setIntegerValue(12);
 					attribute2.setValueType(CtxAttributeValueType.INTEGER);
-					contextMgmt.update(attribute2);
+					contextMgmt.update("contextClient", attribute2);
                     
-					identifiers = contextMgmt.lookupEntities("NUMBER", "BOOKS", 1, 10);
+					identifiers = contextMgmt.lookupEntities("contextClient", "NUMBER", "BOOKS", 1, 10);
 					System.out.println(identifiers);
 					Log.d(LOG_TAG, "The identifiers is - " + identifiers);
 					Log.d(LOG_TAG, "Size now should be 1 - " + identifiers.size());
                     
 					Log.d(LOG_TAG, "Is it instanceof CtxEntityIdentifier? - " + identifiers.get(0));
                     //					assertTrue(identifiers.get(0)instanceof CtxEntityIdentifier);
-					entityId = (CtxEntityIdentifier) identifiers.get(0);
+					entityId = (ACtxEntityIdentifier) identifiers.get(0);
                     
 					Log.d(LOG_TAG, "The model type should be " + CtxModelType.ENTITY + "and it is - " + entityId.getModelType());
 					Log.d(LOG_TAG, "The type should be NUMBER and it is - " + entityId.getType());
@@ -234,14 +234,14 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 			} else if(v.getId() == R.id.button8){
 				Log.d(LOG_TAG, "Running Update method.");
 				if(contextMgmtConnected){
-					entity = contextMgmt.createEntity("house");
-					attribute = contextMgmt.createAttribute(entity.getId(), "name");
+					entity = contextMgmt.createEntity("contextClient", "house");
+					attribute = contextMgmt.createAttribute("contextClient", entity.getId(), "name");
                     
-					attribute = (CtxAttribute) contextMgmt.retrieve(attribute.getId());
+					attribute = (ACtxAttribute) contextMgmt.retrieve("contextClient", attribute.getId());
 					attribute.setIntegerValue(5);
-					contextMgmt.update(attribute);
+					contextMgmt.update("contextClient", attribute);
 					//verify update
-					attribute = (CtxAttribute) contextMgmt.retrieve(attribute.getId());
+					attribute = (ACtxAttribute) contextMgmt.retrieve("contextClient", attribute.getId());
 					Log.d(LOG_TAG, "attribute value should be 5 and it is:"+attribute.getIntegerValue());
                     
 					Log.d(LOG_TAG, "Successfully Updated Attribute.");
@@ -286,9 +286,9 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 	
 	            //OBTAIN SERVICE DISCOVERY API
 	            
-	            contextMgmt = (ICtxClientBroker) binder.getService();
+	            contextMgmt = (IInternalCtxClient) binder.getService();
 	            contextMgmtConnected = true;
-	            Log.d(LOG_TAG, "Successfully connected to ICtxClientBroker service");
+	            Log.d(LOG_TAG, "Successfully connected to IInternalCtxClient service");
 	            
         	} catch (Exception ex) {
         		Log.d(LOG_TAG, "Error binding to service: " + ex.getMessage());

@@ -8,9 +8,9 @@
         	<version>RELEASE</version>
 	</parent>
 
-	<groupId>org.societies.android.platform.contextservice</groupId>
-	<artifactId>ContextService</artifactId>
-	<name>AndroidContextManagementService</name>
+	<groupId>org.societies.android.platform.ctxclient</groupId>
+	<artifactId>InternalCtxClient</artifactId>
+	<name>AndroidInternalContextClient</name>
 	<version>${version.cm}</version>
 	<packaging>apklib</packaging>
 	
@@ -41,11 +41,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
+
 		<dependency>
 	    <groupId>org.societies.api.external</groupId>
 		    <artifactId>societies-api</artifactId>
@@ -61,10 +57,11 @@
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-    	<dependency>
-    		<groupId>com.google.code.gson</groupId>
-        	<artifactId>gson</artifactId>
-        	<scope>compile</scope>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
@@ -86,8 +83,8 @@
 			    </exclusion>
 			</exclusions>
 		</dependency>
-    </dependencies>
-
+	</dependencies>
+	
     <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
