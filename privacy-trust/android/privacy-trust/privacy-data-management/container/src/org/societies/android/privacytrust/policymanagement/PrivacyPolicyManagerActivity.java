@@ -129,11 +129,11 @@ public class PrivacyPolicyManagerActivity extends Activity {
 				RequestorCisBean requestor = new RequestorCisBean();
 				requestor.setRequestorId("master.societies.local");
 	    		requestor.setCisRequestorId("cis-15a35e8e-4d3a-4a43-ac20-b83393b4547e.societies.local");
-				RequestPolicy privacyPolicy = privacyPolicyManagerService.getPrivacyPolicy(requestor);
+				RequestPolicy privacyPolicy = privacyPolicyManagerService.getPrivacyPolicy("test", requestor);
 				StringBuffer sb = new StringBuffer();
 				sb.append("Privacy policy retrieved: "+(null != privacyPolicy));
 				if (null != privacyPolicy) {
-					sb.append(privacyPolicyManagerService.toXmlString(privacyPolicy));
+					sb.append(privacyPolicyManagerService.toXmlString("test", privacyPolicy));
 				}
 				txtLocation.setText(sb.toString());
 			} catch (PrivacyException e) {

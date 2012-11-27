@@ -62,20 +62,20 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.schema.identity.RequestorBean)
 	 */
-	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException {
+	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
-		return privacyPolicyManagerRemote.getPrivacyPolicy(requestor);
+		return privacyPolicyManagerRemote.getPrivacyPolicy(client, requestor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
@@ -85,38 +85,38 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		return privacyPolicyManagerRemote.updatePrivacyPolicy(privacyPolicy);
+		return privacyPolicyManagerRemote.updatePrivacyPolicy(client, privacyPolicy);
 	}
-	public RequestPolicy updatePrivacyPolicy(String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = fromXmlString(privacyPolicyXml);
+		RequestPolicy privacyPolicy = fromXmlString(client, privacyPolicyXml);
 		if (null == privacyPolicy) {
 			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
 		privacyPolicy.setRequestor(requestor);
 		// Create / Store it
-		return updatePrivacyPolicy(privacyPolicy);
+		return updatePrivacyPolicy(client, privacyPolicy);
 	}
 
-	public boolean deletePrivacyPolicy(RequestorBean requestor) throws PrivacyException {
+	public boolean deletePrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
 		// -- Delete
-		return privacyPolicyManagerRemote.deletePrivacyPolicy(requestor);
+		return privacyPolicyManagerRemote.deletePrivacyPolicy(client, requestor);
 	}
 
-	public RequestPolicy inferPrivacyPolicy(int privacyPolicyType, Map configuration) throws PrivacyException {
+	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
 		List<RequestItem> requests = new ArrayList<RequestItem>();
 		RequestPolicy privacyPolicy = new RequestPolicy();
 		privacyPolicy.setRequestItems(requests);
 		return privacyPolicy;
 	}
 
-	public String toXmlString(RequestPolicy privacyPolicy) {
+	public String toXmlString(String client, RequestPolicy privacyPolicy) {
 		String encoding = "UTF-8";
 		// -- Empty Privacy Policy
 		if (null == privacyPolicy) {
@@ -184,7 +184,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return result.toString();
 	}
 
-	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
+	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException {
 		// -- Verify
 		// Empty privacy policy
 		if (null == privacyPolicy || privacyPolicy.equals("")) {

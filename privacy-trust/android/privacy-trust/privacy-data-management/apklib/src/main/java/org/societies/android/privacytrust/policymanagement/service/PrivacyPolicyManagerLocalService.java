@@ -24,193 +24,41 @@
  */
 package org.societies.android.privacytrust.policymanagement.service;
 
-import java.util.Map;
-
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.intent.PrivacyPolicyIntentHelper;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.schema.identity.RequestorBean;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyPolicyManagerLocalService extends Service implements IPrivacyPolicyManager {
+public class PrivacyPolicyManagerLocalService extends Service {
 	private final static String TAG = PrivacyPolicyManagerLocalService.class.getSimpleName();
 
-	private final IBinder binder;
-	private IPrivacyPolicyManager privacyPolicyManager;
+	private IBinder binder;
 
 
-	public PrivacyPolicyManagerLocalService() {
-		super();
-		// Creation of a binder for the service
-		binder = new LocalBinder();
-		// Creation of an instance of the Java implementation
-		privacyPolicyManager = new PrivacyPolicyManager(this);
+	public void onCreate() {
+		this.binder = new LocalBinder();
 	}
+	
 
+	/* ****************************
+	 * Android Service Management *
+	 **************************** */
 
-	/* ***
-	 * Service Method Implementation
-	 **** */
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.schema.identity.RequestorBean)
+	/**
+	 * Create Binder object for local service invocation
 	 */
-	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException {
-		Log.d(TAG, "Local call to service getPrivacyPolicy()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_GET_PRIVACY_POLICY); 
-		RequestPolicy privacyPolicy = null;
-		try {
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestor);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, privacyPolicy);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return privacyPolicy;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException {
-		Log.d(TAG, "Local call to service updatePrivacyPolicy()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_UPDATE_PRIVACY_POLICY);
-		RequestPolicy updatedPrivacyPolicy = null;
-		try {
-			updatedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, updatedPrivacyPolicy);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return updatedPrivacyPolicy;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.api.schema.identity.RequestorBean)
-	 */
-	public RequestPolicy updatePrivacyPolicy(String privacyPolicy, RequestorBean requestor) throws PrivacyException {
-		Log.d(TAG, "Local call to service updatePrivacyPolicy()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_UPDATE_PRIVACY_POLICY);
-		RequestPolicy updatedPrivacyPolicy = null;
-		try {
-			updatedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestor);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, updatedPrivacyPolicy);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return updatedPrivacyPolicy;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.schema.identity.RequestorBean)
-	 */
-	public boolean deletePrivacyPolicy(RequestorBean requestor) throws PrivacyException {
-		Log.d(TAG, "Local call to service deletePrivacyPolicy()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_DELETE_PRIVACY_POLICY);
-		boolean deleted = false;
-		try {
-			deleted = privacyPolicyManager.deletePrivacyPolicy(requestor);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, deleted);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return deleted;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferPrivacyPolicy(int, java.util.Map)
-	 */
-	public RequestPolicy inferPrivacyPolicy(int privacyPolicyType, Map configuration) throws PrivacyException {
-		Log.d(TAG, "Local call to service inferPrivacyPolicy()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_INFER_PRIVACY_POLICY);
-		RequestPolicy privacyPolicy = null;
-		try {
-			privacyPolicy = privacyPolicyManager.inferPrivacyPolicy(privacyPolicyType, configuration);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, privacyPolicy);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return privacyPolicy;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#toXmlString(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	public String toXmlString(RequestPolicy privacyPolicy) {
-		Log.d(TAG, "Local call to service toXmlString()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_PRIVACY_POLICY_TO_XML);
-		String xmlPrivacyPolicy = privacyPolicyManager.toXmlString(privacyPolicy);
-		intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-		intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, xmlPrivacyPolicy);
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return xmlPrivacyPolicy;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#fromXmlString(java.lang.String)
-	 */
-	public RequestPolicy fromXmlString(String xmlPrivacyPolicy) throws PrivacyException {
-		Log.d(TAG, "Local call to service fromXmlString()");
-		Intent intent = new Intent(PrivacyPolicyIntentHelper.METHOD_PRIVACY_POLICY_FROM_XML);
-		RequestPolicy privacyPolicy = null;
-		try {
-			privacyPolicy = privacyPolicyManager.fromXmlString(xmlPrivacyPolicy);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, true);
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, privacyPolicy);
-		}
-		catch(PrivacyException e) {
-			intent.putExtra(PrivacyPolicyIntentHelper.RESULT_ACK, false);
-		}
-		// - Send result in intent
-		sendBroadcast(intent);
-		// - Send result in return value
-		return privacyPolicy;
-	}
-
-
-	/* ***
-	 * Android Service Management
-	 **** */
-
 	public class LocalBinder extends Binder {
-		public PrivacyPolicyManagerLocalService getService() {
-			return PrivacyPolicyManagerLocalService.this;
+		public IPrivacyPolicyManager getService() {
+			// Creation of an instance
+			IPrivacyPolicyManager privacyPolicyManager = new PrivacyPolicyManager(getApplicationContext());
+			return privacyPolicyManager;
 		}
 	}
 

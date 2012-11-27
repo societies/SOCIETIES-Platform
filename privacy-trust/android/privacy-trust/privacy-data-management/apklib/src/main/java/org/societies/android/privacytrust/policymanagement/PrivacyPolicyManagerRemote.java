@@ -71,7 +71,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 	}
 
 
-	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException {
+	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
@@ -128,7 +128,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 	}
 
 
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
@@ -186,7 +186,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 		}
 	}
 
-	public boolean deletePrivacyPolicy(RequestorBean requestor) throws PrivacyException {
+	public boolean deletePrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
@@ -242,16 +242,16 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 		}
 	}
 
-	public RequestPolicy inferPrivacyPolicy(int privacyPolicyType, Map configuration) throws PrivacyException {
+	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
 		return null;
 	}
-	public String toXmlString(RequestPolicy privacyPolicy) {
+	public String toXmlString(String client, RequestPolicy privacyPolicy) {
 		return null;
 	}
-	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
+	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException {
 		return null;
 	}
-	public RequestPolicy updatePrivacyPolicy(String privacyPolicy, RequestorBean requestor) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean requestor) throws PrivacyException {
 		return null;
 	}
 }
