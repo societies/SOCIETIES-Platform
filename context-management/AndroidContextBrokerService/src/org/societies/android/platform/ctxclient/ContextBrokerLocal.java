@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,19 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.personalisation;
+package org.societies.android.platform.ctxclient;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author pkosmides
  *
  */
-public interface IPersonalisationCallback {
+public class ContextBrokerLocal extends Service {
+	
+    private static final String LOG_TAG = ContextBrokerLocal.class.getName();
+    private IBinder binder = null;
+    
+    @Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		Log.d(LOG_TAG, "ContextBrokerLocal service starting");
+	}
 
-	public void receiveIAction(IIdentity userId, ServiceResourceIdentifier serviceId, IAction action);
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "ContextBrokerLocal service terminating");
+	}
+
+	/**Create Binder object for local service invocation */
+	public class LocalBinder extends Binder {
+		public ContextBrokerBase getService() {
+			return new ContextBrokerBase(ContextBrokerLocal.this.getApplicationContext());
+		}
+	}
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
 }
