@@ -200,26 +200,38 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				
 				for (final String oldFriend : oldFriends) {
 					
-					final TrustedEntityId teid = new TrustedEntityId(
-							isFriendsWith.getParentEntity().getOwnerId(), TrustedEntityType.CSS, oldFriend);
+					final TrustedEntityId subjectId = new TrustedEntityId(
+							TrustedEntityType.CSS,
+							isFriendsWith.getParentEntity().getOwnerId());
+					final TrustedEntityId objectId = new TrustedEntityId(
+							TrustedEntityType.CSS, 
+							oldFriend);
 					final TrustEvidenceType type = TrustEvidenceType.UNFRIENDED_USER;
 					final Date ts = isFriendsWith.getLastModified();
 					if (LOG.isInfoEnabled()) // TODO DEBUG
-						LOG.info("Adding direct trust evidence: teid="
-								+ teid + ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+						LOG.info("Adding direct trust evidence: subjectId="
+								+ subjectId + ", objectId=" + objectId 
+								+ ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(
+							subjectId, objectId, type, ts, null);
 				}
 
 				for (final String newFriend : newFriends) {
 					
-					final TrustedEntityId teid = new TrustedEntityId(
-							isFriendsWith.getParentEntity().getOwnerId(), TrustedEntityType.CSS, newFriend);
+					final TrustedEntityId subjectId = new TrustedEntityId(
+							TrustedEntityType.CSS,
+							isFriendsWith.getParentEntity().getOwnerId());
+					final TrustedEntityId objectId = new TrustedEntityId(
+							TrustedEntityType.CSS, 
+							newFriend);
 					final TrustEvidenceType type = TrustEvidenceType.FRIENDED_USER;
 					final Date ts = isFriendsWith.getLastModified();
 					if (LOG.isInfoEnabled()) // TODO DEBUG
-						LOG.info("Adding direct trust evidence: teid="
-								+ teid + ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+						LOG.info("Adding direct trust evidence: subjectId="
+								+ subjectId + ", objectId=" + objectId 
+								+ ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(
+							subjectId, objectId, type, ts, null);
 				}
 						
 			} catch (Exception e) {
@@ -267,26 +279,38 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				
 				for (final String oldCommunity : oldCommunities) {
 					
-					final TrustedEntityId teid = new TrustedEntityId(
-							isMemberOf.getParentEntity().getOwnerId(), TrustedEntityType.CIS, oldCommunity);
+					final TrustedEntityId subjectId = new TrustedEntityId(
+							TrustedEntityType.CSS,
+							isMemberOf.getParentEntity().getOwnerId());
+					final TrustedEntityId objectId = new TrustedEntityId(
+							TrustedEntityType.CIS, 
+							oldCommunity);
 					final TrustEvidenceType type = TrustEvidenceType.LEFT_COMMUNITY;
 					final Date ts = isMemberOf.getLastModified();
 					if (LOG.isInfoEnabled()) // TODO DEBUG
-						LOG.info("Adding direct trust evidence: teid="
-								+ teid + ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+						LOG.info("Adding direct trust evidence: subjectId="
+								+ subjectId + ", objectId="	+ objectId 
+								+ ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(
+							subjectId, objectId, type, ts, null);
 				}
 
 				for (final String newCommunity : newCommunities) {
 					
-					final TrustedEntityId teid = new TrustedEntityId(
-							isMemberOf.getParentEntity().getOwnerId(), TrustedEntityType.CIS, newCommunity);
+					final TrustedEntityId subjectId = new TrustedEntityId(
+							TrustedEntityType.CSS,
+							isMemberOf.getParentEntity().getOwnerId());
+					final TrustedEntityId objectId = new TrustedEntityId(
+							TrustedEntityType.CIS, 
+							newCommunity);
 					final TrustEvidenceType type = TrustEvidenceType.JOINED_COMMUNITY;
 					final Date ts = isMemberOf.getLastModified();
 					if (LOG.isInfoEnabled()) // TODO DEBUG
-						LOG.info("Adding direct trust evidence: teid="
-								+ teid + ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(teid, type, ts, null);
+						LOG.info("Adding direct trust evidence: subjectId="
+								+ subjectId + ", objectId="	+ objectId 
+								+ ", type=" + type + ", ts=" + ts);
+					trustEvidenceCollector.addDirectEvidence(
+							subjectId, objectId, type, ts, null);
 				}
 						
 			} catch (Exception e) {

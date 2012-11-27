@@ -27,18 +27,16 @@ package org.societies.api.privacytrust.trust.evidence;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.societies.api.identity.IIdentity;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * This interface is used to add trust evidence with regards to CSSs, CISs or
  * services. Trust evidence data are the basis for evaluating direct and
  * indirect trust in these entities. 
  * <p>
- * More specifically, each piece of trust evidence is associated with a 
+ * More specifically, each piece of trust evidence is associated with a TODO 
  * {@link TrustedEntityId} which identifies the trusted entity that particular
  * piece of evidence refers to. Therefore, multiple trust evidence can be
  * assigned to a single trusted entity. Moreover, the {@link TrustEvidenceType}
@@ -60,113 +58,69 @@ public interface ITrustEvidenceCollector {
 	
 	/**
 	 * Adds the specified piece of direct trust evidence. The
-	 * {@link TrustedEntityId} this evidence refers to, its type, as well as,
-	 * the time the evidence was recorded are also supplied. Finally, depending
-	 * on the evidence type, the method allows specifying supplementary
-	 * information.
+	 * {@link TrustedEntityId TrustedEntityIds} of the subject and the object
+	 * this piece of evidence refers to, its type, as well as, the time the
+	 * evidence was recorded are also supplied. Finally, depending on the
+	 * evidence type, the method allows specifying supplementary information.
 	 *  
-	 * @param teid
-	 *            the {@link TrustedEntityId} the evidence refers to
+	 * @param subjectId
+	 *            the {@link TrustedEntityId} of the subject the piece of
+	 *            evidence refers to.
+	 * @param objectId
+	 *            the {@link TrustedEntityId} of the object the piece of
+	 *            evidence refers to.
 	 * @param type
-	 *            the type of the evidence to be added
+	 *            the type of the evidence to be added.
 	 * @param timestamp
-	 *            the time the evidence was recorded
+	 *            the time the evidence was recorded.
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise
+	 *            otherwise.
 	 * @throws TrustException
 	 *            if the specified piece of direct trust evidence cannot be 
-	 *            added
+	 *            added.
 	 * @throws NullPointerException
-	 *            if any of the teid, type or timestamp parameter is
-	 *            <code>null</code>
+	 *            if any of the specified subjectId, objectId, type or 
+	 *            timestamp parameter is <code>null</code>.
+	 * @since 0.5
 	 */
-	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+	public void addDirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type,
 			final Date timestamp, final Serializable info) throws TrustException;
 	
 	/**
 	 * Adds the specified piece of indirect trust evidence which originates
-	 * from the given source. The {@link TrustedEntityId} this evidence refers
-	 * to, its type, as well as, the time the evidence was recorded are also
-	 * supplied. Finally, depending on the evidence type, the method allows
-	 * specifying supplementary information. 
+	 * from the given source. The {@link TrustedEntityId TrustedEntityIds} of
+	 * the subject and the object this piece of evidence refers to, its type,
+	 * as well as, the time the evidence was recorded are also supplied. 
+	 * Finally, depending on the evidence type, the method allows specifying
+	 * supplementary information.
 	 *  
-	 * @param source
-	 *            the source this evidence originates from
-	 * @param teid
-	 *            the {@link TrustedEntityId} this evidence refers to
+	 * @param subjectId
+	 *            the {@link TrustedEntityId} of the subject the piece of
+	 *            evidence refers to.
+	 * @param objectId
+	 *            the {@link TrustedEntityId} of the object the piece of
+	 *            evidence refers to.
 	 * @param type
-	 *            the type of the evidence to be added
+	 *            the type of the evidence to be added.
 	 * @param timestamp
-	 *            the time the evidence was recorded
+	 *            the time the evidence was recorded.
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise
+	 *            otherwise.
+	 * @param sourceId
+	 *            the source this evidence originates from.
 	 * @throws TrustException
 	 *            if the specified piece of indirect trust evidence cannot be 
 	 *            added
 	 * @throws NullPointerException
-	 *            if any of the source, teid, type or timestamp parameter is
-	 *            <code>null</code>
+	 *            if any of the subjectId, objectId, type, timestamp or 
+	 *            sourceId parameter is <code>null</code>.
+	 * @since 0.5
 	 */
-	public void addIndirectEvidence(final TrustedEntityId source, 
-			final TrustedEntityId teid,	final TrustEvidenceType type, 
-			final Date timestamp, final Serializable info) 
-					throws TrustException;
-	
-	/**
-	 * Assigns the specified trust rating to the identified trustee by the
-	 * supplied trustor. The identified trustee can be either a CSS or a CIS,
-	 * while the trustor must reference a CSS. The trust rating value should be
-	 * in the range of [0,1].
-	 * 
-	 * @param trustor 
-	 *            the CSS that assigns the trust rating
-	 * @param trustee
-	 *            the CSS or CIS to assign the rating to
-	 * @param rating
-	 *            the trust rating [0,1]
-	 * @param timestamp
-	 *            the timestamp of the given rating, or the current time if
-	 *            a <code>null</code> value is specified
-	 * @throws TrustException
-	 *            if the operation fails
-	 * @throws NullPointerException
-	 *            if any of the trustor or trustee parameters are
-	 *            <code>null</code>
-	 * @throws IllegalArgumentException
-	 *            if the trustor does not identify a CSS; the trustee does not
-	 *            identify a CSS or CIS; the trust rating is not in the range
-	 *            of [0,1] 
-	 */
-	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
-			final double rating, final Date timestamp) throws TrustException;
-
-	/**
-	 * Assigns the specified trust rating to the identified trustee by the
-	 * supplied trustor. The identified trustee is a service, while the trustor
-	 * must reference a CSS. The trust rating value should be in the range of
-	 * [0,1].
-	 * 
-	 * @param trustor 
-	 *            the CSS that assigns the trust rating
-	 * @param trustee
-	 *            the service to assign the rating to
-	 * @param rating
-	 *            the trust rating [0,1]
-	 * @param timestamp
-	 *            the timestamp of the given rating, or the current time if
-	 *            a <code>null</code> value is specified
-	 * @throws TrustException
-	 *            if the operation fails
-	 * @throws NullPointerException
-	 *            if any of the trustor or trustee parameters are
-	 *            <code>null</code>
-	 * @throws IllegalArgumentException
-	 *            if the trustor does not identify a CSS or the trust rating is
-	 *            not in the range of [0,1] 
-	 */
-	public void addTrustRating(final IIdentity trustor, 
-			final ServiceResourceIdentifier trustee, final double rating,
-			final Date timestamp) throws TrustException;
+	public void addIndirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type, 
+			final Date timestamp, final Serializable info, 
+			final TrustedEntityId sourceId)	throws TrustException;
 }

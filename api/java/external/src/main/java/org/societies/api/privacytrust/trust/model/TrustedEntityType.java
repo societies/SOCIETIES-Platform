@@ -31,7 +31,6 @@ package org.societies.api.privacytrust.trust.model;
  * <li>{@link #CSS}: Denotes a trusted individual</li>
  * <li>{@link #CIS}: Denotes a trusted community</li>
  * <li>{@link #SVC}: Denotes a trusted service</li>
- * <li>{@link #DVP}: Denotes a trusted service developer</li>
  * <li>{@link #LGC}: Denotes a trusted legacy entity, i.e. non-SOCIETIES
  * entity</li>
  * </ul>
@@ -55,11 +54,6 @@ public enum TrustedEntityType {
 	 * The enum constant for trusted services
 	 */
 	SVC,
-	
-	/**
-	 * The enum constant for trusted service developers
-	 */
-	DVP,
 	
 	/**
 	 * The enum constant for trusted legacy entities, i.e. non-SOCIETIES

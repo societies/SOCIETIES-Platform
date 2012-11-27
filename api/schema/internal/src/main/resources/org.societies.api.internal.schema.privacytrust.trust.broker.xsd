@@ -34,13 +34,14 @@
 	
 	<xs:complexType name="retrieveTrustBrokerRequestBean">
 		<xs:sequence>
-			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustorId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="retrieveTrustBrokerResponseBean">
 		<xs:sequence>
-			<xs:element name="result" type="xs:double" nillable="true" minOccurs="1"/>
+			<xs:element name="result" type="xs:double" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
   

@@ -22,14 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.remote;
+package org.societies.api.privacytrust.trust.model;
 
-import org.societies.api.internal.schema.privacytrust.trust.model.TrustedEntityIdBean;
-import org.societies.api.internal.schema.privacytrust.trust.model.TrustedEntityTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
+/**
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.5
+ */
 public final class TrustModelBeanTranslator {
 	
 	private static TrustModelBeanTranslator instance = new TrustModelBeanTranslator();

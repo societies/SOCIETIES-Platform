@@ -31,9 +31,9 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * <code>TrustUpdateEvent</code> object is sent as an argument to the
  * {@link ITrustUpdateEventListener} methods.
  * <p>
- * Normally, TrustUpdateEvents are accompanied by the source, i.e. the 
- * {@link TrustedEntityId identifier} of the entity whose trust value was
- * updated, as well as, the old and new value. 
+ * Normally, TrustUpdateEvents are accompanied by the {@link TrustedEntityId
+ * identifiers} of the trustor and the trustee whose trust value was updated,
+ * as well as, the old and new value. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
@@ -41,6 +41,9 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 public class TrustUpdateEvent extends TrustEvent {
 
 	private static final long serialVersionUID = -4292086499526921194L;
+	
+	/** The trustee identifier. */ 
+	private final TrustedEntityId trusteeId;
 
 	/** The old trust value */
 	private final Double oldValue;
@@ -50,32 +53,52 @@ public class TrustUpdateEvent extends TrustEvent {
 	
 	/**
 	 * Constructs a <code>TrustUpdateEvent</code> object with the specified
-	 * source, old and new trust value.
+	 * trustor, trustee, old and new trust value.
 	 *  
-	 * @param source
-	 *            the identifier of the entity whose trust value was updated
+	 * @param trustorId
+	 *            the identifier of the trustor, i.e. the entity which updated
+	 *            its trust in the trustee.
+	 * @param trusteeId
+	 *            the identifier of the entity whose trust value was updated by
+	 *            the specified trustor
 	 * @param oldValue
 	 *            the old trust value
 	 * @param newValue
 	 *            the new trust value
+	 * @since 0.5
 	 */
-	public TrustUpdateEvent(TrustedEntityId source, Double oldValue, Double newValue) {
+	public TrustUpdateEvent(final TrustedEntityId trustorId, 
+			final TrustedEntityId trusteeId, final Double oldValue, 
+			final Double newValue) {
 		
-		super(source);
-		
+		super(trustorId);
+		this.trusteeId = trusteeId;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
+	}
+	
+	/**
+	 * Returns the identifier of the entity which updated its trust in the
+	 * trustee.
+	 * 
+	 * @return the identifier of the entity which updated its trust in the
+	 * trustee.
+	 * @since 0.5
+	 */
+	public TrustedEntityId getTrustord() {
+		
+		return (TrustedEntityId) super.getSource();
 	}
 	
 	/**
 	 * Returns the identifier of the entity whose trust value was updated.
 	 * 
 	 * @return the identifier of the entity whose trust value was updated.
-	 * @since 0.0.7
+	 * @since 0.5
 	 */
-	public TrustedEntityId getId() {
+	public TrustedEntityId getTrusteeId() {
 		
-		return (TrustedEntityId) super.getSource();
+		return this.trusteeId;
 	}
 	
 	/**
@@ -99,7 +122,6 @@ public class TrustUpdateEvent extends TrustEvent {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see java.util.EventObject#toString()
 	 */
 	@Override
@@ -107,11 +129,13 @@ public class TrustUpdateEvent extends TrustEvent {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("{");
-		sb.append("id=" + this.getId());
+		sb.append("trustord=" + super.source);
 		sb.append(", ");
-		sb.append("oldValue=" + this.getOldValue());
+		sb.append("trusteed=" + this.trusteeId);
 		sb.append(", ");
-		sb.append("newValue=" + this.getNewValue());
+		sb.append("oldValue=" + this.oldValue);
+		sb.append(", ");
+		sb.append("newValue=" + this.newValue);
 		sb.append("}");
 		
 		return sb.toString();

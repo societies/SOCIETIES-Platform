@@ -65,7 +65,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		super.trustEventMgr.registerListener(
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
-					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
+					TrustEventTopic.INDIRECT_TRUST_UPDATED });
 	}
 	
 	/*

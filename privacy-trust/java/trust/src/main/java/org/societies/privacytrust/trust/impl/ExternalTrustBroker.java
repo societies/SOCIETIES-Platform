@@ -60,32 +60,39 @@ public class ExternalTrustBroker implements org.societies.api.privacytrust.trust
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Async
 	@Override
-	public Future<Double> retrieveTrust(final TrustedEntityId teid) throws TrustException {
+	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustException {
 					
-		return this.internalTrustBroker.retrieveTrust(teid);
+		return this.internalTrustBroker.retrieveTrust(trustorId, trusteeId);
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException {
+	public void registerTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
 		
-		this.internalTrustBroker.registerTrustUpdateEventListener(listener, teid);
+		this.internalTrustBroker.registerTrustUpdateEventListener(listener,
+				trustorId, trusteeId);
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException {
+	public void unregisterTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
 		
-		this.internalTrustBroker.unregisterTrustUpdateEventListener(listener, teid);
+		this.internalTrustBroker.unregisterTrustUpdateEventListener(listener,
+				trustorId, trusteeId);
 	}
 }

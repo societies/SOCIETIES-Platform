@@ -68,7 +68,7 @@ public class TrustedEntityIdMgr implements ITrustedEntityIdMgr {
 		for (final IIdentity publicId : publicIds) {
 			final String publicIdStr = publicId.getBareJid();
 			final TrustedEntityId publicTeid = new TrustedEntityId(
-					publicIdStr, TrustedEntityType.CSS, publicIdStr);
+					TrustedEntityType.CSS, publicIdStr);
 			if (LOG.isInfoEnabled())
 				LOG.info("Adding my TEID '" + publicTeid + "'");
 			this.myTEIDs.add(publicTeid);

@@ -60,9 +60,9 @@ public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
 	
-	/** The Trust Mgr service reference. */
+	/** The Trusted Entity Id Mgr service reference. */
 	@Autowired(required=true)
-	private ITrustedEntityIdMgr trustMgr;
+	private ITrustedEntityIdMgr trustedEntityIdMgr;
 	
 	/** The Trust Event Mgr service reference. */
 	@Autowired(required=true)
@@ -84,38 +84,41 @@ public class TrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Async
 	@Override
-	public Future<Double> retrieveTrust(final TrustedEntityId teid) throws TrustException {
+	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 		
 		Double trustValue = null;
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving trust value for entity '"
-					+ teid + "' from Trust Repository");
-		
-		if (this.trustRepo == null)
-			throw new TrustBrokerException("Could not retrieve trust value for entity '"
-					+ teid + "': ITrustRepository service is not available");
+			LOG.debug("Retrieving trust value for entity (" + trustorId 
+					+ ", " + trusteeId + ")");
 		
 		boolean doLocal;
 		try {
-			doLocal = this.trustMgr.isLocalId(teid);
+			doLocal = this.trustedEntityIdMgr.isLocalId(trustorId);
 		} catch (TrustedEntityIdMgrException teidme) {
 			throw new TrustBrokerException("Could not determine if the retrieve request needs remote handling: "
 					+ teidme.getLocalizedMessage());
 		}
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("doLocal for entity " + teid + " is '" + doLocal + "'");
+			LOG.debug("doLocal for trustor " + trustorId + " is '" + doLocal + "'");
 		if (doLocal) {
 		
-			final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
+			if (this.trustRepo == null)
+				throw new TrustBrokerException("Could not retrieve trust value for entity (" 
+						+ trustorId	+ ", " + trusteeId 
+						+ "): ITrustRepository service is not available");
+			final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 			if (entity != null)
 				trustValue = entity.getUserPerceivedTrust().getValue();
 
@@ -124,22 +127,23 @@ public class TrustBroker implements ITrustBroker {
 			if (this.hasTrustBrokerRemote && this.trustBrokerRemote != null) {
 				
 				final RemoteRetrieveCallback callback = new RemoteRetrieveCallback();
-				this.trustBrokerRemote.retrieveTrust(teid, callback);
+				this.trustBrokerRemote.retrieveTrust(trustorId, trusteeId, callback);
 				synchronized (callback) {
 					try {
 						callback.wait();
 						trustValue = callback.getResult();
 					} catch (InterruptedException ie) {
 						
-						throw new TrustBrokerException("Interrupted while receiveing trust for entity "
-								+ teid);
+						throw new TrustBrokerException("Interrupted while receiveing trust for entity (" 
+						+ trustorId	+ ", " + trusteeId + ")");
 					}
 				}
 				
 			} else {
 				
-				throw new TrustBrokerException("Cannot retrieve trust for entity "
-						+ teid + ": ITrustBrokerRemote service is not available");
+				throw new TrustBrokerException("Cannot retrieve trust for entity (" 
+						+ trustorId	+ ", " + trusteeId 
+						+ "): ITrustBrokerRemote service is not available");
 			}
 		}
 			
@@ -147,43 +151,51 @@ public class TrustBroker implements ITrustBroker {
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException {
+	public void registerTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
 		
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 		
 		if (this.trustEventMgr == null)
-			throw new TrustBrokerException("Could not register trust update listener for entity '"
-					+ teid + "': ITrustEventMgr service is not available");
+			throw new TrustBrokerException("Could not register trust update listener for entity (" 
+					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
 		
 		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
 		if (LOG.isDebugEnabled())
-			LOG.debug("Registering event listener for entity " + teid + " to topics '"
-					+ Arrays.toString(topics) + "'");
-		this.trustEventMgr.registerListener(listener, topics, teid);
+			LOG.debug("Registering event listener for entity (" + trustorId 
+					+ ", " + trusteeId + ") to topics '" + Arrays.toString(topics) + "'");
+		this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeId);
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException {
+	public void unregisterTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId) 
+					throws TrustException {
 		// TODO Auto-generated method stub
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 		
 		if (this.trustEventMgr == null)
-			throw new TrustBrokerException("Could not unregister trust update listener for entity '"
-					+ teid + "': ITrustEventMgr service is not available");
+			throw new TrustBrokerException("Could not unregister trust update listener for entity (" 
+					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
 	}
 	
 	/**
