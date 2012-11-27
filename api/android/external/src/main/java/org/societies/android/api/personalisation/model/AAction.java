@@ -88,11 +88,11 @@ public class AAction extends Action implements Parcelable{
 		return action;
 	}
 	
-	private void setAServiceID(AServiceResourceIdentifier aServiceID){
+	public void setAServiceID(AServiceResourceIdentifier aServiceID){
 		this.aServiceID = aServiceID;
 	}
 	
-	private AServiceResourceIdentifier getAServiceID(){
+	public AServiceResourceIdentifier getAServiceID(){
 		return this.aServiceID;
 	}
 }
