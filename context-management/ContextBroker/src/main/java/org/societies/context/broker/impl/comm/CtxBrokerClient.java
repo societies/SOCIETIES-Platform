@@ -45,7 +45,6 @@ import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -87,8 +86,6 @@ public class CtxBrokerClient implements ICommCallback {
 
 	private ICommManager commManager;
 
-	private IIdentityManager idMgr;
-
 	private CtxBrokerCommCallback ctxBrokerCommCallback = new CtxBrokerCommCallback();
 
 	public ICommManager getCommManager() {
@@ -112,7 +109,6 @@ public class CtxBrokerClient implements ICommCallback {
 		this.commManager = commManager;
 		this.commManager.register(this);
 		this.commManager.register(this.ctxBrokerCommCallback);
-		this.idMgr = this.commManager.getIdManager();
 	}
 
 	public void createEntity(Requestor requestor, IIdentity targetCss, 
