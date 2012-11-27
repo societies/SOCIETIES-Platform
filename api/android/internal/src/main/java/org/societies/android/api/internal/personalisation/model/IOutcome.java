@@ -22,52 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.android.api.internal.personalisation.model;
 
-package org.societies.android.api.internal.personalisation;
 
-import java.util.concurrent.Future;
-
-import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 
-
-
+import android.os.Parcelable;
 
 /**
- * @author Eliza
+ * Interface that extends the @see IAction
+ * @author Elizabeth
  * @version 1.0
- * @created 11-Nov-2011 14:42:55
+ * @created 08-Nov-2011 13:25:58
  */
-public interface IPersonalisationManagerInternalAndroid extends IPersonalisationManagerAndroid{
+public interface IOutcome extends Parcelable, IAction {
 
-	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.internal.personalisation.ReturnValue";
-	public static final String GET_INTENT_ACTION = "org.societies.android.api.internal.personalisation.getIntentAction";
-	public static final String GET_PREFERENCE = "org.societies.android.api.internal.personalisation.getPreference";
-	
-	public String methodsArray[] = {"getIntentAction(String clientID, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName)",
-			"getPreference(String clientID, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName)"};
-	/**
-	 * 
-	 * @param ownerID
-	 * @param serviceID
-	 * @param preferenceName
-	 * @param callback
-	 */
-	public Future<IAction> getIntentAction(String clientID, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName);
-
-	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
-	 * @param ownerID    the DigitalIIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceType    the type of the service requesting the outcome
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 */
-	public Future<IAction> getPreference(String clientID, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName);
+	public int getConfidenceLevel();
 
 }

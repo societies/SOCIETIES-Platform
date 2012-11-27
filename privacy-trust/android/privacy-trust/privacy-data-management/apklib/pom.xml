@@ -28,10 +28,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.android.privacytrust</groupId>
-	<artifactId>datamanagementbuilder</artifactId>
-	<name>Privacy Protection Android Builder</name>
-	<packaging>pom</packaging>
+	<groupId>org.societies.android</groupId>
+	<artifactId>privacytrust</artifactId>
+	<name>Privacy Protection (Light Client)</name>
+	<packaging>apklib</packaging>
 	<version>${version.pt}</version>
 	<developers>
 		<developer>
@@ -46,16 +46,82 @@
 		</developer>
 	</developers>
 
-	<!-- All builder projects should inherit from version-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
+		<artifactId>android-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
-	
-	<modules>
-		<module>apklib</module>
-		<module>container</module>
-		<module>test</module>
-	</modules>
+
+	<dependencies>
+		<!-- Societies -->
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Comm -->
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<!-- Android -->
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>cordova</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
