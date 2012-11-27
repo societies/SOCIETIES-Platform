@@ -1,6 +1,5 @@
 package org.societies.android.api.personalisation;
 
-import java.util.concurrent.Future;
 
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.api.identity.IIdentity;
@@ -25,8 +24,8 @@ public interface IPersonalisationManagerAndroid {
 	public static final String GET_INTENT_ACTION = "org.societies.android.api.personalisation.getIntentAction";
 	public static final String GET_PREFERENCE = "org.societies.android.api.personalisation.getPreference";
 	
-	public String methodsArray[] = {"getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName)",
-			"getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName)"};
+	public String methodsArray[] = {"getIntentAction(String clientID, Requestor requestor, org.societies.api.identity.IIdentity ownerID, org.societies.android.api.servicelifecycle.AServiceResourceIdentifier serviceID, String preferenceName)",
+			"getPreference(String clientID, Requestor requestor, org.societies.api.identity.IIdentity ownerID, String serviceType, org.societies.android.api.servicelifecycle.AServiceResourceIdentifier serviceID, String preferenceName)"};
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return TODO
