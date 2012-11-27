@@ -26,14 +26,18 @@ package org.societies.android.privacytrust.policymanagement.callback;
 
 import java.util.List;
 
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -50,11 +54,15 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	private RequestPolicy privacyPolicy;
 	private boolean ack;
 	private String ackMessage;
+	private Context contexte;
+	private String clientPackage;
 
 
-	public RemotePrivacyPolicyCallback(List<String> eLEMENT_NAMES,
+	public RemotePrivacyPolicyCallback(Context contexte, String clientPackage, List<String> eLEMENT_NAMES,
 			List<String> nAME_SPACES, List<String> pACKAGES) {
 		super();
+		this.contexte = contexte;
+		this.clientPackage = clientPackage;
 		ELEMENT_NAMES = eLEMENT_NAMES;
 		NAME_SPACES = nAME_SPACES;
 		PACKAGES = pACKAGES;
@@ -64,6 +72,7 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	public void receiveResult(Stanza stanza, Object payload) {
 		Log.d(TAG, "receiveResult");
 		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
+		debugStanza(stanza);
 		if (payload instanceof PrivacyPolicyManagerBeanResult) {
 			PrivacyPolicyManagerBeanResult resultBean = (PrivacyPolicyManagerBeanResult) payload;
 			MethodType methodType = resultBean.getMethod();
@@ -72,11 +81,16 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 			Log.d(TAG, "Type of response: " +methodType+" "+(ack ? "success" : "faillure"));
 			if (ack && (MethodType.GET_PRIVACY_POLICY.equals(methodType) || MethodType.UPDATE_PRIVACY_POLICY.equals(methodType))) {
 				privacyPolicy = resultBean.getPrivacyPolicy();
+				Log.d(TAG, "privacyPolicy retrieved");
+				Intent intent = new Intent(methodType.name());
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, ack);
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_METHOD_KEY, methodType.name());
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
+				intent.setPackage(clientPackage);
+				Log.d(TAG, "privacyPolicy result sent");
+				contexte.sendBroadcast(intent);
 			}
 		}
-		debugStanza(stanza);
-		// Tell upper layer that received is finished
-		notifyAll();
 	}
 
 	public void receiveError(Stanza stanza, XMPPError error) {

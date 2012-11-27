@@ -10,4 +10,6 @@
     <string name="txt_sameprocess">Refresh using same process approach</string>
     <string name="txt_differentprocess">Refresh using different process approach</string>
     <string name="txt_reset">Reset</string>
+    <string name="txtOnConnect">Connect to XMPP Server</string>
+    <string name="txtLaunchTest">Launch Test</string>
 </resources>

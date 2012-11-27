@@ -71,34 +71,18 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 	}
 
 
-	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
-		// -- Verify
-		if (null == requestor || null == requestor.getRequestorId()) {
-			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
-		}
-
+	public void getPrivacyPolicy(String clientPackage, RequestorBean requestor) throws PrivacyException {
 		// Send remote call
-		GetRemotePrivacyPolicyTask task = new GetRemotePrivacyPolicyTask(context); 
+		GetRemotePrivacyPolicyTask task = new GetRemotePrivacyPolicyTask(context, clientPackage); 
 		task.execute(requestor);
-
-		// Wait and retrieve the result
-		RequestPolicy privacyPolicy = null;
-		try {
-			privacyPolicy = task.get();
-		}
-		catch(InterruptedException e) {
-			Log.e(TAG, "Interruption: can't retrieve the result - "+e.getMessage(), e);
-		}
-		catch(ExecutionException e) {
-			Log.e(TAG, "Execution: can't retrieve the result - "+e.getMessage(), e);
-		}
-		return privacyPolicy;
 	}
 	private class GetRemotePrivacyPolicyTask extends AsyncTask<Object, Void, RequestPolicy> {
 		private Context context;
+		private String clientPackage;
 
-		public GetRemotePrivacyPolicyTask(Context context) {
+		public GetRemotePrivacyPolicyTask(Context context, String clientPackage) {
 			this.context = context;
+			this.clientPackage = clientPackage;
 		}
 
 		protected RequestPolicy doInBackground(Object... args) {
@@ -114,7 +98,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			messageBean.setRequestor((RequestorBean) args[0]);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 			try {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
@@ -139,19 +123,8 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 
 		// Send remote call
 		UpdateRemotePrivacyPolicyTask task = new UpdateRemotePrivacyPolicyTask(context); 
-		task.execute(privacyPolicy);
-
-		// Wait and retrieve the result
-		try {
-			privacyPolicy = task.get();
-		}
-		catch(InterruptedException e) {
-			Log.e(TAG, "Interruption: can't retrieve the result - "+e.getMessage(), e);
-		}
-		catch(ExecutionException e) {
-			Log.e(TAG, "Execution: can't retrieve the result - "+e.getMessage(), e);
-		}
-		return privacyPolicy;
+		task.execute(client, privacyPolicy);
+		return null;
 	}
 	private class UpdateRemotePrivacyPolicyTask extends AsyncTask<Object, Void, RequestPolicy> {
 		private Context context;
@@ -170,10 +143,10 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-			messageBean.setPrivacyPolicy((RequestPolicy) args[0]);
+			messageBean.setPrivacyPolicy((RequestPolicy) args[1]);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, (String) args[0], ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 			try {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
@@ -194,20 +167,8 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 
 		// Send remote call
 		DeleteRemotePrivacyPolicyTask task = new DeleteRemotePrivacyPolicyTask(context); 
-		task.execute(requestor);
-
-		// Wait and retrieve the result
-		boolean result = false;
-		try {
-			result = task.get();
-		}
-		catch(InterruptedException e) {
-			Log.e(TAG, "Interruption: can't retrieve the result - "+e.getMessage(), e);
-		}
-		catch(ExecutionException e) {
-			Log.e(TAG, "Execution: can't retrieve the result - "+e.getMessage(), e);
-		}
-		return result;
+		task.execute(client, requestor);
+		return true;
 	}
 	private class DeleteRemotePrivacyPolicyTask extends AsyncTask<Object, Void, Boolean> {
 		private Context context;
@@ -226,10 +187,10 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-			messageBean.setRequestor((RequestorBean) args[0]);
+			messageBean.setRequestor((RequestorBean) args[1]);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, (String) args[0], ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 			try {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
@@ -245,10 +206,10 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
 		return null;
 	}
-	public String toXmlString(String client, RequestPolicy privacyPolicy) {
+	public String toXmlString(RequestPolicy privacyPolicy) {
 		return null;
 	}
-	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException {
+	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
 		return null;
 	}
 	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean requestor) throws PrivacyException {

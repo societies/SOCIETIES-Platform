@@ -36,9 +36,12 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.utilities.MissingClientPackageException;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
 import android.util.Log;
@@ -57,26 +60,32 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	public PrivacyPolicyManager(Context context)  {
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.schema.identity.RequestorBean)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.api.schema.identity.RequestorBean)
 	 */
-	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
+	public void getPrivacyPolicy(String clientPackage, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
-		return privacyPolicyManagerRemote.getPrivacyPolicy(client, requestor);
+		privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, requestor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
-	public RequestPolicy updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
 		}
@@ -85,93 +94,57 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		return privacyPolicyManagerRemote.updatePrivacyPolicy(client, privacyPolicy);
+		return privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
-	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(String clientPackage, String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
+		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
+		if (null == privacyPolicyXml || "".equals(privacyPolicyXml)) {
+			throw new PrivacyException("The XML privacy policy to update is empty.");
+		}
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = fromXmlString(client, privacyPolicyXml);
+		RequestPolicy privacyPolicy = fromXmlString(privacyPolicyXml);
 		if (null == privacyPolicy) {
-			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
+			throw new PrivacyException("The XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
 		privacyPolicy.setRequestor(requestor);
 		// Create / Store it
-		return updatePrivacyPolicy(client, privacyPolicy);
+		return updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
 
-	public boolean deletePrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
+	public boolean deletePrivacyPolicy(String clientPackage, RequestorBean requestor) throws PrivacyException {
 		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
 		// -- Delete
-		return privacyPolicyManagerRemote.deletePrivacyPolicy(client, requestor);
+		return privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, requestor);
 	}
 
-	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
+	public RequestPolicy inferPrivacyPolicy(String clientPackage, int privacyPolicyType, Map configuration) throws PrivacyException {
+		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		List<RequestItem> requests = new ArrayList<RequestItem>();
 		RequestPolicy privacyPolicy = new RequestPolicy();
 		privacyPolicy.setRequestItems(requests);
 		return privacyPolicy;
 	}
 
-	public String toXmlString(String client, RequestPolicy privacyPolicy) {
+	public String toXmlString(RequestPolicy privacyPolicy) {
 		String encoding = "UTF-8";
 		// -- Empty Privacy Policy
 		if (null == privacyPolicy) {
 			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
 		}
-
-		// -- Generate the XML Privacy Policy
-		//		StringBuilder str = new StringBuilder("<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n<RequestPolicy>");
-		//		// - Requestor
-		//		if (null != privacyPolicy.getRequestor()) {
-		//			str.append("\n<Subject>");
-		//			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getCanonicalName()+"\">");
-		//			str.append("\n\t\t<AttributeValue>"+privacyPolicy.getRequestor().getRequestorId()+"</AttributeValue>");
-		//			str.append("\n\t</Attribute>");
-		//			// CIS
-		//			if (privacyPolicy.getRequestor() instanceof RequestorCisBean) {
-		//				str.append("\n\t<Attribute AttributeId=\"CisId\" DataType=\""+IIdentity.class.getCanonicalName()+"\">");
-		//				str.append("\n\t\t<AttributeValue>"+((RequestorCisBean)privacyPolicy.getRequestor()).getCisRequestorId()+"</AttributeValue>");
-		//				str.append("\n\t</Attribute>");
-		//			}
-		//			// Service
-		//			if (privacyPolicy.getRequestor() instanceof RequestorServiceBean) {
-		//				str.append("\n\t<Attribute AttributeId=\"serviceID\" DataType=\""+ServiceResourceIdentifier.class.getCanonicalName()+"\">");
-		//				str.append("\n\t\t<AttributeValue>"+((RequestorServiceBean)privacyPolicy.getRequestor()).getRequestorServiceId().getServiceInstanceIdentifier()+"</AttributeValue>");
-		//				str.append("\n\t</Attribute>");
-		//			}
-		//			str.append("</Subject>");
-		//		}
-		//		// Requested Items
-		//		for (RequestItem requestItem : privacyPolicy.getRequestItems()) {
-		//			str.append("\n<Target>");
-		//			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\" DataType=\"org.societies.api.context.model.CtxIdentifier\">");
-		//			str.append("\n\t\t<AttributeValue>"+requestItem.getResource().getDataIdUri()+"</AttributeValue>");
-		//			str.append("\n\t</Attribute>");
-		//			for (Action action : requestItem.getActions()){
-		//				str.append("\n\t<Action>");
-		//				str.append("\n\t\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">");
-		//				str.append("\n\t\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>");
-		//				str.append("\n\t\t</Attribute>");
-		//				str.append("\n\t\t<optional>"+action.isOptional()+"</optional>");
-		//				str.append("\n\t</Action>");
-		//			}
-		//			for (Condition condition : requestItem.getConditions()){
-		//				str.append("\n\t<Condition>");
-		//				str.append("\n\t\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">");
-		//				str.append("\n\t\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>");
-		//				str.append("\n\t\t</Attribute>");
-		//				str.append("\n\t\t<optional>"+condition.isOptional()+"</optional>"); 
-		//				str.append("\n\t</Condition>");
-		//			}
-		//			str.append("\n\t<optional>"+requestItem.isOptional()+"</optional>");
-		//			str.append("\n</Target>");
-		//		}
-		//		str.append("</RequestPolicy>");
-		//		return str.toString();
 
 		Serializer serializer = new Persister(); 
 		Writer result = new StringWriter();
@@ -184,7 +157,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return result.toString();
 	}
 
-	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException {
+	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
 		// -- Verify
 		// Empty privacy policy
 		if (null == privacyPolicy || privacyPolicy.equals("")) {
@@ -211,20 +184,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		} catch (Exception e) {
 			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy.", e);
 		}
-		//		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader();
-		//		try {
-		//			// -- Create XMLDocument version of the privacy policy
-		//			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		//			Document privacyPolicyDocument = xmlDocumentBuilder.parse(new ByteArrayInputStream(privacyPolicy.getBytes(encoding)));
-		//			// -- Transform XML Privacy Policy to Java Privacy Policy
-		//			result = xmlPolicyReader.readPolicyFromFile(privacyPolicyDocument);
-		//		} catch (ParserConfigurationException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy.", e);
-		//		} catch (SAXException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy. SAX error.", e);
-		//		} catch (IOException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy. IO error.", e);
-		//		}
 		return result;
 	}
 }

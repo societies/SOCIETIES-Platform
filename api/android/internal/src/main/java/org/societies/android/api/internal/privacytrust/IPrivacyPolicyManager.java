@@ -26,9 +26,14 @@ package org.societies.android.api.internal.privacytrust;
 
 import java.util.Map;
 
+import org.societies.android.api.identity.ARequestorCis;
+import org.societies.android.api.identity.ARequestorService;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.ARequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
 
 
 /**
@@ -40,13 +45,23 @@ import org.societies.api.schema.identity.RequestorBean;
  */
 public interface IPrivacyPolicyManager {
 	/**
+     * IPrivacyPolicyManager intents
+     * Used to create to create Intents to signal return values of a called method
+     * If the method is locally bound it is possible to directly return a value but is discouraged
+     * as called methods usually involve making asynchronous calls. 
+     */
+    public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.ReturnValue";
+    public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.privacytrust.ReturnStatus";
+    public static final String INTENT_RETURN_METHOD_KEY = "org.societies.android.privacytrust.ReturnMethod";
+    
+	/**
 	 * Retrieve a CIS or 3P service privacy policy by the ID of the CIS or the 3P service
 	 * @param client Client package name
-	 * @param requestor Id of the CIS or the 3P service {@see org.societies.api.schema.identity.RequestorCisBean} and {@see org.societies.api.schema.identity.RequestorServiceBean}
-	 * @return the privacy policy
+	 * @param requestor Id of the CIS or the 3P service {@link ARequestorCis} and {@link ARequestorService}
+	 * @post The response is available in an Intent: {@link MethodType}::GET_PRIVACY_POLICY. {@link INTENT_RETURN_VALUE_KEY} contains a {@link ARequestPolicy}
 	 * @throws PrivacyException
 	 */
-	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException;
+	public void getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException;
 	
 	/**
 	 * Store or update a (CIS or 3P Service) privacy policy
@@ -96,18 +111,16 @@ public interface IPrivacyPolicyManager {
 	
 	/**
 	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy
-	 * @param client Client package name
 	 * @param privacyPolicy Privacy policy
 	 * @return A string containing the XML version the privacy policy
 	 */
-	public String toXmlString(String client, RequestPolicy privacyPolicy);
+	public String toXmlString(RequestPolicy privacyPolicy);
 	
 	/**
 	 * Create a Privacy Policy in a Java format from a XML format Privacy Policy
-	 * @param client Client package name
 	 * @param privacyPolicy Privacy policy
 	 * @return A Java object containing the privacy policy
 	 * @throws PrivacyException 
 	 */
-	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException;
+	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException;
 }

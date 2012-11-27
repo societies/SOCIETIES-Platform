@@ -13,21 +13,22 @@
 			    android:layout_width="match_parent"
 			    android:layout_height="wrap_content" >
 
-			    <Button
-			        android:id="@+id/btnRefreshUsingSameProcess"
-			        android:layout_width="0dp"
-			        android:layout_height="match_parent"
-			        android:layout_weight="1"
-			        android:text="@string/txt_sameprocess"
-			        android:onClick="onButtonRefreshUsingSameProcessClick" />
+				<Button
+				    android:id="@+id/btnConnect"
+				    android:layout_width="0dp"
+				    android:layout_height="match_parent"
+				    android:layout_weight="1"
+				    android:onClick="onConnect"
+				    android:text="@string/txtOnConnect" />
 
 			    <Button
-			        android:id="@+id/btnRefreshUsingDifferentProcess"
+			        android:id="@+id/btnLaunchTest"
 			        android:layout_width="0dp"
 			        android:layout_height="match_parent"
 			        android:layout_weight="1"
-			        android:text="@string/txt_differentprocess"
-			        android:onClick="onButtonRefreshUsingDifferentProcessClick" />
+			        android:onClick="onLaunchTest"
+			        android:text="@string/txtLaunchTest" />
+
 			</LinearLayout>
 
 			<Button

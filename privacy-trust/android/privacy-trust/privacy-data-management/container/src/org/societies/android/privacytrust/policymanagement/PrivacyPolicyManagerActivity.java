@@ -34,16 +34,19 @@ import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.android.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -70,16 +73,23 @@ import android.widget.Toast;
  */
 public class PrivacyPolicyManagerActivity extends Activity {
 	private final static String TAG = PrivacyPolicyManagerActivity.class.getSimpleName();
-	
+
 	private TextView txtLocation;
 
 	private boolean ipBoundToService = false;
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
-	
+	private ClientCommunicationMgr clientCommManager;
+
+
+	//Enter local user credentials and domain name
+	private static final String USER_NAME = "university";
+	private static final String USER_PASS = "university";
+	private static final String XMPP_DOMAIN = "societies.local";
+
 	/* **************
 	 * Activity Lifecycle
 	 * ************** */
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -87,10 +97,19 @@ public class PrivacyPolicyManagerActivity extends Activity {
 
 		// -- Create a link with editable area
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
-		
+
+		clientCommManager = new ClientCommunicationMgr(this);
+
+
 		// -- Create a link with services
 		Intent ipIntent = new Intent(this.getApplicationContext(), PrivacyPolicyManagerLocalService.class);
 		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
+
+		//REGISTER BROADCAST
+		IntentFilter intentFilter = new IntentFilter() ;
+		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
+
+		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
 	}
 
 	protected void onStop() {
@@ -99,6 +118,8 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		if (ipBoundToService) {
 			unbindService(inProcessServiceConnection);
 		}
+		// -- Logout
+		clientCommManager.logout();
 	}
 
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
@@ -115,27 +136,22 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	/* **************
 	 * Button Listeners
 	 * ************** */
-	
+
 	/**
 	 * Call an in-process service. Service consumer simply calls service API and can use 
 	 * return value
 	 *  
 	 * @param view
 	 */
-	public void onButtonRefreshUsingSameProcessClick(View view) {
+	public void onLaunchTest(View view) {
 		// If this service is available
 		if (ipBoundToService) {
 			try {
 				RequestorCisBean requestor = new RequestorCisBean();
 				requestor.setRequestorId("master.societies.local");
-	    		requestor.setCisRequestorId("cis-15a35e8e-4d3a-4a43-ac20-b83393b4547e.societies.local");
-				RequestPolicy privacyPolicy = privacyPolicyManagerService.getPrivacyPolicy("test", requestor);
-				StringBuffer sb = new StringBuffer();
-				sb.append("Privacy policy retrieved: "+(null != privacyPolicy));
-				if (null != privacyPolicy) {
-					sb.append(privacyPolicyManagerService.toXmlString("test", privacyPolicy));
-				}
-				txtLocation.setText(sb.toString());
+				requestor.setCisRequestorId("cis-15a35e8e-4d3a-4a43-ac20-b83393b4547e.societies.local");
+				privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), requestor);
+				txtLocation.setText("Waiting");
 			} catch (PrivacyException e) {
 				Log.e(TAG, "Error during the privacy policy retrieving", e);
 				Toast.makeText(this, "Error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
@@ -145,12 +161,45 @@ public class PrivacyPolicyManagerActivity extends Activity {
 			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
 	}
-	
-    /**
-     * Utilities button to reset all values of this activity
-     * @param view
-     */
+
+	public void onConnect(View view) {
+		// -- Login to XMPP Server
+		Log.d(TAG, "loginXMPPServer user: " + USER_NAME + " pass: " + USER_PASS + " domain: " + XMPP_DOMAIN);
+		INetworkNode networkNode = clientCommManager.login(USER_NAME, XMPP_DOMAIN, USER_PASS);
+		Toast.makeText(this, "Connected to :"+networkNode.getJid(), Toast.LENGTH_SHORT);
+	}
+
+	/**
+	 * Utilities button to reset all values of this activity
+	 * @param view
+	 */
 	public void onButtonResetClick(View view) {
 		txtLocation.setText("Nothing yet");
-    }
+	}
+
+
+	private class bReceiver extends BroadcastReceiver  {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, intent.getAction());
+
+			if ((intent.getAction().equals(MethodType.GET_PRIVACY_POLICY))) {
+				//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
+				boolean ack =  1 == intent.getIntExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, 0) ? true : false;
+				StringBuffer sb = new StringBuffer();
+				if (ack) {
+					RequestPolicy privacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
+					sb.append("Privacy policy retrieved: "+(null != privacyPolicy));
+					if (null != privacyPolicy) {
+						sb.append(privacyPolicyManagerService.toXmlString(privacyPolicy));
+					}
+				}
+				else {
+					sb.append("Arg, no ack");
+				}
+				txtLocation.setText(sb.toString());
+			}
+		}
+	};
 }
