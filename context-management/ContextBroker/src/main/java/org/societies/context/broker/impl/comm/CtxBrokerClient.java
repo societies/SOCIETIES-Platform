@@ -111,6 +111,7 @@ public class CtxBrokerClient implements ICommCallback {
 		
 		this.commManager = commManager;
 		this.commManager.register(this);
+		this.commManager.register(this.ctxBrokerCommCallback);
 		this.idMgr = this.commManager.getIdManager();
 	}
 
