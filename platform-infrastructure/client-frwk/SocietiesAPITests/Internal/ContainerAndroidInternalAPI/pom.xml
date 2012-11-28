@@ -25,29 +25,39 @@
 
 
     <dependencies>
-	<dependency>
-                <groupId>com.google.android</groupId>
-                <artifactId>android</artifactId>
-                <exclusions>
-                <!-- Provided by Android -->
-                  <exclusion>
-                      <artifactId>xpp3</artifactId>
-                      <groupId>xpp3</groupId>
-                 </exclusion>
-                </exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.societies.android.api.internal</groupId>
-		<artifactId>societies-android-api-internal</artifactId>
-		<version>${release.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>org.societies.api.schema</groupId>
-		<artifactId>societies-api-schema</artifactId>
-		<version>${release.version}</version>
-	</dependency>
-		
-        
+			<dependency>
+		        <groupId>com.google.android</groupId>
+		        <artifactId>android</artifactId>
+		        <exclusions>
+		        <!-- Provided by Android -->
+		          <exclusion>
+		              <artifactId>xpp3</artifactId>
+		              <groupId>xpp3</groupId>
+		         </exclusion>
+		        </exclusions>
+			</dependency>
+			<dependency>
+			   	<groupId>org.societies.api.internal</groupId>
+			   	<artifactId>societies-api-internal</artifactId>
+				<version>${release.version}</version>
+        	</dependency>
+			<dependency>
+				<groupId>org.societies.android.api.external</groupId>
+				<artifactId>societies-android-api</artifactId>
+				<version>${release.version}</version>
+			</dependency>
+			
+			<!--dependency>
+				<groupId>org.societies.api.external</groupId>
+				<artifactId>societies-api</artifactId>
+				<version>${release.version}</version>
+			</dependency-->
+			
+			<dependency>
+				<groupId>org.societies.api.schema</groupId>
+				<artifactId>societies-api-schema</artifactId>
+				<version>${release.version}</version>
+			</dependency>
     </dependencies>
 
     <build>
@@ -59,11 +69,11 @@
                   <artifactId>android-maven-plugin</artifactId>
 
 				  <configuration>
-				      <!--emulator>
+				      <emulator>
 						  <avd>Nexus403</avd>
 						  <wait>60000</wait>
 						  <options>-no-skin</options>
-				      </emulator-->
+				      </emulator>
                       <!-- emma start -->
 					    <emmaEnable>true</emmaEnable>
 					    <emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>

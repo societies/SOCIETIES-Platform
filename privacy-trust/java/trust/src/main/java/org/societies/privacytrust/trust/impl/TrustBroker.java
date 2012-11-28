@@ -30,15 +30,14 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.TrustedEntityIdMgrException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -61,18 +60,17 @@ public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
 	
+	/** The Trust Mgr service reference. */
+	@Autowired(required=true)
+	private ITrustedEntityIdMgr trustMgr;
+	
 	/** The Trust Event Mgr service reference. */
 	@Autowired(required=true)
 	private ITrustEventMgr trustEventMgr;
 	
 	/** The Trust Repository service reference. */
-	@Autowired(required=true)
-	private ITrustRepository trustRepo;
-	
-	/** The Communications Mgr service reference. */
 	@Autowired(required=false)
-	private ICommManager commMgr;
-	private boolean hasCommMgr = false;
+	private ITrustRepository trustRepo;
 	
 	/** The Remote Trust Broker service reference. */
 	@Autowired(required=false)
@@ -81,7 +79,8 @@ public class TrustBroker implements ITrustBroker {
 			
 	TrustBroker() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -106,13 +105,10 @@ public class TrustBroker implements ITrustBroker {
 		
 		boolean doLocal;
 		try {
-			doLocal = this.isLocalTeid(teid);
-		} catch (TrustBrokerException tbe) {
-			
-			LOG.error("Could not determine if the retrieve request needs remote handling: "
-					+ tbe.getLocalizedMessage());
-			LOG.warn("Will try local Trust Repository...");
-			doLocal = true;
+			doLocal = this.trustMgr.isLocalId(teid);
+		} catch (TrustedEntityIdMgrException teidme) {
+			throw new TrustBrokerException("Could not determine if the retrieve request needs remote handling: "
+					+ teidme.getLocalizedMessage());
 		}
 		
 		if (LOG.isDebugEnabled())
@@ -218,55 +214,6 @@ public class TrustBroker implements ITrustBroker {
 		
 		LOG.info("Unbinding service reference " + trustBrokerRemote);
 		this.hasTrustBrokerRemote = false;
-	}
-	
-	/**
-	 * This method is called when the {@link ICommManager} service is bound.
-	 * 
-	 * @param commMgr
-	 *            the {@link ICommManager} service that was bound
-	 * @param props
-	 *            the set of properties that the {@link ICommManager} service
-	 *            was registered with
-	 */
-	public void bindCommMgr(ICommManager commMgr, Dictionary<Object,Object> props) {
-		
-		LOG.info("Binding service reference " + commMgr);
-		this.hasCommMgr = true;
-	}
-	
-	/**
-	 * This method is called when the {@link ICommManager} service is unbound.
-	 * 
-	 * @param commMgr
-	 *            the {@link ICommManager} service that was unbound
-	 * @param props
-	 *            the set of properties that the {@link ICommManager} service
-	 *            was registered with
-	 */
-	public void unbindCommMgr(ICommManager commMgr, Dictionary<Object,Object> props) {
-		
-		LOG.info("Unbinding service reference " + commMgr);
-		this.hasCommMgr = false;
-	}
-	
-	private boolean isLocalTeid(final TrustedEntityId teid) throws TrustBrokerException {
-		
-		if (this.hasCommMgr && this.commMgr != null) {
-			
-			try {
-				final IIdentity trustorId = this.commMgr.getIdManager().fromJid(teid.getTrustorId());
-				return this.commMgr.getIdManager().isMine(trustorId);
-			} catch (InvalidFormatException ife) {
-				
-				throw new TrustBrokerException("Invalid trustorId IIdentity: "
-						+ ife.getLocalizedMessage(), ife);
-			} 
-			
-		} else {
-			
-			throw new TrustBrokerException("ICommManager service is not available");
-		}
 	}
 	
 	private class RemoteRetrieveCallback implements ITrustBrokerRemoteCallback {

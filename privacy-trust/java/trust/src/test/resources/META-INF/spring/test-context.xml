@@ -17,8 +17,6 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-	<context:component-scan base-package="org.societies.privacytrust.trust.impl" />
 	
 	<bean id="TrustRepositoryConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -89,12 +87,6 @@
 		<property name="password" value="${jdbc.password}" />
 		<property name="initialSize" value="10" />
 		<property name="maxActive" value="100" />
-	</bean>
-	
-	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.mock.MockEventMgr"/>
-	
-	<bean id="ctxTrustEvidenceMonitor" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
-		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.impl.evidence.monitor.CtxTrustEvidenceMonitor" />
 	</bean>
 	
 </beans>

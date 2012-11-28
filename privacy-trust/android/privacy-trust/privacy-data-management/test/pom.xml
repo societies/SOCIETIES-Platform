@@ -1,0 +1,157 @@
+<!-- Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY 
+	(TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET (SN), GERMAN AEROSPACE CENTRE 
+	(Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne 
+	tehnologije informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE 
+	OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE COMMUNICATIONS (LAKE), 
+	INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, 
+	SA (PTIN), IBM Corp., INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI 
+	KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI), 
+	TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC)) All 
+	rights reserved. Redistribution and use in source and binary forms, with 
+	or without modification, are permitted provided that the following conditions 
+	are met: 1. Redistributions of source code must retain the above copyright 
+	notice, this list of conditions and the following disclaimer. 2. Redistributions 
+	in binary form must reproduce the above copyright notice, this list of conditions 
+	and the following disclaimer in the documentation and/or other materials 
+	provided with the distribution. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT 
+	HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
+	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+	HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+	OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
+	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+	OF SUCH DAMAGE. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.android.privacytrust.test</groupId>
+	<artifactId>datamanagement</artifactId>
+	<name>Privacy Protection Tester (Light Client)</name>
+	<packaging>apk</packaging>
+	<version>1.0</version>
+	<developers>
+		<developer>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<dependencies>
+		<!-- Societies -->
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Platform Lib -->
+		<dependency>
+			<groupId>org.societies.android</groupId>
+			<artifactId>privacytrust</artifactId>
+			<version>${version.pt}</version>
+			<scope>provided</scope>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust</groupId>
+			<artifactId>container</artifactId>
+			<version>${version.pt}</version>
+			<scope>provided</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust</groupId>
+			<artifactId>container</artifactId>
+			<version>${version.pt}</version>
+			<type>apk</type>
+		</dependency>
+		<!-- Android -->
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>emma</groupId>
+			<artifactId>emma</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<tested.project.package>${project.groupdId}</tested.project.package>
+		<tested.project.dir>${project.basedir}/../apklib</tested.project.dir>
+	</properties>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<testCoverage>true</testCoverage>
+					<testCreateReport>true</testCreateReport>
+					<testTestSize>medium</testTestSize>
+					<testCoverageFile>/data/data/${tested.project.package}/files/coverage.ec</testCoverageFile>
+				</configuration>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>pull-coverage</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>pull</goal>
+						</goals>
+						<configuration>
+							<pullSource>/data/data/${tested.project.package}/files/coverage.ec</pullSource>
+							<pullDestination>${tested.project.dir}/target/emma/coverage.ec</pullDestination>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.12.4</version>
+			</plugin>
+		</plugins>
+	</reporting>
+</project>

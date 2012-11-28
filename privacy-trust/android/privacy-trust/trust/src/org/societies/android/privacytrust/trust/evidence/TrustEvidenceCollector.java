@@ -105,6 +105,7 @@ public class TrustEvidenceCollector extends Service
 	private CountDownLatch cdLatch;
 	
 	/** The Client Comm Mgr callback. */
+	// TODO move instantiation to constructor
 	private final ICommCallback callback = new ICommCallback() {
 		
 		/*

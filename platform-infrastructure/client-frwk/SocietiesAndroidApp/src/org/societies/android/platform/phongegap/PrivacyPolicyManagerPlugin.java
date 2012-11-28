@@ -144,7 +144,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 
 				// - Launch location status retrieval
 				RequestorBean requestor = jsonHelper.fromJson(arguments.getString(0), RequestorBean.class);
-				privacyPolicyManagerService.getPrivacyPolicy(requestor);
+				privacyPolicyManagerService.getPrivacyPolicy("test", requestor);
 			}
 			// -- Error: Unknown method name
 			else {

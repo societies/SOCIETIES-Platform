@@ -26,11 +26,13 @@ public class ProviderElementNamespaceRegistrar {
 	public void unregister(ElementNamespaceTuple tuple) {		
 		Log.d(LOG_TAG, "unregister tuple: " + tuple.namespace);
 		Integer count = providersElementsAndNamespaces.get(tuple);
-		count--;
-		if(count == 0)
-			providersElementsAndNamespaces.remove(tuple);	
-		else
-			providersElementsAndNamespaces.put(tuple, count);	
+		if(count != null) {
+			count--;
+			if(count == 0)
+				providersElementsAndNamespaces.remove(tuple);	
+			else
+				providersElementsAndNamespaces.put(tuple, count);
+		}
 	}
 	
 	public boolean isRegistered(ElementNamespaceTuple tuple) {

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        	<groupId>org.societies</groupId>
+        	<artifactId>android-parent</artifactId>
+        	<version>RELEASE</version>
+	</parent>
+
+	<groupId>org.societies.android.platform.internalctxclient</groupId>
+	<artifactId>InternalCtxClient</artifactId>
+	<name>AndroidInternalContextClient</name>
+	<version>${version.cm}</version>
+	<packaging>apklib</packaging>
+	
+	<developers>
+	    <developer>
+			<id>pkosmides</id>
+			<name>Pavlos Kosmides</name>
+			<email>pkosmidi@central.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
+	
+   <dependencies>
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+	    <groupId>org.societies.api.external</groupId>
+		    <artifactId>societies-api</artifactId>
+		    <version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<exclusions>
+			    <!-- StAX is not available on Android -->
+			    <exclusion>
+			        <artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <!-- Provided by Android -->
+			    <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			    </exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

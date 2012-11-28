@@ -100,7 +100,7 @@
 
 				  <configuration>
 				      <emulator>
-						  <avd>Test403Nexus</avd>
+						  <avd>Nexus403</avd>
 						  <wait>60000</wait>
 						  <options>-no-skin</options>
 				      </emulator>
@@ -120,13 +120,13 @@
                       </dex>
                   </configuration>
                   <executions>
-			    	<execution>
+			    	<!--execution>
 				        <id>startEmulator</id>
 				        <phase>initialize</phase>
 				        <goals>
 				            <goal>emulator-start</goal>
 				        </goals>
-			    	</execution>
+			    	</execution-->
 			    	<!--execution>
 				        <id>stopEmulator</id>
 				        <phase>initialize</phase>

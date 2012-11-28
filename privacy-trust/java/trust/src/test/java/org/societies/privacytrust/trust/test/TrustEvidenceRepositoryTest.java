@@ -56,7 +56,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 0.0.6
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
+@ContextConfiguration(locations = {"classpath:META-INF/spring/TrustEvidenceRepositoryTest-context.xml"})
 public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
 	private static final String BASE_ID = "tert";

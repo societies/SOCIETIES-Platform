@@ -358,6 +358,14 @@ public class ServiceModelUtils {
 		
 	}
 	
+	/**
+	 * 
+	 * Please use the external API method
+	 *
+	 * @param serviceId
+	 * @return
+	 */
+	@Deprecated
 	public static ServiceResourceIdentifier generateServiceResourceIdentifierFromString(String serviceId){
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
@@ -377,6 +385,14 @@ public class ServiceModelUtils {
 		return result;
 	}
 	
+	/**
+	 * 
+	 * Please use the external API method
+	 *
+	 * @param serviceId
+	 * @return
+	 */
+	@Deprecated
 	public static String serviceResourceIdentifierToString(ServiceResourceIdentifier serviceId){
 		
 		return serviceId.getServiceInstanceIdentifier() + " " + serviceId.getIdentifier().toString();

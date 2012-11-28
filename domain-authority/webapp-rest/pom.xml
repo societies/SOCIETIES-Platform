@@ -280,7 +280,6 @@
 					</supportedProjectTypes>
 					<instructions>
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-				<!-- 	<Export-Package>org.societies.domainauthority.rest.*</Export-Package> -->
 						<Import-Package>
 							<!--
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
@@ -353,6 +352,8 @@
 							javax.annotation;resolution:=optional, 
 							*;resolution:=optional
 						</Import-Package>
+				<!-- 	<Export-Package>org.societies.domainauthority.rest.*</Export-Package> -->
+						<Export-Package>!*</Export-Package>
 						<_nouses>true</_nouses>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
 						<Webapp-Context>rest</Webapp-Context>

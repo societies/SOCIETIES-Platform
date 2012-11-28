@@ -37,6 +37,10 @@ import java.util.Date;
  * @since 0.0.7
  */
 public interface ITrust extends Serializable {
+	
+	public static final double MIN_VALUE = 0.0d;
+	
+	public static final double MAX_VALUE = 1.0d;
 
 	/**
 	 * 

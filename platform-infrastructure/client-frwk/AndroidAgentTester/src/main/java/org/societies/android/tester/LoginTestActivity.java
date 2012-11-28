@@ -62,8 +62,7 @@ public class LoginTestActivity extends Activity {
 	
     @Override
     public void onDestroy() {
-    	super.onDestroy();
-    	ccm.logout();
+    	super.onDestroy();	
     }
 	
 	private class LoginTask extends AsyncTask<Void, Void, AssertionError> {

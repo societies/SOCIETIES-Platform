@@ -25,6 +25,7 @@
 package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutionException;
 
@@ -35,10 +36,14 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -55,7 +60,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 0.0.7
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
+@ContextConfiguration(locations = {"classpath:META-INF/spring/TrustBrokerTest-context.xml"})
 public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
 	private static final String BASE_ID = "tbt";
@@ -77,10 +82,14 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	private static TrustedEntityId serviceTeid;
 	
 	@Autowired
+	@InjectMocks
 	private ITrustBroker trustBroker;
 	
 	@Autowired
 	private ITrustRepository trustRepo;
+	
+	@Mock
+	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -111,6 +120,9 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
+		MockitoAnnotations.initMocks(this);
+		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
 	}
 
 	/**

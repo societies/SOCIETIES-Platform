@@ -27,6 +27,7 @@ package org.societies.privacytrust.trust.impl.engine;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,10 @@ public abstract class TrustEngine {
 	
 	/** The Trust Event Mgr service reference. */
 	protected ITrustEventMgr trustEventMgr;
+	
+	/** The TEID Mgr service reference. */
+	@Autowired
+	protected ITrustedEntityIdMgr trustedEntityIdMgr;
 	
 	/** The executor service. */
 	protected ExecutorService executorService = Executors.newSingleThreadExecutor();

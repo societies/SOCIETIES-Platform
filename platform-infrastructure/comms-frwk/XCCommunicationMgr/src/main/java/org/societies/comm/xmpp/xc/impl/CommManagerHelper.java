@@ -490,6 +490,8 @@ public class CommManagerHelper {
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			iqCommCallbacks.put(iq.getID(), callback);
+			if (!clm.classloaderRegistryVerify(callback))
+				LOG.warn("Got sendIQ call from unregistered ICommCallback: "+callback.toString()+"... forced registry...");
 			return iq;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
@@ -518,7 +520,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(fs);
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -527,15 +529,17 @@ public class CommManagerHelper {
 
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		clm.classloaderRegistry(Thread.currentThread().getContextClassLoader());
+		clm.classloaderRegistry(messageCallback);
 //		for (String ns : messageCallback.getXMLNamespaces()) {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
-		String mainNs = messageCallback.getXMLNamespaces().get(0);
-		if (mainNs.indexOf("#")>-1) {
-			LOG.info("registering Callback for namespace " + mainNs);
-			nsCommCallbacks.put(mainNs, messageCallback);
+		if (messageCallback.getXMLNamespaces().size()>0) {
+			String mainNs = messageCallback.getXMLNamespaces().get(0);
+			if (mainNs.indexOf("#")>-1) {
+				LOG.info("registering Callback for namespace " + mainNs);
+				nsCommCallbacks.put(mainNs, messageCallback);
+			}
 		}
 	}
 	
