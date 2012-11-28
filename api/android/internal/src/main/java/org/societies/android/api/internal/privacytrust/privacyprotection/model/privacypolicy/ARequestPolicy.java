@@ -31,5 +31,4 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.model.pr
  *
  */
 public class ARequestPolicy extends RequestPolicy {
-
 }

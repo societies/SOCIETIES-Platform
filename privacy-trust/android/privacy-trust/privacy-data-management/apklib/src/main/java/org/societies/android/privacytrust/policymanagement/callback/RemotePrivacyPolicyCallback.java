@@ -71,25 +71,38 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 
 	public void receiveResult(Stanza stanza, Object payload) {
 		Log.d(TAG, "receiveResult");
-		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
 		debugStanza(stanza);
+		if (null == payload) {
+			Log.e(TAG, "Arg, the payload is null!");
+			return;
+		}
+		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
+		Intent intent = new Intent();
+		intent.setPackage(clientPackage);
+		// -- Privacy
 		if (payload instanceof PrivacyPolicyManagerBeanResult) {
-			PrivacyPolicyManagerBeanResult resultBean = (PrivacyPolicyManagerBeanResult) payload;
-			MethodType methodType = resultBean.getMethod();
-			ack = resultBean.isAck();
-			ackMessage = resultBean.getAckMessage();
-			Log.d(TAG, "Type of response: " +methodType+" "+(ack ? "success" : "faillure"));
-			if (ack && (MethodType.GET_PRIVACY_POLICY.equals(methodType) || MethodType.UPDATE_PRIVACY_POLICY.equals(methodType))) {
-				privacyPolicy = resultBean.getPrivacyPolicy();
-				Log.d(TAG, "privacyPolicy retrieved");
-				Intent intent = new Intent(methodType.name());
-				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, ack);
-				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_METHOD_KEY, methodType.name());
-				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
-				intent.setPackage(clientPackage);
-				Log.d(TAG, "privacyPolicy result sent");
-				contexte.sendBroadcast(intent);
+			receiveResult(stanza, (PrivacyPolicyManagerBeanResult)payload, intent);
+		}
+		Log.d(TAG, "privacyPolicy result sent");
+		contexte.sendBroadcast(intent);
+	}
+
+	public void receiveResult(Stanza stanza, PrivacyPolicyManagerBeanResult payload, Intent intent) {
+		MethodType methodType = payload.getMethod();
+		boolean ack = payload.isAck();
+		String ackMsg = payload.getAckMessage();
+		intent.setAction(methodType.name());
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, ack);
+		Log.d(TAG, "PrivacyPolicyManager: " +methodType+" "+(ack ? "success" : "faillure")+(null != ackMsg ? " - "+ackMsg : ""));
+		if (!ack) {
+			if (null != ackMsg) {
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_ERROR_MSG_KEY, ackMsg);
 			}
+			return;
+		}
+		if (MethodType.GET_PRIVACY_POLICY.equals(methodType)) {
+			privacyPolicy = payload.getPrivacyPolicy();
+			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
 		}
 	}
 

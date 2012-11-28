@@ -26,6 +26,7 @@ package org.societies.android.api.identity;
 
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.identity.RequestorBean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,23 +37,23 @@ import android.os.Parcelable;
  * @author Eliza, Nicolas, Olivier
  *
  */
-public class ARequestor implements Parcelable {
+public class ARequestor extends RequestorBean implements Parcelable {
 	
-	private final String requestorId;
 
 	
-	/**
-	 * Create a CSS requestor from the CSS identity
-	 * @param requestorId CSS identity
-	 */
-	public ARequestor(String requestorId){
-		this.requestorId = requestorId;
-		
-	}
+//	/**
+//	 * Create a CSS requestor from the CSS identity
+//	 * @param requestorId CSS identity
+//	 */
+//	public ARequestor(String requestorId) {
+//		readFromParcel(requestorId);
+//		this.requestorId = requestorId;
+//		
+//	}
 	
 	private  ARequestor(Parcel in){
 		super();
-		this.requestorId = in.readString();
+		readFromParcel(in);
 	}
 	
 
@@ -141,6 +142,10 @@ public class ARequestor implements Parcelable {
 		return 0;
 	}
 
+	
+	private void readFromParcel(Parcel in) {
+		requestorId = in.readString();
+	}
 
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeString(requestorId);

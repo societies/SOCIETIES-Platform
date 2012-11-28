@@ -22,11 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.policymanagement;
+package org.societies.android.platform.privacytrust.policymanagement;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.android.api.identity.ARequestorCis;
 import org.societies.android.api.identity.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
@@ -43,7 +44,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.android.privacytrust.R;
+import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
@@ -75,6 +76,7 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	private final static String TAG = PrivacyPolicyManagerActivity.class.getSimpleName();
 
 	private TextView txtLocation;
+	private TextView txtConnectivity;
 
 	private boolean ipBoundToService = false;
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
@@ -97,8 +99,10 @@ public class PrivacyPolicyManagerActivity extends Activity {
 
 		// -- Create a link with editable area
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
+		txtConnectivity = (TextView) findViewById(R.id.txtConnectivity);
 
 		clientCommManager = new ClientCommunicationMgr(this);
+//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 
 
 		// -- Create a link with services
@@ -147,14 +151,16 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		// If this service is available
 		if (ipBoundToService) {
 			try {
-				RequestorCisBean requestor = new RequestorCisBean();
-				requestor.setRequestorId("master.societies.local");
-				requestor.setCisRequestorId("cis-15a35e8e-4d3a-4a43-ac20-b83393b4547e.societies.local");
+				ARequestorCis requestor = new ARequestorCis("university.societies.local", "cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
 				privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), requestor);
 				txtLocation.setText("Waiting");
 			} catch (PrivacyException e) {
 				Log.e(TAG, "Error during the privacy policy retrieving", e);
 				Toast.makeText(this, "Error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
+			}
+			catch (Exception e) {
+				Log.e(TAG, "Fatal error during the privacy policy retrieving", e);
+				Toast.makeText(this, "Fatal error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
 			}
 		}
 		else {
@@ -165,8 +171,14 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	public void onConnect(View view) {
 		// -- Login to XMPP Server
 		Log.d(TAG, "loginXMPPServer user: " + USER_NAME + " pass: " + USER_PASS + " domain: " + XMPP_DOMAIN);
+		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
+		clientCommManager.setPortNumber(5222);
+		clientCommManager.setResource("PrivacyPolicyTest");
+		clientCommManager.setDomainAuthorityNode("university.societies.local");
+		clientCommManager.setDebug(true);
 		INetworkNode networkNode = clientCommManager.login(USER_NAME, XMPP_DOMAIN, USER_PASS);
 		Toast.makeText(this, "Connected to :"+networkNode.getJid(), Toast.LENGTH_SHORT);
+		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 	}
 
 	/**
@@ -184,9 +196,9 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(TAG, intent.getAction());
 
-			if ((intent.getAction().equals(MethodType.GET_PRIVACY_POLICY))) {
+			if ((intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
 				//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-				boolean ack =  1 == intent.getIntExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, 0) ? true : false;
+				boolean ack =  intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
 				StringBuffer sb = new StringBuffer();
 				if (ack) {
 					RequestPolicy privacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);

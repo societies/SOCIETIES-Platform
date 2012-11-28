@@ -43,6 +43,8 @@
 				android:layout_height="wrap_content" android:text="@string/title_location"></TextView>
 			<TextView android:layout_width="wrap_content" android:id="@+id/txtLocation"
 				android:layout_height="wrap_content" android:text="@string/txt_nothing"></TextView>
+			<TextView android:layout_width="wrap_content" android:id="@+id/txtConnectivity"
+				android:layout_height="wrap_content" android:text="@string/txt_nothing"></TextView>
 		</LinearLayout>
 	</ScrollView>
 </LinearLayout>

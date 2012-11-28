@@ -26,14 +26,15 @@ package org.societies.android.api.internal.privacytrust;
 
 import java.util.Map;
 
-import org.societies.android.api.identity.ARequestorCis;
-import org.societies.android.api.identity.ARequestorService;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.ARequestPolicy;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 
 /**
@@ -45,69 +46,105 @@ import org.societies.api.schema.identity.RequestorCisBean;
  */
 public interface IPrivacyPolicyManager {
 	/**
-     * IPrivacyPolicyManager intents
-     * Used to create to create Intents to signal return values of a called method
-     * If the method is locally bound it is possible to directly return a value but is discouraged
-     * as called methods usually involve making asynchronous calls. 
-     */
+	 * Intent field: Return value of the request
+	 */
     public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.ReturnValue";
+    /**
+     * Intent field: Status of the request
+     */
     public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.privacytrust.ReturnStatus";
-    public static final String INTENT_RETURN_METHOD_KEY = "org.societies.android.privacytrust.ReturnMethod";
+    /**
+	 * Intent field: Error description if the request status is failure
+	 */
+    public static final String INTENT_RETURN_STATUS_MSG_KEY = "org.societies.android.privacytrust.ReturnStatusMsg";
     
 	/**
 	 * Retrieve a CIS or 3P service privacy policy by the ID of the CIS or the 3P service
 	 * @param client Client package name
-	 * @param requestor Id of the CIS or the 3P service {@link ARequestorCis} and {@link ARequestorService}
-	 * @post The response is available in an Intent: {@link MethodType}::GET_PRIVACY_POLICY. {@link INTENT_RETURN_VALUE_KEY} contains a {@link ARequestPolicy}
+	 * @param owner Id of the CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean} owner of the privacy policy
+	 * @post The response is available in an Intent: {@link MethodType}::GET_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyPolicyManager}::INTENT_RETURN_VALUE_KEY contains a {@link RequestPolicy}
 	 * @throws PrivacyException
 	 */
-	public void getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException;
+	public void getPrivacyPolicy(String client, RequestorBean owner) throws PrivacyException;
 	
 	/**
 	 * Store or update a (CIS or 3P Service) privacy policy
-	 * Example of use:
-	 * - CIS Management, to create a policy for a CIS.
-	 * - 3rd Service Creation, to attach a policy to a service
-	 * - More generally: GUI, to edit a policy.
 	 * 
 	 * @param client Client package name
-	 * @param privacyPolicy The privacy policy
-	 * @return The stored privacy policy
+	 * @param privacyPolicy The privacy policy to store or update
+	 * @post The response is available in an Intent: {@link MethodType}::UPDATE_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY.
 	 */
-	public RequestPolicy updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException;
+	public void updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException;
 	
 	/**
 	 * Store or update a (CIS or 3P Service) privacy policy from an XML version of it.
 	 * 
 	 * @param client Client package name
-	 * @param privacyPolicy XML formatted string containing the privacy policy
-	 * @param requestor Identity of the owner of this privacy policy
-	 * @return The privacy policy now stored by the PrivacyPolicyManager
+	 * @param privacyPolicy XML formatted string containing the privacy policy to store or update
+	 * @param owner Id of the CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean} owner of the privacy policy
+	 * @post The response is available in an Intent: {@link MethodType}::UPDATE_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request to know if the operation succeed or not, and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY.
 	 * @throws PrivacyException
 	 */
-	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean requestor) throws PrivacyException;
+	public void updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean owner) throws PrivacyException;
 	
 	/**
 	 * Delete a CIS or 3P service privacy policy by the ID of the CIS or the 3P Service
 	 * 
 	 * @param client Client package name
-	 * @param requestor Id of the CIS or the 3P service
-	 * @return True if the privacy policy is successfully deleted
+	 * @param owner Id of the CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean} owner of the privacy policy
+	 * @post The response is available in an Intent: {@link MethodType}::DELETE_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request to know if the operation succeed or not,  and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY.
+	 * @throws PrivacyException
 	 */
-	public boolean deletePrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException;
+	public void deletePrivacyPolicy(String client, RequestorBean owner) throws PrivacyException;
 
 	/**
-	 * Help a developer or a user to create a privacy policy by inferring a default
+	 * General function to help a developer or a user to create a privacy policy by inferring a default
 	 * one using information about the CIS or the service. The privacy policy in
-	 * result will be slighty completed but still need to be filled. E.g. if a CIS
-	 * configuration contains information about geolocation data, the inference engine
-	 * will add geolocation data line to the privacy policy.
-	 * @param client Client package name
-	 * @param privacyPolicyType 1 means CIS privacy policy, 0 means 3P Service privacy policy
+	 * result will be slightly completed but still need to be filled.
+	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
+	 * the inference engine will add geolocation data line to the privacy policy.
+	 * @param privacyPolicyType Type of the privacy policy: for a CIS or a 3P service
 	 * @param configuration Configuration of the CIS or the 3P service
-	 * @return A not complete privacy policy
+	 * @return A slightly completed privacy policy
 	 */
-	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException;
+	@SuppressWarnings("rawtypes")
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
+	
+	/**
+	 * Help a developer or a user to create a CIS privacy policy by inferring a default
+	 * one using information about the CIS. The privacy policy in
+	 * result will be slightly completed but still need to be filled.
+	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
+	 * the inference engine will add geolocation data line to the privacy policy.
+	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
+	 * @param membershipCriteria Membership criteria of the CIS (optional)
+	 * @param configuration Other optional configuration
+	 * @return A slightly completed privacy policy
+	 */
+	public RequestPolicy inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants globalBehaviour, MembershipCriteria membershipCriteria, Map<String, String> configuration) throws PrivacyException;
+	
+	/**
+	 * Help a developer or a user to create a CIS privacy policy by inferring a default
+	 * one using information about the CIS. The privacy policy in
+	 * result will be slightly completed but still need to be filled.
+	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
+	 * the inference engine will add geolocation data line to the privacy policy.
+	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
+	 * @param membershipCriteria Membership criteria of the CIS
+	 * @return A slightly completed privacy policy
+	 */
+	public RequestPolicy inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants globalBehaviour, MembershipCriteria membershipCriteria) throws PrivacyException;
+	
+	/**
+	 * Help a developer or a user to create a 3P-service privacy policy by inferring a default
+	 * one using information about the 3P-service. The privacy policy in
+	 * result will be slightly completed but still need to be filled.
+	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
+	 * the inference engine will add geolocation data line to the privacy policy.
+	 * @param configuration Configuration of the 3P service
+	 * @return A slightly completed privacy policy
+	 */
+	public RequestPolicy infer3pServicePrivacyPolicy(Map<String, String> configuration) throws PrivacyException;
 	
 	/**
 	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy

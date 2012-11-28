@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +38,12 @@ import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.utilities.MissingClientPackageException;
-import org.societies.api.identity.INetworkNode;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
 import android.util.Log;
@@ -63,25 +65,27 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.api.schema.identity.RequestorBean)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)
 	 */
-	public void getPrivacyPolicy(String clientPackage, RequestorBean requestor) throws PrivacyException {
+	@Override
+	public void getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// -- Verify
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
 		}
-		if (null == requestor || null == requestor.getRequestorId()) {
+		if (null == owner || null == owner.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
-		privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, requestor);
+		privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, owner);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
-	public RequestPolicy updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
+	@Override
+	public void updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
@@ -94,9 +98,15 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		return privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
+		privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
-	public RequestPolicy updatePrivacyPolicy(String clientPackage, String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, java.lang.String, org.societies.android.api.identity.RequestorBean)
+	 */
+	@Override
+	public void updatePrivacyPolicy(String clientPackage, String privacyPolicyXml, RequestorBean owner) throws PrivacyException {
 		// -- Verify
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
@@ -105,38 +115,82 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			throw new PrivacyException("The XML privacy policy to update is empty.");
 		}
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = fromXmlString(privacyPolicyXml);
+		RequestPolicy privacyPolicy = (RequestPolicy) fromXmlString(privacyPolicyXml);
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
-		privacyPolicy.setRequestor(requestor);
+		privacyPolicy.setRequestor(owner);
 		// Create / Store it
-		return updatePrivacyPolicy(clientPackage, privacyPolicy);
+		updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
 
-	public boolean deletePrivacyPolicy(String clientPackage, RequestorBean requestor) throws PrivacyException {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#deletePrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)
+	 */
+	@Override
+	public void deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// -- Verify
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
 		}
-		if (null == requestor || null == requestor.getRequestorId()) {
+		if (null == owner || null == owner.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
 		// -- Delete
-		return privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, requestor);
+		privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, owner);
 	}
 
-	public RequestPolicy inferPrivacyPolicy(String clientPackage, int privacyPolicyType, Map configuration) throws PrivacyException {
-		// -- Verify
-		if (null == clientPackage || "".equals(clientPackage)) {
-			throw new PrivacyException(new MissingClientPackageException());
-		}
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants, java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		List<RequestItem> requests = new ArrayList<RequestItem>();
 		RequestPolicy privacyPolicy = new RequestPolicy();
 		privacyPolicy.setRequestItems(requests);
 		return privacyPolicy;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria, java.util.Map)
+	 */
+	@Override
+	public RequestPolicy inferCisPrivacyPolicy(
+			PrivacyPolicyBehaviourConstants globalBehaviour,
+			MembershipCriteria membershipCriteria,
+			Map<String, String> configuration) throws PrivacyException {
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("globalBehaviour", globalBehaviour);
+		parameters.put("membershipCriteria", membershipCriteria);
+		parameters.putAll(configuration);
+		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria)
+	 */
+	@Override
+	public RequestPolicy inferCisPrivacyPolicy(
+			PrivacyPolicyBehaviourConstants globalBehaviour,
+			MembershipCriteria membershipCriteria) throws PrivacyException {
+		return inferCisPrivacyPolicy(globalBehaviour, membershipCriteria, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#infer3pServicePrivacyPolicy(java.util.Map)
+	 */
+	@Override
+	public RequestPolicy infer3pServicePrivacyPolicy(
+			Map<String, String> configuration) throws PrivacyException {
+		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.SERVICE, configuration);
 	}
 
 	public String toXmlString(RequestPolicy privacyPolicy) {
