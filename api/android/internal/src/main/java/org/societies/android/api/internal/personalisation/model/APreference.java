@@ -24,12 +24,11 @@
  */
 package org.societies.android.api.internal.personalisation.model;
 
-import java.io.Serializable;
 import java.util.Enumeration;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.android.api.internal.personalisation.model.tree.MutableTreeNode;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -41,38 +40,84 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPreference, Parcelable {
-
-
-
+public class APreference extends DefaultMutableTreeNode implements Parcelable {
 
 	
-	public APreferenceTreeNode(){
+	public APreference(){
 		super();
 	}
 	
-	public APreferenceTreeNode(IPreferenceCondition pc){
+	public APreference(AContextPreferenceCondition pc){
 		super(pc);	
 	}
 	
-	public APreferenceTreeNode(IOutcome po){
+	public APreference(APreferenceOutcome po){
 		super(po,false);
 		
 	}
 
-	public IPreferenceOutcome getOutcome() {
+	public APreferenceOutcome getOutcome() {
 		Object obj = this.getUserObject();
-		if (obj instanceof IOutcome){
-			return (IPreferenceOutcome) obj;
+		if (obj instanceof APreferenceOutcome){
+			return (APreferenceOutcome) obj;
 		}
 		return null;
 	}
 
+	public void writeToParcel(Parcel out, int flags) {
+		out.writeByte((byte) (allowsChildren ? 1 : 0));   
+		
+		
+		Parcelable[] aChildren = new Parcelable[this.children.size()];
+		for (int i =0; i< this.children.size(); i++){
+			aChildren[i] = (Parcelable) this.children.get(i);
+		}
+		
+		out.writeParcelableArray(aChildren, flags);
+		
+		out.writeParcelable((Parcelable) parent, flags);
+		
+		out.writeParcelable((Parcelable) userObject, flags);
+	}
+	
+	public APreference(Parcel in){
+		super();
+		this.allowsChildren = in.readByte() == 1; 
+		this.readChildren(in.readParcelableArray(MutableTreeNode.class.getClassLoader()));
+		this.parent = (APreference) in.readParcelable(APreference.class.getClassLoader());
+		if (this.allowsChildren){
+			try{
+			this.userObject = in.readParcelable(AContextPreferenceCondition.class.getClassLoader());
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+		}else{
+				this.userObject = in.readParcelable(APreferenceOutcome.class.getClassLoader());
+			
+		}
+	}
+	
+	private void readChildren(Parcelable[] readParcelableArray) {
+		for (Parcelable p : readParcelableArray){
+			this.children.add(p);
+		}
+		
+	}
+	public static final Parcelable.Creator<APreference> CREATOR = new Parcelable.Creator<APreference>() {
 
-	public IPreferenceCondition getCondition() {
+        public APreference createFromParcel(Parcel in) {
+            return new APreference(in);
+        }
+
+        public APreference[] newArray(int size) {
+            return new APreference[size];
+        }
+
+    };
+	public AContextPreferenceCondition getCondition() {
 		Object obj = this.getUserObject();
-		if (obj instanceof IPreferenceCondition){
-			return (IPreferenceCondition) obj;
+		if (obj instanceof AContextPreferenceCondition){
+			return (AContextPreferenceCondition) obj;
 		}
 		return null;
 	}
@@ -82,7 +127,7 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 		if (obj==null){
 			return true;
 		}
-		if (obj instanceof IPreferenceCondition){
+		if (obj instanceof AContextPreferenceCondition){
 			return true;
 		}	
 		return false;
@@ -90,7 +135,7 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 	
 	public boolean isLeaf(){
 		Object obj = this.getUserObject();
-		if (obj instanceof IPreferenceCondition){
+		if (obj instanceof AContextPreferenceCondition){
 			return false;
 		}	
 		if (obj==null){
@@ -106,27 +151,27 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 
 
 
-	public void add(IPreference p) {
+	public void add(APreference p) {
 	
 		super.add(p);
 		
 	}
 
-	public void remove(IPreference p) {
+	public void remove(APreference p) {
 		super.remove(p);
 		
 	}	
 	
-	public Enumeration<IPreference> depthFirstEnumeration(){
+	public Enumeration<APreference> depthFirstEnumeration(){
 		return super.depthFirstEnumeration();
 	}
 	
-	public Enumeration<IPreference> breadthFirstEnumeration(){
+	public Enumeration<APreference> breadthFirstEnumeration(){
 		return super.breadthFirstEnumeration();
 	}
 	
-	public IPreference getRoot(){
-		return (IPreference) super.getRoot();
+	public APreference getRoot(){
+		return (APreference) super.getRoot();
 	}
 	
 	public int getLevel(){
@@ -141,7 +186,7 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 	 * @see DefaultMutableTreeNode#preorderEnumeration()
 	 * @return	an enumeration of IPreference node objects traversed in pre-order
 	 */
-	public Enumeration<IPreference> preorderEnumeration(){
+	public Enumeration<APreference> preorderEnumeration(){
 		return super.preorderEnumeration();
 	}
 	
@@ -149,10 +194,14 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 	 * @see DefaultMutableTreeNode#postorderEnumeration()
 	 * @return	an enumeration of IPreference node objects traversed in post-order
 	 */
-	public Enumeration<IPreference> postorderEnumeration(){
+	public Enumeration<APreference> postorderEnumeration(){
 		return super.postorderEnumeration();
 	}
 	
+	@Override
+	public APreference getParent(){
+		return (APreference) parent;
+	}
 	/*
 	public String toString(){
 		String str = "";
@@ -189,10 +238,10 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 
 	public String toTreeString(){
 		String str = "";
-		Enumeration<IPreference> e = this.preorderEnumeration();
+		Enumeration<APreference> e = this.preorderEnumeration();
 		
 		while (e.hasMoreElements()){
-			IPreference p = e.nextElement();
+			APreference p = e.nextElement();
 			for (int i = 0; i<p.getLevel(); i++){
 				str = str.concat("\t");
 			}
@@ -208,8 +257,5 @@ public class APreferenceTreeNode extends DefaultMutableTreeNode implements IPref
 		return 0;
 	}
 
-	public void writeToParcel(Parcel arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+
 }

@@ -28,7 +28,6 @@ public interface IPersonalisationManagerAndroid {
 			"getPreference(String clientID, Requestor requestor, org.societies.api.identity.IIdentity ownerID, String serviceType, org.societies.android.api.servicelifecycle.AServiceResourceIdentifier serviceID, String preferenceName)"};
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return TODO
 	 * @return					the outcome in the form of an IAction object
 	 * 
 	 * @param requestor    the DigitalIdentity of the service requesting the outcome
@@ -37,6 +36,7 @@ public interface IPersonalisationManagerAndroid {
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
+	 * @return	this method doesn't actually return anything. use the INTENT_RETURN_VALUE to retrieve the result 
 	 */
 	public IAction getIntentAction(String clientID, Requestor requestor, IIdentity ownerID, AServiceResourceIdentifier serviceID, String preferenceName);
 
@@ -47,10 +47,38 @@ public interface IPersonalisationManagerAndroid {
 	 * @param requestor    the DigitalIdentity of the service requesting the outcome
 	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
 	 * user of this service)
+	 * @param serviceID    the service identifier of the service requesting the
+	 * outcome
+	 * @param preferenceName    the name of the preference requested
+	 * @return	this method doesn't actually return anything. use the INTENT_RETURN_VALUE to retrieve the result 
+	 */
+	public IAction getIntentAction(String clientID, String requestor, String ownerID, String serviceID, String preferenceName);
+	
+	/**
+	 * Allows any service to request an context-based evaluated preference outcome.
+	 * 
+	 * @param requestor    the DigitalIdentity of the service requesting the outcome
+	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
+	 * user of this service)
 	 * @param serviceType    the type of the service requesting the outcome
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
+	 * @return	this method doesn't actually return anything. use the INTENT_RETURN_VALUE to retrieve the result 
 	 */
 	public IAction getPreference(String clientID, Requestor requestor, IIdentity ownerID, String serviceType, AServiceResourceIdentifier serviceID, String preferenceName);
+	
+	/**
+	 * Allows any service to request an context-based evaluated preference outcome.
+	 * 
+	 * @param requestor    the DigitalIdentity of the service requesting the outcome
+	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
+	 * user of this service)
+	 * @param serviceType    the type of the service requesting the outcome
+	 * @param serviceID    the service identifier of the service requesting the
+	 * outcome
+	 * @param preferenceName    the name of the preference requested
+	 * @return	this method doesn't actually return anything. use the INTENT_RETURN_VALUE to retrieve the result 
+	 */
+	public IAction getPreference(String clientID, String requestor, String ownerID, String serviceType, String serviceID, String preferenceName);
 }

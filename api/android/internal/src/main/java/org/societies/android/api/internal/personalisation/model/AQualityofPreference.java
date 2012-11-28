@@ -34,7 +34,7 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class AQualityofPreference implements IQualityofPreference, Parcelable {
+public class AQualityofPreference implements Parcelable {
 
 	/**
 	 * how many times this outcome has been aborted

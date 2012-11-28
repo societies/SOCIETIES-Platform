@@ -26,9 +26,9 @@ package org.societies.android.api.internal.personalisation.model;
 
 import java.util.Date;
 
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 
+import org.societies.android.api.internal.personalisation.model.tree.DefaultTreeModel;
+import org.societies.android.api.internal.personalisation.model.tree.TreeNode;
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 
 import android.os.Parcel;
@@ -41,20 +41,20 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class APreferenceTreeModel extends DefaultTreeModel implements IPreferenceTreeModel, Parcelable {
+public class APreferenceTreeModel extends DefaultTreeModel implements Parcelable {
 
 	private AServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private String preferenceName;
-	private IPreference preference;
+	private APreference preference;
 	private Date lastModifiedDate;
 
-	public APreferenceTreeModel(IPreference root) {
-		super(root);
+	public APreferenceTreeModel(APreference root) {
+		super((TreeNode) root);
 		this.preference = root;
 	}
 
-	public IPreference getRootPreference(){
+	public APreference getRootPreference(){
 		return this.preference;
 	}
 	public String getPreferenceName() {
@@ -89,7 +89,7 @@ public class APreferenceTreeModel extends DefaultTreeModel implements IPreferenc
 	}
 
 	private APreferenceTreeModel(Parcel in){
-		super((IPreference) in.readParcelable(IPreference.class.getClassLoader()));
+		this((APreference) in.readParcelable(APreference.class.getClassLoader()));
 		this.serviceID = in.readParcelable(AServiceResourceIdentifier.class.getClassLoader());
 		this.preferenceName = in.readString();
 		this.serviceType = in.readString();

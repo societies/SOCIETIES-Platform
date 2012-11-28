@@ -26,9 +26,8 @@ package org.societies.android.api.internal.personalisation.model;
 
 import java.util.ArrayList;
 
-
+import org.societies.android.api.personalisation.model.AAction;
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
-import org.societies.api.personalisation.model.Action;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -40,22 +39,47 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class APreferenceOutcome extends Action implements IPreferenceOutcome, Parcelable {
+public class APreferenceOutcome extends AAction implements Parcelable {
 
 	private int confidenceLevel;
 	private ArrayList<String> parameterNames;
-	private IQualityofPreference qop;
+	private AQualityofPreference qop;
 
 	public APreferenceOutcome(){
 		super();
 	}
 
 	public APreferenceOutcome(AServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
-		super(serviceID, serviceType, parameterName, value);
+		super();
+		setServiceID(serviceID);
+		setServiceType(serviceType);
+		setparameterName(parameterName);
+		setvalue(value);
 		this.confidenceLevel = 51;
 	}
 
+	private APreferenceOutcome(Parcel in){
+		
+		//setAServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		
+	}
 
+	public void writeToParcel(Parcel out, int flags) {
+		
+		
+	}
+
+	public static final Parcelable.Creator<APreferenceOutcome> CREATOR = new Parcelable.Creator<APreferenceOutcome>() {
+
+        public APreferenceOutcome createFromParcel(Parcel in) {
+            return new APreferenceOutcome(in);
+        }
+
+        public APreferenceOutcome[] newArray(int size) {
+            return new APreferenceOutcome[size];
+        }
+
+    };
 	/**
 	 * Method to set the confidence level
 	 * @param confidenceLevel
@@ -73,7 +97,7 @@ public class APreferenceOutcome extends Action implements IPreferenceOutcome, Pa
 
 
 	
-	public void setQualityofPreference(IQualityofPreference qop){
+	public void setQualityofPreference(AQualityofPreference qop){
 		this.qop = qop;
 	}
 
@@ -82,12 +106,9 @@ public class APreferenceOutcome extends Action implements IPreferenceOutcome, Pa
 		return 0;
 	}
 
-	public void writeToParcel(Parcel out, int flags) {
-		
-		
-	}
 
-	public IQualityofPreference getQualityofPreference() {
+
+	public AQualityofPreference getQualityofPreference() {
 		// TODO Auto-generated method stub
 		return this.qop;
 	}
