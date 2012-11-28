@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.Registry;
 import org.simpleframework.xml.convert.RegistryStrategy;
+import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.societies.maven.converters.URIConverter;
 
@@ -54,16 +55,17 @@ public class SocietiesSerialiser {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		s = new Persister(strategy);
 	}
 	
-	public static String Write(Object payload) throws Exception {
+	public String Write(Object payload) throws Exception {
 		Log.d(LOG_TAG, "Serialising payload: " + payload.getClass().getName());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		s.write(payload, os);
 		return os.toString();
 	}
 	
-	public static Object Read(Class<? extends Object> c, String xml) throws Exception {
+	public Object Read(Class<? extends Object> c, String xml) throws Exception {
 		//GET CLASS FIRST
 		Object payload = s.read(c, xml);		
 		return payload;
