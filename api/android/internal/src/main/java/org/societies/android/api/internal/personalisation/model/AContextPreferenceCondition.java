@@ -71,6 +71,27 @@ public class AContextPreferenceCondition implements Parcelable{
 		out.writeString(this.name);
 		
 	}
+	
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+	public static final Parcelable.Creator<AContextPreferenceCondition> CREATOR = new Parcelable.Creator<AContextPreferenceCondition>() {
+
+        public AContextPreferenceCondition createFromParcel(Parcel in) {
+            return new AContextPreferenceCondition(in);
+        }
+
+        public AContextPreferenceCondition[] newArray(int size) {
+            return new AContextPreferenceCondition[size];
+        }
+
+    };
+    
+    
 	public String getType(){
 		return this.type;
 	}
@@ -156,23 +177,6 @@ public class AContextPreferenceCondition implements Parcelable{
 		return true;
 	}
 
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-
-
-	public static final Parcelable.Creator<AContextPreferenceCondition> CREATOR = new Parcelable.Creator<AContextPreferenceCondition>() {
-
-        public AContextPreferenceCondition createFromParcel(Parcel in) {
-            return new AContextPreferenceCondition(in);
-        }
-
-        public AContextPreferenceCondition[] newArray(int size) {
-            return new AContextPreferenceCondition[size];
-        }
-
-    };
 
 }

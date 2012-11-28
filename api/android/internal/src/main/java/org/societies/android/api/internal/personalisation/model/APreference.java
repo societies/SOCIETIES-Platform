@@ -25,10 +25,11 @@
 package org.societies.android.api.internal.personalisation.model;
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Stack;
+import java.util.Vector;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.societies.android.api.internal.personalisation.model.tree.MutableTreeNode;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -40,24 +41,53 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class APreference extends DefaultMutableTreeNode implements Parcelable {
+public class APreference implements Parcelable {
 
-	
+
+	/**
+     * An enumeration that is always empty. This is used when an enumeration
+     * of a leaf node's children is requested.
+     */
+    static public final Enumeration<APreference> EMPTY_ENUMERATION
+	= new Enumeration<APreference>() {
+	    public boolean hasMoreElements() { return false; }
+	    public APreference nextElement() {
+		throw new NoSuchElementException("No more elements");
+	    }
+    };
+
+    /** this node's parent, or null if this node has no parent */
+    protected APreference   parent;
+
+    /** array of children, may be null if this node has no children */
+    protected Vector<APreference> children;
+
+    /** optional user object */
+    transient protected Object	userObject;
+
+    /** true if the node is able to have children */
+    protected boolean		allowsChildren;
+
 	public APreference(){
-		super();
+		this(null, true);
 	}
 	
 	public APreference(AContextPreferenceCondition pc){
-		super(pc);	
+		this(pc, true);
 	}
 	
 	public APreference(APreferenceOutcome po){
-		super(po,false);
+		this(po,false);
 		
 	}
 
+	private APreference(Object obj, boolean allowsCh){
+		parent = null;
+		this.allowsChildren = allowsCh;
+		this.userObject = obj;
+	}
 	public APreferenceOutcome getOutcome() {
-		Object obj = this.getUserObject();
+		Object obj = this.userObject;
 		if (obj instanceof APreferenceOutcome){
 			return (APreferenceOutcome) obj;
 		}
@@ -83,7 +113,7 @@ public class APreference extends DefaultMutableTreeNode implements Parcelable {
 	public APreference(Parcel in){
 		super();
 		this.allowsChildren = in.readByte() == 1; 
-		this.readChildren(in.readParcelableArray(MutableTreeNode.class.getClassLoader()));
+		this.readChildren((APreference[]) in.readParcelableArray(APreference.class.getClassLoader()));
 		this.parent = (APreference) in.readParcelable(APreference.class.getClassLoader());
 		if (this.allowsChildren){
 			try{
@@ -97,9 +127,9 @@ public class APreference extends DefaultMutableTreeNode implements Parcelable {
 		}
 	}
 	
-	private void readChildren(Parcelable[] readParcelableArray) {
-		for (Parcelable p : readParcelableArray){
-			this.children.add(p);
+	private void readChildren(APreference[] readParcelableArray) {
+		for (APreference pr : readParcelableArray){
+			this.children.add((APreference) pr);
 		}
 		
 	}
@@ -115,30 +145,30 @@ public class APreference extends DefaultMutableTreeNode implements Parcelable {
 
     };
 	public AContextPreferenceCondition getCondition() {
-		Object obj = this.getUserObject();
-		if (obj instanceof AContextPreferenceCondition){
-			return (AContextPreferenceCondition) obj;
+		
+		if (this.userObject instanceof AContextPreferenceCondition){
+			return (AContextPreferenceCondition) this.userObject;
 		}
 		return null;
 	}
 
 	public boolean isBranch() {
-		Object obj = this.getUserObject();
-		if (obj==null){
+		
+		if (this.userObject==null){
 			return true;
 		}
-		if (obj instanceof AContextPreferenceCondition){
+		if (this.userObject instanceof AContextPreferenceCondition){
 			return true;
 		}	
 		return false;
 	}
 	
 	public boolean isLeaf(){
-		Object obj = this.getUserObject();
-		if (obj instanceof AContextPreferenceCondition){
+		
+		if (this.userObject instanceof AContextPreferenceCondition){
 			return false;
 		}	
-		if (obj==null){
+		if (this.userObject==null){
 			return false;
 		}
 		return true;	
@@ -146,59 +176,227 @@ public class APreference extends DefaultMutableTreeNode implements Parcelable {
 	
 	
 	public Object[] getUserObjectPath(){
-		return super.getUserObjectPath();
+		APreference[]          realPath = getPath();
+		Object[]            retPath = new Object[realPath.length];
+
+		for(int counter = 0; counter < realPath.length; counter++)
+		    retPath[counter] = ((APreference)realPath[counter])
+			               .getUserObject();
+		return retPath;
 	}
 
 
 
-	public void add(APreference p) {
+	public Object getUserObject(){
+		return this.userObject;
+	}
 	
-		super.add(p);
-		
+    public APreference[] getPath() {
+	return getPathToRoot(this, 0);
+    }
+    
+    protected APreference[] getPathToRoot(APreference aNode, int depth) {
+    	APreference[]              retNodes;
+
+	/* Check for null, in case someone passed in a null node, or
+	   they passed in an element that isn't rooted at root. */
+	if(aNode == null) {
+	    if(depth == 0)
+		return null;
+	    else
+		retNodes = new APreference[depth];
+	}
+	else {
+	    depth++;
+	    retNodes = getPathToRoot(aNode.getParent(), depth);
+	    retNodes[retNodes.length - depth] = aNode;
+	}
+	return retNodes;
+    }
+    
+	
+    public void add(APreference newChild) {
+	if(newChild != null && newChild.getParent() == this)
+	    insert(newChild, getChildCount() - 1);
+	else
+	    insert(newChild, getChildCount());
+    }
+    
+    public void insert(APreference newChild, int childIndex) {
+	if (!allowsChildren) {
+	    throw new IllegalStateException("node does not allow children");
+	} else if (newChild == null) {
+	    throw new IllegalArgumentException("new child is null");
+	} else if (isNodeAncestor(newChild)) {
+	    throw new IllegalArgumentException("new child is an ancestor");
 	}
 
-	public void remove(APreference p) {
-		super.remove(p);
-		
-	}	
+	APreference oldParent = (APreference)newChild.getParent();
+
+	    if (oldParent != null) {
+		oldParent.remove(newChild);
+	    }
+	    newChild.setParent(this);
+	    if (children == null) {
+		children = new Vector<APreference>();
+	    }
+	    children.insertElementAt(newChild, childIndex);
+    }
+    
+    public void setParent(APreference newParent) {
+	parent = newParent;
+    }
+    public boolean isNodeAncestor(APreference anotherNode) {
+	if (anotherNode == null) {
+	    return false;
+	}
+
+	APreference ancestor = this;
+
+	do {
+	    if (ancestor == anotherNode) {
+		return true;
+	    }
+	} while((ancestor = ancestor.getParent()) != null);
+
+	return false;
+    }
+
+    /**
+     * Returns the number of children of this node.
+     *
+     * @return	an int giving the number of children of this node
+     */
+    public int getChildCount() {
+	if (children == null) {
+	    return 0;
+	} else {
+	    return children.size();
+	}
+    }
+    
+    public void remove(APreference aChild) {
+	if (aChild == null) {
+	    throw new IllegalArgumentException("argument is null");
+	}
+
+	if (!isNodeChild(aChild)) {
+	    throw new IllegalArgumentException("argument is not a child");
+	}
+	remove(getIndex(aChild));	// linear search
+    }
+    
+    
+    public void remove(int childIndex) {
+    	APreference child = (APreference)getChildAt(childIndex);
+	children.removeElementAt(childIndex);
+	child.setParent(null);
+    }
+
+    public APreference getChildAt(int index) {
+	if (children == null) {
+	    throw new ArrayIndexOutOfBoundsException("node has no children");
+	}
+	return (APreference)children.elementAt(index);
+    }
+
+    public int getIndex(APreference aChild) {
+	if (aChild == null) {
+	    throw new IllegalArgumentException("argument is null");
+	}
+
+	if (!isNodeChild(aChild)) {
+	    return -1;
+	}
+	return children.indexOf(aChild);	// linear search
+    }
+    
+    public boolean isNodeChild(APreference aNode) {
+	boolean retval;
+
+	if (aNode == null) {
+	    retval = false;
+	} else {
+	    if (getChildCount() == 0) {
+		retval = false;
+	    } else {
+		retval = (aNode.getParent() == this);
+	    }
+	}
+
+	return retval;
+    }
+
+    public Enumeration<APreference> depthFirstEnumeration() {
+    	return postorderEnumeration();
+    }
+    
+    
+    public Enumeration<APreference> breadthFirstEnumeration() {
+	return new BreadthFirstEnumeration(this);
+    }
 	
-	public Enumeration<APreference> depthFirstEnumeration(){
-		return super.depthFirstEnumeration();
+    public APreference getRoot() {
+    	APreference ancestor = this;
+    	APreference previous;
+
+	do {
+	    previous = ancestor;
+	    ancestor = ancestor.getParent();
+	} while (ancestor != null);
+
+	return previous;
+    }
+	
+    public int getLevel() {
+	APreference ancestor;
+	int levels = 0;
+
+	ancestor = this;
+	while((ancestor = ancestor.getParent()) != null){
+	    levels++;
+	}
+
+	return levels;
+    }
+
+	
+    public int getDepth() {
+	Object	last = null;
+	Enumeration<APreference>	enum_ = breadthFirstEnumeration();
+	
+	while (enum_.hasMoreElements()) {
+	    last = enum_.nextElement();
 	}
 	
-	public Enumeration<APreference> breadthFirstEnumeration(){
-		return super.breadthFirstEnumeration();
+	if (last == null) {
+	    throw new Error ("nodes should be null");
 	}
 	
-	public APreference getRoot(){
-		return (APreference) super.getRoot();
+	return ((APreference)last).getLevel() - getLevel();
+    }
+    public Enumeration<APreference> children() {
+	if (children == null) {
+	    return EMPTY_ENUMERATION;
+	} else {
+	    return children.elements();
 	}
-	
-	public int getLevel(){
-		return super.getLevel();
-	}
-	
-	public int getDepth(){
-		return super.getDepth();
-	}
-	
-	/**
-	 * @see DefaultMutableTreeNode#preorderEnumeration()
-	 * @return	an enumeration of IPreference node objects traversed in pre-order
-	 */
-	public Enumeration<APreference> preorderEnumeration(){
-		return super.preorderEnumeration();
-	}
+    }
+
 	
 	/**
 	 * @see DefaultMutableTreeNode#postorderEnumeration()
 	 * @return	an enumeration of IPreference node objects traversed in post-order
 	 */
-	public Enumeration<APreference> postorderEnumeration(){
-		return super.postorderEnumeration();
-	}
+    public Enumeration<APreference> postorderEnumeration() {
+	return new PostorderEnumeration(this);
+    }
+
+    public Enumeration preorderEnumeration() {
+	return new PreorderEnumeration(this);
+    }
+
 	
-	@Override
 	public APreference getParent(){
 		return (APreference) parent;
 	}
@@ -256,6 +454,156 @@ public class APreference extends DefaultMutableTreeNode implements Parcelable {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+    final class BreadthFirstEnumeration implements Enumeration<APreference> {
+	protected Queue	queue;
+	
+	public BreadthFirstEnumeration(APreference rootNode) {
+	    super();
+	    Vector<APreference> v = new Vector<APreference>(1);
+	    v.addElement(rootNode);	// PENDING: don't really need a vector
+	    queue = new Queue();
+	    queue.enqueue(v.elements());
+	}
+	
+	public boolean hasMoreElements() {
+	    return (!queue.isEmpty() &&
+		    ((Enumeration)queue.firstObject()).hasMoreElements());
+	}
+	
+	public APreference nextElement() {
+	    Enumeration	enumer = (Enumeration)queue.firstObject();
+	    APreference	node = (APreference)enumer.nextElement();
+	    Enumeration<APreference>	children = node.children();
+	
+	    if (!enumer.hasMoreElements()) {
+		queue.dequeue();
+	    }
+	    if (children.hasMoreElements()) {
+		queue.enqueue(children);
+	    }
+	    return node;
+	}
+	
+	
+	// A simple queue with a linked list data structure.
+	final class Queue {
+	    QNode head;	// null if empty
+	    QNode tail;
+	
+	    final class QNode {
+		public Object	object;
+		public QNode	next;	// null if end
+		public QNode(Object object, QNode next) {
+		    this.object = object;
+		    this.next = next;
+		}
+	    }
+	
+	    public void enqueue(Object anObject) {
+		if (head == null) {
+		    head = tail = new QNode(anObject, null);
+		} else {
+		    tail.next = new QNode(anObject, null);
+		    tail = tail.next;
+		}
+	    }
+	
+	    public Object dequeue() {
+		if (head == null) {
+		    throw new NoSuchElementException("No more elements");
+		}
+	
+		Object retval = head.object;
+		QNode oldHead = head;
+		head = head.next;
+		if (head == null) {
+		    tail = null;
+		} else {
+		    oldHead.next = null;
+		}
+		return retval;
+	    }
+	
+	    public Object firstObject() {
+		if (head == null) {
+		    throw new NoSuchElementException("No more elements");
+		}
+	
+		return head.object;
+	    }
+	
+	    public boolean isEmpty() {
+		return head == null;
+	    }
+	
+	} // End of class Queue
+	
+	}  // End of class BreadthFirstEnumeration
+	final class PreorderEnumeration implements Enumeration<APreference> {
+	protected Stack stack;
+	
+	public PreorderEnumeration(APreference rootNode) {
+	    super();
+	    Vector<APreference> v = new Vector<APreference>(1);
+	    v.addElement(rootNode);	// PENDING: don't really need a vector
+	    stack = new Stack();
+	    stack.push(v.elements());
+	}
+	
+	public boolean hasMoreElements() {
+	    return (!stack.empty() &&
+		    ((Enumeration)stack.peek()).hasMoreElements());
+	}
+	
+	public APreference nextElement() {
+	    Enumeration	enumer = (Enumeration)stack.peek();
+	    APreference	node = (APreference)enumer.nextElement();
+	    Enumeration	children = node.children();
+	
+	    if (!enumer.hasMoreElements()) {
+		stack.pop();
+	    }
+	    if (children.hasMoreElements()) {
+		stack.push(children);
+	    }
+	    return node;
+	}
+	
+	}  // End of class PreorderEnumeration
+	final class PostorderEnumeration implements Enumeration<APreference> {
+	protected APreference root;
+	protected Enumeration<APreference> children;
+	protected Enumeration<APreference> subtree;
+	
+	public PostorderEnumeration(APreference rootNode) {
+	    super();
+	    root = rootNode;
+	    children = root.children();
+	    subtree = EMPTY_ENUMERATION;
+	}
+	
+	public boolean hasMoreElements() {
+	    return root != null;
+	}
+	
+	public APreference nextElement() {
+		APreference retval;
+	
+	    if (subtree.hasMoreElements()) {
+		retval = subtree.nextElement();
+	    } else if (children.hasMoreElements()) {
+		subtree = new PostorderEnumeration(
+				(APreference)children.nextElement());
+		retval = subtree.nextElement();
+	    } else {
+		retval = root;
+		root = null;
+	    }
+	
+	    return retval;
+	}
+	
+	}  // End of class PostorderEnumeration
 
 
 }

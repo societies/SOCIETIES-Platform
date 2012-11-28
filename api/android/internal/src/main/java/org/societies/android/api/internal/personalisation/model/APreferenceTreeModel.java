@@ -27,8 +27,6 @@ package org.societies.android.api.internal.personalisation.model;
 import java.util.Date;
 
 
-import org.societies.android.api.internal.personalisation.model.tree.DefaultTreeModel;
-import org.societies.android.api.internal.personalisation.model.tree.TreeNode;
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 
 import android.os.Parcel;
@@ -41,19 +39,25 @@ import android.os.Parcelable;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class APreferenceTreeModel extends DefaultTreeModel implements Parcelable {
+public class APreferenceTreeModel implements Parcelable {
 
 	private AServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private String preferenceName;
 	private APreference preference;
 	private Date lastModifiedDate;
-
+    protected boolean asksAllowsChildren;
+    
 	public APreferenceTreeModel(APreference root) {
-		super((TreeNode) root);
+		this(root, false);
 		this.preference = root;
 	}
 
+	public APreferenceTreeModel(APreference root, boolean asksAllowsChildren) {
+        super();
+        this.preference = root;
+        this.asksAllowsChildren = asksAllowsChildren;
+    }
 	public APreference getRootPreference(){
 		return this.preference;
 	}

@@ -60,12 +60,22 @@ public class APreferenceOutcome extends AAction implements Parcelable {
 
 	private APreferenceOutcome(Parcel in){
 		
-		//setAServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		this.setServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		this.setServiceType(in.readString());
+		this.setparameterName(in.readString());
+		this.setvalue(in.readString());
+		this.qop = in.readParcelable(AQualityofPreference.class.getClassLoader());
+		this.confidenceLevel = in.readInt();
 		
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
-		
+		out.writeParcelable(this.getServiceID(), flags);
+		out.writeString(this.getServiceType());
+		out.writeString(this.getparameterName());
+		out.writeString(this.getvalue());
+		out.writeParcelable(this.qop, flags);
+		out.writeInt(this.confidenceLevel);
 		
 	}
 
