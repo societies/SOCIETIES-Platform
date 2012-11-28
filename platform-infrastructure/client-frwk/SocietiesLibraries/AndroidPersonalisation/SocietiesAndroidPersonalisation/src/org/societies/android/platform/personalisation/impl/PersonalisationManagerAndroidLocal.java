@@ -22,83 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
+package org.societies.android.platform.personalisation.impl;
 
-import org.societies.android.api.context.model.ACtxAttributeIdentifier;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-
-
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Class that links a context condition that affects a specific PreferenceName
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
+ * @author Eliza
+ *
  */
-public class APreferenceConditionIOutcomeName implements Parcelable{
+public class PersonalisationManagerAndroidLocal extends Service{
 
-	private ACtxAttributeIdentifier ctxIdentifier;
-	private String prefName;
+	private static final String LOG_TAG = PersonalisationManagerAndroidLocal.class.getName();
+	private IBinder binder = null;
 
-	public APreferenceConditionIOutcomeName(){
-
-	}
-	/**
-	 * 
-	 * @param id
-	 * @param preferenceName
-	 */
-	public APreferenceConditionIOutcomeName(ACtxAttributeIdentifier id, String preferenceName){
-		this.ctxIdentifier = id;
-		this.prefName = preferenceName;
-	}
-	
-	
-    private APreferenceConditionIOutcomeName(Parcel in) {
-        super();
-        
-        this.ctxIdentifier = (ACtxAttributeIdentifier) in.readParcelable(ACtxAttributeIdentifier.class.getClassLoader());
-        this.prefName = in.readString();
-    }
     
-
-	/**
-	 * Method to get the context identifier of the condition that affects this
-	 * preference
-	 * @return 	the context identifier
-	 */
-	public ACtxAttributeIdentifier getICtxIdentifier(){
-		return ctxIdentifier;
+    @Override
+	public void onCreate () {
+		this.binder = new LocalPlatformEventsBinder();
+		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service starting");
 	}
 
-	/**
-	 * Method to get the name of the outcome affected
-	 * @return	the name of the preference
-	 */
-	public String getPreferenceName(){
-		return prefName;
-	}
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeParcelable(this.ctxIdentifier, flags);
-		out.writeString(prefName);
+	/**Create Binder object for local service invocation */
+	public class LocalPlatformEventsBinder extends Binder {
 		
+		public PersonalisationManagerAndroid getService() {
+			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			
+			PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), pubsubClient, ccm, false);
+
+			return serviceBase;
+		}
 	}
-	public static final Parcelable.Creator<APreferenceConditionIOutcomeName> CREATOR = new Parcelable.Creator<APreferenceConditionIOutcomeName>() {
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service terminating");
+	}
 
-        public APreferenceConditionIOutcomeName createFromParcel(Parcel in) {
-            return new APreferenceConditionIOutcomeName(in);
-        }
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
+	/**
+	 * Factory method to get instance of {@link PubsubClientAndroid}
+	 * @return PubsubClientAndroid
+	 */
+	protected PubsubClientAndroid createPubSubClientAndroid() {
+		return new PubsubClientAndroid(getApplicationContext());
+	}
+	
+	/**
+	 * Factory method to get instance of {@link ClientCommunicationMgr}
+	 * @return ClientCommunicationMgr
+	 */
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
+	}
 
-        public APreferenceConditionIOutcomeName[] newArray(int size) {
-            return new APreferenceConditionIOutcomeName[size];
-        }
-
-    };
 }

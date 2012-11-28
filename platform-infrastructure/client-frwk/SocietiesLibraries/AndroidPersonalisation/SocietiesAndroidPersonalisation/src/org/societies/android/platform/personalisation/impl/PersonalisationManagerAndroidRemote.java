@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,21 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
+package org.societies.android.platform.personalisation.impl;
 
+import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
+import org.societies.android.api.utilities.RemoteServiceHandler;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
-import org.societies.api.personalisation.model.IAction;
-
-import android.os.Parcelable;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.util.Log;
 
 /**
- * Interface that extends the @see IAction
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 13:25:58
+ * @author Eliza
+ *
  */
-public interface IOutcome extends Parcelable, IAction {
+public class PersonalisationManagerAndroidRemote extends Service{
 
-	public int getConfidenceLevel();
+	private static final String LOG_TAG = PersonalisationManagerAndroidRemote.class.getName();
+	private Messenger inMessenger;
+	
+	@Override
+	public void onCreate () {
+		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
+		
+		PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(this.getApplicationContext(), pubsubClient, ccm, false);
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IPersonalisationManagerAndroid.methodsArray));
+		Log.i(LOG_TAG, "PersonalisationManagerAndroidRemote creation");
+	}
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		Log.d(LOG_TAG, "PersonalisationManagerAndroidRemote onBind");
+		return inMessenger.getBinder();
+	}
 
+	@Override
+	public void onDestroy() {
+		Log.i(LOG_TAG, "PersonalisationManagerAndroidRemote terminating");
+	}
 }

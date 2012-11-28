@@ -96,6 +96,24 @@ public class APreferenceDetails implements Parcelable {
 		
 	}
 	
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	public static final Parcelable.Creator<APreferenceDetails> CREATOR = new Parcelable.Creator<APreferenceDetails>() {
+
+        public APreferenceDetails createFromParcel(Parcel in) {
+            return new APreferenceDetails(in);
+        }
+
+        public APreferenceDetails[] newArray(int size) {
+            return new APreferenceDetails[size];
+        }
+
+    };
+	
 	/**
 	 * 
 	 * @param prefName
@@ -229,22 +247,6 @@ public class APreferenceDetails implements Parcelable {
 		+ "PreferenceName: "+this.preferenceName+"\n";
 	}
 
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-
-	public static final Parcelable.Creator<APreferenceDetails> CREATOR = new Parcelable.Creator<APreferenceDetails>() {
-
-        public APreferenceDetails createFromParcel(Parcel in) {
-            return new APreferenceDetails(in);
-        }
-
-        public APreferenceDetails[] newArray(int size) {
-            return new APreferenceDetails[size];
-        }
-
-    };
 
 }
