@@ -18,10 +18,10 @@ public class ClassLoaderManager {
 	private Map<Long, ClassLoader> classloaderMap;
 	private Map<String, Long> classToBundle;
 	
-	public ClassLoaderManager(Object commMgrBean) {
+	public ClassLoaderManager() {
 		classloaderMap = new HashMap<Long, ClassLoader>();
 		classToBundle = new HashMap<String, Long>();
-		thisBundleId = getBundleId(commMgrBean);
+		thisBundleId = getBundleId(this);
 	}
 
 	public ClassLoader classLoaderMagic(Object targetBean) {
@@ -44,21 +44,28 @@ public class ClassLoaderManager {
 	}
 
 	// when this is called the Thread is from the target bundle... not always!
-	public void classloaderRegistry(Object targetBean) {
+	public synchronized void classloaderRegistry(Object targetBean) {
 		Long id = getBundleId(targetBean);
+		
+		ClassLoader registeredClassloader = classloaderMap.get(id);
+		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		
 		LOG.info("saving class "+targetBean.getClass().getCanonicalName()+" for bundle "+id);
 		classToBundle.put(targetBean.getClass().getCanonicalName(), id);
 		if (!id.equals(thisBundleId)) {
-			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-			LOG.info("saving classloader "+ccl.toString()+" for bundle "+id);
-			classloaderMap.put(id, ccl);
+			if (registeredClassloader==null || ccl instanceof BundleDelegatingClassLoader) { // prevent event threads classloaders to update the registry
+				LOG.info("saving classloader "+ccl.toString()+" for bundle "+id);
+				classloaderMap.put(id, ccl);
+			}
+			else
+				LOG.info("Already got classloader for bundle id '"+id+"': "+registeredClassloader.toString()+"... discarding new classloader "+ccl.toString());
 		}
 		else
 			LOG.info("this is the local classloader: skipping...");
+		
 	}
 	
-	public boolean classloaderRegistryVerify(Object targetBean) {
+	public synchronized boolean classloaderRegistryVerify(Object targetBean) {
 		if (!classToBundle.containsKey(targetBean.getClass().getCanonicalName())){
 			classloaderRegistry(targetBean);
 			return false;

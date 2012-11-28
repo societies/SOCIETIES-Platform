@@ -47,8 +47,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	private boolean privacyLogEnabled = false;
 
 	public XCCommunicationMgr(String host, String subDomain,
-			String secretKey, String daNode) {
-		this.helper = new CommManagerHelper();
+			String secretKey, String daNode, ClassLoaderManager clm) {
+		this.helper = new CommManagerHelper(clm);
 		this.host = host;
 		this.subDomain = subDomain;
 		this.secretKey = secretKey;
