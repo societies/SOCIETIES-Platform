@@ -45,7 +45,7 @@ public class AAction extends Action implements Parcelable{
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeParcelable(AServiceResourceIdentifier.convertServiceResourceIdentifier(this.getServiceID()), flags);
+		dest.writeParcelable(this.getServiceID(), flags);
 		dest.writeString(this.getServiceType());
 		dest.writeString(this.getparameterName());
 		dest.writeString(this.getvalue());

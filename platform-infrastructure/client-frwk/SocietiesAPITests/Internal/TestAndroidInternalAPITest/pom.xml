@@ -63,12 +63,14 @@
 			   <artifactId>ContainerAndroidInternalAPI</artifactId>
 			   <version>${release.version}</version>
 			   <type>apk</type>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 			   <groupId>org.societies.android.api.internal.container</groupId>
 			   <artifactId>ContainerAndroidInternalAPI</artifactId>
 			   <version>${release.version}</version>
 			   <type>jar</type>
+			   <scope>provided</scope>
 			</dependency>
 			<dependency>
 		   		<groupId>com.google.code.gson</groupId>
@@ -80,6 +82,14 @@
 		            <artifactId>emma</artifactId>
 		            <scope>compile</scope>
 		    </dependency>
+		    <dependency>
+	   			<groupId>org.societies.android.platform.androidutils</groupId>
+			    <artifactId>SocietiesAndroidUtilities</artifactId>
+	   			<version>${release.version}</version>
+	   			<type>apklib</type>
+	   			<scope>provided</scope>
+			</dependency>
+			
     </dependencies>
 
     <build>
