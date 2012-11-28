@@ -53,7 +53,7 @@ public class AAction extends Action implements Parcelable{
 	
 	private AAction(Parcel in) {
 		super();
-		this.setAServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
+		this.setServiceID((AServiceResourceIdentifier) in.readParcelable(AServiceResourceIdentifier.class.getClassLoader()));
 		this.setServiceType(in.readString());
 		this.setparameterName(in.readString());
 		this.setvalue(in.readString());
@@ -70,7 +70,7 @@ public class AAction extends Action implements Parcelable{
 	
 	public static AAction convertAction(Action action) {
 		AAction aaction = new AAction();
-		aaction.setAServiceID(AServiceResourceIdentifier.convertServiceResourceIdentifier(action.getServiceID()));
+		aaction.setServiceID(AServiceResourceIdentifier.convertServiceResourceIdentifier(action.getServiceID()));
 		aaction.setServiceType(action.getServiceType());
 		aaction.setparameterName(action.getparameterName());
 		aaction.setvalue(action.getvalue());
@@ -80,7 +80,7 @@ public class AAction extends Action implements Parcelable{
 	
 	public static Action convertAAction(AAction aaction) {
 		Action action = new Action();
-		action.setServiceID(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aaction.getAServiceID()));
+		action.setServiceID(AServiceResourceIdentifier.convertAServiceResourceIdentifier(aaction.getServiceID()));
 		action.setServiceType(aaction.getServiceType());
 		action.setparameterName(aaction.getparameterName());
 		action.setvalue(aaction.getvalue());
@@ -88,11 +88,11 @@ public class AAction extends Action implements Parcelable{
 		return action;
 	}
 	
-	public void setAServiceID(AServiceResourceIdentifier aServiceID){
+	public void setServiceID(AServiceResourceIdentifier aServiceID){
 		this.aServiceID = aServiceID;
 	}
 	
-	public AServiceResourceIdentifier getAServiceID(){
+	public AServiceResourceIdentifier getServiceID(){
 		return this.aServiceID;
 	}
 }
