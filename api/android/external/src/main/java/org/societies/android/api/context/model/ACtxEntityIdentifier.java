@@ -151,7 +151,7 @@ public class ACtxEntityIdentifier extends ACtxIdentifier {
 	protected void parseString(String input)
 			throws MalformedCtxIdentifierException {
 	
-		super.string = input;
+/*		super.string = input;
 
 		final int length = input.length();
 
@@ -206,6 +206,6 @@ public class ACtxEntityIdentifier extends ACtxIdentifier {
 		} catch (IllegalArgumentException iae) {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context identifier scheme: " + schemeStr, iae);
-		}
+		} */
 	}
 }

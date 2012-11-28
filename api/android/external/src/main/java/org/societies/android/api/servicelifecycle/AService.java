@@ -71,6 +71,7 @@ public class AService extends Service implements Parcelable {
 		dest.writeString(this.getAuthorSignature());
 		dest.writeString(this.getContextSource());
 		dest.writeString(this.getPrivacyPolicy());
+		dest.writeString(this.getSecurityPolicy());
 	    dest.writeString(this.getServiceDescription());
 	    dest.writeString(this.getServiceEndpoint());
 	    dest.writeParcelable(this.getServiceIdentifier(), flags);
@@ -87,6 +88,7 @@ public class AService extends Service implements Parcelable {
 		this.setAuthorSignature(in.readString());
 		this.setContextSource(in.readString());
 	    this.setPrivacyPolicy(in.readString());
+	    this.setSecurityPolicy(in.readString());
 	    this.setServiceDescription(in.readString());
 	    this.setServiceEndpoint(in.readString());
 	    this.setServiceIdentifier((AServiceResourceIdentifier) in.readParcelable(this.getClass().getClassLoader()) );
@@ -107,6 +109,119 @@ public class AService extends Service implements Parcelable {
 			return new AService[size];
 		}
 	};
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getAuthorSignature() == null) ? 0 : this.getAuthorSignature().hashCode());
+		result = prime * result + ((this.getContextSource() == null) ? 0 : this.getContextSource().hashCode());
+		result = prime * result + ((this.getPrivacyPolicy() == null) ? 0 : this.getPrivacyPolicy().hashCode());
+		result = prime * result + ((this.getSecurityPolicy() == null) ? 0 : this.getSecurityPolicy().hashCode());
+		result = prime * result + ((this.getServiceDescription() == null) ? 0 : this.getServiceDescription().hashCode());
+		result = prime * result + ((this.getServiceEndpoint() == null) ? 0 : this.getServiceEndpoint().hashCode());
+		result = prime * result + ((this.getServiceIdentifier() == null) ? 0 : this.getServiceIdentifier().hashCode());
+		result = prime * result + ((this.getServiceInstance() == null) ? 0 : this.getServiceInstance().hashCode());
+		result = prime * result + ((this.getServiceLocation() == null) ? 0 : this.getServiceLocation().hashCode());
+		result = prime * result + ((this.getServiceName() == null) ? 0 : this.getServiceName().hashCode());
+		result = prime * result + ((this.getServiceCategory() == null) ? 0 : this.getServiceCategory().hashCode());
+		result = prime * result + ((this.getServiceStatus() == null) ? 0 : this.getServiceStatus().hashCode());
+		result = prime * result + ((this.getServiceType() == null) ? 0 : this.getServiceType().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		AService other = (AService) obj;
+		//getAuthorSignature()
+		if (this.getAuthorSignature() == null) {
+			if (other.getAuthorSignature() != null)
+				return false;
+		} else if (!this.getAuthorSignature().equals(other.getAuthorSignature()))
+			return false;
+		//getContextSource()
+		if (this.getContextSource() == null) {
+			if (other.getContextSource() != null)
+				return false;
+		} else if (!this.getContextSource().equals(other.getContextSource()))
+			return false;
+		//getPrivacyPolicy()
+		if (this.getPrivacyPolicy() == null) {
+			if (other.getPrivacyPolicy() != null)
+				return false;
+		} else if (!this.getPrivacyPolicy().equals(other.getPrivacyPolicy()))
+			return false;
+		//getSecurityPolicy()
+		if (this.getSecurityPolicy() == null) {
+			if (other.getSecurityPolicy() != null)
+				return false;
+		} else if (!this.getSecurityPolicy().equals(other.getSecurityPolicy()))
+			return false;
+		//getServiceDescription()
+		if (this.getServiceDescription() == null) {
+			if (other.getServiceDescription() != null)
+				return false;
+		} else if (!this.getServiceDescription().equals(other.getServiceDescription()))
+			return false;
+		//getServiceEndpoint()
+		if (this.getServiceEndpoint() == null) {
+			if (other.getServiceEndpoint() != null)
+				return false;
+		} else if (!this.getServiceEndpoint().equals(other.getServiceEndpoint()))
+			return false;
+		//getServiceIdentifier()
+		if (this.getServiceIdentifier() == null) {
+			if (other.getServiceIdentifier() != null)
+				return false;
+		} else if (!this.getServiceIdentifier().equals(other.getServiceIdentifier()))
+			return false;
+		//getServiceInstance()
+		if (this.getServiceInstance() == null) {
+			if (other.getServiceInstance() != null)
+				return false;
+		} else if (!this.getServiceInstance().equals(other.getServiceInstance()))
+			return false;
+		//getServiceLocation()
+		if (this.getServiceLocation() == null) {
+			if (other.getServiceLocation() != null)
+				return false;
+		} else if (!this.getServiceLocation().equals(other.getServiceLocation()))
+			return false;
+		//getServiceName()
+		if (this.getServiceName() == null) {
+			if (other.getServiceName() != null)
+				return false;
+		} else if (!this.getServiceName().equals(other.getServiceName()))
+			return false;
+		//getServiceCategory()
+		if (this.getServiceCategory() == null) {
+			if (other.getServiceCategory() != null)
+				return false;
+		} else if (!this.getServiceCategory().equals(other.getServiceCategory()))
+			return false;
+		//getServiceStatus()
+		if (this.getServiceStatus() == null) {
+			if (other.getServiceStatus() != null)
+				return false;
+		} else if (!this.getServiceStatus().equals(other.getServiceStatus()))
+			return false;
+		//getServiceType()
+		if (this.getServiceType() == null) {
+			if (other.getServiceType() != null)
+				return false;
+		} else if (!this.getServiceType().equals(other.getServiceType()))
+			return false;
+		return true;
+	}
 	
 	public static AService convertService(Service service) {
 		AService aservice = new AService();

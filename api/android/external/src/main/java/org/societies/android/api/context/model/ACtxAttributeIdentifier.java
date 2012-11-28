@@ -209,7 +209,7 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 	protected void parseString(String input)
 			throws MalformedCtxIdentifierException {
 	
-		super.string = input;
+/*		super.string = input;
 
 		final int length = input.length();
 
@@ -261,6 +261,6 @@ public class ACtxAttributeIdentifier extends ACtxIdentifier {
 		
 		super.ownerId = this.scope.getOwnerId();
 		
-		super.scheme = this.scope.getScheme();
+		super.scheme = this.scope.getScheme(); */
 	}
 }

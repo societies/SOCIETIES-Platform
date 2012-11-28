@@ -26,11 +26,7 @@ package org.societies.android.api.servicelifecycle;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -96,4 +92,40 @@ public class AServiceResourceIdentifier extends ServiceResourceIdentifier implem
 		return sri;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getIdentifier() == null) ? 0 : this.getIdentifier().hashCode());
+		result = prime * result + ((this.getServiceInstanceIdentifier() == null) ? 0 : this.getServiceInstanceIdentifier().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		AServiceResourceIdentifier other = (AServiceResourceIdentifier) obj;
+		//getServiceInstanceIdentifier()
+		if (this.getServiceInstanceIdentifier() == null) {
+			if (other.getServiceInstanceIdentifier() != null)
+				return false;
+		} else if (!this.getServiceInstanceIdentifier().equals(other.getServiceInstanceIdentifier()))
+			return false;
+		//getIdentifier()
+		if (this.getIdentifier() == null) {
+			if (other.getIdentifier() != null)
+				return false;
+		} else if (!this.getIdentifier().equals(other.getIdentifier()))
+			return false;
+		
+		return true;
+	}
 }

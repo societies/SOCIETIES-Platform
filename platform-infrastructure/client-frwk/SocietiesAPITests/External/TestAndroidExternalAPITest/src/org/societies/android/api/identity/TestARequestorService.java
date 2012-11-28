@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,21 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
+package org.societies.android.api.identity;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.societies.api.personalisation.model.IAction;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 
-import android.os.Parcelable;
+import android.os.Parcel;
+import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 
 /**
- * Interface that extends the @see IAction
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 13:25:58
+ * @author Eliza
+ *
  */
-public interface IOutcome extends Parcelable, IAction {
+public class TestARequestorService extends AndroidTestCase{
 
-	public int getConfidenceLevel();
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
+	protected void tearDown() throws Exception {
+
+		super.tearDown();
+	}
+
+
+	@MediumTest
+	public void testParcelable() throws URISyntaxException{
+		AServiceResourceIdentifier serviceID = new AServiceResourceIdentifier();
+		serviceID.setIdentifier(new URI("http://societies.org"));
+		serviceID.setServiceInstanceIdentifier("service_59");
+		ARequestorService requestor = new ARequestorService("emma.societies.local", serviceID);
+		assertNotNull(requestor);
+
+
+
+		assertEquals(0, requestor.describeContents());
+
+		Parcel parcel = Parcel.obtain();
+		requestor.writeToParcel(parcel, 0);
+		//done writing, now reset parcel for reading
+		parcel.setDataPosition(0);
+		//finish round trip
+
+
+		ARequestorService createFromParcel = ARequestorService.CREATOR.createFromParcel(parcel);
+
+		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());		
+		assertEquals(requestor.getRequestorServiceId(), createFromParcel.getRequestorServiceId());
+	}
+	
 }

@@ -22,83 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
 
-import org.societies.android.api.context.model.ACtxAttributeIdentifier;
+
+package org.societies.android.api.identity;
 
 import android.os.Parcel;
-import android.os.Parcelable;
+import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
+import org.societies.android.api.identity.ARequestor;
 
 
 
-
-/**
- * Class that links a context condition that affects a specific PreferenceName
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
- */
-public class APreferenceConditionIOutcomeName implements Parcelable{
-
-	private ACtxAttributeIdentifier ctxIdentifier;
-	private String prefName;
-
-	public APreferenceConditionIOutcomeName(){
-
-	}
-	/**
-	 * 
-	 * @param id
-	 * @param preferenceName
-	 */
-	public APreferenceConditionIOutcomeName(ACtxAttributeIdentifier id, String preferenceName){
-		this.ctxIdentifier = id;
-		this.prefName = preferenceName;
-	}
+public class TestARequestor extends AndroidTestCase{
 	
-	
-    private APreferenceConditionIOutcomeName(Parcel in) {
-        super();
-        
-        this.ctxIdentifier = (ACtxAttributeIdentifier) in.readParcelable(ACtxAttributeIdentifier.class.getClassLoader());
-        this.prefName = in.readString();
-    }
-    
-
-	/**
-	 * Method to get the context identifier of the condition that affects this
-	 * preference
-	 * @return 	the context identifier
-	 */
-	public ACtxAttributeIdentifier getICtxIdentifier(){
-		return ctxIdentifier;
+	protected void setUp() throws Exception {
+		super.setUp();
 	}
 
-	/**
-	 * Method to get the name of the outcome affected
-	 * @return	the name of the preference
-	 */
-	public String getPreferenceName(){
-		return prefName;
-	}
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeParcelable(this.ctxIdentifier, flags);
-		out.writeString(prefName);
-		
-	}
-	public static final Parcelable.Creator<APreferenceConditionIOutcomeName> CREATOR = new Parcelable.Creator<APreferenceConditionIOutcomeName>() {
+	protected void tearDown() throws Exception {
 
-        public APreferenceConditionIOutcomeName createFromParcel(Parcel in) {
-            return new APreferenceConditionIOutcomeName(in);
-        }
+		super.tearDown();
+	}
 
-        public APreferenceConditionIOutcomeName[] newArray(int size) {
-            return new APreferenceConditionIOutcomeName[size];
-        }
 
-    };
+	@MediumTest
+	public void testParcelable(){
+		ARequestor requestor = new ARequestor("emma.societies.local");
+		assertNotNull(requestor);
+
+
+
+		assertEquals(0, requestor.describeContents());
+
+		Parcel parcel = Parcel.obtain();
+		requestor.writeToParcel(parcel, 0);
+		//done writing, now reset parcel for reading
+		parcel.setDataPosition(0);
+		//finish round trip
+
+
+		ARequestor createFromParcel = ARequestor.CREATOR.createFromParcel(parcel);
+
+		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());		
+	}
 }

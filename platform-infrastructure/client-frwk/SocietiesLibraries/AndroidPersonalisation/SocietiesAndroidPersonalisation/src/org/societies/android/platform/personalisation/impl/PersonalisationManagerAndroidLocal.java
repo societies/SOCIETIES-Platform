@@ -22,82 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
+package org.societies.android.platform.personalisation.impl;
 
-import java.util.Date;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
-import android.os.Parcelable;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
+ * @author Eliza
+ *
  */
-public interface IQualityofPreference extends Parcelable {
+public class PersonalisationManagerAndroidLocal extends Service{
 
-	/**
-	 * Retrieves how many times the outcome has been aborted
-	 * @return
-	 */
-	public int getAbortedCounter();
+	private static final String LOG_TAG = PersonalisationManagerAndroidLocal.class.getName();
+	private IBinder binder = null;
 
-	/**
-	 * Retrieves the Date the outcome was last aborted
-	 * @return		the last aborted Date
-	 */
-	public Date getLastAborted();
+    
+    @Override
+	public void onCreate () {
+		this.binder = new LocalPlatformEventsBinder();
+		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service starting");
+	}
 
-	/**
-	 * get the Date an outcome was last learnt
-	 * @return	the Date
-	 */
-	public Date getLastModified();
+	/**Create Binder object for local service invocation */
+	public class LocalPlatformEventsBinder extends Binder {
+		
+		public PersonalisationManagerAndroid getService() {
+			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			
+			PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), pubsubClient, ccm, false);
 
-	/**
-	 * Retrieves the Date the outcome was last successfully implemented
-	 * @return
-	 */
-	public Date getLastSuccess();
+			return serviceBase;
+		}
+	}
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service terminating");
+	}
 
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
 	/**
-	 * Retrieves how many times the outcome has been successfully implemented
-	 * @return		the successCounter
+	 * Factory method to get instance of {@link PubsubClientAndroid}
+	 * @return PubsubClientAndroid
 	 */
-	public int getSuccessCounter();
-
+	protected PubsubClientAndroid createPubSubClientAndroid() {
+		return new PubsubClientAndroid(getApplicationContext());
+	}
+	
 	/**
-	 * increases the abortedCounter by level
-	 * 
-	 * @param level    by how much to increase the abortedCounter
+	 * Factory method to get instance of {@link ClientCommunicationMgr}
+	 * @return ClientCommunicationMgr
 	 */
-	public void increaseAbortedCounter(int level);
-
-	/**
-	 * increases the counter for successful implementations by level
-	 * 
-	 * @param level    by how much to increase the successCounter
-	 */
-	public void increaseSuccessCounter(int level);
-
-	/**
-	 * Changes the Date the outcome was last aborted
-	 * 
-	 * @param lastAborted    the Date last aborted
-	 */
-	public void setLastAborted(Date lastAborted);
-
-	/**
-	 * set the Date an outcome was last learnt
-	 * 
-	 * @param lastModified    lastModified
-	 */
-	public void setLastModified(Date lastModified);
-
-	/**
-	 * Changes the date the outcome was last successfully implemented
-	 * 
-	 * @param lastSuccess    lastSuccess
-	 */
-	public void setLastSuccess(Date lastSuccess);
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
+	}
 
 }

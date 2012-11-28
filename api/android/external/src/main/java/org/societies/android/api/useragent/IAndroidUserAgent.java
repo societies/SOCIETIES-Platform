@@ -25,14 +25,20 @@
 
 package org.societies.android.api.useragent;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
+import org.societies.android.api.personalisation.model.AAction;
+//import org.societies.api.identity.IIdentity;
 
 public interface IAndroidUserAgent {
 
 	//Array of interface method signatures
-	String methodsArray [] = {"monitor(String client, IIdentity identity, IAction action)"};
+	String methodsArray [] = {"monitor(String client, String identity, org.societies.android.api.personalisation.model.AAction action)"};
 
-	public void monitor(String client, IIdentity identity, IAction action);
+	/**
+	 * Send a user action (performed in your android application) to the platform
+	 * @param client
+	 * @param identity - the identity of the user consuming your application
+	 * @param action - the action performed by the user consuming your application
+	 */
+	public void monitor(String client, String identity, AAction action);
 
 }

@@ -37,7 +37,7 @@ import android.os.Parcelable;
 
 
 
-public class AContextPreferenceCondition implements IPreferenceCondition, Parcelable{
+public class AContextPreferenceCondition implements Parcelable{
 
 	private ACtxAttributeIdentifier CtxIdentifier;
 	//private String strCtxId;
@@ -71,6 +71,27 @@ public class AContextPreferenceCondition implements IPreferenceCondition, Parcel
 		out.writeString(this.name);
 		
 	}
+	
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+	public static final Parcelable.Creator<AContextPreferenceCondition> CREATOR = new Parcelable.Creator<AContextPreferenceCondition>() {
+
+        public AContextPreferenceCondition createFromParcel(Parcel in) {
+            return new AContextPreferenceCondition(in);
+        }
+
+        public AContextPreferenceCondition[] newArray(int size) {
+            return new AContextPreferenceCondition[size];
+        }
+
+    };
+    
+    
 	public String getType(){
 		return this.type;
 	}
@@ -116,7 +137,7 @@ public class AContextPreferenceCondition implements IPreferenceCondition, Parcel
 		return this.CtxIdentifier.getType()+this.operator+this.value;
 	}
 	
-	public boolean equals(IPreferenceCondition pc){
+	public boolean equals(AContextPreferenceCondition pc){
 
 		if (!(pc.getname().equals(this.name))){
 			return false;
@@ -136,7 +157,7 @@ public class AContextPreferenceCondition implements IPreferenceCondition, Parcel
 		
 		return true;
 	}
-	public boolean equalsIgnoreValue(IPreferenceCondition pc){
+	public boolean equalsIgnoreValue(AContextPreferenceCondition pc){
 		if (!(pc.getCtxIdentifier().equals(this.CtxIdentifier))){
 			return false;
 		}
@@ -156,23 +177,6 @@ public class AContextPreferenceCondition implements IPreferenceCondition, Parcel
 		return true;
 	}
 
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-
-
-	public static final Parcelable.Creator<AContextPreferenceCondition> CREATOR = new Parcelable.Creator<AContextPreferenceCondition>() {
-
-        public AContextPreferenceCondition createFromParcel(Parcel in) {
-            return new AContextPreferenceCondition(in);
-        }
-
-        public AContextPreferenceCondition[] newArray(int size) {
-            return new AContextPreferenceCondition[size];
-        }
-
-    };
 
 }

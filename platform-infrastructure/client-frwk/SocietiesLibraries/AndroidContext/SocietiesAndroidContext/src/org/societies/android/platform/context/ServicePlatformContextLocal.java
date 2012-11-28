@@ -22,21 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.personalisation.model;
+package org.societies.android.platform.context;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.android.api.context.ACtxClient;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
-import android.os.Parcelable;
-
-
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
+ * This wrapper class acts as a local wrapper for the Service Context Android service.
+ * It uses the base service implementation {@link PlatformContextBase} to provide the service functionality
  */
-public interface IPreferenceOutcome extends Parcelable,IOutcome {
 
-	public IQualityofPreference getQualityofPreference();
+public class ServicePlatformContextLocal extends Service {
+	
+    private static final String LOG_TAG = ServicePlatformContextLocal.class.getName();
+    private IBinder binder = null;
+    
+    @Override
+	public void onCreate () {
+		this.binder = new LocalPlatformEventsBinder();
+		Log.d(LOG_TAG, "ServicePlatformContextLocal service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "ServicePlatformContextLocal service terminating");
+	}
+
+	/**Create Binder object for local service invocation */
+	public class LocalPlatformEventsBinder extends Binder {
+		
+		public ACtxClient getService() {
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			
+			PlatformContextBase serviceBase = new PlatformContextBase(ServicePlatformContextLocal.this.getApplicationContext(), ccm, false);
+
+			return serviceBase;
+		}
+	}
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
+//	/**
+//	 * Factory method to get instance of {@link PubsubClientAndroid}
+//	 * @return PubsubClientAndroid
+//	 */
+//	protected PubsubClientAndroid createPubSubClientAndroid() {
+//		return new PubsubClientAndroid(getApplicationContext());
+//	}
+	
+	/**
+	 * Factory method to get instance of {@link ClientCommunicationMgr}
+	 * @return ClientCommunicationMgr
+	 */
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
+	}
 
 }
