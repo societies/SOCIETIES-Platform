@@ -37,6 +37,13 @@
 		        </exclusions>
 			</dependency>
 			<dependency>
+				<groupId>org.societies.android.api.internal</groupId>
+				<artifactId>societies-android-api-internal</artifactId>
+				<version>${release.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			
+			<dependency>
 			   	<groupId>org.societies.api.internal</groupId>
 			   	<artifactId>societies-api-internal</artifactId>
 				<version>${release.version}</version>
@@ -58,6 +65,14 @@
 				<artifactId>societies-api-schema</artifactId>
 				<version>${release.version}</version>
 			</dependency>
+			
+			<dependency>
+	   			<groupId>org.societies.android.platform.androidutils</groupId>
+			    <artifactId>SocietiesAndroidUtilities</artifactId>
+	   			<version>${release.version}</version>
+	   			<type>apklib</type>
+			</dependency>
+ 
     </dependencies>
 
     <build>
