@@ -74,22 +74,20 @@
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
     						org.simpleframework.xml.stream,
-    						org.hibernate.proxy;resolution:=optional,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
     						org.societies.identity,
     						org.societies.comm.xmpp,
     						org.societies.comm.xmpp.pubsub,
-    						org.societies.comm.xmpp.event,
     						org.societies.comm.xmpp.pubsub.impl
 		           		</Export-Package>
 		           		<!-- Is impl export needed for anything but tests? 
 		           		why do i need to import explicitly org.simpleframework.xml.stream?
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
-		           		org.societies.identity exported because privacy serializes Identity
 		           		-->
+		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>

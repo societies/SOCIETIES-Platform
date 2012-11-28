@@ -26,13 +26,11 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	private ICommManager originalEndpoint;
 	private IIdentityManager idm;
 	private String domainName;
-	private ClassLoaderManager clm;
 	
-	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword, ClassLoaderManager clm) {
+	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword) {
 		cisCommManagers = new HashMap<IIdentity, ICommManager>();
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
-		this.clm = clm;
 		
 		initCISCommunicationMgrFactoryImpl();
 	}
@@ -51,7 +49,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		if (!cisIdentity.getType().equals(IdentityType.CIS))
 			throw new CommunicationException("Provided identity does not belong to a CIS");
 		
-		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid(), clm);
+		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid());
 		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
 			throw new CommunicationException("Unable to create CISCommManager!");
@@ -74,7 +72,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			String randomCisIdentifier = IdentityManagerImpl.CIS_PREFIX+UUID.randomUUID().toString()+"."+domainName;
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
-			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid(), clm);
+			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
 			commMgr.loginFromConfig();
 			if (commMgr.getIdManager()==null)
 				throw new CommunicationException("Unable to connect!");
@@ -93,7 +91,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		try {
 			// TODO verify if exists one with same JID logged int
 			IIdentity cisIdentity = idm.fromJid(jid);
-			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid(), clm);
+			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
 			commMgr.loginFromConfig();
 			if (commMgr.getIdManager()==null)
 				throw new CommunicationException("Unable to connect!");

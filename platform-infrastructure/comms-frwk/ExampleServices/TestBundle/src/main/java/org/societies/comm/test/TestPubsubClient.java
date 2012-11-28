@@ -14,11 +14,17 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.examples.calculatorbean.CalcBean;
 import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.test.Testnode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TestPubsubClient extends Thread implements Subscriber, ApplicationListener<PubsubEvent> {
 	
 	private static Logger LOG = LoggerFactory
@@ -28,23 +34,23 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 	private IIdentityManager idm;
 	private ICommManager endpoint;
 	
+	@Autowired
 	public TestPubsubClient(PubsubClient psc, ICommManager endpoint) {
 		this.psc = psc;
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
-		LOG.info("TestPubsubClient initialized! Launching test thread...");
 		start();
 	}
 
-	private Testnode createTestItem()  {
-//	private CalcBean createTestItem()  {
+	//private Testnode createTestItem()  {
+	private CalcBean createTestItem()  {
 		Testnode tn = new Testnode();
 		tn.setTestattribute("testValue");
-		return tn;
+		//return tn;
 		
-//		CalcBean calc = new CalcBean();
-//		calc.setMessage("successful");
-//		return calc; 
+		CalcBean calc = new CalcBean();
+		calc.setMessage("successful");
+		return calc; 
 	}
 
 	@Override
@@ -54,10 +60,6 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			CalcBean calc = (CalcBean)item;
 			LOG.info("###Object Info: " + calc.getMessage());
 		}
-		if (item instanceof Testnode) {
-			Testnode t = (Testnode)item;
-			LOG.info("###Object Info: " + t.getTestattribute());
-		}
 	}
 
 	@Override
@@ -66,22 +68,17 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			IIdentity psService = idm.getThisNetworkNode();
 			String node = "testNode";
 			List<String> packageList = new ArrayList<String>();
-			List<String> classList = new ArrayList<String>();
 			packageList.add("org.societies.test");
-			classList.add(Testnode.class.getCanonicalName());
 			LOG.info("ready to start Pubsub and Eventing tests for jid '"+psService.getJid()+"'");
 			
 			Thread.sleep(1000);
 			LOG.info("### going to add JAXB package...");
-			psc.addJaxbPackages(packageList); // TODO DEPRECATED; Application listener is also DEPRECATED
+			psc.addJaxbPackages(packageList);
+			LOG.info("### going to create testNode...");
 			try {
-				psc.addSimpleClasses(classList);
-				LOG.info("### going to create testNode...");
 				psc.ownerCreate(psService, node);
 			} catch (XMPPError e) {
 				LOG.error("Node already exists", e);
-			} catch (ClassNotFoundException e) {
-				LOG.error("ClassNotFoundException!!! EVERYTHING GOING TO HELL!", e);
 			}
 			LOG.info("### created testNode! going to subscribe testNode...");
 			psc.subscriberSubscribe(psService, node, this);

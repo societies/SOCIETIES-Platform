@@ -1,5 +1,6 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.io.ByteArrayInputStream;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -156,11 +157,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			
 			//SERIALISE OBJECT
 			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
-			
 			Class<?> c = elementToClass.get(elementID);
-			ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(c.getClassLoader());
-			
 			Object bean = null;
 			try {
 				bean = serializer.read(c, eventBeanXML);
@@ -171,9 +168,6 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			List<Subscriber> subscriberList = subscribers.get(sub);
 			for (Subscriber subscriber : subscriberList)
 				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
-				
-			// TODO multiple subscribers and classloaders
-			Thread.currentThread().setContextClassLoader(oldCl);
 		}
 	}
 	// TODO subId
@@ -594,18 +588,13 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try {
-			for (String c : classList) {
-				Class<?> clazz = cl.loadClass(c);
-				Root rootAnnotation = clazz.getAnnotation(Root.class);
-				Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
-				if (rootAnnotation!=null && namespaceAnnotation!=null) {
-					elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
-				}
+		for (String c : classList) {
+			Class<?> clazz = Class.forName(c);
+			Root rootAnnotation = clazz.getAnnotation(Root.class);
+			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
 			}
-		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException(e.getMessage()+" from classloader "+cl.toString(), e);
 		}
 	}
 }
