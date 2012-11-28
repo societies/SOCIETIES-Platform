@@ -1,15 +1,20 @@
 package org.societies.android.api.internal.cssmanager;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.util.Log;
 
+import org.societies.android.platform.androidutils.SocietiesSerialiser;
 
 public class TestAndroidCSSRecord extends AndroidTestCase{
 
+	private static final String LOG_TAG = TestAndroidCSSRecord.class.getName();
+	
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
 
@@ -211,12 +216,20 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 		
 		assertEquals(0, cssRecord.describeContents());
 		
+		Log.d(LOG_TAG, "Start Parcelable Serialise : " + System.currentTimeMillis());
+
         Parcel parcel = Parcel.obtain();
         cssRecord.writeToParcel(parcel, 0);
-        //done writing, now reset parcel for reading
+		
+        Log.d(LOG_TAG, "End Parcelable Serialise : " + System.currentTimeMillis());
+
+		//done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
         AndroidCSSRecord createFromParcel = AndroidCSSRecord.CREATOR.createFromParcel(parcel);
+        
+		Log.d(LOG_TAG, "Finish Serialise : " + System.currentTimeMillis());
+
        
         assertEquals(cssRecord.getCssHostingLocation(), createFromParcel.getCssHostingLocation());		
         assertEquals(cssRecord.getCssIdentity(), createFromParcel.getCssIdentity());		
@@ -238,5 +251,94 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
         assertEquals(cssRecord.getStatus(), createFromParcel.getStatus());		
         assertEquals(cssRecord.getArchivedCSSNodes().length, createFromParcel.getArchivedCSSNodes().length);
         assertEquals(cssRecord.getCSSNodes().length, createFromParcel.getCSSNodes().length);
+	}
+	@MediumTest
+	public void testSimpleSerialisation() throws Exception {
+		try {
+			
+			CssRecord cssRecord = new CssRecord();
+			assertNotNull(cssRecord);
+			
+			cssRecord.getCssNodes().add(cssNode_1);
+			cssRecord.getCssNodes().add(cssNode_2);
+			cssRecord.getArchiveCSSNodes().add(cssNode_1);
+			cssRecord.getArchiveCSSNodes().add(cssNode_2);
+			
+			cssRecord.setCssIdentity(TEST_IDENTITY);
+			cssRecord.setCssInactivation(TEST_INACTIVE_DATE);
+			cssRecord.setCssRegistration(TEST_REGISTERED_DATE);
+			cssRecord.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+			cssRecord.setCssUpTime(TEST_UPTIME);
+			cssRecord.setEmailID(TEST_EMAIL);
+			cssRecord.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+			cssRecord.setForeName(TEST_FORENAME);
+			cssRecord.setHomeLocation(TEST_HOME_LOCATION);
+			cssRecord.setIdentityName(TEST_IDENTITY_NAME);
+			cssRecord.setImID(TEST_IM_ID);
+			cssRecord.setName(TEST_NAME);
+			cssRecord.setPassword(TEST_PASSWORD);
+			cssRecord.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+			cssRecord.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+			cssRecord.setSocialURI(TEST_SOCIAL_URI);
+ 
+			SocietiesSerialiser serialiser = new SocietiesSerialiser();
+			
+			Log.d(LOG_TAG, "Start Simple Serialise : " + System.currentTimeMillis());
+			//serialise record
+			String xmlRecord = serialiser.Write(cssRecord);
+			
+			Log.d(LOG_TAG, "End Simple Serialise : " + System.currentTimeMillis());
+
+			Log.d(LOG_TAG, "Size of XML: " + xmlRecord.length());
+
+			
+			//de-serialise record
+			CssRecord record = (CssRecord) serialiser.Read(CssRecord.class, xmlRecord);
+			Log.d(LOG_TAG, "Finish Serialise : " + System.currentTimeMillis());
+			
+			SocietiesSerialiser serialiser_1 = new SocietiesSerialiser();
+			
+			
+			Log.d(LOG_TAG, "Start Simple Serialise : " + System.currentTimeMillis());
+			//serialise record
+			String xmlRecord_1 = serialiser_1.Write(cssRecord);
+			
+			Log.d(LOG_TAG, "End Simple Serialise : " + System.currentTimeMillis());
+
+			Log.d(LOG_TAG, "Size of XML: " + xmlRecord_1.length());
+
+			
+			//de-serialise record
+			CssRecord record_1 = (CssRecord) serialiser_1.Read(CssRecord.class, xmlRecord_1);
+			Log.d(LOG_TAG, "Finish Serialise : " + System.currentTimeMillis());
+
+			
+	        assertEquals(cssRecord.getCssHostingLocation(), record.getCssHostingLocation());		
+	        assertEquals(cssRecord.getCssIdentity(), record.getCssIdentity());		
+	        assertEquals(cssRecord.getCssInactivation(), record.getCssInactivation());		
+	        assertEquals(cssRecord.getCssRegistration(), record.getCssRegistration());		
+	        assertEquals(cssRecord.getCssUpTime(), record.getCssUpTime());		
+	        assertEquals(cssRecord.getDomainServer(), record.getDomainServer());		
+	        assertEquals(cssRecord.getEmailID(), record.getEmailID());		
+	        assertEquals(cssRecord.getEntity(), record.getEntity());		
+	        assertEquals(cssRecord.getForeName(), record.getForeName());		
+	        assertEquals(cssRecord.getHomeLocation(), record.getHomeLocation());		
+	        assertEquals(cssRecord.getIdentityName(), record.getIdentityName());		
+	        assertEquals(cssRecord.getImID(), record.getImID());		
+	        assertEquals(cssRecord.getName(), record.getName());		
+	        assertEquals(cssRecord.getPassword(), record.getPassword());		
+	        assertEquals(cssRecord.getPresence(), record.getPresence());		
+	        assertEquals(cssRecord.getSex(), record.getSex());		
+	        assertEquals(cssRecord.getSocialURI(), record.getSocialURI());		
+	        assertEquals(cssRecord.getStatus(), record.getStatus());		
+	        assertEquals(cssRecord.getArchiveCSSNodes().size(), record.getArchiveCSSNodes().size());
+	        assertEquals(cssRecord.getCssNodes().size(), record.getCssNodes().size());
+
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }
