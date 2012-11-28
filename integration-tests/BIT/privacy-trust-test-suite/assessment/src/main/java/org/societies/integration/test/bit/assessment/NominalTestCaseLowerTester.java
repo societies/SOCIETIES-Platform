@@ -107,7 +107,8 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1055] testSpeedOfExecution()");
 
 		IIdentity owner = new MockIdentity("owner.a@a.com");
-		IIdentity requestorId = new MockIdentity("requestor.a@a.com");
+		//IIdentity requestorId = new MockIdentity("requestor.a@a.com");
+		IIdentity requestorId = new MockIdentity("from.a@a.com");
 		Requestor requestor = new Requestor(requestorId);
 		
 		IIdentity fromIdentity = new MockIdentity("from.a@a.com");
