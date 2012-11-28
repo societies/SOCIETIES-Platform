@@ -116,8 +116,8 @@ public class CommManagerHelper {
 	private Serializer s;
 	private ClassLoaderManager clm;
 	
-	public CommManagerHelper () {
-		clm = new ClassLoaderManager(this);
+	public CommManagerHelper (ClassLoaderManager clm) {
+		this.clm = clm;
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		s = new Persister(strategy);
@@ -545,9 +545,12 @@ public class CommManagerHelper {
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
 		// TODO latest namespace register sticks! no multiple namespace support atm
-		StringBuilder contextPath = new StringBuilder(packages.get(0));
-		for (int i = 1; i < packages.size(); i++)
-			contextPath.append(":" + packages.get(i));
+		if (packages.size()>0) { // TODO why does this remain here???
+			StringBuilder contextPath = new StringBuilder(packages.get(0));
+			for (int i = 1; i < packages.size(); i++)
+				contextPath.append(":" + packages.get(i));
+		}
+		
 		/*
 		try {
 			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(), this.getClass().getClassLoader());

@@ -72,6 +72,8 @@
 	
 	
 	<!-- Bundle Beans -->
+	<bean id="clm"  class="org.societies.comm.xmpp.xc.impl.ClassLoaderManager" />
+	
 	<bean id="xcCommunication" 
 		 class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr"
 		 init-method="loginFromConfig"
@@ -80,6 +82,7 @@
 	    <constructor-arg value="${subDomain}"/>
 	    <constructor-arg value="${secretKey}"/>
 	    <constructor-arg value="${daNode}"/>
+	    <constructor-arg ref="clm"/>
 		<property name="privacyLog" ref="privacyLog"/>
     </bean>
     
@@ -88,6 +91,7 @@
     	destroy-method="destroyAllConnections">
     	<constructor-arg ref="xcCommunication"/>
         <constructor-arg value="${secretKey}"/>
+        <constructor-arg ref="clm"/>
     </bean>
 
 	<bean id="pubsubService" class="org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter">

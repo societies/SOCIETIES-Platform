@@ -126,7 +126,7 @@ public class PrivacyNegotiationManagerCommServer implements IFeatureServer{
 
 					Object obj;
 
-					obj = SerialisationHelper.deserialise(agreementEnvelopeArray, this.idMgr.getClass().getClassLoader());
+					obj = SerialisationHelper.deserialise(agreementEnvelopeArray, this.getClass().getClassLoader());
 
 					//Object obj = Util.convertToObject(agreementEnvelopeArray, this.getClass());
 					if (obj!=null){
@@ -172,7 +172,7 @@ public class PrivacyNegotiationManagerCommServer implements IFeatureServer{
 				}else if (bean.getMethod().equals(NegAgentMethodType.NEGOTIATE)){
 					try{
 						byte[] responseArray = bean.getResponsePolicy();
-						Object obj = SerialisationHelper.deserialise(responseArray, this.idMgr.getClass().getClassLoader());
+						Object obj = SerialisationHelper.deserialise(responseArray, this.getClass().getClassLoader());
 						//Object obj = Util.convertToObject(responseArray,this.getClass());
 						if (obj!=null){
 							if (obj instanceof ResponsePolicy){

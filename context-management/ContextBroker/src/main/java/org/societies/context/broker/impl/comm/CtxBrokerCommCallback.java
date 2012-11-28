@@ -26,6 +26,7 @@ package org.societies.context.broker.impl.comm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,14 +57,16 @@ public class CtxBrokerCommCallback implements ICommCallback {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerCommCallback.class);
 
-	private final static List<String> NAMESPACES = Arrays.asList(
-			"http://societies.org/api/schema/identity",
-			"http://societies.org/api/schema/context/model",
-			"http://societies.org/api/schema/context/contextmanagement");
-	private static final List<String> PACKAGES = Arrays.asList(
-			"org.societies.api.schema.identity",
-			"org.societies.api.schema.context.model",
-			"org.societies.api.schema.context.contextmanagement");
+	private final static List<String> NAMESPACES = Collections.emptyList();
+//	Arrays.asList(
+//			"http://societies.org/api/schema/identity",
+//			"http://societies.org/api/schema/context/model",
+//			"http://societies.org/api/schema/context/contextmanagement");
+	private static final List<String> PACKAGES = Collections.emptyList();
+//	Arrays.asList(
+//			"org.societies.api.schema.identity",
+//			"org.societies.api.schema.context.model",
+//			"org.societies.api.schema.context.contextmanagement");
 
 	//MAP TO STORE ALL THE CLIENT CONNECTIONS
 	private final Map<String, ICtxCallback> ctxClients = new HashMap<String, ICtxCallback>();
