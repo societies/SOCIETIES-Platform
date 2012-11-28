@@ -45,14 +45,11 @@
 		<module>../../utilities/DBC</module>
 
 		<!-- Android Communication components -->
-		<!--module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
-		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module-->
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsub</module>
-		<!-- Societies Android Comms APK-->
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidComms</module>
 
 		<!-- API -->
@@ -60,43 +57,22 @@
 		<module>../../api/android/external</module>
 		<module>../../api/android/internal</module>
 
-		<!-- Client Framework Examples -->
-		<module>../../platform-infrastructure/client-frwk/Examples/PhoneGapReference</module>
-		<module>../../platform-infrastructure/client-frwk/Examples/IPCServiceExample</module>
-		<!--module>../../platform-infrastructure/client-frwk/devicestatusgui</module -->
-
-		<!-- CIS -->
-		<!-- <module>../../cis-modules/android/socialprovider</module> -->
-
-		<!-- Client Framework -->
-		<module>../../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesCISManager</module>
+		<!-- Client Framework Libraries -->
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/ServiceLifecycle/SocietiesServiceMonitor</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/CommunityManagement/SocietiesCISManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
-                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
-                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
  
-		<!--module>../../platform-infrastructure/client-frwk/MasterGUI</module-->
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
 		<module>../../platform-infrastructure/sns/SocietiesAndroidSocialData</module>
+
 		<!-- Societies Android Client APK-->
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
-
-
-		<!-- CIS manager light modules -->
-		<module>../../platform-infrastructure/client-frwk/TestContainerCIS</module>
-		<!-- <module>../cis-modules/android/client-lib-android</module> -->
-		<!-- <module>../cis-modules/android/cis-management</module> -->
-		<!-- CIS manager light test modules. Give error due to missing emulator. 
-			Not sure where these should go -->
-		<!-- <module>../cis-modules/android/client-lib-android-test</module> -->
-		<!-- <module>../cis-modules/android/cis-management-test</module> -->
-
-		<!-- Test applications N.B. Requires that emulator is started -->
-		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
 
 		<!-- Android User Agent -->
 		<!-- module>../user-agent/Android-user-agent</module -->
