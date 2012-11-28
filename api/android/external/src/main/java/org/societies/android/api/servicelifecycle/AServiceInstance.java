@@ -24,8 +24,6 @@
  */
 package org.societies.android.api.servicelifecycle;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -90,6 +88,71 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 			return new AServiceInstance[size];
 		}
 	};
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getCssJid() == null) ? 0 : this.getCssJid().hashCode());
+		result = prime * result + ((this.getFullJid() == null) ? 0 : this.getFullJid().hashCode());
+		result = prime * result + ((this.getParentJid() == null) ? 0 : this.getParentJid().hashCode());
+		result = prime * result + ((this.getXMPPNode() == null) ? 0 : this.getXMPPNode().hashCode());
+		result = prime * result + ((this.getServiceImpl() == null) ? 0 : this.getServiceImpl().hashCode());
+		result = prime * result + ((this.getParentIdentifier() == null) ? 0 : this.getParentIdentifier().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		AServiceInstance other = (AServiceInstance) obj;
+		//getCssJid()
+		if (this.getCssJid() == null) {
+			if (other.getCssJid() != null)
+				return false;
+		} else if (!this.getCssJid().equals(other.getCssJid()))
+			return false;
+		//getFullJid()
+		if (this.getFullJid() == null) {
+			if (other.getFullJid() != null)
+				return false;
+		} else if (!this.getFullJid().equals(other.getFullJid()))
+			return false;
+		//getParentJid()
+		if (this.getParentJid() == null) {
+			if (other.getParentJid() != null)
+				return false;
+		} else if (!this.getParentJid().equals(other.getParentJid()))
+			return false;
+		//getXMPPNode()
+		if (this.getXMPPNode() == null) {
+			if (other.getXMPPNode() != null)
+				return false;
+		} else if (!this.getXMPPNode().equals(other.getXMPPNode()))
+			return false;
+		//getServiceImpl()
+		if (this.getServiceImpl() == null) {
+			if (other.getServiceImpl() != null)
+				return false;
+		} else if (!this.getServiceImpl().equals(other.getServiceImpl()))
+			return false;
+		//getParentIdentifier()
+		if (this.getParentIdentifier() == null) {
+			if (other.getParentIdentifier() != null)
+				return false;
+		} else if (!this.getParentIdentifier().equals(other.getParentIdentifier()))
+			return false;
+		
+		return true;
+	}
 	
 	public static AServiceInstance convertServiceInstance(ServiceInstance servIns) {
 		AServiceInstance aservIns = new AServiceInstance();

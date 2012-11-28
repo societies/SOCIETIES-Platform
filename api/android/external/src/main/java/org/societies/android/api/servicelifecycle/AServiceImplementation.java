@@ -25,8 +25,6 @@
 
 package org.societies.android.api.servicelifecycle;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -71,6 +69,57 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 			return new AServiceImplementation[size];
 		}
 	};
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getServiceNameSpace() == null) ? 0 : this.getServiceNameSpace().hashCode());
+		result = prime * result + ((this.getServiceProvider() == null) ? 0 : this.getServiceProvider().hashCode());
+		result = prime * result + ((this.getServiceVersion() == null) ? 0 : this.getServiceVersion().hashCode());
+		result = prime * result + ((this.getServiceClient() == null) ? 0 : this.getServiceClient().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		AServiceImplementation other = (AServiceImplementation) obj;
+		//getServiceNameSpace()
+		if (this.getServiceNameSpace() == null) {
+			if (other.getServiceNameSpace() != null)
+				return false;
+		} else if (!this.getServiceNameSpace().equals(other.getServiceNameSpace()))
+			return false;
+		//getServiceProvider()
+		if (this.getServiceProvider() == null) {
+			if (other.getServiceProvider() != null)
+				return false;
+		} else if (!this.getServiceProvider().equals(other.getServiceProvider()))
+			return false;
+		//getServiceVersion()
+		if (this.getServiceVersion() == null) {
+			if (other.getServiceVersion() != null)
+				return false;
+		} else if (!this.getServiceVersion().equals(other.getServiceVersion()))
+			return false;
+		//getServiceClient()
+		if (this.getServiceClient() == null) {
+			if (other.getServiceClient() != null)
+				return false;
+		} else if (!this.getServiceClient().equals(other.getServiceClient()))
+			return false;
+		
+		return true;
+	}
 	
 	/**Converts ServiceImplementation to AServiceImplementation
 	 * 
