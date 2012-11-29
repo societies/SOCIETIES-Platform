@@ -623,6 +623,9 @@ public class Jaxb2Simple extends AbstractMojo
 			str.append("\t\t}\n");
 			str.append("\t};\n\n");
 		}
+		else {
+			str.append("\t\tpublic static Parcelable.Creator CREATOR;\n");
+		}
 		String parcelableStuff = str.toString();
 
 		// ClassName
@@ -638,7 +641,7 @@ public class Jaxb2Simple extends AbstractMojo
 			String writedMethod = "dest.write"+type2ParcelableAction(type);
 			strWrite.append("\t\t"+type2ParcelableWriteData(type, fieldName, writedMethod)+";\n");
 			String readMethod = "in.read"+type2ParcelableAction(type);
-			strRead.append("\t\t"+type2ParcelableReadData(type, fieldName, readMethod)+";\n");
+			strRead.append("\t\t"+type2ParcelableReadData(type, fieldName, readMethod, className)+";\n");
 		}
 		Pattern patternWrite = Pattern.compile("WRITEPARCELABLE");
 		Matcher matcherWrite = patternWrite.matcher(parcelableStuff);
@@ -660,8 +663,9 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (isListOrArray(type)) {
 			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
-				writedMethod = writedMethod.replace("List", "Array");
-				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
+//				writedMethod = writedMethod.replace("List", "Array");
+//				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
+				return "dest.writeTypedList("+fieldName+")";
 			}
 			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
 				return "dest.writeList("+fieldName+")";
@@ -685,7 +689,7 @@ public class Jaxb2Simple extends AbstractMojo
 		return writedMethod+"("+fieldName+")";
 	}
 
-	private String type2ParcelableReadData(String type, String fieldName, String readMethod) {
+	private String type2ParcelableReadData(String type, String fieldName, String readMethod, String className) {
 		if ("boolean".equals(type) || "Boolean".equals(type)) {
 			return fieldName+" = (1=="+readMethod+"() ? true : false)";
 		}
@@ -695,8 +699,9 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (isListOrArray(type)) {
 			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
-				readMethod = readMethod.replace("List", "Array");
-				return fieldName+" = Arrays.asList(("+typeToParcelableRawType(type, false)+"[])"+readMethod+"("+typeToParcelableRawType(type, false)+".class.getClassLoader()))";
+				StringBuilder strList = new StringBuilder(fieldName+" = new ArrayList<"+typeToParcelableRawType(type, false)+">();\n");
+				strList.append("\t\tin.readTypedList("+fieldName+", "+typeToParcelableRawType(type, false)+".CREATOR)");
+				return strList.toString();
 			}
 			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
 				return "in.readList("+fieldName+", Integer.class.getClassLoader())";
