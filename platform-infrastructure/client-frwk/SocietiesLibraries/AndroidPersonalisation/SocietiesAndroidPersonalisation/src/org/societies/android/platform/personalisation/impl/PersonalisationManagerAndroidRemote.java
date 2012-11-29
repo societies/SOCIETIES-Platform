@@ -27,7 +27,6 @@ package org.societies.android.platform.personalisation.impl;
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.android.api.utilities.RemoteServiceHandler;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
 import android.app.Service;
 import android.content.Intent;
@@ -46,10 +45,9 @@ public class PersonalisationManagerAndroidRemote extends Service{
 	
 	@Override
 	public void onCreate () {
-		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
 		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
 		
-		PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(this.getApplicationContext(), pubsubClient, ccm, false);
+		PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(this.getApplicationContext(),  ccm, false);
 		
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IPersonalisationManagerAndroid.methodsArray));
 		Log.i(LOG_TAG, "PersonalisationManagerAndroidRemote creation");

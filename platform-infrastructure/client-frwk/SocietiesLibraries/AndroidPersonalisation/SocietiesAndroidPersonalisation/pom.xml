@@ -43,11 +43,6 @@
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
         
         <dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
