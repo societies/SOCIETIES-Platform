@@ -6,7 +6,7 @@
 
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>socialprofiler</artifactId>
-	<version>${version.pm}</version>
+	<version>${release.version}</version>
 	<name>Social Profiler</name>
 	<packaging>bundle</packaging>
 
@@ -40,30 +40,24 @@
 	<scope>provided</scope>
 </dependency>
 
-<dependency>
-	<groupId>org.societies</groupId>
-	<artifactId>hibernate_classes</artifactId>
-	<scope>provided</scope>
-</dependency>
 
 <dependency>
-	<groupId>org.societies</groupId>
-	<artifactId>common-ext-libs</artifactId>
-	<scope>provided</scope>
-</dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
-<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<scope>provided</scope>
-</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
-<dependency>
-	<groupId>org.societies.api.external</groupId>
-	<artifactId>societies-api</artifactId>
-	<scope>provided</scope>
-</dependency>
-		
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		
 		
 		<dependency>
@@ -79,16 +73,23 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-graph-algo</artifactId>
+			<version>1.6</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.18</version>
 		</dependency>
 		
-	     <dependency>
-			<groupId>jfreechart</groupId>
+		 <dependency>
+			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+	     
   
  
 	
@@ -97,26 +98,36 @@
 
 
 		<!-- PROVIDED  -->
-     
-
-      <dependency>
-			<groupId>org.societies.platform</groupId>
-			<artifactId>socialdata</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
 
     
 		
+		<!-- DA ELIMINARE
 		
+		
+
+<dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+
 		<dependency>
   			<groupId>org.societies.utilities</groupId>
   			<artifactId>DBC</artifactId>
   			<version>${release.version}</version>
             <scope>compile</scope>
         </dependency>
+        
+       
+		
+		<dependency>
+			<groupId>org.societies</groupId>
+	<artifactId>hibernate_classes</artifactId>
+	<scope>provided</scope>
+</dependency>
 	
-	
+	 -->
 
 </dependencies>
 
@@ -150,10 +161,29 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-					   <Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>org.societies.personalisation.socialprofiler</Export-Package>
+					    <Import-Package>org.osgi.framework,
+							!com.sun.*,
+							!org.gjt.*,!org.jaxen.*,!org.mortbay.*,
+							!org.relaxng.*,
+							!org.jivesoftware.*,
+							!org.xmlpull.*,
+							!org.xmpp.*,
+							!scala.*,
+							!org.eclipse.jetty.*,
+							!com.keypoint.*,
+							!net.jcip.*,
+							!org.apache.commons.logging.*,
+							!org.apache.shindig.*,
+							!javax.*,
+							!org.dom4j.*;
+							!gnu.inet.*,
+							!com.googlecode.*,
+							!com.google.*,
+							!org.aopalliance.*,
+							*;resolution:=optional</Import-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Include-Resource>{maven-resources},config.properties</Include-Resource>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -169,8 +199,8 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.pm}</version>
-							<type>jar</type>
+							<version>${release.version}</version>
+							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>

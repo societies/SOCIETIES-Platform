@@ -10,9 +10,13 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-
-	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
-	<osgi:reference id="socialdata" 	   interface="org.societies.platform.socialdata" />
-
-
+  
+  
+    <!-- 
+	 <osgi:service ref="iSocialProfiler"    interface="org.societies.api.internal.personalisation.ISocialProfiler"/>
+	 
+	  -->
+	 
+	 <osgi:reference id="socialdata" 		interface="org.societies.api.internal.sns.ISocialData"/>
+	  
 </beans>

@@ -7,7 +7,29 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
+	
+	
 
-  <bean name="socialprofiler" class="org.societies.personalisation.socialprofiler" />
-
+ 
+  <bean id="iSocialProfiler" 
+  		class="org.societies.personalisation.socialprofiler.SocialProfiler" 
+  		depends-on="socialdata"
+  		init-method="initService" >
+   	 <property name="socialdata" ref="socialdata"/>
+   	 
+  </bean>
+  
+  
+  <!-- 
+  
+  <bean id="iSocialData" 
+    	  class="org.societies.platform.socialdata.SocialData"
+    	  init-method="initSocialData">
+    
+   		 <property name="internalCtxBroker" ref="internalCtxBroker"/>
+		 <property name="commsMgr" 			ref="commsMgr"/>
+           
+    </bean>
+  
+   -->
 </beans>
