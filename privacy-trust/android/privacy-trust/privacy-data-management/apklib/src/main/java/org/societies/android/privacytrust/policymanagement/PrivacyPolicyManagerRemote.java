@@ -34,11 +34,15 @@ import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.ARequestPolicy;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
@@ -50,7 +54,7 @@ import android.util.Log;
  * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
-public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
+public class PrivacyPolicyManagerRemote {
 	private final static String TAG = PrivacyPolicyManagerRemote.class.getSimpleName();
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("privacyPolicyManagerBean", "privacyPolicyManagerBeanResult"); // /!\ First letter in lowercase
 	private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement",
@@ -71,12 +75,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.android.api.identity.ARequestor)
-	 */
-	@Override
-	public void getPrivacyPolicy(String clientPackage, ARequestor owner) throws PrivacyException {
+	public void getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// Send remote call
 		GetRemotePrivacyPolicyTask task = new GetRemotePrivacyPolicyTask(context, clientPackage); 
 		task.execute(owner);
@@ -101,7 +100,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.GET_PRIVACY_POLICY);
-			messageBean.setRequestor((ARequestor) args[0]);
+			messageBean.setRequestor((RequestorBean) args[0]);
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
@@ -117,12 +116,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.ARequestPolicy)
-	 */
-	@Override
-	public void updatePrivacyPolicy(String clientPackage, ARequestPolicy privacyPolicy) throws PrivacyException {
+	public void updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
 		// Send remote call
 		UpdateRemotePrivacyPolicyTask task = new UpdateRemotePrivacyPolicyTask(clientPackage, context); 
 		task.execute(privacyPolicy);
@@ -146,7 +140,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-			messageBean.setPrivacyPolicy((ARequestPolicy) args[0]);
+			messageBean.setPrivacyPolicy((RequestPolicy) args[0]);
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
@@ -162,12 +156,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#deletePrivacyPolicy(java.lang.String, org.societies.android.api.identity.ARequestor)
-	 */
-	@Override
-	public void deletePrivacyPolicy(String clientPackage, ARequestor owner) throws PrivacyException {
+	public void deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// Send remote call
 		DeleteRemotePrivacyPolicyTask task = new DeleteRemotePrivacyPolicyTask(clientPackage, context); 
 		task.execute(owner);
@@ -191,7 +180,7 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-			messageBean.setRequestor((ARequestor) args[0]);
+			messageBean.setRequestor((RequestorBean) args[0]);
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
@@ -205,17 +194,5 @@ public class PrivacyPolicyManagerRemote implements IPrivacyPolicyManager {
 			}
 			return callback.isAck();
 		}
-	}
-
-	public ARequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
-		return null;
-	}
-	public String toXmlString(ARequestPolicy privacyPolicy) {
-		return null;
-	}
-	public ARequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
-		return null;
-	}
-	public void updatePrivacyPolicy(String client, String privacyPolicy, ARequestor owner) throws PrivacyException {
 	}
 }

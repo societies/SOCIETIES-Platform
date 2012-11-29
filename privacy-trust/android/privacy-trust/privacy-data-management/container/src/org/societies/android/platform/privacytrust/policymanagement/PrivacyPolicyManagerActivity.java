@@ -151,7 +151,9 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		// If this service is available
 		if (ipBoundToService) {
 			try {
-				ARequestorCis requestor = new ARequestorCis("university.societies.local", "cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+				RequestorCisBean requestor = new RequestorCisBean();
+				requestor.setCisRequestorId("university.societies.local");
+				requestor.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
 				privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), requestor);
 				txtLocation.setText("Waiting");
 			} catch (PrivacyException e) {

@@ -96,7 +96,7 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 		Log.d(TAG, "PrivacyPolicyManager: " +methodType+" "+(ack ? "success" : "faillure")+(null != ackMsg ? " - "+ackMsg : ""));
 		if (!ack) {
 			if (null != ackMsg) {
-				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_ERROR_MSG_KEY, ackMsg);
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_MSG_KEY, ackMsg);
 			}
 			return;
 		}

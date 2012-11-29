@@ -39,10 +39,16 @@ import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
@@ -150,9 +156,39 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
-		List<RequestItem> requests = new ArrayList<RequestItem>();
 		RequestPolicy privacyPolicy = new RequestPolicy();
-		privacyPolicy.setRequestItems(requests);
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
+		// Not private
+		if (configuration.containsKey("globalBehaviour")) {
+			// CIS Member list
+			RequestItem requestItem = new RequestItem();
+			Resource cisMemberList = new Resource();
+			cisMemberList.setScheme(DataIdentifierScheme.CIS);
+			cisMemberList.setDataType("cis-member-list");
+			requestItem.setResource(cisMemberList);
+			List<Action> actions = new ArrayList<Action>();
+			Action action = new Action();
+			action.setActionConstant(ActionConstants.READ);
+			actions.add(action);
+			requestItem.setActions(actions);
+			List<Condition> conditions = new ArrayList<Condition>();
+			// Public
+			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
+				Condition condition = new Condition();
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3_RD_PARTIES);
+				condition.setValue("1");
+			}
+			// Members only
+			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour)) {
+				Condition condition = new Condition();
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
+				condition.setValue("1");
+			}
+			requestItem.setConditions(conditions);
+			requestItems.add(requestItem);
+		}
+		privacyPolicy.setRequestItems(requestItems);
 		return privacyPolicy;
 	}
 	

@@ -158,7 +158,7 @@ public class PrivacyDataManagerActivity extends Activity {
 	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 	    		AAction[] actions = new AAction[1];
 	    		AAction action = new AAction();
-	    		action.setActionConstant(ActionConstants.READ);
+//	    		action.setActionConstant(ActionConstants.READ);
 	    		actions[0] = action;
 				ResponseItem permission = targetIPService.checkPermission(requestor, dataId, actions);
 				StringBuffer sb = new StringBuffer();
@@ -206,7 +206,7 @@ public class PrivacyDataManagerActivity extends Activity {
     		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
     		Parcelable[] actions = new AAction[1];
     		AAction action = new AAction();
-    		action.setActionConstant(ActionConstants.READ);
+//    		action.setActionConstant(ActionConstants.READ);
     		actions[0] = action;
     		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), requestor);
     		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), dataId);
