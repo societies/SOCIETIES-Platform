@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +44,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -86,7 +90,7 @@ public class Jaxb2Simple extends AbstractMojo
 		try {
 			files = FileListing.getFileListing(startingDirectory);
 
-			// First process ObjectFactories and package-infos
+			// First process ObjectFactories and package-infos: will potentially create new files
 			for (File javaFile : files) {
 				if (javaFile.isFile() && javaFile.getName().equals("ObjectFactory.java")) {
 					getLog().debug("Processing: " + javaFile.getAbsolutePath());
@@ -98,17 +102,21 @@ public class Jaxb2Simple extends AbstractMojo
 				}
 			}
 
+			// Reload files
+			files = FileListing.getFileListing(startingDirectory);
+
 			// Process all java files now and delete unwanted ones
 			for (File javaFile : files) {
+				getLog().info("Test: " + javaFile.getAbsolutePath());
 				if (javaFile.isFile()) { //IGNORE DIRECTORIES
 					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java")) {
-						getLog().debug("Deleting: " + javaFile.getAbsolutePath());
+						getLog().info("Deleting: " + javaFile.getAbsolutePath());
 						javaFile.delete();
 
 					}
 					else {	
 						if (javaFile.getName().endsWith(".java")) {
-							getLog().debug("Processing: " + javaFile.getAbsolutePath());
+							getLog().info("Processing: " + javaFile.getAbsolutePath());
 							String newSchemaContent = processCodeFile(javaFile);
 							FileWriter newFile = new FileWriter(javaFile.getAbsolutePath());
 							newFile.write(newSchemaContent);
@@ -150,9 +158,6 @@ public class Jaxb2Simple extends AbstractMojo
 			newSchemaContent = replaceFieldAndAccessors(newSchemaContent, fieldName, className);
 		}
 
-		// Parcelable Stuff
-		newSchemaContent = replaceParcelableStuff(newSchemaContent, fieldClasses);
-
 		//ENUM NEEDS TO BE SERIALIZED WITH "VALUE", NOT "NAME"
 		if (newSchemaContent.indexOf("public enum ") > 0) {
 			String textToFind = ".*}\n\n}\n";
@@ -166,6 +171,9 @@ public class Jaxb2Simple extends AbstractMojo
 			String textToReplace = "$1\nimport org.simpleframework.xml.ElementList;";
 			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace); 
 		}
+
+		// Parcelable Stuff
+		newSchemaContent = replaceParcelableStuff(javaFile, newSchemaContent);
 
 		return newSchemaContent;
 	}
@@ -457,32 +465,37 @@ public class Jaxb2Simple extends AbstractMojo
 		return newSchemaContent;
 	}
 
-	private String replaceParcelableStuff(String schemaContent,
-			Map<String, String> fieldClasses) {
+	private String replaceParcelableStuff(File javaFile,
+			String schemaContent) {
 		String textToFind; String textToReplace;
+		
+		// -- Check if this file has to be Parcelable
+		if (isPatternMatching("Adapter1", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+		if (!isPatternMatching("xjc", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
 
-		// -- Data Model
-		// Retrieve ClassName or enum name
-		Pattern patternClassName = Pattern.compile("public (?:abstract )?(class|enum) (.+)\\s");
+		// -- Collect information about the file
+		// Retrieve ClassName (even if it is an enum)
+		Pattern patternClassName = Pattern.compile("public (?:abstract )?(class|enum) (.+)( |\\s)");
 		Matcher matcherClassName = patternClassName.matcher(schemaContent);
-		// Not a class : stop everything
+		// Not a class or an enum: stop everything
 		if (!matcherClassName.find()) {
 			return schemaContent;
 		}
-		Pattern patternIsAbstract = Pattern.compile(" abstract ");
-		Matcher matcherIsAbstract = patternIsAbstract.matcher(schemaContent);
-		boolean isAbstract = matcherIsAbstract.find();
-		Pattern patternIsExtension = Pattern.compile("extends ");
-		Matcher matcherIsExtension = patternIsExtension.matcher(schemaContent);
-		boolean isExtension = matcherIsExtension.find();
-		boolean isEnum = "enum".equals(matcherClassName.group(1).trim());
 		String className = matcherClassName.group(2).trim();
-		if (isEnum) {
-			className = className.replace(" {", "");
-		}
+		className = className.replace(" {", ""); // For enum and empty class it is useful
 		getLog().info("###ClassName:"+className);
+		// Is it an enum?
+		boolean isEnum = "enum".equals(matcherClassName.group(1).trim());
+		// Is abstract?
+		boolean isAbstract = isPatternMatching(" abstract ", schemaContent);
+		// Is it extending something?
+		boolean isExtension = isPatternMatching("extends ", schemaContent);
 
-		// Retrieve all Fields
+		// Retrieve all Fields information
 		NavigableMap<String, String> fields = new TreeMap<String, String>();
 		Pattern patternFields = Pattern.compile("(?:protected|private) (?:final )?(?:static )?([^ ]+) ([^ ]+);\n", Pattern.CASE_INSENSITIVE);
 		Matcher matcherFields = patternFields.matcher(schemaContent);
@@ -491,7 +504,7 @@ public class Jaxb2Simple extends AbstractMojo
 			getLog().info("#Attr:"+matcherFields.group(1)+" "+matcherFields.group(2));
 		}
 
-		// -- Parcelable
+		// -- Add Parcelable information to the file
 		// - Implement parcelable
 		Pattern patternIsSerializable = Pattern.compile("implements Serializable");
 		Matcher matcherIsSerializable = patternIsSerializable.matcher(schemaContent);
@@ -512,16 +525,30 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		String newSchemaContent = findReplacePattern(schemaContent, textToFind, textToReplace);
 
-		// Add imports
-		textToFind = "import org\\.simpleframework\\.xml\\.Order;";
-		textToReplace = "import org\\.simpleframework\\.xml\\.Order;\nimport android\\.os\\.Parcel;\nimport android\\.os\\.Parcelable;\nimport java\\.util\\.Arrays;";
+		// - Add imports
+		// Parcelable imports
+		textToFind = "package (.+);";
+		textToReplace = "package $1;\n\n\nimport android\\.os\\.Parcel;\nimport android\\.os\\.Parcelable;\nimport java\\.util\\.Arrays;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
-		// Generate the parcelable inherited methods
+		// Specific imports (if some specific classes are found in the class)
+		if (isPatternMatching("URI", newSchemaContent)) {
+			textToFind = "package (.+);";
+			textToReplace = "package $1;\n\n\nimport java\\.net\\.URI;\nimport java\\.net\\.URISyntaxException;\n";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		}
+		if (isPatternMatching("XMLGregorianCalendar", newSchemaContent)) {
+			textToFind = "package (.+);";
+			textToReplace = "package $1;\n\n\nimport javax\\.xml\\.datatype\\.DatatypeConfigurationException;\nimport javax\\.xml\\.datatype\\.DatatypeFactory;\nimport javax\\.xml\\.datatype\\.XMLGregorianCalendar;\n";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		}
+
+		// -- Generate the parcelable inherited methods
 		String parcelableStuff = generateParcelableStuff(isEnum, isExtension, isAbstract, className, fields);
 		textToFind = "}\n$";
 		textToReplace = "\n"+parcelableStuff+"\n}\n";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		return newSchemaContent;
 	}
 
@@ -548,7 +575,7 @@ public class Jaxb2Simple extends AbstractMojo
 			}
 			str.append("\t}\n\n");
 		}
-		
+
 
 		if (!isEnum) {
 			str.append("\tprotected void readFromParcel(Parcel in) {\n");
@@ -607,27 +634,6 @@ public class Jaxb2Simple extends AbstractMojo
 		return  parcelableStuff;
 	}
 
-	private String type2ParcelableReadData(String type, String fieldName, String readMethod) {
-		if ("boolean".equals(type) || "Boolean".equals(type)) {
-			return fieldName+" = (1=="+readMethod+"() ? true : false)";
-		}
-		String globalType = type2ParcelableAction(type);
-		if ("Parcelable".equals(globalType)) {
-			return fieldName+" = "+readMethod+"("+type+".class.getClassLoader())";
-		}
-		if (isListOrArray(type)) {
-			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
-				readMethod = readMethod.replace("List", "Array");
-				return fieldName+" = Arrays.asList(("+typeToParcelableRawType(type, false)+"[])"+readMethod+"("+typeToParcelableRawType(type, false)+".class.getClassLoader()))";
-			}
-			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
-				readMethod = readMethod.replace("List", "Array");
-				return fieldName+" = Arrays.asList((int[])"+readMethod+"())";
-			}
-			return readMethod+"("+fieldName+")";
-		}
-		return fieldName+" = "+readMethod+"()";
-	}
 
 	private String type2ParcelableWriteData(String type, String fieldName, String writedMethod) {
 		if ("boolean".equals(type) || "Boolean".equals(type)) {
@@ -637,18 +643,50 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("Parcelable".equals(globalType)) {
 			return writedMethod+"("+fieldName+", flags)";
 		}
+		if ("URI".equals(typeToParcelableRawType(type, false))) {
+			return "dest.writeString("+fieldName+".toString())";
+		}
+		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
+			return "dest.writeString("+fieldName+".toString())";
+		}
 		if (isListOrArray(type)) {
 			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
 				writedMethod = writedMethod.replace("List", "Array");
 				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
 			}
 			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
-				writedMethod = writedMethod.replace("List", "Array");
-				return writedMethod+"((int[]) "+fieldName+".toArray())";
+				return "dest.writeList("+fieldName+")";
 			}
 			return writedMethod+"("+fieldName+")";
 		}
 		return writedMethod+"("+fieldName+")";
+	}
+
+	private String type2ParcelableReadData(String type, String fieldName, String readMethod) {
+		if ("boolean".equals(type) || "Boolean".equals(type)) {
+			return fieldName+" = (1=="+readMethod+"() ? true : false)";
+		}
+		String globalType = type2ParcelableAction(type);
+		if ("Parcelable".equals(globalType)) {
+			return fieldName+" = "+readMethod+"("+type+".class.getClassLoader())";
+		}
+		if ("URI".equals(typeToParcelableRawType(type, false))) {
+			return "try { new URI(in.readString()); } catch(URISyntaxException e) { System.out.println(\"Arg, can't create URI for field "+fieldName+"\"); }";
+		}
+		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
+			return "try { DatatypeFactory.newInstance().newXMLGregorianCalendar(in.readString()); } catch(DatatypeConfigurationException e) { System.out.println(\"Arg, can't create XMLGregorianCalendar for field "+fieldName+"\"); }";
+		}
+		if (isListOrArray(type)) {
+			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
+				readMethod = readMethod.replace("List", "Array");
+				return fieldName+" = Arrays.asList(("+typeToParcelableRawType(type, false)+"[])"+readMethod+"("+typeToParcelableRawType(type, false)+".class.getClassLoader()))";
+			}
+			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
+				return "in.readList("+fieldName+", Integer.class.getClassLoader())";
+			}
+			return readMethod+"("+fieldName+")";
+		}
+		return fieldName+" = "+readMethod+"()";
 	}
 
 	private boolean isListOrArray(String type) {
@@ -693,6 +731,10 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("long".equals(type)) {
 			return "Long";
 		}
+		// Manual steps
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+			return "String";
+		}
 		// Parcelable
 		if (rawTypeAreParcelable) {
 			return "Parcelable";
@@ -728,6 +770,10 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("long".equals(type)) {
 			return "Long";
 		}
+		// Manual steps
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+			return type;
+		}
 		// Parcelable
 		if (rawTypeAreParcelable) {
 			return "Parcelable";
@@ -739,6 +785,29 @@ public class Jaxb2Simple extends AbstractMojo
 		return typeToParcelableGlobalType(type, true);
 	}
 
+	/**
+	 * Check if the pattern is found in a string
+	 * @param textToFind Text to find 
+	 * @param textWhereToSearch Text where to find the pattern
+	 * @param flags Regex flags
+	 * @return True if the pattern is founded
+	 */
+	private static boolean isPatternMatching(String textToFind, String textWhereToSearch, int flags) {
+		Pattern pattern = Pattern.compile(textToFind, flags);
+		Matcher matcher = pattern.matcher(textWhereToSearch);
+		return  matcher.find();
+	}
+	
+	/**
+	 * Check if the pattern is found in a string
+	 * @param textToFind Text to find 
+	 * @param textWhereToSearch Text where to find the pattern
+	 * @return True if the pattern is founded
+	 */
+	private static boolean isPatternMatching(String textToFind, String textWhereToSearch) {
+		return isPatternMatching(textToFind, textWhereToSearch, Pattern.CASE_INSENSITIVE);
+	}
+	
 	/**Replaces a regular expression with a specified string
 	 * @param schemaContent The string to check
 	 * @param textToFind Text to find 
