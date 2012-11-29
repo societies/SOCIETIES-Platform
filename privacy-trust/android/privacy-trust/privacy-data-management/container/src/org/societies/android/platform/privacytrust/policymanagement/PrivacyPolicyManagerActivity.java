@@ -24,29 +24,20 @@
  */
 package org.societies.android.platform.privacytrust.policymanagement;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.identity.ARequestorCis;
-import org.societies.android.api.identity.DataIdentifierFactory;
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
-import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
+import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Activity;
@@ -58,10 +49,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.Parcelable;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -81,6 +68,7 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	private boolean ipBoundToService = false;
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
 	private ClientCommunicationMgr clientCommManager;
+	private RequestPolicy retrievedPrivacyPolicy;
 
 
 	//Enter local user credentials and domain name
@@ -102,7 +90,7 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		txtConnectivity = (TextView) findViewById(R.id.txtConnectivity);
 
 		clientCommManager = new ClientCommunicationMgr(this);
-//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
+		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 
 
 		// -- Create a link with services
@@ -112,6 +100,9 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		//REGISTER BROADCAST
 		IntentFilter intentFilter = new IntentFilter() ;
 		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.INFER_PRIVACY_POLICY.name());
 
 		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
 	}
@@ -148,24 +139,55 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	 * @param view
 	 */
 	public void onLaunchTest(View view) {
+		txtLocation.setText(R.string.txt_nothing);
 		// If this service is available
 		if (ipBoundToService) {
 			try {
-				RequestorCisBean requestor = new RequestorCisBean();
-				requestor.setCisRequestorId("university.societies.local");
-				requestor.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
-				privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), requestor);
 				txtLocation.setText("Waiting");
+				RequestorCisBean owner = new RequestorCisBean();
+				owner.setRequestorId("university.societies.local");
+				owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+				if (R.id.btnLaunchTest1 == view.getId()) {
+					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
+				}
+				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
+					if (retrievedPrivacyPolicy == null) {
+						txtLocation.setText("Hum, for testing purpose, retrieve the Privacy Policy before please!");
+					}
+					else {
+						RequestItem requestItem = new RequestItem();
+						Resource resource = new Resource();
+						resource.setScheme(DataIdentifierScheme.CIS);
+						resource.setDataType("member-list");
+						requestItem.setResource(resource);
+						List<RequestItem> requestItemList = retrievedPrivacyPolicy.getRequestItems();
+						requestItemList.add(requestItem);
+						retrievedPrivacyPolicy.setRequestItems(requestItemList);
+						if (R.id.btnLaunchTest2 == view.getId()) {
+							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
+						}
+						else {
+							retrievedPrivacyPolicy.setRequestor(null);
+							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), privacyPolicyManagerService.toXmlString(retrievedPrivacyPolicy), owner);
+						}
+					}
+				}
+				else if (R.id.btnLaunchTest4 == view.getId()) {
+					privacyPolicyManagerService.deletePrivacyPolicy(this.getPackageName(), owner);
+				}
 			} catch (PrivacyException e) {
 				Log.e(TAG, "Error during the privacy policy retrieving", e);
+				txtLocation.setText(R.string.txt_nothing);
 				Toast.makeText(this, "Error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
 			}
 			catch (Exception e) {
 				Log.e(TAG, "Fatal error during the privacy policy retrieving", e);
+				txtLocation.setText(R.string.txt_nothing);
 				Toast.makeText(this, "Fatal error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
 			}
 		}
 		else {
+			txtLocation.setText(R.string.txt_nothing);
 			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
 	}
@@ -188,7 +210,7 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	 * @param view
 	 */
 	public void onButtonResetClick(View view) {
-		txtLocation.setText("Nothing yet");
+		txtLocation.setText(R.string.txt_nothing);
 	}
 
 
@@ -198,22 +220,17 @@ public class PrivacyPolicyManagerActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(TAG, intent.getAction());
 
-			if ((intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
-				//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-				boolean ack =  intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
-				StringBuffer sb = new StringBuffer();
-				if (ack) {
-					RequestPolicy privacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
-					sb.append("Privacy policy retrieved: "+(null != privacyPolicy));
-					if (null != privacyPolicy) {
-						sb.append(privacyPolicyManagerService.toXmlString(privacyPolicy));
-					}
+			boolean ack =  intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
+			StringBuffer sb = new StringBuffer();
+			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
+			if (ack && (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
+				retrievedPrivacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
+				sb.append("Privacy policy retrieved: "+(null != retrievedPrivacyPolicy));
+				if (null != retrievedPrivacyPolicy) {
+					sb.append(privacyPolicyManagerService.toXmlString(retrievedPrivacyPolicy));
 				}
-				else {
-					sb.append("Arg, no ack");
-				}
-				txtLocation.setText(sb.toString());
 			}
+			txtLocation.setText(sb.toString());
 		}
 	};
 }

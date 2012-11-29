@@ -26,19 +26,12 @@ package org.societies.android.privacytrust.policymanagement;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.identity.ARequestor;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.ARequestPolicy;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
-import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
