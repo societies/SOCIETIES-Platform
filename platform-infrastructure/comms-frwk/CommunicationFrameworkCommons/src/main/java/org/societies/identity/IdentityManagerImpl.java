@@ -3,8 +3,6 @@ package org.societies.identity;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityContextMapper;
 import org.societies.api.identity.IIdentityManager;
@@ -15,9 +13,6 @@ import org.societies.api.identity.InvalidFormatException;
 public class IdentityManagerImpl implements IIdentityManager {
 	
 	public static final String CIS_PREFIX = "cis-";
-
-	private static Logger LOG = LoggerFactory
-			.getLogger(IdentityManagerImpl.class);
 	
 	private INetworkNode thisNode;
 	private INetworkNode cloudNode;

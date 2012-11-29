@@ -22,11 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.personalisation.impl;
+package org.societies.android.platform.personalisation.container;
 
-import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-
+import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
+import org.societies.android.platform.personalisation.impl.mocks.MockClientCommunicationMgr;
+import org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroid;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -37,47 +38,41 @@ import android.util.Log;
  * @author Eliza
  *
  */
-public class PersonalisationManagerAndroidLocal extends Service{
+public class PersonalisationAndroidTest extends Service{
 
-	private static final String LOG_TAG = PersonalisationManagerAndroidLocal.class.getName();
-	private IBinder binder = null;
+	private static final String LOG_TAG = PersonalisationAndroidTest.class.getName();
+	private IBinder binder;
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return binder;
+	}
 
-    
     @Override
 	public void onCreate () {
-		this.binder = new LocalPlatformEventsBinder();
-		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service starting");
+		this.binder = new TestPersonalisationBinder();
+		Log.d(LOG_TAG, "PersonalisationAndroidTest service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "PersonalisationAndroidTest service terminating");
 	}
 
 	/**Create Binder object for local service invocation */
-	public class LocalPlatformEventsBinder extends Binder {
-		
-		public IPersonalisationManagerAndroid getService() {
-
+	public class TestPersonalisationBinder extends Binder {
+		public IPersonalisationManagerAndroid getService(){
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			
-			IPersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), ccm, false);
-
-			return serviceBase;
+			PersonalisationManagerAndroid perso = new PersonalisationManagerAndroid(getApplicationContext(), ccm, false);
+			return perso;
 		}
 	}
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "PersonalisationManagerAndroidLocal service terminating");
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
-	
-
 	/**
 	 * Factory method to get instance of {@link ClientCommunicationMgr}
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
+		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
 	}
-
 }
