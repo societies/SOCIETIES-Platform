@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.api.internal</groupId>
+	<groupId>org.societies.android.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
 	<name>SOCIETIES Java Internal API</name>
 	<!-- the api version is the same as the release -->
