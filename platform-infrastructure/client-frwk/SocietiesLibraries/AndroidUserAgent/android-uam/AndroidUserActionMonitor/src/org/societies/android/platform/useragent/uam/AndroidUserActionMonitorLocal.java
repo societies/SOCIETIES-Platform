@@ -23,22 +23,51 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.useragent;
+package org.societies.android.platform.useragent.uam;
 
-import org.societies.android.api.personalisation.model.AAction;
-//import org.societies.api.identity.IIdentity;
+import org.societies.android.api.useragent.IAndroidUserActionMonitor;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
-public interface IAndroidUserAgent {
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-	//Array of interface method signatures
-	String methodsArray [] = {"monitor(String client, String identity, org.societies.android.api.personalisation.model.AAction action)"};
+public class AndroidUserActionMonitorLocal extends Service{
 
-	/**
-	 * Send a user action (performed in your android application) to the platform
-	 * @param client
-	 * @param identity - the identity of the user consuming your application
-	 * @param action - the action performed by the user consuming your application
-	 */
-	public void monitor(String client, String identity, AAction action);
+	private static final String LOG_TAG = AndroidUserActionMonitorLocal.class.getName();
+	private IBinder binder;
 
+	@Override
+	public void onCreate () {
+		this.binder = new LocalUAMBinder();
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service starting...");
+	}
+
+	@Override
+	public void onDestroy(){
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service terminating...");
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal onBind...");
+		return this.binder;
+	}
+
+	public class LocalUAMBinder extends Binder {
+		public IAndroidUserActionMonitor getService() {
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(
+					AndroidUserActionMonitorLocal.this.getApplicationContext(),  
+					ccm, 
+					false);
+			return uamBase;
+		}
+	}
+	
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
+	}
 }

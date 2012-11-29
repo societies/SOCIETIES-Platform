@@ -23,38 +23,50 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.internal.useragent;
+package org.societies.android.platform.useragent.uam.container;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.android.api.useragent.IAndroidUserActionMonitor;
+import org.societies.android.platform.useragent.uam.AndroidUserActionMonitorBase;
+import org.societies.android.platform.useragent.uam.mocks.MockClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
-public interface IInternalAndroidUserAgent {
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-	/**
-	 * Get explicit feedback from the user - force them to interact with notification box
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (ack/nack, radio button or check box)
-	 * @param content - the content for the feedback form
-	 * @return - an array of result strings
-	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content);
+public class TestContainerUAMService extends Service{
 
-	/**
-	 * Get implicit feedback from the user - only require them to interact with the notification box
-	 * if the proposed platform behaviour is not desired.
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (timed abort is currently the only one)
-	 * @param content - he content for the feedback form
-	 * @return - a boolean value, true indicating that the proposed action should continue and 
-	 * false indicating that the proposed action should be aborted.
-	 */
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content);
+	private static final String LOG_TAG = TestContainerUAMService.class.getName();
+	IBinder binder;
 
-	/**
-	 * Show a notification popup to the user.  This popup does not give any option for user interation and is
-	 * just for information purposes.
-	 * @param client
-	 * @param notificationText - the text to display to the user
-	 */
-	public void showNotification(String client, String notificationText);
+	@Override
+	public void onCreate () {
+		this.binder = new UAMContainerBinder();
+		Log.d(LOG_TAG, "TestContainerUAMService service starting...");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "TestContainerUAMService service terminating...");
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOG_TAG, "TestContainerUAMService service onbind...");
+		return this.binder;
+	}
+
+	public class UAMContainerBinder extends Binder {
+		public IAndroidUserActionMonitor getService() {
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(getApplicationContext(), ccm, true);
+			return uamBase;
+		}
+	}
+	
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new MockClientCommunicationMgr(getApplicationContext());
+	}
 }
