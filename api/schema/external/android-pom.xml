@@ -21,6 +21,12 @@
 	</parent>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>4.1.1.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.1.8</version>
@@ -197,6 +203,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<wrapIntoParcelable>true</wrapIntoParcelable>
 					<!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
 				</configuration>
 			</plugin>

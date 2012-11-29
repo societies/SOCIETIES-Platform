@@ -1,12 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.api.schema</groupId>
-	<artifactId>societies-api-schema</artifactId>
+	<groupId>org.societies.api.schema.internal</groupId>
+	<artifactId>societies-api-schema-internal</artifactId>
 	<version>${release.version}</version>
-	<name>SOCIETIES Schema API</name>
+	<name>SOCIETIES Schema Internal API</name>
 	<packaging>jar</packaging>
-
 	<developers>
 		<developer>
 			<name>Bruno Jean-Bart </name>
@@ -20,10 +19,22 @@
 		<version>RELEASE</version>
 	</parent>
 	<dependencies>
+	<dependency>
+				<groupId>com.google.android</groupId>
+				<artifactId>android</artifactId>
+				<version>4.1.1.4</version>
+				<scope>provided</scope>
+			</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.1.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -32,29 +43,30 @@
 			<version>2.6.4</version>
 			<scope>compile</scope>
 			<exclusions>
-				<!-- StAX is not available on Android -->
-				<exclusion>
-					<artifactId>stax</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>stax-api</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<!-- Provided by Android -->
-				<exclusion>
-					<artifactId>xpp3</artifactId>
-					<groupId>xpp3</groupId>
-				</exclusion>
+			    <!-- StAX is not available on Android -->
+			    <exclusion>
+			        <artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <!-- Provided by Android -->
+			    <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			    </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.maven.converters</groupId>
-			<artifactId>SimpleXMLConverters</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>${release.version}</version>
+		    <scope>compile</scope>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<sourceDirectory>src/main/resources</sourceDirectory>
 		<resources>
@@ -62,14 +74,16 @@
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>*.xjb</exclude>
-					<!-- <exclude>*.xsd</exclude> -->
+					<exclude>*.xsd</exclude>
 				</excludes>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
 		<plugins>
-			<!-- 1) generate-sources jaxb2:generate 2) process-sources jaxb2simple:convert 
-				3) compile maven-compiler-plugin -->
+		    <!-- 1) generate-sources jaxb2:generate
+			 	 2) process-sources  jaxb2simple:convert
+				 3) compile 		 maven-compiler-plugin 
+			-->
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -81,91 +95,9 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<schemaExcludes>
-								<exclude>dataforms.xsd</exclude>
-								<exclude>pubsub.xsd</exclude>
-								<exclude>pubsub#errors.xsd</exclude>
-								<exclude>pubsub#owner.xsd</exclude>
-								<exclude>pubsub#event.xsd</exclude>
-							</schemaExcludes>
 							<args>
 								<arg>-Xcollection-setter-injector</arg>
 							</args>
-						</configuration>
-					</execution>
-					<execution>
-						<id>dataforms-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<include>dataforms.xsd</include>
-							</schemaIncludes>
-							<generateDirectory>${project.build.directory}/generated-sources/dataforms</generateDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>pubsub-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<include>pubsub.xsd</include>
-							</schemaIncludes>
-							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
-							<bindingIncludes>
-								<include>*.episode</include>
-							</bindingIncludes>
-							<generateDirectory>${project.build.directory}/generated-sources/pubsub</generateDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>errors-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<include>pubsub#errors.xsd</include>
-							</schemaIncludes>
-							<generatePackage>org.jabber.protocol.pubsub.errors</generatePackage>
-							<generateDirectory>${project.build.directory}/generated-sources/errors</generateDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>owner-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<include>pubsub#owner.xsd</include>
-							</schemaIncludes>
-							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
-							<bindingIncludes>
-								<include>*.episode</include>
-							</bindingIncludes>
-							<generatePackage>org.jabber.protocol.pubsub.owner</generatePackage>
-							<generateDirectory>${project.build.directory}/generated-sources/owner</generateDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>event-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<include>pubsub#event.xsd</include>
-							</schemaIncludes>
-							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
-							<bindingIncludes>
-								<include>*.episode</include>
-							</bindingIncludes>
-							<generatePackage>org.jabber.protocol.pubsub.event</generatePackage>
-							<generateDirectory>${project.build.directory}/generated-sources/event</generateDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -197,7 +129,18 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
+					<wrapIntoParcelable>true</wrapIntoParcelable>
+			 	 <!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<includes>
+						<include>org/societies/api/internal/schema/**</include>
+					</includes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -241,8 +184,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
