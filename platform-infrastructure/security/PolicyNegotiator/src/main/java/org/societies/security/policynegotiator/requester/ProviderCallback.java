@@ -25,12 +25,12 @@
 package org.societies.security.policynegotiator.requester;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -41,6 +41,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationCallback
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
@@ -95,8 +96,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				sop = result.getSla();
 				try {
 					String selectedSop = selectSopOption(sop);
-					// TODO: use real identity when it can be gathered from other components
-					sop = requester.getSignatureMgr().signXml(sop, selectedSop, null);
+					IIdentity identity = requester.getGroupMgr().getIdMgr().getThisNetworkNode();
+					sop = requester.getSignatureMgr().signXml(sop, selectedSop, identity);
 					ProviderCallback callback = new ProviderCallback(requester, provider,
 							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
 							finalCallback); 
@@ -108,6 +109,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 							callback);
 				} catch (XmlException e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
+				} catch (DigsigException e) {
+					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
 			}
 			break;
@@ -118,6 +121,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				if (requester.getSignatureMgr().verifyXml(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
+					LOG.debug("receiveResult(): final SLA: {}", sla);
 					
 					// Store the SLA into secure storage
 					String agreementKey = generateKey();
