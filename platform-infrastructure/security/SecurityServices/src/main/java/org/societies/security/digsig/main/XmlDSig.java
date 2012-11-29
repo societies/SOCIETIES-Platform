@@ -35,7 +35,6 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.certs.SignatureCheck;
 import org.societies.security.digsig.util.XmlManipulator;
@@ -80,27 +79,27 @@ public class XmlDSig {
 	 * Please use one of other methods with same name.
 	 */
 	@Deprecated
-	public String signXml(String xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+	public String signXml(String xml, String xmlNodeId) throws DigsigException {
 
-		LOG.debug("signXml(String, {}, {})", xmlNodeId, identity);
+		LOG.debug("signXml(String, {}, {})", xmlNodeId);
 
 		ArrayList<String> idsToSign = new ArrayList<String>();
 		
 		idsToSign.add(xmlNodeId);
 
-		xml = signXml(xml, idsToSign, identity);
+		xml = signXml(xml, idsToSign);
 		return xml;
 	}
 
-	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+	public Document signXml(Document xml, String xmlNodeId) throws DigsigException {
 
-		LOG.debug("signXml(Document, {}, {})", xmlNodeId, identity);
+		LOG.debug("signXml(Document, {}, {})", xmlNodeId);
 
 		ArrayList<String> idsToSign = new ArrayList<String>();
 		
 		idsToSign.add(xmlNodeId);
 
-		xml = signXml(xml, idsToSign, identity);
+		xml = signXml(xml, idsToSign);
 		return xml;
 	}
 
@@ -119,7 +118,7 @@ public class XmlDSig {
 		return xmlSig.getElement().getAttribute("Id");
 	}
 
-	public Document signXml(Document doc, ArrayList<String> idsToSign, IIdentity identity) throws DigsigException {
+	public Document signXml(Document doc, ArrayList<String> idsToSign) throws DigsigException {
 
 		XMLSignature sig;
 		
@@ -150,7 +149,7 @@ public class XmlDSig {
 		}
 	}
 
-	public String signXml(String xml, ArrayList<String> idsToSign, IIdentity identity) throws DigsigException {
+	public String signXml(String xml, ArrayList<String> idsToSign) throws DigsigException {
 		
 		Document doc;
 		String str;
@@ -159,7 +158,7 @@ public class XmlDSig {
 		xmlManipulator.load(xml);
 		doc = xmlManipulator.getDocument();
 		
-		doc = signXml(doc, idsToSign, identity);
+		doc = signXml(doc, idsToSign);
 
 		xmlManipulator = new XmlManipulator();
 		xmlManipulator.setDocument(doc);

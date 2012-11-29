@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -68,30 +67,29 @@ public class SignatureMgr implements ISignatureMgr {
 		LOG.info("SignatureMgr()");
 		
 		X509Certificate cert = certStorage.getOurCert();
-		Key key = certStorage.getOurKey();
-		PrivateKey privateKey = (PrivateKey) key;
+		PrivateKey privateKey = certStorage.getOurKey();
 		PublicKey publicKey = cert.getPublicKey();
-		xmlDSig = new XmlDSig(certStorage.getOurCert(), certStorage.getOurKey());
+		xmlDSig = new XmlDSig(cert, privateKey);
 		 
 		LOG.debug("Certificate: {}", cert);
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);
 		
-		//test();
+		test();
 	}
 	
 	private void test() throws DigsigException {
 		String xml = getResource("PrintService.xml");
 		// 1st signature. By the provider, all options are signed.
-		xml = xmlDSig.signXml(xml, "Container", null);
+		xml = xmlDSig.signXml(xml, "Container");
 		// 2nd signature. By the requester, the selected option is signed.
-		xml = xmlDSig.signXml(xml, "Standard Printing. Costs 0.1$ per A4", null);
+		xml = xmlDSig.signXml(xml, "Standard Printing. Costs 0.1$ per A4");
 		// 3rd signature. By the provider, requester's signature is signed.
 		try {
 			Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(xml));
 			String requesterSigId = xmlDSig.getRequesterSignatureId(doc);
 			LOG.debug("requesterSigId = {}", requesterSigId);
-			xml = xmlDSig.signXml(xml, requesterSigId, null);
+			xml = xmlDSig.signXml(xml, requesterSigId);
 		} catch (UnsupportedEncodingException e) {
 			LOG.warn("", e);
 		} catch (DigsigException e) {
@@ -141,7 +139,7 @@ public class SignatureMgr implements ISignatureMgr {
 		
 		ids.add(xmlNodeId);
 		
-		return xmlDSig.signXml(xml, ids, identity);
+		return xmlDSig.signXml(xml, ids);
 	}
 	
 	@Override
@@ -151,7 +149,7 @@ public class SignatureMgr implements ISignatureMgr {
 		
 		ids.add(xmlNodeId);
 		
-		return xmlDSig.signXml(xml, ids, identity);
+		return xmlDSig.signXml(xml, ids);
 	}
 	
 	@Override
