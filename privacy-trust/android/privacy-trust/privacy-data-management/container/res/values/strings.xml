@@ -10,4 +10,10 @@
     <string name="txt_sameprocess">Refresh using same process approach</string>
     <string name="txt_differentprocess">Refresh using different process approach</string>
     <string name="txt_reset">Reset</string>
+    <string name="txtOnConnect">Connect to XMPP Server</string>
+    <string name="txtLaunchTest">Launch Test</string>
+    <string name="txtLaunchTest1">Launch Get Privacy Policy</string>
+    <string name="txtLaunchTest2">Launch Update Privacy Policy (1)</string>
+    <string name="txtLaunchTest3">Launch Update Privacy Policy (2)</string>
+    <string name="txtLaunchTest4">Launch Delete Privacy Policy</string>
 </resources>

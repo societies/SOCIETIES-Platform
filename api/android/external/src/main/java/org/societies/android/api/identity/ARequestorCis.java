@@ -24,9 +24,8 @@
  */
 package org.societies.android.api.identity;
 
-import java.io.Serializable;
-
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.identity.RequestorCisBean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -37,27 +36,29 @@ import android.os.Parcelable;
  * @author Nicolas, Olivier, Eliza
  *
  */
-public class ARequestorCis extends ARequestor implements Parcelable {
-	private final String cisRequestorId;
-	
-	
+public class ARequestorCis extends RequestorCisBean implements Parcelable {
 	/**
 	 * Create a CIS requestor from the CSS and CIS identities
 	 * @param requestorId Identity of the CSS ownerof the CIS
 	 * @param cisRequestorId CIS identity
 	 */
 	public ARequestorCis(String requestorId, String cisRequestorId) {
-		super(requestorId);
+		super();
+		this.requestorId = requestorId;
 		this.cisRequestorId = cisRequestorId;
 	}
 
 	private ARequestorCis(Parcel in){
-		super(in.readString());
-		this.cisRequestorId = in.readString();
+		readFromParcel(in);
+	}
+	
+	private void readFromParcel(Parcel in) {
+		requestorId = in.readString();
+		cisRequestorId = in.readString();
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
-		super.writeToParcel(out, flags);
+		out.writeString(requestorId);
 		out.writeString(cisRequestorId);
 	}
 	
@@ -95,14 +96,16 @@ public class ARequestorCis extends ARequestor implements Parcelable {
 		return super.toString()+", [CIS Identity: "+cisRequestorId+"]";
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.identity.Requestor#toXMLString()
-	 */
-	@Override
 	public String toXMLString() {
 		String cisIdType = new String("CisId");
-		StringBuilder str = new StringBuilder(super.toXMLString());
+		String subjectIdType = new String("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+		StringBuilder str = new StringBuilder();
+		str.append("\n\t<Attribute AttributeId=\""+subjectIdType+"\"");
+		str.append("\n\t\t\tDataType=\""+IIdentity.class.getCanonicalName()+"\">");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(requestorId);
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
 		str.append("\n\t<Attribute AttributeId=\""+cisIdType+"\"");
 		str.append("\n\t\t\tDataType=\""+IIdentity.class.getCanonicalName()+"\">");
 		str.append("\n\t\t<AttributeValue>");
@@ -148,5 +151,11 @@ public class ARequestorCis extends ARequestor implements Parcelable {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
