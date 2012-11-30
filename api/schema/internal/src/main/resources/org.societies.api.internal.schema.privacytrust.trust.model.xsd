@@ -6,9 +6,8 @@
 
   <xs:complexType name="trustedEntityIdBean">
     <xs:sequence>
-      <xs:element name="trustorId" type="xs:string" nillable="false"/>
       <xs:element name="entityType" type="tns:trustedEntityTypeBean" nillable="false"/>
-      <xs:element name="trusteeId" type="xs:string" nillable="false"/>
+      <xs:element name="entityId" type="xs:string" nillable="false"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -17,7 +16,6 @@
       <xs:enumeration value="CSS"/>
       <xs:enumeration value="CIS"/>
       <xs:enumeration value="SVC"/>
-      <xs:enumeration value="DVP"/>
       <xs:enumeration value="LGC"/>
     </xs:restriction>
   </xs:simpleType>

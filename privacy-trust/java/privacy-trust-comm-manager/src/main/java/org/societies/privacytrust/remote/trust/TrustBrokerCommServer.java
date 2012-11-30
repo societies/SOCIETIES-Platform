@@ -107,17 +107,17 @@ public class TrustBrokerCommServer implements IFeatureServer {
 						+ "RetrieveTrustBrokerRequestBean can't be null");
 			
 			try {
-				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(retrieveRequestBean.getTeid());
+				final TrustedEntityId trustorId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(retrieveRequestBean.getTrustorId());
+				final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(retrieveRequestBean.getTrusteeId());
+				final Double result = this.trustBroker.retrieveTrust(
+						trustorId, trusteeId).get();
 				
-				final Double result = this.trustBroker.retrieveTrust(teid).get();
 				final RetrieveTrustBrokerResponseBean retrieveResponseBean = 
-						new RetrieveTrustBrokerResponseBean();
-				// TODO find way to pass null result 
+						new RetrieveTrustBrokerResponseBean(); 
 				if (result != null)
 					retrieveResponseBean.setResult(result);
-				else
-					retrieveResponseBean.setResult(new Double(0.0d));
 				responseBean.setMethodName(MethodName.RETRIEVE);
 				responseBean.setRetrieve(retrieveResponseBean);
 				

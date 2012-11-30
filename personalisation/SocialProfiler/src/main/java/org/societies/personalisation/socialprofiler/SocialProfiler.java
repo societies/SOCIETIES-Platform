@@ -1,21 +1,18 @@
 package org.societies.personalisation.socialprofiler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Timer;
 
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.personalisation.ISocialProfiler;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalisation.socialprofiler.service.DatabaseConnection;
@@ -24,43 +21,42 @@ import org.societies.personalisation.socialprofiler.service.ProfilerEngine;
 import org.societies.personalisation.socialprofiler.service.SocialTimerTask;
 
 
-public class SocialProfiler implements ISocialProfiler {
+public class SocialProfiler  { //implements ISocialProfiler
 
 	private static final Logger logger = LoggerFactory.getLogger(SocialProfiler.class);
 	private Properties 				props 			= new Properties();
 	private String 					configFileName	= "config.properties";
 	private GraphManager	 		graph;
 	private DatabaseConnection  	databaseConnection;
+	private ISocialData 			socialdata;
+	
+	
+	public ISocialData getSocialdata() {
+		return socialdata;
+	}
+
+
+	public void setSocialdata(ISocialData socialdata) {
+		this.socialdata = socialdata;
+	}
 
 	private ProfilerEngine 			engine;
 	
 	private Timer 					timer;
 	
-	
-	public SocialProfiler(){
-		
-	}
-	
 	private float daysFull = 0;
-
-	@Override
-	public void setSocialdata(ISocialData socialData) {
-		initializationSocialProfiler(socialData);
-	}
-	
-	
-	public ISocialData getSocialdata() {
-		return engine.getSocialData();
-	}
 	
 	
 
 
-	private void initializationSocialProfiler(ISocialData socialdata){
+	public void initService(){
 		
-		logger.info("Social Profiler Intialized");
+		logger.info("Social Profiler Initialized");
 		
 		this.enableProperties();
+		
+		
+		
 		String neoDBPath = props.getProperty("neo4j.dbPath");
 		
 		if (neoDBPath==null || neoDBPath.isEmpty()){
@@ -74,7 +70,7 @@ public class SocialProfiler implements ISocialProfiler {
 		this.databaseConnection	    = new DatabaseConnection(props);
 		
 		logger.info("Engine Initialization ...");
-		this.engine	= new ProfilerEngine(graph, databaseConnection, socialdata);
+		this.engine	= new ProfilerEngine(graph, databaseConnection, getSocialdata());
 		
 		// start Scheduler
 		scheduleNetworkUpdate();
@@ -83,20 +79,30 @@ public class SocialProfiler implements ISocialProfiler {
 	
 	
 	private void enableProperties(){
-		try{
+//		try{
 			logger.debug("Read keys...");
 			
-			InputStream inputStream = new FileInputStream(new File(configFileName));
-            if (inputStream!=null){
-				props.load(inputStream);
-	            inputStream.close();
-	        }
+//			InputStream inputStream = new FileInputStream(new File(configFileName));
+//            if (inputStream!=null){
+//				props.load(inputStream);
+//	            inputStream.close();
+//	        }
+			
+			ResourceBundle rb = ResourceBundle.getBundle("config");
+			Enumeration <String> keys = rb.getKeys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+				String value = rb.getString(key);
+				logger.info(key + ": " + value);
+				props.put(key, value);
+				
+			}
            
             logger.info("engine activated.");
 
-		}catch(IOException e){
-			logger.error("Unable to read property file CAUSE: "+e);
-		}
+//		}catch(IOException e){
+//			logger.error("Unable to read property file CAUSE: "+e);
+//		}
 	}
 	
 	
@@ -121,7 +127,7 @@ public class SocialProfiler implements ISocialProfiler {
 	 
 
 
-	@Override
+//	@Override
 	public void addSocialNetwork(List<ISocialConnector> connectors) {
 		
 		
@@ -145,7 +151,7 @@ public class SocialProfiler implements ISocialProfiler {
 
 
 
-	@Override
+//	@Override
 	public void removeSocialNetwork(List<ISocialConnector> connectors) {
 	
 		try {
@@ -181,7 +187,7 @@ public class SocialProfiler implements ISocialProfiler {
 
 
 
-	@Override
+//	@Override
 	public void setUpdateFrequency(float frequency) {
 		logger.info("Frequency update changed into :"+frequency + "days");
 		this.daysFull=frequency;
@@ -190,14 +196,14 @@ public class SocialProfiler implements ISocialProfiler {
 
 
 
-	@Override
+//	@Override
 	public float getUpdateFrequency() {
 		return daysFull;
 	}
 
 
 
-	@Override
+//	@Override
 	public List<ISocialConnector> getListOfLinkedSN() {
 		return this.engine.getSocialData().getSocialConnectors();
 	}	

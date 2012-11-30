@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.util.XmlManipulator;
-import org.societies.security.storage.CertStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,12 +56,14 @@ public class SignatureCheck {
 
 	private XMLSignature customerSignature;
 	private X509Certificate customerCert;
+	private X509Certificate ourCert;
 
-	private CertStorage certStorage;
+	public SignatureCheck(Document doc, X509Certificate ourCert) {
 
-	public SignatureCheck(Document doc, CertStorage certStorage) {
+		LOG.debug("constructor()");
+		
 		this.doc = doc;
-		this.certStorage = certStorage;
+		this.ourCert = ourCert;
 
 		xml = new XmlManipulator();
 		xml.setDocument(doc);
@@ -81,15 +82,12 @@ public class SignatureCheck {
 
 		if (sopElemId == null) {
 			// <serviceOperaitonPolicy> element must have an Id
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("sopElemId is null");
 		}
 		String sopElemRef = "#" + sopElemId;
 
 		// Make sure signatures were extracted
 		extractSignatures();
-
-		X509Certificate ourCert;
-		ourCert = certStorage.getOurCert();
 
 		for (XMLSignature sig : signatures) {
 			if (hasReference(sig, sopElemRef)) {
@@ -98,7 +96,7 @@ public class SignatureCheck {
 					KeyInfo keyInfo = sig.getKeyInfo();
 					X509Certificate sigCert = keyInfo.getX509Certificate();
 					if (sigCert == null) {
-						throw new DigsigException("BAD_REQUEST");
+						throw new DigsigException("sigCert is null");
 					}
 
 					if (sigCert.equals(ourCert)) {
@@ -139,10 +137,11 @@ public class SignatureCheck {
 		Element sopElem = extractSOPElement();
 
 		String sopElemId = sopElem.getAttribute("Id");
+		LOG.debug("getReferencedSOP(): sopElemId = {}", sopElemId);
 
 		if (sopElemId == null) {
 			// <serviceOperaitonPolicy> element must have an Id
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("sopElemId is null");
 		}
 
 		String sopElemRef = "#" + sopElemId;
@@ -155,8 +154,9 @@ public class SignatureCheck {
 
 				// The sig element must have and Id
 				String sigId = sig.getElement().getAttribute("Id");
+				LOG.debug("getReferencedSOP(): sigId = {}", sigId);
 				if (sigId == null)
-					throw new DigsigException("BAD_REQUEST");
+					throw new DigsigException("sigId is null");
 
 				String refId = ref.substring(1);
 				Node sopNode = xml.getNode(String.format(
@@ -164,25 +164,28 @@ public class SignatureCheck {
 						refId));
 				if (sopNode == null || !(sopNode instanceof Element)) {
 					// check that this is actual SOP
-					throw new DigsigException("BAD_REQUEST");
+					throw new DigsigException("sopNode is null");
+				}
+				if (!(sopNode instanceof Element)) {
+					// check that this is actual SOP
+					throw new DigsigException("sopNode not instance of Element");
 				}
 
 				try {
 					X509Certificate sigCert = sig.getKeyInfo()
 							.getX509Certificate();
 					if (sigCert == null)
-						throw new DigsigException("BAD_REQUEST");
+						throw new DigsigException("sigCert is null");
 
 					// TODO check consumer identity...
 
-					boolean result = sig.checkSignatureValue(sigCert
-							.getPublicKey());
+					boolean result = sig.checkSignatureValue(sigCert.getPublicKey());
 					customerSignature = sig;
 					customerCert = sigCert;
 					if (result)
 						return (Element) sopNode;
 				} catch (XMLSignatureException e) {
-					throw new DigsigException(e, "BAD_REQUEST");
+					throw new DigsigException(e, "could not check signature value");
 				} catch (Exception e) {
 					throw new DigsigException(e, "INTERNAL_SERVER_ERROR");
 				}
@@ -192,7 +195,10 @@ public class SignatureCheck {
 		throw new DigsigException("BAD_REQUEST");
 	}
 
-	public XMLSignature getCustomerSignature() {
+	public XMLSignature getCustomerSignature() throws DigsigException {
+		if (customerSignature == null) {
+			getReferencedSOP();
+		}
 		return customerSignature;
 	}
 
@@ -211,11 +217,11 @@ public class SignatureCheck {
 			return;
 
 		if (doc == null || doc.getDocumentElement() == null)
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("doc or doc.getDocumentElement() is null");
 
 		NodeList childNodes = doc.getDocumentElement().getChildNodes();
 		if (childNodes == null || childNodes.getLength() == 0)
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("no child nodes found");
 
 		int numServiceOperationPolicyNodes = 0;
 
@@ -234,14 +240,16 @@ public class SignatureCheck {
 				try {
 					XMLSignature sig = new XMLSignature(elem, null);
 					signatures.add(sig);
+					LOG.debug("extractSignatures(): extracted signature {}",
+							sig.getElement().getAttribute("Id"));
 				} catch (Exception e) {
-					throw new DigsigException(e, "BAD_REQUEST");
+					throw new DigsigException(e, "could not extract signature");
 				}
 			} else if ("serviceOperationPolicy".equals(elemName)
 					&& elemNS == null) {
 				numServiceOperationPolicyNodes++;
 				if (numServiceOperationPolicyNodes > 1)
-					throw new DigsigException("BAD_REQUEST");
+					throw new DigsigException("numServiceOperationPolicyNodes is more than 1");
 			} else {
 				throw new DigsigException("BAD_REQUEST");
 			}
@@ -253,9 +261,9 @@ public class SignatureCheck {
 	private Element extractSOPElement() throws DigsigException {
 		Node node = xml.getNode("/societies/serviceOperationPolicy");
 		if (node == null)
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("node is null");
 		if (!(node instanceof Element))
-			throw new DigsigException("BAD_REQUEST");
+			throw new DigsigException("node not instance of Element");
 
 		return (Element) node;
 	}

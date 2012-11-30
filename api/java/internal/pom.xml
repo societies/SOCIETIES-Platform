@@ -31,7 +31,6 @@
 
 	<dependencies>
 		<!-- add your dependencies here -->
-
 		<dependency>
 			<groupId>org.societies.api.schema.internal</groupId>
 			<artifactId>societies-api-schema-internal</artifactId>

@@ -32,7 +32,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
@@ -55,14 +55,17 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	@Column(name = "id")
 	private long id;
 	
-	/** The identifier of the trusted entity this evidence refers to. */
-	@Columns(columns={
-			@Column(name = "trustor_id", nullable = false, updatable = false, length = 255),
-			@Column(name = "entity_type", nullable = false, updatable = false, length = 3),
-			@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
-	})
-	@Type(type = "org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdCompositeType")
-	private final TrustedEntityId teid;
+	/** The identifier of the subject this evidence refers to. */
+	@Index(name = "subject_idx")
+	@Column(name = "subject_id", nullable = false, updatable = false, length = 255)
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
+	private final TrustedEntityId subjectId;
+	
+	/** The identifier of the object this evidence refers to. */
+	@Index(name = "object_idx")
+	@Column(name = "object_id", nullable = false, updatable = false, length = 255)
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
+	private final TrustedEntityId objectId;
 	
 	@Column(name = "type", nullable = false, updatable = false)
 	private final TrustEvidenceType type;
@@ -74,22 +77,33 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	@Column(name = "info", length = 1023)
 	private final Serializable info;
 	
-	TrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type, 
+	TrustEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId,	final TrustEvidenceType type, 
 			final Date timestamp, final Serializable info) {
 		
-		this.teid = teid;
+		this.subjectId = subjectId;
+		this.objectId = objectId;
 		this.type = type;
 		this.timestamp = timestamp;
 		this.info = info;
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getTeid()
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getSubjectId()
 	 */
 	@Override
-	public TrustedEntityId getTeid() {
+	public TrustedEntityId getSubjectId() {
 		
-		return this.teid;
+		return this.subjectId;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getObjectId()
+	 */
+	@Override
+	public TrustedEntityId getObjectId() {
+		
+		return this.objectId;
 	}
 	
 	/*
@@ -129,7 +143,9 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		
 		int result = 1;
 		result = prime * result 
-				+ ((this.teid == null) ? 0 : this.teid.hashCode());
+				+ ((this.subjectId == null) ? 0 : this.subjectId.hashCode());
+		result = prime * result 
+				+ ((this.objectId == null) ? 0 : this.objectId.hashCode());
 		result = prime * result
 				+ ((this.type == null) ? 0 : this.type.hashCode());
 		result = prime * result
@@ -155,10 +171,15 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		
 		TrustEvidence other = (TrustEvidence) that;
 		
-		if (this.teid == null) {
-			if (other.teid != null)
+		if (this.subjectId == null) {
+			if (other.subjectId != null)
 				return false;
-		} else if (!this.teid.equals(other.teid))
+		} else if (!this.subjectId.equals(other.subjectId))
+			return false;
+		if (this.objectId == null) {
+			if (other.objectId != null)
+				return false;
+		} else if (!this.objectId.equals(other.objectId))
 			return false;
 		if (this.type == null) {
 			if (other.type != null)
@@ -187,7 +208,9 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("{");
-		sb.append("teid=" + this.teid);
+		sb.append("subjectId=" + this.subjectId);
+		sb.append(",");
+		sb.append("objectId=" + this.objectId);
 		sb.append(",");
 		sb.append("type=" + this.type);
 		sb.append(",");

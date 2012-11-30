@@ -25,11 +25,11 @@
 package org.societies.security.digsig.main;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.net.URL;
-import java.security.Key;
+import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -37,9 +37,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.digsig.util.DOMHelper;
+import org.societies.security.digsig.util.StreamUtil;
 import org.societies.security.storage.CertStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,7 @@ import org.w3c.dom.Document;
  * 
  * @author Mitja Vardjan
  */
-public class SignatureMgr implements ISignatureMgr {
+public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
@@ -61,61 +63,65 @@ public class SignatureMgr implements ISignatureMgr {
 	public SignatureMgr() {
 	}
 	
-	public void init() {
+	public void init() throws DigsigException {
 		
 		LOG.info("SignatureMgr()");
 		
 		X509Certificate cert = certStorage.getOurCert();
-		Key key = certStorage.getOurKey();
-		PrivateKey privateKey = (PrivateKey) key;
+		PrivateKey privateKey = certStorage.getOurKey();
 		PublicKey publicKey = cert.getPublicKey();
-		xmlDSig = new XmlDSig(certStorage);
+		xmlDSig = new XmlDSig(cert, privateKey);
 		 
 		LOG.debug("Certificate: {}", cert);
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);
 		
-		//testXmlString();
+		//test();
 	}
 	
-	private void testXmlDocument() {
-		
-		URL resource = SignatureMgr.class.getClassLoader().getResource("PrintService.xml");
-		Document doc;
-		ArrayList<String> idsToSign = new ArrayList<String>();
-		OutputStream os;
-		
-		idsToSign.add("Container");
-
+	private void test() throws DigsigException {
+		String xml = getResource("PrintService.xml");
+		// 1st signature. By the provider, all options are signed.
+		xml = xmlDSig.signXml(xml, "Container");
+		// 2nd signature. By the requester, the selected option is signed.
+		xml = xmlDSig.signXml(xml, "Standard Printing. Costs 0.1$ per A4");
+		// 3rd signature. By the provider, requester's signature is signed.
 		try {
-			doc = DOMHelper.parseDocument(resource.openStream());
-			doc = xmlDSig.signXml(doc, idsToSign);
-			os = new FileOutputStream("PrintService.signed.xml");
-		} catch (Exception e) {
-			LOG.error("test()", e);
-			return;
+			Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(xml));
+			String requesterSigId = getRequesterSignatureId(doc);
+			LOG.debug("requesterSigId = {}", requesterSigId);
+			xml = xmlDSig.signXml(xml, requesterSigId);
+		} catch (UnsupportedEncodingException e) {
+			LOG.warn("", e);
+		} catch (DigsigException e) {
+			LOG.warn("", e);
 		}
-		DOMHelper.outputDocument(doc, os);
+		writeFile("PrintService.signed.xml", xml);
 	}
 	
-	private void testXmlString() {
-		
-		InputStream resource = SignatureMgr.class.getClassLoader().getResourceAsStream("PrintService.xml");
-		ArrayList<String> idsToSign = new ArrayList<String>();
+	private String getResource(String name) {
+
+		InputStream resource = SignatureMgr.class.getClassLoader().getResourceAsStream(name);
+		StringWriter writer = new StringWriter();
+
+		try {
+			IOUtils.copy(resource, writer, "UTF-8");
+		} catch (IOException e) {
+			LOG.error("getResource()", e);
+			return null;
+		}
+		return writer.toString();
+	}
+	
+	private void writeFile(String name, String contents) {
+
 		OutputStream os;
 		
-		idsToSign.add("Container");
-
-		String xml;
 		try {
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(resource, writer, "UTF-8");
-			xml = writer.toString();
-			xml = xmlDSig.signXml(xml, idsToSign);
-			os = new FileOutputStream("PrintService.signed.xml");
-			os.write(xml.getBytes());
+			os = new FileOutputStream(name);
+			os.write(contents.getBytes());
 		} catch (Exception e) {
-			LOG.error("test()", e);
+			LOG.error("writeFile()", e);
 		}
 	}
 	
@@ -128,10 +134,25 @@ public class SignatureMgr implements ISignatureMgr {
 	}
 	
 	@Override
-	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
-		return xmlDSig.signXml(xml, xmlNodeId, identity);
+	public String signXml(String xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+		
+		ArrayList<String> ids = new ArrayList<String>();
+		
+		ids.add(xmlNodeId);
+		
+		return xmlDSig.signXml(xml, ids);
 	}
-
+	
+	@Override
+	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+		
+		ArrayList<String> ids = new ArrayList<String>();
+		
+		ids.add(xmlNodeId);
+		
+		return xmlDSig.signXml(xml, ids);
+	}
+	
 	@Override
 	public boolean verifyXml(String xml) {
 		return xmlDSig.verifyXml(xml);
@@ -202,5 +223,9 @@ public class SignatureMgr implements ISignatureMgr {
 			return null;
 		}
 		return cert.getPublicKey();
+	}
+	
+	public String getRequesterSignatureId(Document doc) {
+		return xmlDSig.getRequesterSignatureId(doc);
 	}
 }

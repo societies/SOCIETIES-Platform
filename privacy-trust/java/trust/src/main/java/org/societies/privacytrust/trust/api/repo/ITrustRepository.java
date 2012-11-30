@@ -32,32 +32,44 @@ import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 public interface ITrustRepository {
 
 	/**
-	 * Creates an {@link ITrustedEntity} object with the specified
-	 * {@link TrustedEntityId} which is persisted in the Trust Repository. If
-	 * the repository already contains the entity, the call leaves the
-	 * repository unchanged and returns the existing entity associated with the
-	 * supplied TrustedEntityId. This prevents duplicate entities in the
-	 * repository.
+	 * Creates an {@link ITrustedEntity} object with the specified trustor and
+	 * trustee {@link TrustedEntityId TrustedEntityIds} which is persisted in
+	 * the Trust Repository. If the repository already contains the entity, the
+	 * call leaves the repository unchanged and returns the existing entity
+	 * associated with the supplied TrustedEntityIds. This prevents duplicate 
+	 * entities in the repository.
 	 * 
-	 * @param teid
-	 *            the identifier of the entity to be added to the repository
+	 * @param trustorId
+	 *            the identifier of the trustor of the entity to be added to
+	 *            the trust repository
+	 * @param trusteeId
+	 *            the identifier of the trustee referenced in the entity to be
+	 *            added to the trust repository
 	 * @return the newly created {@link TrustedEntity} or the existing one if
-	 *         the repository already contains the identified entity
+	 *         the repository already contains the specified entity
 	 * @throws NullPointerException
 	 *             if the specified teid is <code>null</code>
 	 * @throws TrustRepositoryException
 	 *             if there is a problem accessing the Trust Repository
-	 * @since 0.3
+	 * @since 0.5
 	 */
-	public ITrustedEntity createEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	public ITrustedEntity createEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException;
 
 	/**
 	 * 
-	 * @param teid
+	 * @param trustorId
+	 *            the identifier of the trustor of the entity to be added to
+	 *            the trust repository
+	 * @param trusteeId
+	 *            the identifier of the trustee referenced in the entity to be
+	 *            added to the trust repository
 	 * @return
 	 * @throws TrustRepositoryException
+	 * @since 0.5
 	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	public ITrustedEntity retrieveEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException;
 	
 	/**
 	 * 
@@ -69,10 +81,17 @@ public interface ITrustRepository {
 	
 	/**
 	 * 
-	 * @param teid
+	 * @param trustorId
+	 *            the identifier of the trustor of the entity to be added to
+	 *            the trust repository
+	 * @param trusteeId
+	 *            the identifier of the trustee referenced in the entity to be
+	 *            added to the trust repository
 	 * @throws TrustRepositoryException
+	 * @since 0.5
 	 */
-	public void removeEntity(TrustedEntityId teid) throws TrustRepositoryException;
+	public void removeEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException;
 	
 	/**
 	 * 
@@ -80,8 +99,9 @@ public interface ITrustRepository {
 	 * @param type
 	 * @return
 	 * @throws TrustRepositoryException
-	 * @since 0.3
+	 * @since 0.5
 	 */
-	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
-			final Class<T> entityClass) throws TrustRepositoryException;
+	public <T extends ITrustedEntity> List<T> retrieveEntities(
+			final TrustedEntityId trustorId, final Class<T> entityClass)
+					throws TrustRepositoryException;
 }

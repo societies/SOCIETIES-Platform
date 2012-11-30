@@ -60,8 +60,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	
 	private static final String BASE_ID = "trt";
 	
-	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
-	private static final String TRUSTOR_ID2 = BASE_ID + "TrustorIIdentity2";
+	private static final String TRUSTOR_CSS_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_CSS_ID2 = BASE_ID + "TrustorIIdentity2";
 	
 	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
 	
@@ -70,6 +70,10 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
 	
 	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
+	
+	private static TrustedEntityId trustorCssTeid;
+	
+	private static TrustedEntityId trustorCssTeid2;
 	
 	private static TrustedEntityId trustedCssTeid;
 	
@@ -86,11 +90,15 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	
-		trustedCssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
+		trustorCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
 		
-		trustedCisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		trustorCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID2);
 		
-		trustedServiceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
+		trustedCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTED_CSS_ID);
+		
+		trustedCisTeid = new TrustedEntityId(TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		
+		trustedServiceTeid = new TrustedEntityId(TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 	}
 
 	/**
@@ -99,6 +107,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		
+		trustorCssTeid = null;
+		trustorCssTeid2 = null;
 		trustedCssTeid = null;
 		trustedCisTeid = null;
 		trustedServiceTeid = null;
@@ -172,10 +182,12 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testAddTrustedCss() throws TrustRepositoryException {
 		
-		ITrustedCss newCss = (ITrustedCss) this.trustRepo.createEntity(trustedCssTeid);
+		ITrustedCss newCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trustedCssTeid);
 		assertNotNull(newCss);
 		// test duplicate entity 
-		ITrustedCss dupCss = (ITrustedCss) this.trustRepo.createEntity(trustedCssTeid);
+		ITrustedCss dupCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trustedCssTeid);
 		assertEquals(newCss, dupCss);
 	}
 	
@@ -189,13 +201,15 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCss trustedCssFromDb;
 	
 		// test retrieval of existing entity
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		assertNotNull(trustedCssFromDb);
-		assertEquals(trustedCssTeid, trustedCssFromDb.getTeid());
+		assertEquals(trustorCssTeid, trustedCssFromDb.getTrustorId());
+		assertEquals(trustedCssTeid, trustedCssFromDb.getTrusteeId());
 		
 		// test retrieval of non-existing entity
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
-				new TrustedEntityId(TRUSTOR_ID2, TrustedEntityType.CSS, TRUSTED_CSS_ID));
+				trustorCssTeid2, trustedCssTeid);
 		assertNull(trustedCssFromDb);
 	}
 	
@@ -218,7 +232,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCss trustedCssFromDb;
 		
 		// set direct trust to trustValue1
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getDirectTrust().setValue(trustValue1);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -231,7 +246,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update direct trust with new value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getDirectTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -247,7 +263,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update direct trust with same value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getDirectTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -259,7 +276,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -282,7 +299,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCss trustedCssFromDb;
 		
 		// set indirect trust to trustValue1
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getIndirectTrust().setValue(trustValue1);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -295,7 +313,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update indirect trust with new value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -311,7 +330,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update indirect trust with same value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -323,7 +343,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -346,7 +366,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCss trustedCssFromDb;
 		
 		// set user-perceived trust to trustValue1
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue1);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -359,7 +380,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update user-perceived trust with new value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -375,7 +397,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update user-perceived trust with same value, i.e. trustValue2
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCssTeid);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCssTeid);
 		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
 		// verify update
@@ -387,7 +410,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -397,8 +420,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveCss() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustedCssTeid);
-		assertNull(this.trustRepo.retrieveEntity(trustedCssTeid));
+		this.trustRepo.removeEntity(trustorCssTeid, trustedCssTeid);
+		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedCssTeid));
 	}
 	
 	/**
@@ -407,10 +430,10 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testAddTrustedCis() throws TrustRepositoryException {
 		
-		ITrustedCis newCis = (ITrustedCis) this.trustRepo.createEntity(trustedCisTeid);
+		ITrustedCis newCis = (ITrustedCis) this.trustRepo.createEntity(trustorCssTeid, trustedCisTeid);
 		assertNotNull(newCis);
 		// test duplicate entity 
-		ITrustedCis dupCis = (ITrustedCis) this.trustRepo.createEntity(trustedCisTeid);
+		ITrustedCis dupCis = (ITrustedCis) this.trustRepo.createEntity(trustorCssTeid, trustedCisTeid);
 		assertEquals(newCis, dupCis);
 	}
 	
@@ -424,13 +447,15 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCis trustedCisFromDb;
 		
 		// test retrieval of existing entity
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		assertNotNull(trustedCisFromDb);
-		assertEquals(trustedCisTeid, trustedCisFromDb.getTeid());
+		assertEquals(trustorCssTeid, trustedCisFromDb.getTrustorId());
+		assertEquals(trustedCisTeid, trustedCisFromDb.getTrusteeId());
 		
 		// test retrieval of non-existing entity
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
-				new TrustedEntityId(TRUSTOR_ID2, TrustedEntityType.CSS, TRUSTED_CIS_ID));
+				trustorCssTeid2, trustedCisTeid);
 		assertNull(trustedCisFromDb);
 	}
 	
@@ -453,7 +478,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCis trustedCisFromDb;
 		
 		// set direct trust to trustValue1
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getDirectTrust().setValue(trustValue1);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -466,7 +492,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update direct trust with new value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getDirectTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -482,7 +509,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update direct trust with same value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getDirectTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -494,7 +522,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -517,7 +545,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCis trustedCisFromDb;
 		
 		// set indirect trust to trustValue1
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getIndirectTrust().setValue(trustValue1);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -530,7 +559,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update indirect trust with new value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -546,7 +576,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update indirect trust with same value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -558,7 +589,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -581,7 +612,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedCis trustedCisFromDb;
 		
 		// set user-perceived trust to trustValue1
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getUserPerceivedTrust().setValue(trustValue1);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -594,7 +626,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update user-perceived trust with new value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -610,7 +643,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update user-perceived trust with same value, i.e. trustValue2
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCisTeid);
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedCisTeid);
 		trustedCisFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedCisFromDb = (ITrustedCis) this.trustRepo.updateEntity(trustedCisFromDb);
 		// verify update
@@ -622,7 +656,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -632,8 +666,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveCis() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustedCisTeid);
-		assertNull(this.trustRepo.retrieveEntity(trustedCisTeid));
+		this.trustRepo.removeEntity(trustorCssTeid, trustedCisTeid);
+		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedCisTeid));
 	}
 	
 	/**
@@ -642,10 +676,12 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testAddTrustedService() throws TrustRepositoryException {
 		
-		ITrustedService newService = (ITrustedService) this.trustRepo.createEntity(trustedServiceTeid);
+		ITrustedService newService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trustedServiceTeid);
 		assertNotNull(newService);
 		// test duplicate entity 
-		ITrustedService dupService = (ITrustedService) this.trustRepo.createEntity(trustedServiceTeid);
+		ITrustedService dupService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trustedServiceTeid);
 		assertEquals(newService, dupService);
 	}
 	
@@ -659,13 +695,15 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedService trustedServiceFromDb;
 		
 		// test retrieval of existing entity
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		assertNotNull(trustedServiceFromDb);
-		assertEquals(trustedServiceTeid, trustedServiceFromDb.getTeid());
+		assertEquals(trustorCssTeid, trustedServiceFromDb.getTrustorId());
+		assertEquals(trustedServiceTeid, trustedServiceFromDb.getTrusteeId());
 		
 		// test retrieval of non-existing entity
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
-				new TrustedEntityId(TRUSTOR_ID2, TrustedEntityType.SVC, TRUSTED_SERVICE_ID));
+				trustorCssTeid2, trustedServiceTeid);
 		assertNull(trustedServiceFromDb);
 	}
 	
@@ -688,7 +726,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		ITrustedService trustedServiceFromDb;
 		
 		// set direct trust to trustValue1
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getDirectTrust().setValue(trustValue1);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -701,7 +740,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update direct trust with new value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getDirectTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -717,7 +757,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update direct trust with same value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getDirectTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -729,7 +770,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -754,7 +795,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		//this.trustRepo.addEntity(trustedService);
 		
 		// set indirect trust to trustValue1
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getIndirectTrust().setValue(trustValue1);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -767,7 +809,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update indirect trust with new value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -783,7 +826,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update indirect trust with same value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getIndirectTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -795,7 +839,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 
@@ -820,7 +864,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		//this.trustRepo.addEntity(trustedService);
 		
 		// set user-perceived trust to trustValue1
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getUserPerceivedTrust().setValue(trustValue1);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -833,7 +878,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertEquals(lastModified1, lastUpdated1);
 		
 		// update user-perceived trust with new value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -849,7 +895,8 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
 		
 		// update user-perceived trust with same value, i.e. trustValue2
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceTeid);
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustorCssTeid, trustedServiceTeid);
 		trustedServiceFromDb.getUserPerceivedTrust().setValue(trustValue2);
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.updateEntity(trustedServiceFromDb);
 		// verify update
@@ -861,7 +908,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertNotNull(lastUpdated3);
 		assertFalse(lastModified3.equals(lastUpdated3));
 		// Verify update of lastModified/Updated props
-		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertEquals(lastModified3.getTime(), lastModified2.getTime(), 1000); // MySQL hack - ignore ms
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
 	
@@ -871,7 +918,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveService() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustedServiceTeid);
-		assertNull(this.trustRepo.retrieveEntity(trustedServiceTeid));
+		this.trustRepo.removeEntity(trustorCssTeid, trustedServiceTeid);
+		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedServiceTeid));
 	}
 }

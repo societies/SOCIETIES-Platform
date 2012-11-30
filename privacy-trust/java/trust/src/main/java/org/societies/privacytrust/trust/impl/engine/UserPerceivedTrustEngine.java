@@ -65,7 +65,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		super.trustEventMgr.registerListener(
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
-					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
+					TrustEventTopic.INDIRECT_TRUST_UPDATED });
 	}
 	
 	/*
@@ -139,11 +139,14 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 	
 	private class CssUserPerceivedTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final TrustedEntityId trustorId;
+		private final TrustedEntityId trusteeId;
 		
-		private CssUserPerceivedTrustEngine(final TrustedEntityId teid) {
+		private CssUserPerceivedTrustEngine(final TrustedEntityId trustorId,
+				final TrustedEntityId trusteeId) {
 			
-			this.teid = teid;
+			this.trustorId = trustorId;
+			this.trusteeId = trusteeId;
 		}
 		
 		/*
@@ -153,13 +156,16 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		public void run() {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running CssUserPerceivedTrustEngine for entity " + teid);
+				LOG.debug("Running CssUserPerceivedTrustEngine for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId + "'");
 			
 			try {
-				final ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(teid);
+				final ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(
+						this.trustorId, this.trusteeId);
 				if (css == null) {
-					LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": Entity not found in the trust repository");
+					LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': Entity not found in the trust repository");
 					return;
 				}
 				
@@ -171,19 +177,23 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 					trustRepo.updateEntity(evaluatedCss);
 			} catch (TrustException te) {
 				
-				LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": " + te.getLocalizedMessage(), te);
+				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': " + te.getLocalizedMessage(), te);
 			}
 		} 
 	}
 	
 	private class CisUserPerceivedTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final TrustedEntityId trustorId;
+		private final TrustedEntityId trusteeId;
 		
-		private CisUserPerceivedTrustEngine(final TrustedEntityId teid) {
+		private CisUserPerceivedTrustEngine(final TrustedEntityId trustorId,
+				final TrustedEntityId trusteeId) {
 			
-			this.teid = teid;
+			this.trustorId = trustorId;
+			this.trusteeId = trusteeId;
 		}
 		
 		/*
@@ -193,13 +203,16 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		public void run() {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running CisDirectTrustEngine for entity " + teid);
+				LOG.debug("Running CisDirectTrustEngine for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId + "'");
 			
 			try {
-				final ITrustedCis cis = (ITrustedCis) trustRepo.retrieveEntity(teid);
+				final ITrustedCis cis = (ITrustedCis) trustRepo.retrieveEntity(
+						this.trustorId, this.trusteeId);
 				if (cis == null) {
-					LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": Entity not found in the trust repository");
+					LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': Entity not found in the trust repository");
 					return;
 				}
 				
@@ -211,19 +224,23 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 					trustRepo.updateEntity(evaluatedCis);
 			} catch (TrustException te) {
 				
-				LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": " + te.getLocalizedMessage(), te);
+				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': " + te.getLocalizedMessage(), te);
 			}
 		} 
 	}
 	
 	private class ServiceUserPerceivedTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final TrustedEntityId trustorId;
+		private final TrustedEntityId trusteeId;
 		
-		private ServiceUserPerceivedTrustEngine(final TrustedEntityId teid) {
+		private ServiceUserPerceivedTrustEngine(final TrustedEntityId trustorId,
+				final TrustedEntityId trusteeId) {
 			
-			this.teid = teid;
+			this.trustorId = trustorId;
+			this.trusteeId = trusteeId;
 		}
 		
 		/*
@@ -233,13 +250,16 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		public void run() {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running ServiceDirectTrustEngine for entity " + teid);
+				LOG.debug("Running ServiceDirectTrustEngine for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId + "'");
 			
 			try {
-				final ITrustedService service = (ITrustedService) trustRepo.retrieveEntity(teid);
+				final ITrustedService service = (ITrustedService) trustRepo.retrieveEntity(
+						this.trustorId, this.trusteeId);
 				if (service == null) {
-					LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": Entity not found in the trust repository");
+					LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': Entity not found in the trust repository");
 					return;
 				}
 				
@@ -251,8 +271,9 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 					trustRepo.updateEntity(evaluatedService);
 			} catch (TrustException te) {
 				
-				LOG.error("Could not (re)evaluate user-perceived trust for entity "
-						+ teid + ": " + te.getLocalizedMessage(), te);
+				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
+						+ this.trusteeId + "' on behalf of '" + this.trustorId 
+						+ "': " + te.getLocalizedMessage(), te);
 			}
 		} 
 	}
@@ -268,16 +289,20 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received TrustUpdateEvent " + evt);
 			
-			final TrustedEntityId teid = evt.getId();
-			final TrustedEntityType entityType = teid.getEntityType();
-			if (TrustedEntityType.CSS.equals(entityType))
-				executorService.execute(new CssUserPerceivedTrustEngine(teid));
-			else if (TrustedEntityType.CIS.equals(entityType))
-				executorService.execute(new CisUserPerceivedTrustEngine(teid));
-			else if (TrustedEntityType.SVC.equals(entityType))
-				executorService.execute(new ServiceUserPerceivedTrustEngine(teid));
+			final TrustedEntityId trustorId = evt.getTrustorId();
+			final TrustedEntityId trusteeId = evt.getTrusteeId();
+			final TrustedEntityType trusteeType = trusteeId.getEntityType();
+			if (TrustedEntityType.CSS.equals(trusteeType))
+				executorService.execute(new CssUserPerceivedTrustEngine(
+						trustorId, trusteeId));
+			else if (TrustedEntityType.CIS.equals(trusteeType))
+				executorService.execute(new CisUserPerceivedTrustEngine(
+						trustorId, trusteeId));
+			else if (TrustedEntityType.SVC.equals(trusteeType))
+				executorService.execute(new ServiceUserPerceivedTrustEngine(
+						trustorId, trusteeId));
 			else
-				LOG.warn("Unsupported trusted entity type: " + entityType);
+				LOG.warn("Unsupported trusted entity type: " + trusteeType);
 		}		
 	}
 }

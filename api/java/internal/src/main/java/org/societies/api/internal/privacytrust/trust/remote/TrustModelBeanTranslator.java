@@ -50,9 +50,8 @@ public final class TrustModelBeanTranslator {
 			throw new NullPointerException("teid can't be null");
 		
 		final TrustedEntityIdBean teidBean = new TrustedEntityIdBean();
-		teidBean.setTrustorId(teid.getTrustorId());
 		teidBean.setEntityType(fromTrustedEntityType(teid.getEntityType()));
-		teidBean.setTrusteeId(teid.getTrusteeId());
+		teidBean.setEntityId(teid.getEntityId());
 		
 		return teidBean;
 	}
@@ -63,9 +62,8 @@ public final class TrustModelBeanTranslator {
 			throw new NullPointerException("teidBean can't be null");
 		
 		final TrustedEntityId teid = new TrustedEntityId(
-				teidBean.getTrustorId(),
 				fromTrustedEntityTypeBean(teidBean.getEntityType()),
-				teidBean.getTrusteeId());
+				teidBean.getEntityId());
 		
 		return teid;
 	}

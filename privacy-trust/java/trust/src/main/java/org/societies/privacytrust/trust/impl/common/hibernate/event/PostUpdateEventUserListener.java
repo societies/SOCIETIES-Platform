@@ -56,8 +56,6 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateEventUserListener.class);
 	
-	private static final String EVENT_SOURCE = "TrustRepository"; 
-	
 	private static final Map<String, String> TRUST_PROPERTY_MAP;
     
 	static {
@@ -98,20 +96,21 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            final Object oldValue = event.getOldState()[i];
 	            final Object newValue = event.getState()[i];
 	            if (areDifferent(oldValue, newValue)) {
-	            	final TrustedEntityId teid = ((TrustedEntity) event.getEntity()).getTeid();
+	            	final TrustedEntityId trustorId = ((TrustedEntity) event.getEntity()).getTrustorId();
+	            	final TrustedEntityId trusteeId = ((TrustedEntity) event.getEntity()).getTrusteeId();
 	            	final Double oldTrustValue = (oldValue != null) 
 	            			? ((Trust) oldValue).getValue() : null; 
 	            	final Double newTrustValue = (newValue != null) 
 	            			? ((Trust) newValue).getValue() : null;
 	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
-	            			teid, oldTrustValue, newTrustValue);
+	            			trustorId, trusteeId, oldTrustValue, newTrustValue);
 	            	final String topic = TRUST_PROPERTY_MAP.get(propName);
 	            	if (LOG.isDebugEnabled())
 	            		LOG.debug("Posting TrustUpdateEvent " + trustUpdateEvent
 	            				+ " to topic '" + topic + "'");
 	            	try {
 						this.trustEventMgr.postEvent(trustUpdateEvent, 
-								new String[] { topic }, EVENT_SOURCE);
+								new String[] { topic });
 					} catch (TrustEventMgrException teme) {
 						
 						LOG.error("Could not post TrustUpdateEvent " 

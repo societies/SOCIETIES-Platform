@@ -40,7 +40,6 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote;
 import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
@@ -79,17 +78,19 @@ public class TrustEvidenceCollectorCommClient implements
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
 	 */
 	@Override
-	public void addDirectEvidence(final TrustedEntityId teid, 
-			final TrustEvidenceType type, final Date timestamp, 
-			final Serializable info, 
+	public void addDirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info, 
 			final ITrustEvidenceCollectorRemoteCallback callback)
 					throws TrustException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
@@ -98,32 +99,32 @@ public class TrustEvidenceCollectorCommClient implements
 			throw new NullPointerException("callback can't be null");
 		
 		if (LOG.isDebugEnabled()) 
-			LOG.debug("Adding direct trust evidence for entity " + teid);
+			LOG.debug("Adding direct trust evidence with subjectId '" + subjectId
+					+ "' and objectId '" + objectId + "'");
 		
 		try {
 			final IIdentity toIdentity = 
-					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
+					this.commManager.getIdManager().getCloudNode(); 
 			final Stanza stanza = new Stanza(toIdentity);
-			// uncomment for local testing only (1)
-			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
 			
 			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final AddDirectEvidenceRequestBean addEvidenceBean = new AddDirectEvidenceRequestBean();
-			// 1. teid
-			addEvidenceBean.setTeid(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// uncomment for local testing only (2)
-			//addEvidenceBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
-			// 2. type
+			// 1. subjectId
+			addEvidenceBean.setSubjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId));
+			// 2. subjectId
+			addEvidenceBean.setObjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId));
+			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
-			// 3. timestamp
+			// 4. timestamp
 			// TODO Uncomment once #1310 is resolved
 			final GregorianCalendar gregCal = new GregorianCalendar();
 			gregCal.setTime(timestamp);
 			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
-			// 4. info
-			if (TrustEvidenceType.RATED.equals(type))
+			// 5. info
+			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
 			
 			final TrustEvidenceCollectorRequestBean requestBean = new TrustEvidenceCollectorRequestBean();
@@ -132,71 +133,72 @@ public class TrustEvidenceCollectorCommClient implements
 			
 			this.commManager.sendIQGet(stanza, requestBean, this.privacyTrustCommClientCallback);
 		
-		} catch (InvalidFormatException ife) {
-			
-			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
-					+ ": Invalid trustorId IIdentity: " 
-					+ ife.getLocalizedMessage(), ife);
 		} catch (CommunicationException ce) {
 			
-			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
-					+ ": " + ce.getLocalizedMessage(), ce);
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add direct trust evidence with subjectId '" 
+					+ subjectId + "' and objectId '" + objectId 
+					+ "': " + ce.getLocalizedMessage(), ce);
 			
 		// TODO Uncomment once #1310 is resolved
 		} catch (DatatypeConfigurationException dce) {
 			
-			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
-					+ ": " + dce.getLocalizedMessage(), dce);
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add direct trust evidence with subjectId '" 
+					+ subjectId + "' and objectId '" + objectId 
+					+ "': " + dce.getLocalizedMessage(), dce);
 		} catch (IOException ioe) {
 		
-			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
-					+ ": Could not serialise info object into byte[]: " 
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add direct trust evidence with subjectId '" 
+					+ subjectId + "' and objectId '" + objectId 
+					+ "': Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage(), ioe);
 		}
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
 	 */
 	@Override
-	public void addIndirectEvidence(final TrustedEntityId source, 
-			final TrustedEntityId teid,	final TrustEvidenceType type,
+	public void addIndirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId,	final TrustEvidenceType type,
 			final Date timestamp, final Serializable info,
+			final TrustedEntityId sourceId,
 			final ITrustEvidenceCollectorRemoteCallback callback) 
 					throws TrustException {
 		
-		if (source == null)
-			throw new NullPointerException("source can't be null");
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
+		if (sourceId == null)
+			throw new NullPointerException("sourceId can't be null");
 		if (callback == null)
 			throw new NullPointerException("callback can't be null");
 		
 		if (LOG.isDebugEnabled()) 
-			LOG.debug("Adding indirect trust evidence for entity " + teid);
+			LOG.debug("Adding indirect trust evidence with subjectId '"	
+					+ subjectId + "' and objectId '" + objectId	+ "'");
 		
 		try {
 			final IIdentity toIdentity = 
-					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
+					this.commManager.getIdManager().getCloudNode(); 
 			final Stanza stanza = new Stanza(toIdentity);
-			// uncomment for local testing only (1)
-			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
 			
 			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final AddIndirectEvidenceRequestBean addEvidenceBean = new AddIndirectEvidenceRequestBean();
-			// 1. source
-			addEvidenceBean.setSource(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(source));
-			// 2. teid
-			addEvidenceBean.setTeid(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// uncomment for local testing only (2)
-			//addEvidenceBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
+			// 1. subjectId
+			addEvidenceBean.setSubjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId));
+			// 2. objectId
+			addEvidenceBean.setObjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId));
 			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 4. timestamp
@@ -204,8 +206,11 @@ public class TrustEvidenceCollectorCommClient implements
 			gregCal.setTime(timestamp);
 			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 5. info
-			if (TrustEvidenceType.RATED.equals(type))
+			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
+			// 6. sourceId
+			addEvidenceBean.setSourceId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(sourceId));
 			
 			final TrustEvidenceCollectorRequestBean requestBean = new TrustEvidenceCollectorRequestBean();
 			requestBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
@@ -213,24 +218,26 @@ public class TrustEvidenceCollectorCommClient implements
 			
 			this.commManager.sendIQGet(stanza, requestBean, this.privacyTrustCommClientCallback);
 		
-		} catch (InvalidFormatException ife) {
-			
-			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
-					+ ": Invalid trustorId IIdentity: " 
-					+ ife.getLocalizedMessage(), ife);
 		} catch (CommunicationException ce) {
 			
-			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
-					+ ": " + ce.getLocalizedMessage(), ce);
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add indirect trust evidence with subjectId '"	
+					+ subjectId + "' and objectId '" + objectId	
+					+ "': " + ce.getLocalizedMessage(), ce);
 			
 		} catch (DatatypeConfigurationException dce) {
 			
-			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
-					+ ": " + dce.getLocalizedMessage(), dce);
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add indirect trust evidence with subjectId '"	
+					+ subjectId + "' and objectId '" + objectId	
+					+ "': " + dce.getLocalizedMessage(), dce);
+			
 		} catch (IOException ioe) {
 		
-			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
-					+ ": Could not serialise info object into byte[]: " 
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add indirect trust evidence with subjectId '"	
+					+ subjectId + "' and objectId '" + objectId	
+					+ "': Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage(), ioe);
 		}
 	}

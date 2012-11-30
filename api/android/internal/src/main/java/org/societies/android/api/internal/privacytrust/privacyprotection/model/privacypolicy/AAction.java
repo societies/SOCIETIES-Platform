@@ -24,7 +24,6 @@
  */
 package org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 
@@ -67,7 +66,7 @@ public class AAction extends Action implements Parcelable {
 		dest.writeInt(optional ? 1 : 0);
 	}
 	
-	private void readFromParcel(Parcel in) {
+	protected void readFromParcel(Parcel in) {
 		actionConstant = ActionConstants.fromValue(in.readString());
 		optional = 1 == in.readInt() ? true : false;
 	}

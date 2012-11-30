@@ -91,18 +91,22 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	/* Empty constructor required by Hibernate */
 	private TrustedCss() {
 		
-		super(null);
+		super(null, null);
 	}
 	
 	/**
-	 * Constructs a <code>TrustedCss</code> with the specified identifier.
+	 * Constructs a <code>TrustedCss</code> with the specified trustor and
+	 * trustee identifiers.
 	 * 
-	 * @param teid
-	 *            the identifier of the new <code>TrustedCss</code>
+	 * @param trustorId
+	 *            the identifier of the trustor
+	 * @param trusteeId
+	 *            the identifier of the trustee
+	 * @since 0.5
 	 */
-	public TrustedCss(final TrustedEntityId teid) {
+	public TrustedCss(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
-		super(teid);
+		super(trustorId, trusteeId);
 	}
 
 	/*

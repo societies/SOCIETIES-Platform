@@ -39,5 +39,5 @@ public interface IIndirectTrustEvidence extends ITrustEvidence {
 	 * @return
 	 * @since 0.5
 	 */
-	public TrustedEntityId getSource();
+	public TrustedEntityId getSourceId();
 }

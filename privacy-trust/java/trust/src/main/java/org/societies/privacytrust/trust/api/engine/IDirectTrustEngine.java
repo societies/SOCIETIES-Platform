@@ -26,12 +26,14 @@ package org.societies.privacytrust.trust.api.engine;
 
 import java.util.Set;
 
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 /**
  * This interface provides methods to evaluate the trustworthiness of 
- * {@link ITrustedEntity} objects.
+ * {@link ITrustedEntity} objects based on {@link IDirectTrustEvidence}
+ * information.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.3
@@ -41,74 +43,25 @@ public interface IDirectTrustEngine {
 	/**
 	 * TODO
 	 * 
+	 * @param trustorId
 	 * @param evidence
 	 * @return
 	 * @throws TrustEngineException
 	 * @since 0.5
 	 */
-	public Set<ITrustedEntity> evaluate(final IDirectTrustEvidence evidence)
-			throws TrustEngineException;
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final IDirectTrustEvidence evidence) throws TrustEngineException;
 	
 	/**
 	 * TODO
 	 * 
+	 * @param trustorId
 	 * @param evidenceSet
 	 * @return
 	 * @throws TrustEngineException
 	 * @since 0.5
 	 */
-	public Set<ITrustedEntity> evaluate(final Set<IDirectTrustEvidence> evidenceSet)
-			throws TrustEngineException;
-	
-	/*
-	 * Evaluates the trustworthiness of the specified list of 
-	 * {@link ITrustedCss} based on the supplied list of {@link ITrustEvidence}.
-	 *  
-	 * @param cssList
-	 *            the list of {@link ITrustedCss} whose trust values to evaluate
-	 * @param evidenceList
-	 *            the list of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust values
-	 * @throws TrustEngineException
-	 *            if there is an error during trust evaluation
-	 * @throw NullPointerException
-	 *            if any of the specified parameters is <code>null</code>
-	 *
-	public void evaluateCss(final List<ITrustedCss> cssList, 
-			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
-	
-	/**
-	 * Evaluates the trustworthiness of the specified list of {@link ITrustedCis} based
-	 * on the supplied list of {@link ITrustEvidence}.
-	 *  
-	 * @param cisList
-	 *            the list of {@link ITrustedCis} whose trust values to evaluate
-	 * @param evidenceList
-	 *            the list of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust values 
-	 * @throws TrustEngineException
-	 *            if there is an error during trust evaluation
-	 * @throw NullPointerException
-	 *            if any of the specified parameters is <code>null</code>
-	 *
-	public void evaluateCis(final List<ITrustedCis> cisList, 
-			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
-	
-	/**
-	 * Evaluates the trustworthiness of the specified list of {@link ITrustedService}
-	 * based on the supplied list of {@link ITrustEvidence}.
-	 *  
-	 * @param serviceList
-	 *            the list of {@link ITrustedService} whose trust values to evaluate
-	 * @param evidenceList
-	 *            the list of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust values
-	 * @throws TrustEngineException
-	 *            if there is an error during trust evaluation
-	 * @throw NullPointerException
-	 *            if any of the specified parameters is <code>null</code>
-	 *
-	public void evaluateService(final List<ITrustedService> serviceList, 
-			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
-	*/
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final Set<IDirectTrustEvidence> evidenceSet) 
+					throws TrustEngineException;
 }

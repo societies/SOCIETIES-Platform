@@ -27,6 +27,8 @@ package org.societies.privacytrust.trust.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
@@ -43,7 +45,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -65,21 +67,23 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	
 	private static final String BASE_ID = "tbt";
 	
-	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_CSS_ID = BASE_ID + "TrustorCssIIdentity";
 	
-	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
+	private static final String TRUSTED_CSS_ID = BASE_ID + "TrusteeCssIIdentity";
 	
-	private static final String TRUSTED_CIS_ID = BASE_ID + "CisIIdentity";
+	private static final String TRUSTED_CIS_ID = BASE_ID + "TrusteeCisIIdentity";
 	
-	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
+	private static final String TRUSTED_SERVICE_ID = BASE_ID + "TrusteeServiceResourceIdentifier";
 	
 	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
-	private static TrustedEntityId cssTeid;
+	private static TrustedEntityId trustorCssTeid;
 	
-	private static TrustedEntityId cisTeid;
+	private static TrustedEntityId trusteeCssTeid;
 	
-	private static TrustedEntityId serviceTeid;
+	private static TrustedEntityId trusteeCisTeid;
+	
+	private static TrustedEntityId trusteeServiceTeid;
 	
 	@Autowired
 	@InjectMocks
@@ -89,7 +93,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	private ITrustRepository trustRepo;
 	
 	@Mock
-	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
+	private ITrustNodeMgr mockTrustNodeMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -97,11 +101,10 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		cssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
-		
-		cisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
-		
-		serviceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
+		trustorCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
+		trusteeCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTED_CSS_ID);
+		trusteeCisTeid = new TrustedEntityId(TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		trusteeServiceTeid = new TrustedEntityId(TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 	}
 
 	/**
@@ -110,9 +113,10 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		
-		cssTeid = null;
-		cisTeid = null;
-		serviceTeid = null;
+		trustorCssTeid = null;
+		trusteeCssTeid = null;
+		trusteeCisTeid = null;
+		trusteeServiceTeid = null;
 	}
 
 	/**
@@ -122,7 +126,10 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
+		final Collection<TrustedEntityId> myIds = new HashSet<TrustedEntityId>();
+		myIds.add(trustorCssTeid);
+		when(mockTrustNodeMgr.getMyIds()).thenReturn(myIds);
+		when(mockTrustNodeMgr.isMaster()).thenReturn(true);
 	}
 
 	/**
@@ -133,13 +140,13 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.TrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testRetrieveTrustedCssTrust() throws TrustException, InterruptedException, ExecutionException {
+	public void testRetrieveTrustedCssTrust() throws Exception {
 		
 		// test params
 		final double trustValue1 = 0.5d;
@@ -147,37 +154,42 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(cssTeid).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustorCssTeid, trusteeCssTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
 		// add trusted CSS with user perceived value set to trustValue1
-		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(cssTeid);
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
 		trustedCss.getUserPerceivedTrust().setValue(trustValue1);
 		this.trustRepo.updateEntity(trustedCss);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCss.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
 		
 		// update trusted CSS with user perceived value set to trustValue2
-		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
 		trustedCss.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedCss);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCss.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.TrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testRetrieveTrustedCisTrust() throws TrustException, InterruptedException, ExecutionException {
+	public void testRetrieveTrustedCisTrust() throws Exception {
 		
 		// test params
 		final double trustValue1 = 0.5d;
@@ -185,31 +197,36 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(cisTeid).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustorCssTeid, trusteeCisTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
 		// add trusted CIS with user perceived value set to trustValue1
-		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(cisTeid);  
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);  
 		trustedCis.getUserPerceivedTrust().setValue(trustValue1);
 		this.trustRepo.updateEntity(trustedCis);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCis.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
 		
 		// update trusted CIS with user perceived value set to trustValue2
-		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis.getTeid());
+		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId());
 		trustedCis.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedCis);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCis.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.TrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
@@ -223,31 +240,36 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(serviceTeid).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustorCssTeid, trusteeServiceTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
 		// add trusted service with user perceived value set to trustValue1 
-		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(serviceTeid); 
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid); 
 		trustedService.getUserPerceivedTrust().setValue(trustValue1);
 		this.trustRepo.updateEntity(trustedService);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedService.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
 		
 		// update trusted service with user perceived value set to trustValue2
-		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(trustedService.getTeid());
+		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustedService.getTrustorId(), trustedService.getTrusteeId());
 		trustedService.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedService);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedService.getTeid()).get();
+		retrievedTrustValue = this.trustBroker.retrieveTrust(
+				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.TrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}.
 	 */
 	@Test
 	@Ignore
@@ -256,7 +278,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.TrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}.
 	 */
 	@Test
 	@Ignore

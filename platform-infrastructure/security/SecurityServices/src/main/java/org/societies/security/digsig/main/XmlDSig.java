@@ -24,7 +24,7 @@
  */
 package org.societies.security.digsig.main;
 
-import java.security.Key;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -35,11 +35,9 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.certs.SignatureCheck;
 import org.societies.security.digsig.util.XmlManipulator;
-import org.societies.security.storage.CertStorage;
 import org.w3c.dom.Document;
 
 /**
@@ -52,10 +50,19 @@ public class XmlDSig {
 
 	private static Logger LOG = LoggerFactory.getLogger(XmlDSig.class);
 
-	private CertStorage certStorage;
+	/** Our certificate */
+	X509Certificate cert;
+	
+	PrivateKey key;
+	
+	public XmlDSig(X509Certificate cert, PrivateKey key) throws DigsigException {
+		this.cert = cert;
+		this.key = key;
 
-	public XmlDSig(CertStorage certStorage) {
-		this.certStorage = certStorage;
+		if (cert == null || key == null) {
+			LOG.error("XmlDSig: cert and key must not be null: cert = {}, key = {}", cert, key);
+			throw new DigsigException("Cert or key is null");
+		}
 
 		try {
 			if (!Init.isInitialized()) {
@@ -68,37 +75,55 @@ public class XmlDSig {
 
 	}
 
-	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
+	/**
+	 * Please use one of other methods with same name.
+	 */
+	@Deprecated
+	public String signXml(String xml, String xmlNodeId) throws DigsigException {
 
-		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
+		LOG.debug("signXml(String, {}, {})", xmlNodeId);
 
-		return xml; // FIXME
+		ArrayList<String> idsToSign = new ArrayList<String>();
+		
+		idsToSign.add(xmlNodeId);
+
+		xml = signXml(xml, idsToSign);
+		return xml;
+	}
+
+	public Document signXml(Document xml, String xmlNodeId) throws DigsigException {
+
+		LOG.debug("signXml(Document, {}, {})", xmlNodeId);
+
+		ArrayList<String> idsToSign = new ArrayList<String>();
+		
+		idsToSign.add(xmlNodeId);
+
+		xml = signXml(xml, idsToSign);
+		return xml;
 	}
 
 	// TODO: move to PolicyNegotiator
 	public String getRequesterSignatureId(Document doc) {
 
-		SignatureCheck check = new SignatureCheck(doc, certStorage);
-		String sigId = check.getCustomerSignature().getElement().getAttribute("Id");
-
-		return sigId;
+		SignatureCheck check = new SignatureCheck(doc, cert);
+		XMLSignature xmlSig;
+		
+		try {
+			xmlSig = check.getCustomerSignature();
+		} catch (DigsigException e) {
+			LOG.warn("getRequesterSignatureId", e);
+			return null;
+		}
+		return xmlSig.getElement().getAttribute("Id");
 	}
 
 	public Document signXml(Document doc, ArrayList<String> idsToSign) throws DigsigException {
 
-		X509Certificate cert;
-		Key key;
 		XMLSignature sig;
 		
 		LOG.debug("signXml({}, {})", doc, idsToSign);
 		
-		cert = certStorage.getOurCert();
-		key = certStorage.getOurKey();
-		if (cert == null || key == null) {
-			LOG.error("signXml: cert and key must not be null: cert = {}, key = {}", cert, key);
-			throw new DigsigException("Cert or key is null");
-		}
-
 		try {
 			sig = new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA);
 

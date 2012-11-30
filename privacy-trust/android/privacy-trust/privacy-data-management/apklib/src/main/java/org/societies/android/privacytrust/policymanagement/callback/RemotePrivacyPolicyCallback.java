@@ -26,6 +26,7 @@ package org.societies.android.privacytrust.policymanagement.callback;
 
 import java.util.List;
 
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -34,6 +35,8 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.model.pr
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -50,11 +53,15 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	private RequestPolicy privacyPolicy;
 	private boolean ack;
 	private String ackMessage;
+	private Context contexte;
+	private String clientPackage;
 
 
-	public RemotePrivacyPolicyCallback(List<String> eLEMENT_NAMES,
+	public RemotePrivacyPolicyCallback(Context contexte, String clientPackage, List<String> eLEMENT_NAMES,
 			List<String> nAME_SPACES, List<String> pACKAGES) {
 		super();
+		this.contexte = contexte;
+		this.clientPackage = clientPackage;
 		ELEMENT_NAMES = eLEMENT_NAMES;
 		NAME_SPACES = nAME_SPACES;
 		PACKAGES = pACKAGES;
@@ -63,20 +70,39 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 
 	public void receiveResult(Stanza stanza, Object payload) {
 		Log.d(TAG, "receiveResult");
-		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
-		if (payload instanceof PrivacyPolicyManagerBeanResult) {
-			PrivacyPolicyManagerBeanResult resultBean = (PrivacyPolicyManagerBeanResult) payload;
-			MethodType methodType = resultBean.getMethod();
-			ack = resultBean.isAck();
-			ackMessage = resultBean.getAckMessage();
-			Log.d(TAG, "Type of response: " +methodType+" "+(ack ? "success" : "faillure"));
-			if (ack && (MethodType.GET_PRIVACY_POLICY.equals(methodType) || MethodType.UPDATE_PRIVACY_POLICY.equals(methodType))) {
-				privacyPolicy = resultBean.getPrivacyPolicy();
-			}
-		}
 		debugStanza(stanza);
-		// Tell upper layer that received is finished
-		notifyAll();
+		if (null == payload) {
+			Log.e(TAG, "Arg, the payload is null!");
+			return;
+		}
+		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
+		Intent intent = new Intent();
+		intent.setPackage(clientPackage);
+		// -- Privacy
+		if (payload instanceof PrivacyPolicyManagerBeanResult) {
+			receiveResult(stanza, (PrivacyPolicyManagerBeanResult)payload, intent);
+		}
+		Log.d(TAG, "privacyPolicy result sent");
+		contexte.sendBroadcast(intent);
+	}
+
+	public void receiveResult(Stanza stanza, PrivacyPolicyManagerBeanResult payload, Intent intent) {
+		MethodType methodType = payload.getMethod();
+		boolean ack = payload.isAck();
+		String ackMsg = payload.getAckMessage();
+		intent.setAction(methodType.name());
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, ack);
+		Log.d(TAG, "PrivacyPolicyManager: " +methodType+" "+(ack ? "success" : "faillure")+(null != ackMsg ? " - "+ackMsg : ""));
+		if (!ack) {
+			if (null != ackMsg) {
+				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_MSG_KEY, ackMsg);
+			}
+			return;
+		}
+		if (MethodType.GET_PRIVACY_POLICY.equals(methodType)) {
+			privacyPolicy = payload.getPrivacyPolicy();
+			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
+		}
 	}
 
 	public void receiveError(Stanza stanza, XMPPError error) {

@@ -47,7 +47,7 @@ import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidenc
 @Table(
 		name = TableName.INDIRECT_TRUST_EVIDENCE, 
 		uniqueConstraints = { @UniqueConstraint(columnNames = { 
-				"trustor_id", "trustee_id", "type", "timestamp", "source" }) }
+				"subject_id", "object_id", "type", "timestamp", "source_id" }) }
 )
 public class IndirectTrustEvidence extends TrustEvidence implements
 		IIndirectTrustEvidence {
@@ -55,30 +55,32 @@ public class IndirectTrustEvidence extends TrustEvidence implements
 	private static final long serialVersionUID = 1470145009236839996L;
 	
 	/** The source of this evidence. */
-	@Column(name = "source", nullable = false, updatable = false)
+	@Column(name = "source_id", nullable = false, updatable = false, length = 255)
 	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
-	private final TrustedEntityId source;
+	private final TrustedEntityId sourceId;
 
 	/* Empty constructor required by Hibernate */
 	private IndirectTrustEvidence() {
 		
-		super(null, null, null, null);
-		this.source = null;
+		super(null, null, null, null, null);
+		this.sourceId = null;
 	}
 	
-	public IndirectTrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info, final TrustedEntityId source) {
+	public IndirectTrustEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info, 
+			final TrustedEntityId sourceId) {
 		
-		super(teid, type, timestamp, info);
-		this.source = source;
+		super(subjectId, objectId, type, timestamp, info);
+		this.sourceId = sourceId;
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence#getSource()
+	 * @see org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence#getSourceId()
 	 */
 	@Override
-	public TrustedEntityId getSource() {
+	public TrustedEntityId getSourceId() {
 		
-		return this.source;
+		return this.sourceId;
 	}
 }
