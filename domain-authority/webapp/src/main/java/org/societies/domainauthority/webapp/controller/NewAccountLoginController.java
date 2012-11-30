@@ -191,7 +191,7 @@ public class NewAccountLoginController {
 		userRecord.setPort("");
 		userRecord.setStatus("new");
 		userRecord.setUserType("user");
-		userRecord.setPassword(password);
+
 		
 		daRegistry.addXmppIdentityDetails(userRecord);
 

@@ -182,14 +182,7 @@ public class LoginController {
 			return new ModelAndView("login", model);
 		}
 		
-		
-		if (!(userRecord.getPassword().contentEquals(password)))
-		{
-				//account doesn't exist, direct to new user page
-				model.put("error", "incoorect usename or password");
-				return new ModelAndView("login", model);
-		}
-		
+	
 		isAuthenticated = true;
 		// Now get the url details from the registry
 		String redirectUrl = new String();

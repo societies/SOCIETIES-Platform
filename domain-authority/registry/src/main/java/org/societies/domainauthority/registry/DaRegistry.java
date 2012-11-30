@@ -37,14 +37,14 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.domainauthority.registry.model.DaRegistryRecordEntry;
-
+import org.societies.api.internal.domainauthority.IDomainAuthorityRegistry; 
 
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class DaRegistry.
  */
-public class DaRegistry {
+public class DaRegistry implements IDomainAuthorityRegistry{
 	
 	/** The session factory. */
 	private SessionFactory sessionFactory;
@@ -103,7 +103,6 @@ public class DaRegistry {
 			tmpEntry.setPort(details.getPort());
 			tmpEntry.setStatus(details.getStatus());
 			tmpEntry.setUserType(details.getUserType());
-			tmpEntry.setPassword(details.getPassword());
 			session.save(tmpEntry);
 
 			t.commit();
@@ -193,7 +192,6 @@ public class DaRegistry {
 			tmpEntry.setPort(details.getPort());
 			tmpEntry.setStatus(details.getStatus());
 			tmpEntry.setUserType(details.getUserType());
-			tmpEntry.setPassword(details.getPassword());
 			
 			session.save(tmpEntry);
 
@@ -247,7 +245,6 @@ public class DaRegistry {
 				recordDetails.setPort(tmpEn.getPort());
 				recordDetails.setStatus(tmpEn.getStatus());
 				recordDetails.setUserType(tmpEn.getUserType());
-				recordDetails.setPassword(tmpEn.getPassword());
 			}
 
 	
@@ -290,7 +287,6 @@ public class DaRegistry {
 				tmpUserEntry.setPort(tmpEn.getPort());
 				tmpUserEntry.setStatus(tmpEn.getStatus());
 				tmpUserEntry.setUserType(tmpEn.getUserType());
-				tmpUserEntry.setPassword(tmpEn.getPassword());
 				userList.add(tmpUserEntry);
 			}
 		}
@@ -308,6 +304,108 @@ public class DaRegistry {
 
 	}
 
+	public void updateUserSessionCommsId(String userid, String commsid)
+	{
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		
+		try {
+
+
+			List<DaRegistryRecordEntry> tmpRegistryEntryList = session.createCriteria(DaRegistryRecordEntry.class)
+					.add(Restrictions.eq("id",userid).ignoreCase()).setMaxResults(1).list();
+			
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+				
+				tmpRegistryEntryList.get(0).setSessioncommsid(commsid);
+				session.saveOrUpdate(tmpRegistryEntryList.get(0));
+
+			}
+			t.commit();
+			log.debug("updateUserSessionCommsId Record Saved.");
+	
+		} catch (Exception e) {
+	
+			// Do nothing
+			t.rollback();
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+	}
+	
+	public String getUserSessionCommsId(String userid)
+	{
+		Session session = sessionFactory.openSession();
+		
+		String result = null;
+	
+		try {
+
 	
 
+			List<DaRegistryRecordEntry> tmpRegistryEntryList = session.createCriteria(DaRegistryRecordEntry.class)
+					.add(Restrictions.eq("id",userid).ignoreCase()).setMaxResults(1).list();
+			
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+				
+				result = tmpRegistryEntryList.get(0).getSessioncommsid();
+
+
+			}
+
+			log.debug("getUserSessionCommsId Record Saved.");
+	
+		} catch (Exception e) {
+	
+			// Do nothing
+
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		
+		return result;
+	}
+
+	
+	public boolean checkUserCommMgr (String userId, String commMgrId)
+	{
+		boolean result = false;
+		
+		Session session = sessionFactory.openSession();
+		
+
+	
+		try {
+
+	
+
+			List<DaRegistryRecordEntry> tmpRegistryEntryList = session.createCriteria(DaRegistryRecordEntry.class)
+					.add(Restrictions.eq("id",userId).ignoreCase())
+					.add(Restrictions.eq("sessioncommsid",commMgrId).ignoreCase())
+					.setMaxResults(1).list();
+			
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+					result = true;
+			}
+		} catch (Exception e) {
+	
+			// Do nothing
+
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		
+		return result;
+	}
+	
 }

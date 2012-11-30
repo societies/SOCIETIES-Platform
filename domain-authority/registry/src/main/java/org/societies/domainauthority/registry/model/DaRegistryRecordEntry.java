@@ -57,7 +57,7 @@ public class DaRegistryRecordEntry implements Serializable {
 	private String port;
 	private String status;
 	private String userType;
-	private String password;
+	private String sessioncommsid;
 
 	
 
@@ -159,18 +159,18 @@ public class DaRegistryRecordEntry implements Serializable {
 	}
 	
 	/**
-	 * @return the password
+	 * @return the sessioncommsid
 	 */
-	@Column(name = "password")
-	public String getPassword() {
-		return password;
+	@Column(name = "sessioncommsid")
+	public String getSessioncommsid() {
+		return sessioncommsid;
 	}
 
 	/**
-	 * @param port the password to set
+	 * @param port the sessioncommsid to set
 	 */
-	public void setPassword(String password) {
-		this.password = password;
+	public void setSessioncommsid(String sessioncommsid) {
+		this.sessioncommsid = sessioncommsid;
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class DaRegistryRecordEntry implements Serializable {
 	 * * @param password
 	 */
 	public DaRegistryRecordEntry(String name, String id, String host,
-			String port, String status, String userType, String password) {
+			String port, String status, String userType) {
 		super();
 		this.name = name;
 		this.id = id;
@@ -191,7 +191,6 @@ public class DaRegistryRecordEntry implements Serializable {
 		this.port = port;
 		this.status = status;
 		this.userType = userType;
-		this.password = password;
 	}
 
 	/**

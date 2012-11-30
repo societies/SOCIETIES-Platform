@@ -50,6 +50,11 @@
 				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
 				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
 				<prop key="hibernate.format_sql">${format_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+		<!--  		<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>-->
+				
+
 			</props>
 		</property>
 	</bean>

@@ -1,0 +1,78 @@
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/internal/schema/usergui" 
+	targetNamespace="http://societies.org/api/internal/schema/usergui"
+	xmlns:tns="http://societies.org/api/internal/schema/usergui" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+ <!--  There should be no need to add extra elements here -->
+ 
+
+	<xs:element name="userGuiBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="targetcomponent" type="tns:componentType" minOccurs="1" />
+				<xs:element name="targetcomponentparameter" type="tns:componentParameters" minOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="userGuiBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+			<!-- Generic returns fields -->
+				<xs:element name="boolReturn" type="xs:boolean" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="intReturn" type="xs:int" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="stringList" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+				
+				<!-- If you cannot use the generic return fields you should specific specify 
+				complex types for your target component 
+				First!, ask yourself does the webapp really, really need that data 
+				NB: Always set minOccurs to 0 is you do add fields. Other components will be using
+				the same xsd and should not be required to set up fields they don't require -->
+	
+
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	
+
+	<!--  As more components are added to the new webapp, and need to make calls to the usser container
+ 		they should be added here -->
+	<xs:simpleType name="componentType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="usergui" />
+			<xs:enumeration value="cismanager" />
+			<xs:enumeration value="cssmamanger" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<!--  Think carefully, when you add elements here. do you really need to send a list of specific objects?
+	Didn't you get all that information from the server, so why is there a need to send it all back again, 
+	can you just send the id back and let your conponent in the data-server retrieve that information locally? -->
+	<xs:complexType name="componentParameters">
+		<xs:sequence>
+		<xs:element name="componentmethod" type="tns:method" minOccurs="1" />
+		<!--  componentsubmethod supplied as on option to provide developer with a way to minimize data -->
+		<!--  for example, if one field in the record has being updated by the user in the webapp, not necessary to send all,
+		the data of the record back. Use the submethod field to indicate the field changed, and just set back the new field value.
+		And code your target component accordingly -->
+		<xs:element name="componentsubmethod" type="tns:method" minOccurs="0" />
+		<xs:element name="stringList" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:simpleType name="method">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="inform" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	
+</xs:schema>
+

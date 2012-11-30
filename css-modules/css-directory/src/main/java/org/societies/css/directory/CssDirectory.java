@@ -101,6 +101,9 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
+		
+		sessionFactory.getStatistics().logSummary(); 
+
 
 	}
 
@@ -135,7 +138,8 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
-
+		
+		sessionFactory.getStatistics().logSummary(); 
 	}
 
 	/*
@@ -157,7 +161,7 @@ public class CssDirectory implements ICssDirectory {
 		try {
 
 			tmpAdvertList = session.createCriteria(
-					CssAdvertisementRecordEntry.class).list();
+					CssAdvertisementRecordEntry.class).setCacheable(true).list();
 
 			for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CssAdvertisementRecord();
@@ -176,6 +180,9 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
+		
+		sessionFactory.getStatistics().logSummary(); 
+		
 		return new AsyncResult<List<CssAdvertisementRecord>>(returnList);
 
 	}
@@ -201,7 +208,7 @@ public class CssDirectory implements ICssDirectory {
 		try {
 
 			tmpAdvertList = session.createCriteria(
-					CssAdvertisementRecordEntry.class).list();
+					CssAdvertisementRecordEntry.class).setCacheable(true).list();
 
 			for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
 				if (entry.getName().contains(filterCss.getName())) {
@@ -221,6 +228,8 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
+		
+		sessionFactory.getStatistics().logSummary(); 
 		return new AsyncResult<List<CssAdvertisementRecord>>(returnList);
 	}
 
@@ -257,6 +266,8 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
+		
+		sessionFactory.getStatistics().logSummary(); 
 
 	}
 
@@ -281,7 +292,7 @@ public class CssDirectory implements ICssDirectory {
 			if (cssIds != null && (cssIds.size() > 0))
 			{
 				tmpAdvertList = session.createCriteria(CssAdvertisementRecordEntry.class).
-						add(Restrictions.in("id",cssIds)).list();
+						add(Restrictions.in("id",cssIds)).setCacheable(true).list();
 			
 				for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
 					record = new CssAdvertisementRecord();
@@ -301,6 +312,8 @@ public class CssDirectory implements ICssDirectory {
 				session.close();
 			}
 		}
+		
+		sessionFactory.getStatistics().logSummary(); 
 		return new AsyncResult<List<CssAdvertisementRecord>>(returnList);
 
 	}

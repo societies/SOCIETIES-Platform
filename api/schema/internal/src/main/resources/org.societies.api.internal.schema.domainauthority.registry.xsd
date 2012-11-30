@@ -1,0 +1,43 @@
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/internal/schema/domainauthority/registry" 
+	targetNamespace="http://societies.org/api/internal/schema/domainauthority/registry"
+	xmlns:tns="http://societies.org/api/internal/schema/domainauthority/registry" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+ <!--  There should be no need to add extra elements here -->
+ 
+
+	<xs:element name="daRegistryBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="tns:method" minOccurs="1" />
+				<xs:element name="commIdToCheck" type="xs:string" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="daRegistryBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="boolReturn" type="xs:boolean" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	
+
+	
+
+	<xs:simpleType name="method">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="checkUserCommValid" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	
+</xs:schema>
+

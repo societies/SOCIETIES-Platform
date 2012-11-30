@@ -12,6 +12,13 @@
        testing of the bundle outside of an OSGi container -->
 	
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	<osgi:service ref="daRegistry" interface="org.societies.domainauthority.registry.DaRegistry" />
+	<osgi:service ref="daRegistry">
+		<interface>
+			<values>
+			org.societies.api.internal.domainauthority.IDomainAuthorityRegistry,
+			org.societies.domainauthority.registry.DaRegistry
+			</values>
+		</interface>
+	</osgi:service>
 	
 </beans>

@@ -127,7 +127,6 @@ public class PilotController {
 			// create default admin account
 			DaUserRecord defaultRecord = new DaUserRecord();
 			defaultRecord.setName("XCManager");
-			defaultRecord.setPassword("");
 			defaultRecord.setUserType("user");
 			defaultRecord.setStatus("active");
 			defaultRecord.setHost("localhost");

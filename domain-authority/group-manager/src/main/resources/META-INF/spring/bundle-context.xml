@@ -18,6 +18,7 @@
 		<property name="commManager" ref="CommManagerBundle" />
 		<property name="cssDirectory" ref="CssDirectory" />
 		<property name="cisDirectory" ref="CisDirectory" />
+		<property name="daRegistry" ref="DaRegistry" />
 	</bean>
 	
 </beans>

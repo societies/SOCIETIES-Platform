@@ -151,7 +151,6 @@ public class UserAdminController {
 			// create default admin account
 			DaUserRecord adminRecord = new DaUserRecord();
 			adminRecord.setName("Administrator");
-			adminRecord.setPassword("Administrator");
 			adminRecord.setUserType("admin");
 			adminRecord.setStatus("active");
 			adminRecord.setHost("");
@@ -220,13 +219,6 @@ public class UserAdminController {
 			return new ModelAndView("error", model);
 		}
 		
-		
-		if ((userRecord.getPassword().contentEquals(password)) == false)
-		{
-				//account doesn't exist, direct to new user page
-				model.put("errormsg", "incoorect usename or password");
-				return new ModelAndView("error", model);
-		}
 		
 		// model is nothing but a standard Map object
 				Map<String, Object> modelnew = new HashMap<String, Object>();

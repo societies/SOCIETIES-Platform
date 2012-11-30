@@ -38,7 +38,7 @@ public class DaUserRecord {
 	private String port;
 	private String status;
 	private String userType;
-	private String password;
+
 	/**
 	 * @return the id
 	 */
@@ -88,6 +88,9 @@ public class DaUserRecord {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	
+	//TODO Host and port will be removed, but leaving them here for now until new webapp completed
 	/**
 	 * @return the host
 	 */
@@ -115,18 +118,7 @@ public class DaUserRecord {
 	
 	
 	
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
+
 	/**
 	 * @param name
 	 * @param id
@@ -136,7 +128,7 @@ public class DaUserRecord {
 	 * @param userType
 	 */
 	public DaUserRecord(String name, String id, String host, String port,
-			String status, String userType, String password) {
+			String status, String userType) {
 		super();
 		this.name = name;
 		this.id = id;
@@ -144,7 +136,6 @@ public class DaUserRecord {
 		this.port = port;
 		this.status = status;
 		this.userType = userType;
-		this.userType = password;
 	}
 	/**
 	 * 

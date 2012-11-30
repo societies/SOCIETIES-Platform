@@ -53,6 +53,11 @@ import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.directory.CisDirectoryBean;
 import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 
+import org.societies.api.internal.domainauthority.IDomainAuthorityRegistry; 
+import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBean;
+import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBeanResult;
+
+
 
 
 
@@ -60,18 +65,22 @@ public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/css/directory",
-					  "http://societies.org/api/schema/cis/directory"));
+					  "http://societies.org/api/schema/cis/directory",
+					  "http://societies.org/api/internal/schema/domainauthority/registry"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.css.directory",
-					  "org.societies.api.schema.cis.directory"));
+					  "org.societies.api.schema.cis.directory",
+					  "org.societies.api.internal.schema.domainauthority.registry"));
 	
 	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private ICssDirectory cssDirectory;
 	private ICisDirectory cisDirectory;
+	private IDomainAuthorityRegistry daRegistry;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
-
+	
+	
 	
 	public ICommManager getCommManager() {
 		return commManager;
@@ -98,6 +107,13 @@ public class CommsServer implements IFeatureServer {
 	}
 	
 
+	public IDomainAuthorityRegistry getDaRegistry() {
+		return daRegistry;
+	}
+
+	public void setDaRegistry(IDomainAuthorityRegistry daRegistry) {
+		this.daRegistry = daRegistry;
+	}
 	
 	
 	//METHODS
@@ -258,7 +274,7 @@ public class CommsServer implements IFeatureServer {
 			
 		}
 		
-		if (payload.getClass().equals(CisDirectoryBean.class)) {
+		else if (payload.getClass().equals(CisDirectoryBean.class)) {
 			
 			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery");
 			
@@ -315,6 +331,34 @@ public class CommsServer implements IFeatureServer {
 						}
 						break;
 					}
+				}
+			} catch (Exception e) {
+					e.printStackTrace();
+			};
+				
+		
+			return resultBean;
+			
+		}
+		else if (payload.getClass().equals(DaRegistryBean.class)) {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Domain Authority ");
+			
+			DaRegistryBean daMsgBean = (DaRegistryBean) payload;
+			DaRegistryBeanResult resultBean = new DaRegistryBeanResult(); 
+			
+			resultBean.setBoolReturn(false);
+			
+			try
+			{
+				switch (daMsgBean.getMethod()) {
+					case CHECK_USER_COMM_VALID :
+					{
+						resultBean.setBoolReturn(this.getDaRegistry().checkUserCommMgr(stanza.getFrom().getJid().toString(), daMsgBean.getCommIdToCheck()));
+					}
+					break;
+					
+				
 				}
 			} catch (Exception e) {
 					e.printStackTrace();

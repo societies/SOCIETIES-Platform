@@ -177,7 +177,7 @@ public class IndexController {
 			userRecord.setPort("");
 			userRecord.setStatus("new");
 			userRecord.setUserType("user");
-			userRecord.setPassword(password);
+
 			daRegistry.addXmppIdentityDetails(userRecord);
 
 			//CREATE CSS ADVERT
