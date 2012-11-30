@@ -187,7 +187,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 			
 			final InternalEvent internalEvent = new InternalEvent(
 					topics[i], event.getTrusteeId().toString(), 
-					event.getTrustord().toString(), eventInfo);
+					event.getTrustorId().toString(), eventInfo);
 
 			if (this.eventMgr == null)
 				throw new TrustEventMgrException("Could not send TrustUpdateEvent '"

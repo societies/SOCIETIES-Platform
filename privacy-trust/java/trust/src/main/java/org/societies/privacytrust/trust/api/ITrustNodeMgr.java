@@ -34,9 +34,26 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.4.1
  */
-public interface ITrustedEntityIdMgr {
+public interface ITrustNodeMgr {
 	
-	public boolean isLocalId(final TrustedEntityId teid) throws TrustedEntityIdMgrException;
+	/**
+	 * Returns the collection of {@link TrustedEntityId TrustedEntityIds} on
+	 * whose behalf this node operates. Note that the method returns an
+	 * <i>unmodifiable</i> view of this collection.
+	 *  
+	 * @return the collection of {@link TrustedEntityId TrustedEntityIds} on
+	 *         whose behalf this node operates.
+	 * @throws TrustedEntityIdMgrException
+	 *         if the collection of {@link TrustedEntityId TrustedEntityIds} on
+	 *         whose behalf this node operates cannot be retrieved.
+	 */
+	public Collection<TrustedEntityId> getMyIds();
 	
-	public Collection<TrustedEntityId> getMyIds() throws TrustedEntityIdMgrException;
+	/**
+	 * Returns <code>true</code> if this node is master; <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this node is master; <code>false</code> otherwise.
+	 * @since 0.5
+	 */
+	public boolean isMaster();
 }

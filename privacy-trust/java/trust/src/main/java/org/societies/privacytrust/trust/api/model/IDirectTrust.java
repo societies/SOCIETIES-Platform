@@ -40,9 +40,9 @@ public interface IDirectTrust extends ITrust {
 	
 	public static final double INIT_SCORE = 0.0d;
 	
-	public static final double MIN_SCORE = Double.MIN_VALUE;
+	public static final double MIN_SCORE = -1.0E8;
 	
-	public static final double MAX_SCORE = Double.MAX_VALUE;
+	public static final double MAX_SCORE = 1.0E8;
 
 	/**
 	 * 

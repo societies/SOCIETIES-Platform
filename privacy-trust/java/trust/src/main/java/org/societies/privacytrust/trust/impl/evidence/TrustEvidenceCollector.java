@@ -35,7 +35,7 @@ import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvide
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
@@ -57,13 +57,14 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	
 	/** The Trust Mgr service reference. */
 	@Autowired(required=true)
-	private ITrustedEntityIdMgr trustMgr;
+	private ITrustNodeMgr trustNodeMgr;
 	
-	@Autowired(required=false)
 	/** The Trust Evidence Repository service reference. */
+	@Autowired(required=false)
 	private ITrustEvidenceRepository trustEvidenceRepository;
 	
 	/** The remote Trust Evidence Collector service reference. */
+	@Autowired(required=false)
 	private ITrustEvidenceCollectorRemote trustEvidenceCollectorRemote;
 	
 	TrustEvidenceCollector() {
@@ -89,39 +90,48 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
 		
-		final boolean doLocal = this.trustMgr.isLocalId(subjectId); // TODO check if cloud node
-		if (doLocal) {
-		
-			final DirectTrustEvidence evidence = new DirectTrustEvidence(
-					subjectId, objectId, type, timestamp, info);
-			try {
+		try {
+			final boolean doLocal = this.trustNodeMgr.isMaster();
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal is " + doLocal);
+			if (doLocal) {
+
+				final DirectTrustEvidence evidence = new DirectTrustEvidence(
+						subjectId, objectId, type, timestamp, info);
+				if (this.trustEvidenceRepository == null)
+					throw new TrustEvidenceCollectorException(
+							"Could not add direct evidence with " + subjectId + "'" 
+									+ "' and objectId '" + objectId 
+									+ "': ITrustEvidenceRepository service is not available");
 				this.trustEvidenceRepository.addEvidence(evidence);
-			} catch (ServiceUnavailableException sue) {
-				throw new TrustEvidenceCollectorException(
-						"Could not add direct evidence with " + subjectId + "'" 
-						+ "' and objectId '" + objectId 
-						+ "': ITrustEvidenceRepository service is not available");
-			}
-		} else {
-			
-			final TrustEvidenceCollectorRemoteCallback callback = 
-					new TrustEvidenceCollectorRemoteCallback();
-			try {
+				
+			} else {
+
+				final TrustEvidenceCollectorRemoteCallback callback = 
+						new TrustEvidenceCollectorRemoteCallback();
+				if (this.trustEvidenceCollectorRemote == null)
+					throw new TrustEvidenceCollectorException(
+							"Could not add direct evidence with " + subjectId + "'" 
+									+ "' and objectId '" + objectId 
+									+ "': ITrustEvidenceCollectorRemote service is not available");
 				this.trustEvidenceCollectorRemote.addDirectEvidence(
 						subjectId, objectId, type, timestamp, info, callback);
 				synchronized (callback) {
-					callback.wait();
+					try {
+						callback.wait();
+					} catch (InterruptedException ie) {
+					throw new TrustEvidenceCollectorException(
+							"Interrupted while adding direct trust evidence with " + subjectId + "'" 
+									+ "' and objectId '" + objectId	+ "'");
+					}
 				}
-			} catch (InterruptedException ie) {
-				throw new TrustEvidenceCollectorException(
-						"Interrupted while adding direct trust evidence with " + subjectId + "'" 
-						+ "' and objectId '" + objectId	+ "'");
-			} catch (ServiceUnavailableException sue) {
-				throw new TrustEvidenceCollectorException(
-						"Could not add direct evidence with " + subjectId + "'" 
-						+ "' and objectId '" + objectId 
-						+ "': ITrustEvidenceCollectorRemote service is not available");
 			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustEvidenceCollectorException(
+					"Could not add direct evidence with " + subjectId + "'" 
+							+ "' and objectId '" + objectId 
+							+ "': " + sue.getLocalizedMessage(), sue);
 		}
 	}
 

@@ -49,6 +49,7 @@ import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceColl
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +80,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	@Autowired
-	CtxTrustEvidenceMonitor(ICommManager commMgr) throws Exception {
+	CtxTrustEvidenceMonitor(ITrustNodeMgr trustNodeMgr, ICommManager commMgr) throws Exception {
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");

@@ -22,56 +22,75 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.test.mock;
+package org.societies.privacytrust.trust.impl;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventListener;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.4.1
  */
-public class MockEventMgr implements IEventMgr {
+@Service
+public class TrustNodeMgr implements ITrustNodeMgr {
+
+	private static final Logger LOG = LoggerFactory.getLogger(TrustNodeMgr.class);
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MockEventMgr.class);
+	private ICommManager commMgr;
 	
-	MockEventMgr() {
+	private final Collection<TrustedEntityId> myTEIDs = new CopyOnWriteArraySet<TrustedEntityId>();
+	
+	@Autowired
+	public TrustNodeMgr(ICommManager commMgr) throws Exception {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
+		
+		this.commMgr = commMgr;
+		
+		final Set<IIdentity> publicIds = this.commMgr.getIdManager().getPublicIdentities();
+		for (final IIdentity publicId : publicIds) {
+			final String publicIdStr = publicId.getBareJid();
+			final TrustedEntityId publicTeid = new TrustedEntityId(
+					TrustedEntityType.CSS, publicIdStr);
+			if (LOG.isInfoEnabled())
+				LOG.info("Adding my trustor TEID '" + publicTeid + "'");
+			this.myTEIDs.add(publicTeid);
+		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.osgi.event.IEventMgr#publishInternalEvent(org.societies.api.osgi.event.InternalEvent)
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#getMyIds()
 	 */
 	@Override
-	public void publishInternalEvent(InternalEvent arg0) throws EMSException {
-		// TODO Auto-generated method stub
+	public Collection<TrustedEntityId> getMyIds() {
 		
+		return Collections.unmodifiableCollection(this.myTEIDs);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.osgi.event.IEventMgr#subscribeInternalEvent(org.societies.api.osgi.event.EventListener, java.lang.String[], java.lang.String)
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#isMaster()
 	 */
 	@Override
-	public void subscribeInternalEvent(EventListener arg0, String[] arg1,
-			String arg2) {
-		// TODO Auto-generated method stub
-		
-	}
+	public boolean isMaster() {
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.osgi.event.IEventMgr#unSubscribeInternalEvent(org.societies.api.osgi.event.EventListener, java.lang.String[], java.lang.String)
-	 */
-	@Override
-	public void unSubscribeInternalEvent(EventListener arg0, String[] arg1,
-			String arg2) {
-		// TODO Auto-generated method stub
-		
+		final INetworkNode localNode = this.commMgr.getIdManager().getThisNetworkNode();
+		final INetworkNode cloudNode = this.commMgr.getIdManager().getCloudNode();
+		return localNode.equals(cloudNode);
 	}
 }

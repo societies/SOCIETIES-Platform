@@ -27,6 +27,8 @@ package org.societies.privacytrust.trust.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
@@ -43,7 +45,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -91,7 +93,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	private ITrustRepository trustRepo;
 	
 	@Mock
-	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
+	private ITrustNodeMgr mockTrustNodeMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -100,11 +102,8 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	public static void setUpBeforeClass() throws Exception {
 		
 		trustorCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
-		
 		trusteeCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTED_CSS_ID);
-		
 		trusteeCisTeid = new TrustedEntityId(TrustedEntityType.CIS, TRUSTED_CIS_ID);
-		
 		trusteeServiceTeid = new TrustedEntityId(TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 	}
 
@@ -127,7 +126,10 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
+		final Collection<TrustedEntityId> myIds = new HashSet<TrustedEntityId>();
+		myIds.add(trustorCssTeid);
+		when(mockTrustNodeMgr.getMyIds()).thenReturn(myIds);
+		when(mockTrustNodeMgr.isMaster()).thenReturn(true);
 	}
 
 	/**

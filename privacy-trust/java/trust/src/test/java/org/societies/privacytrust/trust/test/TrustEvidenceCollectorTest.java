@@ -25,7 +25,6 @@
 package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
@@ -46,7 +45,7 @@ import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceColl
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.ITrustedEntityIdMgr;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +80,7 @@ public class TrustEvidenceCollectorTest {
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	
 	@Mock
-	private ITrustedEntityIdMgr mockTrustedEntityIdMgr;
+	private ITrustNodeMgr mockTrustNodeMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -104,7 +103,7 @@ public class TrustEvidenceCollectorTest {
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-		when(mockTrustedEntityIdMgr.isLocalId(any(TrustedEntityId.class))).thenReturn(true);
+		when(mockTrustNodeMgr.isMaster()).thenReturn(true);
 	}
 
 	/**

@@ -85,7 +85,7 @@ public class TrustUpdateEvent extends TrustEvent {
 	 * trustee.
 	 * @since 0.5
 	 */
-	public TrustedEntityId getTrustord() {
+	public TrustedEntityId getTrustorId() {
 		
 		return (TrustedEntityId) super.getSource();
 	}

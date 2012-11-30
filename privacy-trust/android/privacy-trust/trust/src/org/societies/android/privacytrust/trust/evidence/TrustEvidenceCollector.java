@@ -301,7 +301,9 @@ public class TrustEvidenceCollector extends Service
 			final AddDirectEvidenceRequestBean addEvidenceBean = 
 					new AddDirectEvidenceRequestBean();
 			// 1. teid
-			addEvidenceBean.setTeid(
+			addEvidenceBean.setSubjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+			addEvidenceBean.setObjectId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
 			// 2. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
@@ -380,10 +382,12 @@ public class TrustEvidenceCollector extends Service
 			final AddIndirectEvidenceRequestBean addEvidenceBean = 
 					new AddIndirectEvidenceRequestBean();
 			// 1. source
-			addEvidenceBean.setSource(
+			addEvidenceBean.setSourceId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(source));
 			// 2. teid
-			addEvidenceBean.setTeid(
+			addEvidenceBean.setSubjectId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+			addEvidenceBean.setObjectId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
 			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
