@@ -73,8 +73,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		this.classList.add(CONTEXT_CLASS);
 		this.classList.add(CSS_MANAGER_CLASS);
 		
-		this.assignConnectionParameters();
-		this.registerForPubsub();
+		this.configureForPubsub();
     }
 
 	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass) {
@@ -234,9 +233,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	}
 
 	/**
-	 * Register for Pubsub events
+	 * Configure for Pubsub events
 	 */
-	private void registerForPubsub() {
+	private void configureForPubsub() {
 		
 		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
 		
@@ -244,7 +243,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
             this.pubsubClient.addSimpleClasses(classList);
 
             Log.d(LOG_TAG, "Subscribing to pubsub");
-	        
+            
+
         } catch (ClassNotFoundException e) {
                 Log.e(LOG_TAG, "ClassNotFoundException loading " + Arrays.toString(classList.toArray()), e);
         }
@@ -267,7 +267,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 						if (key.contains(intentTarget)) {
 							Intent intent = new Intent(intentTarget);
 							intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (Parcelable) payload);
-							intent.setPackage(PlatformEventsBase.this.getClient(key));
+//							intent.setPackage(PlatformEventsBase.this.getClient(key));
 							
 							PlatformEventsBase.this.androidContext.sendBroadcast(intent);
 
@@ -402,6 +402,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		
     		this.intentValue = intentValue;
     		this.client = client;
+    		
+    		PlatformEventsBase.this.assignConnectionParameters();
+
 		}
     	
 		private boolean resultStatus = true;
@@ -483,24 +486,36 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
      * Assign connection parameters (must happen after successful XMPP login)
      */
     private void assignConnectionParameters() {
-		//Get the Cloud destination
-    	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
-		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
-
-    	this.domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
-    	Log.d(LOG_TAG, "Domain Authority Node: " + this.domainCommsDestination);
-    			
+    	Log.d(LOG_TAG, "assignConnectionParameters invoked");
     	try {
-			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
-			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
-			
-			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainCommsDestination);
-			Log.d(LOG_TAG, "Domain node identity: " + this.cloudNodeIdentity);
-			
-		} catch (InvalidFormatException e) {
-			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
-			throw new RuntimeException(e);
-		}     
+        	if (null == this.cloudCommsDestination) {
+            	Log.d(LOG_TAG, "determine destinations");
+            	
+            	Log.d(LOG_TAG, "Is CCM connected ? " + this.ccm.isConnected());
+
+        		//Get the Cloud destination
+            	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
+        		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
+
+            	this.domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
+            	Log.d(LOG_TAG, "Domain Authority Node: " + this.domainCommsDestination);
+            			
+            	try {
+        			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
+        			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
+        			
+        			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainCommsDestination);
+        			Log.d(LOG_TAG, "Domain node identity: " + this.cloudNodeIdentity);
+        			
+        		} catch (InvalidFormatException e) {
+        			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
+        			throw new RuntimeException(e);
+        		}     
+        	}
+    		
+    	} catch (Exception e ) {
+    		Log.e(LOG_TAG, e.getMessage(), e);
+    	}
     }
 
     /**
