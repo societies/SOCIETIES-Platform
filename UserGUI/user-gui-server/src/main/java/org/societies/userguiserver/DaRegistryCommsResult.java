@@ -24,6 +24,7 @@
  */
 package org.societies.userguiserver;
 
+import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBeanResult;
 import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
 
 
@@ -35,7 +36,7 @@ import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
  */
 public class DaRegistryCommsResult {
 
-	DomainAuthorityRegistryResult resultBean;
+	DaRegistryBeanResult resultBean;
 
 		
 		
@@ -44,7 +45,7 @@ public class DaRegistryCommsResult {
 	
 		}
 		
-		public void getResult(DomainAuthorityRegistryResult result) {
+		public void getResult(DaRegistryBeanResult result) {
 			setResultBean(result);
 		}
 
@@ -52,11 +53,11 @@ public class DaRegistryCommsResult {
 		/**
 		 * @return the resultList
 		 */
-		public DomainAuthorityRegistryResult getResultBean() {
+		public DaRegistryBeanResult getResultBean() {
 			return resultBean;
 		}
 
-		public void setResultBean(DomainAuthorityRegistryResult result) {
+		public void setResultBean(DaRegistryBeanResult result) {
 			this.resultBean = result;
 		}
 

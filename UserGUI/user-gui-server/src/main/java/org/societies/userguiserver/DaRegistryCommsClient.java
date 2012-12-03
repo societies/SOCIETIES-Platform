@@ -24,7 +24,6 @@
  */
 package org.societies.userguiserver;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +37,6 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.domainauthority.IDomainAuthorityRegistry;
 import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBean;
 import org.societies.api.internal.schema.domainauthority.registry.Method;
 

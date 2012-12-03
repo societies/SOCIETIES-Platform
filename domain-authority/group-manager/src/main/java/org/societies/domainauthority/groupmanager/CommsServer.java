@@ -53,7 +53,7 @@ import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.directory.CisDirectoryBean;
 import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 
-import org.societies.api.internal.domainauthority.IDomainAuthorityRegistry; 
+import org.societies.domainauthority.registry.DaRegistry; 
 import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBean;
 import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBeanResult;
 
@@ -77,7 +77,7 @@ public class CommsServer implements IFeatureServer {
 	private ICommManager commManager;
 	private ICssDirectory cssDirectory;
 	private ICisDirectory cisDirectory;
-	private IDomainAuthorityRegistry daRegistry;
+	private DaRegistry daRegistry;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	
@@ -107,11 +107,11 @@ public class CommsServer implements IFeatureServer {
 	}
 	
 
-	public IDomainAuthorityRegistry getDaRegistry() {
+	public DaRegistry getDaRegistry() {
 		return daRegistry;
 	}
 
-	public void setDaRegistry(IDomainAuthorityRegistry daRegistry) {
+	public void setDaRegistry(DaRegistry daRegistry) {
 		this.daRegistry = daRegistry;
 	}
 	

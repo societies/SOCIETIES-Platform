@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.webapp.comms;
+package org.societies.userguiserver;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +38,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.internal.schema.domainauthority.registry.DaRegistryBeanResult;
 import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
 
 
@@ -100,7 +101,7 @@ public class DaRegistryCommsClientCallback implements ICommCallback {
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 		
 		DaRegistryCommsResult commsClient = getRequestingClient(returnStanza.getId());
-		commsClient.getResult((DaRegistryCommsResult) msgBean);	
+		commsClient.getResult((DaRegistryBeanResult) msgBean);	
 			
 		} 
 

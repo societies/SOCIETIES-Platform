@@ -32,10 +32,8 @@
 package org.societies.userguiserver;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +47,6 @@ import org.societies.api.internal.schema.usergui.UserGuiBean;
 import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
 import org.societies.userguiserver.handler.CisManagerHandler;
 import org.societies.userguiserver.handler.CssManagerHandler;
-import org.societies.userguiserver.handler.UserGuiHandler;
 
 
 
@@ -205,13 +202,16 @@ public class UserGuiCommsServer implements IFeatureServer {
 	}
 	
 	private void handleCisManagerReceiveMessage(Stanza stanza, UserGuiBean messageBean) {
-		this.getCisManagerHandler().handleReceiveMessage(stanza, messageBean);
+		
+		if (stanza.getFrom().getBareJid().contains(this.getCurrentRegisteredCommId()))
+			this.getCisManagerHandler().handleReceiveMessage(stanza, messageBean);
 		
 	}
 
 	private void handleCssManagerReceiveMessage(Stanza stanza,
 			UserGuiBean messageBean) {
-		this.getCssManagerHandler().handleReceiveMessage(stanza, messageBean);
+		if (stanza.getFrom().getBareJid().contains(this.getCurrentRegisteredCommId()))
+			this.getCssManagerHandler().handleReceiveMessage(stanza, messageBean);
 		
 	}
 	
