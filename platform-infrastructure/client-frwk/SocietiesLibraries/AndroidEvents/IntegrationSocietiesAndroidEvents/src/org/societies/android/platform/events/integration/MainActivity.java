@@ -1,9 +1,14 @@
 package org.societies.android.platform.events.integration;
 
 
+import java.util.List;
+
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.api.identity.IIdentity;
+import org.societies.utilities.DBC.Dbc;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -22,6 +27,9 @@ public class MainActivity extends Activity {
     private static final String LOG_TAG = MainActivity.class.getName();
     private static final String TARGET_PACKAGE = "org.societies.android.platform.gui";
     private static final String TARGET_CLASS = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+    private static final String SERVICE_ACTION = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+    
+    private static final String CLIENT_NAME = "org.societies.android.platform.events.integration";
     
     private boolean boundToService;
 	private Messenger targetService = null;
@@ -54,33 +62,15 @@ public class MainActivity extends Activity {
      */
     private void subscribeToAllEvents() {
     	if (boundToService) {
-    		
-    		String targetMethod = IAndroidSocietiesEvents.methodsArray[2];
-    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-    		Bundle outBundle = new Bundle();
-    		/*
-    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
-    		 * only the client can receive it.
-    		 */
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getPackageName());
-    		Log.d(this.getClass().getName(), "Client Package Name: " + this.getPackageName());
-    		outMessage.setData(outBundle);
-
-    		Log.d(this.getClass().getName(), "Call Societies Android Service: ");
-
-    		try {
-				targetService.send(outMessage);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
+    		invoke.execute();
     	}
     }
     
     private void bindToService() {
-    	Intent serviceIntent = new Intent();
-    	serviceIntent.setComponent(new ComponentName(TARGET_PACKAGE, TARGET_CLASS));
-    	
+//    	Intent serviceIntent = new Intent();
+//    	serviceIntent.setComponent(new ComponentName(TARGET_PACKAGE, TARGET_CLASS));
+    	Intent serviceIntent = new Intent(SERVICE_ACTION);
     	Log.d(LOG_TAG, "Bind to Societies Android Service: ");
     	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
@@ -160,5 +150,51 @@ public class MainActivity extends Activity {
 
         return receiver;
     }
+    
+	/**
+     * 
+     * Async task to invoke remote service method
+     *
+     */
+    private class InvokeRemoteMethod extends AsyncTask<Void, Void, Void> {
 
+    	private final String LOCAL_LOG_TAG = InvokeRemoteMethod.class.getName();
+    	private String packageName;
+    	private String client;
+
+    	/**
+    	 * Default Constructor
+    	 * 
+    	 * @param packageName
+    	 * @param client
+    	 */
+    	public InvokeRemoteMethod(String client) {
+    		this.client = client;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+
+    		String targetMethod = IAndroidSocietiesEvents.methodsArray[2];
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Service: ");
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
 }

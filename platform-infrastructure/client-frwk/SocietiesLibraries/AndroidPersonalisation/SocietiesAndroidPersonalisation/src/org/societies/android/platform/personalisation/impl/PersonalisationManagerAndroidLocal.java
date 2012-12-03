@@ -24,8 +24,8 @@
  */
 package org.societies.android.platform.personalisation.impl;
 
+import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
 import android.app.Service;
 import android.content.Intent;
@@ -52,11 +52,11 @@ public class PersonalisationManagerAndroidLocal extends Service{
 	/**Create Binder object for local service invocation */
 	public class LocalPlatformEventsBinder extends Binder {
 		
-		public PersonalisationManagerAndroid getService() {
-			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
+		public IPersonalisationManagerAndroid getService() {
+
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
-			PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), pubsubClient, ccm, false);
+			IPersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), ccm, false);
 
 			return serviceBase;
 		}
@@ -71,14 +71,7 @@ public class PersonalisationManagerAndroidLocal extends Service{
 		return this.binder;
 	}
 	
-	/**
-	 * Factory method to get instance of {@link PubsubClientAndroid}
-	 * @return PubsubClientAndroid
-	 */
-	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new PubsubClientAndroid(getApplicationContext());
-	}
-	
+
 	/**
 	 * Factory method to get instance of {@link ClientCommunicationMgr}
 	 * @return ClientCommunicationMgr

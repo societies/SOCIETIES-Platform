@@ -29,12 +29,10 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -61,44 +59,26 @@ public class ExternalTrustEvidenceCollector implements
 	}
 
 	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
-	public void addDirectEvidence(TrustedEntityId teid, TrustEvidenceType type,
+	public void addDirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, final TrustEvidenceType type,
 			Date timestamp, Serializable info) throws TrustException {
 		
-		this.internalTrustEvidenceCollector.addDirectEvidence(teid, type, timestamp, info);
+		this.internalTrustEvidenceCollector.addDirectEvidence(subjectId,
+				objectId, type, timestamp, info);
 	}
 
 	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void addIndirectEvidence(TrustedEntityId source,
-			TrustedEntityId teid, TrustEvidenceType type, Date timestamp,
-			Serializable info) throws TrustException {
+	public void addIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, TrustEvidenceType type, Date timestamp,
+			Serializable info, final TrustedEntityId sourceId) throws TrustException {
 		
-		this.internalTrustEvidenceCollector.addIndirectEvidence(source, teid, type, timestamp, info);
-	}
-
-	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
-	 */
-	@Override
-	public void addTrustRating(IIdentity trustor, IIdentity trustee,
-			double rating, Date timestamp) throws TrustException {
-		
-		this.internalTrustEvidenceCollector.addTrustRating(trustor, trustee, rating, timestamp);
-	}
-
-	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
-	 */
-	@Override
-	public void addTrustRating(IIdentity trustor,
-			ServiceResourceIdentifier trustee, double rating, Date timestamp)
-			throws TrustException {
-		
-		this.internalTrustEvidenceCollector.addTrustRating(trustor, trustee, rating, timestamp);
+		this.internalTrustEvidenceCollector.addIndirectEvidence(subjectId,
+				objectId, type, timestamp, info, sourceId);
 	}
 }

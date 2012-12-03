@@ -41,8 +41,16 @@ public interface ITrustEvidence extends Serializable, Comparable<ITrustEvidence>
 	/**
 	 * 
 	 * @return
+	 * @since 0.5
 	 */
-	public TrustedEntityId getTeid();
+	public TrustedEntityId getSubjectId();
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.5
+	 */
+	public TrustedEntityId getObjectId();
 	
 	/**
 	 * 

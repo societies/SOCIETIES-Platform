@@ -56,7 +56,7 @@ public interface ITrustEvidenceRepository {
 	
 	/**
 	 * Retrieves all the direct trust evidence associated with the specified 
-	 * {@link TrustedEntityId}.
+	 * subject and object.
 	 * 
 	 * @param teid
 	 *            the {@link TrustedEntityId} whose direct trust evidence to
@@ -66,14 +66,16 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
 	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(
-			final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
+			final TrustedEntityId subjectId, final TrustedEntityId objectId)
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Retrieves the direct trust evidence associated with the specified 
-	 * {@link TrustedEntityId}. The method allows specifying optional search 
+	 * subject and object. The method allows specifying optional search 
 	 * criteria, such as, the {@link TrustEvidenceType trust evidence type}, as
 	 * well as, the time range in which the evidence was collected.
 	 * 
@@ -90,12 +92,13 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
-	 * @since 0.3
+	 *             if any the specified subject or object teid is <code>null</code>
+	 * @since 0.5
 	 */
 	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
-			final TrustedEntityId teid, final TrustEvidenceType type,			
-			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date startDate, 
+			final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Retrieves all the indirect trust evidence associated with the specified 
@@ -109,10 +112,12 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
 	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(
-			final TrustedEntityId teid)	throws TrustEvidenceRepositoryException;
+			final TrustedEntityId subjectId, final TrustedEntityId objectId)
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Retrieves the indirect trust evidence associated with the specified 
@@ -133,12 +138,13 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
-	 * @since 0.3
+	 *             if any the specified subject or object teid is <code>null</code>
+	 * @since 0.5
 	 */
 	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
-			final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date startDate, 
+			final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes all the direct trust evidence associated with the specified 
@@ -150,10 +156,12 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
-	public void removeAllDirectEvidence(final TrustedEntityId teid)
-			throws TrustEvidenceRepositoryException;
+	public void removeAllDirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId) 
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes the direct trust evidence associated with the specified 
@@ -173,12 +181,12 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
-	 * @since 0.3
+	 *             if any the specified subject or object teid is <code>null</code>
+	 * @since 0.5
 	 */
-	public void removeDirectEvidence(final TrustedEntityId teid, 
-			final TrustEvidenceType type, final Date startDate,
-			final Date endDate) throws TrustEvidenceRepositoryException;
+	public void removeDirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId,	final TrustEvidenceType type, 
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes all the indirect trust evidence associated with the specified 
@@ -190,10 +198,12 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
 	 */
-	public void removeAllIndirectEvidence(final TrustedEntityId teid)
-			throws TrustEvidenceRepositoryException;
+	public void removeAllIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId)
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes the indirect trust evidence associated with the specified 
@@ -213,10 +223,11 @@ public interface ITrustEvidenceRepository {
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
 	 * @throws NullPointerException
-	 *             if the specified teid is <code>null</code>
-	 * @since 0.3
+	 *             if any the specified subject or object teid is <code>null</code>
+	 * @since 0.5
 	 */
-	public void removeIndirectEvidence(final TrustedEntityId teid,
-			final TrustEvidenceType type, final Date startDate, 
-			final Date endDate) throws TrustEvidenceRepositoryException;
+	public void removeIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date startDate, final Date endDate) 
+					throws TrustEvidenceRepositoryException;
 }

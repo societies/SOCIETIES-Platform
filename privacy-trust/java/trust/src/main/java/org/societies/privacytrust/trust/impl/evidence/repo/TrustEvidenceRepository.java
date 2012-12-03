@@ -45,10 +45,10 @@ import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
 import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
+import org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdCompositeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -106,161 +106,201 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
 	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(
-			final TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+			final TrustedEntityId subjectId, final TrustedEntityId objectId)
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all direct trust evidence for TEID " + teid 
-					+ " from the Trust Evidence Repository...");		
-		return this.retrieveDirectEvidence(teid, null, null, null);
+			LOG.debug("Retrieving all direct trust evidence with subjectId '"
+					+ subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");		
+		return this.retrieveDirectEvidence(subjectId, objectId, null, null, null);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
-			final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date startDate, final Date endDate)
-			throws TrustEvidenceRepositoryException {
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date startDate, 
+			final Date endDate)	throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving direct trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type 
-					+ " for TEID " + teid + " from the Trust Evidence Repository...");
-		result.addAll(this.retrieve(teid, DirectTrustEvidence.class, type, startDate, endDate));
+					+ " with subjectId '" + subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");
+		result.addAll(this.retrieve(subjectId, objectId, 
+				DirectTrustEvidence.class, type, startDate, endDate));
 		
 		return result;
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
 	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(
-			final TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+			final TrustedEntityId subjectId, final TrustedEntityId objectId)
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all indirect trust evidence for TEID " + teid 
-					+ " from the Trust Evidence Repository...");		
-		return this.retrieveIndirectEvidence(teid, null, null, null);
+			LOG.debug("Retrieving all indirect trust evidence with subjectId '"
+					+ subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");		
+		return this.retrieveIndirectEvidence(subjectId, objectId, null, null,
+				null);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
-			final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date startDate, final Date endDate)
-			throws TrustEvidenceRepositoryException {
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date startDate, 
+			final Date endDate)	throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving indirect trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
-					+ " for TEID " + teid + " from the Trust Evidence Repository...");
-		result.addAll(this.retrieve(teid, IndirectTrustEvidence.class, type,
-				startDate, endDate));
+					+ " with subjectId '"
+					+ subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");
+		result.addAll(this.retrieve(subjectId, objectId, 
+				IndirectTrustEvidence.class, type, startDate, endDate));
 		
 		return result;
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeAllDirectEvidence(final TrustedEntityId teid)
-			throws TrustEvidenceRepositoryException {
+	public void removeAllDirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId)	
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Removing all direct trust evidence for TEID " + teid 
-					+ " from the Trust Evidence Repository...");
-		this.removeDirectEvidence(teid, null, null, null);
+			LOG.debug("Removing all direct trust evidence with subjectId '"
+					+ subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");
+		this.removeDirectEvidence(subjectId, objectId, null, null, null);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
 	 */
 	@Override
-	public void removeDirectEvidence(final TrustedEntityId teid,
-			final TrustEvidenceType type, final Date startDate,
-			final Date endDate)	throws TrustEvidenceRepositoryException {
+	public void removeDirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId,	final TrustEvidenceType type,
+			final Date startDate, final Date endDate)
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Removing direct trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
-					+ " for TEID " + teid + " from the Trust Evidence Repository...");
-		this.remove(teid, DirectTrustEvidence.class, type, startDate, endDate);
+					+ " with subjectId '" + subjectId + "' and objectId '" 
+					+ objectId + "' from the Trust Evidence Repository...");
+		this.remove(subjectId, objectId, DirectTrustEvidence.class, type,
+				startDate, endDate);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeAllIndirectEvidence(final TrustedEntityId teid) 
-			throws TrustEvidenceRepositoryException {
+	public void removeAllIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId)	
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Removing all indirect trust evidence for TEID " + teid 
-					+ " from the Trust Evidence Repository...");
-		this.removeIndirectEvidence(teid, null, null, null);
+			LOG.debug("Removing all indirect trust evidence with subjectId '"
+					+ subjectId + "' and objectId '" + objectId 
+					+ "' from the Trust Evidence Repository...");
+		this.removeIndirectEvidence(subjectId, objectId, null, null, null);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
 	 */
 	@Override
-	public void removeIndirectEvidence(final TrustedEntityId teid,
-			final TrustEvidenceType type, final Date startDate, 
-			final Date endDate)	throws TrustEvidenceRepositoryException {
+	public void removeIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId,	final TrustEvidenceType type,
+			final Date startDate, final Date endDate)
+					throws TrustEvidenceRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Removing indirect trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
-					+ " for TEID " + teid + " from the Trust Evidence Repository...");
-		this.remove(teid, IndirectTrustEvidence.class, type, startDate, endDate);
+					+ " with subjectId '" + subjectId + "' and objectId '" 
+					+ objectId + "' from the Trust Evidence Repository...");
+		this.remove(subjectId, objectId, IndirectTrustEvidence.class, type,
+				startDate, endDate);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private <T extends TrustEvidence> Set<T> retrieve(
-			final TrustedEntityId teid, final Class<T> evidenceClass,
-			final TrustEvidenceType type, final Date startDate,
-			final Date endDate) throws TrustEvidenceRepositoryException {
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final Class<T> evidenceClass, final TrustEvidenceType type,
+			final Date startDate, final Date endDate)
+					throws TrustEvidenceRepositoryException {
 		
 		final Set<T> result = new HashSet<T>();
-		final Session session = this.sessionFactory.openSession();
-		try {		
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
 			final Criteria criteria = session.createCriteria(evidenceClass)
-					.add(Restrictions.eq("teid", teid));
+					.add(Restrictions.and(
+							Restrictions.eq("subjectId", subjectId),
+							Restrictions.eq("objectId", objectId)
+					));
 		
 			if (type != null)
 				criteria.add(Restrictions.eq("type", type));
@@ -273,8 +313,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	
 			result.addAll(criteria.list());
 		} catch (Exception e) {
-			throw new TrustEvidenceRepositoryException("Could not retrieve evidence " 
-					+ "for TEID '" + teid + "': " + e.getLocalizedMessage(), e);
+			throw new TrustEvidenceRepositoryException(
+					"Could not retrieve evidence with subjectId '" + subjectId
+					+ "' and objectId '" + objectId	+ "': " 
+					+ e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -283,13 +325,14 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		return result;
 	}
 	
-	private void remove(final TrustedEntityId teid, 
+	private void remove(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId,	
 			final Class<? extends TrustEvidence> evidenceClass,
 			final TrustEvidenceType type, final Date startDate,
 			final Date endDate)	throws TrustEvidenceRepositoryException {
 		
 		String hqlDelete = "delete " + evidenceClass.getName() + " ec where"
-				+ " ec.teid = :teid";
+				+ " ec.subjectId = :subjectId and ec.objectId = :objectId";
 		
 		if (type != null)
 			hqlDelete += " and ec.type = :type";
@@ -304,8 +347,9 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		Transaction tx = null; 
 		try {
 			tx = session.beginTransaction();
-			final Query deleteQuery = session.createQuery(hqlDelete)
-					.setParameter("teid", teid, Hibernate.custom(TrustedEntityIdCompositeType.class));
+			final Query deleteQuery = session.createQuery(hqlDelete);
+			deleteQuery.setParameter("subjectId", subjectId, Hibernate.custom(TrustedEntityIdUserType.class));
+			deleteQuery.setParameter("objectId", objectId, Hibernate.custom(TrustedEntityIdUserType.class));
 		
 			if (type != null)
 				deleteQuery.setParameter("type", type);
@@ -326,8 +370,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			LOG.warn("Rolling back transaction for query " + hqlDelete);
 			if (tx != null)
 				tx.rollback();
-			throw new TrustEvidenceRepositoryException("Could not remove evidence for TEID '" 
-					+ teid + "': " + e.getLocalizedMessage(), e);
+			throw new TrustEvidenceRepositoryException(
+					"Could not remove evidence with subjectId '"
+					+ subjectId + "' and objectId '" + objectId + "': " 
+					+ e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();

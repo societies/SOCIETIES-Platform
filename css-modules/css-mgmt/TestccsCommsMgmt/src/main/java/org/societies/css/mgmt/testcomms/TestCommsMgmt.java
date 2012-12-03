@@ -98,9 +98,6 @@ public class TestCommsMgmt {
     	LOG.info("Testing testAndroidPubsub");
         this.randomGenerator = new Random();
 
-    	createPubSubNodes();
-    	//Allow some time to load Android app
-    	Thread.sleep(120000);
     	
 		CssEvent event = new CssEvent();
 		event.setType(CSSManagerEnums.ADD_CSS_NODE);

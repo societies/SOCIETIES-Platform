@@ -32,7 +32,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
@@ -61,13 +61,17 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Column(name = "id")
 	private long id;
 	
-	/** The identifier of this trusted entity. */
-	@Columns(columns = {
-			@Column(name = "trustor_id", nullable = false, updatable = false, length = 255),
-			@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
-	})
-	@Type(type = "org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
-	private final TrustedEntityId teid;
+	/** The identifier of the trustor. */
+	@Index(name = "trustor_idx")
+	@Column(name = "trustor_id", nullable = false, updatable = false, length = 255)
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
+	private final TrustedEntityId trustorId;
+	
+	/** The identifier of the trustee. */
+	@Index(name = "trustee_idx")
+	@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
+	private final TrustedEntityId trusteeId;
 	
 	/** The direct trust in this entity. */
 	@Embedded
@@ -96,22 +100,38 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	})
 	private UserPerceivedTrust userPerceivedTrust = new UserPerceivedTrust();
 
-	TrustedEntity(final TrustedEntityId teid) {
-		
-		this.teid = teid;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTeid()
+	/**
+	 * Constructs a <code>TrustedEntity</code> with the specified trustor and 
+	 * trustee identifiers.
+	 * 
+	 * @param trusteeId
+	 * @param trustorId
 	 */
-	@Override
-	public TrustedEntityId getTeid() {
+	TrustedEntity(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
-		return this.teid;
+		this.trustorId = trustorId;
+		this.trusteeId = trusteeId;
 	}
 	
 	/*
-	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTrustorId()
+	 */
+	@Override
+	public TrustedEntityId getTrustorId() {
+		
+		return this.trustorId;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTrusteeId()
+	 */
+	@Override
+	public TrustedEntityId getTrusteeId() {
+		
+		return this.trusteeId;
+	}
+	
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectTrust()
 	 */
 	@Override
@@ -123,7 +143,6 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getIndirectTrust()
 	 */
 	@Override
@@ -135,7 +154,6 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getUserPerceivedTrust()
 	 */
 	@Override
@@ -146,7 +164,7 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		return this.userPerceivedTrust;
 	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -154,12 +172,15 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		result = prime * result
+				+ ((this.trustorId == null) ? 0 : this.trustorId.hashCode());
+		result = prime * result
+				+ ((this.trusteeId == null) ? 0 : this.trusteeId.hashCode());
 		
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -172,17 +193,21 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		final TrustedEntity other = (TrustedEntity) that;
-		
-		if (this.teid == null) {
-			if (other.teid != null)
+		TrustedEntity other = (TrustedEntity) that;
+		if (this.trustorId == null) {
+			if (other.trustorId != null)
 				return false;
-		} else if (!this.teid.equals(other.teid))
+		} else if (!this.trustorId.equals(other.trustorId))
+			return false;
+		if (this.trusteeId == null) {
+			if (other.trusteeId != null)
+				return false;
+		} else if (!this.trusteeId.equals(other.trusteeId))
 			return false;
 		
 		return true;
 	}
-	
+
 	/*
 	 * @see java.lang.Object#toString()
 	 */
@@ -192,7 +217,9 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append("{");
-		sb.append("teid=" + this.teid);
+		sb.append("trustorId=" + this.trustorId);
+		sb.append(",");
+		sb.append("trusteeId=" + this.trusteeId);
 		sb.append(",");
 		sb.append("directTrust=" + this.directTrust);
 		sb.append(",");

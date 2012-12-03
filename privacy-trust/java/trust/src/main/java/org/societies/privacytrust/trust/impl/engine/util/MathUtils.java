@@ -25,6 +25,11 @@
 package org.societies.privacytrust.trust.impl.engine.util;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cern.colt.Arrays;
 
 /**
  * Describe your class here...
@@ -33,17 +38,47 @@ import org.apache.commons.math.stat.StatUtils;
  * @since 0.3
  */
 public class MathUtils {
-
-	public static double[] normalise(double[] input) {
 	
-		return StatUtils.normalize(input);
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(MathUtils.class);
+
+	public static double[] normalise(final double[] sample) {
+	
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("sample=" + Arrays.toString(sample));
+		final DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		// Add the data from the series to stats
+		for (int i = 0; i < sample.length; i++) {
+			stats.addValue(sample[i]);
+		}
+		
+		// Compute mean and standard deviation
+		final double mean = stats.getMean();
+		final double standardDeviation = stats.getStandardDeviation();
+		
+		// initialize the standardizedSample, which has the same length as the sample
+		double[] normalisedSample = new double[sample.length];
+		
+		for (int i = 0; i < sample.length; i++) {
+			// z = (x- mean)/standardDeviation
+			if (standardDeviation != 0.0d)
+				normalisedSample[i] = (sample[i] - mean) / standardDeviation;
+			else
+				normalisedSample[i] = 0.0d;
+		}
+		
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("normalisedSample=" + Arrays.toString(normalisedSample));
+		return normalisedSample;
 	}
 	
-	public static double[] stanine(double[] input) {
+	public static double[] stanine(final double[] input) {
 		
-		double[] zscores = normalise(input);
-		
-		double[] stanines = new double[zscores.length];
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("input=" + Arrays.toString(input));
+		final double[] zscores = normalise(input);
+		final double[] stanines = new double[zscores.length];
 		for (int i = 0; i < zscores.length; ++i) {
 			if (zscores[i] < -1.75d)
 				stanines[i] = 1;
@@ -65,6 +100,8 @@ public class MathUtils {
 				stanines[i] = 9;
 		}
 		
+		if (LOG.isInfoEnabled()) // TODO DEBUG
+			LOG.info("stanines=" + Arrays.toString(stanines));
 		return stanines;
 	}
 	

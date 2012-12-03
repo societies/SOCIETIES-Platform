@@ -64,6 +64,7 @@ public class TrustRepository implements ITrustRepository {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
 	
+	/** The Hibernate session factory. */
 	@Autowired
 	private SessionFactory sessionFactory;
 	
@@ -73,38 +74,41 @@ public class TrustRepository implements ITrustRepository {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#createEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#createEntity(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public ITrustedEntity createEntity(final TrustedEntityId teid)
-			throws TrustRepositoryException {
+	public ITrustedEntity createEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 
 		final ITrustedEntity entity;
-		switch (teid.getEntityType()) {
+		switch (trusteeId.getEntityType()) {
 		
 		case CSS:
-			entity = new TrustedCss(teid);
+			entity = new TrustedCss(trustorId, trusteeId);
 			break;
 		case CIS:
-			entity = new TrustedCis(teid);
+			entity = new TrustedCis(trustorId, trusteeId);
 			break;
 		case SVC:
-			entity = new TrustedService(teid);
+			entity = new TrustedService(trustorId, trusteeId);
 			break;
 		default:
-			throw new TrustRepositoryException("Unsupported TrustedEntityType: "
-					+ teid.getEntityType());
+			throw new TrustRepositoryException("Unsupported trustee entity type: "
+					+ trusteeId.getEntityType());
 		}
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
 		
-		final Session session = sessionFactory.openSession();
+		Session session = null;
 		Transaction tx = null;
 		try {
+			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 			session.save(entity);
 			session.flush();
@@ -124,42 +128,52 @@ public class TrustRepository implements ITrustRepository {
 				session.close();
 		}
 		
-		return this.retrieveEntity(teid);
+		return this.retrieveEntity(trustorId, trusteeId);
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(java.lang.String, org.societies.privacytrust.trust.api.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public ITrustedEntity retrieveEntity(TrustedEntityId teid)
+	public ITrustedEntity retrieveEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId)
 			throws TrustRepositoryException {
 		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
 		Class<? extends TrustedEntity> entityClass = TrustedEntity.class;
-		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
+		if (TrustedEntityType.CSS.equals(trusteeId.getEntityType()))
 			entityClass = TrustedCss.class;
-		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
+		else if (TrustedEntityType.CIS.equals(trusteeId.getEntityType()))
 			entityClass = TrustedCis.class;
-		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
+		else if (TrustedEntityType.SVC.equals(trusteeId.getEntityType()))
 			entityClass = TrustedService.class;
 		// TODO TrustedEntityType.LGC
 		
-		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(entityClass)
-			.add(Restrictions.eq("teid", teid));
-		
-		//if (TrustedCss.class.equals(entityClass))
-		//	criteria.setFetchMode("communities", FetchMode.SELECT);
-		
-		//if (TrustedCis.class.equals(entityClass))
-		//	criteria.setFetchMode("members", FetchMode.SELECT);
-		
 		final ITrustedEntity result;
 		
+		Session session = null;
 		try {
+			session = sessionFactory.openSession();
+			final Criteria criteria = session.createCriteria(entityClass)
+					.add(Restrictions.and(
+							Restrictions.eq("trustorId", trustorId),
+							Restrictions.eq("trusteeId", trusteeId)
+					));
+			
+			//if (TrustedCss.class.equals(entityClass))
+			//	criteria.setFetchMode("communities", FetchMode.SELECT);
+			
+			//if (TrustedCis.class.equals(entityClass))
+			//	criteria.setFetchMode("members", FetchMode.SELECT);
+			
 			result = (ITrustedEntity) criteria.uniqueResult();
 		} catch (Exception e) {
-			throw new TrustRepositoryException("Could not retrieve trusted entity '"
-					+ teid + "': " + e.getLocalizedMessage(), e);
+			throw new TrustRepositoryException("Could not retrieve entity ("
+					+ trustorId + "," + trusteeId + "): " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -174,6 +188,9 @@ public class TrustRepository implements ITrustRepository {
 	@Override
 	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
+		
+		if (entity == null)
+			throw new NullPointerException("entity can't be null");
 		
 		ITrustedEntity result = null;
 		final Session session = sessionFactory.openSession();
@@ -197,22 +214,25 @@ public class TrustRepository implements ITrustRepository {
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeEntity(final TrustedEntityId teid)
-			throws TrustRepositoryException {
+	public void removeEntity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException {
 
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 		
-		final ITrustedEntity entity = this.retrieveEntity(teid);
+		final ITrustedEntity entity = this.retrieveEntity(trustorId, trusteeId);
 		if (entity == null)
 			return;
 		
-		final Session session = sessionFactory.openSession();
+		Session session = null;
 		Transaction tx = null;
 		try {
+			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 			session.delete(entity);
 			tx.commit();
@@ -229,12 +249,13 @@ public class TrustRepository implements ITrustRepository {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(java.lang.String, java.lang.Class)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
-			final Class<T> entityClass) throws TrustRepositoryException {
+	public <T extends ITrustedEntity> List<T> retrieveEntities(
+			final TrustedEntityId trustorId, final Class<T> entityClass)
+					throws TrustRepositoryException {
 		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
@@ -253,11 +274,11 @@ public class TrustRepository implements ITrustRepository {
 					+ entityClass);
 			
 		final List<T> result = new ArrayList<T>();
-		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(daClass)
-				.add(Restrictions.eq("teid.trustor_id", trustorId));
-		
+		Session session = null;
 		try {
+			session = sessionFactory.openSession();
+			final Criteria criteria = session.createCriteria(daClass)
+					.add(Restrictions.eq("trustorId", trustorId));
 			result.addAll(criteria.list());
 		} catch (Exception e) {
 			throw new TrustRepositoryException("Could not retrieve entities trusted by '"

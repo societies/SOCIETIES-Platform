@@ -51,8 +51,6 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostInsertEventUserListener.class);
 	
-	private static final String EVENT_SOURCE = "TrustEvidenceRepository";
-	
 	/** The Trust Event Mgr service reference. */
 	@Autowired
 	private ITrustEventMgr trustEventMgr;
@@ -82,7 +80,7 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
         				+ " to topic '" + topic + "'");
 			try {
 				this.trustEventMgr.postEvent(trustEvidenceUpdateEvent, 
-						new String[] { topic }, EVENT_SOURCE);
+						new String[] { topic });
 			} catch (TrustEventMgrException teme) {
 				
 				LOG.error("Could not post TrustEvidenceUpdateEvent " 

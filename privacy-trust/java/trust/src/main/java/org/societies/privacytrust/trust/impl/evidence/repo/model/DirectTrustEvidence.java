@@ -45,7 +45,7 @@ import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 @Table(
 		name = TableName.DIRECT_TRUST_EVIDENCE, 
 		uniqueConstraints = { @UniqueConstraint(columnNames = {
-				"trustor_id", "trustee_id", "type", "timestamp" }) }
+				"subject_id", "object_id", "type", "timestamp" }) }
 )
 public class DirectTrustEvidence extends TrustEvidence implements
 		IDirectTrustEvidence {
@@ -55,12 +55,13 @@ public class DirectTrustEvidence extends TrustEvidence implements
 	/* Empty constructor required by Hibernate */
 	private DirectTrustEvidence() {
 		
-		super(null, null, null, null);
+		super(null, null, null, null, null);
 	}
 	
-	public DirectTrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+	public DirectTrustEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, final TrustEvidenceType type,
 			final Date timestamp, final Serializable info) {
 		
-		super(teid, type, timestamp, info);
+		super(subjectId, objectId, type, timestamp, info);
 	}
 }

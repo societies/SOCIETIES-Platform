@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
 public class SLA {
 
 	private static Logger Log = LoggerFactory.getLogger(SLA.class);
-
+	
 	private Xml xml;
 
 	/**
@@ -61,6 +61,11 @@ public class SLA {
 	}
 	
 	public static class Attribute {
+
+		/**
+		 * The Id attribute of XML node that contains all SOPs
+		 */
+		public static final String SOPS_ID_VALUE = "Container";
 		public static final String SOP_ID = "Id";
 		public static final String NAME = "name";
 	}

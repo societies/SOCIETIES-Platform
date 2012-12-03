@@ -35,7 +35,8 @@
 	
 	<xs:complexType name="addDirectEvidenceRequestBean">
 		<xs:sequence>
-			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
  			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
 			<xs:element name="info" type="xs:base64Binary" minOccurs="0"/>
@@ -44,11 +45,12 @@
 	
 	<xs:complexType name="addIndirectEvidenceRequestBean">
 		<xs:sequence>
-			<xs:element name="source" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
-			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
 			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
 			<xs:element name="info" type="xs:base64Binary" minOccurs="0"/>
+			<xs:element name="sourceId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	

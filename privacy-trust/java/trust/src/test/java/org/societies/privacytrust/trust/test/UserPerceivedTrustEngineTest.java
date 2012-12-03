@@ -61,22 +61,22 @@ public class UserPerceivedTrustEngineTest {
 
 	private static final String BASE_ID = "uptet";
 	
-	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_CSS_ID = BASE_ID + "TrustorCssIIdentity";
 	
-	private static final int TRUSTED_CSS_LIST_SIZE = 100;
-	private static final String TRUSTED_CSS_ID_BASE = BASE_ID + "CssIIdentity";
+	private static final int TRUSTEE_CSS_LIST_SIZE = 100;
+	private static final String TRUSTEE_CSS_ID_BASE = BASE_ID + "TrusteeCssIIdentity";
 	
-	private static final int TRUSTED_CIS_LIST_SIZE = 10;
-	private static final String TRUSTED_CIS_ID_BASE = BASE_ID + "CisIIdentity";
+	private static final int TRUSTEE_CIS_LIST_SIZE = 10;
+	private static final String TRUSTEE_CIS_ID_BASE = BASE_ID + "TrusteeCisIIdentity";
 	
-	private static final int TRUSTED_SERVICE_LIST_SIZE = 500;
-	private static final String TRUSTED_SERVICE_ID_BASE = BASE_ID + "ServiceResourceIdentifier";
+	private static final int TRUSTEE_SERVICE_LIST_SIZE = 500;
+	private static final String TRUSTEE_SERVICE_ID_BASE = BASE_ID + "TrusteeServiceResourceIdentifier";
 	
-	private static List<ITrustedCss> trustedCssList;
+	private static List<ITrustedCss> trusteeCssList;
 	
-	private static List<ITrustedCis> trustedCisList;
+	private static List<ITrustedCis> trusteeCisList;
 	
-	private static List<ITrustedService> trustedServiceList;
+	private static List<ITrustedService> trusteeServiceList;
 	
 	private static ITrustEventMgr mockTrustEventMgr = mock(ITrustEventMgr.class);
 	
@@ -89,8 +89,8 @@ public class UserPerceivedTrustEngineTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		doNothing().when(mockTrustEventMgr).registerListener(any(ITrustEventListener.class),
-				any(String[].class), any(TrustedEntityId.class));
+		doNothing().when(mockTrustEventMgr).registerListener(
+				any(ITrustEventListener.class),	any(String[].class));
 	}
 
 	/**
@@ -106,25 +106,28 @@ public class UserPerceivedTrustEngineTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		trustedCssList = new ArrayList<ITrustedCss>(TRUSTED_CSS_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_CSS_LIST_SIZE; ++i) {
-			final TrustedEntityId cssTeid = 
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID_BASE+i);
-			trustedCssList.add(new TrustedCss(cssTeid));
+		final TrustedEntityId trustorCssId = 
+				new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
+		
+		trusteeCssList = new ArrayList<ITrustedCss>(TRUSTEE_CSS_LIST_SIZE);
+		for (int i = 0; i < TRUSTEE_CSS_LIST_SIZE; ++i) {
+			final TrustedEntityId trusteeCssId = 
+					new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID_BASE+i);
+			trusteeCssList.add(new TrustedCss(trustorCssId, trusteeCssId));
 		}
 		
-		trustedCisList = new ArrayList<ITrustedCis>(TRUSTED_CIS_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_CIS_LIST_SIZE; ++i) {
-			final TrustedEntityId cisTeid =
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID_BASE+i);
-			trustedCisList.add(new TrustedCis(cisTeid));
+		trusteeCisList = new ArrayList<ITrustedCis>(TRUSTEE_CIS_LIST_SIZE);
+		for (int i = 0; i < TRUSTEE_CIS_LIST_SIZE; ++i) {
+			final TrustedEntityId trusteeCisId =
+					new TrustedEntityId(TrustedEntityType.CIS, TRUSTEE_CIS_ID_BASE+i);
+			trusteeCisList.add(new TrustedCis(trustorCssId, trusteeCisId));
 		}
 	
-		trustedServiceList = new ArrayList<ITrustedService>(TRUSTED_SERVICE_LIST_SIZE);
-		for (int i = 0; i < TRUSTED_SERVICE_LIST_SIZE; ++i) {
-			final TrustedEntityId serviceTeid = 
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID_BASE+i);
-			trustedServiceList.add(new TrustedService(serviceTeid));
+		trusteeServiceList = new ArrayList<ITrustedService>(TRUSTEE_SERVICE_LIST_SIZE);
+		for (int i = 0; i < TRUSTEE_SERVICE_LIST_SIZE; ++i) {
+			final TrustedEntityId trusteeServiceId = 
+					new TrustedEntityId(TrustedEntityType.SVC, TRUSTEE_SERVICE_ID_BASE+i);
+			trusteeServiceList.add(new TrustedService(trustorCssId, trusteeServiceId));
 		}
 		
 		this.engine = new UserPerceivedTrustEngine(mockTrustEventMgr); 
@@ -144,7 +147,7 @@ public class UserPerceivedTrustEngineTest {
 	@Test
 	public void testEvaluateCssTrustValues() throws TrustEngineException {
 		
-		final ITrustedCss trustedCss = trustedCssList.get(0);
+		final ITrustedCss trustedCss = trusteeCssList.get(0);
 		final List<ITrustedCss> trustedCssSubList = new ArrayList<ITrustedCss>();
 		trustedCssSubList.add(trustedCss);
 		
@@ -193,7 +196,7 @@ public class UserPerceivedTrustEngineTest {
 	@Test
 	public void testEvaluateCisTrustValues() throws TrustEngineException {
 		
-		final ITrustedCis trustedCis = trustedCisList.get(0);
+		final ITrustedCis trustedCis = trusteeCisList.get(0);
 		final List<ITrustedCis> trustedCisSubList = new ArrayList<ITrustedCis>();
 		trustedCisSubList.add(trustedCis);
 		
@@ -242,7 +245,7 @@ public class UserPerceivedTrustEngineTest {
 	@Test
 	public void testEvaluateServiceTrustValues() throws TrustEngineException {
 		
-		final ITrustedService trustedService = trustedServiceList.get(0);
+		final ITrustedService trustedService = trusteeServiceList.get(0);
 		final List<ITrustedService> trustedServiceSubList = new ArrayList<ITrustedService>();
 		trustedServiceSubList.add(trustedService);
 		

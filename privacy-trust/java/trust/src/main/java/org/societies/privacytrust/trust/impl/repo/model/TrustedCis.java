@@ -73,15 +73,22 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	/* Empty constructor required by Hibernate */
 	private TrustedCis() {
 		
-		super(null);
+		super(null, null);
 	}
 	
 	/**
-	 * @param teid
+	 * Constructs a <code>TrustedCis</code> with the specified trustor and
+	 * trustee identifiers.
+	 * 
+	 * @param trustorId
+	 *            the identifier of the trustor
+	 * @param trusteeId
+	 *            the identifier of the trustee
+	 * @since 0.5
 	 */
-	public TrustedCis(final TrustedEntityId teid) {
+	public TrustedCis(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
-		super(teid);
+		super(trustorId, trusteeId);
 	}
 
 	/*

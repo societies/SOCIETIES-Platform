@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.android.api.external</groupId>
+	<!-- change the artifactid to your project artifactid -->
+	<artifactId>societies-api</artifactId>
+	<name>SOCIETIES Java API (External/3rd Party)</name>
+	<!-- the api version is the same as the release -->
+	<version>${release.version}</version>
+	<!-- the packaging tag enables the creation of the correct manifest using 
+		the maven-bundle-plugin -->
+	<packaging>bundle</packaging>
+
+	<description>
+    	This bundle provides the external interfaces of the SOCIETIES platform version XX.
+    </description>
+
+	<developers>
+		<developer>
+			<name>Bruno Jean-Bart </name>
+			<organization>Trialog</organization>
+			<organizationUrl>http://www.trialog.com/</organizationUrl>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<dependencies>
+	<dependency>
+				<groupId>com.google.android</groupId>
+				<artifactId>android</artifactId>
+				<version>4.1.1.4</version>
+				<scope>provided</scope>
+			</dependency>
+		<!-- Societies -->
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+	
+		<!-- Needed for Societies-specific annotations -->
+		<dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>societies-annotations</artifactId>
+			<version>${release.version}</version>
+			 <scope>compile</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>${release.version}</version>
+		    <scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<!-- the API will export all interfaces packages for the rest of modules. 
+							The exclusion of internal package can be avoided as the plugin excludes automatically 
+							'internal' and 'impl' package names org.societies.api.** -->
+						<_exportcontents>*</_exportcontents>
+						<Import-Package>
+    						<!--!javax.microedition.io,-->*
+    					</Import-Package>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<!-- ;scope=compile|runtime -->
+						<Embed-Transitive>false</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${release.version}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.8.1</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

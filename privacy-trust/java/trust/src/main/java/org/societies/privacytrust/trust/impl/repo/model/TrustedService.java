@@ -86,13 +86,23 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	/* Empty constructor required by Hibernate */
 	private TrustedService() {
 		
-		super(null);
+		super(null, null);
 		//this.type = null;
 	}
 	
-	public TrustedService(final TrustedEntityId teid) {
+	/**
+	 * Constructs a <code>TrustedService</code> with the specified trustor and
+	 * trustee identifiers.
+	 * 
+	 * @param trustorId
+	 *            the identifier of the trustor
+	 * @param trusteeId
+	 *            the identifier of the trustee
+	 * @since 0.5
+	 */
+	public TrustedService(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
-		super(teid);
+		super(trustorId, trusteeId);
 	}
 
 	/*
