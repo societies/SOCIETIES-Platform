@@ -41,7 +41,7 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-			<scope>provided</scope>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>
