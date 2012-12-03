@@ -45,6 +45,6 @@
 		<!-- module>android-uam/RemoteTestsUAM/pom.xml</module-->
 		
 		<!-- User Feedback modules -->
-		<!-- module>android-feedback/AndroidUserFeedback/pom.xml</module-->
+		<!-- module>android-feedback/AndroidUserFeedback/pom.xml</module -->
 	</modules>
 </project>
