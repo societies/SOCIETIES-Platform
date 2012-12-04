@@ -25,7 +25,7 @@
 
 	<xs:import
 		namespace="http://societies.org/api/schema/privacytrust/trust/model"
-		schemaLocation="../../../../external/src/main/resources/org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.trust.model.xsd" />
 
 
 	<xs:complexType name="PrivacyPreferenceConditionBean">
