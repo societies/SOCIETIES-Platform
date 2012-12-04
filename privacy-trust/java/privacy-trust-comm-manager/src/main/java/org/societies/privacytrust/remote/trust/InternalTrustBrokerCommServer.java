@@ -69,7 +69,7 @@ public class InternalTrustBrokerCommServer implements IFeatureServer {
 	private ICommManager commManager;
 	
 	/** The Trust Broker service reference. */
-	private ITrustBroker trustBroker;
+	private ITrustBroker internalTrustBroker;
 	
 	InternalTrustBrokerCommServer() {
 		
@@ -111,7 +111,7 @@ public class InternalTrustBrokerCommServer implements IFeatureServer {
 						fromTrustedEntityIdBean(retrieveRequestBean.getTrustorId());
 				final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
 						fromTrustedEntityIdBean(retrieveRequestBean.getTrusteeId());
-				final Double result = this.trustBroker.retrieveTrust(
+				final Double result = this.internalTrustBroker.retrieveTrust(
 						trustorId, trusteeId).get();
 				
 				final RetrieveTrustBrokerResponseBean retrieveResponseBean = 
@@ -174,8 +174,8 @@ public class InternalTrustBrokerCommServer implements IFeatureServer {
 		this.commManager = commManager;
 	}
 	
-	public void setTrustBroker(ITrustBroker trustBroker) {
+	public void setInternalTrustBroker(ITrustBroker internalTrustBroker) {
 		
-		this.trustBroker = trustBroker;
+		this.internalTrustBroker = internalTrustBroker;
 	}
 }
