@@ -20,7 +20,7 @@
 
 	<import resource="test-context.xml"/>
 	
-	<bean id="trustEvidenceCollector" class="org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector"/>
+	<bean id="internalTrustEvidenceCollector" class="org.societies.privacytrust.trust.impl.evidence.InternalTrustEvidenceCollector"/>
 
 	<bean id="trustEvidenceRepository" class="org.societies.privacytrust.trust.impl.evidence.repo.TrustEvidenceRepository"/> 
 

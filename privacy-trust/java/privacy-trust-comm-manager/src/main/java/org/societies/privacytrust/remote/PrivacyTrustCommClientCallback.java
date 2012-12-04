@@ -39,12 +39,14 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback;
+import org.societies.privacytrust.remote.trust.InternalTrustBrokerCommClientCallback;
 import org.societies.privacytrust.remote.trust.TrustBrokerCommClientCallback;
+import org.societies.privacytrust.remote.trust.evidence.InternalTrustEvidenceCollectorCommClientCallback;
 import org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommClientCallback;
 
 /**
@@ -59,7 +61,9 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/broker",
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
 					"http://societies.org/api/internal/schema/privacytrust/trust/broker",
 					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
@@ -67,7 +71,9 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
-					"org.societies.api.internal.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.broker",
+					"org.societies.api.schema.privacytrust.trust.evidence.collector",
 					"org.societies.api.internal.schema.privacytrust.trust.broker",
 					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
@@ -78,6 +84,8 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 	private PrivacyAgreementManagerCommClientCallback privacyAgreementManagerCommClientCallback;
 	private TrustBrokerCommClientCallback trustBrokerCommClientCallback;
 	private TrustEvidenceCollectorCommClientCallback trustEvidenceCollectorCommClientCallback;
+	private InternalTrustBrokerCommClientCallback internalTrustBrokerCommClientCallback;
+	private InternalTrustEvidenceCollectorCommClientCallback internalTrustEvidenceCollectorCommClientCallback;
 
 	public PrivacyTrustCommClientCallback() {
 	}
@@ -97,7 +105,6 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 			LOG.error("initBean(): ", e);
 		}
 	}
-
 
 	/**
 	 * Received a result
@@ -135,6 +142,12 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		
 		/* else */ if (payload instanceof TrustEvidenceCollectorResponseBean)
 			this.trustEvidenceCollectorCommClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
+		
+		/* else */ if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean)
+			this.internalTrustBrokerCommClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
+		
+		/* else */ if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean)
+			this.internalTrustEvidenceCollectorCommClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
 	}		
 
 	/* (non-Javadoc)
@@ -268,8 +281,18 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		this.trustEvidenceCollectorCommClientCallback = trustEvidenceCollectorCommClientCallback;
 		LOG.info("[DependencyInjection] TrustEvidenceCollectorCommClientCallback injected");
 	}
-
-
+	
+	public void setInternalTrustBrokerCommClientCallback(
+			InternalTrustBrokerCommClientCallback internalTrustBrokerCommClientCallback) {
+		this.internalTrustBrokerCommClientCallback = internalTrustBrokerCommClientCallback;
+		LOG.info("[DependencyInjection] InternalTrustBrokerCommClientCallback injected");
+	}
+	
+	public void setInternalTrustEvidenceCollectorCommClientCallback(
+			InternalTrustEvidenceCollectorCommClientCallback internalTrustEvidenceCollectorCommClientCallback) {
+		this.internalTrustEvidenceCollectorCommClientCallback = internalTrustEvidenceCollectorCommClientCallback;
+		LOG.info("[DependencyInjection] InternalTrustEvidenceCollectorCommClientCallback injected");
+	}
 
 	// -- Getters / Setters
 

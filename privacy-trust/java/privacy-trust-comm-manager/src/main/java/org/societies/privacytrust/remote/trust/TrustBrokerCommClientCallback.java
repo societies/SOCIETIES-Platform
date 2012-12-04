@@ -36,16 +36,16 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
-import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.5
  */
 public class TrustBrokerCommClientCallback implements ICommCallback {
 	
@@ -54,13 +54,13 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/broker"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
-					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.broker"));
+					"org.societies.api.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.broker"));
 	
 	private final Map<String,ITrustBrokerRemoteCallback> clients =
 			new ConcurrentHashMap<String, ITrustBrokerRemoteCallback>();

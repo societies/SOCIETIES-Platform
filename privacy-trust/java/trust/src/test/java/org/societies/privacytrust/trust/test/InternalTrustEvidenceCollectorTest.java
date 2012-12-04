@@ -59,8 +59,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 0.2
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:META-INF/spring/TrustEvidenceCollectorTest-context.xml"})
-public class TrustEvidenceCollectorTest {
+@ContextConfiguration(locations = {"classpath:META-INF/spring/InternalTrustEvidenceCollectorTest-context.xml"})
+public class InternalTrustEvidenceCollectorTest {
 	
 	private static final String BASE_ID = "tect";
 	
@@ -74,7 +74,7 @@ public class TrustEvidenceCollectorTest {
 	
 	@Autowired
 	@InjectMocks
-	private ITrustEvidenceCollector trustEvidenceCollector;
+	private ITrustEvidenceCollector internalTrustEvidenceCollector;
 	
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
@@ -123,7 +123,7 @@ public class TrustEvidenceCollectorTest {
 		final TrustedEntityId subjectCssTeid = new TrustedEntityId(TrustedEntityType.CSS, SUBJECT_CSS_ID);
 		final TrustedEntityId objectCssTeid = new TrustedEntityId(TrustedEntityType.CSS, OBJECT_CSS_ID);
 		final Date now = new Date(1000 * (new Date().getTime() / 1000));
-		this.trustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
+		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectCssTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
 		final Set<IDirectTrustEvidence> evidenceSet = 
@@ -138,7 +138,7 @@ public class TrustEvidenceCollectorTest {
 	
 	/**
 	 * TODO
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.InternalTrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Ignore
@@ -180,7 +180,7 @@ public class TrustEvidenceCollectorTest {
 		final TrustedEntityId subjectCssTeid = new TrustedEntityId(TrustedEntityType.CSS, SUBJECT_CSS_ID);
 		final TrustedEntityId objectCisTeid = new TrustedEntityId(TrustedEntityType.CIS, OBJECT_CIS_ID);
 		final Date now = new Date(1000 * (new Date().getTime() / 1000));
-		this.trustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
+		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectCisTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
 		final Set<IDirectTrustEvidence> evidenceSet = 
@@ -203,7 +203,7 @@ public class TrustEvidenceCollectorTest {
 		final TrustedEntityId subjectCssTeid = new TrustedEntityId(TrustedEntityType.CSS, SUBJECT_CSS_ID);
 		final TrustedEntityId objectServiceTeid = new TrustedEntityId(TrustedEntityType.SVC, OBJECT_SERVICE_ID);
 		final Date now = new Date(1000 * (new Date().getTime() / 1000));
-		this.trustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
+		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectServiceTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
 		final Set<IDirectTrustEvidence> evidenceSet = 
@@ -218,7 +218,7 @@ public class TrustEvidenceCollectorTest {
 	
 	/**
 	 * TODO
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.InternalTrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Ignore

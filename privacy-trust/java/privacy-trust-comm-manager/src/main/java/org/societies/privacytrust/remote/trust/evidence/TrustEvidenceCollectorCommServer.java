@@ -42,21 +42,21 @@ import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.MethodName;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
 public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	
@@ -65,13 +65,13 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
-					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
+					"org.societies.api.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.evidence.collector"));
 
 	/** The Communications Mgr service reference. */
 	@SuppressWarnings("unused")

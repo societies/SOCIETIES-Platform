@@ -56,14 +56,14 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Test cases for the TrustBroker
+ * Test cases for the InternalTrustBroker
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:META-INF/spring/TrustBrokerTest-context.xml"})
-public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
+@ContextConfiguration(locations = {"classpath:META-INF/spring/InternalTrustBrokerTest-context.xml"})
+public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
 	private static final String BASE_ID = "tbt";
 	
@@ -87,7 +87,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	
 	@Autowired
 	@InjectMocks
-	private ITrustBroker trustBroker;
+	private ITrustBroker internalTrustBroker;
 	
 	@Autowired
 	private ITrustRepository trustRepo;
@@ -154,7 +154,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustorCssTeid, trusteeCssTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
@@ -165,7 +165,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		this.trustRepo.updateEntity(trustedCss);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
@@ -176,7 +176,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		trustedCss.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedCss);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
@@ -197,7 +197,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustorCssTeid, trusteeCisTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
@@ -208,7 +208,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		this.trustRepo.updateEntity(trustedCis);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
@@ -219,7 +219,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		trustedCis.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedCis);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
@@ -240,7 +240,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustorCssTeid, trusteeServiceTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
@@ -251,7 +251,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		this.trustRepo.updateEntity(trustedService);
 		
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue1), retrievedTrustValue);
@@ -262,7 +262,7 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		trustedService.getUserPerceivedTrust().setValue(trustValue2);
 		this.trustRepo.updateEntity(trustedService);
 		// verify
-		retrievedTrustValue = this.trustBroker.retrieveTrust(
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
 				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(trustValue2), retrievedTrustValue);
