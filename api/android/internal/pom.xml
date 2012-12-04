@@ -5,12 +5,12 @@
 	<artifactId>societies-android-api-internal</artifactId>
 	<name>SOCIETIES API Android Internal</name>
 	<version>${release.version}</version>
-	<packaging>jar</packaging>
+	<packaging>apklib</packaging>
 
 
 	<description>
-    	This jar file provides the internal interfaces and related classes of the 
-    	SOCIETIES Android platform
+    		This jar file provides the internal interfaces and related classes of the 
+    		SOCIETIES Android platform
     </description>
 
 	<parent>
@@ -39,18 +39,13 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
         <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
-            <scope>provided</scope>
+         		<groupId>com.google.android</groupId>
+         		<artifactId>android</artifactId>
+         		<scope>provided</scope>
 		</dependency>
-		<dependency>
-      		<groupId>junit</groupId>
-      		<artifactId>junit</artifactId>
-      		<version>4.8.2</version>
-      		<scope>test</scope>
-    	</dependency>
 		
 		<dependency>
   			<groupId>org.societies.utilities</groupId>
@@ -60,5 +55,15 @@
         </dependency>
 		
 	</dependencies>
-
+    <build>
+        <finalName>${project.artifactId}</finalName>
+         <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+	
 </project>

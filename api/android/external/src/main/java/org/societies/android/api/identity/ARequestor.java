@@ -38,7 +38,11 @@ import android.os.Parcelable;
  *
  */
 public class ARequestor extends RequestorBean implements Parcelable {
+	String identity;
 	
+	public ARequestor(String identity) {
+		this.identity = identity;
+	}
 
 	
 //	/**

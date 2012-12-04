@@ -24,96 +24,12 @@
  */
 package org.societies.api.internal.privacytrust.trust.evidence.remote;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import org.societies.api.privacytrust.trust.TrustException;
-import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.3
  */
-public interface ITrustEvidenceCollectorRemote {
-	
-	/**
-	 * Adds the specified piece of direct trust evidence. The
-	 * {@link TrustedEntityId TrustedEntityIds} of the subject and the object
-	 * this piece of evidence refers to, its type, as well as, the time the
-	 * evidence was recorded are also supplied. Finally, depending on the
-	 * evidence type, the method allows specifying supplementary information.
-	 *  
-	 * @param subjectId
-	 *            the {@link TrustedEntityId} of the subject the piece of
-	 *            evidence refers to.
-	 * @param objectId
-	 *            the {@link TrustedEntityId} of the object the piece of
-	 *            evidence refers to.
-	 * @param type
-	 *            the type of the evidence to be added
-	 * @param timestamp
-	 *            the time the evidence was recorded
-	 * @param info
-	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise
-	 * @param callback
-	 *            the callback to acknowledge the addition of the direct trust
-	 *            evidence
-	 * @throws TrustException
-	 *            if the specified piece of direct trust evidence cannot be 
-	 *            added
-	 * @throws NullPointerException
-	 *            if any of the teid, type or timestamp parameter is
-	 *            <code>null</code>
-	 * @since 0.5
-	 */
-	public void addDirectEvidence(final TrustedEntityId subjectId,
-			final TrustedEntityId objectId,	final TrustEvidenceType type,
-			final Date timestamp, final Serializable info, 
-			final ITrustEvidenceCollectorRemoteCallback callback) 
-					throws TrustException;
-	
-	/**
-	 * Adds the specified piece of indirect trust evidence which originates
-	 * from the given source. The {@link TrustedEntityId TrustedEntityIds} of
-	 * the subject and the object this piece of evidence refers to, its type,
-	 * as well as, the time the evidence was recorded are also supplied. 
-	 * Finally, depending on the evidence type, the method allows specifying
-	 * supplementary information.
-	 *  
-	 * @param subjectId
-	 *            the {@link TrustedEntityId} of the subject the piece of
-	 *            evidence refers to.
-	 * @param objectId
-	 *            the {@link TrustedEntityId} of the object the piece of
-	 *            evidence refers to. 
-	 * @param type
-	 *            the type of the evidence to be added.
-	 * @param timestamp
-	 *            the time the evidence was recorded.
-	 * @param info
-	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise.
-	 * @param sourceId
-	 *            the source this evidence originates from.
-	 * @param callback
-	 *            the callback to acknowledge the addition of the indirect 
-	 *            trust evidence
-	 * @throws TrustException
-	 *            if the specified piece of indirect trust evidence cannot be 
-	 *            added
-	 * @throws NullPointerException
-	 *            if any of the source, teid, type or timestamp parameter is
-	 *            <code>null</code>
-	 * @since 0.5
-	 */
-	public void addIndirectEvidence(final TrustedEntityId subjectId, 
-			final TrustedEntityId objectId,	final TrustEvidenceType type,
-			final Date timestamp, final Serializable info,
-			final TrustedEntityId sourceId,
-			final ITrustEvidenceCollectorRemoteCallback callback)
-					throws TrustException;
+public interface ITrustEvidenceCollectorRemote 
+	extends org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote {
 }

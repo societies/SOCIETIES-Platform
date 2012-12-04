@@ -39,6 +39,7 @@
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
         <dependency>
 			<groupId>org.societies.comm.android</groupId>
@@ -62,11 +63,11 @@
 	 	   		</exclusion>
 			</exclusions-->
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
    			<artifactId>SocietiesPlatformEvents</artifactId>

@@ -40,19 +40,20 @@
 				<groupId>org.societies.android.api.internal</groupId>
 				<artifactId>societies-android-api-internal</artifactId>
 				<version>${release.version}</version>
-				<scope>provided</scope>
+				<type>apklib</type>
 			</dependency>
 			
-			<dependency>
+			<!--dependency>
 			   	<groupId>org.societies.api.internal</groupId>
 			   	<artifactId>societies-api-internal</artifactId>
 				<version>${release.version}</version>
-        	</dependency>
-			<dependency>
+        	</dependency-->
+			<!--dependency>
 				<groupId>org.societies.android.api.external</groupId>
 				<artifactId>societies-android-api</artifactId>
 				<version>${release.version}</version>
-			</dependency>
+				<type>apklib</type>
+			</dependency-->
 			
 			<!--dependency>
 				<groupId>org.societies.api.external</groupId>
@@ -60,11 +61,11 @@
 				<version>${release.version}</version>
 			</dependency-->
 			
-			<dependency>
+			<!--dependency>
 				<groupId>org.societies.api.schema</groupId>
 				<artifactId>societies-api-schema</artifactId>
 				<version>${release.version}</version>
-			</dependency>
+			</dependency-->
 			
 			<dependency>
 	   			<groupId>org.societies.android.platform.androidutils</groupId>

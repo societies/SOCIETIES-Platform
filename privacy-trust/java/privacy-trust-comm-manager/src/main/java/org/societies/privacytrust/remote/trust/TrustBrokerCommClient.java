@@ -31,19 +31,19 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
-import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.5
  */
 public class TrustBrokerCommClient implements ITrustBrokerRemote {
 	
@@ -63,7 +63,7 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback)
+	 * @see org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback)
 	 */
 	@Override
 	public void retrieveTrust(final TrustedEntityId trustorId,
@@ -78,8 +78,8 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 			throw new NullPointerException("callback can't be null");
 		
 		if (LOG.isDebugEnabled()) 
-			LOG.debug("Retrieving trust value for entity (" + trustorId	+ ", "
-					+ trusteeId + ")");
+			LOG.debug("Retrieving trust value assigned to entity '" + trusteeId	
+					+ "' by '" + trustorId + "'");
 		
 		try {
 			final IIdentity toIdentity = 
@@ -102,15 +102,15 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 			
 		} catch (InvalidFormatException ife) {
 			
-			throw new TrustBrokerCommException("Could not retrieve trust for entity (" 
-					+ trustorId + ", " + trusteeId 
-					+ "): Invalid trustorId IIdentity: " 
+			throw new TrustBrokerCommException("Could not retrieve trust value assigned to entity '" 
+					+ trusteeId	+ "' by '" + trustorId 
+					+ "': Invalid trustorId IIdentity: " 
 					+ ife.getLocalizedMessage(), ife);
 		} catch (CommunicationException ce) {
 			
-			throw new TrustBrokerCommException("Could not retrieve trust for entity (" 
-					+ trustorId + ", " + trusteeId 
-					+ "): " + ce.getLocalizedMessage(), ce);
+			throw new TrustBrokerCommException("Could not retrieve trust value assigned to entity '" 
+					+ trusteeId	+ "' by '" + trustorId 
+					+ "': " + ce.getLocalizedMessage(), ce);
 		}
 	}
 	

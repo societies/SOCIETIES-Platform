@@ -46,15 +46,16 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer;
+import org.societies.privacytrust.remote.trust.InternalTrustBrokerCommServer;
 import org.societies.privacytrust.remote.trust.TrustBrokerCommServer;
+import org.societies.privacytrust.remote.trust.evidence.InternalTrustEvidenceCollectorCommServer;
 import org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommServer;
-
 
 public class PrivacyTrustCommServer implements IFeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyTrustCommServer.class);
@@ -65,7 +66,9 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
 			  		"http://societies.org/api/schema/servicelifecycle/model",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/model",
+			  		"http://societies.org/api/schema/privacytrust/trust/model",
+			  		"http://societies.org/api/schema/privacytrust/trust/broker",
+			  		"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
@@ -74,7 +77,9 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
 			  		"org.societies.api.schema.servicelifecycle.model",
-			  		"org.societies.api.internal.schema.privacytrust.trust.model",
+			  		"org.societies.api.schema.privacytrust.trust.model",
+			  		"org.societies.api.schema.privacytrust.trust.broker",
+			  		"org.societies.api.schema.privacytrust.trust.evidence.collector",
 			  		"org.societies.api.internal.schema.privacytrust.trust.broker",
 			  		"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
@@ -85,6 +90,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 
 	private TrustBrokerCommServer trustBrokerCommServer;
 	private TrustEvidenceCollectorCommServer trustEvidenceCollectorCommServer;
+	private InternalTrustBrokerCommServer internalTrustBrokerCommServer;
+	private InternalTrustEvidenceCollectorCommServer internalTrustEvidenceCollectorCommServer;
 	
 	public PrivacyTrustCommServer() {
 	}
@@ -149,6 +156,14 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 			return this.trustEvidenceCollectorCommServer.getQuery(stanza, payload);
 		}
 		
+		else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean) {
+			return this.internalTrustBrokerCommServer.getQuery(stanza, payload);
+		}
+		
+		else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean) {
+			return this.internalTrustEvidenceCollectorCommServer.getQuery(stanza, payload);
+		}
+		
 		return null;
 	}
 	
@@ -204,8 +219,6 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		
 	}
 
-
-
 	// -- Dependency Injection
 
 	public void setCommManager(ICommManager commManager) {
@@ -237,6 +250,16 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 	public void setTrustEvidenceCollectorCommServer(TrustEvidenceCollectorCommServer trustEvidenceCollectorCommServer) {
 		this.trustEvidenceCollectorCommServer = trustEvidenceCollectorCommServer;
 		LOG.info("[DependencyInjection] TrustEvidenceCollectorCommServer injected");
+	}
+	
+	public void setInternalTrustBrokerCommServer(InternalTrustBrokerCommServer internalTrustBrokerCommServer) {
+		this.internalTrustBrokerCommServer = internalTrustBrokerCommServer;
+		LOG.info("[DependencyInjection] InternalTrustBrokerCommServer injected");
+	}
+	
+	public void setInternalTrustEvidenceCollectorCommServer(InternalTrustEvidenceCollectorCommServer internalTrustEvidenceCollectorCommServer) {
+		this.internalTrustEvidenceCollectorCommServer = internalTrustEvidenceCollectorCommServer;
+		LOG.info("[DependencyInjection] InternalTrustEvidenceCollectorCommServer injected");
 	}
 
 	// -- Getters / Setters
