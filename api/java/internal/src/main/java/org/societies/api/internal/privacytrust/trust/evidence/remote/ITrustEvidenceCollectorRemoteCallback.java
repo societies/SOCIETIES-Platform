@@ -30,15 +30,6 @@ package org.societies.api.internal.privacytrust.trust.evidence.remote;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.3
  */
-public interface ITrustEvidenceCollectorRemoteCallback {
-	
-	/**
-	 * Called when the direct trust evidence has been added.
-	 */
-	public void onAddedDirectEvidence();
-	
-	/**
-	 * Called when the indirect trust evidence has been added.
-	 */
-	public void onAddedIndirectEvidence();
+public interface ITrustEvidenceCollectorRemoteCallback 
+	extends org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback {
 }

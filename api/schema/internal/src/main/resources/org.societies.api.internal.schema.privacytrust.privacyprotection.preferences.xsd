@@ -6,7 +6,7 @@
 	xmlns:ns1="http://societies.org/api/schema/identity"
 	xmlns:ns2="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
 	xmlns:context="http://societies.org/api/schema/context/model"
-	xmlns:trust="http://societies.org/api/internal/schema/privacytrust/trust/model"
+	xmlns:trust="http://societies.org/api/schema/privacytrust/trust/model"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 
@@ -24,8 +24,8 @@
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.context.model.xsd" />
 
 	<xs:import
-		namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
-		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
+		namespace="http://societies.org/api/schema/privacytrust/trust/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
 
 
 	<xs:complexType name="PrivacyPreferenceConditionBean">

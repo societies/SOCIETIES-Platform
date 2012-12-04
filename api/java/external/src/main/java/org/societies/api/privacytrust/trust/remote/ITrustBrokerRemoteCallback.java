@@ -22,14 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.evidence.remote;
+package org.societies.api.privacytrust.trust.remote;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
-public interface ITrustEvidenceCollectorRemote 
-	extends org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote {
+public interface ITrustBrokerRemoteCallback {
+	
+	public void onRetrievedTrust(Double value);
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema elementFormDefault="qualified" version="1.0" 
-	targetNamespace="http://societies.org/api/internal/schema/privacytrust/trust/broker"   
-	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/trust/broker" 
+	targetNamespace="http://societies.org/api/schema/privacytrust/trust/broker"   
+	xmlns:tns="http://societies.org/api/schema/privacytrust/trust/broker" 
 	xmlns:tnsm="http://societies.org/api/schema/privacytrust/trust/model"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
-	
+
 	<xs:import namespace="http://societies.org/api/schema/privacytrust/trust/model"
-		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.trust.model.xsd" />
+		schemaLocation="org.societies.api.schema.privacytrust.trust.model.xsd" />
 		
 	<xs:element name="trustBrokerRequestBean">
 		<xs:complexType>

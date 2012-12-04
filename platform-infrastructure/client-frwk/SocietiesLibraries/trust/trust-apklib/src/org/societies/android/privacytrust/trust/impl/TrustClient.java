@@ -22,42 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.evidence;
+package org.societies.android.privacytrust.trust.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.xml.datatype.DatatypeFactory;
-
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.android.api.privacytrust.trust.ITrustClient;
+import org.societies.android.api.privacytrust.trust.model.ADate;
+import org.societies.android.api.privacytrust.trust.model.ATrustEvidenceType;
+import org.societies.android.api.privacytrust.trust.model.ATrustedEntityId;
 import org.societies.android.privacytrust.trust.org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.privacytrust.trust.TrustException;
-import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
@@ -69,15 +63,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * Android implementation of the {@link ITrustEvidenceCollector} service.
+ * Android implementation of the {@link ITrustClient} service.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.4
+ * @since 0.5
  */
-public class TrustEvidenceCollector extends Service 
-	implements ITrustEvidenceCollector {
+public class TrustClient extends Service implements ITrustClient {
 	
-	private static final String TAG = TrustEvidenceCollector.class.getName();
+	private static final String TAG = TrustClient.class.getName();
 	
 	private static final List<String> ELEMENT_NAMES = Arrays.asList(
 			"trustEvidenceCollectorRequestBean", "trustEvidenceCollectorResponseBean");
@@ -113,7 +106,7 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public List<String> getXMLNamespaces() {
 			
-			return TrustEvidenceCollector.NAMESPACES;
+			return TrustClient.NAMESPACES;
 		}
 
 		/*
@@ -121,7 +114,7 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public List<String> getJavaPackages() {
 			
-			return TrustEvidenceCollector.PACKAGES;
+			return TrustClient.PACKAGES;
 		}
 
 		/*
@@ -129,7 +122,7 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveResult(Stanza stanza, Object payload) {
 
-			Log.d(TrustEvidenceCollector.TAG, "receiveResult:stanza="
+			Log.d(TrustClient.TAG, "receiveResult:stanza="
 					+ this.stanzaToString(stanza)
 					+ ",payload.getClass=" 
 					+ payload.getClass().getName());
@@ -138,26 +131,25 @@ public class TrustEvidenceCollector extends Service
 
 				TrustEvidenceCollectorResponseBean responseBean = 
 						(TrustEvidenceCollectorResponseBean) payload;
-				Log.d(TrustEvidenceCollector.TAG, 
+				Log.d(TrustClient.TAG, 
 						"receiveResult:payload.methodName=" 
 								+ responseBean.getMethodName());
 				switch (responseBean.getMethodName()) {
 
 				case ADD_DIRECT_EVIDENCE:
-				case ADD_INDIRECT_EVIDENCE:
-					TrustEvidenceCollector.this.callbackException = null;
+					TrustClient.this.callbackException = null;
 					break;
 				default:
-					TrustEvidenceCollector.this.callbackException = 
-						new TrustEvidenceCollectorCommException("Unsupported method in response bean: "
+					TrustClient.this.callbackException = 
+						new TrustClientException("Unsupported method in response bean: "
 							+ responseBean.getMethodName());
 				}
 			} else {
-				TrustEvidenceCollector.this.callbackException = 
-						new TrustEvidenceCollectorCommException("Unsupported payload type: "
+				TrustClient.this.callbackException = 
+						new TrustClientException("Unsupported payload type: "
 								+ payload.getClass().getName());
 			}
-			TrustEvidenceCollector.this.cdLatch.countDown();
+			TrustClient.this.cdLatch.countDown();
 		}
 
 		/*
@@ -165,15 +157,15 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveError(Stanza stanza, XMPPError error) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveError:stanza="
+			Log.d(TrustClient.TAG, "receiveError:stanza="
 					+ this.stanzaToString(stanza) 
 					+ ",error=" + error);
 			if (error != null)
-				TrustEvidenceCollector.this.callbackException = error;
+				TrustClient.this.callbackException = error;
 			else
-				TrustEvidenceCollector.this.callbackException = 
-					new TrustEvidenceCollectorCommException("Unspecified XMPPError");
-			TrustEvidenceCollector.this.cdLatch.countDown();
+				TrustClient.this.callbackException = 
+					new TrustClientException("Unspecified XMPPError");
+			TrustClient.this.cdLatch.countDown();
 		}
 
 		/*
@@ -181,7 +173,7 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveInfo with stanza "
+			Log.d(TrustClient.TAG, "receiveInfo with stanza "
 					+ this.stanzaToString(stanza));
 		}
 
@@ -190,7 +182,7 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveMessage(Stanza stanza, Object payload) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveMessage with stanza "
+			Log.d(TrustClient.TAG, "receiveMessage with stanza "
 					+ this.stanzaToString(stanza));
 		}
 
@@ -199,12 +191,12 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveItems(Stanza stanza, String node, List<String> items) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveItems with stanza "
+			Log.d(TrustClient.TAG, "receiveItems with stanza "
 					+ this.stanzaToString(stanza)
 					+ ", node " + node
 					+ " and items: ");
 			for(String item : items)
-				Log.d(TrustEvidenceCollector.TAG, item);
+				Log.d(TrustClient.TAG, item);
 		}
 		
 		private String stanzaToString(Stanza stanza) {
@@ -272,14 +264,28 @@ public class TrustEvidenceCollector extends Service
 	}
 
 	/*
-	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrust(java.lang.String, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId)
 	 */
-	public void addDirectEvidence(final TrustedEntityId teid, 
-			final TrustEvidenceType type, final Date timestamp,
+	public void retrieveTrust(final String client, 
+			final ATrustedEntityId trustorId, final ATrustedEntityId trusteeId)
+					throws TrustException {
+		
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addTrustEvidence(java.lang.String, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustEvidenceType, org.societies.android.api.privacytrust.trust.model.ADate, java.io.Serializable)
+	 */
+	public void addTrustEvidence(final String client, 
+			final ATrustedEntityId subjectId, final ATrustedEntityId objectId,
+			final ATrustEvidenceType type, final ADate timestamp, 
 			final Serializable info) throws TrustException {
 		
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
@@ -287,8 +293,12 @@ public class TrustEvidenceCollector extends Service
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("Adding direct trust evidence:");
-		sb.append("teid=");
-		sb.append(teid);
+		sb.append("client=");
+		sb.append(client);
+		sb.append(", subjectId=");
+		sb.append(subjectId);
+		sb.append(", objectId=");
+		sb.append(objectId);
 		sb.append(", type=");
 		sb.append(type);
 		sb.append(", timestamp=");
@@ -300,20 +310,21 @@ public class TrustEvidenceCollector extends Service
 		try {
 			final AddDirectEvidenceRequestBean addEvidenceBean = 
 					new AddDirectEvidenceRequestBean();
-			// 1. teid
+			// 1. subjectId
 			addEvidenceBean.setSubjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId.getTeid()));
+			// 2. objectId
 			addEvidenceBean.setObjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// 2. type
-			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
-			// 3. timestamp
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId.getTeid()));
+			// 3. type
+			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.getType().name()));
+			// 4. timestamp
 			final GregorianCalendar gregCal = new GregorianCalendar();
-			gregCal.setTime(timestamp);
+			gregCal.setTime(timestamp.getDate());
 			addEvidenceBean.setTimestamp(
 					new DatatypeFactoryImpl().newXMLGregorianCalendar(gregCal));
-			// 4. info
-			if (TrustEvidenceType.RATED.equals(type))
+			// 5. info
+			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
 
 			final TrustEvidenceCollectorRequestBean requestBean = 
@@ -331,165 +342,29 @@ public class TrustEvidenceCollector extends Service
 		} catch (IOException ioe) {
 
 			final String errorMessage = 
-					"Could not add direct trust evidence for entity " + teid
+					"Could not add trust evidence for subject '" + subjectId
+					+ "' and object '" + objectId + "' of type '" + type
 					+ ": Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage();
 			Log.e(TAG, errorMessage);
-			throw new TrustEvidenceCollectorCommException(errorMessage, ioe);
+			throw new TrustClientException(errorMessage, ioe);
 			
 		} catch (Exception e) {
 			
 			final String errorMessage =
-					"Could not add direct trust evidence for entity " + teid
-					+ ": " + e.getLocalizedMessage();
+					"Could not add direct trust evidence for subject '" 
+					+ subjectId	+ "' and object '" + objectId + "' of type '"
+					+ type + ": " + e.getLocalizedMessage();
 			Log.e(TAG, errorMessage);
-			throw new TrustEvidenceCollectorCommException(errorMessage, e);
+			throw new TrustClientException(errorMessage, e);
 		}
-	}
-
-	/*
-	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
-	 */
-	public void addIndirectEvidence(final TrustedEntityId source, 
-			final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info) 
-					throws TrustException {
-		
-		if (source == null)
-			throw new NullPointerException("source can't be null");
-		if (teid == null)
-			throw new NullPointerException("teid can't be null");
-		if (type == null)
-			throw new NullPointerException("type can't be null");
-		if (timestamp == null)
-			throw new NullPointerException("timestamp can't be null");
-		
-		final StringBuilder sb = new StringBuilder();
-		sb.append("Adding indirect trust evidence:");
-		sb.append("source=");
-		sb.append(source);
-		sb.append(",teid=");
-		sb.append(teid);
-		sb.append(", type=");
-		sb.append(type);
-		sb.append(", timestamp=");
-		sb.append(timestamp);
-		sb.append(", info=");
-		sb.append(info);
-		Log.d(TAG, sb.toString());
-
-		try {
-			final AddIndirectEvidenceRequestBean addEvidenceBean = 
-					new AddIndirectEvidenceRequestBean();
-			// 1. source
-			addEvidenceBean.setSourceId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(source));
-			// 2. teid
-			addEvidenceBean.setSubjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			addEvidenceBean.setObjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// 3. type
-			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
-			// 4. timestamp
-			final GregorianCalendar gregCal = new GregorianCalendar();
-			gregCal.setTime(timestamp);
-			addEvidenceBean.setTimestamp(
-					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
-			// 5. info
-			if (TrustEvidenceType.RATED.equals(type))
-				addEvidenceBean.setInfo(serialise(info));
-
-			final TrustEvidenceCollectorRequestBean requestBean = 
-					new TrustEvidenceCollectorRequestBean();
-			requestBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
-			requestBean.setAddIndirectEvidence(addEvidenceBean);
-
-			final Stanza stanza = new Stanza(this.cloudNodeId);
-			this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, this.callback);
-			this.cdLatch = new CountDownLatch(1);
-			this.cdLatch.await();
-			if (this.callbackException != null)
-				throw this.callbackException;
-			
-		} catch (IOException ioe) {
-
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add indirect trust evidence for entity " + teid
-					+ ": Could not serialise info object into byte[]: " 
-					+ ioe.getLocalizedMessage(), ioe);
-
-		} catch (Exception e) {
-			
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add indirect trust evidence for entity " + teid
-					+ ": " + e.getLocalizedMessage(), e);
-		}
-	}
-
-	/*
-	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
-	 */
-	public void addTrustRating(final IIdentity trustor, 
-			final IIdentity trustee, final double rating, Date timestamp)
-					throws TrustException {
-		
-		if (trustor == null)
-			throw new NullPointerException("trustor can't be null");
-		if (trustee == null)
-			throw new NullPointerException("trustee can't be null");
-		
-		if (!IdentityType.CSS.equals(trustor.getType()))
-			throw new IllegalArgumentException("trustor is not a CSS");
-		if (!IdentityType.CSS.equals(trustee.getType()) && !IdentityType.CIS.equals(trustee.getType()))
-			throw new IllegalArgumentException("trustee is neither a CSS nor a CIS");
-		if (rating < 0d || rating > 1d)
-			throw new IllegalArgumentException("rating out of range [0,1]");
-		
-		// if timestamp is null assign current time
-		if (timestamp == null)
-			timestamp = new Date();
-		
-		final TrustedEntityType entityType;
-		if (IdentityType.CSS.equals(trustee.getType()))
-			entityType = TrustedEntityType.CSS;
-		else // if (IdentityType.CIS.equals(trustee.getType()))
-			entityType = TrustedEntityType.CIS;
-		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
-	}
-
-	/*
-	 * @see org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
-	 */
-	public void addTrustRating(final IIdentity trustor, 
-			final ServiceResourceIdentifier trustee, final double rating,
-			Date timestamp) throws TrustException {
-		
-		if (trustor == null)
-			throw new NullPointerException("trustor can't be null");
-		if (trustee == null)
-			throw new NullPointerException("trustee can't be null");
-		
-		if (!IdentityType.CSS.equals(trustor.getType()))
-			throw new IllegalArgumentException("trustor is not a CSS");
-		if (rating < 0d || rating > 1d)
-			throw new IllegalArgumentException("rating is not in the range of [0,1]");
-		
-		// if timestamp is null assign current time
-		if (timestamp == null)
-			timestamp = new Date();
-		
-		final TrustedEntityType entityType = TrustedEntityType.SVC;
-		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 	
 	public class LocalBinder extends Binder {
 		
-		public ITrustEvidenceCollector getService() {
+		public ITrustClient getService() {
 			
-			return TrustEvidenceCollector.this;
+			return TrustClient.this;
 		}
 	}
 	
@@ -508,6 +383,5 @@ public class TrustEvidenceCollector extends Service
 		oos.writeObject(object);
 		
 		return baos.toByteArray();
-
 	}
 }

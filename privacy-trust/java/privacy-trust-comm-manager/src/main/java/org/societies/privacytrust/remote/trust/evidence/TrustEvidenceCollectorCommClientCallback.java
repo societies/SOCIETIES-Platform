@@ -36,15 +36,15 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
 public class TrustEvidenceCollectorCommClientCallback implements ICommCallback {
 	
@@ -53,8 +53,8 @@ public class TrustEvidenceCollectorCommClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(

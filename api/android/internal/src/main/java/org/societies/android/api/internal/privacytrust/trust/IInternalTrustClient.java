@@ -22,14 +22,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.evidence.remote;
+package org.societies.android.api.internal.privacytrust.trust;
+
+import org.societies.android.api.privacytrust.trust.ITrustClient;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
-public interface ITrustEvidenceCollectorRemote 
-	extends org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote {
+public interface IInternalTrustClient extends ITrustClient {
+	
+	public static final String INTENT_RETURN_VALUE_KEY = 
+			"org.societies.android.api.internal.privacytrust.trust.ReturnValue";
+    public static final String INTENT_RETURN_STATUS_KEY = 
+    		"org.societies.android.api.internal.privacytrust.trust.ReturnStatus";
+    
+    public static final String RETRIEVE_TRUST_VALUE = 
+    		"org.societies.android.api.internal.privacytrust.trust.RETRIEVE_TRUST_VALUE";
+    public static final String ADD_TRUST_EVIDENCE = 
+    		"org.societies.android.api.internal.privacytrust.trust.ADD_TRUST_EVIDENCE";
+
+    String methodsArray [] = {
+    		"retrieveTrust(String client, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId trustorId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId trusteeId)",
+            "addTrustEvidence(String client, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId subjectId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId objectId, org.societies.android.api.privacytrust.trust.model.ATrustEvidenceType type, org.societies.android.api.privacytrust.trust.model.ADate timestamp, Serializable info"
+            };
 }

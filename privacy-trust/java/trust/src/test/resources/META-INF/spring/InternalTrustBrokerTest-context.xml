@@ -20,7 +20,7 @@
        
     <import resource="test-context.xml"/>
 	
-	<bean id="trustBroker" class="org.societies.privacytrust.trust.impl.TrustBroker"/>
+	<bean id="internalTrustBroker" class="org.societies.privacytrust.trust.impl.InternalTrustBroker"/>
 	
 	<bean id="trustRepository" class="org.societies.privacytrust.trust.impl.repo.TrustRepository"/>
 	

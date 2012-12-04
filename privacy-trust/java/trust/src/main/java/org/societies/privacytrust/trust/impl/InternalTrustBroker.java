@@ -24,18 +24,22 @@
  */
 package org.societies.privacytrust.trust.impl;
 
+import java.util.Arrays;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote;
-import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.osgi.service.ServiceUnavailableException;
@@ -44,17 +48,16 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of the external {@link org.societies.api.privacytrust.trust.
- * ITrustBroker ITrustBroker} interface.
+ * Implementation of the {@link ITrustBroker} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.4
+ * @since 0.0.3
  */
 @Service
 @Lazy(value = false)
-public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustBroker {
+public class InternalTrustBroker implements ITrustBroker {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
+	private static final Logger LOG = LoggerFactory.getLogger(InternalTrustBroker.class);
 	
 	/** The Trust Node Mgr service reference. */
 	@Autowired(required=true)
@@ -64,17 +67,18 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 	@Autowired(required=true)
 	private ITrustEventMgr trustEventMgr;
 	
-	/** The internal Trust Broker service reference. */
-	@Autowired(required=true)
-	private ITrustBroker internalTrustBroker;
+	/** The Trust Repository service reference. */
+	@Autowired(required=false)
+	private ITrustRepository trustRepo;
 	
 	/** The Remote Trust Broker service reference. */
 	@Autowired(required=false)
 	private ITrustBrokerRemote trustBrokerRemote;
 			
-	TrustBroker() {
+	InternalTrustBroker() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -84,11 +88,13 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 	@Override
 	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustException {
-					
+		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
 		if (trusteeId == null)
 			throw new NullPointerException("trusteeId can't be null");
+		
+		Double trustValue = null;
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value assigned to entity '"	+ trusteeId
@@ -102,11 +108,13 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
 			if (doLocal) {
 
-				if (this.internalTrustBroker == null)
+				if (this.trustRepo == null)
 					throw new TrustBrokerException("Could not retrieve trust value assigned to entity '" 
 							+ trusteeId + "' by '" + trustorId 
-							+ "': Internal ITrustBroker service is not available");
-				return this.internalTrustBroker.retrieveTrust(trustorId, trusteeId);
+							+ "': ITrustRepository service is not available");
+				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
+				if (entity != null)
+					trustValue = entity.getUserPerceivedTrust().getValue();
 
 			} else {
 
@@ -120,7 +128,7 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 				synchronized (callback) {
 					try {
 						callback.wait();
-						return new AsyncResult<Double>(callback.getResult());
+						trustValue = callback.getResult();
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException("Interrupted while receiveing trust value assigned to entity '" 
@@ -134,8 +142,17 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 					+ trusteeId + "' by '" + trustorId 
 					+ "': " + sue.getLocalizedMessage(), sue);
 		}
+			
+		return new AsyncResult<Double>(trustValue);
 	}
 
+	@Deprecated
+	public Future<Double> retrieveTrust(
+			final TrustedEntityId trusteeId) throws TrustException {
+		
+		return new AsyncResult<Double>(null);
+	}
+	
 	/*
 	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
@@ -145,8 +162,22 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
 					throws TrustException {
 		
-		this.internalTrustBroker.registerTrustUpdateEventListener(listener,
-				trustorId, trusteeId);
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException("Could not register trust update listener for entity (" 
+					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
+		
+		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering event listener for entity (" + trustorId 
+					+ ", " + trusteeId + ") to topics '" + Arrays.toString(topics) + "'");
+		this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeId);
 	}
 	
 	/*
@@ -155,11 +186,19 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 	@Override
 	public void unregisterTrustUpdateEventListener(
 			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId) 
 					throws TrustException {
+		// TODO Auto-generated method stub
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
 		
-		this.internalTrustBroker.unregisterTrustUpdateEventListener(listener,
-				trustorId, trusteeId);
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException("Could not unregister trust update listener for entity (" 
+					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
 	}
 	
 	private class RemoteRetrieveCallback implements ITrustBrokerRemoteCallback {
@@ -167,7 +206,7 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 		private Double trustValue;
 		
 		/*
-		 * @see org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrievedTrust(java.lang.Double)
+		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrievedTrust(java.lang.Double)
 		 */
 		@Override
 		public void onRetrievedTrust(Double value) {

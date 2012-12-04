@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.evidence;
+package org.societies.android.privacytrust.trust.impl;
 
 import org.societies.api.privacytrust.trust.TrustException;
 
@@ -31,34 +31,34 @@ import org.societies.api.privacytrust.trust.TrustException;
  * remote call.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.4
+ * @since 0.5
  */
-public class TrustEvidenceCollectorCommException extends TrustException {
+public class TrustClientException extends TrustException {
 
 	private static final long serialVersionUID = -3733487749109997000L;
 
 	/**
-     * Constructs a <code>TrustEvidenceCollectorCommException</code> with no detail message.
+     * Constructs a <code>TrustClientException</code> with no detail message.
      */
-    public TrustEvidenceCollectorCommException() {
+    public TrustClientException() {
     	
         super();
     }
 
     /**
-     * Constructs a <code>TrustEvidenceCollectorCommException</code> with the specified detail
+     * Constructs a <code>TrustClientException</code> with the specified detail
      * message.
      * 
      * @param message
      *            the detail message.
      */
-    public TrustEvidenceCollectorCommException(String message) {
+    public TrustClientException(String message) {
     	
         super(message);
     }
 
     /**
-     * Creates a <code>TrustEvidenceCollectorCommException</code> with the specified detail message
+     * Creates a <code>TrustClientException</code> with the specified detail message
      * and cause.
      * 
      * @param message
@@ -70,13 +70,13 @@ public class TrustEvidenceCollectorCommException extends TrustException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public TrustEvidenceCollectorCommException(String message, Throwable cause) {
+    public TrustClientException(String message, Throwable cause) {
     	
         super(message, cause);
     }
 
     /**
-     * Creates a <code>TrustEvidenceCollectorCommException</code> with the specified cause and a
+     * Creates a <code>TrustClientException</code> with the specified cause and a
      * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
      * typically contains the class and detail message of <tt>cause</tt>).
      * 
@@ -86,7 +86,7 @@ public class TrustEvidenceCollectorCommException extends TrustException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public TrustEvidenceCollectorCommException(Throwable cause) {
+    public TrustClientException(Throwable cause) {
     	
         super(cause);
     }

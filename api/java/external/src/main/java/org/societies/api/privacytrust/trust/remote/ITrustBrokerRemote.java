@@ -22,15 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.remote;
+package org.societies.api.privacytrust.trust.remote;
+
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * This interface provides access to the trust values associated with individuals,
  * communities and services.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.5
  */
-public interface ITrustBrokerRemote 
-	extends org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote {
+public interface ITrustBrokerRemote {
+
+	/**
+	 * Retrieves the trust value which the specified trustor has assigned to the
+	 * supplied trustee. The method returns <code>null</code> if no trust value
+	 * has been assigned to the specified trustee by the given trustor.
+	 * 
+	 * @param trustorId
+	 *            the identifier of the entity which has assigned the trust
+	 *            value to retrieve.
+	 * @param trusteeId
+	 *            the identifier of the entity whose trust value to retrieve.
+	 * @param callback
+	 *            the callback to receive the trust value.
+	 * @throws TrustException 
+	 *             if the trust value of the specified entity cannot be
+	 *             retrieved
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.5
+	 */
+	public void retrieveTrust(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId, 
+			final ITrustBrokerRemoteCallback callback) throws TrustException;
 }

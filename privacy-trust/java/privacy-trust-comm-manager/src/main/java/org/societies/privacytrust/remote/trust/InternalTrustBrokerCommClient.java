@@ -31,33 +31,33 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.schema.privacytrust.trust.broker.MethodName;
-import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
-import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote;
 import org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
+ * @since 0.0.8
  */
-public class TrustBrokerCommClient implements ITrustBrokerRemote {
+public class InternalTrustBrokerCommClient implements ITrustBrokerRemote {
 	
 	/** The logging facility. */
-	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommClient.class);
+	private static Logger LOG = LoggerFactory.getLogger(InternalTrustBrokerCommClient.class);
 	
 	/** The Communications Mgr service reference. */
 	private ICommManager commManager; 
 	
 	private PrivacyTrustCommClientCallback privacyTrustCommClientCallback;
 	
-	private TrustBrokerCommClientCallback trustBrokerCommClientCallback;
+	private InternalTrustBrokerCommClientCallback trustBrokerCommClientCallback;
 
-	TrustBrokerCommClient() {
+	InternalTrustBrokerCommClient() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
@@ -102,15 +102,15 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 			
 		} catch (InvalidFormatException ife) {
 			
-			throw new TrustBrokerCommException("Could not retrieve trust value assigned to entity '" 
+			throw new TrustBrokerCommException("Could not retrieve trust assigned to entity '" 
 					+ trusteeId	+ "' by '" + trustorId 
 					+ "': Invalid trustorId IIdentity: " 
 					+ ife.getLocalizedMessage(), ife);
 		} catch (CommunicationException ce) {
 			
-			throw new TrustBrokerCommException("Could not retrieve trust value assigned to entity '" 
-					+ trusteeId	+ "' by '" + trustorId 
-					+ "': " + ce.getLocalizedMessage(), ce);
+			throw new TrustBrokerCommException("Could not retrieve trust assigned to entity '" 
+					+ trusteeId	+ "' by '" + trustorId + "': " 
+					+ ce.getLocalizedMessage(), ce);
 		}
 	}
 	
@@ -126,7 +126,7 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 	}
 	
 	public void setTrustBrokerCommClientCallback(
-			TrustBrokerCommClientCallback trustBrokerCommClientCallback) {
+			InternalTrustBrokerCommClientCallback trustBrokerCommClientCallback) {
 		
 		this.trustBrokerCommClientCallback = trustBrokerCommClientCallback;
 	}
