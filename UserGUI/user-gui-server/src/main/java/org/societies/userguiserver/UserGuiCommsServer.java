@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -55,9 +56,9 @@ import org.societies.userguiserver.handler.CssManagerHandler;
 public class UserGuiCommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/internal/schema/userguiserver"));
+			  Arrays.asList("http://societies.org/api/internal/schema/usergui"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.internal.schema.userguiserver"));
+			  Arrays.asList("org.societies.api.internal.schema.usergui"));
 	
 	
 	private ICommManager commManager;
@@ -131,15 +132,22 @@ public class UserGuiCommsServer implements IFeatureServer {
 
 	//METHODS
 	public UserGuiCommsServer() {
+		
+		LOG.info("UserGuiCommsServer: Constructor");
+		
 	}
 	
 	public void InitService() {
 		//Registry Our User Gui Server with the Comms Manager
+		LOG.info("InitService: start");
 		try {
 			getCommManager().register(this); 
 		} catch (CommunicationException e) {
 			e.printStackTrace();
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
+		LOG.info("InitService: End");
 	}
 	
 
@@ -158,7 +166,7 @@ public class UserGuiCommsServer implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		
+		LOG.info("receiveMessage: Received a message Start");
 		UserGuiBean messageBean = (UserGuiBean) payload;
 	
 			
@@ -179,16 +187,57 @@ public class UserGuiCommsServer implements IFeatureServer {
 				e.printStackTrace();
 		};
 		
+		LOG.info("receiveMessage: Received a message end");
+		
 	}
 
 
 	/* Put your functionality here if there IS a return object */
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
+		LOG.info("Got query message start");
 
 		UserGuiBean messageBean = (UserGuiBean) payload;
-		UserGuiBeanResult resultBean ; 
+		UserGuiBeanResult resultBean = null ; 
 		
+		try
+		{
+			switch (messageBean.getTargetcomponent()) {
+				case USERGUI :
+					resultBean = this.handleUserGuiGetQuery(stanza,messageBean);
+					break;
+				case CISMANAGER :
+					LOG.info("Got query message for cismanager");
+					resultBean = this.handleCisManagerGetQuery(stanza,messageBean);
+					break;
+				case CSSMAMANGER :
+					resultBean = this.handleCssManagerGetQuery(stanza,messageBean);
+					break;
+			};
+		} catch (Exception e) {
+				e.printStackTrace();
+		};
+		
+		LOG.info("finished dealing with query");
+		return resultBean;
+	}
+
+	private UserGuiBeanResult handleCssManagerGetQuery(Stanza stanza,
+			UserGuiBean messageBean) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private UserGuiBeanResult handleCisManagerGetQuery(Stanza stanza,
+			UserGuiBean messageBean) {
+	//	if (stanza.getFrom().getBareJid().contains(this.getCurrentRegisteredCommId()))
+			return this.getCisManagerHandler().handleGetQuery(stanza, messageBean);
+	//	return null;
+	}
+
+	private UserGuiBeanResult handleUserGuiGetQuery(Stanza stanza,
+			UserGuiBean messageBean) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -197,6 +246,7 @@ public class UserGuiCommsServer implements IFeatureServer {
 	 */
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		LOG.info("setQuery Called : Not implemented");
 		// TODO Auto-generated method stub
 		return null;
 	}

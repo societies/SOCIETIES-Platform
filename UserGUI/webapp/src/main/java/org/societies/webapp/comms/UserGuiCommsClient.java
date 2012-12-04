@@ -41,7 +41,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.schema.usergui.ComponentParameters;
 import org.societies.api.internal.schema.usergui.ComponentType;
+import org.societies.api.internal.schema.usergui.Method;
 import org.societies.api.internal.schema.usergui.UserGuiBean;
+import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
 
 
 
@@ -54,13 +56,14 @@ import org.societies.api.internal.schema.usergui.UserGuiBean;
 public class UserGuiCommsClient implements ICommCallback {
 	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/internal/schema/userguiserver"));
+			  Arrays.asList("http://societies.org/api/internal/schema/usergui"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.internal.schema.userguiserver"));
+			  Arrays.asList("org.societies.api.internal.schema.usergui"));
 
 
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(UserGuiCommsClient.class);
+	private UserGuiBeanResult beanResult;
 	
 
 	// PROPERTIES
@@ -74,6 +77,7 @@ public class UserGuiCommsClient implements ICommCallback {
 
 
 	public UserGuiCommsClient(ICommManager commManager) {
+		LOG.info("UserGuiCommsClient Comstructor");
 		setCommManager(commManager);
 		
 		try {
@@ -81,6 +85,7 @@ public class UserGuiCommsClient implements ICommCallback {
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		LOG.info("UserGuiCommsClient Constructor end");
 	}
 
 	/*
@@ -168,8 +173,13 @@ public class UserGuiCommsClient implements ICommCallback {
 	 * .societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) {
+	public void receiveResult(Stanza arg0, Object msgBean) {
 		// TODO Auto-generated method stub
+		beanResult = (UserGuiBeanResult) msgBean;
+		synchronized (this) {
+            notifyAll( );
+        }
+		
 
 	}
 
@@ -190,15 +200,12 @@ public class UserGuiCommsClient implements ICommCallback {
 		UserGuiBean msgBean = new UserGuiBean();
 		msgBean.setTargetcomponent(ComponentType.USERGUI);
 		ComponentParameters comParams = new ComponentParameters();
-		comParams.setComponentmethod("inform");
+		comParams.setComponentmethod(Method.INFORM);
 		List<String> params = new ArrayList<String>();
 		params.add(commsMgrId);
 		comParams.setStringList(params);
 		msgBean.setTargetcomponentparameter(comParams);
 		
-		
-		//		cssDir.setCssA(cssAdvert);
-		//		cssDir.setMethod(MethodType.ADD_CSS_ADVERTISEMENT_RECORD);
 		try {
 			commManager.sendMessage(stanza, msgBean);
 		} catch (CommunicationException e) {
@@ -206,6 +213,88 @@ public class UserGuiCommsClient implements ICommCallback {
 		};
 	}
 		
+	
+	
+	public void getMyCisList(String userid, UserGuiCommsResult callback)
+	{
+		LOG.info("UserGuiCommsClient getMyCisList called for" + userid);
+		
+		// We want to sent all messages for CssDirectory to the domain authority Node
+		IIdentity toIdentity = null;
+		
+		try {
+			toIdentity = getCommManager().getIdManager().fromJid(userid);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		catch( Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		Stanza stanza = new Stanza(toIdentity);
+		UserGuiCommsClientCallback userCallback = new UserGuiCommsClientCallback(stanza.getId(), callback);
 
+		// CREATE MESSAGE BEAN
+		UserGuiBean msgBean = new UserGuiBean();
+		msgBean.setTargetcomponent(ComponentType.CISMANAGER);
+		ComponentParameters comParams = new ComponentParameters();
+		comParams.setComponentmethod(Method.GET_MY_CIS_LIST);
+		msgBean.setTargetcomponentparameter(comParams);
+		
+		LOG.info("UserGuiCommsClient About to send message ");
+		try {
+			commManager.sendIQGet(stanza, msgBean, userCallback);
+		} catch (CommunicationException e) {
+			LOG.error(e.getMessage());
+			e.printStackTrace();
+		} catch (Exception e1) {
+			LOG.error(e1.getMessage());
+			e1.printStackTrace();
+		};
+	}
+		
+	public void getSuggestedCisList(String userid, UserGuiCommsResult callback)
+	{
+		LOG.info("UserGuiCommsClient getSuggestedCisList called for" + userid);
+			
+			// We want to sent all messages for CssDirectory to the domain authority Node
+		IIdentity toIdentity = null;
+			
+		try {
+				toIdentity = getCommManager().getIdManager().fromJid(userid);
+			} catch (InvalidFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch( Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			Stanza stanza = new Stanza(toIdentity);
+			UserGuiCommsClientCallback userCallback = new UserGuiCommsClientCallback(stanza.getId(), callback);
+
+			// CREATE MESSAGE BEAN
+			UserGuiBean msgBean = new UserGuiBean();
+			msgBean.setTargetcomponent(ComponentType.CISMANAGER);
+			ComponentParameters comParams = new ComponentParameters();
+			comParams.setComponentmethod(Method.GET_SUGGESTED_CIS_LIST);
+			msgBean.setTargetcomponentparameter(comParams);
+			
+			LOG.info("UserGuiCommsClient About to send message ");
+			try {
+				commManager.sendIQGet(stanza, msgBean, userCallback);
+			} catch (CommunicationException e) {
+				LOG.error(e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e1) {
+				LOG.error(e1.getMessage());
+				e1.printStackTrace();
+			};
+
+			
+	}
 
 }

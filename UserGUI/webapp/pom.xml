@@ -139,6 +139,47 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>3.0.5.RELEASE</version>
+		</dependency>
+
+		<!-- Spring MVC for Portlet Environments (depends on spring-core, spring-beans, 
+			spring-context, spring-web) Define this if you use Spring MVC with a Portlet 
+			Container (org.springframework.web.portlet.*) -->
+
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc-portlet</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		
 
 
 	</dependencies>
@@ -235,6 +276,7 @@
 							net.sf.cglib.core;resolution:=optional,
 							org.springframework.aop.config;resolution:=optional,
 							net.sf.cglib.reflect;resolution:=optional,
+							org.springframework.web.servlet.view.json;resolution:=optional,
 							<!-- Form validation -->
 
 							javax.validation,*;resolution:=optional
@@ -296,6 +338,21 @@
 	<type>jar</type>
 </artifactItem>
 
+
+<artifactItem>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.7.1</version>
+			<type>jar</type>
+		</artifactItem>
+		
+		<artifactItem>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.7.1</version>
+			<type>jar</type>
+		</artifactItem>
+		
 
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

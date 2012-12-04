@@ -51,9 +51,9 @@ import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
 public class UserGuiCommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/internal/schema/userguiserver"));
+			  Arrays.asList("http://societies.org/api/internal/schema/usergui"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.internal.schema.userguiserver"));
+			  Arrays.asList("org.societies.api.internal.schema.usergui"));
 	
 	
 	private static Logger logger = LoggerFactory.getLogger(UserGuiCommsClientCallback.class);

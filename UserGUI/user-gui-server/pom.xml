@@ -51,7 +51,13 @@
 			<scope>provided</scope>
 		</dependency>
 
-
+		<!-- TODO : Export needs to move out of this bundle! -->
+		<dependency>
+			<groupId>org.societies.cis</groupId>
+			<artifactId>CisDirectoryClient</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 
 

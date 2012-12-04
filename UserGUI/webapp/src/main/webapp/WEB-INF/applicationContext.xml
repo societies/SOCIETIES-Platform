@@ -45,6 +45,7 @@
 	<osgi:reference id="commMngrController" interface="org.societies.api.internal.comm.ICommManagerController"/>
 	<osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
 	<osgi:reference id="daregistry" interface="org.societies.domainauthority.registry.DaRegistry"/>
+	<osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory" />
 
 
 </beans>

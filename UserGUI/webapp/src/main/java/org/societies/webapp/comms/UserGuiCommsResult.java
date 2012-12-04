@@ -33,6 +33,7 @@ import org.societies.api.internal.schema.usergui.UserGuiBeanResult;
  * @author mmanniox
  *
  */
+// remote client !
 public class UserGuiCommsResult {
 
 	UserGuiBeanResult resultBean;

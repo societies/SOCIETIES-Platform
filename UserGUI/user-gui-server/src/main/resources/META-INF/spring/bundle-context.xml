@@ -17,6 +17,8 @@
 	</bean>
 
 	<bean id="cisManagerHandlerBean" class="org.societies.userguiserver.handler.CisManagerHandler" >
+		<property name="cisManager" ref="CisManagementBundle" />
+		<property name="cisDirectoryRemote" ref="cisDirectoryRemote" />
 	</bean>
 	
 

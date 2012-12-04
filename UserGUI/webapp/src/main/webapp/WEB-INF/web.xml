@@ -33,8 +33,8 @@
 		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
 
-	<!-- This setting means that sessions will timeout after 1 minute of activity. We will increase this -->
+	<!-- This setting means that sessions will timeout after 10 minutes of activity. -->
 	<session-config>
-		<session-timeout>1</session-timeout>
+		<session-timeout>10</session-timeout>
 	</session-config>
 </web-app>

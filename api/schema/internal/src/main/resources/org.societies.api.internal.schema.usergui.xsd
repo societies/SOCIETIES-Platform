@@ -68,7 +68,11 @@
 
 	<xs:simpleType name="method">
 		<xs:restriction base="xs:string">
+			<!-- User Gui Methods -->
 			<xs:enumeration value="inform" />
+			<!-- Cis Methods -->
+			<xs:enumeration value="getMyCisList"/>
+			<xs:enumeration value="getSuggestedCisList"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
