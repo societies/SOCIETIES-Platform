@@ -70,7 +70,7 @@ public class InternalTrustEvidenceCollectorCommClient implements
 	
 	private PrivacyTrustCommClientCallback privacyTrustCommClientCallback;
 	
-	private InternalTrustEvidenceCollectorCommClientCallback trustEvidenceCollectorCommClientCallback;
+	private InternalTrustEvidenceCollectorCommClientCallback internalTrustEvidenceCollectorCommClientCallback;
 	
 	InternalTrustEvidenceCollectorCommClient() {
 		
@@ -107,7 +107,7 @@ public class InternalTrustEvidenceCollectorCommClient implements
 					this.commManager.getIdManager().getCloudNode(); 
 			final Stanza stanza = new Stanza(toIdentity);
 			
-			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
+			this.internalTrustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final AddDirectEvidenceRequestBean addEvidenceBean = new AddDirectEvidenceRequestBean();
 			// 1. subjectId
@@ -190,7 +190,7 @@ public class InternalTrustEvidenceCollectorCommClient implements
 					this.commManager.getIdManager().getCloudNode(); 
 			final Stanza stanza = new Stanza(toIdentity);
 			
-			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
+			this.internalTrustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final AddIndirectEvidenceRequestBean addEvidenceBean = new AddIndirectEvidenceRequestBean();
 			// 1. subjectId
@@ -253,10 +253,10 @@ public class InternalTrustEvidenceCollectorCommClient implements
 		this.privacyTrustCommClientCallback = privacyTrustCommClientCallback;
 	}
 	
-	public void setTrustEvidenceCollectorCommClientCallback(
-			InternalTrustEvidenceCollectorCommClientCallback trustEvidenceCollectorCommClientCallback) {
+	public void setInternalTrustEvidenceCollectorCommClientCallback(
+			InternalTrustEvidenceCollectorCommClientCallback internalTrustEvidenceCollectorCommClientCallback) {
 		
-		this.trustEvidenceCollectorCommClientCallback = trustEvidenceCollectorCommClientCallback;
+		this.internalTrustEvidenceCollectorCommClientCallback = internalTrustEvidenceCollectorCommClientCallback;
 	}
 	
 	/**

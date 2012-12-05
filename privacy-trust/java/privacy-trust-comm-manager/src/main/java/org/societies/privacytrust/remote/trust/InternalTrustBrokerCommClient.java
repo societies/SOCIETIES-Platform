@@ -55,7 +55,7 @@ public class InternalTrustBrokerCommClient implements ITrustBrokerRemote {
 	
 	private PrivacyTrustCommClientCallback privacyTrustCommClientCallback;
 	
-	private InternalTrustBrokerCommClientCallback trustBrokerCommClientCallback;
+	private InternalTrustBrokerCommClientCallback internalTrustBrokerCommClientCallback;
 
 	InternalTrustBrokerCommClient() {
 		
@@ -86,7 +86,7 @@ public class InternalTrustBrokerCommClient implements ITrustBrokerRemote {
 					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
 			final Stanza stanza = new Stanza(toIdentity);
 			
-			this.trustBrokerCommClientCallback.addClient(stanza.getId(), callback);
+			this.internalTrustBrokerCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
 			retrieveBean.setTrustorId(
@@ -125,9 +125,9 @@ public class InternalTrustBrokerCommClient implements ITrustBrokerRemote {
 		this.privacyTrustCommClientCallback = privacyTrustCommClientCallback;
 	}
 	
-	public void setTrustBrokerCommClientCallback(
-			InternalTrustBrokerCommClientCallback trustBrokerCommClientCallback) {
+	public void setInternalTrustBrokerCommClientCallback(
+			InternalTrustBrokerCommClientCallback internalTrustBrokerCommClientCallback) {
 		
-		this.trustBrokerCommClientCallback = trustBrokerCommClientCallback;
+		this.internalTrustBrokerCommClientCallback = internalTrustBrokerCommClientCallback;
 	}
 }

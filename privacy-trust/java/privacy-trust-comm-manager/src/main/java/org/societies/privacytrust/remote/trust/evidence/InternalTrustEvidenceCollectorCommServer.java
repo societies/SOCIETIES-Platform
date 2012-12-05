@@ -78,7 +78,7 @@ public class InternalTrustEvidenceCollectorCommServer implements IFeatureServer 
 	private ICommManager commManager;
 	
 	/** The Trust Evidence Collector service reference. */
-	private ITrustEvidenceCollector trustEvidenceCollector;
+	private ITrustEvidenceCollector internalTrustEvidenceCollector;
 	
 	InternalTrustEvidenceCollectorCommServer() {
 		
@@ -148,7 +148,7 @@ public class InternalTrustEvidenceCollectorCommServer implements IFeatureServer 
 							+ ",objectId=" + objectId + ",type=" + type 
 							+ ",timestamp=" + timestamp	+ ",info=" + info + ")");
 				
-				this.trustEvidenceCollector.addDirectEvidence(subjectId,
+				this.internalTrustEvidenceCollector.addDirectEvidence(subjectId,
 						objectId, type, timestamp, info);
 				
 				responseBean.setMethodName(MethodName.ADD_DIRECT_EVIDENCE);
@@ -212,7 +212,7 @@ public class InternalTrustEvidenceCollectorCommServer implements IFeatureServer 
 							+ ",timestamp="	+ timestamp	+ ",info=" + info 
 							+ ",sourceId" + sourceId + ")");
 				
-				this.trustEvidenceCollector.addIndirectEvidence(subjectId, 
+				this.internalTrustEvidenceCollector.addIndirectEvidence(subjectId, 
 						objectId, type, timestamp, info, sourceId);
 				
 				responseBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
@@ -279,9 +279,9 @@ public class InternalTrustEvidenceCollectorCommServer implements IFeatureServer 
 		this.commManager = commManager;
 	}
 	
-	public void setTrustEvidenceCollector(ITrustEvidenceCollector trustEvidenceCollector) {
+	public void setInternalTrustEvidenceCollector(ITrustEvidenceCollector internalTrustEvidenceCollector) {
 		
-		this.trustEvidenceCollector = trustEvidenceCollector;
+		this.internalTrustEvidenceCollector = internalTrustEvidenceCollector;
 	}
 	
 	private String stanzaToString(Stanza stanza) {
