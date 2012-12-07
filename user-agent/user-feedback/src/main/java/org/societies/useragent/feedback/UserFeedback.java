@@ -65,7 +65,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 	//pubsub event schemas
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
-			Collections.unmodifiableList(Arrays.asList("org.societies.api.schema.useragent.feedback"));
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.schema.useragent.feedback.UserFeedbackBean",
+					"org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
+					"org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean"));
 
 	//GUI types for forms
 	private static final String RADIO = "radio";
@@ -100,10 +103,12 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//create pubsub node
 		try {
+			LOG.debug("Creating user feedback pubsub node");
 			pubsub.addSimpleClasses(EVENT_SCHEMA_CLASSES);
 			pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.REQUEST);
 			pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE);
 			pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE);
+			LOG.debug("Pubsub node created!");
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -114,9 +119,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//register for events from created pubsub node
 		try {
+			LOG.debug("Registering for user feedback pubsub node");
 			pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.REQUEST, this);
 			pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
 			pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
+			LOG.debug("Pubsub registration complete!");
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -152,7 +159,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//send pubsub event to all user agents
 		try {
-			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, requestID, ufBean);
+			LOG.debug("Sending user feedback request event via pubsub");
+			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -200,7 +208,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//send pubsub event to all user agents
 		try {
-			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, requestID, ufBean);
+			LOG.debug("Sending user feedback request event via pubsub");
+			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -244,7 +253,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//send pubsub event to all user agents
 		try {
-			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, requestID, ufBean);
+			LOG.debug("Sending user feedback request event via pubsub");
+			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -327,8 +337,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		requestMgr.removeRequest(responseID);
 		//set result value in hashmap
 		synchronized(expResults){
-			this.expResults.put(responseID, result);
-			this.expResults.notifyAll();
+			if(expResults.containsKey(responseID)){
+				LOG.debug("this is the node where the exp feedback request originated....adding result to expResults hashmap");
+				this.expResults.put(responseID, result);
+				this.expResults.notifyAll();
+			}else{
+				LOG.debug("This isn't the node where the exp feedback request originated...don't need to add result to expResults hashmap");
+			}
 		}
 	}
 
@@ -347,8 +362,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		requestMgr.removeRequest(responseID);
 		//set result value in hashmap
 		synchronized(impResults){
-			this.impResults.put(responseID, result);
-			this.impResults.notifyAll();
+			if(impResults.containsKey(responseID)){
+				LOG.debug("this is the node where the imp feedback request originated....adding result to impResults hashmap");
+				this.impResults.put(responseID, result);
+				this.impResults.notifyAll();
+			}else{
+				LOG.debug("This isn't the node where the imp feedback request originated...don't need to add result to impResults hashmap");
+			}
 		}
 	}
 
@@ -386,7 +406,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//fire response pubsub event to all user agents
 		try {
-			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestID, resultBean);
+			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, null, resultBean);
 		} catch (XMPPError e1) {
 			e1.printStackTrace();
 		} catch (CommunicationException e1) {
@@ -403,7 +423,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 		//fire response pubsub event to all user agents
 		try {
-			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestID, resultBean);
+			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, null, resultBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
