@@ -25,12 +25,12 @@
 package org.societies.security.policynegotiator.requester;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -96,8 +96,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				sop = result.getSla();
 				try {
 					String selectedSop = selectSopOption(sop);
-					IIdentity identity = requester.getGroupMgr().getIdMgr().getThisNetworkNode();
-					sop = requester.getSignatureMgr().signXml(sop, selectedSop, identity);
+					// TODO: use real identity when it can be gathered from other components
+					sop = requester.getSignatureMgr().signXml(sop, selectedSop, null);
 					ProviderCallback callback = new ProviderCallback(requester, provider,
 							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
 							finalCallback); 
@@ -121,7 +121,6 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				if (requester.getSignatureMgr().verifyXml(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
-					LOG.debug("receiveResult(): final SLA: {}", sla);
 					
 					// Store the SLA into secure storage
 					String agreementKey = generateKey();
