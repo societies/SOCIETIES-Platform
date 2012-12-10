@@ -46,12 +46,12 @@
 			<groupId>com.google.android</groupId>
 			<artifactId>android-test</artifactId>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.societies.android.api.external.container</groupId>
 			<artifactId>ContainerAndroidExternalAPI</artifactId>

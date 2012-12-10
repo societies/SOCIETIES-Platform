@@ -43,6 +43,7 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>

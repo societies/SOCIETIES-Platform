@@ -74,7 +74,7 @@ public class TestUserFeedback extends TestCase{
 		
 		userFeedback = new UserFeedback();
 		userFeedback.setCtxBroker(mockCtxBroker);
-		userFeedback.myDeviceID = mockDeviceID;
+		//userFeedback.myCloudID = mockDeviceID;
 		
 		mockPersonId = new CtxEntityIdentifier(mockIdentity, "PERSON", new Long(12345));
 		mockEntityId = new CtxEntityIdentifier(mockIdentity, "testEntity", new Long(12345));

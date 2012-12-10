@@ -11,7 +11,7 @@
   
   <target name="copy">
 	<antcall target="clean-included-code"></antcall>  
-	<antcall target="update-included-code"></antcall>  
+	<!--antcall target="update-included-code"></antcall-->  
   </target>
 
   <target name="clean-included-code">

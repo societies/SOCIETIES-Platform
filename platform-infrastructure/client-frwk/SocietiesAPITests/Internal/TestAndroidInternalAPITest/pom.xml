@@ -46,18 +46,18 @@
 		            <artifactId>android-test</artifactId>
 			</dependency>
 			
-			<dependency>
+			<!--dependency>
 				<groupId>org.societies.android.api.internal</groupId>
 				<artifactId>societies-android-api-internal</artifactId>
 				<version>${release.version}</version>
 				<scope>provided</scope>
-			</dependency>
-			<dependency>
+			</dependency-->
+			<!--dependency>
 				<groupId>org.societies.api.schema</groupId>
 				<artifactId>societies-api-schema</artifactId>
 				<version>${release.version}</version>
 				<scope>provided</scope>
-			</dependency>
+			</dependency-->
 			<dependency>
 			   <groupId>org.societies.android.api.internal.container</groupId>
 			   <artifactId>ContainerAndroidInternalAPI</artifactId>
@@ -82,13 +82,13 @@
 		            <artifactId>emma</artifactId>
 		            <scope>compile</scope>
 		    </dependency>
-		    <dependency>
+		    <!--dependency>
 	   			<groupId>org.societies.android.platform.androidutils</groupId>
 			    <artifactId>SocietiesAndroidUtilities</artifactId>
 	   			<version>${release.version}</version>
 	   			<type>apklib</type>
 	   			<scope>provided</scope>
-			</dependency>
+			</dependency-->
 			
     </dependencies>
 

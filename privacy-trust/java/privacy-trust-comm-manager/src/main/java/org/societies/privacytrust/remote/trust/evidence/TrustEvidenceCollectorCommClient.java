@@ -40,16 +40,16 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote;
-import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.MethodName;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote;
+import org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
@@ -57,7 +57,7 @@ import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
 public class TrustEvidenceCollectorCommClient implements
 		ITrustEvidenceCollectorRemote {
@@ -78,7 +78,7 @@ public class TrustEvidenceCollectorCommClient implements
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
+	 * @see org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
 	 */
 	@Override
 	public void addDirectEvidence(final TrustedEntityId subjectId, 
@@ -158,7 +158,7 @@ public class TrustEvidenceCollectorCommClient implements
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
+	 * @see org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback)
 	 */
 	@Override
 	public void addIndirectEvidence(final TrustedEntityId subjectId, 

@@ -27,6 +27,7 @@
 		init-method="initialiseUserFeedback">
 		<property name="ctxBroker" ref="ctxBroker"/>
 		<property name="commsMgr" ref="commsMgr"/>
+		<property name="pubsub" ref="pubsub"/>
 		<property name="uaRemote" ref="uaRemote"/>
 	</bean>
 	
