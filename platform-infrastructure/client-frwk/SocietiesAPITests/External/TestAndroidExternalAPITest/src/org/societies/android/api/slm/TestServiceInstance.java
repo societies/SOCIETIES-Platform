@@ -26,13 +26,13 @@ package org.societies.android.api.slm;
 
 import java.net.URI;
 
-import org.societies.android.api.utilities.SocietiesSerialiser;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
-
 
 /**
  * Describe your class here...
@@ -40,7 +40,7 @@ import android.test.suitebuilder.annotation.MediumTest;
  * @author aleckey
  *
  */
-public class TestSRI extends AndroidTestCase {
+public class TestServiceInstance  extends AndroidTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -54,38 +54,41 @@ public class TestSRI extends AndroidTestCase {
 	
 	@MediumTest
 	public void testParcelable() throws Exception {
-		ServiceResourceIdentifier SRI = new ServiceResourceIdentifier();
-		SRI.setIdentifier(new URI("http://alec.societies.org"));
-		SRI.setServiceInstanceIdentifier("alecBundle123");
+		ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
+		sri.setIdentifier(new URI("http://alec.societies.org"));
+		sri.setServiceInstanceIdentifier("alecBundle123");
 		
-		assertEquals(0, SRI.describeContents());
+		ServiceImplementation serviceImp = new ServiceImplementation();
+		serviceImp.setServiceClient("TestClient");
+		serviceImp.setServiceNameSpace("http://soceities.org/test/namespace");
+		serviceImp.setServiceProvider("TestProvider");
+		serviceImp.setServiceVersion("V0.1.1b");
+		
+		ServiceInstance serInstance = new ServiceInstance();
+		serInstance.setCssJid("john.societies.local");
+		serInstance.setFullJid("john@societies.local/android");
+		serInstance.setParentJid("parent.societies.local");
+		serInstance.setXMPPNode("john.societies.local");
+		serInstance.setParentIdentifier(sri);
+		serInstance.setServiceImpl(serviceImp);
+		
+		assertEquals(0, serviceImp.describeContents());
 		
         Parcel parcel = Parcel.obtain();
-        SRI.writeToParcel(parcel, 0);
+        serInstance.writeToParcel(parcel, 0);
         
         //done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
         
-        ServiceResourceIdentifier createFromParcel = (ServiceResourceIdentifier) ServiceResourceIdentifier.CREATOR.createFromParcel(parcel);
+        ServiceInstance createFromParcel = ServiceInstance.CREATOR.createFromParcel(parcel);
        
-        assertEquals("ServiceInstanceIdentifiers should be equals", SRI.getServiceInstanceIdentifier(), createFromParcel.getServiceInstanceIdentifier());
-        assertEquals("Identifiers should be equals", SRI.getIdentifier(), createFromParcel.getIdentifier());
-        assertEquals("Identifier strings should be equals", SRI.getIdentifier().toASCIIString(), createFromParcel.getIdentifier().toASCIIString());
+        assertEquals(serInstance.getCssJid(), createFromParcel.getCssJid());
+        assertEquals(serInstance.getFullJid(), createFromParcel.getFullJid());
+        assertEquals(serInstance.getParentJid(), createFromParcel.getParentJid());
+        assertEquals(serInstance.getXMPPNode(), createFromParcel.getXMPPNode());
+        assertEquals(serInstance.getParentIdentifier(), createFromParcel.getParentIdentifier());
+        assertEquals(serInstance.getServiceImpl(), createFromParcel.getServiceImpl());
 	}
-	
-	@MediumTest
-	public void testSimple() throws Exception {
-		ServiceResourceIdentifier SRI = new ServiceResourceIdentifier();
-		SRI.setIdentifier(new URI("http://alec.societies.org"));
-		SRI.setServiceInstanceIdentifier("alecBundle123");
-		
-		SocietiesSerialiser serialiser = new SocietiesSerialiser();
-		String aSRIString = serialiser.Write(SRI);
-		ServiceResourceIdentifier aSRIRetrieved  = (ServiceResourceIdentifier) serialiser.Read(ServiceResourceIdentifier.class, aSRIString);
-		String aSRIRetrievedString = serialiser.Write(aSRIRetrieved);
-		assertEquals("ServiceInstanceIdentifiers should be equals", SRI.getServiceInstanceIdentifier(), aSRIRetrieved.getServiceInstanceIdentifier());
-		assertEquals("Identifiers Should be equals", SRI.getIdentifier(), aSRIRetrieved.getIdentifier());
-		assertEquals("Should be equals", aSRIString, aSRIRetrievedString);
-	}
+
 }
