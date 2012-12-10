@@ -16,8 +16,8 @@
 
     <dependencies>
 		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>

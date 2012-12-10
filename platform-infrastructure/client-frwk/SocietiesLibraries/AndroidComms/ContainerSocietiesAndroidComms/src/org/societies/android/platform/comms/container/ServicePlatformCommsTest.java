@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform.comms.container;
 
-import org.societies.android.api.internal.comms.XMPPAgent;
+import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.platform.comms.AndroidCommsBase;
 
 import android.app.Service;
