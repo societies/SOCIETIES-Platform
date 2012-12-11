@@ -52,6 +52,10 @@
 	<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>
 	
+	<!-- pubsub is needed by the user feedback -->
+	<osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient">
+	</osgi:reference>
+	
 	<!-- IServiceDiscovery is needed by dm (at least) -->
 	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
 	</osgi:reference>

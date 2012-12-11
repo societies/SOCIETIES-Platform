@@ -7,29 +7,13 @@
 	<artifactId>societies-android-api</artifactId>
 	<name>SOCIETIES API Android External</name>
 	<version>${release.version}</version>
-	<packaging>jar</packaging>
+	<packaging>apklib</packaging>
 
 	<description>
-    	This jar file provides the external interfaces and related classes of the 
-    	SOCIETIES Android platform    
-    </description>
+    		This APKLIB file provides the external interfaces and related classes of the 
+    		SOCIETIES Android platform    
+    	</description>
 
-	<developers>
-		<developer>
-			<name>Babak Farshchian </name>
-			<organization>SINTEF</organization>
-			<organizationUrl>http://www.sintef.com/</organizationUrl>
-		</developer>
-		<developer>
-			<name>Olivier Maridat</name>
-			<email>olivier.maridat@trialog.com</email>
-			<organization>Trialog</organization>
-			<timezone>+1</timezone>
-			<roles>
-				<role>Developer</role>
-			</roles>
-		</developer>
-	</developers>
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -38,30 +22,35 @@
 	</parent>
 
 	<dependencies>
-       	<dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
-            <scope>provided</scope>
+       		<dependency>
+            		<groupId>com.google.android</groupId>
+            		<artifactId>android</artifactId>
+            		<scope>provided</scope>
 		</dependency>
-		<dependency>
-      			<groupId>junit</groupId>
-      			<artifactId>junit</artifactId>
-      			<version>4.8.2</version>
-      			<scope>test</scope>
-    	</dependency>
-    	<dependency>
+    		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
     	
-    	<dependency>
+    		<dependency>
   			<groupId>org.societies.utilities</groupId>
   			<artifactId>DBC</artifactId>
   			<version>${release.version}</version>
-            <scope>compile</scope>
-        </dependency>
+            		<scope>compile</scope>
+        	</dependency>
     	
 	</dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

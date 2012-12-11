@@ -32,6 +32,7 @@ import java.security.cert.X509Certificate;
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+//import org.w3c.dom.Document;
 
 /**
  * Methods to digitally sign given data and methods to verify given signatures.
@@ -48,10 +49,25 @@ public interface ISignatureMgr {
 	 * @param xml The XML String to be signed.
 	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
 	 * @param identity The identity to be used for signature.
+	 * @throws DigsigException on any error when parsing XML document, finding the
+	 * reference to sign, error with private key, etc.
 	 * 
 	 * @return XML with embedded signature.
 	 */
-	public String signXml(String xml, String xmlNodeId, IIdentity identity);
+	public String signXml(String xml, String xmlNodeId, IIdentity identity) throws DigsigException;
+
+	/**
+	 * Digitally sign given XML data and embed the signature in the given XML.
+	 * 
+	 * @param xml The XML Document to be signed.
+	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
+	 * @param identity The identity to be used for signature.
+	 * @throws DigsigException on any error when parsing XML document, finding the
+	 * reference to sign, error with private key, etc.
+	 * 
+	 * @return XML with embedded signature.
+	 */
+	//public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException;
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the

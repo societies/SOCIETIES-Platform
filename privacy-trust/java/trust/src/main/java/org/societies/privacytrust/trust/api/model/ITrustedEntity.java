@@ -42,11 +42,20 @@ import org.societies.privacytrust.trust.impl.repo.model.Trust;
 public interface ITrustedEntity extends Serializable {
 
 	/**
-	 * Returns the identifier of this trusted entity.
+	 * Returns the identifier of the trustor.
 	 * 
-	 * @return the identifier of this trusted entity.
+	 * @return the identifier of this trustor.
+	 * @since 0.5
 	 */
-	public TrustedEntityId getTeid();
+	public TrustedEntityId getTrustorId();
+	
+	/**
+	 * Returns the identifier of the trustee.
+	 * 
+	 * @return the identifier of this trustor.
+	 * @since 0.5
+	 */
+	public TrustedEntityId getTrusteeId();
 
 	/**
 	 * Returns the direct trust in this entity.

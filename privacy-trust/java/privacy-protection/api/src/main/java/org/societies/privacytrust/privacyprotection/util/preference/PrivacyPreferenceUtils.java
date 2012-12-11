@@ -53,10 +53,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.util.model.priv
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ConditionUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResourceUtils;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.*;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.identity.RequestorBean;
 

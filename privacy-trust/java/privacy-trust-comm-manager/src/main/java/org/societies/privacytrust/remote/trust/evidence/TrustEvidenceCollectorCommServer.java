@@ -42,21 +42,21 @@ import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.MethodName;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.5
  */
 public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	
@@ -65,13 +65,13 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
-					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
+					"org.societies.api.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.evidence.collector"));
 
 	/** The Communications Mgr service reference. */
 	@SuppressWarnings("unused")
@@ -121,36 +121,35 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 						+ "AddDirectEvidenceRequestBean can't be null");
 			
 			try {
-				// 1. teid
-				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(addEvidenceRequestBean.getTeid());
-				// 2. type
+				// 1. subjectId
+				final TrustedEntityId subjectId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getSubjectId());
+				// 2. objectId
+				final TrustedEntityId objectId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getObjectId());
+				// 3. type
 				final TrustEvidenceType type = TrustEvidenceType.valueOf(
 						addEvidenceRequestBean.getType().toString());
-				// 3. timestamp
+				// 4. timestamp
 				// TODO Uncomment once #1310 is resolved
 				//final Date timestamp = addEvidenceRequestBean.
 				//		getTimestamp().toGregorianCalendar().getTime();
 				final Date timestamp = new Date();
-				// 4. info
+				// 5. info
 				final Serializable info;
-				if (TrustEvidenceType.RATED.equals(type)) {
-					if (addEvidenceRequestBean.getInfo() == null)
-						throw new XMPPError(StanzaError.bad_request, 
-								"Invalid TrustEvidenceCollector remote addDirectEvidence request: "
-								+ "info is null");
+				if (addEvidenceRequestBean.getInfo() != null)
 					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
-				} else {
+				else
 					info = null;
-				}
 				
 				// TODO Change to debug once tested
 				if (LOG.isInfoEnabled())
-					LOG.info("addDirectTrustEvidence(teid=" + teid
-							+ ",type=" + type + ",timestamp=" + timestamp
-							+ ",info=" + info + ")");
+					LOG.info("addDirectTrustEvidence(subjectId=" + subjectId
+							+ ",objectId=" + objectId + ",type=" + type 
+							+ ",timestamp=" + timestamp	+ ",info=" + info + ")");
 				
-				this.trustEvidenceCollector.addDirectEvidence(teid, type, timestamp, info);
+				this.trustEvidenceCollector.addDirectEvidence(subjectId,
+						objectId, type, timestamp, info);
 				
 				responseBean.setMethodName(MethodName.ADD_DIRECT_EVIDENCE);
 				
@@ -185,12 +184,12 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 						+ "AddIndirectEvidenceRequestBean can't be null");
 			
 			try {
-				// 1. source
-				final TrustedEntityId source = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(addEvidenceRequestBean.getSource()); 
-				// 2. teid
-				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(addEvidenceRequestBean.getTeid());
+				// 1. subjectId
+				final TrustedEntityId subjectId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getSubjectId()); 
+				// 2. objectId
+				final TrustedEntityId objectId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getObjectId());
 				// 3. type
 				final TrustEvidenceType type = TrustEvidenceType.valueOf(
 						addEvidenceRequestBean.getType().toString());
@@ -199,22 +198,22 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 						getTimestamp().toGregorianCalendar().getTime();
 				// 5. info
 				final Serializable info;
-				if (TrustEvidenceType.RATED.equals(type)) {
-					if (addEvidenceRequestBean.getInfo() == null)
-						throw new XMPPError(StanzaError.bad_request, 
-								"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
-								+ "info is null");
+				if (addEvidenceRequestBean.getInfo() != null)
 					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
-				} else {
+				else
 					info = null;
-				}
+				// 6. sourceId
+				final TrustedEntityId sourceId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getSourceId());
 				
 				if (LOG.isDebugEnabled())
-					LOG.debug("addIndirectTrustEvidence(source=" + source
-							+ ",teid=" + teid + ",type=" + type + ",timestamp=" 
-							+ timestamp	+ ",info=" + info + ")");
+					LOG.debug("addIndirectTrustEvidence(subjectId=" + subjectId
+							+ ",objectId=" + objectId + ",type=" + type 
+							+ ",timestamp="	+ timestamp	+ ",info=" + info 
+							+ ",sourceId" + sourceId + ")");
 				
-				this.trustEvidenceCollector.addIndirectEvidence(source, teid, type, timestamp, info);
+				this.trustEvidenceCollector.addIndirectEvidence(subjectId, 
+						objectId, type, timestamp, info, sourceId);
 				
 				responseBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
 				

@@ -25,6 +25,9 @@
 package org.societies.android.api.identity;
 
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.ServiceModelUtils;
 
 import android.os.Parcel;
@@ -38,10 +41,7 @@ import android.os.Parcelable;
  * @author Olivier, Eliza, Nicolas 
  *
  */
-public class ARequestorService extends ARequestor implements Parcelable{
-
-	private final AServiceResourceIdentifier requestorServiceId;
-	
+public class ARequestorService extends RequestorServiceBean implements Parcelable{
 	
 	/**
 	 * Create a 3P service requestor from the CSS and 3P service identities
@@ -49,29 +49,23 @@ public class ARequestorService extends ARequestor implements Parcelable{
 	 * @param requestorServiceId 3P service id
 	 */
 	public ARequestorService(String requestorId, AServiceResourceIdentifier requestorServiceId) {
-		super(requestorId);
+		super();
+		this.requestorId = requestorId;
 		this.requestorServiceId = requestorServiceId;
 	}
 
 	
-	/**
-	 * Id of the 3P service requestor
-	 * @return the 3P service id
-	 */
-	public AServiceResourceIdentifier getRequestorServiceId() {
-		return requestorServiceId;
+	private ARequestorService(Parcel in){
+		readFromParcel(in);
 	}
 	
-	private ARequestorService(Parcel in){
-		super(in.readString());
-		
+	private void readFromParcel(Parcel in) {
+		this.requestorId = in.readString();
 		this.requestorServiceId = AServiceResourceIdentifier.convertServiceResourceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierFromString(in.readString()));
-		
-		
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
-		super.writeToParcel(out, flags);
+		out.writeString(requestorId); 
 		out.writeString(ServiceModelUtils.serviceResourceIdentifierToString(requestorServiceId));
 	}
 	
@@ -100,14 +94,16 @@ public class ARequestorService extends ARequestor implements Parcelable{
 		return super.toString()+", [3P Service Id: "+requestorServiceId.getServiceInstanceIdentifier()+"]";
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.identity.Requestor#toXMLString()
-	 */
-	@Override
 	public String toXMLString() {
 		String cisIdType = new String("serviceID");
-		StringBuilder str = new StringBuilder(super.toXMLString());
+		String subjectIdType = new String("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+		StringBuilder str = new StringBuilder();
+		str.append("\n\t<Attribute AttributeId=\""+subjectIdType+"\"");
+		str.append("\n\t\t\tDataType=\""+IIdentity.class.getCanonicalName()+"\">");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(requestorId);
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
 		str.append("\n\t<Attribute AttributeId=\""+cisIdType+"\"");
 		str.append("\n\t\t\tDataType=\""+AServiceResourceIdentifier.class.getCanonicalName()+"\">");
 		str.append("\n\t\t<AttributeValue>");
@@ -160,7 +156,7 @@ public class ARequestorService extends ARequestor implements Parcelable{
 		return true;
 	}
 	
-	private boolean equalsServiceIdentifier(AServiceResourceIdentifier other){
+	private boolean equalsServiceIdentifier(ServiceResourceIdentifier other){
 		if (null==this.requestorServiceId.getIdentifier()) {
 			if (other.getIdentifier() != null) {
 				return false;
@@ -177,5 +173,12 @@ public class ARequestorService extends ARequestor implements Parcelable{
 			return false;
 		}
 		return true;
+	}
+
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

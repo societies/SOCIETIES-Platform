@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.util.XmlManipulator;
-import org.societies.security.storage.CertStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,12 +56,14 @@ public class SignatureCheck {
 
 	private XMLSignature customerSignature;
 	private X509Certificate customerCert;
+	private X509Certificate ourCert;
 
-	private CertStorage certStorage;
+	public SignatureCheck(Document doc, X509Certificate ourCert) {
 
-	public SignatureCheck(Document doc, CertStorage certStorage) {
+		LOG.debug("constructor()");
+		
 		this.doc = doc;
-		this.certStorage = certStorage;
+		this.ourCert = ourCert;
 
 		xml = new XmlManipulator();
 		xml.setDocument(doc);
@@ -87,9 +88,6 @@ public class SignatureCheck {
 
 		// Make sure signatures were extracted
 		extractSignatures();
-
-		X509Certificate ourCert;
-		ourCert = certStorage.getOurCert();
 
 		for (XMLSignature sig : signatures) {
 			if (hasReference(sig, sopElemRef)) {
@@ -192,7 +190,10 @@ public class SignatureCheck {
 		throw new DigsigException("BAD_REQUEST");
 	}
 
-	public XMLSignature getCustomerSignature() {
+	public XMLSignature getCustomerSignature() throws DigsigException {
+		if (customerSignature == null) {
+			getReferencedSOP();
+		}
 		return customerSignature;
 	}
 

@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
@@ -94,30 +93,36 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		LOG.info("Registering for direct trust evidence updates...");
 		super.trustEventMgr.registerListener(
 				new DirectTrustEvidenceUpdateListener(), 
-				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED }, null);
+				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED });
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
 	 */
 	@Override
-	public Set<ITrustedEntity> evaluate(final IDirectTrustEvidence evidence)
-			throws TrustEngineException {
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId, 
+			final IDirectTrustEvidence evidence) throws TrustEngineException {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Evaluating direct trust evidence " + evidence);
+			LOG.info("Evaluating direct trust evidence " + evidence
+					+ " on behalf of '" + trustorId + "'");
 		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
 		
 		final Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
+		
+		if (!this.areRelevant(trustorId, evidence))
+			return resultSet;
 
 		try {
-			// Create the trustee the evidence refers to if not already available
-			this.createEntityIfAbsent(evidence.getTeid());
+			// Create the trusted entity the evidence object refers to if not already available
+			this.createEntityIfAbsent(trustorId, evidence.getObjectId());
 			
 			final Class<? extends ITrustedEntity> entityClass;
-			switch (evidence.getTeid().getEntityType()) {
+			switch (evidence.getObjectId().getEntityType()) {
 			
 			case CSS:
 				entityClass = ITrustedCss.class;
@@ -134,14 +139,14 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			// TODO case LGC:
 				
 			default:
-				throw new TrustEngineException("Unsupported object type: " 
-						+ evidence.getTeid().getEntityType());
+				throw new TrustEngineException("Unsupported evidence object type: " 
+						+ evidence.getObjectId().getEntityType());
 			}
 			
 			// Retrieve all TrustedEntities trusted by the trustor
-			// referenced in the specified TrustEvidence
+			// having the same type as the object referenced in the specified TrustEvidence
 			final List<? extends ITrustedEntity> entityList = this.trustRepo.retrieveEntities(
-					evidence.getTeid().getTrustorId(), entityClass);
+					trustorId, entityClass);
 			if (LOG.isInfoEnabled()) // TODO DEBUG
 				LOG.info("entityList=" + entityList);
 			resultSet.addAll(entityList);
@@ -149,9 +154,9 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			final Map<TrustedEntityId,ITrustedEntity> entityMap = 
 					new HashMap<TrustedEntityId, ITrustedEntity>(entityList.size());
 			for (final ITrustedEntity entity : entityList)
-				entityMap.put(entity.getTeid(), entity);
+				entityMap.put(entity.getTrusteeId(), entity);
 			
-			final ITrustedEntity trustee = entityMap.get(evidence.getTeid());
+			final ITrustedEntity trustee = entityMap.get(evidence.getObjectId());
 			// TODO if trustee == null die
 			
 			switch (evidence.getType()) {
@@ -176,22 +181,22 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			// Update association
 			case JOINED_COMMUNITY:
 			case LEFT_COMMUNITY:
-				// Create TEID of the user that joined the community (trustee)
-				final TrustedEntityId userTeid = new TrustedEntityId(
-						evidence.getTeid().getTrustorId(), // TODO me
-						TrustedEntityType.CSS, 
-						evidence.getTeid().getTrustorId());
+				// Create TrustedCss representing the user that joined the community
 				final ITrustedCss user;
-				if (super.trustedEntityIdMgr.getMyIds().contains(userTeid))
-					user = this.createMyCssIfAbsent(userTeid);
+				if (super.trustNodeMgr.getMyIds().contains(evidence.getSubjectId()))
+					user = this.createMyCssIfAbsent(evidence.getSubjectId());
 				else
-					user = (ITrustedCss) this.createEntityIfAbsent(userTeid);
-
+					user = (ITrustedCss) this.createEntityIfAbsent(trustorId, evidence.getSubjectId());
 				final ITrustedCis community = (ITrustedCis) trustee; // TODO class cast exception?
 				if (TrustEvidenceType.JOINED_COMMUNITY.equals(evidence.getType()))
 					user.addCommunity(community);
 				else 
 					user.removeCommunity(community);
+				if (LOG.isInfoEnabled()) { // TODO DEBUG
+					LOG.info("user '" + user + "' " + evidence.getType() + " community '" + community + "'");
+					LOG.info("user is member of " + user.getCommunities().size() + " communities");
+					LOG.info("community has " + community.getMembers().size() + " members");
+				}
 				this.trustRepo.updateEntity(user); // TODO add to resultSet?
 				break;
 				
@@ -216,7 +221,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			if (!userSet.isEmpty()) {
 				this.evaluateUsers(userSet);
 				final List<ITrustedCis> communityList = this.trustRepo.retrieveEntities(
-						evidence.getTeid().getTrustorId(), ITrustedCis.class);
+						trustorId, ITrustedCis.class);
 				if (!communityList.isEmpty()) {
 					this.evaluateCommunities(new HashSet<ITrustedCis>(communityList));
 					resultSet.addAll(communityList);
@@ -240,15 +245,19 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(java.util.Set)
+	 * @see org.societies.privacytrust.trust.api.engine.IDirectTrustEngine#evaluate(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.util.Set)
 	 */
 	@Override
-	public Set<ITrustedEntity> evaluate(final Set<IDirectTrustEvidence> evidenceSet)
-			throws TrustEngineException {
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final Set<IDirectTrustEvidence> evidenceSet) 
+					throws TrustEngineException {
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluating direct trust evidence set " + evidenceSet);
+			LOG.info("Evaluating direct trust evidence set " + evidenceSet
+					+ " on behalf of '" + trustorId + "'");
 		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
 		if (evidenceSet == null)
 			throw new NullPointerException("evidenceSet can't be null");
 		
@@ -259,7 +268,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		if (LOG.isDebugEnabled())
 			LOG.debug("Sorted direct trust evidence set " + sortedEvidenceSet);
 		for (final IDirectTrustEvidence evidence : sortedEvidenceSet) {
-			final Set<ITrustedEntity> newResultSet = this.evaluate(evidence);  
+			final Set<ITrustedEntity> newResultSet = this.evaluate(trustorId, evidence);  
 			resultSet.removeAll(newResultSet);
 			resultSet.addAll(newResultSet);
 		}
@@ -270,7 +279,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	private void evaluateUsers(final Set<ITrustedCss> cssSet) throws TrustEngineException {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("cssSet=" + cssSet);
+			LOG.info("Evaluating cssSet=" + cssSet);
 		
 		final double[] rawTrustScores = new double[cssSet.size()];
 		final ITrustedCss[] cssArray = cssSet.toArray(new ITrustedCss[0]);
@@ -280,14 +289,14 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		final double[] stanineTrustScores = MathUtils.stanine(rawTrustScores);
 		for (int i = 0; i < cssArray.length; ++i) {
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CSS '" + cssArray[i].getTeid() + "' direct trust before normalisation: "
+				LOG.info("(" + cssArray[i].getTrustorId() + ", " + cssArray[i].getTrusteeId() + ") direct trust before normalisation: "
 						+ cssArray[i].getDirectTrust());
 			final Double rating = cssArray[i].getDirectTrust().getRating();
 			final Double stanineScore = stanineTrustScores[i]; 
 			cssArray[i].getDirectTrust().setValue(
 					estimateValue(rating, stanineScore));
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CSS '" + cssArray[i].getTeid() + "' direct trust after normalisation: "
+				LOG.info("(" + cssArray[i].getTrustorId() + ", " + cssArray[i].getTrusteeId() + ") direct trust after normalisation: "
 						+ cssArray[i].getDirectTrust());
 		}
 	}
@@ -295,26 +304,27 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	private void evaluateCommunities(final Set<ITrustedCis> cisSet) throws TrustEngineException {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("cisSet=" + cisSet);
+			LOG.info("Evaluating cisSet=" + cisSet);
 		
 		// 1. Re-evaluate trust ratings/scores
 		for (final ITrustedCis cis : cisSet) {
 			
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CIS '" + cis.getTeid() + "' direct trust before rating/score re-evaluation: " 
+				LOG.info("(" + cis.getTrustorId() + ", " + cis.getTrusteeId() 
+						+ ") direct trust before rating/score re-evaluation: " 
 						+ cis.getDirectTrust());
 	
 			// 1A. Reset CIS trust if empty  
 			if (cis.getMembers().size() == 0) {
 				cis.getDirectTrust().setScore(IDirectTrust.INIT_SCORE);
-				// TODO re-consider cis.getDirectTrust().setRating(null);
 				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("CIS '" + cis.getTeid() + "' direct trust after rating/score re-evaluation: " 
+					LOG.info("(" + cis.getTrustorId() + ", " + cis.getTrusteeId() 
+							+ ") direct trust after rating/score re-evaluation: " 
 							+ cis.getDirectTrust());
 				continue;
 			}
 			
-			// 1Bi. Choose weakest link for score
+			// 1B. Choose weakest link for score
 			final List<Double> memberScoreList = new ArrayList<Double>(cis.getMembers().size());
 			for (final ITrustedCss member : cis.getMembers())
 				if (member.getDirectTrust().getScore() != null)
@@ -323,21 +333,9 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			for (int i = 0; i < memberScoreArray.length; ++i)
 				memberScoreArray[i] = memberScoreList.get(i);
 			cis.getDirectTrust().setScore(MathUtils.min(memberScoreArray));
-			
-			// 2Bii. Choose weakest link for rating *unless* the user has already assigned one
-			if (cis.getDirectTrust().getRating() == null) {
-				final List<Double> memberRatingList = new ArrayList<Double>(cis.getMembers().size());
-				for (final ITrustedCss member : cis.getMembers())
-					if (member.getDirectTrust().getRating() != null)
-						memberRatingList.add(member.getDirectTrust().getRating());
-				final double[] memberRatingArray = new double[memberRatingList.size()];
-				for (int i = 0; i < memberRatingArray.length; ++i)
-					memberRatingArray[i] = memberRatingList.get(i);
-				cis.getDirectTrust().setRating(MathUtils.min(memberRatingArray));
-			}
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CIS '" + cis.getTeid() + "' direct trust after re-evaluation: " 
-						+ cis.getDirectTrust());
+				LOG.info("(" + cis.getTrustorId() + ", " + cis.getTrusteeId() 
+						+ ") direct trust after re-evaluation: " + cis.getDirectTrust());
 		}
 
 		// 2. Re-evaluate trust values
@@ -349,14 +347,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		final double[] stanineTrustScores = MathUtils.stanine(rawTrustScores);
 		for (int i = 0; i < cisArray.length; ++i) {
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CIS '" + cisArray[i].getTeid() + "' direct trust before normalisation: "
+				LOG.info("(" + cisArray[i].getTrustorId() + ", " 
+						+ cisArray[i].getTrusteeId() + ") direct trust before normalisation: "
 						+ cisArray[i].getDirectTrust());
 			final Double rating = cisArray[i].getDirectTrust().getRating();
 			final Double stanineScore = stanineTrustScores[i]; 
 			cisArray[i].getDirectTrust().setValue(
 					estimateValue(rating, stanineScore));
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("CIS '" + cisArray[i].getTeid() + "' direct trust after normalisation: "
+				LOG.info("(" + cisArray[i].getTrustorId() + ", " 
+						+ cisArray[i].getTrusteeId() + ") direct trust after normalisation: "
 						+ cisArray[i].getDirectTrust());
 		}
 	}
@@ -364,7 +364,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	private void evaluateServices(final Set<ITrustedService> svcSet) throws TrustEngineException {
 		
 		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("svcSet=" + svcSet);
+			LOG.info("Evaluating svcSet=" + svcSet);
 		
 		final double[] rawTrustScores = new double[svcSet.size()];
 		final ITrustedService[] svcArray = svcSet.toArray(new ITrustedService[0]);
@@ -374,32 +374,37 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		final double[] stanineTrustScores = MathUtils.stanine(rawTrustScores);
 		for (int i = 0; i < svcArray.length; ++i) {
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("SVC '" + svcArray[i].getTeid() + "' direct trust before normalisation: "
+				LOG.info("(" + svcArray[i].getTrustorId() + ", " 
+						+ svcArray[i].getTrusteeId() + ") direct trust before normalisation: "
 						+ svcArray[i].getDirectTrust());
 			final Double rating = svcArray[i].getDirectTrust().getRating();
 			final Double stanineScore = stanineTrustScores[i]; 
 			svcArray[i].getDirectTrust().setValue(
 					estimateValue(rating, stanineScore));
 			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("SVC '" + svcArray[i].getTeid() + "' direct trust after normalisation: "
+				LOG.info("(" + svcArray[i].getTrustorId() + ", " 
+						+ svcArray[i].getTrusteeId() + ") direct trust after normalisation: "
 						+ svcArray[i].getDirectTrust());
 		}
 	}
 
-	private ITrustedEntity createEntityIfAbsent(final TrustedEntityId teid) 
-			throws TrustRepositoryException {
+	private ITrustedEntity createEntityIfAbsent(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException {
 
-		ITrustedEntity entity = (ITrustedEntity) this.trustRepo.retrieveEntity(teid);
+		ITrustedEntity entity = (ITrustedEntity) this.trustRepo.retrieveEntity(
+				trustorId, trusteeId);
 
-		return (entity == null) ? this.trustRepo.createEntity(teid) : entity;
+		return (entity == null) ? this.trustRepo.createEntity(
+				trustorId, trusteeId) : entity;
 	}
 	
-	private ITrustedCss createMyCssIfAbsent(final TrustedEntityId myTeid) 
+	private ITrustedCss createMyCssIfAbsent(final TrustedEntityId myTrustorId) 
 			throws TrustRepositoryException {
 
-		ITrustedCss myCss = (ITrustedCss) this.trustRepo.retrieveEntity(myTeid);
+		ITrustedCss myCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				myTrustorId, myTrustorId);
 		if (myCss == null) {
-			myCss = (ITrustedCss) this.trustRepo.createEntity(myTeid);
+			myCss = (ITrustedCss) this.trustRepo.createEntity(myTrustorId, myTrustorId);
 			myCss.getDirectTrust().setRating(IDirectTrust.MAX_RATING);
 			myCss.getDirectTrust().setScore(IDirectTrust.MAX_SCORE);
 			myCss.getDirectTrust().setValue(ITrust.MAX_VALUE);
@@ -407,6 +412,34 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		}
 
 		return myCss;
+	}
+	
+	private boolean areRelevant(final TrustedEntityId trustorId,
+			final IDirectTrustEvidence evidence) throws TrustEngineException {
+		
+		boolean result = false;
+		
+		switch (evidence.getType()) {
+
+		case RATED:
+		case FRIENDED_USER:
+		case UNFRIENDED_USER:
+		case USED_SERVICE:
+			if (trustorId.equals(evidence.getSubjectId()))
+				result = true;
+			break;
+			
+		case JOINED_COMMUNITY:
+		case LEFT_COMMUNITY:
+			result = true;
+			break;
+			
+		default:
+			throw new TrustEngineException("Unsupported type: " 
+					+ evidence.getType());
+		}
+		
+		return result;
 	}
 
 	private static Double estimateValue(final Double rating, final Double stanineScore) {
@@ -444,7 +477,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				LOG.debug("Handling evidence " + this.evidence);
 			
 			try {
-				evaluate(evidence);
+				for (final TrustedEntityId myId : DirectTrustEngine.super.trustNodeMgr.getMyIds())
+					evaluate(myId, evidence);
 			} catch (TrustException te) {
 				
 				LOG.error("Could not handle evidence "

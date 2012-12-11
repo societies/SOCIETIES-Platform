@@ -65,6 +65,7 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
  
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
@@ -77,9 +78,8 @@
 		<!-- Android User Agent -->
 		<!-- module>../user-agent/Android-user-agent</module -->
 
-		<!-- Privacy and Trust -->
+		<!-- Privacy -->
 		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/apklib</module>
-		<module>../../privacy-trust/android/privacy-trust/trust</module>
 
 	</modules>
 </project>

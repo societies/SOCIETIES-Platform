@@ -30,7 +30,6 @@ package org.societies.api.internal.privacytrust.trust.remote;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustBrokerRemoteCallback {
-	
-	public void onRetrievedTrust(Double value);
+public interface ITrustBrokerRemoteCallback 
+	extends org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback {
 }

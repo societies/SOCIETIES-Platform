@@ -42,47 +42,66 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ITrustBroker {
 
 	/**
-	 * Retrieves the trust value of the specified entity.
+	 * Retrieves the trust value which the specified trustor has assigned to the
+	 * supplied trustee. The method returns <code>null</code> if no trust value
+	 * has been assigned to the specified trustee by the given trustor.
 	 * 
-	 * @param teid
+	 * @param trustorId
+	 *            the identifier of the entity which has assigned the trust
+	 *            value to retrieve.
+	 * @param trusteeId
 	 *            the identifier of the entity whose trust value to retrieve.
-	 * @return the trust value of the specified entity.
-	 * @throws TrustException if the trust value of the specified entity
-	 *         cannot be retrieved
-	 * @throws NullPointerException if the specified entity identifier is
+	 * @return the trust value which the specified trustor has assigned to the
+	 *         supplied trustee.
+	 * @throws TrustException if the trust value cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
 	 *         <code>null</code>
+	 * @since 0.5
 	 */
-	public Future<Double> retrieveTrust(final TrustedEntityId teid) throws TrustException;
+	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustException;
 	
 	/**
-	 * Registers the specified listener for trust value update events associated
-	 * with the identified entity.
+	 * Registers the specified listener for updates of the trust value which
+	 * the identified trustor has assigned to the supplied trustee.
 	 * 
 	 * @param listener
-	 *            the listener to register for trust update events
-	 * @param teid
+	 *            the listener to register for trust update events.
+	 * @param trustorId
+	 *            the identifier of the entity which assigns the trust
+	 *            value whose updates to register for.
+	 * @param trusteeId
 	 *            the identifier of the entity whose trust value update events
-	 *            to register for
+	 *            to register for.
 	 * @throws TrustException if the specified listener cannot be registered
-	 * @throws NullPointerException if any of the specified listener or entity
-	 *         identifier is <code>null</code>
+	 * @throws NullPointerException if any of the specified paramaters is 
+	 *         <code>null</code>.
+	 * @since 0.5
 	 */
-	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException;
+	public void registerTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException;
 	
 	/**
-	 * Unregisters the specified listener from trust value update events associated
-	 * with the identified entity.
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor has assigned to the supplied trustee.
 	 * 
 	 * @param listener
 	 *            the listener to unregister from trust update events
-	 * @param teid
+	 * @param trustorId
+	 *            the identifier of the entity which assigns the trust
+	 *            value whose updates to unregister from.
+	 * @param trusteeId
 	 *            the identifier of the entity whose trust value update events
-	 *            to unregister from
+	 *            to unregister from.
 	 * @throws TrustException if the specified listener cannot be unregistered
-	 * @throws NullPointerException if any of the specified listener or entity
-	 *         identifier is <code>null</code>
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 0.5
 	 */
-	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException;
+	public void unregisterTrustUpdateEventListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException;
 }

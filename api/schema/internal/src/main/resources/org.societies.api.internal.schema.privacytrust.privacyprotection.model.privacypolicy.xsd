@@ -2,107 +2,140 @@
 <xs:schema version="1.0" elementFormDefault="qualified"
 	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
 	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
-	xmlns:ns1="http://societies.org/api/schema/identity" 
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	xmlns:ns1="http://societies.org/api/schema/identity" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:import namespace="http://societies.org/api/schema/identity" schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
 
-  <xs:complexType name="responseItem">
-    <xs:sequence>
-      <xs:element name="decision" type="tns:decision" minOccurs="0"/>
-      <xs:element name="requestItem" type="tns:requestItem" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="responseItem">
+		<xs:sequence>
+			<xs:element name="decision" type="tns:decision" minOccurs="0" />
+			<xs:element name="requestItem" type="tns:requestItem"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="requestItem">
-    <xs:sequence>
-      <xs:element name="actions" type="tns:action" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="conditions" type="tns:condition" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="optional" type="xs:boolean"/>
-      <xs:element name="resource" type="tns:resource" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="requestItem">
+		<xs:sequence>
+			<xs:element name="actions" type="tns:action" nillable="true"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="conditions" type="tns:condition"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="optional" type="xs:boolean" />
+			<xs:element name="resource" type="tns:resource" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="action">
-    <xs:sequence>
-      <xs:element name="actionConstant" type="tns:actionConstants" minOccurs="0"/>
-      <xs:element name="optional" type="xs:boolean"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="action">
+		<xs:sequence>
+			<xs:element name="actionConstant" type="tns:actionConstants"
+				minOccurs="0" />
+			<xs:element name="optional" type="xs:boolean" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="condition">
-    <xs:sequence>
-      <xs:element name="conditionConstant" type="tns:conditionConstants" minOccurs="0"/>
-      <xs:element name="optional" type="xs:boolean"/>
-      <xs:element name="value" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="condition">
+		<xs:sequence>
+			<xs:element name="conditionConstant" type="tns:conditionConstants"
+				minOccurs="0" />
+			<xs:element name="optional" type="xs:boolean" />
+			<xs:element name="value" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="resource">
-    <xs:sequence>
-      <xs:element name="dataIdUri" type="xs:string" minOccurs="0"/>
-      <xs:element name="dataType" type="xs:string" minOccurs="0"/>
-      <xs:element name="scheme" type="ns1:dataIdentifierScheme" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="resource">
+		<xs:sequence>
+			<xs:element name="dataIdUri" type="xs:string" minOccurs="0" />
+			<xs:element name="dataType" type="xs:string" minOccurs="0" />
+			<xs:element name="scheme" type="ns1:dataIdentifierScheme"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="agreementEnvelope">
-    <xs:sequence>
-      <xs:element name="agreement" type="tns:agreement" minOccurs="0"/>
-      <xs:element name="agreementCheckSum" type="xs:long"/>
-      <xs:element name="publicKey" type="xs:base64Binary" minOccurs="0"/>
-      <xs:element name="signature" type="xs:base64Binary" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="agreementEnvelope">
+		<xs:sequence>
+			<xs:element name="agreement" type="tns:agreement"
+				minOccurs="0" />
+			<xs:element name="agreementCheckSum" type="xs:long" />
+			<xs:element name="publicKey" type="xs:base64Binary"
+				minOccurs="0" />
+			<xs:element name="signature" type="xs:base64Binary"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="agreement">
-    <xs:sequence>
-      <xs:element name="requestedItems" type="tns:responseItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="requestor" type="ns1:requestorBean" minOccurs="0"/>
-      <xs:element name="userIdentity" type="xs:string" minOccurs="0"/>
-      <xs:element name="userPublicIdentity" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="agreement">
+		<xs:sequence>
+			<xs:element name="requestedItems" type="tns:responseItem"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" />
+			<xs:element name="userIdentity" type="xs:string"
+				minOccurs="0" />
+			<xs:element name="userPublicIdentity" type="xs:string"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:complexType name="requestPolicy">
-    <xs:sequence>
-      <xs:element name="requestItems" type="tns:requestItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="requestor" type="ns1:requestorBean" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:complexType name="requestPolicy">
+		<xs:sequence>
+			<xs:element name="requestItems" type="tns:requestItem"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="requestor" type="ns1:requestorBean"
+				minOccurs="0" />
+			<xs:element name="privacyPolicyType" type="tns:privacyPolicyTypeConstants"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
-  <xs:simpleType name="actionConstants">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="READ"/>
-      <xs:enumeration value="WRITE"/>
-      <xs:enumeration value="CREATE"/>
-      <xs:enumeration value="DELETE"/>
-    </xs:restriction>
-  </xs:simpleType>
+	<xs:simpleType name="actionConstants">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="READ" />
+			<xs:enumeration value="WRITE" />
+			<xs:enumeration value="CREATE" />
+			<xs:enumeration value="DELETE" />
+		</xs:restriction>
+	</xs:simpleType>
 
-  <xs:simpleType name="decision">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="PERMIT"/>
-      <xs:enumeration value="DENY"/>
-      <xs:enumeration value="INDETERMINATE"/>
-      <xs:enumeration value="NOT_APPLICABLE"/>
-    </xs:restriction>
-  </xs:simpleType>
+	<xs:simpleType name="privacyPolicyTypeConstants">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SERVICE" />
+			<xs:enumeration value="CIS" />
+			<xs:enumeration value="OTHER" />
+		</xs:restriction>
+	</xs:simpleType>
 
-  <xs:simpleType name="conditionConstants">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="SHARE_WITH_3RD_PARTIES"/>
-      <xs:enumeration value="SHARE_WITH_CIS_MEMBERS_ONLY"/>
-      <xs:enumeration value="SHARE_WITH_CIS_OWNER_ONLY"/>
-      <xs:enumeration value="MAY_BE_INFERRED"/>
-      <xs:enumeration value="DATA_RETENTION_IN_SECONDS"/>
-      <xs:enumeration value="DATA_RETENTION_IN_MINUTES"/>
-      <xs:enumeration value="DATA_RETENTION_IN_HOURS"/>
-      <xs:enumeration value="RIGHT_TO_OPTOUT"/>
-      <xs:enumeration value="STORE_IN_SECURE_STORAGE"/>
-      <xs:enumeration value="RIGHT_TO_ACCESS_HELD_DATA"/>
-      <xs:enumeration value="RIGHT_TO_CORRECT_INCORRECT_DATA"/>
-    </xs:restriction>
-  </xs:simpleType>
+	<xs:simpleType name="privacyPolicyBehaviourConstants">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PRIVATE" />
+			<xs:enumeration value="MEMBERS_ONLY" />
+			<xs:enumeration value="PUBLIC" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="decision">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PERMIT" />
+			<xs:enumeration value="DENY" />
+			<xs:enumeration value="INDETERMINATE" />
+			<xs:enumeration value="NOT_APPLICABLE" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="conditionConstants">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SHARE_WITH_3RD_PARTIES" />
+			<xs:enumeration value="SHARE_WITH_CIS_MEMBERS_ONLY" />
+			<xs:enumeration value="SHARE_WITH_CIS_OWNER_ONLY" />
+			<xs:enumeration value="MAY_BE_INFERRED" />
+			<xs:enumeration value="DATA_RETENTION_IN_SECONDS" />
+			<xs:enumeration value="DATA_RETENTION_IN_MINUTES" />
+			<xs:enumeration value="DATA_RETENTION_IN_HOURS" />
+			<xs:enumeration value="RIGHT_TO_OPTOUT" />
+			<xs:enumeration value="STORE_IN_SECURE_STORAGE" />
+			<xs:enumeration value="RIGHT_TO_ACCESS_HELD_DATA" />
+			<xs:enumeration value="RIGHT_TO_CORRECT_INCORRECT_DATA" />
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>
 

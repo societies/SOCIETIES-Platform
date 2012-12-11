@@ -78,7 +78,7 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return PubsubClientAndroid
 	 */
 	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new PubsubClientAndroid(getApplicationContext());
+		return new PubsubClientAndroid(this);
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
+		return new ClientCommunicationMgr(this);
 	}
 
 }

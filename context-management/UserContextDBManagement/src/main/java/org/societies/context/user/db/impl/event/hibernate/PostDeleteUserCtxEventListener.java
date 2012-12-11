@@ -24,6 +24,9 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.hibernate.event.PostDeleteEvent;
 import org.hibernate.event.PostDeleteEventListener;
 import org.slf4j.Logger;
@@ -35,8 +38,6 @@ import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import cern.colt.Arrays;
 
 /**
  * Describe your class here...
@@ -59,6 +60,9 @@ public class PostDeleteUserCtxEventListener implements PostDeleteEventListener {
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 	
+	/** The executor service. */
+	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
 	PostDeleteUserCtxEventListener() {
 		
 		if (LOG.isInfoEnabled())
@@ -79,25 +83,7 @@ public class PostDeleteUserCtxEventListener implements PostDeleteEventListener {
 			return;
 		
 		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-		if (this.ctxEventMgr != null) {
-			try { 
-				if (LOG.isDebugEnabled())
-					LOG.debug("Sending context change event for '" + ctxId
-							+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
-							+ "' with scope '" + EVENT_SCOPE + "'");
-				this.ctxEventMgr.post(new CtxChangeEvent(ctxId), EVENT_TOPICS, EVENT_SCOPE);
-			} catch (Exception e) {
-				
-				LOG.error("Could not send context change event for '" + ctxId 
-						+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
-						+ "' with scope '" + EVENT_SCOPE + "': "
-						+ e.getLocalizedMessage(), e);
-			}
-		} else {
-			LOG.error("Could not send context change event for '" + ctxId
-					+ "' to topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' with scope '" + EVENT_SCOPE + "': "
-					+ "ICtxEventMgr service is not available");
-		}
+		this.executorService.execute(new CtxChangeEventDispatcher(
+				this.ctxEventMgr, new CtxChangeEvent(ctxId), EVENT_TOPICS, EVENT_SCOPE));
 	}
 }

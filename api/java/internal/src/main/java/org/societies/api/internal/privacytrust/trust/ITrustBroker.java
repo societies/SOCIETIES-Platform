@@ -24,6 +24,11 @@
  */
 package org.societies.api.internal.privacytrust.trust;
 
+import java.util.concurrent.Future;
+
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+
 /**
  * This interface extends the external {@link org.societies.api.privacytrust.
  * trust.ITrustBroker ITrustBroker} interface and provides platform services with access to the
@@ -34,4 +39,14 @@ package org.societies.api.internal.privacytrust.trust;
  */
 public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrustBroker {
 
+	/**
+	 * 
+	 * @param trusteeId
+	 * @return
+	 * @throws TrustException
+	 * @deprecated As of 0.5, use {@link #retrieveTrust(TrustedEntityId, TrustedEntityId)}.
+	 */
+	@Deprecated
+	public Future<Double> retrieveTrust(
+			final TrustedEntityId trusteeId) throws TrustException;
 }

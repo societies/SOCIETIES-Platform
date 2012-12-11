@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +37,18 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.utilities.MissingClientPackageException;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
@@ -57,26 +68,34 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	public PrivacyPolicyManager(Context context)  {
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.schema.identity.RequestorBean)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)
 	 */
-	public RequestPolicy getPrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
+	@Override
+	public void getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// -- Verify
-		if (null == requestor || null == requestor.getRequestorId()) {
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
+		if (null == owner || null == owner.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
-		return privacyPolicyManagerRemote.getPrivacyPolicy(client, requestor);
+		privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, owner);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
-	public RequestPolicy updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException {
+	@Override
+	public void updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
 		}
@@ -85,93 +104,137 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		return privacyPolicyManagerRemote.updatePrivacyPolicy(client, privacyPolicy);
+		privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
-	public RequestPolicy updatePrivacyPolicy(String client, String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, java.lang.String, org.societies.android.api.identity.RequestorBean)
+	 */
+	@Override
+	public void updatePrivacyPolicy(String clientPackage, String privacyPolicyXml, RequestorBean owner) throws PrivacyException {
+		// -- Verify
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
+		if (null == privacyPolicyXml || "".equals(privacyPolicyXml)) {
+			throw new PrivacyException("The XML privacy policy to update is empty.");
+		}
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = fromXmlString(client, privacyPolicyXml);
+		RequestPolicy privacyPolicy = (RequestPolicy) fromXmlString(privacyPolicyXml);
 		if (null == privacyPolicy) {
-			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
+			throw new PrivacyException("The XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
-		privacyPolicy.setRequestor(requestor);
+		privacyPolicy.setRequestor(owner);
 		// Create / Store it
-		return updatePrivacyPolicy(client, privacyPolicy);
+		updatePrivacyPolicy(clientPackage, privacyPolicy);
 	}
 
-	public boolean deletePrivacyPolicy(String client, RequestorBean requestor) throws PrivacyException {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#deletePrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)
+	 */
+	@Override
+	public void deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		// -- Verify
-		if (null == requestor || null == requestor.getRequestorId()) {
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
+		if (null == owner || null == owner.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
 		}
 
 		// -- Delete
-		return privacyPolicyManagerRemote.deletePrivacyPolicy(client, requestor);
+		privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, owner);
 	}
 
-	public RequestPolicy inferPrivacyPolicy(String client, int privacyPolicyType, Map configuration) throws PrivacyException {
-		List<RequestItem> requests = new ArrayList<RequestItem>();
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants, java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		RequestPolicy privacyPolicy = new RequestPolicy();
-		privacyPolicy.setRequestItems(requests);
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
+		// Not private
+		if (configuration.containsKey("globalBehaviour")) {
+			// CIS Member list
+			RequestItem requestItem = new RequestItem();
+			Resource cisMemberList = new Resource();
+			cisMemberList.setScheme(DataIdentifierScheme.CIS);
+			cisMemberList.setDataType("cis-member-list");
+			requestItem.setResource(cisMemberList);
+			List<Action> actions = new ArrayList<Action>();
+			Action action = new Action();
+			action.setActionConstant(ActionConstants.READ);
+			actions.add(action);
+			requestItem.setActions(actions);
+			List<Condition> conditions = new ArrayList<Condition>();
+			// Public
+			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
+				Condition condition = new Condition();
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3_RD_PARTIES);
+				condition.setValue("1");
+			}
+			// Members only
+			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour)) {
+				Condition condition = new Condition();
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
+				condition.setValue("1");
+			}
+			requestItem.setConditions(conditions);
+			requestItems.add(requestItem);
+		}
+		privacyPolicy.setRequestItems(requestItems);
 		return privacyPolicy;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria, java.util.Map)
+	 */
+	@Override
+	public RequestPolicy inferCisPrivacyPolicy(
+			PrivacyPolicyBehaviourConstants globalBehaviour,
+			MembershipCriteria membershipCriteria,
+			Map<String, String> configuration) throws PrivacyException {
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("globalBehaviour", globalBehaviour);
+		parameters.put("membershipCriteria", membershipCriteria);
+		parameters.putAll(configuration);
+		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
+	}
 
-	public String toXmlString(String client, RequestPolicy privacyPolicy) {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria)
+	 */
+	@Override
+	public RequestPolicy inferCisPrivacyPolicy(
+			PrivacyPolicyBehaviourConstants globalBehaviour,
+			MembershipCriteria membershipCriteria) throws PrivacyException {
+		return inferCisPrivacyPolicy(globalBehaviour, membershipCriteria, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#infer3pServicePrivacyPolicy(java.util.Map)
+	 */
+	@Override
+	public RequestPolicy infer3pServicePrivacyPolicy(
+			Map<String, String> configuration) throws PrivacyException {
+		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.SERVICE, configuration);
+	}
+
+	public String toXmlString(RequestPolicy privacyPolicy) {
 		String encoding = "UTF-8";
 		// -- Empty Privacy Policy
 		if (null == privacyPolicy) {
 			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
 		}
-
-		// -- Generate the XML Privacy Policy
-		//		StringBuilder str = new StringBuilder("<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n<RequestPolicy>");
-		//		// - Requestor
-		//		if (null != privacyPolicy.getRequestor()) {
-		//			str.append("\n<Subject>");
-		//			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getCanonicalName()+"\">");
-		//			str.append("\n\t\t<AttributeValue>"+privacyPolicy.getRequestor().getRequestorId()+"</AttributeValue>");
-		//			str.append("\n\t</Attribute>");
-		//			// CIS
-		//			if (privacyPolicy.getRequestor() instanceof RequestorCisBean) {
-		//				str.append("\n\t<Attribute AttributeId=\"CisId\" DataType=\""+IIdentity.class.getCanonicalName()+"\">");
-		//				str.append("\n\t\t<AttributeValue>"+((RequestorCisBean)privacyPolicy.getRequestor()).getCisRequestorId()+"</AttributeValue>");
-		//				str.append("\n\t</Attribute>");
-		//			}
-		//			// Service
-		//			if (privacyPolicy.getRequestor() instanceof RequestorServiceBean) {
-		//				str.append("\n\t<Attribute AttributeId=\"serviceID\" DataType=\""+ServiceResourceIdentifier.class.getCanonicalName()+"\">");
-		//				str.append("\n\t\t<AttributeValue>"+((RequestorServiceBean)privacyPolicy.getRequestor()).getRequestorServiceId().getServiceInstanceIdentifier()+"</AttributeValue>");
-		//				str.append("\n\t</Attribute>");
-		//			}
-		//			str.append("</Subject>");
-		//		}
-		//		// Requested Items
-		//		for (RequestItem requestItem : privacyPolicy.getRequestItems()) {
-		//			str.append("\n<Target>");
-		//			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\" DataType=\"org.societies.api.context.model.CtxIdentifier\">");
-		//			str.append("\n\t\t<AttributeValue>"+requestItem.getResource().getDataIdUri()+"</AttributeValue>");
-		//			str.append("\n\t</Attribute>");
-		//			for (Action action : requestItem.getActions()){
-		//				str.append("\n\t<Action>");
-		//				str.append("\n\t\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">");
-		//				str.append("\n\t\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>");
-		//				str.append("\n\t\t</Attribute>");
-		//				str.append("\n\t\t<optional>"+action.isOptional()+"</optional>");
-		//				str.append("\n\t</Action>");
-		//			}
-		//			for (Condition condition : requestItem.getConditions()){
-		//				str.append("\n\t<Condition>");
-		//				str.append("\n\t\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">");
-		//				str.append("\n\t\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>");
-		//				str.append("\n\t\t</Attribute>");
-		//				str.append("\n\t\t<optional>"+condition.isOptional()+"</optional>"); 
-		//				str.append("\n\t</Condition>");
-		//			}
-		//			str.append("\n\t<optional>"+requestItem.isOptional()+"</optional>");
-		//			str.append("\n</Target>");
-		//		}
-		//		str.append("</RequestPolicy>");
-		//		return str.toString();
 
 		Serializer serializer = new Persister(); 
 		Writer result = new StringWriter();
@@ -184,7 +247,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return result.toString();
 	}
 
-	public RequestPolicy fromXmlString(String client, String privacyPolicy) throws PrivacyException {
+	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
 		// -- Verify
 		// Empty privacy policy
 		if (null == privacyPolicy || privacyPolicy.equals("")) {
@@ -211,20 +274,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		} catch (Exception e) {
 			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy.", e);
 		}
-		//		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader();
-		//		try {
-		//			// -- Create XMLDocument version of the privacy policy
-		//			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		//			Document privacyPolicyDocument = xmlDocumentBuilder.parse(new ByteArrayInputStream(privacyPolicy.getBytes(encoding)));
-		//			// -- Transform XML Privacy Policy to Java Privacy Policy
-		//			result = xmlPolicyReader.readPolicyFromFile(privacyPolicyDocument);
-		//		} catch (ParserConfigurationException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy.", e);
-		//		} catch (SAXException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy. SAX error.", e);
-		//		} catch (IOException e) {
-		//			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy. IO error.", e);
-		//		}
 		return result;
 	}
 }

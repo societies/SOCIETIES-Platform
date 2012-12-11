@@ -22,88 +22,12 @@
 		</osgi:interfaces>
 	</osgi:service>
 
-	<osgi:service ref="ctxBrokerClient">
-		<osgi:interfaces>
-			<value>org.societies.context.broker.impl.comm.CtxBrokerClient</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<osgi:service ref="ctxBrokerServer">
-		<osgi:interfaces>
-			<value>org.societies.context.broker.impl.comm.CtxBrokerServer</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<osgi:service ref="ctxAccessController">
-		<osgi:interfaces>
-			<value>org.societies.context.broker.api.security.ICtxAccessController</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<!-- ctx event mgr -->
-	<osgi:service ref="ctxEventMgr">
-		<osgi:interfaces>
-			<value>org.societies.context.api.event.ICtxEventMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<!-- user ctx db -->
-	<osgi:service ref="userCtxDBMgr">
-		<osgi:interfaces>
-			<value>org.societies.context.api.user.db.IUserCtxDBMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<!-- user ctx db -->
-	<osgi:service ref="communityCtxDBMgr">
-		<osgi:interfaces>
-			<value>org.societies.context.api.community.db.ICommunityCtxDBMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<!-- user history db -->
-	<osgi:service ref="userContextHistoryManagement">
-		<osgi:interfaces>
-			<value>org.societies.context.api.user.history.IUserCtxHistoryMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-
 	<!-- ctx source mgmt -->
 	<osgi:service ref="contextSourceManagement">
 		<osgi:interfaces>
 			<value>org.societies.api.context.source.ICtxSourceMgr</value>
 		</osgi:interfaces>
 	</osgi:service>
-
-	<!-- usr ctx inference mgmt -->
-	<osgi:service ref="userCtxInferenceMgr">
-		<osgi:interfaces>
-			<value>org.societies.context.api.user.inference.IUserCtxInferenceMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-	
-	<!-- usr ctx refiner -->
-	<osgi:service ref="userCtxRefiner">
-		<osgi:interfaces>
-			<value>org.societies.context.api.user.refinement.IUserCtxRefiner</value>
-		</osgi:interfaces>
-	</osgi:service>
-	
-	<!-- usr location refiner -->
-	<osgi:service ref="userLocationRefiner">
-		<osgi:interfaces>
-			<value>org.societies.context.user.refinement.impl.location.UserLocationRefiner</value>
-		</osgi:interfaces>
-	</osgi:service>
-
-	<!-- community ctx inference mgmt -->
-	<osgi:service ref="communityCtxInferenceMgr">
-		<osgi:interfaces>
-			<value>org.societies.context.api.community.inference.ICommunityCtxInferenceMgr</value>
-		</osgi:interfaces>
-	</osgi:service>
-
 
 	<!-- importing external services -->
 
@@ -124,7 +48,8 @@
 	    interface="javax.sql.DataSource" />
 
 	<!-- event mgr -->
-	<osgi:reference id="eventAdmin" interface="org.osgi.service.event.EventAdmin"
+	<osgi:reference id="eventManager"
+		interface="org.societies.api.osgi.event.IEventMgr" 
 		cardinality="1..1" />
 	<osgi:reference id="pubsubClient"
 		interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"
@@ -133,8 +58,5 @@
 	<osgi:reference id="deviceManager"
 		interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"
 		cardinality="1..1" />
-	<osgi:reference id="eventManager"
-		interface="org.societies.api.osgi.event.IEventMgr" cardinality="1..1" />
-
 
 </beans>

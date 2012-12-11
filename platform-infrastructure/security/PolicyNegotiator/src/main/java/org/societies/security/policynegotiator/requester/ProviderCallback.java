@@ -41,6 +41,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationCallback
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
@@ -107,6 +108,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 							provider.getRequestorId(),
 							callback);
 				} catch (XmlException e) {
+					LOG.warn("receiveResult(): session {}: ", sessionId, e);
+				} catch (DigsigException e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
 			}

@@ -265,7 +265,7 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 		//Received implicit feedback from remote UA
 		}else if (bean instanceof ImpFeedbackResultBean){
 			String requestId = ((ImpFeedbackResultBean)bean).getRequestId();
-			boolean result = ((ImpFeedbackResultBean)bean).isFeedback();
+			boolean result = ((ImpFeedbackResultBean)bean).isAccepted();
 			synchronized(results){
 				this.results.put(requestId, new Boolean(result));
 				this.results.notifyAll();

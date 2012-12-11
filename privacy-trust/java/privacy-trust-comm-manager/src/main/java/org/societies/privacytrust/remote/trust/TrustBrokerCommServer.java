@@ -35,19 +35,19 @@ import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.privacytrust.trust.ITrustBroker;
-import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
-import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.5
  */
 public class TrustBrokerCommServer implements IFeatureServer {
 	
@@ -56,13 +56,13 @@ public class TrustBrokerCommServer implements IFeatureServer {
 	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
-					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+					"http://societies.org/api/schema/privacytrust/trust/model",
+					"http://societies.org/api/schema/privacytrust/trust/broker"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
-					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.broker"));
+					"org.societies.api.schema.privacytrust.trust.model",
+					"org.societies.api.schema.privacytrust.trust.broker"));
 
 	/** The Communications Mgr service reference. */
 	@SuppressWarnings("unused")
@@ -107,17 +107,17 @@ public class TrustBrokerCommServer implements IFeatureServer {
 						+ "RetrieveTrustBrokerRequestBean can't be null");
 			
 			try {
-				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(retrieveRequestBean.getTeid());
+				final TrustedEntityId trustorId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(retrieveRequestBean.getTrustorId());
+				final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(retrieveRequestBean.getTrusteeId());
+				final Double result = this.trustBroker.retrieveTrust(
+						trustorId, trusteeId).get();
 				
-				final Double result = this.trustBroker.retrieveTrust(teid).get();
 				final RetrieveTrustBrokerResponseBean retrieveResponseBean = 
-						new RetrieveTrustBrokerResponseBean();
-				// TODO find way to pass null result 
+						new RetrieveTrustBrokerResponseBean(); 
 				if (result != null)
 					retrieveResponseBean.setResult(result);
-				else
-					retrieveResponseBean.setResult(new Double(0.0d));
 				responseBean.setMethodName(MethodName.RETRIEVE);
 				responseBean.setRetrieve(retrieveResponseBean);
 				

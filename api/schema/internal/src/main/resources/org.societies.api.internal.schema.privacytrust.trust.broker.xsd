@@ -2,11 +2,11 @@
 <xs:schema elementFormDefault="qualified" version="1.0" 
 	targetNamespace="http://societies.org/api/internal/schema/privacytrust/trust/broker"   
 	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/trust/broker" 
-	xmlns:tnsm="http://societies.org/api/internal/schema/privacytrust/trust/model"
+	xmlns:tnsm="http://societies.org/api/schema/privacytrust/trust/model"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
-	<xs:import namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
-		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
+	
+	<xs:import namespace="http://societies.org/api/schema/privacytrust/trust/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.trust.model.xsd" />
 		
 	<xs:element name="trustBrokerRequestBean">
 		<xs:complexType>
@@ -34,13 +34,14 @@
 	
 	<xs:complexType name="retrieveTrustBrokerRequestBean">
 		<xs:sequence>
-			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustorId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="retrieveTrustBrokerResponseBean">
 		<xs:sequence>
-			<xs:element name="result" type="xs:double" nillable="true" minOccurs="1"/>
+			<xs:element name="result" type="xs:double" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
   

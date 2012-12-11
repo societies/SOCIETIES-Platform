@@ -24,10 +24,6 @@
  */
 package org.societies.api.internal.privacytrust.trust.remote;
 
-//import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.privacytrust.trust.TrustException;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-
 /**
  * This interface provides access to the trust values associated with individuals,
  * communities and services.
@@ -35,55 +31,6 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustBrokerRemote {
-
-	/**
-	 * Retrieves the trust value of the specified entity.
-	 * 
-	 * @param teid
-	 *            the identifier of the entity whose trust value to retrieve.
-	 * @param callback
-	 *            the callback to receive the trust value.
-	 * @return the trust value of the specified entity.
-	 * @throws TrustException 
-	 *             if the trust value of the specified entity cannot be
-	 *             retrieved
-	 * @throws NullPointerException 
-	 *             if any of the specified parameters is <code>null</code>
-	 */
-	public void retrieveTrust(final TrustedEntityId teid, 
-			final ITrustBrokerRemoteCallback callback) throws TrustException;
-	
-	/* TODO
-	 * Registers the specified listener for trust value update events associated
-	 * with the identified entity.
-	 * 
-	 * @param listener
-	 *            the listener to register for trust update events
-	 * @param teid
-	 *            the identifier of the entity whose trust value update events
-	 *            to register for
-	 * @throws TrustException if the specified listener cannot be registered
-	 * @throws NullPointerException if any of the specified listener or entity
-	 *         identifier is <code>null</code>
-	 *
-	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId entityId) throws TrustException;
-	
-	/**
-	 * Unregisters the specified listener from trust value update events associated
-	 * with the identified entity.
-	 * 
-	 * @param listener
-	 *            the listener to unregister from trust update events
-	 * @param teid
-	 *            the identifier of the entity whose trust value update events
-	 *            to unregister from
-	 * @throws TrustException if the specified listener cannot be unregistered
-	 * @throws NullPointerException if any of the specified listener or entity
-	 *         identifier is <code>null</code>
-	 *
-	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId teid) throws TrustException;
-	 */
+public interface ITrustBrokerRemote 
+	extends org.societies.api.privacytrust.trust.remote.ITrustBrokerRemote {
 }
