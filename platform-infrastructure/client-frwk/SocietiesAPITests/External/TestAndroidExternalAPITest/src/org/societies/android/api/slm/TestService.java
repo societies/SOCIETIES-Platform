@@ -108,8 +108,23 @@ public class TestService extends AndroidTestCase {
         assertEquals(service.getServiceCategory(), createFromParcel.getServiceCategory());
         assertEquals(service.getServiceDescription(), createFromParcel.getServiceDescription());
         assertEquals(service.getServiceEndpoint(), createFromParcel.getServiceEndpoint());
-        assertEquals(service.getServiceIdentifier(), createFromParcel.getServiceIdentifier());
-        assertEquals(service.getServiceInstance(), createFromParcel.getServiceInstance());
+        //SRI
+        assertEquals(service.getServiceIdentifier().getServiceInstanceIdentifier(), createFromParcel.getServiceIdentifier().getServiceInstanceIdentifier());
+        assertEquals(service.getServiceIdentifier().getIdentifier(), createFromParcel.getServiceIdentifier().getIdentifier());
+        //SERVICE INSTANCE
+        assertEquals(service.getServiceInstance().getCssJid(), createFromParcel.getServiceInstance().getCssJid());
+        assertEquals(service.getServiceInstance().getFullJid(), createFromParcel.getServiceInstance().getFullJid());
+        assertEquals(service.getServiceInstance().getParentJid(), createFromParcel.getServiceInstance().getParentJid());
+        assertEquals(service.getServiceInstance().getXMPPNode(), createFromParcel.getServiceInstance().getXMPPNode());
+        //SERVICE INSTANCE -> PARENT ID (sri)
+        assertEquals(service.getServiceInstance().getParentIdentifier().getServiceInstanceIdentifier(), createFromParcel.getServiceInstance().getParentIdentifier().getServiceInstanceIdentifier());
+        assertEquals(service.getServiceInstance().getParentIdentifier().getIdentifier(), createFromParcel.getServiceInstance().getParentIdentifier().getIdentifier());
+        //SERVICE INSTANCE -> SERVICE IMPL
+        assertEquals(service.getServiceInstance().getServiceImpl().getServiceClient(), createFromParcel.getServiceInstance().getServiceImpl().getServiceClient());
+        assertEquals(service.getServiceInstance().getServiceImpl().getServiceNameSpace(), createFromParcel.getServiceInstance().getServiceImpl().getServiceNameSpace());
+        assertEquals(service.getServiceInstance().getServiceImpl().getServiceProvider(), createFromParcel.getServiceInstance().getServiceImpl().getServiceProvider());
+        assertEquals(service.getServiceInstance().getServiceImpl().getServiceVersion(), createFromParcel.getServiceInstance().getServiceImpl().getServiceVersion());
+        
         assertEquals(service.getServiceLocation(), createFromParcel.getServiceLocation());
         assertEquals(service.getServiceName(), createFromParcel.getServiceName());
         assertEquals(service.getServiceStatus(), createFromParcel.getServiceStatus());

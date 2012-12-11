@@ -24,11 +24,7 @@
  */
 package org.societies.android.api.slm;
 
-import java.net.URI;
-
-import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -40,7 +36,7 @@ import android.test.suitebuilder.annotation.MediumTest;
  * @author aleckey
  *
  */
-public class TestServiceInstance  extends AndroidTestCase {
+public class TestServiceStatus extends AndroidTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -54,47 +50,24 @@ public class TestServiceInstance  extends AndroidTestCase {
 	
 	@MediumTest
 	public void testParcelable() throws Exception {
-		ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
-		sri.setIdentifier(new URI("http://alec.societies.org"));
-		sri.setServiceInstanceIdentifier("alecBundle123");
 		
-		ServiceImplementation serviceImp = new ServiceImplementation();
-		serviceImp.setServiceClient("TestClient");
-		serviceImp.setServiceNameSpace("http://soceities.org/test/namespace");
-		serviceImp.setServiceProvider("TestProvider");
-		serviceImp.setServiceVersion("V0.1.1b");
+		ServiceStatus status = ServiceStatus.STARTED;
+		System.out.println("name(): " + status.name());
+		System.out.println("toString(): " + status.toString());
+		System.out.println("value(): " + status.value());
 		
-		ServiceInstance serInstance = new ServiceInstance();
-		serInstance.setCssJid("john.societies.local");
-		serInstance.setFullJid("john@societies.local/android");
-		serInstance.setParentJid("parent.societies.local");
-		serInstance.setXMPPNode("john.societies.local");
-		serInstance.setParentIdentifier(sri);
-		serInstance.setServiceImpl(serviceImp);
-		
-		assertEquals(0, serviceImp.describeContents());
+		assertEquals(0, status.describeContents());
 		
         Parcel parcel = Parcel.obtain();
-        serInstance.writeToParcel(parcel, 0);
+        status.writeToParcel(parcel, 0);
         
         //done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
         
-        ServiceInstance createFromParcel = ServiceInstance.CREATOR.createFromParcel(parcel);
-       
-        assertEquals(serInstance.getCssJid(), createFromParcel.getCssJid());
-        assertEquals(serInstance.getFullJid(), createFromParcel.getFullJid());
-        assertEquals(serInstance.getParentJid(), createFromParcel.getParentJid());
-        assertEquals(serInstance.getXMPPNode(), createFromParcel.getXMPPNode());
-        //CAN'T COMPARE SRI'S DIRECTLY, MUST COMPARE EACH PROPERTY
-        assertEquals(serInstance.getParentIdentifier().getServiceInstanceIdentifier(), createFromParcel.getParentIdentifier().getServiceInstanceIdentifier());
-        assertEquals(serInstance.getParentIdentifier().getIdentifier(), createFromParcel.getParentIdentifier().getIdentifier());
-        //CAN'T COMPARE ServiceImpl'S DIRECTLY, MUST COMPARE EACH PROPERTY
-        assertEquals(serInstance.getServiceImpl().getServiceClient(), createFromParcel.getServiceImpl().getServiceClient());
-        assertEquals(serInstance.getServiceImpl().getServiceNameSpace(), createFromParcel.getServiceImpl().getServiceNameSpace());
-        assertEquals(serInstance.getServiceImpl().getServiceProvider(), createFromParcel.getServiceImpl().getServiceProvider());
-        assertEquals(serInstance.getServiceImpl().getServiceVersion(), createFromParcel.getServiceImpl().getServiceVersion());
+        ServiceStatus createFromParcel = ServiceStatus.CREATOR.createFromParcel(parcel);
+        assertEquals(status.name(), createFromParcel.name());
+        assertEquals(status, createFromParcel);
 	}
-
+	
 }

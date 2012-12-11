@@ -67,19 +67,19 @@
 
   <xs:simpleType name="serviceStatus">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="STARTED"/>
-      <xs:enumeration value="STOPPED"/>
-      <xs:enumeration value="UNAVAILABLE"/>
+      <xs:enumeration value="started"/>
+      <xs:enumeration value="stopped"/>
+      <xs:enumeration value="unavailable"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="serviceType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="ThirdPartyServer"/>
-      <xs:enumeration value="ThirdPartyClient"/>
-      <xs:enumeration value="ThirdPartyWeb"/>
-      <xs:enumeration value="ThirdPartyAndroid"/>
-       <xs:enumeration value="Device"/>
+      <xs:enumeration value="thirdPartyServer"/>
+      <xs:enumeration value="thirdPartyClient"/>
+      <xs:enumeration value="thirdPartyWeb"/>
+      <xs:enumeration value="thirdPartyAndroid"/>
+       <xs:enumeration value="device"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
