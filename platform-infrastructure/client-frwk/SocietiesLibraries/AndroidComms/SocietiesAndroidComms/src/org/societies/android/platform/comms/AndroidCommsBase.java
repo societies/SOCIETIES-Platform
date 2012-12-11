@@ -155,18 +155,12 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		//Send intent
 		Intent intent = new Intent(UN_REGISTER_COMM_MANAGER);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
 
 		try {
-			Set<ProviderElementNamespaceRegistrar.ElementNamespaceTuple> tuples = providerRegistrar.getRegists();
-			for(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple:tuples) {
-				removeProviders(tuple);
-			}
-			providerRegistrar.clear();
-			
-			this.serviceContext.sendBroadcast(intent);
-			retValue = true;
-			
+			retValue = UnRegisterCommManagerInternal();
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
@@ -242,7 +236,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		//Send intent
 		Intent intent = new Intent(GET_IDENTITY);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 
 		try {
 			connect();			
@@ -266,7 +263,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		//Send intent
 		Intent intent = new Intent(GET_DOMAIN_AUTHORITY_NODE);
 		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, this.domainAuthorityNode);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 		this.serviceContext.sendBroadcast(intent);
 
 		return null;
@@ -280,7 +280,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		//Send intent
 		Intent intent = new Intent(GET_ITEMS);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 
 		String retValue = null;
 		
@@ -336,10 +339,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		boolean retValue = false;
 		Intent intent = new Intent(IS_CONNECTED);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 		
 		if (null != connection) {
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, connection.isConnected());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, isConnectedInternal());
 		} else {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 		}
@@ -358,7 +364,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		String retValue = null;
 		//Send intent
 		Intent intent = new Intent(NEW_MAIN_IDENTITY);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 
 		
 		String serverHost = domain;
@@ -408,10 +417,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		String retValue = null;
 		Intent intent = new Intent(LOGIN);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 		
-		if(isConnected(client)) {
-			logout(client);
+		if(isConnectedInternal()) {
+			logoutInternal();
 		}
 		String username = username(identifier, domain);
 		loadConfig(domain, username, password);
@@ -450,15 +462,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		boolean retValue = false;
 		Intent intent = new Intent(LOGOUT);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 		
 		try {
-			UnRegisterCommManager(client);		
-			connection.disconnect();
-			usingConnectionCounter = 0;
-			
-			retValue = true;
-
+			retValue = logoutInternal();
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
@@ -476,7 +486,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		//Send intent
 		Intent intent = new Intent(DESTROY_MAIN_IDENTITY);
 		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
-		intent.setPackage(client);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
 		this.serviceContext.sendBroadcast(intent);
 
 		return false; // http://code.google.com/p/asmack/issues/detail?id=63
@@ -517,6 +530,34 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.debug = enabled;		
 	}
 	
+	@Override
+	public boolean configureAgent(String client, String xmppDomainAuthorityNode,
+		int xmppPort, String xmppResource, boolean xmppDebug) {
+		
+		Dbc.require("Client must be specified", null != client && client.length() > 0);
+		Dbc.require("Domain Authority Node must be specified", null != xmppDomainAuthorityNode && xmppDomainAuthorityNode.length() > 0);
+		Dbc.require("Port must be positive", xmppPort > 0);
+		Dbc.require("Resource must be specified", null != xmppResource && xmppResource.length() > 0);
+		Log.d(LOG_TAG, "configureAgent");
+		
+		this.setDomainAuthorityNode(client, xmppDomainAuthorityNode);
+		this.setPortNumber(client, xmppPort);
+		this.setResource(client, xmppResource);
+		this.setDebug(client, xmppDebug);
+		
+		//Send intent
+		Intent intent = new Intent(CONFIGURE_AGENT);
+		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
+		if (this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+
+		this.serviceContext.sendBroadcast(intent);
+
+		
+		return false;
+	}
+
 	private void removeProviders(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple) {
 		Log.d(LOG_TAG, "removeProviders");
 		ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
@@ -646,5 +687,32 @@ public class AndroidCommsBase implements XMPPAgent {
 				
 			});
 		}
+	}
+
+	private boolean isConnectedInternal() {
+		boolean retValue = false;
+		
+		if (null != connection) {
+			retValue = connection.isConnected();
+		}
+		return retValue;
+	}
+	
+	private boolean UnRegisterCommManagerInternal() {
+		Set<ProviderElementNamespaceRegistrar.ElementNamespaceTuple> tuples = providerRegistrar.getRegists();
+		for(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple:tuples) {
+			removeProviders(tuple);
+		}
+		providerRegistrar.clear();
+		
+		return true;
+	}
+	
+	private boolean logoutInternal() {
+		UnRegisterCommManagerInternal();		
+		connection.disconnect();
+		usingConnectionCounter = 0;
+		
+		return true;
 	}
 }

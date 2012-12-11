@@ -37,6 +37,19 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+  			<groupId>org.societies.utilities</groupId>
+  			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+            <scope>compile</scope>
+        </dependency>
+		
     </dependencies>
 
     <build>

@@ -60,7 +60,7 @@ public class ServicePlatformCommsLocal extends Service {
 		
 		public XMPPAgent getService() {
 			
-			AndroidCommsBase serviceBase = new AndroidCommsBase(ServicePlatformCommsLocal.this, false);
+			AndroidCommsBase serviceBase = new AndroidCommsBase(ServicePlatformCommsLocal.this, true);
 			return serviceBase;
 		}
 	}

@@ -25,7 +25,8 @@ public interface XMPPAgent {
 							  "setDomainAuthorityNode(String client, String domainAuthorityNode)",
 							  "setPortNumber(String client, int port)",
 							  "setResource(String client, String resource)",
-							  "setDebug(String client, boolean enabled)"
+							  "setDebug(String client, boolean enabled)", 
+							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug)"
 	};
 	
 	/**
@@ -45,6 +46,7 @@ public interface XMPPAgent {
 	public static final String LOGIN = "org.societies.android.platform.comms.LOGIN";
 	public static final String LOGOUT = "org.societies.android.platform.comms.LOGOUT";
 	public static final String DESTROY_MAIN_IDENTITY = "org.societies.android.platform.comms.DESTROY_MAIN_IDENTITY";
+	public static final String CONFIGURE_AGENT = "org.societies.android.platform.comms.CONFIGURE_AGENT";
 
 
 	public void register(String client, String[] elementNames, String[] namespaces, Callback callback);
@@ -82,4 +84,6 @@ public interface XMPPAgent {
 	public void setResource(String client, String resource);
 	
 	public void setDebug(String client, boolean enabled);
+	
+	public boolean configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug);
 }

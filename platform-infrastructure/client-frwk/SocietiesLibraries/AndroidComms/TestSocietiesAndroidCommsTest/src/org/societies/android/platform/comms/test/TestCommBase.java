@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.XMPPException;
+import org.societies.android.api.comms.Callback;
+import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.android.api.internal.comms.Callback;
-import org.societies.android.api.internal.comms.XMPPAgent;
 import org.societies.android.platform.comms.AndroidCommsBase;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest.TestPlatformCommsBinder;
@@ -36,8 +36,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	private static final String LOG_TAG = TestCommBase.class.getName();
 
 	private final static String CLIENT = "org.comms.test";
-	private static final List<String> CSS_ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
-    private static final List<String> CSS_NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cssmanagement");
+	private final String elementNames [] = {"cssManagerMessageBean", "cssManagerResultBean"};
+    private final String nameSpaces [] = {"http://societies.org/api/schema/cssmanagement"};
     private static final List<String> CSS_PACKAGES = Arrays.asList("org.societies.api.schema.cssmanagement");
     
     private final List<String> JABBER_ELEMENT_NAMES = Arrays.asList("pubsub", "event", "query");
@@ -54,7 +54,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
                                         "org.jabber.protocol.pubsub.event");
 
     
-    private static final int DELAY = 5000;
+    private static final int DELAY = 3000;
     
     //Modify these constants to suit local XMPP server
     
@@ -90,7 +90,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	
 	@MediumTest
 	public void testRegistration() throws Exception {
-		this.setupBroadcastReceiver();
+		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -99,46 +99,46 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.setResource(CLIENT, XMPP_RESOURCE);
-//			Thread.sleep(DELAY);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			Thread.sleep(DELAY);
 
-			commsService.setPortNumber(CLIENT, XMPP_PORT);
-//			Thread.sleep(DELAY);
-			
 			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			
 			commsService.isConnected(CLIENT);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 
-			String elements [] = new String[CSS_ELEMENT_NAMES.size()];
-			String names [] = new String [CSS_NAME_SPACES.size()];
 			
 			try {
-				commsService.register(CLIENT, CSS_ELEMENT_NAMES.toArray(elements), CSS_NAME_SPACES.toArray(names), new TestCallback());
-//				Thread.sleep(DELAY);
+				assertEquals(2, elementNames.length);
+				assertEquals(1, nameSpaces.length);
+				
+				commsService.register(CLIENT, elementNames, nameSpaces, new TestCallback());
+				Thread.sleep(DELAY);
 
-				commsService.UnRegisterCommManager(CLIENT);
+//				commsService.UnRegisterCommManager(CLIENT);
 //				Thread.sleep(DELAY);
 				
-			} catch (RuntimeException r) {
-				Log.d(LOG_TAG, "RunTimeException thrown: " + r.getMessage(), r);
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "Exception thrown: " + e.getMessage(), e);
 				fail();
 			} finally {
-				commsService.unregister(CLIENT, CSS_ELEMENT_NAMES.toArray(elements), CSS_NAME_SPACES.toArray(names));
+				commsService.unregister(CLIENT, elementNames, nameSpaces);
+				Thread.sleep(DELAY);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
 			commsService.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 	}
 	
 	@MediumTest
 	public void testSuccessfulLogin() throws Exception {
-		this.setupBroadcastReceiver();
+		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -147,34 +147,34 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.setResource(CLIENT, XMPP_RESOURCE);
-			commsService.setPortNumber(CLIENT, XMPP_PORT);
-			commsService.setDomainAuthorityNode(CLIENT, XMPP_DOMAIN_AUTHORITY);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			Thread.sleep(DELAY);
 			
 			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			
 			commsService.isConnected(CLIENT);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			
 			commsService.getIdentity(CLIENT);
-			
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
+
 			commsService.getDomainAuthorityNode(CLIENT);
-			
+			Thread.sleep(DELAY);			
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
 			commsService.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 	}
 
 	@MediumTest
 	public void testBadUserLogin() throws Exception {
-		this.setupAlternativeReceiver();
+		BroadcastReceiver receiver = this.setupAlternativeReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -183,25 +183,25 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.setResource(CLIENT, XMPP_RESOURCE);
-			commsService.setPortNumber(CLIENT, XMPP_PORT);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			Thread.sleep(DELAY);
 
 			commsService.login(CLIENT, XMPP_BAD_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
-			
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {			
 			commsService.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 	}
 
 	@MediumTest
 	public void testBadPasswordLogin() throws Exception {
-		this.setupAlternativeReceiver();
+		BroadcastReceiver receiver = this.setupAlternativeReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -210,24 +210,25 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.setResource(CLIENT, XMPP_RESOURCE);
-			commsService.setPortNumber(CLIENT, XMPP_PORT);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			Thread.sleep(DELAY);
 
 			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_BAD_PASSWORD);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {		
 			commsService.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 	}
 
 	@MediumTest
 	public void testCreateIdentity() throws Exception {
-		this.setupBroadcastReceiver();
+		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -235,26 +236,25 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
-    	commsService.setResource(CLIENT, XMPP_RESOURCE);
-    	commsService.setPortNumber(CLIENT, XMPP_PORT);
-    	commsService.setDomainAuthorityNode(CLIENT, XMPP_DOMAIN_AUTHORITY);
+		commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+		Thread.sleep(DELAY);
 			
 		try {
 			commsService.newMainIdentity(CLIENT, XMPP_NEW_IDENTIFIER, XMPP_DOMAIN, XMPP_NEW_PASSWORD);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			commsService.destroyMainIdentity(CLIENT);
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
-			Thread.sleep(DELAY);
+			unregisterReceiver(receiver);
 		}
 	}
 
 	@MediumTest
 	public void testSendMessage() throws Exception {
-		this.setupBroadcastReceiver();
+		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
 		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
@@ -263,23 +263,25 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.setResource(CLIENT, XMPP_RESOURCE);
-			commsService.setPortNumber(CLIENT, XMPP_PORT);
-			commsService.setDomainAuthorityNode(CLIENT, XMPP_DOMAIN_AUTHORITY);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			Thread.sleep(DELAY);
 			
 			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
 
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			commsService.isConnected(CLIENT);
 
-//			Thread.sleep(DELAY);
+			Thread.sleep(DELAY);
 			commsService.sendMessage(CLIENT, SIMPLE_XML_MESSAGE);
+			Thread.sleep(DELAY);
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
 			commsService.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 
@@ -288,6 +290,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	//@MediumTest
 	//TODO Requires more work or a sample XML message
 	public void testSendIQ() throws Exception {
+		BroadcastReceiver receiver = this.setupBroadcastReceiver();
+
 		AndroidCommsBase base = new AndroidCommsBase(getContext(), true);
 		assertTrue(null != base);
 
@@ -311,6 +315,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			fail();
 		} finally {
 			base.logout(CLIENT);
+			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 
@@ -378,6 +383,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         return receiver;
     }
 
+    /**
+     * Unregister a broadcast receiver
+     * @param receiver
+     */
+    private void unregisterReceiver(BroadcastReceiver receiver) {
+        Log.d(LOG_TAG, "Unregister broadcast receiver");
+    	getContext().unregisterReceiver(receiver);
+    }
 	
     /**
      * Broadcast receiver to receive intent return values from service method calls
@@ -415,7 +428,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
 			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
-				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				assertEquals(true, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
 				assertNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
@@ -426,7 +439,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
-				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				Log.d(LOG_TAG, "Un-Register Comm Manager: " + intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				assertEquals(true, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			}
 		}
     }

@@ -19,7 +19,7 @@ public class ServicePlatformCommsRemote extends Service {
 
 	@Override
 	public void onCreate () {
-		AndroidCommsBase serviceBase = new AndroidCommsBase(this, false);
+		AndroidCommsBase serviceBase = new AndroidCommsBase(this, true);
 		
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, XMPPAgent.methodsArray));
 		Log.d(LOG_TAG, "ServicePlatformCommsRemote creation");

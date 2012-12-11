@@ -3,7 +3,8 @@ package org.societies.android.platform.comms.integration;
 
 import java.util.List;
 
-import org.societies.android.api.internal.comms.XMPPAgent;
+import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +26,25 @@ public class MainActivity extends Activity {
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
     
     private static final String CLIENT_NAME = "org.societies.android.platform.comms.integration";
+    
+    //Modify these constants to suit local XMPP server
+    
+    private static final String XMPP_DOMAIN = "societies.bespoke";
+    private static final String XMPP_IDENTIFIER = "alan";
+    private static final String XMPP_PASSWORD = "midge";
+    private static final String XMPP_BAD_IDENTIFIER = "godzilla";
+    private static final String XMPP_BAD_PASSWORD = "smog";
+    private static final String XMPP_NEW_IDENTIFIER = "gollum";
+    private static final String XMPP_NEW_PASSWORD = "precious";
+    private static final String XMPP_RESOURCE = "GalaxyNexus";
+    private static final String XMPP_SUCCESSFUL_JID = XMPP_IDENTIFIER + "@" + XMPP_DOMAIN + "/" + XMPP_RESOURCE;
+    private static final String XMPP_NEW_JID = XMPP_NEW_IDENTIFIER + "@" + XMPP_DOMAIN + "/" + XMPP_RESOURCE;
+    private static final int XMPP_PORT = 5222;
+    private static final String XMPP_DOMAIN_AUTHORITY = "danode." + XMPP_DOMAIN;
+
+    private static final String SIMPLE_XML_MESSAGE = "<iq from='romeo@montague.net/orchard to='juliet@capulet.com/balcony'> " +
+    													"<query xmlns='http://jabber.org/protocol/disco#info'/></iq>";
+
     
     private boolean boundToService;
 	private Messenger targetService = null;
@@ -55,18 +75,23 @@ public class MainActivity extends Activity {
      * 5. Send message
      * 
      */
-    private void subscribeToAllEvents() {
+    private void userLogin() {
     	if (boundToService) {
     		InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
     		invoke.execute();
     	}
     }
     
+    private void configureService() {
+    	if (boundToService) {
+    		ConfigureRemoteService configure = new ConfigureRemoteService(CLIENT_NAME);
+    		configure.execute();
+    	}
+    }
+    
     private void bindToService() {
-//    	Intent serviceIntent = new Intent();
-//    	serviceIntent.setComponent(new ComponentName(TARGET_PACKAGE, TARGET_CLASS));
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Service: ");
+    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service: ");
     	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
     }
@@ -79,36 +104,11 @@ public class MainActivity extends Activity {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			boundToService = true;
 			targetService = new Messenger(service);
-	    	Log.d(this.getClass().getName(), "Societies Android Service connected: ");
-	    	subscribeToAllEvents();
+	    	Log.d(this.getClass().getName(), "Societies Android Comms Service connected: ");
+	    	configureService();
 		}
 	};
 
-    /**
-     * Broadcast receiver to receive intent return values from service method calls
-     */
-    private class MainReceiver extends BroadcastReceiver {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			
-			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
-				Log.d(LOG_TAG, "Subscribed to all events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				Log.d(LOG_TAG, "Subscribed to all event - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				Log.d(LOG_TAG, "Subscribed to events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
-				Log.d(LOG_TAG, "Un-subscribed from all events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
-				Log.d(LOG_TAG, "Un-subscribed from event - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				Log.d(LOG_TAG, "Un-subscribed from events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-			}
-		}
-    }
-    
     /**
      * Create a suitable intent filter
      * @return IntentFilter
@@ -131,6 +131,35 @@ public class MainActivity extends Activity {
 
     }
 
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class MainReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			
+			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
+				Log.d(LOG_TAG, Boolean.toString(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false)));
+			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
+				Log.d(LOG_TAG, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
+				Log.d(LOG_TAG, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
+				Log.d(LOG_TAG, "Logged in JID: " + intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
+				Log.d(LOG_TAG, Boolean.toString(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false)));
+			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
+				Log.d(LOG_TAG, Boolean.toString(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false)));
+			} else if (intent.getAction().equals(XMPPAgent.CONFIGURE_AGENT)) {
+				Log.d(LOG_TAG, Boolean.toString(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false)));
+				userLogin();
+			}
+		}
+    }
+
+    
     /**
      * Create a broadcast receiver
      * 
@@ -171,8 +200,8 @@ public class MainActivity extends Activity {
 
     	protected Void doInBackground(Void... args) {
 
-    		String targetMethod = IAndroidSocietiesEvents.methodsArray[2];
-    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+    		String targetMethod = XMPPAgent.methodsArray[10];
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
     		Bundle outBundle = new Bundle();
     		/*
     		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
@@ -180,9 +209,78 @@ public class MainActivity extends Activity {
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), XMPP_IDENTIFIER);
+    		Log.d(LOCAL_LOG_TAG, "Identifier: " + XMPP_IDENTIFIER);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), XMPP_DOMAIN);
+    		Log.d(LOCAL_LOG_TAG, "Domain: " + XMPP_DOMAIN);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), XMPP_PASSWORD);
+    		Log.d(LOCAL_LOG_TAG, "Password: " + XMPP_PASSWORD);
+    		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Service: ");
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+	/**
+     * 
+     * Async task to invoke remote service method
+     *
+     */
+    private class ConfigureRemoteService extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = ConfigureRemoteService.class.getName();
+    	private String packageName;
+    	private String client;
+
+    	/**
+    	 * Default Constructor
+    	 * 
+    	 * @param packageName
+    	 * @param client
+    	 */
+    	public ConfigureRemoteService(String client) {
+    		this.client = client;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+
+    		String targetMethod = XMPPAgent.methodsArray[17];
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), XMPP_DOMAIN_AUTHORITY);
+    		Log.d(LOCAL_LOG_TAG, "Domain Authority: " + XMPP_DOMAIN_AUTHORITY);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), XMPP_PORT);
+    		Log.d(LOCAL_LOG_TAG, "XMPP port" + XMPP_PORT);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), XMPP_RESOURCE);
+    		Log.d(LOCAL_LOG_TAG, "JID resource: " + XMPP_RESOURCE);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), false);
+    		Log.d(LOCAL_LOG_TAG, "Debug : " + false);
+    		
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
 
     		try {
 				targetService.send(outMessage);
