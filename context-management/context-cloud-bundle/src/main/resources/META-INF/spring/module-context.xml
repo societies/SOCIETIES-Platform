@@ -94,8 +94,4 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-<!-- 	<bean id="userCtxDBMgr"
-		class="org.societies.context.user.db.impl.UserCtxDBMgr">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean> -->
 </beans>
