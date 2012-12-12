@@ -37,12 +37,7 @@ public class OpenfireLoginService {
 	
 	@Autowired
 	private ICommManager commManager;
-	@Autowired
-	private ICommManagerController commManagerControl;
-	@Autowired
-	ICISCommunicationMgrFactory ccmFactory;
-	@Autowired
-	DaRegistry daregistry;
+	
 	
 	private String xmppDomain;
 	
@@ -54,39 +49,7 @@ public class OpenfireLoginService {
 		this.commManager = commManager;
 	}
 	
-	/**
-	 * @return the commManagerControl
-	 */
-	public ICommManagerController getCommManagerControl() {
-		return commManagerControl;
-	}
-
-	/**
-	 * @param commManagerControl the commManagerControl to set
-	 */
-	public void setCommManagerControl(ICommManagerController commManagerControl) {
-		this.commManagerControl = commManagerControl;
-	}
-
 	
-	public ICISCommunicationMgrFactory getCcmFactory() {
-		return ccmFactory;
-	}
-
-	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
-		this.ccmFactory = ccmFactory;
-	}
-
-
-	public DaRegistry getDaregistry() {
-		return daregistry;
-	}
-
-	public void setDaregistry(DaRegistry daregistry) {
-		this.daregistry = daregistry;
-	}
-
-
 	private static Logger log = LoggerFactory.getLogger(OpenfireLoginService.class);
 	
 	public OpenfireLoginService() {
@@ -141,29 +104,7 @@ public class OpenfireLoginService {
 			
 			log.info("Logged on succesffuly");
 			
-			//GET CONTAINER INFO
-			DaUserRecord userRecord = new DaUserRecord();
-			userRecord = getDaregistry().getXmppIdentityDetails(username);
-	
-			if ((userRecord != null) && (userRecord.getStatus() != null))
-			{
-				if (!userRecord.getStatus().contentEquals("active") 
-						|| userRecord.getHost().isEmpty() 
-						|| userRecord.getPort().isEmpty()) 
-				{
-					//CLOUD NODE NOT SETUP YET
-					//model.put("loginError", "Cloud node creation not completed");
-					//return new ModelAndView("pilot", model);
-					log.info("Cloud node creation not completed");
-					return null;
-				}
-			} else { // account doesn't exist
-					//CLOUD NODE NOT SETUP YET
-					//model.put("loginError", "User Acount Not Found");
-				log.info("User Acount Not Found");
-					//return new ModelAndView("pilot", model);
-				return null;
-			}
+			
 			
 	// 		GET SERVER/PORT NUMBER FROM REGISTRY
 			//String redirectUrl = new String();
@@ -171,8 +112,8 @@ public class OpenfireLoginService {
 			//model.put("webappurl", redirectUrl);
 			//model.put("name", userName);	
 			//return new ModelAndView("loginsuccess", model);
-			log.info("Got userid"+ userRecord.getId());
-			return userRecord.getId();
+			log.info("Got user lloged on");
+			return "logged";
 		
 	}
 	

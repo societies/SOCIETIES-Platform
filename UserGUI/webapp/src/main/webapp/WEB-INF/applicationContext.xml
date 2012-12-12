@@ -35,17 +35,16 @@
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
 		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">  
 
+
 	
+	<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
+	<osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1" />
+	<osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote" cardinality="0..1" />
 
 
      <mvc:annotation-driven />  
 	
 	
-	<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-	<osgi:reference id="commMngrController" interface="org.societies.api.internal.comm.ICommManagerController"/>
-	<osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
-	<osgi:reference id="daregistry" interface="org.societies.domainauthority.registry.DaRegistry"/>
-	<osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory" />
 
 
 </beans>

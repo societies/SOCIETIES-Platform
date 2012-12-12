@@ -2,7 +2,8 @@ function doAjaxGetMyCommunities() {
 	
   $.ajax({  
     type: "POST",  
-    url: contexPath + "/get_my_communities.html",
+    url: request.getContextPath() + "/get_my_communities.html",
+    //url: "/get_my_communities.html",
   	success: function(response){
       // we have the response 
     	
@@ -48,7 +49,8 @@ function doAjaxGetMyCommunities() {
 		
 	  $.ajax({  
 	    type: "POST",  
-	    url: contexPath + "/get_suggested_communities.html",
+	//    url: contexPath + "/get_suggested_communities.html",
+	    url:  request.getContextPath() + "/get_suggested_communities.html",
 	  	success: function(response){
 	      // we have the response 
 	    	
@@ -76,3 +78,5 @@ function doAjaxGetMyCommunities() {
 	    }  
 	  });  
 }  
+  
+  

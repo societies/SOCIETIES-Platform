@@ -44,11 +44,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.webapp.comms.UserGuiCommsClient;
 import org.societies.webapp.model.CisInfo;
 import org.societies.webapp.model.LoginForm;
 import org.societies.webapp.service.OpenfireLoginService;
 import org.societies.webapp.service.UserService;
+
+import org.societies.cis.directory.client.CisDirectoryRemoteClient;
+
 /**
  * 
  * @author Maria
@@ -62,6 +70,10 @@ public class CisController {
 	
 	@Autowired
 	UserService userService;
+	@Autowired
+	ICisManager  cisManager;
+	@Autowired
+	ICisDirectoryRemote cisDirectory;
 	
 
 	public UserService getUserService() {
@@ -71,6 +83,20 @@ public class CisController {
 		this.userService = userService;
 	}
 
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+	}
+	
+	public ICisDirectoryRemote getCisDirectory() {
+		return cisDirectory;
+	}
+	public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
+		this.cisDirectory = cisDirectory;
+	}
 	/**
 	 * Displays login Page
 	 * 
@@ -106,42 +132,102 @@ public class CisController {
 	@RequestMapping(value = "/get_my_communities.html", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse getMyCommunities( ){
 		JsonResponse res = new JsonResponse();
-		List<CisInfo> cisinfoList = null;
+		List<CisInfo> cisinfoList = new ArrayList<CisInfo>();
 		
-		try {
-		 Future<List<CisInfo>> cisinfoListFut = getUserService().getMyCisList();
-		 cisinfoList = cisinfoListFut.get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		if (getUserService().isUserLoggedIn())
+		{
+			
+			List<ICis> cisList = getCisManager().getCisList();
+			
+			
+			//TODO : Should be able to give cisdorectory a list of id's!!
+			//For now, just get them all 
+			CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 
-		res.setStatus("SUCCESS");
-		res.setResult(cisinfoList);
+			getCisDirectory().findAllCisAdvertisementRecords(callback);
+			List<CisAdvertisementRecord> adverts = callback.getResultList();
+
+			
+			for ( int i = 0; i < cisList.size(); i++)
+			{
+				//find ad for this id
+				boolean bFound = false;
+				int j = 0;
+				do
+				{
+					if (adverts.get(j).getId().contains(cisList.get(i).getCisId()))
+							bFound = true;
+					else
+						j++;
+				} while ((bFound == false) && (j < adverts.size()));
+				
+				if (bFound)
+				{
+					CisInfo cisInfo = new CisInfo();
+					cisInfo.setCisid(cisList.get(i).getCisId());
+					cisInfo.setCisname(adverts.get(j).getName());
+					cisinfoList.add(cisInfo);
+				}
+				
+			}
+		 
+			res.setStatus("SUCCESS");
+			res.setResult(cisinfoList);
+		}
+		else
+			res.setStatus("FAILURE");
+		
 		return res;
 	}
 	
 	@RequestMapping(value = "/get_suggested_communities.html", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse getSuggestedCommunities( ){
 		JsonResponse res = new JsonResponse();
-		List<CisInfo> cisinfoList = null;
+		List<CisInfo> cisinfoList = new ArrayList<CisInfo>();
 		
-		try {
-		 Future<List<CisInfo>> cisinfoListFut = getUserService().getSuggestedCisList();
-		 cisinfoList = cisinfoListFut.get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		if (getUserService().isUserLoggedIn())
+		{
+			
+			List<ICis> cisList = getCisManager().getCisList();
+			
+			
+			//TODO : Should be able to give cisdorectory a list of id's!!
+			//For now, just get them all 
+			CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 
-		res.setStatus("SUCCESS");
-		res.setResult(cisinfoList);
+			getCisDirectory().findAllCisAdvertisementRecords(callback);
+			List<CisAdvertisementRecord> adverts = callback.getResultList();
+
+			
+			for ( int i = 0; i < cisList.size(); i++)
+			{
+				//find ad for this id
+				boolean bFound = false;
+				int j = 0;
+				do
+				{
+					if (adverts.get(j).getId().contains(cisList.get(i).getCisId()))
+							bFound = true;
+					else
+						j++;
+				} while ((bFound == false) && (j < adverts.size()));
+				
+				if (!bFound)
+				{
+					CisInfo cisInfo = new CisInfo();
+					cisInfo.setCisid(cisList.get(i).getCisId());
+					cisInfo.setCisname(adverts.get(j).getName());
+					cisinfoList.add(cisInfo);
+				}
+				
+			}
+		 
+			res.setStatus("SUCCESS");
+			res.setResult(cisinfoList);
+		}
+		else
+			res.setStatus("FAILURE");
+		
 		return res;
 	}
 	

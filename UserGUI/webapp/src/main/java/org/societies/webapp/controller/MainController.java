@@ -115,13 +115,15 @@ public class MainController {
 		if (getUserService().isUserLoggedIn())
 			return new ModelAndView("index", model); //TODO : return error string
 		
-		getUserService().setUserjid(getOpenfireLoginService().doLogin(loginForm.getUsername(), loginForm.getPassword()));
+		//TODO Do check
+		if (getOpenfireLoginService().doLogin(loginForm.getUsername(), loginForm.getPassword()) != null)
+			getUserService().setUserLoggedIn(true);
 		
-		if (getUserService().getUserjid() == null)
-			return new ModelAndView("index", model); //TODO : return error string
+//		if (getUserService().getUserjid() == null)
+//			return new ModelAndView("index", model); //TODO : return error string
 		
 		// if we get this far we can set up the user session comm manager
-		getUserService().getLocalCommManager();
+//		getUserService().getLocalCommManager();
 		
 		
 		/*

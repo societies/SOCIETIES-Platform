@@ -49,7 +49,7 @@
 	<mvc:annotation-driven />	
 
 	<!-- a HTTP Session-scoped bean exposed as a proxy -->
-	<bean id="userService" class="org.societies.webapp.service.UserService" scope="session"  destroy-method="destroyOnSessionEnd"> 
+	<bean id="userService" class="org.societies.webapp.service.UserService" scope="session"> 
            <aop:scoped-proxy/>
 	</bean> 
 	

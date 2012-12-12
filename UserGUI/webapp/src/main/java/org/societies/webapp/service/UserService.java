@@ -34,16 +34,16 @@ import org.springframework.stereotype.Service;
 @Scope("Session")  
 public class UserService {
 
-	@Autowired
+	//@Autowired
 	private ICommManager commManager;
-	@Autowired
+	//@Autowired
 	private ICommManagerController commManagerControl;
-	@Autowired
+	//@Autowired
 	ICISCommunicationMgrFactory ccmFactory;
 	
-	@Autowired
+	//@Autowired
 	DaRegistry daregistry;
-	@Autowired
+	//@Autowired
 	ICisDirectory cisDirectory;
 	
 	
@@ -174,85 +174,7 @@ public class UserService {
 			localCommManager.UnRegisterCommManager();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Async
-	public Future<List<CisInfo>> getMyCisList()
-	{
-		List<CisInfo> cisList = new ArrayList<CisInfo>();
-		
-		// first, get a list of the cis from the user cis manager, we only want the cis id, as we can get the
-		// other information locally from the cisdirectory
-		
-		log.info("UserService getMyCisList Start");
-		log.info("CommMgr we are using is " + this.localCommManager.getIdManager().getThisNetworkNode().getJid());
-		UserGuiCommsClient commsclient = new UserGuiCommsClient(this.localCommManager);
-		UserGuiCommsResult commsresult = new UserGuiCommsResult();
-		log.info("UserService getMyCisList Sending Message");
-		commsclient.getMyCisList(getUserjid(), commsresult);
-		
-		try {
-			//TODO fix:
-			while (commsresult.getResultBean() == null)
-			{
-				Thread.sleep(1000);
-			}
-			Thread.sleep(1000); // give it one more second to populate
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
-		UserGuiBeanResult resultbean = commsresult.getResultBean();
-		List<String> idList = resultbean.getStringList();
-		
-		List<CisAdvertisementRecord> cisAdsList = null;
-		//TODO : Should be able to give cisdorectory a list of id's!!
-		//For now, just get them all 
-		
-		Future<List<CisAdvertisementRecord>> cisAdsFut = getCisDirectory().findAllCisAdvertisementRecords();
-		try {
-			cisAdsList = cisAdsFut.get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		
-		for ( int i = 0; i < idList.size(); i++)
-		{
-			//find ad for this id
-			boolean bFound = false;
-			int j = 0;
-			do
-			{
-				if (cisAdsList.get(j).getId().contains(idList.get(i)))
-						bFound = true;
-				else
-					j++;
-			} while ((bFound == false) && (j < cisAdsList.size()));
-			
-			if (bFound)
-			{
-				CisInfo cisInfo = new CisInfo();
-				cisInfo.setCisid(idList.get(i));
-				cisInfo.setCisname(cisAdsList.get(j).getName());
-				cisList.add(cisInfo);
-			}
-			
-		}
-			
-
-		
-		
-		
-		return new AsyncResult<List<CisInfo>>(cisList);
-		
-		
-		
-	}
+	
 
 	
 	@SuppressWarnings("unchecked")

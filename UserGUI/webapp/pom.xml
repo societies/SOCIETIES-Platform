@@ -180,8 +180,20 @@
 			<version>1.7.1</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.societies.cis</groupId>
+			<artifactId>CisDirectoryClient</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
-
+		<dependency>
+		  <groupId>org.societies.cis</groupId>
+		  <artifactId>cis-management-client</artifactId>
+		  <version>${version.cis}</version>
+		  <scope>provided</scope>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
