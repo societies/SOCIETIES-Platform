@@ -23,45 +23,67 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.internal.useragent;
+package org.societies.android.platform.useragent.feedback.guis;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IAndroidUserFeedback{
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-	//Array of interface method signatures
-	String methodsArray [] = {
-			"getExplicitFB(String client, int type, ExpProposalContent content)",
-			"getImplicitFB(String client, int type, ImpProposalContent content)",
-			"showNotification(String client, String notificationText)"
-			};
+public class CheckboxPopup extends ExplicitPopup{
 	
-	/**
-	 * Get explicit feedback from the user - force them to interact with notification box
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (ack/nack, radio button or check box)
-	 * @param content - the content for the feedback form
-	 * @return - an array of result strings
-	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content);
+	private static final String LOG_TAG = CheckboxPopup.class.getName();
+    LinearLayout layout;
+    TextView text;
+    LayoutParams params;
+    Button submit;
 
-	/**
-	 * Get implicit feedback from the user - only require them to interact with the notification box
-	 * if the proposed platform behaviour is not desired.
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (timed abort is currently the only one)
-	 * @param content - he content for the feedback form
-	 * @return - a boolean value, true indicating that the proposed action should continue and 
-	 * false indicating that the proposed action should be aborted.
-	 */
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content);
 
-	/**
-	 * Show a notification popup to the user.  This popup does not give any option for user interation and is
-	 * just for information purposes.
-	 * @param client
-	 * @param notificationText - the text to display to the user
-	 */
-	public void showNotification(String client, String notificationText);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+	
+    
+	public List<String> getFeedback(String proposalText, List<String> options){
+		List<String> feedback = new ArrayList<String>();
+	
+		//define proposal text
+        text = new TextView(this);
+        text.setText(proposalText);
+        
+        //define checkbox list
+        
+        //define submit button
+        submit = new Button(this);
+        submit.setText("Submit");
+        submit.setOnClickListener(new ButtonListener());
+        
+        params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
+        layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(text, params);
+        layout.addView(submit, params);
+        
+        setContentView(layout);
+		
+		return feedback;
+	}
+	
+	public class CheckBoxListener{
+		
+	}
+	
+	public class ButtonListener implements OnClickListener{
+		public void onClick(View v) {
+            Log.d(LOG_TAG, "submitted");
+        }
+	}
 }

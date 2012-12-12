@@ -8,9 +8,9 @@
         <version>RELEASE</version>
    </parent>
 
-   <groupId>org.societies.android.platform.useragent.uam.container</groupId>
-   <artifactId>TestContainerUAM</artifactId>
-   <name>TestContainerUAM</name>
+   <groupId>org.societies.android.platform.useragent.feedback.container</groupId>
+   <artifactId>TestContainerFeedback</artifactId>
+   <name>TestContainerFeedback</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 
@@ -81,8 +81,8 @@
 			<version>${release.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.android.platform.useragent.uam</groupId>
-   			<artifactId>AndroidUserActionMonitor</artifactId>
+			<groupId>org.societies.android.platform.useragent.feedback</groupId>
+   			<artifactId>AndroidUserFeedback</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>

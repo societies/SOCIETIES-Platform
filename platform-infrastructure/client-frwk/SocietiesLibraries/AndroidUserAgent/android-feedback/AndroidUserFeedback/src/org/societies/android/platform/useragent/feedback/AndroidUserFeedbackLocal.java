@@ -23,45 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.internal.useragent;
+package org.societies.android.platform.useragent.feedback;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
-public interface IAndroidUserFeedback{
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-	//Array of interface method signatures
-	String methodsArray [] = {
-			"getExplicitFB(String client, int type, ExpProposalContent content)",
-			"getImplicitFB(String client, int type, ImpProposalContent content)",
-			"showNotification(String client, String notificationText)"
-			};
+public class AndroidUserFeedbackLocal extends Service{
+
+	private static final String LOG_TAG = AndroidUserFeedbackLocal.class.getName();
+	private IBinder binder;
 	
-	/**
-	 * Get explicit feedback from the user - force them to interact with notification box
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (ack/nack, radio button or check box)
-	 * @param content - the content for the feedback form
-	 * @return - an array of result strings
-	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content);
+	@Override
+	public void onCreate () {
+		this.binder = new LocalFeedbackBinder();
+		Log.d(LOG_TAG, "AndroidUserFeedbackLocal service starting...");
+	}
 
-	/**
-	 * Get implicit feedback from the user - only require them to interact with the notification box
-	 * if the proposed platform behaviour is not desired.
-	 * @param client
-	 * @param type - the type of feedback form to show to the user (timed abort is currently the only one)
-	 * @param content - he content for the feedback form
-	 * @return - a boolean value, true indicating that the proposed action should continue and 
-	 * false indicating that the proposed action should be aborted.
-	 */
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content);
+	@Override
+	public void onDestroy(){
+		Log.d(LOG_TAG, "AndroidUserFeedbackLocal service terminating...");
+	}
 
-	/**
-	 * Show a notification popup to the user.  This popup does not give any option for user interation and is
-	 * just for information purposes.
-	 * @param client
-	 * @param notificationText - the text to display to the user
-	 */
-	public void showNotification(String client, String notificationText);
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOG_TAG, "AndroidUserFeedbackLocal onBind...");
+		return this.binder;
+	}
+	
+	public class LocalFeedbackBinder extends Binder {
+		public IAndroidUserFeedback getService() {
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			PubsubClientAndroid pubsubClient = createPubsubClientAndroid();
+			AndroidUserFeedbackBase uamBase = new AndroidUserFeedbackBase(
+					AndroidUserFeedbackLocal.this.getApplicationContext(),
+					ccm, 
+					pubsubClient,
+					false);
+			return uamBase;
+		}
+	}
+	
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
+	}
+	
+	protected PubsubClientAndroid createPubsubClientAndroid(){
+		return new PubsubClientAndroid(getApplicationContext());
+	}
 }

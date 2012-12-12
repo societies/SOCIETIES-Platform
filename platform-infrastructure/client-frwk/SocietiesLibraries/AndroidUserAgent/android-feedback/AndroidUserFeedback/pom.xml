@@ -8,10 +8,10 @@
         <version>RELEASE</version>
    </parent>
 
-   <groupId>org.societies.android.platform.useragent.uam</groupId>
-   <artifactId>AndroidUserActionMonitor</artifactId>
+   <groupId>org.societies.android.platform.useragent.feedback</groupId>
+   <artifactId>AndroidUserFeedback</artifactId>
    <version>${release.version}</version> 
-   <name>AndroidUserActionMonitor</name>
+   <name>AndroidUserFeedback</name>
    <packaging>apklib</packaging>
    
 	<developers>
@@ -44,21 +44,44 @@
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency> -->
-		<dependency>
+		<!-- <dependency>
    			<groupId>org.societies.android.api.external</groupId>
    			<artifactId>societies-android-api</artifactId>
   			<version>${release.version}</version>
   			<type>apklib</type>
+		</dependency>  -->
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
+		<dependency>
+            <groupId>org.societies.android.platform.androidutils</groupId>
+           	<artifactId>SocietiesAndroidUtilities</artifactId>
+          	<version>${release.version}</version>
+     		<type>apklib</type>
+   		</dependency>
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.comm.android</groupId>
+			<artifactId>AndroidPubsubApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>user-agent-api</artifactId>
+			<version>${version.ua}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
