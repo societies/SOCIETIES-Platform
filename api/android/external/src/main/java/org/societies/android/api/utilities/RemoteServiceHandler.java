@@ -62,12 +62,10 @@ public class RemoteServiceHandler extends Handler {
 			try {
 				Log.d(LOG_TAG, "Target method: " + targetMethod);
 
-				Class <?> parameterClasses[] = ServiceMethodTranslator
-						.getParameterClasses(targetMethod);
+				Class <?> parameterClasses[] = ServiceMethodTranslator.getParameterClasses(targetMethod);
+				
 				for (Class <?> element : parameterClasses) {
-					Log.d(LOG_TAG,
-							"Target method param types: " + element.getName());
-
+					Log.d(LOG_TAG,"Target method param types: " + element.getName());
 				}
 
 				Method method = this.container.getMethod(
@@ -102,20 +100,18 @@ public class RemoteServiceHandler extends Handler {
 						Method bundleMethod = null;
 
 						if (implementsParcelable(parameterClasses[i])) {
-							Log.d(LOG_TAG, "Class: " + parameterClasses[i]
-									+ " is an instance of Parcelable");
-							bundleMethod = Bundle.class.getMethod(
-									"getParcelable", bundleParam);
+							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an instance of Parcelable");
+							bundleMethod = Bundle.class.getMethod("getParcelable", bundleParam);
+						} else if (parameterClasses[i].isArray()) {
+							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an array");
+							bundleMethod = Bundle.class.getMethod("get" + paramTypeList[i], bundleParam);
 						} else {
-							bundleMethod = Bundle.class.getMethod("get"
-									+ paramTypeList[i], bundleParam);
+							bundleMethod = Bundle.class.getMethod("get" + paramTypeList[i], bundleParam);
 						}
-						Log.d(LOG_TAG,
-								"Method invoked: " + bundleMethod.getName());
+						Log.d(LOG_TAG,"Method invoked: " + bundleMethod.getName());
 
 						params[i] = bundleMethod.invoke(bundle, bundleValue);
-						Log.d(LOG_TAG, "parameter i = " + i + " value: "
-								+ params[i]);
+						Log.d(LOG_TAG, "parameter i = " + i + " value: " + params[i]);
 					}
 					method.invoke((this.container.cast(this.containerObject)) , params);
 				} catch (IllegalArgumentException e) {

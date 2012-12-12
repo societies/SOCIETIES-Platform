@@ -83,6 +83,7 @@ public class AndroidCommsBase implements XMPPAgent {
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
 		Log.d(LOG_TAG, "Service Base Object created");
 		this.restrictBroadcast = restrictBroadcast;
+		Log.d(LOG_TAG, "Restrict broadcasted intents: " + this.restrictBroadcast);
 		this.serviceContext = serviceContext;
 	}
 	
@@ -111,7 +112,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		try {
 			connect();
 			
-			connection.addPacketListener( new PacketListener() { // TODO remove packet listener on unregister
+			// TODO remove packet listener on unregister
+			
+			connection.addPacketListener( new PacketListener() { 
 				public void processPacket(Packet packet) {
 					callback.receiveMessage(packet.toXML());
 				}			
@@ -549,11 +552,12 @@ public class AndroidCommsBase implements XMPPAgent {
 		Intent intent = new Intent(CONFIGURE_AGENT);
 		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 		if (this.restrictBroadcast) {
+			Log.d(LOG_TAG, "Restrict broadcast to package: " + client);
 			intent.setPackage(client);
 		}
 
 		this.serviceContext.sendBroadcast(intent);
-
+		Log.d(LOG_TAG, "Return Value broadcast sent: " + intent.getAction());
 		
 		return false;
 	}

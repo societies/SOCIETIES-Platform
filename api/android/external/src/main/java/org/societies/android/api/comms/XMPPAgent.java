@@ -9,14 +9,14 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
  * @author Joao M. Goncalves
  */
 public interface XMPPAgent {
-	String methodsArray [] = {"register(String client, String[] elementNames, String[] namespaces, org.societies.android.api.internal.comms.Callback callback)",
+	String methodsArray [] = {"register(String client, String[] elementNames, String[] namespaces, org.societies.android.api.comms.Callback callback)",
 							  "unregister(String client, String[] elementNames, String[] namespaces)",
 							  "UnRegisterCommManager(String client)",
 							  "sendMessage(String client, String messageXml)",
-							  "sendIQ(String client, String xml, org.societies.android.api.internal.comms.Callback callback)",
+							  "sendIQ(String client, String xml, org.societies.android.api.comms.Callback callback)",
 							  "getIdentity(String client)",
 							  "getDomainAuthorityNode(String client)",
-							  "getItems(String client, String entity, String node, org.societies.android.api.internal.comms.Callback callback)",
+							  "getItems(String client, String entity, String node, org.societies.android.api.comms.Callback callback)",
 							  "isConnected(String client)",
 							  "newMainIdentity(String client, String identifier, String domain, String password)",
 							  "login(String client, String identifier, String domain, String password)",
