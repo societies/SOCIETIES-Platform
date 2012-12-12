@@ -7,9 +7,9 @@
    		<welcome-file>/views/default.jsp</welcome-file>
 	</welcome-file-list>
 	
-	<display-name>societies web-app</display-name>
+	<display-name>societies test web-app</display-name>
 
-	<description>Societies Platform webapplication using Spring MVC </description>
+	<description>Societies Platform Test Web Application using Spring MVC </description>
 
 <!-- OSGI aware web application context declaration -->
 	<context-param>
@@ -42,13 +42,13 @@
 	under servlet declaration -->
 	
 	<servlet>
-		<servlet-name>societies</servlet-name>
+		<servlet-name>societies-test</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>societies</servlet-name>
+		<servlet-name>societies-test</servlet-name>
 		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
 
