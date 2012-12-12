@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -27,8 +27,10 @@ package org.societies.api.context.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -37,6 +39,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -44,11 +47,14 @@ import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeValueTypeBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxHistoryAttributeBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.api.schema.context.model.CtxOriginTypeBean;
 import org.societies.api.schema.context.model.CtxQualityBean;
+import org.societies.api.schema.context.model.HistoryMapBean;
+import org.societies.api.schema.context.model.HistoryMapKVPairBean;
 import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 
 public final class CtxModelBeanTranslator {
@@ -64,6 +70,132 @@ public final class CtxModelBeanTranslator {
 
 		return instance;
 	}
+
+
+	public HistoryMapBean fromHistoryMap(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> historyMap ){
+
+		HistoryMapBean bean = new HistoryMapBean();
+		List<HistoryMapKVPairBean> historyList = new ArrayList<HistoryMapKVPairBean>();
+		try {
+
+			for(CtxHistoryAttribute primaryHoc : historyMap.keySet()){
+				HistoryMapKVPairBean historyKVPairBean = new HistoryMapKVPairBean();
+				historyKVPairBean.setPrimaryHistoryAttribute(fromCtxHoCAttribute(primaryHoc));
+
+				List<CtxHistoryAttribute> escortingList = historyMap.get(primaryHoc);
+				List<CtxHistoryAttributeBean> escortingHistoryAttributeListBean = new ArrayList<CtxHistoryAttributeBean>();
+
+				for(CtxHistoryAttribute escortngHocAttr : escortingList){
+					escortingHistoryAttributeListBean.add(fromCtxHoCAttribute(escortngHocAttr));
+				}
+
+				historyKVPairBean.setEscortingHistoryAttribute(escortingHistoryAttributeListBean);
+				historyList.add(historyKVPairBean);
+			}
+
+			bean.setHistoryKeyValue(historyList);
+
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Could not create History Map bean from instance "
+					+ historyMap + ": " + e.getLocalizedMessage(), e);
+		}
+
+		return bean;
+	}
+
+
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> fromHistoryMapBean(HistoryMapBean historyBean ){
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> hocMap = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+		//List<HistoryMapKVPairBean> historyList = new ArrayList<HistoryMapKVPairBean>();
+
+		List<HistoryMapKVPairBean> hocKeyValues = historyBean.getHistoryKeyValue();
+
+		try {
+
+			for(HistoryMapKVPairBean historyMapKVbean : hocKeyValues){
+
+				CtxHistoryAttributeBean hocPrimaryBean = historyMapKVbean.getPrimaryHistoryAttribute();
+				CtxHistoryAttribute primaryAttribute;
+
+				primaryAttribute = fromCtxHoCAttributeBean(hocPrimaryBean);
+
+				List<CtxHistoryAttribute> hocList = new ArrayList<CtxHistoryAttribute>();
+				List<CtxHistoryAttributeBean> hocListBean = historyMapKVbean.getEscortingHistoryAttribute();
+
+				for(CtxHistoryAttributeBean  escortingHocBean : hocListBean ){
+					CtxHistoryAttribute escortingHoc = fromCtxHoCAttributeBean(escortingHocBean);
+					hocList.add(escortingHoc);	
+				}
+
+				hocMap.put(primaryAttribute, hocList);
+
+			}
+
+		} catch (DatatypeConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return hocMap;
+	}
+
+
+
+
+	public CtxHistoryAttributeBean fromCtxHoCAttribute(CtxHistoryAttribute historyAttr) throws DatatypeConfigurationException {
+
+		CtxHistoryAttributeBean bean = new CtxHistoryAttributeBean();
+		bean.setBinaryValue(historyAttr.getBinaryValue());
+		bean.setDoubleValue(historyAttr.getDoubleValue());
+		bean.setIntegerValue(historyAttr.getIntegerValue());
+		bean.setLastUpdated(DateToXMLGregorianCalendar(historyAttr.getLastUpdated()));
+		bean.setLastModified(DateToXMLGregorianCalendar(historyAttr.getLastModified()));
+		bean.setStringValue(historyAttr.getStringValue());
+		bean.setValueMetric(historyAttr.getValueMetric());
+
+		bean.setValueType(fromCtxAttributeValueType(historyAttr.getValueType()));
+		bean.setId(fromCtxIdentifier(historyAttr.getId()));
+
+
+		return bean;
+	}
+
+	public CtxHistoryAttribute fromCtxHoCAttributeBean(CtxHistoryAttributeBean historyAttrBean) throws DatatypeConfigurationException {
+
+
+		CtxAttributeIdentifier hocID;
+		CtxHistoryAttribute hocAttr = null;
+		Date lastModified = null;
+		Date lastUpdated = null;
+		try {
+			hocID = (CtxAttributeIdentifier) fromCtxIdentifierBean(historyAttrBean.getId());
+
+
+			if(historyAttrBean.getLastModified() != null && historyAttrBean.getLastUpdated() != null ){
+				lastModified = XMLGregorianCalendarToDate(historyAttrBean.getLastModified()); 
+				lastUpdated =  XMLGregorianCalendarToDate(historyAttrBean.getLastUpdated());
+			}
+			String stringValue = historyAttrBean.getStringValue();
+			Integer valueInteger = historyAttrBean.getIntegerValue();
+			Double valueDouble = historyAttrBean.getDoubleValue();
+			byte [] valueBinary = historyAttrBean.getBinaryValue();
+			CtxAttributeValueType valueType = fromCtxAttributeValueTypeBean(historyAttrBean.getValueType());
+
+			String valueMetric = historyAttrBean.getValueMetric();
+
+			hocAttr = new CtxHistoryAttribute(hocID, lastModified, lastUpdated, stringValue, valueInteger, valueDouble, valueBinary, valueType, valueMetric);
+
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return hocAttr;
+	}
+
+
+
 
 	public IndividualCtxEntityBean fromIndiCtxEntity (IndividualCtxEntity indiEntity) throws DatatypeConfigurationException {
 
@@ -280,7 +412,7 @@ public final class CtxModelBeanTranslator {
 	}
 
 	public CtxModelObjectBean fromCtxModelObject(CtxModelObject object) {
-	
+
 		if (LOG.isDebugEnabled())
 			LOG.debug("Creating CtxModelObject bean from instance " + object);
 

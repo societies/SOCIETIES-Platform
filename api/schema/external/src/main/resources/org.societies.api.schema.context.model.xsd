@@ -82,6 +82,37 @@
     </xs:complexContent>
   </xs:complexType>
 
+
+ <xs:complexType name="ctxHistoryAttributeBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="lastUpdated" type="xs:dateTime" minOccurs="0" />
+          <xs:element name="stringValue" type="xs:string" minOccurs="0"/>
+          <xs:element name="integerValue" type="xs:int"  minOccurs="0"/>
+          <xs:element name="doubleValue" type="xs:double"  minOccurs="0"/>
+          <xs:element name="binaryValue" type="xs:base64Binary"  minOccurs="0"/>
+          <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean" minOccurs="0"/>
+          <xs:element name="valueMetric" type="xs:string" minOccurs="0"/>
+          <!--  xs:element name="historyRecordId" type="xs:long"/>-->
+          </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+	<xs:complexType name="historyMapKVPairBean">
+    <xs:sequence>
+      <xs:element name="primaryHistoryAttribute" type="tns:ctxHistoryAttributeBean" minOccurs="0" />
+      <xs:element name="escortingHistoryAttribute" type="tns:ctxHistoryAttributeBean" minOccurs="0" maxOccurs="unbounded" />
+     </xs:sequence>
+  	</xs:complexType>
+
+	<xs:complexType name="historyMapBean">
+    <xs:sequence>
+      <xs:element name="historyKeyValue" type="tns:historyMapKVPairBean" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+  	</xs:complexType>
+	
   <xs:complexType name="ctxQualityBean">
     <xs:sequence>
       <xs:element name="lastUpdated" type="xs:dateTime" minOccurs="0" />
@@ -130,20 +161,7 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="ctxHistoryAttributeBean">
-    <xs:complexContent>
-      <xs:extension base="tns:ctxModelObjectBean">
-        <xs:sequence>
-          <xs:element name="historyRecordId" type="xs:long"/>
-          <xs:element name="stringValue" type="xs:string"  minOccurs="0"/>
-          <xs:element name="integerValue" type="xs:int"  minOccurs="0"/>
-          <xs:element name="doubleValue" type="xs:double"  minOccurs="0"/>
-          <xs:element name="binaryValue" type="xs:base64Binary" minOccurs="0"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
+ 
   <xs:simpleType name="ctxModelTypeBean">
     <xs:restriction base="xs:string">
       <xs:enumeration value="ENTITY"/>

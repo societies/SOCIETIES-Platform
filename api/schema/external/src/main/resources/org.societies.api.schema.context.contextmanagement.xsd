@@ -35,6 +35,12 @@
 					nillable="false" minOccurs="0" />
 				<xs:element name="lookup" type="lookupBean"
 					nillable="false" minOccurs="0" />
+				<xs:element name="retrieveHistoryTuples" type="retrieveHistoryTuplesBean"
+					nillable="false" minOccurs="0" />
+
+
+ <!-- retrieveHistoryTuples(String attributeType, List<CtxAttributeIdentifier> escortingAttrIds,Date startDate, Date endDate) -->
+
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -63,10 +69,25 @@
 				<xs:element name="removeBeanResult" type="tns:ctxModelObjectBean"
 					minOccurs="0" />				
 				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
+					minOccurs="0" maxOccurs="unbounded" />		
+							
+				<xs:element name="retrieveHistoryTuplesBeanResult" type="tns:historyMapBean"
 					minOccurs="0" maxOccurs="unbounded" />				
+			
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	
+	
+	<xs:complexType name="retrieveHistoryTuplesBean">
+		<xs:sequence>
+			<xs:element name="attributeType" type="xs:string" minOccurs="1" />
+			<xs:element name="startDate" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="endDate" type="xs:dateTime" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
 	
 	<xs:complexType name="createEntityBean">
 		<xs:sequence>
