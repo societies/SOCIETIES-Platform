@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.utilities.DBC.Dbc;
@@ -343,9 +342,9 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#getNodeDetails(java.lang.String, org.societies.android.api.internal.examples.AndroidParcelable)
 	 */
-	public AndroidParcelable getNodeDetails(String arg0, AndroidParcelable arg1) {
-		return null;
-	}
+	//public AndroidParcelable getNodeDetails(String arg0, AndroidParcelable arg1) {
+	//	return null;
+	//}
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#startActivity(java.lang.String, java.lang.String)

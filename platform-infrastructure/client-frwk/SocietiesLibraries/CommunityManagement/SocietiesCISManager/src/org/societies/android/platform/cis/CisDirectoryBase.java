@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
@@ -85,7 +84,7 @@ public class CisDirectoryBase implements ICisDirectory {
     
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
-	public ACisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
+	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
         Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -96,7 +95,7 @@ public class CisDirectoryBase implements ICisDirectory {
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
-	public ACisAdvertisementRecord[] findForAllCis(String client, String filter) {       
+	public CisAdvertisementRecord[] findForAllCis(String client, String filter) {       
         Log.d(LOG_TAG, "findForAllCis called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -107,7 +106,7 @@ public class CisDirectoryBase implements ICisDirectory {
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
-	public ACisAdvertisementRecord searchByID(String client, String cis_id) {
+	public CisAdvertisementRecord searchByID(String client, String cis_id) {
 		Log.d(LOG_TAG, "searchByID called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -235,12 +234,14 @@ public class CisDirectoryBase implements ICisDirectory {
 					CisDirectoryBeanResult dirResult = (CisDirectoryBeanResult) msgBean;
 					List<CisAdvertisementRecord> listReturned = dirResult.getResultCis();
 					//CONVERT TO PARCEL BEANS
-					Parcelable returnArray[] = new Parcelable[listReturned.size()];
-					for (int i=0; i<listReturned.size(); i++) {
-						ACisAdvertisementRecord record = ACisAdvertisementRecord.convertCisAdvertRecord(listReturned.get(i)); 
-						returnArray[i] = record;
-						Log.d(LOG_TAG, "Added record: " + record.getId());
-					}
+					//Parcelable returnArray[] = new Parcelable[listReturned.size()];
+					//for (int i=0; i<listReturned.size(); i++) {
+					//	ACisAdvertisementRecord record = ACisAdvertisementRecord.convertCisAdvertRecord(listReturned.get(i)); 
+					//	returnArray[i] = record;
+					//	Log.d(LOG_TAG, "Added record: " + record.getId());
+					//}
+					 CisAdvertisementRecord returnArray[] = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
+					
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
 						

@@ -32,14 +32,14 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.android.api.servicelifecycle.AService;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
@@ -52,7 +52,6 @@ import org.societies.utilities.DBC.Dbc;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.util.Log;
 
 
@@ -95,7 +94,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery methods >>>>>>>>>>>>>>>>>>>>>>>
     /* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public AService[] getMyServices(String client) {
+	public Service[] getMyServices(String client) {
 		Log.d(LOG_TAG, "getMyServices called by client: " + client);
 		
 		AsyncGetMyServices methodAsync = new AsyncGetMyServices();
@@ -106,7 +105,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public AService[] getServices(String client, String identity) {
+	public Service[] getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
 		AsynGetServices methodAsync = new AsynGetServices();
@@ -117,12 +116,12 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
-	public AService getService(String client, AServiceResourceIdentifier sri, String identity) {
+	public Service getService(String client, ServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
-	public AService[] searchService(String client, AService filter, String identity) {
+	public Service[] searchService(String client, Service filter, String identity) {
 		return null;
 	}
 	
@@ -133,12 +132,12 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#uninstallService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
-	public String uninstallService(String client, AServiceResourceIdentifier serviceId, String identity) {
+	public String uninstallService(String client, ServiceResourceIdentifier serviceId, String identity) {
 		return null;
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#shareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String shareService(String client, AService service, String identity) {
+	public String shareService(String client, Service service, String identity) {
 		Log.d(LOG_TAG, "shareService called by client: " + client);
 		
 		AsyncShareService methodAsync = new AsyncShareService();
@@ -149,7 +148,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 	
 	/*@see org.societies.android.api.internal.servicelifecycle.IServiceControl#unshareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String unshareService(String client, AService service, String identity) {
+	public String unshareService(String client, Service service, String identity) {
 		Log.d(LOG_TAG, "unshareService called by client: " + client);
 		
 		AsyncShareService methodAsync = new AsyncShareService();
@@ -160,7 +159,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#startService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String) */
-	public String startService(String client, AServiceResourceIdentifier serviceId) {
+	public String startService(String client, ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "startService called by client: " + client);
 		
 		AsyncControlService methodAsync = new AsyncControlService();
@@ -171,7 +170,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#stopService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
-	public String stopService(String client, AServiceResourceIdentifier serviceId) {
+	public String stopService(String client, ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "stopService called by client: " + client);
 		
 		AsyncControlService methodAsync = new AsyncControlService();
@@ -236,12 +235,13 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
 					//CONVERT TO PARCEL BEANS
-					int i=0;
-					Parcelable serviceArray[] = new Parcelable[serviceList.size()];
-					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
-						serviceArray[i] = AService.convertService(tmpService);
-						i++;
-					}
+					//int i=0;
+					//Parcelable serviceArray[] = new Parcelable[serviceList.size()];
+					//for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
+					//	serviceArray[i] = AService.convertService(tmpService);
+					//	i++;
+					//}
+					org.societies.api.schema.servicelifecycle.model.Service serviceArray[] = serviceList.toArray(new org.societies.api.schema.servicelifecycle.model.Service[serviceList.size()]);
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray); 
 					intent.setPackage(client);
@@ -387,7 +387,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			
 			//PARAMETERS
 			String client = (String)params[0];
-			AService service = (AService) params[1];
+			Service service = (Service) params[1];
 			String identity = (String) params[2];
 			String method = (String) params[3];
 			//RETURN OBJECT
@@ -395,7 +395,8 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			results[0] = client;
 			//MESSAGE BEAN
 			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			messageBean.setService(AService.convertAService(service));
+			//messageBean.setService(AService.convertAService(service));
+			messageBean.setService(service);
 			messageBean.setShareJid(identity);
 			if (method.equals(IServiceControl.SHARE_SERVICE)) 
 				messageBean.setMethod(MethodType.SHARE_SERVICE);
@@ -436,14 +437,15 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			
 			//PARAMETERS
 			String client = (String)params[0];
-			AServiceResourceIdentifier serviceId = (AServiceResourceIdentifier) params[1];
+			ServiceResourceIdentifier serviceId = (ServiceResourceIdentifier) params[1];
 			String method = (String) params[2];
 			//RETURN OBJECT
 			String results[] = new String[1];
 			results[0] = client;
 			//MESSAGE BEAN
 			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			messageBean.setServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(serviceId));
+			//messageBean.setServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(serviceId));
+			messageBean.setServiceId(serviceId);
 			if (method.equals(IServiceControl.START_SERVICE)) 
 				messageBean.setMethod(MethodType.START_SERVICE);
 			else
