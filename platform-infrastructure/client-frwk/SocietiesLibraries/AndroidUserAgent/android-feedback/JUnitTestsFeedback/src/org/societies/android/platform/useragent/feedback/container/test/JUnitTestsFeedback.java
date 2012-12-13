@@ -55,7 +55,7 @@ public class JUnitTestsFeedback extends ServiceTestCase <TestContainerFeedbackSe
 	public void testPreconditions() {
 	}
 	
-	@MediumTest
+	//@MediumTest
 	public void testRadioPopup() throws Exception {
 		Log.d(LOG_TAG, "Testing radio popups");
 		Intent feedbackIntent = new Intent(getContext(), TestContainerFeedbackService.class);
@@ -91,7 +91,7 @@ public class JUnitTestsFeedback extends ServiceTestCase <TestContainerFeedbackSe
 	
 	
 	
-	@MediumTest
+	//@MediumTest
 	public void testAcknackPopup() throws Exception {
 		Log.d(LOG_TAG, "Testing ack/nack popups");
 		Intent feedbackIntent = new Intent(getContext(), TestContainerFeedbackService.class);
