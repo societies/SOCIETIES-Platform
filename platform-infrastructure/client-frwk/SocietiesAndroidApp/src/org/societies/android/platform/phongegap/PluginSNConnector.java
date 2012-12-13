@@ -36,8 +36,7 @@ import org.societies.android.api.internal.sns.ISocialTokenManager;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialTokenManager;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -202,7 +201,8 @@ public class PluginSNConnector extends Plugin {
 			//>>>>>>>>>  ISocialTokenManager METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (action.equals(ServiceMethodTranslator.getMethodName(ISocialTokenManager.methodsArray, 0))) {
 				try {
-					SocialNetwork sn = ISocialConnector.SocialNetwork.valueOf(data.getString(1));
+					//SocialNetwork sn = ISocialConnector.SocialNetwork.valueOf(data.getString(1));
+					Socialnetwork sn = Socialnetwork.fromValue(data.getString(1));
 					this.snActivityManager.getToken(data.getString(0), sn);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -260,9 +260,10 @@ public class PluginSNConnector extends Plugin {
 					//UNMARSHALL RETURN VALUES
 					String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
 					String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
-					String strSN = intent.getStringExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
-					SocialNetwork sn = SocialNetwork.valueOf(strSN);
-					
+					//String strSN = intent.getStringExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
+					//Socialnetwork sn = Socialnetwork.valueOf(strSN);
+					Socialnetwork sn = intent.getParcelableExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
+							
 					PluginResult result = new PluginResult(PluginResult.Status.OK, expires);
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);

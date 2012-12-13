@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.internal.sns;
 
-import org.societies.android.api.internal.sns.ISocialData.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 
 /**
  * Interface to manage access tokens of social networks.
@@ -51,6 +51,6 @@ public interface ISocialTokenManager {
 	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
 	 * @param socialNetwork Social network to get the token.
 	 */
-	public void getToken(String client, SocialNetwork socialNetwork);
+	public void getToken(String client, Socialnetwork socialNetwork);
 
 }

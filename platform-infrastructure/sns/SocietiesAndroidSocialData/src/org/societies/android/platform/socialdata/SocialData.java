@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.internal.sns.AConnectorBean;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
@@ -39,7 +38,7 @@ import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
@@ -107,7 +106,7 @@ public class SocialData extends Service implements ISocialData {
 	
 	//Service API
 
-	public void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity) {
+	public void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity) {
 		Log.d(LOG_TAG, "addSocialConnector");	
 		
 		//MESSAGE BEAN
@@ -183,7 +182,10 @@ public class SocialData extends Service implements ISocialData {
 						intent.putExtra(INTENT_RETURN_KEY, resultBean.getId());
 					}
 					else if(action.equals(GET_SOCIAL_CONNECTORS)) {
-						intent.putExtra(INTENT_RETURN_KEY, convertConnectorsListToAConnectorBeanArray(resultBean.getConnectorsList()));
+						List<ConnectorBean> connectors =  resultBean.getConnectorsList().getConnectorBean();
+						ConnectorBean arrConnectors[] = connectors.toArray(new ConnectorBean[connectors.size()]);
+						intent.putExtra(INTENT_RETURN_KEY, arrConnectors);
+						//intent.putExtra(INTENT_RETURN_KEY, convertConnectorsListToAConnectorBeanArray(resultBean.getConnectorsList()));
 					}
 					else if(action.equals(REMOVE_SOCIAL_CONNECTOR)) {
 						intent.putExtra(INTENT_RETURN_KEY, true);
@@ -220,7 +222,9 @@ public class SocialData extends Service implements ISocialData {
 		};
 	}
 	
+	/*
 	private AConnectorBean[] convertConnectorsListToAConnectorBeanArray(ConnectorsList connectorsList) { 
+	 
 		List<ConnectorBean> beans = connectorsList.getConnectorBean();
 		AConnectorBean[] connectorBeans = new AConnectorBean[beans.size()];
 		
@@ -230,6 +234,7 @@ public class SocialData extends Service implements ISocialData {
 		
 		return connectorBeans;
 	}
+	*/
 	
 	private ICommCallback nullCallback = new ICommCallback() {
 

@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.internal.sns;
 
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+
 /**
  * Android interface for access SocialData bundle.
  *
@@ -42,25 +44,6 @@ public interface ISocialData {
 	public static final String ACTION_XMPP_ERROR = "org.societies.android.platform.sns.action.XMPP_ERROR";
 	public static final String EXTRA_STANZA_ERROR = "org.societies.android.platform.sns.extra.STANZA_ERROR";
 		
-	public enum SocialNetwork{
-		Facebook,
-		Foursquare,
-		twitter,
-		linkedin,
-		googleplus;
-		
-		private final String value = "";
-		
-		public static SocialNetwork fromValue(String v) {
-	        for (SocialNetwork c: SocialNetwork.values()) {
-	            if (c.value.equals(v)) {
-	                return c;
-	            }
-	        }
-	        throw new IllegalArgumentException(v);
-	    }
-	}
-	
 	/**
 	 * Create and add a new social connector.
 	 * A broadcast intent is sent with the Action ADD_SOCIAL_CONNECTOR 
@@ -70,7 +53,7 @@ public interface ISocialData {
 	 * @param token Token for the connector.
 	 * @param validity Validity of the connector.
 	 */
-	void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity);
+	void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity);
 	
 	/**
 	 * Remove the social connector. 
