@@ -24,7 +24,6 @@
  */
 package org.societies.security.policynegotiator.provider;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -36,18 +35,14 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
-import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
-import org.societies.security.policynegotiator.util.DOMHelper;
-import org.societies.security.policynegotiator.util.StreamUtil;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.w3c.dom.Document;
 
@@ -57,7 +52,6 @@ public class NegotiationProvider implements INegotiationProvider {
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationProvider.class);
 	
 	private ISignatureMgr signatureMgr;
-	private ISlaSignatureMgr slaSignatureMgr;
 	private INegotiationProviderRemote groupMgr;
 	private ProviderServiceMgr providerServiceMgr;
 	
@@ -102,12 +96,6 @@ public class NegotiationProvider implements INegotiationProvider {
 		LOG.debug("setSignatureMgr()");
 		this.signatureMgr = signatureMgr;
 	}
-	public ISlaSignatureMgr getSlaSignatureMgr() {
-		return slaSignatureMgr;
-	}
-	public void setSlaSignatureMgr(ISlaSignatureMgr slaSignatureMgr) {
-		this.slaSignatureMgr = slaSignatureMgr;
-	}
 	public ProviderServiceMgr getProviderServiceMgr() {
 		return providerServiceMgr;
 	}
@@ -145,8 +133,6 @@ public class NegotiationProvider implements INegotiationProvider {
 				Xml xml = new Xml(doc);
 				SLA sla = new SLA(xml);
 				slaStr = xml.toString();
-				slaStr = signatureMgr.signXml(slaStr, SLA.Attribute.SOPS_ID_VALUE,
-						groupMgr.getIdMgr().getThisNetworkNode());
 				success = true;
 				session.setSla(sla);
 				LOG.debug("getPolicyOptions({}): SOP: {}", serviceId, doc);
@@ -181,8 +167,11 @@ public class NegotiationProvider implements INegotiationProvider {
 		String serviceId;
 		
 		sla.setSessionId(sessionId);
+		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
 		if (session != null && signatureMgr.verifyXml(signedPolicyOption)) {
+			
+			sla.setSla(finalSla);
 			
 			// FIXME: only in case of service negotiation, not in case of CIS negotiation
 			if (true) {
@@ -196,20 +185,7 @@ public class NegotiationProvider implements INegotiationProvider {
 				}
 			}
 
-			try {
-				Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(signedPolicyOption));
-				finalSla = signatureMgr.signXml(signedPolicyOption, slaSignatureMgr.getRequesterSignatureId(doc),
-						groupMgr.getIdMgr().getThisNetworkNode());
-				sla.setSla(finalSla);
-				sla.setSuccess(true);
-			} catch (UnsupportedEncodingException e) {
-				LOG.warn("acceptPolicyAndGetSla(): Could not parse XML string", e);
-				sla.setSuccess(false);
-			} catch (DigsigException e) {
-				LOG.warn("acceptPolicyAndGetSla(): Could not append final signature", e);
-				sla.setSuccess(false);
-			}
-
+			sla.setSuccess(true);
 		}
 		else {
 			LOG.info("acceptPolicyAndGetSla({}): invalid signature", sessionId);

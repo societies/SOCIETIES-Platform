@@ -61,22 +61,18 @@ import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
-
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
-
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -96,7 +92,6 @@ import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
@@ -117,16 +112,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	/** to define a dedicated Logger for Performance Testing */
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 
+	/** The Comms Mgr service reference. */
+	@Autowired(required=true)
+	private ICommManager commMgr;
+	
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
-
-	/**
-	 * The IIdentity Mgmt service reference.
-	 *
-	 * @see {@link #setIdentityMgr(IIdentityManager)}
-	 */
-	private IIdentityManager idMgr;
 
 	/** The Context Event Mgmt service reference. */
 	@Autowired(required=true)
@@ -145,6 +137,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
 	 */
+	@Autowired(required=true)
 	private IUserCtxDBMgr userCtxDBMgr;
 
 	/**
@@ -171,52 +164,23 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=false)
 	private ICommunityCtxInferenceMgr communityCtxInferenceMgr;
 
-
 	@Autowired(required=true)
 	private CtxBrokerClient ctxBrokerClient;
 
-
-	/** ICtxAccessController service reference. */
+	/** The ICtxAccessController service reference. */
 	@Autowired(required=true)
 	private ICtxAccessController ctxAccessController;
-
 
 	/**
 	 * Instantiates the platform Context Broker in Spring.
 	 * 
-	 * @param userCtxDBMgr
-	 * @param commMgr
-	 * @param communityCtxDBMgr
-	 * @throws CtxException 
+	 * @param ctxBootLoader
 	 */
 	@Autowired(required=true)
-	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) throws Exception {
+	InternalCtxBroker(CtxBootLoader ctxBootLoader) {
 
-		LOG.info(this.getClass() + " instantiated");
-		this.userCtxDBMgr = userCtxDBMgr;
-		this.idMgr = commMgr.getIdManager();
-
-		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
-		LOG.info("Found local CSS node ID " + localCssNodeId);
-		final IIdentity localCssId = this.idMgr.fromJid(localCssNodeId.getBareJid());
-		LOG.info("Found local CSS ID " + localCssId);
-
-		//new Thread() { // Do not hang in the bundle activator. 
-		//	           // Spawn a new thread if the bundle is not completely event-driven.
-			/*
-			 * @see java.lang.Thread#run()
-			 */
-		//	@Override
-		//	public void run() {
-		//		try {
-					createIndividualEntity(localCssId, CtxEntityTypes.PERSON); // TODO don't hardcode the cssOwner type
-					createCssNode(localCssNodeId);
-		//		} catch (Exception e) {
-		//			throw new RuntimeException("Could not initialise Internal Context Broker: "
-		//					+ e.getLocalizedMessage(), e);
-		//		}
-		//	}
-		//}.start();
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 
 	/*
@@ -405,7 +369,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final IIdentity target;
 		try {
-			target = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.commMgr.getIdManager().fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
@@ -419,7 +383,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_LIGHT.equals(target.getType())) {
 			
 			// if target is local CSS
-			if (this.idMgr.isMine(target)) {
+			if (this.commMgr.getIdManager().isMine(target)) {
 
 				try {
 					attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);
@@ -501,7 +465,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		IIdentity localCssId;
 		try {
-			localCssId = this.idMgr.fromJid(this.idMgr.getThisNetworkNode().getBareJid());
+			localCssId = this.commMgr.getIdManager().fromJid(this.commMgr.getIdManager().getThisNetworkNode().getBareJid());
 		} catch (InvalidFormatException ife) {
 
 			throw new CtxBrokerException("Could not retrieve local CSS IIdentity: "
@@ -798,7 +762,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
+			targetCss = this.commMgr.getIdManager().fromJid(attrId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
@@ -816,7 +780,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
+			targetCss = this.commMgr.getIdManager().fromJid(attrId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
@@ -912,7 +876,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
+			targetCss = this.commMgr.getIdManager().fromJid(attrId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
@@ -939,7 +903,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
+			targetCss = this.commMgr.getIdManager().fromJid(attrId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
@@ -1089,7 +1053,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				IIdentity targetCss;
 				try {
-					targetCss = this.idMgr.fromJid(primaryAttrId.getOwnerId());
+					targetCss = this.commMgr.getIdManager().fromJid(primaryAttrId.getOwnerId());
 				} catch (InvalidFormatException ife) {
 					throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 				}
@@ -1137,7 +1101,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			IIdentity targetCss;
 			try {
-				targetCss = this.idMgr.fromJid(primaryAttrId.getOwnerId());
+				targetCss = this.commMgr.getIdManager().fromJid(primaryAttrId.getOwnerId());
 			} catch (InvalidFormatException ife) {
 				throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 			}
@@ -1370,17 +1334,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	/**
-	 * Sets the IIdentity Mgmt service reference.
-	 * 
-	 * @param idMgr
-	 *            the IIdentity Mgmt service reference to set.
-	 */
-	public void setIdentityMgr(IIdentityManager identityMgr) {
-
-		this.idMgr = identityMgr;
-	}
-
-	/**
 	 * Sets the UserCtxInferenceMgr service reference.
 	 * 
 	 * @param idMgr
@@ -1406,41 +1359,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	//******************************************
 	//  service refs used by junit tests
 	//******************************************
-
-	private void createCssNode(INetworkNode cssNodeId) throws CtxException {
-
-		try {
-			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
-			final List<CtxEntityIdentifier> cssNodeEntIds = this.userCtxDBMgr.lookupEntities(
-					CtxEntityTypes.CSS_NODE, CtxAttributeTypes.ID, cssNodeId.toString(), cssNodeId.toString());
-			if (!cssNodeEntIds.isEmpty()) {
-
-				LOG.info("Found CSS node context entity " + cssNodeEntIds.get(0));
-				return;
-			}
-			
-			final IIdentity cssId = this.idMgr.fromJid(cssNodeId.getBareJid());
-			final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
-			final CtxAssociation ownsCssNodesAssoc;
-			if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
-				ownsCssNodesAssoc = this.createAssociation(CtxAssociationTypes.OWNS_CSS_NODES).get();
-			else
-				ownsCssNodesAssoc = (CtxAssociation) this.retrieve(
-						cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next()).get();
-			ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
-			final CtxEntity cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
-			ownsCssNodesAssoc.addChildEntity(cssNodeEnt.getId());
-			this.update(ownsCssNodesAssoc);
-			final CtxAttribute cssNodeIdAttr = this.createAttribute(cssNodeEnt.getId(), CtxAttributeTypes.ID).get();
-			this.updateAttribute(cssNodeIdAttr.getId(), cssNodeId.toString());
-			LOG.info("Created CSS node context entity " + cssNodeEnt.getId());
-
-		} catch (Exception e) {
-
-			throw new CtxBrokerException("Could not create CSS node context entity " + cssNodeId
-					+ ": " + e.getLocalizedMessage(), e);
-		}
-	}
 
 	@Override
 	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID,	CtxAttributeIdentifier ctxAttrId) {
@@ -1496,7 +1414,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxEntity entityResult = null;
 
-		if (idMgr.isMine(targetCss)) {
+		if (this.commMgr.getIdManager().isMine(targetCss)) {
 
 			entityResult = this.userCtxDBMgr.createEntity(type);
 
@@ -1537,7 +1455,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity scopeID;
 
 		try {
-			scopeID = this.idMgr.fromJid(scope.getOwnerId());
+			scopeID = this.commMgr.getIdManager().fromJid(scope.getOwnerId());
 		} catch (InvalidFormatException e1) {
 			throw new CtxBrokerException(scope.getOwnerId()
 					+ ": Invalid owner IIdentity String: " 
@@ -1550,7 +1468,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 			//local call
-			if (this.idMgr.isMine(scopeID)){
+			if (this.commMgr.getIdManager().isMine(scopeID)){
 
 				ctxAttributeResult  =	this.userCtxDBMgr.createAttribute(scope, type);	
 
@@ -1601,7 +1519,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxAssociation associationResult = null;
 
-		if (idMgr.isMine(targetCss)) {
+		if (this.commMgr.getIdManager().isMine(targetCss)) {
 
 			associationResult = this.userCtxDBMgr.createAssociation(type);
 
@@ -1653,7 +1571,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 		final CtxEntity entity;
 		try {
-			final IIdentity targetId = this.idMgr.fromJid(entityId.getOwnerId());
+			final IIdentity targetId = this.commMgr.getIdManager().fromJid(entityId.getOwnerId());
 			if (IdentityType.CIS.equals(targetId.getType()))
 				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
 			else
@@ -1708,7 +1626,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
 			// local call
-			if (this.idMgr.isMine(target)) {
+			if (this.commMgr.getIdManager().isMine(target)) {
 				//LOG.info("lookup local call 1");
 				List<CtxIdentifier> ctxIdListFromDb;
 				try {
@@ -1806,7 +1724,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity target;
 
 		try {
-			target = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.commMgr.getIdManager().fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
@@ -1833,7 +1751,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
-			if (this.idMgr.isMine(target)) {
+			if (this.commMgr.getIdManager().isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
 					LOG.info("Retrieve method, enforcing access control for requestor: "+requestor);
@@ -1931,7 +1849,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity target;
 
 		try {
-			target = this.idMgr.fromJid(ctxModelObj.getId().getOwnerId());
+			target = this.commMgr.getIdManager().fromJid(ctxModelObj.getId().getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID:"+ife.getLocalizedMessage(), ife);
 		}
@@ -1942,7 +1860,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_LIGHT.equals(target.getType())) {
 
 			//local call
-			if (idMgr.isMine(target)) {
+			if (this.commMgr.getIdManager().isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
 
@@ -2131,7 +2049,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity target;
 
 		try {
-			target = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.commMgr.getIdManager().fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
@@ -2158,7 +2076,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
-			if (this.idMgr.isMine(target)) {
+			if (this.commMgr.getIdManager().isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
 					LOG.info("Remove method, enforcing access control for requestor: "+requestor);
@@ -2214,7 +2132,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		CtxEntityIdentifier individualEntityIdResult = null;
 
 		// local call
-		if (this.idMgr.isMine(cssId)) {
+		if (this.commMgr.getIdManager().isMine(cssId)) {
 
 			try {
 				//call local method
@@ -2357,11 +2275,11 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		IIdentity targetCis;
 		try {
-			targetCis = this.idMgr.fromJid(communityID.getOwnerId());
+			targetCis = this.commMgr.getIdManager().fromJid(communityID.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (idMgr.isMine(targetCis)) {
+		if (this.commMgr.getIdManager().isMine(targetCis)) {
 
 			CommunityCtxEntity commEntity;
 			try {
@@ -2410,9 +2328,9 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public Requestor getLocalRequestor() throws CtxBrokerException {
 
-		final INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
+		final INetworkNode cssNodeId = this.commMgr.getIdManager().getThisNetworkNode();
 		try {
-			final IIdentity cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			final IIdentity cssOwnerId = this.commMgr.getIdManager().fromJid(cssNodeId.getBareJid());
 			return new Requestor(cssOwnerId);
 		} catch (InvalidFormatException e) {
 
@@ -2424,10 +2342,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	private IIdentity getLocalIdentity() throws CtxBrokerException {
 
 		IIdentity cssOwnerId = null;
-		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
+		INetworkNode cssNodeId = this.commMgr.getIdManager().getThisNetworkNode();
 
 		try {
-			cssOwnerId = this.idMgr.fromJid(cssNodeId.getBareJid());
+			cssOwnerId = this.commMgr.getIdManager().fromJid(cssNodeId.getBareJid());
 
 		} catch (InvalidFormatException e) {
 			throw new CtxBrokerException(" cssOwnerId could not be set: " + e.getLocalizedMessage(), e);

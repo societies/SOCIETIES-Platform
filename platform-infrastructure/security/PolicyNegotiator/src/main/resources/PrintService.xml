@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<societies>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?><societies>
 	<serviceOperationPolicy Id="Container">
 		<sop Id="Premium Printing for businesses. Costs 0.02$ per A4, but requires more that 2000 sheets to be printed per month">
 			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
@@ -560,4 +559,15 @@
 			</SLA>
 		</sop>
 	</serviceOperationPolicy>
-</societies>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-7E1CE4B4-9B25-11E0-BA24-005056C00008"><ds:SignedInfo Id="SignedInfo-7E1CE4B5-9B25-11E0-BA24-005056C00008"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#Container"><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>QGqeEBSSZcWvjKgrJUsdDaSAFIY=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="SignatureValue-7E1CE4B6-9B25-11E0-BA24-005056C00008">R/VZKRt0aDVBFrrHU2wUzwm/W6qTK3hZLrZvToCTWh5Z7eIkqUvMJe/jh5Xp+OvqlNVwqvE6/ba8
+eWy3HW2X7juitbf82Cy7NXy95NUnzKeX5FatqbOrSUxwdSNy5fcu0dqlDRC04ZoauTPsUXszIYOG
+ML/vkvBSODcEpYhxVSE=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIB7DCCAVUCBE3yJZAwDQYJKoZIhvcNAQEFBQAwPTEWMBQGA1UECgwNSUNUIFNPQ0lFVElF
+UzEjMCEGA1UEAwwaU29jaWV0aWVzIFNlcnZpY2UgUHJvdmlkZXIwHhcNMTEwNjEwMTQwOTIw
+WhcNMTMwNjA5MTQwOTIwWjA9MRYwFAYDVQQKDA1JQ1QgU09DSUVUSUVTMSMwIQYDVQQDDBpT
+b2NpZXRpZXMgU2VydmljZSBQcm92aWRlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA
+8J1KXqL1OrJCF6+g3JOmUFoOcs1gzjocyLRBS0xyfV1JYbn6yY0ZYIH37OG/jXcuiZaD/PQL
+KMGGxL5nyQd13dkVMNvR0p3hPTTfcAt8+sGXE1PWP11MNz3KyX2nFg2yxBBTJe7BX+7yzi4G
+aewFphtAiQtCrgtH5OHggI7yvVkCAwEAATANBgkqhkiG9w0BAQUFAAOBgQBK1M8dF0BZO/Rb
+g8Zs1xhNKcwnZIrTq2SwdQVBA5U2C3FXeV2hvCUlJyUqgD0EaF/j6V85pxFUlWgA1LoONzZd
+afOIIvCheoUH6lyxqzrKH8E2Yh6/Hwvc0XX9phFx8UrRaMYJxRhHQYR2z+6Tdj/WfHa4i23h
+18Wx86iM+xViBA==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></societies>

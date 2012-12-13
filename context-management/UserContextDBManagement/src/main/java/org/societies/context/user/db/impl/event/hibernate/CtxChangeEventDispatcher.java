@@ -24,21 +24,13 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Arrays;
 
-import org.hibernate.event.PostUpdateEvent;
-import org.hibernate.event.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * Describe your class here...
@@ -46,46 +38,54 @@ import org.springframework.stereotype.Service;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
-@Service
-public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
-
-	private static final long serialVersionUID = -8235230620785626161L;
+class CtxChangeEventDispatcher implements Runnable {
 	
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateUserCtxEventListener.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CtxChangeEventDispatcher.class);
 	
-	private static final String[] EVENT_TOPICS = new String[] { CtxChangeEventTopic.MODIFIED };
+	private final ICtxEventMgr ctxEventMgr;
 	
-	private static final CtxEventScope EVENT_SCOPE = CtxEventScope.BROADCAST;
+	private final CtxChangeEvent ctxChangeEvent;
 	
-	/** The Context Event Mgmt service reference. */
-	@Autowired(required=true)
-	private ICtxEventMgr ctxEventMgr;
+	private final String[] topics; 
 	
-	/** The executor service. */
-	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private final CtxEventScope scope;
 	
-	PostUpdateUserCtxEventListener() {
+	CtxChangeEventDispatcher(final ICtxEventMgr ctxEventMgr, 
+			final CtxChangeEvent ctxChangeEvent, final String[] topics, 
+			final CtxEventScope scope) {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		this.ctxEventMgr = ctxEventMgr;
+		this.ctxChangeEvent = ctxChangeEvent;
+		this.topics = topics;
+		this.scope = scope;
 	}
 
 	/*
-	 * @see org.hibernate.event.PostUpdateEventListener#onPostUpdate(org.hibernate.event.PostUpdateEvent)
+	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-	public void onPostUpdate(PostUpdateEvent event) {
-		
-		if (LOG.isTraceEnabled())
-			LOG.trace("Received PostUpdateEvent for context hibernate entity " + event.getId());
-		
-		// Ignore events for non CtxModelObjects
-		if (!(event.getEntity() instanceof CtxModelObjectDAO))
-			return;
-		
-		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-		this.executorService.execute(new CtxChangeEventDispatcher(
-				this.ctxEventMgr, new CtxChangeEvent(ctxId), EVENT_TOPICS, EVENT_SCOPE));
+	public void run() {
+	
+		if (this.ctxEventMgr != null) {
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Sending context change event " + this.ctxChangeEvent
+							+ " to topics '" + Arrays.toString(this.topics) 
+							+ "' with scope '" + this.scope + "'");
+				this.ctxEventMgr.post(this.ctxChangeEvent, this.topics, this.scope);
+			} catch (Exception e) {
+				
+				LOG.error("Could not send context change event " + this.ctxChangeEvent 
+						+ " to topics '" + Arrays.toString(this.topics) 
+						+ "' with scope '" + this.scope + "': "
+						+ e.getLocalizedMessage(), e);
+			}
+		} else {
+			LOG.error("Could not send context change event '" + this.ctxChangeEvent
+					+ " to topics '" + Arrays.toString(this.topics) 
+					+ "' with scope '" + this.scope + "': "
+					+ "ICtxEventMgr service is not available");
+		}
 	}
 }

@@ -47,22 +47,22 @@ import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
 
-public class DecisionMaker extends AbstractDecisionMaker  implements BundleContextAware{
+public class DecisionMaker extends AbstractDecisionMaker implements
+		BundleContextAware {
 
 	private BundleContext myContext;
 
 	private IIdentity entityID;
 
 	private List<IActionConsumer> temporal = null;
-	
+
 	// private IServiceDiscovery SerDiscovery;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-	public void setBundleContext(BundleContext bundleContext) 
-    {   
-        this.myContext = bundleContext;    
-    }
-	
+	public void setBundleContext(BundleContext bundleContext) {
+		this.myContext = bundleContext;
+	}
+
 	// public IServiceDiscovery getSerDiscovery() {
 	// return SerDiscovery;
 	// }
@@ -78,7 +78,7 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 		servTracker.open();
 		Object[] ls = servTracker.getServices();
 		// List<Service> ls=this.SerDiscovery.getLocalServices().get();
-		if(ls==null)
+		if (ls == null)
 			return;
 		for (Object ser : ls) {
 			if (ser instanceof IActionConsumer) {
@@ -94,7 +94,7 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 	}
 
 	public void setMyContext(BundleContext myContext) {
-		logging.debug("BundleContext injected:\t"+myContext);
+		logging.debug("BundleContext injected:\t" + myContext);
 		this.myContext = myContext;
 	}
 
@@ -137,7 +137,8 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
-		logging.debug("make decision with\t" + preferences.size()+" preferences"+"\t"+intents.size()+" intents");
+		logging.debug("make decision with\t" + preferences.size()
+				+ " preferences" + "\t" + intents.size() + " intents");
 		this.refreshServiceLookup();
 		logging.debug("refresh the list of services and doing decision making...");
 		super.makeDecision(intents, preferences);
@@ -149,22 +150,30 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 		// TODO Auto-generated method stub
 		// @temporal solution depends on the 3rd party-services
 		logging.debug("****************************************");
-		logging.debug("implement the Action for Service ID:\t"+action.getServiceID());
-		logging.debug("Service Type:\t"+action.getServiceType());
-		logging.debug("Parameter Name of IAction:\t"+action.getparameterName());
-		logging.debug("Parameter Value of IAction:\t"+action.getvalue());
+		logging.debug("implement the Action for Service ID:\t"
+				+ action.getServiceID());
+		logging.debug("Service Type:\t" + action.getServiceType());
+		logging.debug("Parameter Name of IAction:\t"
+				+ action.getparameterName());
+		logging.debug("Parameter Value of IAction:\t" + action.getvalue());
 		logging.debug("****************************************");
 		logging.debug("implementing IAction DM");
-		boolean found=false;
-		for (IActionConsumer consumer : this.temporal) {
-			this.logging.debug("comparing: "+consumer.getServiceIdentifier().getServiceInstanceIdentifier()+" with: "+action.getServiceID().getServiceInstanceIdentifier());
-			if (consumer.getServiceIdentifier().equals(action.getServiceID())) {
-				consumer.setIAction(this.entityID, action);
-				logging.debug("Service has been matched. IAction has been sent to the service");
-				found=true;
+		boolean found = false;
+		if (this.temporal != null) {
+			for (IActionConsumer consumer : this.temporal) {
+				this.logging.debug("comparing: "
+						+ consumer.getServiceIdentifier()
+								.getServiceInstanceIdentifier() + " with: "
+						+ action.getServiceID().getServiceInstanceIdentifier());
+				if (consumer.getServiceIdentifier().equals(
+						action.getServiceID())) {
+					consumer.setIAction(this.entityID, action);
+					logging.debug("Service has been matched. IAction has been sent to the service");
+					found = true;
+				}
 			}
 		}
-		if(!found){
+		if (!found) {
 			logging.debug("No services have been founded to implement the IAction");
 		}
 

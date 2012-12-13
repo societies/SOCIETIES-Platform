@@ -155,8 +155,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double directTrustValue = 1.0d;
 		trustedCss.getDirectTrust().setValue(directTrustValue);
 		this.engine.evaluateCssTrustValues(trustedCssSubList);
-		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified(),
-				trustedCss.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCss.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCss.getUserPerceivedTrust().getValue());
 		assertEquals(directTrustValue, trustedCss.getUserPerceivedTrust().getValue());
 		
@@ -167,8 +167,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence = 0.5d;
 		trustedCss.getIndirectTrust().setConfidence(indirectTrustConfidence);
 		this.engine.evaluateCssTrustValues(trustedCssSubList);
-		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified(),
-				trustedCss.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCss.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCss.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue = 
 				(1-indirectTrustConfidence) * directTrustValue;
@@ -181,8 +181,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence2 = 1.0d;
 		trustedCss.getIndirectTrust().setConfidence(indirectTrustConfidence2);
 		this.engine.evaluateCssTrustValues(trustedCssSubList);
-		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified(),
-				trustedCss.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCss.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCss.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCss.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue2 = 
 				(1-indirectTrustConfidence2) * directTrustValue + indirectTrustConfidence2 * indirectTrustValue2;
@@ -204,8 +204,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double directTrustValue = 1.0d;
 		trustedCis.getDirectTrust().setValue(directTrustValue);
 		this.engine.evaluateCisTrustValues(trustedCisSubList);
-		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified(),
-				trustedCis.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCis.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCis.getUserPerceivedTrust().getValue());
 		assertEquals(directTrustValue, trustedCis.getUserPerceivedTrust().getValue());
 		
@@ -216,8 +216,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence = 0.5d;
 		trustedCis.getIndirectTrust().setConfidence(indirectTrustConfidence);
 		this.engine.evaluateCisTrustValues(trustedCisSubList);
-		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified(),
-				trustedCis.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCis.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCis.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue = 
 				(1-indirectTrustConfidence) * directTrustValue;
@@ -230,8 +230,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence2 = 1.0d;
 		trustedCis.getIndirectTrust().setConfidence(indirectTrustConfidence2);
 		this.engine.evaluateCisTrustValues(trustedCisSubList);
-		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified(),
-				trustedCis.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedCis.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedCis.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedCis.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue2 = 
 				(1-indirectTrustConfidence2) * directTrustValue + indirectTrustConfidence2 * indirectTrustValue2;
@@ -253,8 +253,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double directTrustValue = 1.0d;
 		trustedService.getDirectTrust().setValue(directTrustValue);
 		this.engine.evaluateServiceTrustValues(trustedServiceSubList);
-		assertEquals(trustedService.getUserPerceivedTrust().getLastModified(),
-				trustedService.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedService.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedService.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedService.getUserPerceivedTrust().getValue());
 		assertEquals(directTrustValue, trustedService.getUserPerceivedTrust().getValue());
 		
@@ -265,8 +265,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence = 0.5d;
 		trustedService.getIndirectTrust().setConfidence(indirectTrustConfidence);
 		this.engine.evaluateServiceTrustValues(trustedServiceSubList);
-		assertEquals(trustedService.getUserPerceivedTrust().getLastModified(),
-				trustedService.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedService.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedService.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedService.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue = 
 				(1-indirectTrustConfidence) * directTrustValue;
@@ -279,8 +279,8 @@ public class UserPerceivedTrustEngineTest {
 		final Double indirectTrustConfidence2 = 1.0d;
 		trustedService.getIndirectTrust().setConfidence(indirectTrustConfidence2);
 		this.engine.evaluateServiceTrustValues(trustedServiceSubList);
-		assertEquals(trustedService.getUserPerceivedTrust().getLastModified(),
-				trustedService.getUserPerceivedTrust().getLastUpdated());
+		assertEquals(trustedService.getUserPerceivedTrust().getLastModified().getTime(),
+				trustedService.getUserPerceivedTrust().getLastUpdated().getTime(), 1000);
 		assertNotNull(trustedService.getUserPerceivedTrust().getValue());
 		final Double userPerceivedTrustValue2 = 
 				(1-indirectTrustConfidence2) * directTrustValue + indirectTrustConfidence2 * indirectTrustValue2;

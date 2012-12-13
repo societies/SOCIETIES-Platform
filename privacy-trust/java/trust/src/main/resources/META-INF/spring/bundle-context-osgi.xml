@@ -18,11 +18,7 @@
 	<osgi:service ref="trustEvidenceCollector" interface="org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector" />
 	
 	<!-- Internal provided services -->
-	<osgi:service ref="trustNodeMgr" interface="org.societies.privacytrust.trust.api.ITrustNodeMgr" />
-	<osgi:service ref="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
 	<osgi:service ref="internalTrustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" />
-	<osgi:service ref="trustRepository" interface="org.societies.privacytrust.trust.api.repo.ITrustRepository" />	    
-	<osgi:service ref="trustEvidenceRepository" interface="org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository" />
 	<osgi:service ref="internalTrustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector" />
 	
 	<!-- External required services -->
