@@ -28,6 +28,7 @@ package org.societies.android.platform.useragent.feedback.container;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.android.platform.useragent.feedback.mocks.MockClientCommunicationMgr;
+import org.societies.android.platform.useragent.feedback.mocks.MockPubsubClientAndroid;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackBase;
 
@@ -73,7 +74,7 @@ public class TestContainerFeedbackService extends Service{
 	}
 	
 	protected PubsubClientAndroid createPubsubClientAndroid(){
-		return new PubsubClientAndroid(getApplicationContext());
+		return new MockPubsubClientAndroid(getApplicationContext());
 	}
 
 }

@@ -41,6 +41,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -49,6 +50,7 @@ import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 
 import android.content.Context;
@@ -76,9 +78,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		expPopups = new HashMap<String, ExplicitPopup>();
 		impPopups = new HashMap<String, ImplicitPopup>();
 
-		//get my cloud ID
-		myCloudID = ccm.getIdManager().getThisNetworkNode();
-		Log.d(LOG_TAG, "Got my cloud ID: "+myCloudID);
+		assignConnectionParameters();
 
 		//register for events from user feedback pubsub node
 		try {
@@ -259,5 +259,29 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 	
 	private void processImpResponseEvent(String responseID, Boolean result){
 		
+	}
+	
+	/**
+	 * Assign connection parameters (must happen after successful XMPP login)
+	 */
+	private void assignConnectionParameters() {
+		//Get the Cloud destination
+		String cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
+		Log.d(LOG_TAG, "Cloud Node: " + cloudCommsDestination);
+
+		//String domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
+		//Log.d(LOG_TAG, "Domain Authority Node: " + domainCommsDestination);
+
+		try {
+			this.myCloudID = IdentityManagerImpl.staticfromJid(cloudCommsDestination);
+			Log.d(LOG_TAG, "Cloud node identity: " + this.myCloudID);
+
+			//this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(domainCommsDestination);
+			//Log.d(LOG_TAG, "Domain node identity: " + this.cloudNodeIdentity);
+
+		} catch (InvalidFormatException e) {
+			Log.e(LOG_TAG, "Unable to get cloud node identity", e);
+			throw new RuntimeException(e);
+		}     
 	}
 }

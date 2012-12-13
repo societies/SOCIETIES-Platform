@@ -75,11 +75,11 @@
 	 	   		</exclusion>
 			</exclusions-->
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.societies.android.platform.useragent.uam</groupId>
    			<artifactId>AndroidUserActionMonitor</artifactId>

@@ -25,24 +25,39 @@
 	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
 	OF SUCH DAMAGE. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-			http://maven.apache.org/maven-v4_0_0.x">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>org.societies</groupId>
-	<artifactId>android-useragent-builder</artifactId>
+	<groupId>org.societies.android.platform.useragent.uam</groupId>
+	<artifactId>builder</artifactId>
+	<name>Android User Action Monitor Builder</name>
 	<packaging>pom</packaging>
-	<version>0.1</version>
-	<name>Android UserAgent Builder</name>
+	<version>${release.version}</version>
+	
+	<developers>
+	    <developer>
+	      <name>Sarah Gallacher</name>
+	      <email>S.Gallacher@hw.ac.uk</email>
+	      <organization>HWU</organization>
+	      <organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+	      <roles>
+	        <role>Senior Developer</role>
+	      </roles>
+	      <timezone>+0</timezone>
+	    </developer>
+	</developers>
 
-	<!-- All Societies Android UserAgent poms -->
+	<!-- All builder projects should inherit from version-parent -->
+	<parent>
+        <groupId>org.societies</groupId>
+        <artifactId>android-parent</artifactId>
+        <version>RELEASE</version>
+   </parent>
+	
 	<modules>
-	    
-	    <!-- UAM -->
-		<module>android-uam/pom.xml</module>
-		
-		<!-- User Feedback -->
-		<module>android-feedback/pom.xml</module>
-		
+		<module>AndroidUserActionMonitor</module>
+		<module>TestContainerUAM</module>
+		<module>JUnitTestsUAM</module>
+		<!-- module>RemoteTestsFeedback</module-->
 	</modules>
 </project>

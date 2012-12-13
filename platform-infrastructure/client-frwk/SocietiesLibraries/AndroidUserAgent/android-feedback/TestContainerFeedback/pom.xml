@@ -53,12 +53,11 @@
   			<version>${release.version}</version>
   			<type>apklib</type>
 		</dependency> 
-        <!-- <dependency>
+        <dependency>
 			<groupId>org.societies.comm.android</groupId>
 			<artifactId>AndroidPubsubApi</artifactId>
 			<version>${version.comm}</version>
-		</dependency> -->
-        
+		</dependency>
         <dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
@@ -75,11 +74,11 @@
 	 	   		</exclusion>
 			</exclusions-->
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.societies.android.platform.useragent.feedback</groupId>
    			<artifactId>AndroidUserFeedback</artifactId>
