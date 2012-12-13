@@ -37,7 +37,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.digsig.util.DOMHelper;
@@ -52,7 +51,7 @@ import org.w3c.dom.Document;
  * 
  * @author Mitja Vardjan
  */
-public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
+public class SignatureMgr implements ISignatureMgr {
 
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
@@ -88,7 +87,7 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		// 3rd signature. By the provider, requester's signature is signed.
 		try {
 			Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(xml));
-			String requesterSigId = getRequesterSignatureId(doc);
+			String requesterSigId = xmlDSig.getRequesterSignatureId(doc);
 			LOG.debug("requesterSigId = {}", requesterSigId);
 			xml = xmlDSig.signXml(xml, requesterSigId);
 		} catch (UnsupportedEncodingException e) {
@@ -143,15 +142,7 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		return xmlDSig.signXml(xml, ids);
 	}
 	
-	@Override
-	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException {
-		
-		ArrayList<String> ids = new ArrayList<String>();
-		
-		ids.add(xmlNodeId);
-		
-		return xmlDSig.signXml(xml, ids);
-	}
+	
 	
 	@Override
 	public boolean verifyXml(String xml) {
@@ -223,9 +214,5 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 			return null;
 		}
 		return cert.getPublicKey();
-	}
-	
-	public String getRequesterSignatureId(Document doc) {
-		return xmlDSig.getRequesterSignatureId(doc);
 	}
 }

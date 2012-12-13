@@ -85,7 +85,7 @@ public class Xml {
 		doc.getDocumentElement().normalize();
 		xpathObj = XPathFactory.newInstance().newXPath();
 	}
-	
+
 	/**
 	 * Get XML node given with XPath and parse its text contents to get double
 	 * 

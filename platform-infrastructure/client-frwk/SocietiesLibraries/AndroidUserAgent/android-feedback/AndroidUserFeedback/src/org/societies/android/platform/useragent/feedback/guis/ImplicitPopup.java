@@ -22,36 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import java.io.Serializable;
+package org.societies.android.platform.useragent.feedback.guis;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import android.app.Activity;
+import android.os.Bundle;
 
+public class ImplicitPopup extends Activity{
 
-
-public class FailedNegotiationEvent implements Serializable{
-
-
-	private Requestor requestor;
+	public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Dialog);
+    }
 	
-	public FailedNegotiationEvent(Requestor requestor){
-		this.setRequestor(requestor);
-	}
-
-	/**
-	 * @return the requestor
-	 */
-	public Requestor getRequestor() {
-		return requestor;
-	}
-
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(Requestor requestor) {
-		this.requestor = requestor;
-	}
-
 }

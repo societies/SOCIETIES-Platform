@@ -12,7 +12,6 @@
        testing of the bundle outside of an OSGi container -->
 
 	<osgi:service ref="signatureMgr"  interface="org.societies.api.security.digsig.ISignatureMgr"/>
-	<osgi:service ref="signatureMgr"  interface="org.societies.api.internal.security.digsig.ISlaSignatureMgr"/>
 	<osgi:service ref="secureStorage" interface="org.societies.api.internal.security.storage.ISecureStorage"/>
 
 </beans>

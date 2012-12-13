@@ -22,24 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.digsig;
+package org.societies.api.internal.privacytrust.privacyprotection.negotiation;
 
-import org.w3c.dom.Document;
+import java.io.Serializable;
 
-/**
- * 
- *
- * @author Mitja Vardjan
- *
- */
-public interface ISlaSignatureMgr {
+import org.societies.api.identity.Requestor;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+
+
+public class FailedNegotiationEvent implements Serializable{
+
+
+	private Requestor requestor;
 	
+	public FailedNegotiationEvent(Requestor requestor){
+		this.setRequestor(requestor);
+	}
+
 	/**
-	 * Gets the value of Id attribute for the requester's signature.
-	 * 
-	 * @param doc The SLA document
-	 * @return Id attribute value
+	 * @return the requestor
 	 */
-	public String getRequesterSignatureId(Document doc);
+	public Requestor getRequestor() {
+		return requestor;
+	}
+
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(Requestor requestor) {
+		this.requestor = requestor;
+	}
 
 }

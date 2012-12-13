@@ -22,57 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+package org.societies.android.platform.useragent.feedback;
 
-/**
- * @author Miroslav Pavleski, Mitja Vardjan
- */
-public class StreamUtil {
+import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
+import org.societies.android.api.utilities.RemoteServiceHandler;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
-	public static void copyStream(InputStream is, OutputStream os) {
-		try {
-			byte buf[] = new byte[8192];
-			int rd = -1;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.util.Log;
 
-			while ((rd = is.read(buf)) != -1)
-				os.write(buf, 0, rd);
-		} catch (Exception e) {
-			throw new RuntimeException("Stream copy failed", e);
-		} finally {
-			closeStream(os);
-			closeStream(is);
-		}
-	}
+public class AndroidUserFeedbackRemote extends Service{
 
-	public static void closeStream(InputStream is) {
-		if (is == null)
-			return;
-		try {
-			is.close();
-		} catch (IOException e) {
-		}
-	}
-
-	public static void closeStream(OutputStream os) {
-		if (os == null)
-			return;
-		try {
-			os.close();
-		} catch (IOException e) {
-		}
+	private static final String LOG_TAG = AndroidUserFeedbackRemote.class.getName();
+	private Messenger inMessenger;
+	
+	@Override
+	public void onCreate () {
+		Log.d(LOG_TAG, "AndroidUserFeedbackRemote service starting...");
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
+		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
+		AndroidUserFeedbackBase ufBase = new AndroidUserFeedbackBase(this.getApplicationContext(), ccm, pubsubClient, false);
+		this.inMessenger = new Messenger(new RemoteServiceHandler(ufBase.getClass(), ufBase, IAndroidUserFeedback.methodsArray));
 	}
 	
-	public static InputStream str2stream(String str) throws UnsupportedEncodingException {
-		
-		byte[] bytes = str.getBytes("UTF-8");
-		InputStream is = new ByteArrayInputStream(bytes);
-		
-		return is;
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "AndroidUserFeedbackRemote service terminating...");
 	}
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOG_TAG, "AndroidUserFeedbackRemote onBind...");
+		return inMessenger.getBinder();
+	}
+
 }

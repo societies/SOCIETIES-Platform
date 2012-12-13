@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-import org.w3c.dom.Document;
+//import org.w3c.dom.Document;
 
 /**
  * Methods to digitally sign given data and methods to verify given signatures.
@@ -67,7 +67,7 @@ public interface ISignatureMgr {
 	 * 
 	 * @return XML with embedded signature.
 	 */
-	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException;
+	//public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException;
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the

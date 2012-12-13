@@ -576,26 +576,26 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 		
-		final CtxIdentifier eventId = modelObject.getId();
+		final CtxChangeEvent event = new CtxChangeEvent(modelObject.getId());
 		final String[] eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
 		final CtxEventScope eventScope = CtxEventScope.BROADCAST;
 		if (this.ctxEventMgr != null) {
 			try {
 				if (LOG.isDebugEnabled())
-					LOG.debug("Sending context change event for '" + eventId
-							+ "' to topics '" + Arrays.toString(eventTopics) 
+					LOG.debug("Sending context change event " + event
+							+ " to topics '" + Arrays.toString(eventTopics) 
 							+ "' with scope '" + eventScope + "'");
-				this.ctxEventMgr.post(new CtxChangeEvent(eventId), eventTopics, eventScope);
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
 			} catch (Exception e) {
 				
-				LOG.error("Could not send context change event for '" + eventId 
-						+ "' to topics '" + Arrays.toString(eventTopics) 
+				LOG.error("Could not send context change event " + event 
+						+ " to topics '" + Arrays.toString(eventTopics) 
 						+ "' with scope '" + eventScope + "': "
 						+ e.getLocalizedMessage(), e);
 			}
 		} else {
-			LOG.error("Could not send context change event for '" + eventId
-					+ "' to topics '" + Arrays.toString(eventTopics) 
+			LOG.error("Could not send context change event " + event
+					+ " to topics '" + Arrays.toString(eventTopics) 
 					+ "' with scope '" + eventScope + "': "
 					+ "ICtxEventMgr service is not available");
 		}

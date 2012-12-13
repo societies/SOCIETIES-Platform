@@ -55,7 +55,6 @@
 	>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
-        <property name="slaSignatureMgr" ref="SlaSignatureMgr"/>
         <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
 	</bean>
 

@@ -83,10 +83,8 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions><!-- TODO should not export any packages!! -->
-						<Export-Package>
-							org.societies.privacytrust.trust.api.**
-						</Export-Package>
+					<instructions>
+						<Export-Package/>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>org.hibernate.proxy;resolution:=optional,

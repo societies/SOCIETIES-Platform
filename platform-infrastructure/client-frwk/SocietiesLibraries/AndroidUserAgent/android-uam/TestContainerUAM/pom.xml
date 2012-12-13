@@ -51,12 +51,13 @@
    			<groupId>org.societies.android.api.external</groupId>
    			<artifactId>societies-android-api</artifactId>
   			<version>${release.version}</version>
+  			<type>apklib</type>
 		</dependency--> 
-        <!-- <dependency>
+        <!--dependency>
 			<groupId>org.societies.comm.android</groupId>
 			<artifactId>AndroidPubsubApi</artifactId>
 			<version>${version.comm}</version>
-		</dependency> -->
+		</dependency-->
         
         <!--dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>

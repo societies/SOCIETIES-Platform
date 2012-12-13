@@ -33,7 +33,7 @@ import org.societies.android.api.useragent.IAndroidUserActionMonitor;
 import org.societies.android.platform.useragent.uam.container.TestContainerUAMService;
 import org.societies.android.platform.useragent.uam.container.TestContainerUAMService.UAMContainerBinder;
 
-import android.content.BroadcastReceiver;
+//import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -46,6 +46,7 @@ public class JUnitTestsUAM extends ServiceTestCase <TestContainerUAMService>{
 
 	public JUnitTestsUAM() {
 		super(TestContainerUAMService.class);
+		Log.d(LOG_TAG, "JUnit tests initialising");
 	}
 
 	@Override
@@ -59,7 +60,7 @@ public class JUnitTestsUAM extends ServiceTestCase <TestContainerUAMService>{
 
 	@MediumTest
 	public void testMonitor() throws Exception {
-
+		Log.d(LOG_TAG, "Testing monitor method");
 		//BroadcastReceiver receiver = setupBroadcastReceiver();
 
 		Intent uamIntent = new Intent(getContext(), TestContainerUAMService.class);
@@ -79,9 +80,9 @@ public class JUnitTestsUAM extends ServiceTestCase <TestContainerUAMService>{
 		aaction.setparameterName("TEST_PARAMETER_NAME");
 		aaction.setvalue("TEST_VALUE");
 
-		Log.d("LOG_TAG", "Sending action to local UAM....");
+		Log.d(LOG_TAG, "Sending action to local UAM....");
 		uamService.monitor("CLIENT", "IDENTITY", aaction);
-		Log.d("LOG_TAG", "Action sent!");
+		Log.d(LOG_TAG, "Action sent!");
 		//Thread.sleep(SLEEP_DELAY);
 
 		//getContext().unregisterReceiver(receiver);

@@ -38,13 +38,11 @@
 	<!-- All Societies Android UserAgent poms -->
 	<modules>
 	    
-	    <!-- UAM modules -->
-		<module>android-uam/AndroidUserActionMonitor/pom.xml</module>
-		<module>android-uam/TestContainerUAM/pom.xml</module>
-		<module>android-uam/JUnitTestsUAM/pom.xml</module>
-		<!-- module>android-uam/RemoteTestsUAM/pom.xml</module-->
+	    <!-- UAM -->
+		<module>android-uam/pom.xml</module>
 		
-		<!-- User Feedback modules -->
-		<!-- module>android-feedback/AndroidUserFeedback/pom.xml</module -->
+		<!-- User Feedback -->
+		<module>android-feedback/pom.xml</module>
+		
 	</modules>
 </project>
