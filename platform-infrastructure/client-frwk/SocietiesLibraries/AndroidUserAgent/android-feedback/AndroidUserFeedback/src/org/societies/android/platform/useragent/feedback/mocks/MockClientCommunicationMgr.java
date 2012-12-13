@@ -1,7 +1,12 @@
 package org.societies.android.platform.useragent.feedback.mocks;
 
+import java.util.List;
 import java.util.Set;
 
+import org.jivesoftware.smack.packet.IQ;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityContextMapper;
 import org.societies.api.identity.IIdentityManager;
@@ -19,6 +24,13 @@ public class MockClientCommunicationMgr extends ClientCommunicationMgr {
 
 	public MockClientCommunicationMgr(Context androidContext) {
 		super(androidContext);
+	}
+	
+	public void register(final List<String> elementNames, final ICommCallback callback) {
+	}
+	
+	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
+			ICommCallback callback) throws CommunicationException {
 	}
 
 	public IIdentityManager getIdManager() {
