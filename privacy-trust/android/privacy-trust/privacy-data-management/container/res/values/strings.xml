@@ -12,7 +12,8 @@
     <string name="txt_reset">Reset</string>
     <string name="txtOnConnect">Connect to XMPP Server</string>
     <string name="txtLaunchTest">Launch Check Permission</string>
-    <string name="txtLaunchTest1">Launch Get Privacy Policy</string>
+    <string name="txtLaunchTest1">Launch Get Privacy Policy University</string>
+    <string name="txtLaunchTest1bis">Launch Get Privacy Policy Emma</string>
     <string name="txtLaunchTest2">Launch Update Privacy Policy (1)</string>
     <string name="txtLaunchTest3">Launch Update Privacy Policy (2)</string>
     <string name="txtLaunchTest4">Launch Delete Privacy Policy</string>

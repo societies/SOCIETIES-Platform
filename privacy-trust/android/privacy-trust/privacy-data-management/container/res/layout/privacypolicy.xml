@@ -26,6 +26,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/txtLaunchTest1" />
+            
+            <Button
+                android:id="@+id/btnLaunchTest1bis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/txtLaunchTest1bis" />
 
             <Button
                 android:id="@+id/btnLaunchTest2"

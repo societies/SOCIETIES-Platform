@@ -26,6 +26,8 @@ package org.societies.android.privacytrust.datamanagement.callback;
 
 import java.util.List;
 
+import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -67,7 +69,7 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 		debugStanza(stanza);
 		// - Wrong payload
 		if (null == payload || !(payload instanceof PrivacyDataManagerBeanResult)) {
-			intentSender.sendIntentCheckPermission(clientPackage, "Wrong payload received.");
+			intentSender.sendIntentError(clientPackage, IPrivacyDataManager.INTENT_DEFAULT_ACTION, "Wrong payload received.");
 			return;
 		}
 		// - Send valid intent
@@ -83,7 +85,7 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 
 	public void receiveError(Stanza stanza, XMPPError error) {
 		Log.e(TAG, "Erreur XMPP: "+error.getMessage());
-		intentSender.sendIntentCheckPermission(clientPackage, "Error: "+error.getGenericText());
+		intentSender.sendIntentError(clientPackage, IPrivacyDataManager.INTENT_DEFAULT_ACTION, "Error: "+error.getGenericText());
 	}
 
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {

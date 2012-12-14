@@ -201,6 +201,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 
 		//REGISTER BROADCAST
 		IntentFilter intentFilter = new IntentFilter() ;
+		intentFilter.addAction(IPrivacyDataManager.INTENT_DEFAULT_ACTION);
 		intentFilter.addAction(MethodType.CHECK_PERMISSION.name());
 		intentFilter.addAction(MethodType.OBFUSCATE_DATA.name());
 

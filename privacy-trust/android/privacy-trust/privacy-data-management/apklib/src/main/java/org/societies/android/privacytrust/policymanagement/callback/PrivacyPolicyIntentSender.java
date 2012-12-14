@@ -54,6 +54,15 @@ public class PrivacyPolicyIntentSender extends PrivacyIntentSender {
 		return true;
 	}
 
+	public boolean sendIntentSuccess(String clientPackage, PrivacyPolicyManagerBeanResult bean) {
+		Intent intent = prepareIntent(clientPackage, bean.getMethod().name(), bean.isAck(), bean.getAckMessage());
+		if (bean.getMethod().name().equals(MethodType.GET_PRIVACY_POLICY.name())) {
+			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, bean.getPrivacyPolicy());
+		}
+		context.sendBroadcast(intent);
+		return true;
+	}
+
 	public boolean sendIntentGetPrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) {
 		Intent intent = prepareIntent(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), true, null);
 		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);

@@ -75,10 +75,11 @@ public class PrivacyDataManagerRemote {
 
 
 	public boolean checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		String action = MethodType.CHECK_PERMISSION.name();
 		// -- Destination
 		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
 		Stanza stanza = new Stanza(cloudNode);
-		Log.d(TAG, "Send "+MethodType.CHECK_PERMISSION.name()+" to "+cloudNode.getJid());
+		Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
 
 		// -- Message
 		PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
@@ -92,10 +93,10 @@ public class PrivacyDataManagerRemote {
 		try {
 			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.CHECK_PERMISSION.name());
+			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentCheckPermission(clientPackage, "Error during the sending of remote request");
+			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 			return false;
 		}
 		return true;

@@ -46,6 +46,11 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  */
 public interface IPrivacyPolicyManager {
 	/**
+	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
+	 * Must be used in the listening IntentFilter
+	 */
+	public static final String INTENT_DEFAULT_ACTION = "org.societies.android.privacytrust.DefaultAction";
+	/**
 	 * Intent field: Return value of the request
 	 */
     public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.ReturnValue";

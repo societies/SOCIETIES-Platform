@@ -45,6 +45,7 @@ import org.societies.android.privacytrust.dataobfuscation.obfuscator.StatusObfus
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.TemperatureObfuscator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
@@ -119,7 +120,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				return privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
 			}
 			catch (PrivacyException e) {
-				intentSender.sendIntentCheckPermission(clientPackage, "Unexpected error during access control: "+e.getMessage());
+				intentSender.sendIntentError(clientPackage, MethodType.CHECK_PERMISSION.name(), "Unexpected error during access control: "+e.getMessage());
 				return false;
 			}
 		}

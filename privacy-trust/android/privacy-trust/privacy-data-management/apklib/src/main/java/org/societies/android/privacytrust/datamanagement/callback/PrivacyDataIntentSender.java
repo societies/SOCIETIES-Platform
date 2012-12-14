@@ -61,8 +61,14 @@ public class PrivacyDataIntentSender extends PrivacyIntentSender {
 		return true;
 	}
 
-	public boolean sendIntentCheckPermission(String clientPackage, String errorMsg) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), false, errorMsg);
+	public boolean sendIntentSuccess(String clientPackage, String action) {
+		Intent intent = prepareIntent(clientPackage, action, true, null);
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	public boolean sendIntentError(String clientPackage, String action, String errorMsg) {
+		Intent intent = prepareIntent(clientPackage, action, false, errorMsg);
 		context.sendBroadcast(intent);
 		return true;
 	}

@@ -29,10 +29,8 @@ import java.util.List;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.platform.privacytrust.R;
-import org.societies.android.platform.privacytrust.datamanagement.PrivacyDataManagerActivity;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -102,6 +100,11 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 				if (R.id.btnLaunchTest1 == view.getId()) {
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
+				if (R.id.btnLaunchTest1bis == view.getId()) {
+					owner.setRequestorId("emma.societies.local");
+					owner.setCisRequestorId("cis-0ba9b78b-611d-4f45-ab04-87934edba84a.societies.local");
+					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
+				}
 				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
 					if (retrievedPrivacyPolicy == null) {
 						txtLocation.setText("Hum, for testing purpose, retrieve the Privacy Policy before please!");
@@ -169,7 +172,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	 * ************** */
 
 	public void onClick(View v) {
-		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
+		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
 			onLaunchTest(v);
 		}
 		else if (R.id.btnReset == v.getId()) {
@@ -201,6 +204,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
 		// -- Create a link with buttons
 		((Button) findViewById(R.id.btnLaunchTest1)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTest1bis)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest2)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest3)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest4)).setOnClickListener(this);
@@ -216,6 +220,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 
 		//REGISTER BROADCAST
 		IntentFilter intentFilter = new IntentFilter() ;
+		intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
 		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
 		intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
 		intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());
