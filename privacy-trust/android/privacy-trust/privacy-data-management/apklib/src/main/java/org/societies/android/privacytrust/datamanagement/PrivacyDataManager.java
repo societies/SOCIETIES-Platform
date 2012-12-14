@@ -62,12 +62,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private Context context;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	private PrivacyDataManagerRemote privacyDataManagerRemote;
+	private PrivacyDataIntentSender intentSender;
 
 
 	public PrivacyDataManager(Context context)  {
 		this.context = context;
 		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 		privacyDataManagerRemote = new PrivacyDataManagerRemote(context);
+		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
@@ -92,12 +94,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private class CheckPermissionTask extends AsyncTask<Object, Void, Boolean> {
 		private Context context;
 		private String clientPackage;
-		private PrivacyDataIntentSender intentSender;
 
 		public CheckPermissionTask(Context context, String clientPackage) {
 			this.context = context;
 			this.clientPackage = clientPackage;
-			intentSender = new PrivacyDataIntentSender(context, clientPackage);
 		}
 
 		protected Boolean doInBackground(Object... args) {
@@ -110,8 +110,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				ResponseItem privacyPermission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
 				if (null != privacyPermission) {
 					Log.d(TAG, "Local Permission retrieved");
-					PrivacyDataIntentSender intentSender = new PrivacyDataIntentSender(context, clientPackage);
-					intentSender.sendIntentCheckPermission(privacyPermission);
+					intentSender.sendIntentCheckPermission(clientPackage, privacyPermission);
 					return true;
 				}
 
@@ -120,7 +119,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				return privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
 			}
 			catch (PrivacyException e) {
-				intentSender.sendIntentCheckPermission("Unexpected error during access control: "+e.getMessage());
+				intentSender.sendIntentCheckPermission(clientPackage, "Unexpected error during access control: "+e.getMessage());
 				return false;
 			}
 		}

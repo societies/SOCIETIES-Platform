@@ -64,11 +64,13 @@ public class PrivacyDataManagerRemote {
 
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
+	private PrivacyDataIntentSender intentSender;
 
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context);
+		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
@@ -93,8 +95,7 @@ public class PrivacyDataManagerRemote {
 			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.CHECK_PERMISSION.name());
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
-			PrivacyDataIntentSender intentSender = new PrivacyDataIntentSender(context, clientPackage);
-			intentSender.sendIntentCheckPermission("Error during the sending of remote request");
+			intentSender.sendIntentCheckPermission(clientPackage, "Error during the sending of remote request");
 			return false;
 		}
 		return true;

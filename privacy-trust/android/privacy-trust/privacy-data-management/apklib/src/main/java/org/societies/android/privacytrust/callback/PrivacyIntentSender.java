@@ -22,48 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.callback;
+package org.societies.android.privacytrust.callback;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.privacytrust.callback.PrivacyIntentSender;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataIntentSender extends PrivacyIntentSender {
-	public PrivacyDataIntentSender(Context context) {
-		super(context);
-		TAG = PrivacyDataIntentSender.class.getSimpleName();
-		returnStatusKey = IPrivacyDataManager.INTENT_RETURN_STATUS_KEY;
-		returnStatusMsgKey = IPrivacyDataManager.INTENT_RETURN_STATUS_MSG_KEY;
-		returnValueKey = IPrivacyDataManager.INTENT_RETURN_VALUE_KEY;
+public abstract class PrivacyIntentSender {
+	protected String TAG = PrivacyIntentSender.class.getSimpleName();
+	
+	protected Context context;
+	protected String returnStatusKey;
+	protected String returnStatusMsgKey;
+	protected String returnValueKey;
+	
+	public PrivacyIntentSender(Context context) {
+		this.context = context;
+		returnStatusKey = "ReturnStatus";
+		returnStatusMsgKey = "ReturnStatusMsg";
+		returnValueKey = "ReturnValue";
 	}
-
-
-	public boolean sendIntentCheckPermission(String clientPackage, PrivacyDataManagerBeanResult bean) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), bean.isAck(), bean.getAckMessage());
-		intent.putExtra(returnValueKey, bean.getPermission());
-		context.sendBroadcast(intent);
-		return true;
-	}
-
-	public boolean sendIntentCheckPermission(String clientPackage, ResponseItem privacyPermission) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), true, null);
-		intent.putExtra(returnValueKey, privacyPermission);
-		context.sendBroadcast(intent);
-		return true;
-	}
-
-	public boolean sendIntentCheckPermission(String clientPackage, String errorMsg) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), false, errorMsg);
-		context.sendBroadcast(intent);
-		return true;
+	
+	protected Intent prepareIntent(String clientPackage, String action, boolean ack, String ackMessage) {
+		Log.d(TAG, "Send Intent("+action+") to "+clientPackage+": "+(ack ? "Success" : "Error "+(null != ackMessage ? ackMessage : "")));
+		Intent intent = new Intent();
+		intent.setPackage(clientPackage);
+		intent.setAction(action);
+		intent.putExtra(returnStatusKey, ack);
+		if (null != ackMessage) {
+			intent.putExtra(returnStatusMsgKey, ackMessage);
+		}
+		return intent;
 	}
 }

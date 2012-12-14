@@ -22,13 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.callback;
+package org.societies.android.privacytrust.policymanagement.callback;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
+
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.privacytrust.callback.PrivacyIntentSender;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
 import android.content.Context;
 import android.content.Intent;
@@ -37,32 +38,37 @@ import android.content.Intent;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataIntentSender extends PrivacyIntentSender {
-	public PrivacyDataIntentSender(Context context) {
+public class PrivacyPolicyIntentSender extends PrivacyIntentSender {
+	public PrivacyPolicyIntentSender(Context context) {
 		super(context);
-		TAG = PrivacyDataIntentSender.class.getSimpleName();
-		returnStatusKey = IPrivacyDataManager.INTENT_RETURN_STATUS_KEY;
-		returnStatusMsgKey = IPrivacyDataManager.INTENT_RETURN_STATUS_MSG_KEY;
-		returnValueKey = IPrivacyDataManager.INTENT_RETURN_VALUE_KEY;
+		TAG = PrivacyPolicyIntentSender.class.getSimpleName();
+		returnStatusKey = IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY;
+		returnStatusMsgKey = IPrivacyPolicyManager.INTENT_RETURN_STATUS_MSG_KEY;
+		returnValueKey = IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY;
 	}
 
-
-	public boolean sendIntentCheckPermission(String clientPackage, PrivacyDataManagerBeanResult bean) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), bean.isAck(), bean.getAckMessage());
-		intent.putExtra(returnValueKey, bean.getPermission());
+	public boolean sendIntentGetPrivacyPolicy(String clientPackage, PrivacyPolicyManagerBeanResult bean) {
+		Intent intent = prepareIntent(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), bean.isAck(), bean.getAckMessage());
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, bean.getPrivacyPolicy());
 		context.sendBroadcast(intent);
 		return true;
 	}
 
-	public boolean sendIntentCheckPermission(String clientPackage, ResponseItem privacyPermission) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), true, null);
-		intent.putExtra(returnValueKey, privacyPermission);
+	public boolean sendIntentGetPrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) {
+		Intent intent = prepareIntent(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), true, null);
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
 		context.sendBroadcast(intent);
 		return true;
 	}
 
-	public boolean sendIntentCheckPermission(String clientPackage, String errorMsg) {
-		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), false, errorMsg);
+	public boolean sendIntentSuccess(String clientPackage, String action) {
+		Intent intent = prepareIntent(clientPackage, action, true, null);
+		context.sendBroadcast(intent);
+		return true;
+	}
+
+	public boolean sendIntentError(String clientPackage, String action, String errorMsg) {
+		Intent intent = prepareIntent(clientPackage, action, false, errorMsg);
 		context.sendBroadcast(intent);
 		return true;
 	}

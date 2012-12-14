@@ -48,6 +48,7 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 	private List<String> PACKAGES;
 
 	private PrivacyDataIntentSender intentSender;
+	private String clientPackage;
 
 
 	public RemotePrivacyDataCallback(Context context, String clientPackage, List<String> elementNames,
@@ -56,7 +57,8 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 		ELEMENT_NAMES = elementNames;
 		NAME_SPACES = namespaces;
 		PACKAGES = packages;
-		intentSender = new PrivacyDataIntentSender(context, clientPackage);
+		this.clientPackage = clientPackage;
+		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
@@ -65,13 +67,13 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 		debugStanza(stanza);
 		// - Wrong payload
 		if (null == payload || !(payload instanceof PrivacyDataManagerBeanResult)) {
-			intentSender.sendIntentCheckPermission("Wrong payload received.");
+			intentSender.sendIntentCheckPermission(clientPackage, "Wrong payload received.");
 			return;
 		}
 		// - Send valid intent
 		// Send intent
 		PrivacyDataManagerBeanResult privacyPaylaod = (PrivacyDataManagerBeanResult)payload;
-		intentSender.sendIntentCheckPermission(privacyPaylaod);
+		intentSender.sendIntentCheckPermission(clientPackage, privacyPaylaod);
 		// TODO: Update PrivacyPermissions
 		if (privacyPaylaod.isAck() && privacyPaylaod.getMethod().equals(MethodType.CHECK_PERMISSION)) {
 //			PrivacyDataManagerInternal privacyDataManagerInternal = new PrivacyDataManagerInternal();
@@ -81,7 +83,7 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 
 	public void receiveError(Stanza stanza, XMPPError error) {
 		Log.e(TAG, "Erreur XMPP: "+error.getMessage());
-		intentSender.sendIntentCheckPermission("Error: "+error.getGenericText());
+		intentSender.sendIntentCheckPermission(clientPackage, "Error: "+error.getGenericText());
 	}
 
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
