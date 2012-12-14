@@ -22,64 +22,66 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
-
-import java.util.List;
+package org.societies.android.privacytrust.datamanagement.callback;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
 import android.util.Log;
-
 
 /**
  * @author Olivier Maridat (Trialog)
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
+public class PrivacyDataIntentSender {
+	private final static String TAG = PrivacyDataIntentSender.class.getSimpleName();
+	
+	private Context context;
+	private String clientPackage;
+	
+	public PrivacyDataIntentSender(Context context, String clientPackage) {
+		this.context = context;
+		this.clientPackage = clientPackage;
 	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
+	
+	public boolean sendIntentCheckPermission(PrivacyDataManagerBeanResult bean) {
+		Intent intent = prepareIntent(MethodType.CHECK_PERMISSION, bean.isAck(), bean.getAckMessage());
+		intent.putExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY, bean.getPermission());
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	public boolean sendIntentCheckPermission(ResponseItem privacyPermission) {
+		Intent intent = prepareIntent(MethodType.CHECK_PERMISSION, true, null);
+		intent.putExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY, privacyPermission);
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	public boolean sendIntentCheckPermission(String errorMsg) {
+		Intent intent = prepareIntent(MethodType.CHECK_PERMISSION, false, errorMsg);
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	
+	private Intent prepareIntent(MethodType action, boolean ack, String ackMessage) {
+		return prepareIntent(action.name(), ack, ackMessage);
+	}
+	
+	private Intent prepareIntent(String action, boolean ack, String ackMessage) {
+		Log.d(TAG, "Send Intent("+action+") to "+clientPackage+": "+(ack ? "Success" : "Error "+(null != ackMessage ? ackMessage : "")));
+		Intent intent = new Intent();
+		intent.setPackage(clientPackage);
+		intent.setAction(action);
+		intent.putExtra(IPrivacyDataManager.INTENT_RETURN_STATUS_KEY, ack);
+		if (null != ackMessage) {
+			intent.putExtra(IPrivacyDataManager.INTENT_RETURN_STATUS_MSG_KEY, ackMessage);
 		}
-	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+		return intent;
 	}
 }

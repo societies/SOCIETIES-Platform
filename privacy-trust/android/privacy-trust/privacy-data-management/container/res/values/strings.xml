@@ -11,9 +11,13 @@
     <string name="txt_differentprocess">Refresh using different process approach</string>
     <string name="txt_reset">Reset</string>
     <string name="txtOnConnect">Connect to XMPP Server</string>
-    <string name="txtLaunchTest">Launch Test</string>
+    <string name="txtLaunchTest">Launch Check Permission</string>
     <string name="txtLaunchTest1">Launch Get Privacy Policy</string>
     <string name="txtLaunchTest2">Launch Update Privacy Policy (1)</string>
     <string name="txtLaunchTest3">Launch Update Privacy Policy (2)</string>
     <string name="txtLaunchTest4">Launch Delete Privacy Policy</string>
+    <string name="gotoData">Go to Privacy Data</string>
+    <string name="gotoPolicy">Go to Privacy Policy</string>
+    <string name="titlePolicy">Privacy Policy Manager</string>
+    <string name="titleData">Privacy Data Manager</string>
 </resources>

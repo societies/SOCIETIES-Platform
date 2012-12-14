@@ -100,12 +100,11 @@ public class PrivacyPolicyManagerRemote {
 			try {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.GET_PRIVACY_POLICY.name());
-				callback.wait();
+				Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.GET_PRIVACY_POLICY.name());
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}
-			return callback.getPrivacyPolicy();
+			return null;
 		}
 	}
 
@@ -141,11 +140,10 @@ public class PrivacyPolicyManagerRemote {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
-				callback.wait();
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}
-			return callback.getPrivacyPolicy();
+			return null;
 		}
 	}
 
@@ -181,11 +179,10 @@ public class PrivacyPolicyManagerRemote {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
-				callback.wait();
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}
-			return callback.isAck();
+			return true;
 		}
 	}
 }

@@ -22,64 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
+package org.societies.android.platform.privacytrust;
 
-import java.util.List;
+import org.societies.android.platform.privacytrust.datamanagement.PrivacyDataManagerActivity;
+import org.societies.android.platform.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
-
-import android.app.Service;
+import android.app.Activity;
+import android.app.TabActivity;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
+import android.content.res.Resources;
+import android.os.Bundle;
+import android.widget.TabHost;
 
 
 /**
  * @author Olivier Maridat (Trialog)
+ * @date 28 nov. 2011
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
+public class MainActivity extends TabActivity {
+	private final static String TAG = MainActivity.class.getSimpleName();
 
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
-	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
-	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
 	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+
+		Resources res = getResources();
+		TabHost tabHost = this.getTabHost();
+		TabHost.TabSpec spec; // reusable tabspec for each tab
+		Intent intent;
+
+		intent = new Intent().setClass(this, PrivacyDataManagerActivity.class);
+		intent.putExtra("value", "Data Manager");
+		spec = tabHost.newTabSpec("privacydata")
+				.setIndicator("Data Manager")     
+				.setContent(intent);
+		tabHost.addTab(spec);
+
+		intent = new Intent().setClass(this, PrivacyPolicyManagerActivity.class);
+		intent.putExtra("value", "Policy Manager");
+		spec = tabHost.newTabSpec("privacypolicy")
+				.setIndicator("Policy Manager")
+				.setContent(intent);
+		tabHost.addTab(spec);
+
+		tabHost.setCurrentTab(0);
 	}
 }

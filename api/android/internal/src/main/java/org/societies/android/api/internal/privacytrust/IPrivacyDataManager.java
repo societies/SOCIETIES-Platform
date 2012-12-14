@@ -27,12 +27,16 @@ package org.societies.android.api.internal.privacytrust;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapper;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.DataIdentifier;;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 /**
  * Interface exposed to Societies components in order to manage access control over resources
@@ -40,43 +44,51 @@ import org.societies.api.schema.identity.DataIdentifier;;
  * @created 09-nov.-2011 16:45:26
  */
 public interface IPrivacyDataManager {
-	public static final String CHECK_PERMISSION = "org.societies.android.api.internal.privacytrust.checkPermission";
-	public static final String CHECK_PERMISSION_RESULT = "org.societies.android.api.internal.privacytrust.checkPermissionResult";
-	public static final String OBFUSCATE_DATA = "org.societies.android.api.internal.privacytrust.obfuscateData";
-	public static final String OBFUSCATE_DATA_RESULT = "org.societies.android.api.internal.privacytrust.obfuscateDataResult";
-	public static final String HAS_OBFUSCATED_VERSION = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersion";
-	public static final String HAS_OBFUSCATED_VERSION_RESULT = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersionResult";
-
 	/**
-	 * Check permission to access/use/disclose a data
+	 * Intent field: Return value of the request
+	 */
+    public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.datamanagement.ReturnValue";
+    /**
+     * Intent field: Status of the request
+     */
+    public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatus";
+    /**
+	 * Intent field: Error description if the request status is failure
+	 */
+    public static final String INTENT_RETURN_STATUS_MSG_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatusMsg";
 
-	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId ID of the requested data.
-	 * @param action Action requested over this data.
-	 * @return A ResponseItem with permission information in it
+    
+	/**
+	 * Check permission to access/update/disclose a data
+	 * @param clientPackage Client package name
+	 * @param requestor Id of the requestor: CSS {@link RequestorBean}, CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean}
+	 * @param dataId Id of the requested data
+	 * @param action Actions requested over this data
+	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link ResponseItem}
 	 * @throws PrivacyException
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException;
+	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data
 	 * wrapper in order to execute the relevant obfuscation operation into relevant
 	 * information.
-	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
-	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
+	 * @param clientPackage Client package name
+	 * @param requestor Id of the requestor: CSS {@link RequestorBean}, CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean}
+	 * @param dataWrapper Data Id wrapped in the relevant DataWrapper. Only the Id information is mandatory to retrieve an obfuscated version. Use {@link DataWrapperFactory} to select the relevant {@link DataWrapper}
+	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link IDataWrapper} wrapping the obfuscated data
 	 * @throws PrivacyException
 	 */
-	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
-	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataWrapper Data ID wrapped in the relevant DataWrapper. Only the ID information is mandatory to retrieve an obfuscated version. Use DataWrapperFactory to select the relevant DataWrapper
-	 * @return ID of the obfuscated version of the data if the persistence is enabled and if the obfuscated data exists
-	 * @return otherwise ID of the non-obfuscated data
+	 * @param clientPackage Client package name
+	 * @param requestor Id of the requestor: CSS {@link RequestorBean}, CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean}
+	 * @param dataWrapper Data Id wrapped in the relevant DataWrapper. Only the Id information is mandatory to retrieve an obfuscated version. Use {@link DataWrapperFactory} to select the relevant {@link DataWrapper}
+	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link DataIdentifier} containing the id of the data to use
 	 * @throws PrivacyException
 	 */
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
 }
