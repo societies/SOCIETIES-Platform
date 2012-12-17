@@ -59,8 +59,7 @@
 
 	<bean id="privacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
-		init-method="init" depends-on="commManager">
-		<property name="commMgr" ref="commManager" />
+		init-method="init">
 		<property name="privacyLog" ref="privacyLog" />
 	</bean>
 
