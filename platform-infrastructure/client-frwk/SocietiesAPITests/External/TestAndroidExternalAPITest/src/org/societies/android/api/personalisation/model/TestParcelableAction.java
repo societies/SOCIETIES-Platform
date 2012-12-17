@@ -28,15 +28,14 @@ package org.societies.android.api.personalisation.model;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
-import org.societies.api.personalisation.model.Action;
+import org.societies.api.schema.personalisation.model.ActionBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
-public class TestAAction extends AndroidTestCase{
+public class TestParcelableAction extends AndroidTestCase{
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -49,40 +48,42 @@ public class TestAAction extends AndroidTestCase{
 	
 	@MediumTest
 	public void testParcelable() {
-		AAction aaction = new AAction();
-		assertNotNull(aaction);
+		ActionBean action = new ActionBean();
+		assertNotNull(action);
 		
-		AServiceResourceIdentifier aServiceID = new AServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceID = new ServiceResourceIdentifier();
 		String serviceIDString = "TEST_SERVICE_ID";
 		try {
-			aServiceID.setIdentifier(new URI(serviceIDString));
+			serviceID.setIdentifier(new URI(serviceIDString));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		aServiceID.setServiceInstanceIdentifier(serviceIDString);
+		serviceID.setServiceInstanceIdentifier(serviceIDString);
 		
-		aaction.setServiceID(aServiceID);
-		aaction.setServiceType("TEST_SERVICE_TYPE");
-		aaction.setparameterName("TEST_PARAMETER_NAME");
-		aaction.setvalue("TEST_VALUE");
+		action.setServiceID(serviceID);
+		action.setServiceType("TEST_SERVICE_TYPE");
+		action.setParameterName("TEST_PARAMETER_NAME");
+		action.setValue("TEST_VALUE");
+		
+		Parcel parcel = Parcel.obtain();
+        action.writeToParcel(parcel, 0);
 				
-		assertEquals(0, aaction.describeContents());
-		
-        Parcel parcel = Parcel.obtain();
-        aaction.writeToParcel(parcel, 0);
+		assertEquals(0, action.describeContents());
+		       
         //done writing, now reset parcel for reading
-        parcel.setDataPosition(0);
-        //finish round trip
-        AAction createFromParcel = AAction.CREATOR.createFromParcel(parcel);
+		parcel.setDataPosition(0);
        
-        assertEquals(aaction.getServiceID().getIdentifier(), createFromParcel.getServiceID().getIdentifier());
-        assertEquals(aaction.getServiceID().getServiceInstanceIdentifier(), createFromParcel.getServiceID().getServiceInstanceIdentifier());
-        assertEquals(aaction.getServiceType(), createFromParcel.getServiceType());
-        assertEquals(aaction.getparameterName(), createFromParcel.getparameterName());
-        assertEquals(aaction.getvalue(), createFromParcel.getvalue());
+        //finish round trip
+        ActionBean createFromParcel = ActionBean.CREATOR.createFromParcel(parcel);
+       
+        assertEquals(action.getServiceID().getIdentifier(), createFromParcel.getServiceID().getIdentifier());
+        assertEquals(action.getServiceID().getServiceInstanceIdentifier(), createFromParcel.getServiceID().getServiceInstanceIdentifier());
+        assertEquals(action.getServiceType(), createFromParcel.getServiceType());
+        assertEquals(action.getParameterName(), createFromParcel.getParameterName());
+        assertEquals(action.getValue(), createFromParcel.getValue());
 	}
 
-	@MediumTest
+	/*@MediumTest
 	public void testConvertAction(){
 		Action action = new Action();
 		assertNotNull(action);
@@ -138,5 +139,5 @@ public class TestAAction extends AndroidTestCase{
 		assertEquals(action.getServiceType(), aaction.getServiceType());
 		assertEquals(action.getparameterName(), aaction.getparameterName());
 		assertEquals(action.getvalue(), aaction.getvalue());
-	}
+	}*/
 }
