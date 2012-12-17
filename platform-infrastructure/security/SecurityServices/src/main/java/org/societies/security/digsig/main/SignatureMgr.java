@@ -142,7 +142,15 @@ public class SignatureMgr implements ISignatureMgr {
 		return xmlDSig.signXml(xml, ids);
 	}
 	
-	
+	@Override
+	public Object signXml(Object xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+		
+		ArrayList<String> ids = new ArrayList<String>();
+		
+		ids.add(xmlNodeId);
+		
+		return xmlDSig.signXml((Document) xml, ids);
+	}
 	
 	@Override
 	public boolean verifyXml(String xml) {
@@ -214,5 +222,10 @@ public class SignatureMgr implements ISignatureMgr {
 			return null;
 		}
 		return cert.getPublicKey();
+	}
+	
+	@Override
+	public String getRequesterSignatureId(Object doc) {
+		return xmlDSig.getRequesterSignatureId((Document) doc);
 	}
 }
