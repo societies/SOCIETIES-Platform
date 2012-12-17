@@ -25,27 +25,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.phongegap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
-import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
-import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalCSSManagerBinder;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
-import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.utilities.DBC.Dbc;
 
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -247,9 +247,9 @@ public class PluginCSSManager extends Plugin {
 		if (action.equals(READ_CSSRECORD)) {
 			CssRecordDAO cssRecordDAO = new CssRecordDAO(this.ctx.getContext());
 			
-			AndroidCSSRecord record = cssRecordDAO.readCSSrecord();
+			CssRecord record = cssRecordDAO.readCSSrecord();
 			if (null != record) {
-	            result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecordDAO.readCSSrecord()));
+	            result = new PluginResult(PluginResult.Status.OK, convertCssRecord(cssRecordDAO.readCSSrecord()));
 			} else {
 	            result = new PluginResult(PluginResult.Status.ERROR, "no CSS Record");
 			}
@@ -274,7 +274,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 
-					this.localCSSManager.loginCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+					this.localCSSManager.loginCSS(data.getString(0), createCssRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -287,7 +287,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 
-					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+					this.localCSSManager.logoutCSS(data.getString(0), createCssRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -295,7 +295,7 @@ public class PluginCSSManager extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0))) {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-					this.localCSSManager.registerXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+					this.localCSSManager.registerXMPPServer(data.getString(0), createCssRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -307,7 +307,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 
-					this.localCSSManager.loginXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+					this.localCSSManager.loginXMPPServer(data.getString(0), createCssRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -325,7 +325,7 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
 					Log.d(LOG_TAG, "parameter 2 - forename: " + data.getJSONObject(1).getString("foreName"));
 					Log.d(LOG_TAG, "parameter 3 - name: " + data.getJSONObject(1).getString("name"));
-					this.localCSSManager.modifyAndroidCSSRecord(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+					this.localCSSManager.modifyAndroidCSSRecord(data.getString(0), createCssRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -423,34 +423,36 @@ public class PluginCSSManager extends Plugin {
 	 */
 	private boolean sendJavascriptResult(String methodCallbackId, Intent intent, String key) {
 		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
-		AndroidCSSRecord cssRecord = null;
-		ACssAdvertisementRecord advertRecord [] = null;
+		CssRecord cssRecord = null;
+		CssAdvertisementRecord advertRecord [] = null;
 		PluginResult result = null;
 		boolean resultStatus = false;
 		
 		//ADVERTISEMENT RECORDS	
 		if (IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() || IAndroidCSSManager.GET_CSS_FRIENDS==intent.getAction() || IAndroidCSSManager.SUGGESTED_FRIENDS==intent.getAction()) {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
-			Parcelable parcelable[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
-			advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			Log.d(LOG_TAG, "Number of friends: " + parcelable.length);
-			for (int i  = 0; i < parcelable.length; i++) {
-				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
-			}
+			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
+			advertRecord = (CssAdvertisementRecord[]) parcels;
+			//advertRecord = new ACssAdvertisementRecord[parcelable.length];
+			//Log.d(LOG_TAG, "Number of friends: " + parcelable.length);
+			//for (int i  = 0; i < parcelable.length; i++) {
+			//	advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
+			//}
 		} 
 		else if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ) {
 			resultStatus = intent.getBooleanExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, false);
-			Parcelable parcelable[] = intent.getParcelableArrayExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY);
-			advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
-			for (int i  = 0; i < parcelable.length; i++) {
-				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
-			}
+			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY);
+			advertRecord = (CssAdvertisementRecord[]) parcels;
+			//advertRecord = new ACssAdvertisementRecord[parcelable.length];
+			//Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
+			//for (int i  = 0; i < parcelable.length; i++) {
+			//	advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
+			//}
 		} 
 		//CSS RECORDS 
 		else  {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
-			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
+			cssRecord = (CssRecord) intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
 		}
 		
 		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
@@ -460,9 +462,9 @@ public class PluginCSSManager extends Plugin {
 					   IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() ||
 					   IAndroidCSSManager.GET_CSS_FRIENDS == intent.getAction() || 
 					   IAndroidCSSManager.SUGGESTED_FRIENDS == intent.getAction()) {
-				result = new PluginResult(PluginResult.Status.OK, convertACssAdvertisements(advertRecord));
+				result = new PluginResult(PluginResult.Status.OK, convertCssAdvertisements(advertRecord));
 			} else {
-				result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
+				result = new PluginResult(PluginResult.Status.OK, convertCssRecord(cssRecord));
 			}
 			result.setKeepCallback(false);
 			this.success(result, methodCallbackId);
@@ -485,7 +487,7 @@ public class PluginCSSManager extends Plugin {
      * @param node
      * @return JSONObject 
      */
-    private JSONArray convertACssAdvertisements(ACssAdvertisementRecord adverts []) {
+    private JSONArray convertCssAdvertisements(CssAdvertisementRecord adverts []) {
         JSONArray jArray = null;
 		Gson gson = new Gson();
 		try {
@@ -506,7 +508,7 @@ public class PluginCSSManager extends Plugin {
      * @param node
      * @return JSONObject 
      */
-    private JSONObject convertCSSNode(AndroidCSSNode node) {
+    private JSONObject convertCssNode(CssNode node) {
         JSONObject jObj = new JSONObject();
 		Gson gson = new Gson();
 		try {
@@ -526,7 +528,7 @@ public class PluginCSSManager extends Plugin {
      * @param record
      * @return JSONObject
      */
-    private JSONObject convertCSSRecord(AndroidCSSRecord record) {
+    private JSONObject convertCssRecord(CssRecord record) {
         JSONObject jObj = new JSONObject();
 		Gson gson = new Gson();
 		try {
@@ -545,12 +547,12 @@ public class PluginCSSManager extends Plugin {
      * @param jRecord JSONObject representation of node
      * @return AndroidCSSNode 
      */
-    private AndroidCSSNode createCSSNode(JSONObject jNode) {
-    	AndroidCSSNode anode = null;
+    private CssNode createCssNode(JSONObject jNode) {
+    	CssNode anode = null;
 
     	Gson gson = new Gson();
     	
-    	anode = gson.fromJson(jNode.toString(), AndroidCSSNode.class);
+    	anode = gson.fromJson(jNode.toString(), CssNode.class);
     	return anode;
     }
     /**
@@ -560,9 +562,9 @@ public class PluginCSSManager extends Plugin {
      * @param jNode JSONObject representation of record
      * @return AndroidCSSRecord 
      */
-    private AndroidCSSRecord createCSSRecord(JSONObject jRecord) {
+    private CssRecord createCssRecord(JSONObject jRecord) {
     	Dbc.require("JSON object cannot be null", jRecord != null);
-    	AndroidCSSRecord aRecord = new AndroidCSSRecord();
+    	CssRecord aRecord = new CssRecord();
 
     	
     	try {
@@ -586,12 +588,15 @@ public class PluginCSSManager extends Plugin {
 	    	aRecord.setStatus(jRecord.getInt("status"));
 	    	
 	    	JSONArray cssNodes = jRecord.getJSONArray("cssNodes");
-	    	AndroidCSSNode aNodes [] = new AndroidCSSNode[cssNodes.length()];
-	    	
+	    	List<CssNode> nodeList = new ArrayList<CssNode>();
 	    	for (int i = 0; i < cssNodes.length(); i++) {
-	    		aNodes[i] = createCSSNode(cssNodes.getJSONObject(i));
+	    		nodeList.add(createCssNode(cssNodes.getJSONObject(i)));
 	    	}
-	    	aRecord.setCSSNodes(aNodes);
+	    	//CssNode aNodes [] = new CssNode[cssNodes.length()];
+	    	//for (int i = 0; i < cssNodes.length(); i++) {
+	    	//	aNodes[i] = createCssNode(cssNodes.getJSONObject(i));
+	    	//}
+	    	aRecord.setCssNodes(nodeList);
 //	    	aRecord.setArchiveCSSNodes(arg0)
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

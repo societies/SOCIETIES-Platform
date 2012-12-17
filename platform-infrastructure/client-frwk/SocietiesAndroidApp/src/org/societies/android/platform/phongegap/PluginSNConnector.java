@@ -30,12 +30,12 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
-import org.societies.android.api.internal.sns.AConnectorBean;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.api.internal.sns.ISocialTokenManager;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialTokenManager;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 
 import android.content.BroadcastReceiver;
@@ -291,11 +291,12 @@ public class PluginSNConnector extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ISocialData.INTENT_RETURN_KEY);
-					AConnectorBean connectors[] = new AConnectorBean[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						connectors[i] = (AConnectorBean) parcels[i];
-					}
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAConnectorBeanToJSONArray(connectors));
+					ConnectorBean connectors[] = (ConnectorBean[]) parcels;
+					//AConnectorBean connectors[] = new AConnectorBean[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	connectors[i] = (AConnectorBean) parcels[i];
+					//}
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertConnectorBeanToJSONArray(connectors));
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -328,7 +329,7 @@ public class PluginSNConnector extends Plugin {
      * @param array of InstalledAppInfo
      * @return JSONArray 
      */
-    private JSONArray convertAConnectorBeanToJSONArray(AConnectorBean array[]) {
+    private JSONArray convertConnectorBeanToJSONArray(ConnectorBean array[]) {
     	JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {

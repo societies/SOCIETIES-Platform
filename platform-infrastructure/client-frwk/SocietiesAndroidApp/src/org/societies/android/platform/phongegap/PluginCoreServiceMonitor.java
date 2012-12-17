@@ -32,8 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.android.api.servicelifecycle.AService;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
@@ -42,6 +40,8 @@ import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -280,13 +280,14 @@ public class PluginCoreServiceMonitor extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
 				try {
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceDisco.getService(data.getString(0), createASRIFromJSON(jObj), data.getString(2));
+					this.serviceDisco.getService(data.getString(0), createSRIFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 2))) {
 				try {
-					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
+					JSONObject jObj = data.getJSONObject(1);
+					this.serviceDisco.searchService(data.getString(0), createServiceFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -301,28 +302,28 @@ public class PluginCoreServiceMonitor extends Plugin {
 			else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 0))) {
 				try {	//START SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.startService(data.getString(0), createASRIFromJSON(jObj));
+					this.serviceControl.startService(data.getString(0), createSRIFromJSON(jObj));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 1))) {
 				try {	//STOP SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.stopService(data.getString(0), createASRIFromJSON(jObj));
+					this.serviceControl.stopService(data.getString(0), createSRIFromJSON(jObj));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 4))) {
 				try {	//SHARE SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.shareService(data.getString(0), createAServiceFromJSON(jObj), data.getString(2));
+					this.serviceControl.shareService(data.getString(0), createServiceFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceControl.methodsArray, 5))) {
 				try {	//UN-SHARE SERVICE
 					JSONObject jObj = data.getJSONObject(1);
-					this.serviceControl.unshareService(data.getString(0), createAServiceFromJSON(jObj), data.getString(2));
+					this.serviceControl.unshareService(data.getString(0), createServiceFromJSON(jObj), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -435,12 +436,12 @@ public class PluginCoreServiceMonitor extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-					AService services[] = new AService[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						services[i] = (AService) parcels[i];
-					}
-					
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAServiceToJSONArray(services));
+					Service services[] = (Service[]) parcels;
+					//AService services[] = new AService[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	services[i] = (AService) parcels[i];
+					//}
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
 					
@@ -457,12 +458,12 @@ public class PluginCoreServiceMonitor extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-					AService services[] = new AService[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						services[i] = (AService) parcels[i];
-					}
-					
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAServiceToJSONArray(services));
+					Service services[] = (Service[]) parcels;
+					//AService services[] = new AService[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	services[i] = (AService) parcels[i];
+					//}
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
 					
@@ -612,9 +613,9 @@ public class PluginCoreServiceMonitor extends Plugin {
      * @return
      * @throws JSONException
      */
-    private AServiceResourceIdentifier createASRIFromJSON(JSONObject jObj) throws JSONException {
+    private ServiceResourceIdentifier createSRIFromJSON(JSONObject jObj) throws JSONException {
     	Gson gson = new Gson();
-    	AServiceResourceIdentifier asri = gson.fromJson(jObj.toString(), AServiceResourceIdentifier.class);
+    	ServiceResourceIdentifier asri = gson.fromJson(jObj.toString(), ServiceResourceIdentifier.class);
     	return asri;
     }
     
@@ -624,9 +625,9 @@ public class PluginCoreServiceMonitor extends Plugin {
      * @return
      * @throws JSONException
      */
-    private AService createAServiceFromJSON(JSONObject jObj) throws JSONException {
+    private Service createServiceFromJSON(JSONObject jObj) throws JSONException {
     	Gson gson = new Gson();
-    	AService aservice = gson.fromJson(jObj.toString(), AService.class);
+    	Service aservice = gson.fromJson(jObj.toString(), Service.class);
     	return aservice;
     }
     
@@ -636,7 +637,7 @@ public class PluginCoreServiceMonitor extends Plugin {
      * @param array of AService
      * @return JSONArray 
      */
-    private JSONArray convertAServiceToJSONArray(AService array[]) {
+    private JSONArray convertServiceToJSONArray(Service array[]) {
     	JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
