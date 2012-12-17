@@ -48,6 +48,7 @@ public class CheckboxPopup extends ExplicitPopup{
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate in CheckboxPopup");
     }
 	
     

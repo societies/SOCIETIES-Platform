@@ -70,6 +70,7 @@ public class JUnitTestsFeedback extends ServiceTestCase <TestContainerFeedbackSe
 		feedbackService.getExplicitFB("CLIENT", ExpProposalType.RADIOLIST, content);
 		
 		//get result through Intent
+		Log.d(LOG_TAG, "Radio popup test complete!");
 	}
 	
 	@MediumTest
@@ -87,6 +88,7 @@ public class JUnitTestsFeedback extends ServiceTestCase <TestContainerFeedbackSe
 		feedbackService.getExplicitFB("CLIENT", ExpProposalType.CHECKBOXLIST, content);
 		
 		//get result through Intent
+		Log.d(LOG_TAG, "Checkbox popup test complete!");
 	}
 	
 	
@@ -106,5 +108,6 @@ public class JUnitTestsFeedback extends ServiceTestCase <TestContainerFeedbackSe
 		feedbackService.getExplicitFB("CLIENT", ExpProposalType.ACKNACK, content);
 		
 		//get result through Intent
+		Log.d(LOG_TAG, "Ack/nack popup test complete!");
 	}
 }

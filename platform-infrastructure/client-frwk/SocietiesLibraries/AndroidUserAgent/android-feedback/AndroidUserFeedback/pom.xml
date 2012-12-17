@@ -56,12 +56,12 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
             <groupId>org.societies.android.platform.androidutils</groupId>
            	<artifactId>SocietiesAndroidUtilities</artifactId>
           	<version>${release.version}</version>
      		<type>apklib</type>
-   		</dependency>
+   		</dependency> -->
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>

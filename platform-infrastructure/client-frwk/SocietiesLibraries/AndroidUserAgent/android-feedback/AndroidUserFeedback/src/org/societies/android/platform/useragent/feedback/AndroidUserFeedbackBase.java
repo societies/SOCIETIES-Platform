@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.platform.androidutils.AndroidNotifier;
+//import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
 import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
 import org.societies.android.platform.useragent.feedback.guis.ExplicitPopup;
@@ -232,6 +232,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 			RadioPopup radPopup = new RadioPopup();
 			break;
 		case 1:	//checkboxPopup
+			Log.d(LOG_TAG, "Creating a checkbox popup");
 			CheckboxPopup cbPopup = new CheckboxPopup();
 			expPopups.put(requestID, cbPopup);
 			List<String> result = cbPopup.getFeedback(proposalText, optionsList);
@@ -250,7 +251,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 	
 	private void processNotificationRequestEvent(String requestID, String proposalText){
 		//use android notification system
-		AndroidNotifier notifications;
+		//AndroidNotifier notifications;
 	}
 	
 	private void processExpResponseEvent(String responseID, List<String> result){
