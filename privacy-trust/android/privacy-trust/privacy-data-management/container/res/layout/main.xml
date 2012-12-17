@@ -1,94 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical" >
-
-            <LinearLayout
-                android:id="@+id/linearLayout1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <Button
-                    android:id="@+id/btnConnect"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:onClick="onConnect"
-                    android:text="@string/txtOnConnect" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnLaunchTest1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onLaunchTest"
-                android:text="@string/txtLaunchTest1" />
-            
-            <Button
-                android:id="@+id/btnLaunchTest2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onLaunchTest"
-                android:text="@string/txtLaunchTest2" />
-            
-            <Button
-                android:id="@+id/btnLaunchTest3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onLaunchTest"
-                android:text="@string/txtLaunchTest3" />
-            
-            <Button
-                android:id="@+id/btnLaunchTest4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onLaunchTest"
-                android:text="@string/txtLaunchTest4" />
-
-            <Button
-                android:id="@+id/btnReset"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onButtonResetClick"
-                android:text="@string/txt_reset" />
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_location"
-                android:textAppearance="?android:attr/textAppearanceMedium" >
-            </TextView>
-
-            <TextView
-                android:id="@+id/txtLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_nothing" >
-            </TextView>
-
-            <TextView
-                android:id="@+id/txtConnectivity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_nothing" >
-            </TextView>
-        </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+<TabHost
+ android:id="@android:id/tabhost"
+ android:layout_width="fill_parent"
+ android:layout_height="fill_parent"
+ xmlns:android="http://schemas.android.com/apk/res/android">
+	<LinearLayout
+	 android:padding="5dp"
+	 android:layout_width="fill_parent"
+	 android:layout_height="fill_parent"
+	 android:orientation="vertical">
+		<TabWidget
+		 android:id="@android:id/tabs"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"/>
+        <FrameLayout
+         android:id="@android:id/tabcontent"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:padding="5dp"/>
+    </LinearLayout>
+</TabHost>

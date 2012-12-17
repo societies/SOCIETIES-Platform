@@ -22,53 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.policymanagement.callback;
+package org.societies.android.privacytrust.datamanagement.callback;
 
 import java.util.List;
 
+import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class RemotePrivacyPolicyCallback implements ICommCallback {
-	private final static String TAG = RemotePrivacyPolicyCallback.class.getSimpleName();
+public class RemotePrivacyDataCallback implements ICommCallback {
+	private final static String TAG = RemotePrivacyDataCallback.class.getSimpleName();
 
 	private List<String> ELEMENT_NAMES;
 	private List<String> NAME_SPACES;
 	private List<String> PACKAGES;
 
-	private RequestPolicy privacyPolicy;
-	private boolean ack;
-	private String ackMessage;
-	private Context context;
+	private PrivacyDataIntentSender intentSender;
 	private String clientPackage;
-	private PrivacyPolicyIntentSender intentSender;
 
 
-	public RemotePrivacyPolicyCallback(Context context, String clientPackage, List<String> eLEMENT_NAMES,
-			List<String> nAME_SPACES, List<String> pACKAGES) {
+	public RemotePrivacyDataCallback(Context context, String clientPackage, List<String> elementNames,
+			List<String> namespaces, List<String> packages) {
 		super();
-		this.context = context;
+		ELEMENT_NAMES = elementNames;
+		NAME_SPACES = namespaces;
+		PACKAGES = packages;
 		this.clientPackage = clientPackage;
-		ELEMENT_NAMES = eLEMENT_NAMES;
-		NAME_SPACES = nAME_SPACES;
-		PACKAGES = pACKAGES;
-		intentSender = new PrivacyPolicyIntentSender(context);
+		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
@@ -76,20 +68,24 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 		Log.d(TAG, "receiveResult");
 		debugStanza(stanza);
 		// - Wrong payload
-		if (null == payload || !(payload instanceof PrivacyPolicyManagerBeanResult)) {
-			intentSender.sendIntentError(clientPackage, IPrivacyPolicyManager.INTENT_DEFAULT_ACTION, "Wrong payload received.");
+		if (null == payload || !(payload instanceof PrivacyDataManagerBeanResult)) {
+			intentSender.sendIntentError(clientPackage, IPrivacyDataManager.INTENT_DEFAULT_ACTION, "Wrong payload received.");
 			return;
 		}
-
 		// - Send valid intent
 		// Send intent
-		PrivacyPolicyManagerBeanResult privacyPaylaod = (PrivacyPolicyManagerBeanResult)payload;
-		intentSender.sendIntentSuccess(clientPackage, privacyPaylaod);
+		PrivacyDataManagerBeanResult privacyPaylaod = (PrivacyDataManagerBeanResult)payload;
+		intentSender.sendIntentCheckPermission(clientPackage, privacyPaylaod);
+		// TODO: Update PrivacyPermissions
+		if (privacyPaylaod.isAck() && privacyPaylaod.getMethod().equals(MethodType.CHECK_PERMISSION)) {
+//			PrivacyDataManagerInternal privacyDataManagerInternal = new PrivacyDataManagerInternal();
+//			privacyDataManagerInternal.updatePermission(privacyPaylaod.getPermission());
+		}
 	}
 
 	public void receiveError(Stanza stanza, XMPPError error) {
-		Log.d(TAG, "receiveError");
-		intentSender.sendIntentError(clientPackage, IPrivacyPolicyManager.INTENT_DEFAULT_ACTION, "Error: "+error.getGenericText());
+		Log.e(TAG, "Erreur XMPP: "+error.getMessage());
+		intentSender.sendIntentError(clientPackage, IPrivacyDataManager.INTENT_DEFAULT_ACTION, "Error: "+error.getGenericText());
 	}
 
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
@@ -121,45 +117,5 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	}
 	public List<String> getJavaPackages() {
 		return PACKAGES;
-	}
-
-	/**
-	 * @return the privacyPolicy
-	 */
-	public RequestPolicy getPrivacyPolicy() {
-		return privacyPolicy;
-	}
-	/**
-	 * @param privacyPolicy the privacyPolicy to set
-	 */
-	public void setPrivacyPolicy(RequestPolicy privacyPolicy) {
-		this.privacyPolicy = privacyPolicy;
-	}
-
-
-	/**
-	 * @return the ack
-	 */
-	public boolean isAck() {
-		return ack;
-	}
-	/**
-	 * @param ack the ack to set
-	 */
-	public void setAck(boolean ack) {
-		this.ack = ack;
-	}
-
-	/**
-	 * @return the ackMessage
-	 */
-	public String getAckMessage() {
-		return ackMessage;
-	}
-	/**
-	 * @param ackMessage the ackMessage to set
-	 */
-	public void setAckMessage(String ackMessage) {
-		this.ackMessage = ackMessage;
 	}
 }

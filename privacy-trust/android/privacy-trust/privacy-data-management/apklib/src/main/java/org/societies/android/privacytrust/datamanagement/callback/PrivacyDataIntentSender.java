@@ -22,64 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
-
-import java.util.List;
+package org.societies.android.privacytrust.datamanagement.callback;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.android.privacytrust.callback.PrivacyIntentSender;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
-
 
 /**
  * @author Olivier Maridat (Trialog)
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
+public class PrivacyDataIntentSender extends PrivacyIntentSender {
+	public PrivacyDataIntentSender(Context context) {
+		super(context);
+		TAG = PrivacyDataIntentSender.class.getSimpleName();
+		returnStatusKey = IPrivacyDataManager.INTENT_RETURN_STATUS_KEY;
+		returnStatusMsgKey = IPrivacyDataManager.INTENT_RETURN_STATUS_MSG_KEY;
+		returnValueKey = IPrivacyDataManager.INTENT_RETURN_VALUE_KEY;
 	}
 
 
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
+	public boolean sendIntentCheckPermission(String clientPackage, PrivacyDataManagerBeanResult bean) {
+		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), bean.isAck(), bean.getAckMessage());
+		intent.putExtra(returnValueKey, bean.getPermission());
+		context.sendBroadcast(intent);
+		return true;
 	}
 
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+	public boolean sendIntentCheckPermission(String clientPackage, ResponseItem privacyPermission) {
+		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), true, null);
+		intent.putExtra(returnValueKey, privacyPermission);
+		context.sendBroadcast(intent);
+		return true;
+	}
+
+	public boolean sendIntentSuccess(String clientPackage, String action) {
+		Intent intent = prepareIntent(clientPackage, action, true, null);
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	public boolean sendIntentError(String clientPackage, String action, String errorMsg) {
+		Intent intent = prepareIntent(clientPackage, action, false, errorMsg);
+		context.sendBroadcast(intent);
+		return true;
 	}
 }

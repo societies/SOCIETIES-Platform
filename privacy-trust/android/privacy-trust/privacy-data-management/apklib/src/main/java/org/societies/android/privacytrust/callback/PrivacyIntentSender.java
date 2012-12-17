@@ -22,64 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
+package org.societies.android.privacytrust.callback;
 
-import java.util.List;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
-
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
 import android.util.Log;
-
 
 /**
  * @author Olivier Maridat (Trialog)
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
+public abstract class PrivacyIntentSender {
+	protected String TAG = PrivacyIntentSender.class.getSimpleName();
+	
+	protected Context context;
+	protected String returnStatusKey;
+	protected String returnStatusMsgKey;
+	protected String returnValueKey;
+	
+	public PrivacyIntentSender(Context context) {
+		this.context = context;
+		returnStatusKey = "ReturnStatus";
+		returnStatusMsgKey = "ReturnStatusMsg";
+		returnValueKey = "ReturnValue";
 	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
+	
+	protected Intent prepareIntent(String clientPackage, String action, boolean ack, String ackMessage) {
+		Log.d(TAG, "Send Intent("+action+") to "+clientPackage+": "+(ack ? "Success" : "Error "+(null != ackMessage ? ackMessage : "")));
+		Intent intent = new Intent();
+		intent.setPackage(clientPackage);
+		intent.setAction(action);
+		intent.putExtra(returnStatusKey, ack);
+		if (null != ackMessage) {
+			intent.putExtra(returnStatusMsgKey, ackMessage);
 		}
-	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+		return intent;
 	}
 }

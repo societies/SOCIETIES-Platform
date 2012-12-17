@@ -31,7 +31,6 @@ import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -51,6 +50,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +60,7 @@ import android.widget.Toast;
  * @author Olivier Maridat (Trialog)
  * @date 28 nov. 2011
  */
-public class PrivacyPolicyManagerActivity extends Activity {
+public class PrivacyPolicyManagerActivity extends Activity implements OnClickListener {
 	private final static String TAG = PrivacyPolicyManagerActivity.class.getSimpleName();
 
 	private TextView txtLocation;
@@ -75,63 +76,12 @@ public class PrivacyPolicyManagerActivity extends Activity {
 	private static final String USER_NAME = "university";
 	private static final String USER_PASS = "university";
 	private static final String XMPP_DOMAIN = "societies.local";
-
+	
 	/* **************
-	 * Activity Lifecycle
+	 * Business
 	 * ************** */
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-
-		// -- Create a link with editable area
-		txtLocation = (TextView) findViewById(R.id.txtLocation);
-		txtConnectivity = (TextView) findViewById(R.id.txtConnectivity);
-
-		clientCommManager = new ClientCommunicationMgr(this);
-		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
-
-
-		// -- Create a link with services
-		Intent ipIntent = new Intent(this.getApplicationContext(), PrivacyPolicyManagerLocalService.class);
-		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
-
-		//REGISTER BROADCAST
-		IntentFilter intentFilter = new IntentFilter() ;
-		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.INFER_PRIVACY_POLICY.name());
-
-		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
-	}
-
-	protected void onStop() {
-		super.onStop();
-		// -- Unlink with services
-		if (ipBoundToService) {
-			unbindService(inProcessServiceConnection);
-		}
-		// -- Logout
-		clientCommManager.logout();
-	}
-
-	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
-		public void onServiceDisconnected(ComponentName name) {
-			ipBoundToService = false;
-		}
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			LocalBinder binder = (LocalBinder) service;
-			privacyPolicyManagerService = (IPrivacyPolicyManager) binder.getService();
-			ipBoundToService = true;
-		}
-	};
-
-	/* **************
-	 * Button Listeners
-	 * ************** */
-
+	// Sender
 	/**
 	 * Call an in-process service. Service consumer simply calls service API and can use 
 	 * return value
@@ -148,6 +98,11 @@ public class PrivacyPolicyManagerActivity extends Activity {
 				owner.setRequestorId("university.societies.local");
 				owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
 				if (R.id.btnLaunchTest1 == view.getId()) {
+					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
+				}
+				if (R.id.btnLaunchTest1bis == view.getId()) {
+					owner.setRequestorId("emma.societies.local");
+					owner.setCisRequestorId("cis-0ba9b78b-611d-4f45-ab04-87934edba84a.societies.local");
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
 				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
@@ -191,31 +146,9 @@ public class PrivacyPolicyManagerActivity extends Activity {
 			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
 	}
-
-	public void onConnect(View view) {
-		// -- Login to XMPP Server
-		Log.d(TAG, "loginXMPPServer user: " + USER_NAME + " pass: " + USER_PASS + " domain: " + XMPP_DOMAIN);
-		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
-		clientCommManager.setPortNumber(5222);
-		clientCommManager.setResource("PrivacyPolicyTest");
-		clientCommManager.setDomainAuthorityNode("university.societies.local");
-		clientCommManager.setDebug(true);
-		INetworkNode networkNode = clientCommManager.login(USER_NAME, XMPP_DOMAIN, USER_PASS);
-		Toast.makeText(this, "Connected to :"+networkNode.getJid(), Toast.LENGTH_SHORT);
-		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
-	}
-
-	/**
-	 * Utilities button to reset all values of this activity
-	 * @param view
-	 */
-	public void onButtonResetClick(View view) {
-		txtLocation.setText(R.string.txt_nothing);
-	}
-
-
+	
+	// Receiver
 	private class bReceiver extends BroadcastReceiver  {
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(TAG, intent.getAction());
@@ -231,6 +164,90 @@ public class PrivacyPolicyManagerActivity extends Activity {
 				}
 			}
 			txtLocation.setText(sb.toString());
+		}
+	}
+
+	/* **************
+	 * Button Listeners
+	 * ************** */
+
+	public void onClick(View v) {
+		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
+			onLaunchTest(v);
+		}
+		else if (R.id.btnReset == v.getId()) {
+			onButtonResetClick(v);
+		}
+		else {
+			Toast.makeText(this, "What button did you clicked on?", Toast.LENGTH_SHORT);
+		}
+	};
+	
+	/**
+	 * Utilities button to reset all values of this activity
+	 * @param view
+	 */
+	public void onButtonResetClick(View view) {
+		txtLocation.setText(R.string.txt_nothing);
+	}
+	
+	/* **************
+	 * Activity Lifecycle
+	 * ************** */
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.privacypolicy);
+
+		// -- Create a link with editable area
+		txtLocation = (TextView) findViewById(R.id.txtLocation);
+		// -- Create a link with buttons
+		((Button) findViewById(R.id.btnLaunchTest1)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTest1bis)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTest2)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTest3)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTest4)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
+
+		clientCommManager = new ClientCommunicationMgr(this);
+		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
+
+
+		// -- Create a link with services
+		Intent ipIntent = new Intent(getApplicationContext(), PrivacyPolicyManagerLocalService.class);
+		getApplicationContext().bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
+
+		//REGISTER BROADCAST
+		IntentFilter intentFilter = new IntentFilter() ;
+		intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
+		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());
+		intentFilter.addAction(MethodType.INFER_PRIVACY_POLICY.name());
+
+		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
+	}
+
+	protected void onStop() {
+		super.onStop();
+		// -- Unlink with services
+		if (ipBoundToService) {
+			getApplicationContext().unbindService(inProcessServiceConnection);
+		}
+		// -- Logout
+		clientCommManager.logout();
+	}
+
+	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
+		public void onServiceDisconnected(ComponentName name) {
+			ipBoundToService = false;
+		}
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			Log.d(TAG, "Connect to service: IPrivacyPolicyManager");
+			LocalBinder binder = (LocalBinder) service;
+			privacyPolicyManagerService = (IPrivacyPolicyManager) binder.getService();
+			ipBoundToService = true;
 		}
 	};
 }
