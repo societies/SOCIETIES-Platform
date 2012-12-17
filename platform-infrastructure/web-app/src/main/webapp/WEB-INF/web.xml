@@ -21,21 +21,6 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-<!-- Alternate to above config if user applicationContext file is in located in not default location--> 
-<!--
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>contextClass</param-name>
-		<param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
-	</context-param>	
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
- -->
-
 	<!-- name of the servlet to register, 
 	Note: the xml configuration should match format of {servlet-name}-servlet.xml also 
 	located under WEB-INF folder. Otherwise you have to define custom location and name

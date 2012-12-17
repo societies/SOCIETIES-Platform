@@ -102,10 +102,6 @@
 			<version>1.0.0.GA</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>com.springsource.org.hibernate.validator</artifactId> 
-			<version>4.2.0.Final</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>javax.servlet</groupId> <artifactId>jstl</artifactId> <version>1.2</version> 
-			</dependency> -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>com.springsource.javax.servlet.jsp.jstl</artifactId>
@@ -116,12 +112,6 @@
 			<artifactId>org.springframework.osgi.web</artifactId>
 			<version>1.2.1</version>
 		</dependency>
-		<!--   <dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>XCCommunicationMgr</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>-->
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -167,6 +157,18 @@
 		</dependency>
 		  
 
+	<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		
 		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
 			<version>${release.version}</version> <scope>provided</scope> </dependency> -->
 		<dependency>
@@ -178,23 +180,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree.chart</groupId>
-			<artifactId>org.jfree.chart-library</artifactId>
-			<type>libd</type>
-			<version>1.0.9</version>
-			<!--scope>provided</scope -->
-		</dependency>
-		<dependency>
-			<groupId>org.jfree.chart</groupId>
-			<artifactId>com.springsource.org.jfree.chart</artifactId>
-			<version>1.0.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>com.springsource.org.jfree</artifactId>
-			<version>1.0.12</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -304,16 +289,16 @@
 							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
+							org.springframework.aop.scope;resolution:=optional,
+							org.springframework.aop.framework;resolution:=optional,
+							org.springframework.aop;resolution:=optional,
+							net.sf.cglib.proxy;resolution:=optional,
+							org.aopalliance.aop;resolution:=optional,
+							net.sf.cglib.core;resolution:=optional,
+							org.springframework.aop.config;resolution:=optional,
+							net.sf.cglib.reflect;resolution:=optional,
+							org.springframework.web.servlet.view.json;resolution:=optional,
 							org.osgi.framework,
-							org.jfree.chart,
-							org.jfree.chart.axis,
-							org.jfree.chart.entity,
-							org.jfree.chart.labels,
-							org.jfree.chart.plot,
-							org.jfree.chart.renderer.category,
-							org.jfree.chart.urls,
-							org.jfree.data.category,
-							org.jfree.data.general,
 							<!-- Form validation -->
 							javax.validation,
 							*;resolution:=optional
@@ -369,28 +354,23 @@
 									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
-									<groupId>org.jfree.chart</groupId>
-									<artifactId>org.jfree.chart-library</artifactId>
-									<version>1.0.9</version>
-									<type>libd</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.jfree.chart</groupId>
-									<artifactId>com.springsource.org.jfree.chart</artifactId>
-									<version>1.0.9</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.jfree</groupId>
-									<artifactId>com.springsource.org.jfree</artifactId>
-									<version>1.0.12</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
 									<groupId>javax.servlet</groupId>
 									<artifactId>com.springsource.javax.servlet</artifactId>
 									<version>2.5.0</version>
 								</artifactItem>
+									<artifactItem>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.7.1</version>
+			<type>jar</type>
+		</artifactItem>
+		
+		<artifactItem>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.7.1</version>
+			<type>jar</type>
+		</artifactItem>
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</configuration>

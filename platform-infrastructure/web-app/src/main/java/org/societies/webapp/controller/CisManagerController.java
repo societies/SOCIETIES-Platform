@@ -89,6 +89,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.webapp.service.UserService;
+
 /**
  * Describe your class here...
  *
@@ -113,6 +115,9 @@ public class CisManagerController {
 	@Autowired
 	private IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
 	
+	@Autowired
+	UserService userService;
+	
 	//IPrivacyPolicyManager
 	
 	private static Logger LOG = LoggerFactory.getLogger(CisManagerController.class);
@@ -125,6 +130,11 @@ public class CisManagerController {
 	@RequestMapping(value="/manage_communities.html",method = RequestMethod.GET)
 	public ModelAndView showManagerCommunitiesPage() {
 		Map<String, Object> model = new HashMap<String, Object>();
+		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
+		
 
 		return new ModelAndView("manage_communities", model) ;
 		
@@ -135,6 +145,10 @@ public class CisManagerController {
 	@RequestMapping(value="/create_community.html",method = RequestMethod.GET)
 	public ModelAndView showCreateCommunityPage() {
 		Map<String, Object> model = new HashMap<String, Object>();
+		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
 		
 		CreateCISForm form = new CreateCISForm();
 		model.put("createCISform", form);
@@ -160,6 +174,10 @@ public class CisManagerController {
 	
 		@RequestMapping(value = "/create_community.html", method = RequestMethod.POST)
 		public ModelAndView createCommunityPost(@Valid CreateCISForm createCISform,  BindingResult result, Map model){
+			
+			// Check if a user is already logged in
+			if (getUserService().isUserLoggedIn() == false)
+				return new ModelAndView("index", model); //TODO : return error string
 			
 			String response = "model error creating community";
 			
@@ -230,6 +248,11 @@ public class CisManagerController {
 	public ModelAndView yourCommunitiesListPage(@RequestParam(value="response", required=false) String incomingResponse) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
+		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
+		
 		model.put("response", incomingResponse);
 
 		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
@@ -268,6 +291,10 @@ public class CisManagerController {
 	public ModelAndView communityProfilePage(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="response", required=false) String response){
 		Map<String, Object> model = new HashMap<String, Object>();
 		
+		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
 		
 		// TODO, add null checks
 		if(null!= response && false == response.isEmpty())
@@ -359,6 +386,10 @@ public class CisManagerController {
 	@RequestMapping(value = "/add_activity_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addActivityInProfilePage(@Valid AddActivityForm addActForm,  BindingResult result, Map model){
 		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
+		
 		if(result.hasErrors()){
 			model.put("acitivityAddError", "Error Adding Activity");
 			return new ModelAndView("community_profile", model);
@@ -392,6 +423,10 @@ public class CisManagerController {
 	@RequestMapping(value = "/add_member_cis_profile_page.html", method = RequestMethod.POST)
 	public ModelAndView addMemberInProfilePage(@Valid AddMemberForm memberForm,  BindingResult result, Map model){
 		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
+		
 		if(result.hasErrors()){
 			model.put("response", "Error Adding Member");
 			return new ModelAndView("community_profile", model);
@@ -417,6 +452,10 @@ public class CisManagerController {
 	@RequestMapping(value = "/join_cis.html", method = RequestMethod.POST)
 	public ModelAndView joinCISfromCommunitiesPage(@RequestParam("position") final int position, @ModelAttribute("cisAdverts") List<CisAdvertisementRecord> adverts,  BindingResult result,  Map model){
 		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
+		
 		//if(result.hasErrors()){
 		//	return yourCommunitiesListPage("Error joining");
 		//}
@@ -441,6 +480,9 @@ public class CisManagerController {
 	@RequestMapping(value="/leave_community.html",method = RequestMethod.GET)
 	public ModelAndView leaveCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
 		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
 		
 		// Leave
 		CisManagerClient leaveCisCallback = new CisManagerClient();
@@ -461,6 +503,9 @@ public class CisManagerController {
 	@RequestMapping(value="/delete_community.html",method = RequestMethod.GET)
 	public ModelAndView deleteCommunity(@RequestParam(value="cisId", required=true) String cisId, Map model){
 		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn() == false)
+			return new ModelAndView("index", model); //TODO : return error string
 		
 		// delete
 		boolean ret = this.getCisManager().deleteCis(cisId);
@@ -478,6 +523,10 @@ public class CisManagerController {
 	
 @RequestMapping(value="/delete_member.html",method = RequestMethod.GET)
 public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) String cisId,@RequestParam(value="cssId", required=true) String cssId, Map model){
+	
+	// Check if a user is already logged in
+	if (getUserService().isUserLoggedIn() == false)
+		return new ModelAndView("index", model); //TODO : return error string
 	
 	boolean ret = false;
 	ICisOwned i = this.getCisManager().getOwnedCis(cisId);
@@ -555,7 +604,12 @@ public ModelAndView deleteMember(@RequestParam(value="cisId", required=true) Str
 	}
 
 
-
+	public UserService getUserService() {
+		return userService;
+	}
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
 
 
 

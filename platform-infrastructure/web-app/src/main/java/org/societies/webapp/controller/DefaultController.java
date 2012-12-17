@@ -27,10 +27,18 @@ package org.societies.webapp.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.societies.webapp.model.LoginForm;
+import org.societies.webapp.service.OpenfireLoginService;
+import org.societies.webapp.service.UserService;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 /**
  * Describe your class here...
@@ -41,19 +49,73 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class DefaultController {
 
-	/**
-	 * This method get called when user request for login page by using
-	 * url http://localhost:8080/societies/login.html
-	 * @return login jsp page and model object
-	 */
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	private ICommManager commManager;
+	
+	@Autowired
+	OpenfireLoginService openfireLoginService;
+	
+	
+	public OpenfireLoginService getOpenfireLoginService() {
+		return openfireLoginService;
+	}
+	public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
+		this.openfireLoginService = openfireLoginService;
+	}
+	
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+	
+	public UserService getUserService() {
+		return userService;
+	}
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+	
 	@RequestMapping(value="/index.html",method = RequestMethod.GET)
 	public ModelAndView DefaultPage() {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
+		
+		model.put("loggedIn", getUserService().isUserLoggedIn());
+		
+		String userID = new String(getCommManager().getIdManager().getThisNetworkNode().getBareJid());
+		
+		LoginForm loginform = new LoginForm();
+		loginform.setUsername(userID.substring(0,userID.indexOf('.')));
+		model.put("loginform", loginform );
 
 		return new ModelAndView("index", model) ;
 	}
 	
+	@RequestMapping(value = "/login.html", method = RequestMethod.POST)
+	public ModelAndView processLogin(@Valid LoginForm loginForm,
+			BindingResult result,  Map model) {
+		LoginForm loginform = new LoginForm();
+		model.put("loginform", loginform );
+		
+		
+		// Check if a user is already logged in
+		if (getUserService().isUserLoggedIn())
+			return new ModelAndView("index", model); //TODO : return error string
+		
+		//TODO Do check
+		if (getOpenfireLoginService().doLogin(loginForm.getUsername(), loginForm.getPassword()) != null)
+			getUserService().setUserLoggedIn(true);
+
+		model.put("loggedIn", getUserService().isUserLoggedIn());
+		
+		return new ModelAndView("index", model);
+	}
 	
 }
