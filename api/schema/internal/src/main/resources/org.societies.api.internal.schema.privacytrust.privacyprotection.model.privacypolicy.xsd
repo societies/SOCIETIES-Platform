@@ -103,51 +103,51 @@
 
 	<xs:simpleType name="actionConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="READ" />
-			<xs:enumeration value="WRITE" />
-			<xs:enumeration value="CREATE" />
-			<xs:enumeration value="DELETE" />
+			<xs:enumeration value="read" />
+			<xs:enumeration value="write" />
+			<xs:enumeration value="create" />
+			<xs:enumeration value="delete" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="privacyPolicyTypeConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="SERVICE" />
-			<xs:enumeration value="CIS" />
-			<xs:enumeration value="OTHER" />
+			<xs:enumeration value="service" />
+			<xs:enumeration value="cis" />
+			<xs:enumeration value="other" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="privacyPolicyBehaviourConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="PRIVATE" />
-			<xs:enumeration value="MEMBERS_ONLY" />
-			<xs:enumeration value="PUBLIC" />
+			<xs:enumeration value="private" />
+			<xs:enumeration value="membersOnly" />
+			<xs:enumeration value="public" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="decision">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="PERMIT" />
-			<xs:enumeration value="DENY" />
-			<xs:enumeration value="INDETERMINATE" />
-			<xs:enumeration value="NOT_APPLICABLE" />
+			<xs:enumeration value="permit" />
+			<xs:enumeration value="deny" />
+			<xs:enumeration value="indeterminate" />
+			<xs:enumeration value="notApplicable" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="conditionConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="SHARE_WITH_3RD_PARTIES" />
-			<xs:enumeration value="SHARE_WITH_CIS_MEMBERS_ONLY" />
-			<xs:enumeration value="SHARE_WITH_CIS_OWNER_ONLY" />
-			<xs:enumeration value="MAY_BE_INFERRED" />
-			<xs:enumeration value="DATA_RETENTION_IN_SECONDS" />
-			<xs:enumeration value="DATA_RETENTION_IN_MINUTES" />
-			<xs:enumeration value="DATA_RETENTION_IN_HOURS" />
-			<xs:enumeration value="RIGHT_TO_OPTOUT" />
-			<xs:enumeration value="STORE_IN_SECURE_STORAGE" />
-			<xs:enumeration value="RIGHT_TO_ACCESS_HELD_DATA" />
-			<xs:enumeration value="RIGHT_TO_CORRECT_INCORRECT_DATA" />
+			<xs:enumeration value="shareWith3rdParties" />
+			<xs:enumeration value="shareWithCisMembersOnly" />
+			<xs:enumeration value="shareWithCisOnwerOnly" />
+			<xs:enumeration value="mayBeInferred" />
+			<xs:enumeration value="dataRetentionInSeconds" />
+			<xs:enumeration value="dataRetentionInMinutes" />
+			<xs:enumeration value="dataRetentionInHours" />
+			<xs:enumeration value="rightToOptOut" />
+			<xs:enumeration value="storeInSecureStorage" />
+			<xs:enumeration value="rightToAccessHeldData" />
+			<xs:enumeration value="rightToCorrectIncorrectData" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
