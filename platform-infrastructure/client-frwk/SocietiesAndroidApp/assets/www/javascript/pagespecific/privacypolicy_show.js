@@ -37,41 +37,39 @@ var	SocietiesPrivacyPolicyManagerService = {
 		 * @param {Object} successCallback The callback which will be called when result is successful
 		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 		 */
-		getPrivacyPolicy: function() {
-			console.log("getPrivacyPolicy");
+		getPrivacyPolicy: function(ownerId, ownerCisId, bAdmin) {
+			console.log("getPrivacyPolicy", ownerId, ownerCisId, bAdmin);
 
 			function success(data) {
-				// Display
 				console.log("getPrivacyPolicy - Succes: ", data);
-				$("#displayer").html("Succes");
-				$('<dl>').addClass("privacyPolicy")
-				.html('<dt>'+data.requestor.requestorId+("requestorCisId" in data.requestor ? ' - '+data.requestor.requestorCisId : '')+'</dt>')
-				.appendTo('#displayer');
+				//EMPTY TABLE - NEED TO LEAVE THE HEADER
+				while( $('ul#getPrivacyPolicy').children().length >0 )
+					$('ul#getPrivacyPolicy li:last').remove();
+				// Display
 				if ("requestItems" in data) {
 					var i;
 					for (i=0; i<data.requestItems.length; i++) {
-						$('<dd>').html(data.requestItems[i].resource.dataIdUri)
-							.appendTo('.privacyPolicy');
+						$('<li>').addClass("requestItem")
+						.attr('id', 'li'+i)
+						.html('<h2>'+data.requestItems[i].resource.dataIdUri+'</h2>')
+						.appendTo('#getPrivacyPolicy');
 					}
 				}
+				else {
+					$('<li>').addClass("empty")
+					.html('<p>Empty</p>')
+					.appendTo('#getPrivacyPolicy');
+				}
+				$('ul#getPrivacyPolicy').listview('refresh');
+				$('ul#getPrivacyPolicy').trigger( "collapse" );
 			}
 
 			function failure(data) {
 				console.log("getPrivacyPolicy - failure: " + data);
-				$("#displayer").html("Faillure: "+data);
+				$("#getPrivacyPolicy").html("Faillure: "+data);
 			}
 
 			// Call
 			window.plugins.PrivacyPolicyManager.getPrivacyPolicy("test", success, failure);
 		}
 }
-
-$(document).on('pageinit', '#privacypolicy', function(event) {
-	console.log("Init page privacypolicy");
-
-	$('#getPrivacyPolicy').off('click').on('click', function() {
-		console.log("Click on getPrivacyPolicy");
-		SocietiesPrivacyPolicyManagerService.getPrivacyPolicy();
-	});
-
-});
