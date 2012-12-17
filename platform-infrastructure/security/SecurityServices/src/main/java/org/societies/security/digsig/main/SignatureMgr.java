@@ -144,13 +144,13 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	}
 	
 	@Override
-	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException {
+	public Object signXml(Object xml, String xmlNodeId, IIdentity identity) throws DigsigException {
 		
 		ArrayList<String> ids = new ArrayList<String>();
 		
 		ids.add(xmlNodeId);
 		
-		return xmlDSig.signXml(xml, ids);
+		return xmlDSig.signXml((Document) xml, ids);
 	}
 	
 	@Override
@@ -225,7 +225,8 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		return cert.getPublicKey();
 	}
 	
-	public String getRequesterSignatureId(Document doc) {
-		return xmlDSig.getRequesterSignatureId(doc);
+	@Override
+	public String getRequesterSignatureId(Object doc) {
+		return xmlDSig.getRequesterSignatureId((Document) doc);
 	}
 }
