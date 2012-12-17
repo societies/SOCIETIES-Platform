@@ -130,5 +130,48 @@ public class TestService extends AndroidTestCase {
         assertEquals(service.getServiceStatus(), createFromParcel.getServiceStatus());
         assertEquals(service.getServiceType(), createFromParcel.getServiceType());
 	}
-	
+
+
+	@MediumTest
+	public void testNullParcelable() throws Exception {
+		
+		Service service = new Service();
+		service.setAuthorSignature("jsmith");
+		service.setContextSource("yes");
+		service.setPrivacyPolicy("<Privacy />");
+		service.setSecurityPolicy("<Security />");
+		service.setServiceCategory("My Service Category");
+		//service.setServiceDescription("What a service description");
+		//service.setServiceEndpoint("localhost:8080/endpoint");
+		//service.setServiceIdentifier(aSRI);
+		//service.setServiceInstance(aSerInstance);
+		service.setServiceLocation("Paris");
+		service.setServiceName("The Testing Service");
+		//service.setServiceStatus(ServiceStatus.STARTED);
+		service.setServiceType(ServiceType.THIRD_PARTY_ANDROID);
+		
+		assertEquals(0, service.describeContents());
+		
+        Parcel parcel = Parcel.obtain();
+        service.writeToParcel(parcel, 0);
+        
+        //done writing, now reset parcel for reading
+        parcel.setDataPosition(0);
+        //finish round trip
+        
+        Service createFromParcel = Service.CREATOR.createFromParcel(parcel);
+       
+        assertEquals(service.getAuthorSignature(), createFromParcel.getAuthorSignature());
+        assertEquals(service.getContextSource(), createFromParcel.getContextSource());
+        assertEquals(service.getPrivacyPolicy(), createFromParcel.getPrivacyPolicy());
+        assertEquals(service.getSecurityPolicy(), createFromParcel.getSecurityPolicy());
+        assertEquals(service.getServiceCategory(), createFromParcel.getServiceCategory());
+        //assertEquals(service.getServiceDescription(), createFromParcel.getServiceDescription());
+        //assertEquals(service.getServiceEndpoint(), createFromParcel.getServiceEndpoint());
+        assertEquals(service.getServiceLocation(), createFromParcel.getServiceLocation());
+        assertEquals(service.getServiceName(), createFromParcel.getServiceName());
+        //assertEquals(service.getServiceStatus(), createFromParcel.getServiceStatus());
+        assertEquals(service.getServiceType(), createFromParcel.getServiceType());
+	}
+
 }
