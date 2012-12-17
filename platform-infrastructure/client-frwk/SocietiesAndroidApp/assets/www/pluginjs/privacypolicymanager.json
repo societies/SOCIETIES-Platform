@@ -2,7 +2,7 @@
 "PrivacyPolicyManagerService" : {
 		"exceptionThreshold" : 0,
 		"getPrivacyPolicy" : {
-								"requestor": "university.societies.local",
+								"requestor": {"requestorId": "university.societies.local"},
 								"requestItems": [
 									{
 										"actions":  [{"actionConstant": "READ", "optional": false}],

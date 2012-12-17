@@ -42,15 +42,25 @@ var	SocietiesPrivacyPolicyManagerService = {
 
 			function success(data) {
 				// Display
-				console.log("getPrivacyPolicy - Succes: " + data);
-				$("#displayer").html("Succes: "+data);
+				console.log("getPrivacyPolicy - Succes: ", data);
+				$("#displayer").html("Succes");
+				$('<dl>').addClass("privacyPolicy")
+				.html('<dt>'+data.requestor.requestorId+("requestorCisId" in data.requestor ? ' - '+data.requestor.requestorCisId : '')+'</dt>')
+				.appendTo('#displayer');
+				if ("requestItems" in data) {
+					var i;
+					for (i=0; i<data.requestItems.length; i++) {
+						$('<dd>').html(data.requestItems[i].resource.dataUri)
+							.appendTo('.privacyPolicy');
+					}
+				}
 			}
 
 			function failure(data) {
 				console.log("getPrivacyPolicy - failure: " + data);
 				$("#displayer").html("Faillure: "+data);
 			}
-			
+
 			// Call
 			window.plugins.PrivacyPolicyManager.getPrivacyPolicy("test", success, failure);
 		}
