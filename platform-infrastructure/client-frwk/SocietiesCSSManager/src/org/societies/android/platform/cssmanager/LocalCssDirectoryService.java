@@ -28,12 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.css.directory.ACssAdvertisementRecord;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssDirectoryBean;
 import org.societies.api.schema.css.directory.MethodType;
 import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
@@ -90,7 +90,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		return this.binder;
 	}
 
-	public ACssAdvertisementRecord[] findAllCssAdvertisementRecords(String client) {
+	public CssAdvertisementRecord[] findAllCssAdvertisementRecords(String client) {
 		Log.d(LOG_TAG, "findAllCssAdvertisementRecords called by client: " + client);
 		
 		AsyncSearchDirectory methodAsync = new AsyncSearchDirectory();
@@ -100,7 +100,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		return null;
 	}
 
-	public ACssAdvertisementRecord[] findForAllCss(String client, String searchTerm) {
+	public CssAdvertisementRecord[] findForAllCss(String client, String searchTerm) {
 		Log.d(LOG_TAG, "getFriendRequests called by client: " + client);
 		
 		AsyncSearchDirectory methodAsync = new AsyncSearchDirectory();
@@ -131,9 +131,9 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 			//MESSAGE BEAN
 			CssDirectoryBean directoryBean = new CssDirectoryBean();
 			if (params.length == 3) {
-				ACssAdvertisementRecord aAdvert = new ACssAdvertisementRecord();
-				aAdvert.setName(searchTerm);
-				directoryBean.setCssA(aAdvert);
+				CssAdvertisementRecord advert = new CssAdvertisementRecord();
+				advert.setName(searchTerm);
+				directoryBean.setCssA(advert);
 			}
 			if (method.equals(IAndroidCssDirectory.FIND_FOR_ALL_CSS)) 
 				directoryBean.setMethod(MethodType.FIND_FOR_ALL_CSS);
@@ -202,8 +202,10 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 				Intent intent = new Intent(returnIntent);
 				
 				CssDirectoryBeanResult resultBean = (CssDirectoryBeanResult) retValue;
-				ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultCss());
-
+				//ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultCss());
+				List<CssAdvertisementRecord> listRecords = resultBean.getResultCss();
+				CssAdvertisementRecord advertArray[] = listRecords.toArray(new CssAdvertisementRecord[listRecords.size()]);  
+				
 				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, true);
 				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY, advertArray);
 				intent.setPackage(client);

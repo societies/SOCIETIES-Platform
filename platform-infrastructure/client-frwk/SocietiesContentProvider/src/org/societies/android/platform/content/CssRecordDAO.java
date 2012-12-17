@@ -26,8 +26,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.platform.content;
 
 
-import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
-import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.ContentValues;
@@ -123,11 +126,11 @@ public class CssRecordDAO {
 	 * 
 	 * @return AndroidCSSRecord if database contains CSSRecord, null otherwise
 	 */
-	public AndroidCSSRecord readCSSrecord() {
-		AndroidCSSRecord record  = null;
+	public CssRecord readCSSrecord() {
+		CssRecord record  = null;
 		
 		if (this.cssRecordExists()) {
-			record  = new AndroidCSSRecord();
+			record  = new CssRecord();
 			
 			SQLiteDatabase database = this.openReadable();
 			
@@ -154,7 +157,7 @@ public class CssRecordDAO {
 
 			cursor.close();
 			
-			record.setCSSNodes(readNodes(DBHelper.CURRENT_NODE_TABLE, false, database));
+			record.setCssNodes(readNodes(DBHelper.CURRENT_NODE_TABLE, false, database));
 			record.setArchiveCSSNodes(readNodes(DBHelper.ARCHIVED_NODE_TABLE, false, database));
 			
 			Dbc.invariant("Can only be one CSSRecord row", 1 == cursor.getCount());
@@ -173,12 +176,12 @@ public class CssRecordDAO {
 	 * @param database existing database
 	 * @return
 	 */
-	public AndroidCSSNode [] readNodes(String table, boolean openDatabase, SQLiteDatabase database) {
+	//public CssNode[] readNodes(String table, boolean openDatabase, SQLiteDatabase database) {
+	public List<CssNode> readNodes(String table, boolean openDatabase, SQLiteDatabase database) {
 		Dbc.require("Valid Node table required", table.equals(DBHelper.CURRENT_NODE_TABLE) || table.equals(DBHelper.ARCHIVED_NODE_TABLE));
 		Dbc.require("Database instance cannot be null", null != database);
 		
 		SQLiteDatabase dbInstance = null;
-		
 		if (openDatabase) {
 			dbInstance = this.openReadable();
 		} else {
@@ -186,19 +189,18 @@ public class CssRecordDAO {
 		}
 
 		Cursor cursor = dbInstance.query(table, DBHelper.ALL_CSSNODE_COLUMNS, null, null, null, null, null);
-
-		AndroidCSSNode node [] = new AndroidCSSNode [cursor.getCount()];
-		
+		//CssNode node [] = new CssNode [cursor.getCount()];
+		List<CssNode> nodeList = new ArrayList<CssNode>();
 		cursor.moveToFirst();
 		
 		Log.d(LOG_TAG, "Number of CSSNode record(s): " + cursor.getCount());
-		
 		for (int i = 0; i < cursor.getCount(); i++) {
-			node[i] = new AndroidCSSNode();
-			
-			node[i].setIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_NODE_IDENTITY)));
-			node[i].setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_STATUS)));
-			node[i].setType(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_TYPE)));
+			//node[i] = new CssNode();
+			CssNode node = new CssNode();
+			node.setIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_NODE_IDENTITY)));
+			node.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_STATUS)));
+			node.setType(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_TYPE)));
+			nodeList.add(node);
 			
 			cursor.moveToNext();
 		}
@@ -208,7 +210,7 @@ public class CssRecordDAO {
 			this.close();			
 		}
 		
-		return node;
+		return nodeList;
 	}
 	
 	/**
@@ -217,7 +219,7 @@ public class CssRecordDAO {
 	 * @param record
 	 * @return boolean true id original CSSrecord found
 	 */
-	public boolean updateCSSRecord(AndroidCSSRecord record) {
+	public boolean updateCSSRecord(CssRecord record) {
 		boolean retValue = false;
 		
 		if (this.cssRecordExists()) {
@@ -239,7 +241,7 @@ public class CssRecordDAO {
 		return retValue;
 	}
 	
-	private void updateNodes(AndroidCSSRecord record, SQLiteDatabase database) {
+	private void updateNodes(CssRecord record, SQLiteDatabase database) {
 		Dbc.require("AndroidCSSRecord cannnot be null", null != record);
 		Dbc.require("Database instance cannot be null", null != database);
 		
@@ -258,7 +260,7 @@ public class CssRecordDAO {
 	 * @param record AndroidCSSRecord object
 	 * @return boolean true if CSSRecord table is empty
 	 */
-	public boolean insertCSSRecord(AndroidCSSRecord record) {
+	public boolean insertCSSRecord(CssRecord record) {
 		boolean retValue = false;
 		
 		if (!this.cssRecordExists()) {
@@ -283,17 +285,15 @@ public class CssRecordDAO {
 	 * @param record
 	 * @param database
 	 */
-	private void insertNodes(AndroidCSSRecord record, SQLiteDatabase database) {
-		AndroidCSSNode nodes [] = record.getCSSNodes();
+	private void insertNodes(CssRecord record, SQLiteDatabase database) {
+		List<CssNode> nodes = record.getCssNodes();
 		
-		for (AndroidCSSNode node : nodes) {
-			
+		for (CssNode node : nodes) {
 			database.insert(DBHelper.CURRENT_NODE_TABLE, null, populateCSSNode(node, cssRowId));
 		}
-		AndroidCSSNode archivedNodes [] = record.getArchivedCSSNodes();
 		
-		for (AndroidCSSNode node : archivedNodes) {
-			
+		List<CssNode> archivedNodes = record.getArchiveCSSNodes();
+		for (CssNode node : archivedNodes) {
 			database.insert(DBHelper.ARCHIVED_NODE_TABLE, null, populateCSSNode(node, cssRowId));
 		}
 
@@ -305,7 +305,7 @@ public class CssRecordDAO {
 	 * @param record
 	 * @return ContentValues
 	 */
-	private ContentValues populateCSSRecord(AndroidCSSRecord record) {
+	private ContentValues populateCSSRecord(CssRecord record) {
 		ContentValues values = new ContentValues();
 		
 		values.put(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION, record.getCssHostingLocation());
@@ -335,7 +335,7 @@ public class CssRecordDAO {
 	 * @param rowid
 	 * @return ContentValues
 	 */
-	private ContentValues populateCSSNode(AndroidCSSNode node, long rowid) {
+	private ContentValues populateCSSNode(CssNode node, long rowid) {
 		ContentValues values = new ContentValues();
 
 		values.put(DBHelper.CSS_NODE_IDENTITY, node.getIdentity());
