@@ -24,7 +24,7 @@
  */
 package org.societies.api.internal.security.digsig;
 
-import org.w3c.dom.Document;
+//import org.w3c.dom.Document;  // Do not import this because Domain Authority Webapp would then fail to deploy
 
 /**
  * 
@@ -38,8 +38,12 @@ public interface ISlaSignatureMgr {
 	 * Gets the value of Id attribute for the requester's signature.
 	 * 
 	 * @param doc The SLA document
+	 * The type should be org.w3c.dom.Document.
+	 * <i>The type in the API is Object because if org.w3c.dom.Document is imported
+	 * in the API, the Domain Authority Webapp fails at deployment, unless it is
+	 * removed from the plan and started separately after the plan starts.</i>
 	 * @return Id attribute value
 	 */
-	public String getRequesterSignatureId(Document doc);
+	public String getRequesterSignatureId(Object doc);
 
 }
