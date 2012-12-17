@@ -25,8 +25,8 @@
             <scope>provided</scope>
 		</dependency>
     	<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>
 		<dependency>
