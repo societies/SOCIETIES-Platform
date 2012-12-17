@@ -9,6 +9,12 @@
 										"conditions": [{"conditionConstant": "SHARE_WITH_3P_SERVICES", "value": "1", "optional": false}],
 										"resource": {"dataIdUri": "cis://cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local/cis-member-list", "scheme": "cis", "dataType": "cis-member-list"},
 										"optional": false
+									},
+									{
+										"actions":  [{"actionConstant": "READ", "optional": false}],
+										"conditions": [{"conditionConstant": "SHARE_WITH_3P_SERVICES", "value": "1", "optional": false}],
+										"resource": {"dataIdUri": "context:///locationSymbolic", "scheme": "context", "dataType": "locationSymbolic"},
+										"optional": false
 									}
 								]
 							}

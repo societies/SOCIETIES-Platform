@@ -50,7 +50,7 @@ var	SocietiesPrivacyPolicyManagerService = {
 				if ("requestItems" in data) {
 					var i;
 					for (i=0; i<data.requestItems.length; i++) {
-						$('<dd>').html(data.requestItems[i].resource.dataUri)
+						$('<dd>').html(data.requestItems[i].resource.dataIdUri)
 							.appendTo('.privacyPolicy');
 					}
 				}
