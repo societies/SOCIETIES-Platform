@@ -82,7 +82,7 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy -->
-		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/apklib</module>
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management</module>
 
 	</modules>
 </project>

@@ -22,51 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
+package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
+import org.societies.api.schema.identity.DataIdentifier;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-
+import android.os.Parcelable;
 
 /**
+ * This data wrapper is an abstraction between obfuscation manager
+ * and data models. This is the way for wrapping data to obfuscate them,
+ * and filling a type of data (needed to know how obfuscate them) 
+ * This wrapper is linked to a specific data obfuscator
+ * and know what kind of data is needed to launch the obfuscation. 
  * @author Olivier Maridat (Trialog)
+ * @date 18 oct. 2011
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
-	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
+public interface IDataWrapper<E extends Parcelable> extends Parcelable {
 	/**
-	 * Create Binder object for local service invocation
+	 * @return Id of the data to be obfuscated
 	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
-	}
-
+	public DataIdentifier getDataId();
 	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
+	 * @param dataId Id of the data to be obfuscated
 	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
-	}
+	public void setDataId(DataIdentifier dataId);
+	
+	/**
+	 * Data
+	 * @return The data to be obfuscated
+	 */
+	public E getData();
+	/**
+	 * Set the data to be obfuscated
+	 * @param data The data to be obfuscated
+	 */
+	public void setData(E data);
+	
+	/**
+	 * To know if obfuscated data will be stored with this obfuscator
+	 * 
+	 * @return True if this obfuscator has enabled persistence
+	 * @return Otherwise false
+	 */
+	public boolean isPersistenceEnabled();
+	/**
+	 * To enable storage of obfuscated data
+	 * @param persist True to persist the data, false otherwise
+	 */
+	public void setPersistenceEnabled(boolean persist);
+	
+	/**
+	 * To know if this wrapper is ready for obfuscation operation
+	 * 
+	 * @return True if this DataWrapper is ready for obfuscation
+	 * @return Otherwise false
+	 */
+	public boolean isReadyForObfuscation();
 }

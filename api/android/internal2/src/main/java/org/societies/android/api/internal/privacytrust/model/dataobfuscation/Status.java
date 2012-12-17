@@ -22,51 +22,100 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
+package org.societies.android.api.internal.privacytrust.model.dataobfuscation;
 
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 
 /**
- * @author Olivier Maridat (Trialog)
+ * Status
+ *
+ * @author olivierm
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
+public class Status implements Parcelable {
+	private String status;
+	
+	public Status() {
+		super();
 	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
 	/**
-	 * Create Binder object for local service invocation
+	 * @param firstName
+	 * @param lastName
 	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
+	public Status(String status) {
+		super();
+		this.status = status;
 	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
+	
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == this) {
+			return true;
+		}
+
+		// -- Verify obj type
+		if (obj instanceof Status) {
+			Status other = (Status) obj;
+			return (this.getStatus().equals(other.getStatus()));
+		}
+		return false;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Name [status=" + status + "]";
+	}
+	
+	/* ************************
+	 * Parcelable Management
+	 * ************************ */
+	
+	public Status(Parcel in) {
+		readFromParcel(in);
+	}
+	
+	/*
+	 * @see android.os.Parcelable#describeContents()
+	 */
+	public int describeContents() {
+		return 0;
+	}
+
+	/*
+	 * 
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+	 */
+	public void writeToParcel(Parcel out, int flag) {
+		out.writeString(status);
+	}
+	
+	private void readFromParcel(Parcel in) {
+		status = in.readString();
+	}
+	
+	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+		public Status createFromParcel(Parcel in) {
+			return new Status(in);
+		}
+
+		public Status[] newArray(int size) {
+			return new Status[size];
+		}
+	};
 }

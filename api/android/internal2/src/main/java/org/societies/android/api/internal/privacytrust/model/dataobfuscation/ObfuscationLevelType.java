@@ -22,51 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
-
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-
+package org.societies.android.api.internal.privacytrust.model.dataobfuscation;
 
 /**
- * @author Olivier Maridat (Trialog)
+ * Describe your class here...
+ *
+ * @author olivierm
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
-
-	private IBinder binder;
-
-
-	public void onCreate() {
-		this.binder = new LocalBinder();
-	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
-	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
-	}
+public enum ObfuscationLevelType {
+	CONTINUOUS, DISCRETE;
 }

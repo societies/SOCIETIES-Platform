@@ -22,51 +22,62 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
-
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-
+package org.societies.android.api.internal.privacytrust.model;
 
 /**
- * @author Olivier Maridat (Trialog)
+ * @author Elizabeth
+ *
  */
-public class PrivacyDataManagerLocalService extends Service {
-	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
+public class PrivacyException extends Exception{
+    /**
+     * Constructs a <code>PrivacyPreferenceException</code> with no detail
+     * message.
+     */
+    public PrivacyException() {
+        super();
+    }
 
-	private IBinder binder;
+    /**
+     * Constructs a <code>PrivacyPreferenceException</code> with the specified
+     * detail message.
+     * 
+     * @param s
+     *            the detail message.
+     */
+    public PrivacyException(String s) {
+        super(s);
+    }
 
+    /**
+     * Creates a <code>PrivacyPreferenceException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public PrivacyException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public void onCreate() {
-		this.binder = new LocalBinder();
-	}
-
-
-	/* ****************************
-	 * Android Service Management *
-	 **************************** */
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	public class LocalBinder extends Binder {
-		public IPrivacyDataManager getService() {
-			// Creation of an instance
-			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
-			return privacyManager;
-		}
-	}
-
-	/**
-	 * Return binder object to allow calling component access to service's
-	 * public methods
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
-	}
+    /**
+     * Creates a <code>PrivacyPreferenceException</code> with the specified cause
+     * and a detail message of <tt>(cause==null ? null : cause.toString())</tt>
+     * (which typically contains the class and detail message of <tt>cause</tt>
+     * ).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public PrivacyException(Throwable cause) {
+        super(cause);
+    }
 }
