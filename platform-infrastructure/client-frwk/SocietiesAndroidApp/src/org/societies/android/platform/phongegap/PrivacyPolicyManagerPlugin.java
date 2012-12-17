@@ -75,7 +75,6 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 
 	public PrivacyPolicyManagerPlugin() {
 		jsonHelper = new Gson();
-		clientPackage = this.ctx.getPackageName();
 	}
 
 	/*
@@ -101,6 +100,8 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	private PluginResult initPlugin(String methodName, JSONArray arguments, String callbackId) {
 		Log.d(TAG, "Plugin Called (first time: connect to service)");
 		
+		clientPackage = this.ctx.getPackageName();
+		
 		// - Inform the JS side: async mode
 		PluginResult result = new PluginResult(Status.NO_RESULT);
 		result.setKeepCallback(true);
@@ -110,6 +111,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 			Log.d(TAG, "Listen intents for PrivacyPolicy");
 			pivacyPolicyManagerReceiver = new ServiceReceiver();
 			IntentFilter intentFilter = new IntentFilter() ;
+			intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
 			intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
 			intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
 			intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());

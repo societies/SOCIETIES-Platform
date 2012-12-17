@@ -42,16 +42,17 @@ var	SocietiesPrivacyPolicyManagerService = {
 
 			function success(data) {
 				// Display
-				$("#displayer").html(data);
+				console.log("getPrivacyPolicy - Succes: " + data);
+				$("#displayer").html("Succes: "+data);
 			}
 
 			function failure(data) {
-				alert("getPrivacyPolicy - failure: " + data);
-				$("#displayer").html("Faillure:"+data);
+				console.log("getPrivacyPolicy - failure: " + data);
+				$("#displayer").html("Faillure: "+data);
 			}
 			
 			// Call
-			window.plugins.PrivacyPolicyManagerService.getPrivacyPolicy("test", success, failure);
+			window.plugins.PrivacyPolicyManager.getPrivacyPolicy("test", success, failure);
 		}
 }
 

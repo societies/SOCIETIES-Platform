@@ -91,7 +91,7 @@ var SocietiesUtility = {
 			cordova.addPlugin("SocialConnectorsService", SocialConnectorsService);
 			
 			console.log("Register PrivacyPolicyManager plugin ");
-			cordova.addPlugin("PrivacyPolicyManagerService", PrivacyPolicyManagerService);
+			cordova.addPlugin("PrivacyPolicyManager", PrivacyPolicyManagerService);
 		});
 		
 		//handle the Android Back button 

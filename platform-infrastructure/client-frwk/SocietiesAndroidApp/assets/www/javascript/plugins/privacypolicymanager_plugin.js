@@ -49,4 +49,4 @@ var PrivacyPolicyManagerService = {
 		}
 }
 
-console.log("Test Page privacypolicymanager_plagin.js");
+console.log("Test Page privacypolicymanager_plugin.js");
