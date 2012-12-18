@@ -37,6 +37,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.internal.privacytrust.util.model.privacypolicy.PrivacyPolicyUtil;
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
@@ -176,7 +177,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			throw new PrivacyException("The XML privacy policy to update is empty.");
 		}
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = (RequestPolicy) fromXmlString(privacyPolicyXml);
+		RequestPolicy privacyPolicy = (RequestPolicy) PrivacyPolicyUtil.fromXmlString(privacyPolicyXml);
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
@@ -294,133 +295,5 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			}
 			return result;
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants, java.util.Map)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
-		RequestPolicy privacyPolicy = new RequestPolicy();
-		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		// Not private
-		if (configuration.containsKey("globalBehaviour")) {
-			// CIS Member list
-			RequestItem requestItem = new RequestItem();
-			Resource cisMemberList = new Resource();
-			cisMemberList.setScheme(DataIdentifierScheme.CIS);
-			cisMemberList.setDataType("cis-member-list");
-			requestItem.setResource(cisMemberList);
-			List<Action> actions = new ArrayList<Action>();
-			Action action = new Action();
-			action.setActionConstant(ActionConstants.READ);
-			actions.add(action);
-			requestItem.setActions(actions);
-			List<Condition> conditions = new ArrayList<Condition>();
-			// Public
-			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
-			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3_RD_PARTIES);
-				condition.setValue("1");
-			}
-			// Members only
-			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour)) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
-				condition.setValue("1");
-			}
-			requestItem.setConditions(conditions);
-			requestItems.add(requestItem);
-		}
-		privacyPolicy.setRequestItems(requestItems);
-		return privacyPolicy;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria, java.util.Map)
-	 */
-	@Override
-	public RequestPolicy inferCisPrivacyPolicy(
-			PrivacyPolicyBehaviourConstants globalBehaviour,
-			MembershipCriteria membershipCriteria,
-			Map<String, String> configuration) throws PrivacyException {
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("globalBehaviour", globalBehaviour);
-		parameters.put("membershipCriteria", membershipCriteria);
-		parameters.putAll(configuration);
-		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#inferCisPrivacyPolicy(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants, org.societies.api.cis.attributes.MembershipCriteria)
-	 */
-	@Override
-	public RequestPolicy inferCisPrivacyPolicy(
-			PrivacyPolicyBehaviourConstants globalBehaviour,
-			MembershipCriteria membershipCriteria) throws PrivacyException {
-		return inferCisPrivacyPolicy(globalBehaviour, membershipCriteria, null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#infer3pServicePrivacyPolicy(java.util.Map)
-	 */
-	@Override
-	public RequestPolicy infer3pServicePrivacyPolicy(
-			Map<String, String> configuration) throws PrivacyException {
-		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.SERVICE, configuration);
-	}
-
-	public String toXmlString(RequestPolicy privacyPolicy) {
-		String encoding = "UTF-8";
-		// -- Empty Privacy Policy
-		if (null == privacyPolicy) {
-			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
-		}
-
-		Serializer serializer = new Persister(); 
-		Writer result = new StringWriter();
-		try {
-			serializer.write(privacyPolicy, result);
-		} catch (Exception e) {
-			Log.e(TAG, "Can't serialize this privacy policy to an XML string.", e);
-			return null;
-		}
-		return result.toString();
-	}
-
-	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
-		// -- Verify
-		// Empty privacy policy
-		if (null == privacyPolicy || privacyPolicy.equals("")) {
-			Log.d(TAG, "Empty privacy policy. Return a null java object.");
-			return null;
-		}
-		// Fill XML header if necessary
-		String encoding = "UTF-8";
-		if (!privacyPolicy.startsWith("<?xml")) {
-			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
-		}
-		// If only contains the XML header: empty privacy policy
-		if (privacyPolicy.endsWith("?>")) {
-			Log.d(TAG, "Empty privacy policy. Return a null java object.");
-			return null;
-		}
-
-		// -- Convert Xml to Java
-		RequestPolicy result = null;
-		Serializer serializer = new Persister();       
-		Reader reader = new StringReader(privacyPolicy);
-		try {
-			result = serializer.read(RequestPolicy.class, reader, false);
-		} catch (Exception e) {
-			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy.", e);
-		}
-		return result;
 	}
 }

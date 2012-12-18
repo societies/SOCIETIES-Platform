@@ -32,6 +32,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -49,14 +50,14 @@ public class PrivacyDataIntentSender extends PrivacyIntentSender {
 
 	public boolean sendIntentCheckPermission(String clientPackage, PrivacyDataManagerBeanResult bean) {
 		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), bean.isAck(), bean.getAckMessage());
-		intent.putExtra(returnValueKey, bean.getPermission());
+		intent.putExtra(returnValueKey, (Parcelable) bean.getPermission());
 		context.sendBroadcast(intent);
 		return true;
 	}
 
 	public boolean sendIntentCheckPermission(String clientPackage, ResponseItem privacyPermission) {
 		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), true, null);
-		intent.putExtra(returnValueKey, privacyPermission);
+		intent.putExtra(returnValueKey, (Parcelable) privacyPermission);
 		context.sendBroadcast(intent);
 		return true;
 	}

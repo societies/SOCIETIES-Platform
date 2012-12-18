@@ -91,7 +91,7 @@ var	SocietiesCISListService = {
 			ServiceManagementServiceHelper.connectToServiceManagement(function() {
 								SocietiesCISListService.showCISServices(communityObj.communityJid); }
 								);
-			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy(communityObj.ownerJid, communityObj.communityJid, bAdmin);
+			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy('#getPrivacyPolicy', communityObj.ownerJid, communityObj.communityJid, bAdmin);
 			SocietiesCISListService.createSelectServices();
 		}
 	},

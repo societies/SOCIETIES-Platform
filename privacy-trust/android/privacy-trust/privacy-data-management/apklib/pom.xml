@@ -54,11 +54,12 @@
 
 	<dependencies>
 		<!-- Societies -->
-		<!--dependency>
+		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-		</dependency-->
+			<type>apklib</type>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
