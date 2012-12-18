@@ -29,8 +29,6 @@ package org.societies.android.api.identity;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
-import org.societies.android.api.identity.ARequestor;
-import org.societies.api.identity.Requestor;
 import org.societies.api.schema.identity.RequestorBean;
 
 
