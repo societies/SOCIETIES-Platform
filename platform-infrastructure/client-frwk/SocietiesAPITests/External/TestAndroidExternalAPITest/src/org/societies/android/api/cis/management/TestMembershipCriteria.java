@@ -7,7 +7,6 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
-import org.societies.android.api.cis.management.ACriteria;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
@@ -54,7 +53,7 @@ public class TestMembershipCriteria extends AndroidTestCase {
 	public void testEmptyMembershipParcelable() throws Exception {
 //		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		
-		List<ACriteria> l = new ArrayList<ACriteria>();
+		List<Criteria> l = new ArrayList<Criteria>();
 		
 //		amembershipCrit.setACriteria(l);
 //		
