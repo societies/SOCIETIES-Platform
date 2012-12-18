@@ -89,4 +89,13 @@ class Configuration {
 		}
 		return daNode;
 	}
+	
+	public String getHost() {
+		String host = null;
+		try {
+			host = configutationBundle.getString("host");
+		} catch(MissingResourceException e) {
+		}
+		return host;
+	} 
 }
