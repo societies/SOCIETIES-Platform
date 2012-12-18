@@ -22,46 +22,67 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.identity;
-
-import android.os.Parcel;
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.MediumTest;
+package org.societies.android.api.context;
 
 /**
- * @author Eliza
- *
+ * Subclasses of <code>CtxException</code> are thrown by the Context Mgmt
+ * components to indicate conditions that a context consumer might want to
+ * catch.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
-public class TestARequestorCis extends AndroidTestCase{
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public abstract class CtxException extends Exception {
 
-	protected void tearDown() throws Exception {
+	private static final long serialVersionUID = 4500318335207829934L;
 
-		super.tearDown();
-	}
+    /**
+     * Constructs a <code>CtxException</code> with no detail message.
+     */
+    public CtxException() {
+        super();
+    }
 
+    /**
+     * Constructs a <code>CtxException</code> with the specified detail
+     * message.
+     * 
+     * @param s
+     *            the detail message.
+     */
+    public CtxException(String s) {
+        super(s);
+    }
 
-	@MediumTest
-	public void testParcelable(){
-		ARequestorCis requestor = new ARequestorCis("emma.societies.local", "society.societies.local");
-		assertNotNull(requestor);
+    /**
+     * Creates a <code>CtxException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-
-
-		assertEquals(0, requestor.describeContents());
-
-		Parcel parcel = Parcel.obtain();
-		requestor.writeToParcel(parcel, 0);
-		//done writing, now reset parcel for reading
-		parcel.setDataPosition(0);
-		//finish round trip
-
-
-		ARequestorCis createFromParcel = ARequestorCis.CREATOR.createFromParcel(parcel);
-
-		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());
-		assertEquals(requestor.getCisRequestorId(), createFromParcel.getCisRequestorId());
-	}
+    /**
+     * Creates a <code>CtxException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxException(Throwable cause) {
+        super(cause);
+    }
 }
