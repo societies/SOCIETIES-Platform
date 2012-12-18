@@ -93,7 +93,7 @@ public class PrivacyPolicyUtil {
 			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
 			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
 				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3_RD_PARTIES);
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH3_RD_PARTIES);
 				condition.setValue("1");
 			}
 			// Members only

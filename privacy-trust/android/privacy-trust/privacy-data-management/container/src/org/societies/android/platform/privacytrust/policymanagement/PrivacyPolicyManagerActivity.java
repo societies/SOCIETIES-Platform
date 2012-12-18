@@ -97,7 +97,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 				txtLocation.setText("Waiting");
 				RequestorCisBean owner = new RequestorCisBean();
 				owner.setRequestorId("university.societies.local");
-				owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+				owner.setCisRequestorId("cis-aa667d2a-9330-4d44-8c0d-c7d2df32a782.societies.local");
 				if (R.id.btnLaunchTest1 == view.getId()) {
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
@@ -158,7 +158,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
 			if (ack && (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
-				retrievedPrivacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
+				retrievedPrivacyPolicy = (RequestPolicy) intent.getParcelableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
 				sb.append("Privacy policy retrieved: "+(null != retrievedPrivacyPolicy));
 				if (null != retrievedPrivacyPolicy) {
 					sb.append(PrivacyPolicyUtil.toXmlString(retrievedPrivacyPolicy));

@@ -105,7 +105,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 				txtResult.setText("Waiting");
 				RequestorCisBean requestor = new RequestorCisBean();
 				requestor.setRequestorId("university.societies.local");
-				requestor.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+				requestor.setCisRequestorId("cis-aa667d2a-9330-4d44-8c0d-c7d2df32a782.societies.local");
 				DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+requestor.getCisRequestorId()+"/cis-member-list");
 				List<Action> actions = new ArrayList<Action>();
 				Action action = new Action();
@@ -140,7 +140,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
 			if (ack && (intent.getAction().equals(MethodType.CHECK_PERMISSION.name()))) {
-				retrievedpermission = (ResponseItem) intent.getSerializableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
+				retrievedpermission = (ResponseItem) intent.getParcelableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
 				sb.append("Privacy permission retrieved: "+(null != retrievedpermission));
 				if (null != retrievedpermission) {
 					sb.append("\nDecision: "+retrievedpermission.getDecision().name());
