@@ -27,7 +27,8 @@ package org.societies.android.api.identity;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -37,7 +38,7 @@ import android.test.suitebuilder.annotation.MediumTest;
  * @author Eliza
  *
  */
-public class TestARequestorService extends AndroidTestCase{
+public class TestRequestorService extends AndroidTestCase{
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -51,10 +52,12 @@ public class TestARequestorService extends AndroidTestCase{
 
 	@MediumTest
 	public void testParcelable() throws URISyntaxException{
-		AServiceResourceIdentifier serviceID = new AServiceResourceIdentifier();
-		serviceID.setIdentifier(new URI("http://societies.org"));
-		serviceID.setServiceInstanceIdentifier("service_59");
-		ARequestorService requestor = new ARequestorService("emma.societies.local", serviceID);
+		RequestorServiceBean requestor = new RequestorServiceBean();
+		requestor.setRequestorId("emma.societies.local");
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		serviceId.setIdentifier(new URI("http://alec.societies.org"));
+		serviceId.setServiceInstanceIdentifier("alecBundle123");
+		requestor.setRequestorServiceId(serviceId);
 		assertNotNull(requestor);
 
 
@@ -68,10 +71,10 @@ public class TestARequestorService extends AndroidTestCase{
 		//finish round trip
 
 
-		ARequestorService createFromParcel = ARequestorService.CREATOR.createFromParcel(parcel);
+		RequestorServiceBean createFromParcel = RequestorServiceBean.CREATOR.createFromParcel(parcel);
 
+		assertNotNull(createFromParcel);
 		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());		
 		assertEquals(requestor.getRequestorServiceId(), createFromParcel.getRequestorServiceId());
 	}
-	
 }

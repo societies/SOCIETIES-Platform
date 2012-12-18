@@ -22,19 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-
 package org.societies.android.api.identity;
+
+import org.societies.api.schema.identity.RequestorCisBean;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
-import org.societies.android.api.identity.ARequestor;
 
 
+/**
+ * @author Eliza
+ *
+ */
+public class TestRequestorCis extends  AndroidTestCase{
 
-public class TestARequestor extends AndroidTestCase{
-	
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -47,7 +49,9 @@ public class TestARequestor extends AndroidTestCase{
 
 	@MediumTest
 	public void testParcelable(){
-		ARequestor requestor = new ARequestor("emma.societies.local");
+		RequestorCisBean requestor = new RequestorCisBean();
+		requestor.setRequestorId("emma.societies.local");
+		requestor.setCisRequestorId("john.societies.local");
 		assertNotNull(requestor);
 
 
@@ -61,8 +65,11 @@ public class TestARequestor extends AndroidTestCase{
 		//finish round trip
 
 
-		ARequestor createFromParcel = ARequestor.CREATOR.createFromParcel(parcel);
+		RequestorCisBean createFromParcel = RequestorCisBean.CREATOR.createFromParcel(parcel);
 
-		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());		
+		assertNotNull(createFromParcel);
+		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());	
+		assertEquals(requestor.getCisRequestorId(), createFromParcel.getCisRequestorId());
 	}
+	
 }
