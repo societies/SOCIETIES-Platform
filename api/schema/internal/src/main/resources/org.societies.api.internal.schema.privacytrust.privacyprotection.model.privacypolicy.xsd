@@ -135,16 +135,23 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+
 	<xs:simpleType name="conditionConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="shareWith3rdParties" />
+			<xs:enumeration value="shareWith3RdParties">
+				<xs:annotation>
+					<xs:appinfo>
+						<jaxb:typesafeEnumMember name="SHARE_WITH_3RD_PARTIES" />
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
 			<xs:enumeration value="shareWithCisMembersOnly" />
 			<xs:enumeration value="shareWithCisOnwerOnly" />
 			<xs:enumeration value="mayBeInferred" />
 			<xs:enumeration value="dataRetentionInSeconds" />
 			<xs:enumeration value="dataRetentionInMinutes" />
 			<xs:enumeration value="dataRetentionInHours" />
-			<xs:enumeration value="rightToOptOut" />
+			<xs:enumeration value="rightToOptout" />
 			<xs:enumeration value="storeInSecureStorage" />
 			<xs:enumeration value="rightToAccessHeldData" />
 			<xs:enumeration value="rightToCorrectIncorrectData" />
