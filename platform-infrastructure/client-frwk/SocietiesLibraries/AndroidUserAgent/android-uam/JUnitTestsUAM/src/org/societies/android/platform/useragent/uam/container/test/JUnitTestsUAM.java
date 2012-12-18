@@ -23,22 +23,67 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.useragent;
+package org.societies.android.platform.useragent.uam.container.test;
+
+import java.net.URI;
 
 import org.societies.android.api.personalisation.model.AAction;
-//import org.societies.api.identity.IIdentity;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.android.api.useragent.IAndroidUserActionMonitor;
+import org.societies.android.platform.useragent.uam.container.TestContainerUAMService;
+import org.societies.android.platform.useragent.uam.container.TestContainerUAMService.UAMContainerBinder;
 
-public interface IAndroidUserAgent {
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.test.ServiceTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
+import android.util.Log;
 
-	//Array of interface method signatures
-	String methodsArray [] = {"monitor(String client, String identity, org.societies.android.api.personalisation.model.AAction action)"};
+public class JUnitTestsUAM extends ServiceTestCase <TestContainerUAMService>{
 
-	/**
-	 * Send a user action (performed in your android application) to the platform
-	 * @param client
-	 * @param identity - the identity of the user consuming your application
-	 * @param action - the action performed by the user consuming your application
-	 */
-	public void monitor(String client, String identity, AAction action);
+	private static final String LOG_TAG = JUnitTestsUAM.class.getName();
+	//private static final int SLEEP_DELAY = 5000;
 
+	public JUnitTestsUAM() {
+		super(TestContainerUAMService.class);
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@MediumTest
+	public void testPreconditions() {
+	}
+
+	@MediumTest
+	public void testMonitor() throws Exception {
+
+		//BroadcastReceiver receiver = setupBroadcastReceiver();
+
+		Intent uamIntent = new Intent(getContext(), TestContainerUAMService.class);
+		UAMContainerBinder binder = (UAMContainerBinder) bindService(uamIntent);
+		assertNotNull(binder);
+
+		IAndroidUserActionMonitor uamService = (IAndroidUserActionMonitor) binder.getService();
+
+		AServiceResourceIdentifier aServiceID = new AServiceResourceIdentifier();
+		String serviceIDString = "http://test.org";
+		aServiceID.setIdentifier(new URI(serviceIDString));
+		aServiceID.setServiceInstanceIdentifier(serviceIDString);
+
+		AAction aaction = new AAction();
+		aaction.setServiceID(aServiceID);
+		aaction.setServiceType("TEST_SERVICE_TYPE");
+		aaction.setparameterName("TEST_PARAMETER_NAME");
+		aaction.setvalue("TEST_VALUE");
+
+		Log.d("LOG_TAG", "Sending action to local UAM....");
+		uamService.monitor("CLIENT", "IDENTITY", aaction);
+		Log.d("LOG_TAG", "Action sent!");
+		//Thread.sleep(SLEEP_DELAY);
+
+		//getContext().unregisterReceiver(receiver);
+	}
 }

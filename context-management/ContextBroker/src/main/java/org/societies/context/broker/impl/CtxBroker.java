@@ -25,13 +25,13 @@
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -43,21 +43,15 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.context.broker.api.CtxBrokerException;
-import org.societies.context.broker.api.security.ICtxAccessController;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
@@ -71,12 +65,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBroker.class);
-
-	/** ICtxAccessController service reference. */
-
-	//@Autowired(required=true)
-	private ICtxAccessController ctxAccessController;
-
 
 	/** The privacy logging facility. */
 	@Autowired(required=false)
@@ -573,17 +561,4 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// do nothing
 		}
 	}
-
-	/**
-	 * Sets the {@link ICtxAccessController} service reference.
-	 *
-	 * @param ctxAccessController
-	 * the {@link ICtxAccessController} service reference to set
-	 */
-	public void setCtxAccessController(ICtxAccessController ctxAccessController) {
-
-		this.ctxAccessController = ctxAccessController;
-	}
-
-
 }

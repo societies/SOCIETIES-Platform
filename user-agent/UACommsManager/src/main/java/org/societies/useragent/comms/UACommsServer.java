@@ -209,7 +209,7 @@ public class UACommsServer implements IFeatureServer{
 				//create response bean
 				ImpFeedbackResultBean impResultBean = new ImpFeedbackResultBean();
 				impResultBean.setRequestId(requestId);
-				impResultBean.setFeedback(result.booleanValue());
+				impResultBean.setAccepted(result.booleanValue());
 				resultBean = impResultBean;
 				
 			} catch (InterruptedException e) {

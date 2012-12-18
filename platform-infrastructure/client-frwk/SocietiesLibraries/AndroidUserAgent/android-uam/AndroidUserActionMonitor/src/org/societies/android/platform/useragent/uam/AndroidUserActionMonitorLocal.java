@@ -22,36 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import java.io.Serializable;
+package org.societies.android.platform.useragent.uam;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.android.api.useragent.IAndroidUserActionMonitor;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
+public class AndroidUserActionMonitorLocal extends Service{
 
-public class FailedNegotiationEvent implements Serializable{
+	private static final String LOG_TAG = AndroidUserActionMonitorLocal.class.getName();
+	private IBinder binder;
 
+	@Override
+	public void onCreate () {
+		this.binder = new LocalUAMBinder();
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service starting...");
+	}
 
-	private Requestor requestor;
+	@Override
+	public void onDestroy(){
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service terminating...");
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal onBind...");
+		return this.binder;
+	}
+
+	public class LocalUAMBinder extends Binder {
+		public IAndroidUserActionMonitor getService() {
+			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(
+					AndroidUserActionMonitorLocal.this.getApplicationContext(),  
+					ccm, 
+					false);
+			return uamBase;
+		}
+	}
 	
-	public FailedNegotiationEvent(Requestor requestor){
-		this.setRequestor(requestor);
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(getApplicationContext());
 	}
-
-	/**
-	 * @return the requestor
-	 */
-	public Requestor getRequestor() {
-		return requestor;
-	}
-
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(Requestor requestor) {
-		this.requestor = requestor;
-	}
-
 }

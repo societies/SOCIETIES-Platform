@@ -26,17 +26,10 @@ package org.societies.context.event.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -55,6 +48,12 @@ import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
@@ -62,7 +61,6 @@ import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.stereotype.Service;
 
 /**
@@ -73,20 +71,18 @@ import org.springframework.stereotype.Service;
  */
 @Service("ctxEventMgr")
 @Lazy(false)
-public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
+public class CtxEventMgr implements ICtxEventMgr {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxEventMgr.class);
-	
-	private static final String EVENT_ID_PROPERTY_KEY = "id";
 	
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
 			Collections.unmodifiableList(Arrays.asList(
 					"org.societies.api.schema.context.model.CtxIdentifierBean"));
 			
-	/** The OSGi EventAdmin service. */
+	/** The Event Mgr service. */
 	@Autowired(required=true)
-	private EventAdmin eventAdmin;
+	private IEventMgr eventMgr;
 	
 	/** The PubsubClient service reference. */
 	private PubsubClient pubsubClient;
@@ -95,9 +91,6 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	private IIdentity pubsubId;
 	
 	private IIdentityManager idMgr;
-	
-	/** The OSGi bundle context. */
-	private BundleContext bundleContext;
 	
 	@Autowired(required=true)
 	CtxEventMgr(PubsubClient pubsubClient, ICommManager commMgr) 
@@ -293,30 +286,33 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		// TODO Auto-generated method stub
 	}
 	
-	/*
-	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void setBundleContext(BundleContext bundleContext) {
-
-		this.bundleContext = bundleContext;
-	}
-	
 	private void postLocalChangeEvent(CtxChangeEvent event, String[] topics) 
 			throws CtxEventMgrException {
 		
 		for (int i = 0; i < topics.length; ++i) {
 			
-			if (this.eventAdmin == null)
-				throw new CtxEventMgrException("Could not send local context change event to topic '"
-						+ topics[i] + "': OSGi EventAdmin service is not available");
-		
-			final Dictionary<String, Object> props = new Hashtable<String, Object>();
-			props.put(EVENT_ID_PROPERTY_KEY, event.getId().toString());
-			if (LOG.isDebugEnabled()) 
-				LOG.debug("Sending local context change event to topic '" + topics[i] + "'"
-						+ " with properties '" + props + "'");
-			this.eventAdmin.postEvent(new Event(topics[i], props));
+			final InternalEvent internalEvent = new InternalEvent(
+					topics[i], event.getId().toString(), event.getId().toString(), event.getId());
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending local context change event to topic '" 
+						+ topics[i] + "'" + " with internal event name '" 
+						+ internalEvent.geteventName() + "'");
+			try {
+				if (this.eventMgr == null)
+					throw new CtxEventMgrException(
+							"Could not send local context change event to topic '"
+							+ topics[i] + "' with internal event name '" 
+							+ internalEvent.geteventName() 
+							+ "'': IEventMgr service is not available");
+				this.eventMgr.publishInternalEvent(internalEvent);
+			} catch (EMSException emse) {
+
+				throw new CtxEventMgrException(
+						"Could not send local context change event to topic '"
+						+ topics[i] + "' with internal event name '" 
+						+ internalEvent.geteventName() 
+						+ "': " + emse.getLocalizedMessage(), emse);
+			}
 		}
 	}
 	
@@ -327,15 +323,14 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		final CtxIdentifierBean eventBean = 
 				CtxModelBeanTranslator.getInstance().fromCtxIdentifier(event.getId());
 		for (int i = 0; i < topics.length; ++i) {
-			
-			if (this.pubsubClient == null)
-				throw new CtxEventMgrException("Could not send remote context change event to topic '"
-						+ topics[i] + "': PubsubClient service is not available");
 		
 			if (LOG.isDebugEnabled()) 
 				LOG.debug("Sending remote context change event to topic '" + topics[i] + "'"
 						+ " with itemId '" + itemId + "'");
 			try {
+				if (this.pubsubClient == null)
+					throw new CtxEventMgrException("Could not send remote context change event to topic '"
+							+ topics[i] + "': PubsubClient service is not available");
 				this.pubsubClient.publisherPublish(this.pubsubId, topics[i], 
 						itemId, eventBean);
 			} catch (Exception e) {
@@ -350,31 +345,27 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	private void registerLocalChangeListener(final CtxChangeEventListener listener,
 			final String[] topics, final IIdentity ownerId) throws CtxException {
 		
-		final Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put(EventConstants.EVENT_TOPIC, topics);
-		props.put(EventConstants.EVENT_FILTER, 
-				"(" + EVENT_ID_PROPERTY_KEY + "=*" + ownerId.toString() + "*)");
+		final String filter = "(" + CSSEventConstants.EVENT_NAME + "=*" 
+				+ ownerId.toString() + "*)";
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering local context change event listener to topics "
 					+ Arrays.toString(topics)
-					+ " with properties '" + props + "'");
-		this.bundleContext.registerService(EventHandler.class.getName(),
-				new LocalChangeEventHandler(listener), props);
+					+ " with filter '" + filter + "'");
+		this.eventMgr.subscribeInternalEvent(
+				new LocalChangeEventHandler(listener), topics, filter);
 	}
 	
 	private void registerLocalChangeListener(final CtxChangeEventListener listener,
 			final String[] topics, final CtxIdentifier ctxId) throws CtxException {
 		
-		final Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put(EventConstants.EVENT_TOPIC, topics);
-		props.put(EventConstants.EVENT_FILTER, 
-				"(" + EVENT_ID_PROPERTY_KEY + "=" + ctxId + ")");
+		final String filter =  "(" + CSSEventConstants.EVENT_NAME + "=" 
+				+ ctxId + ")";
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering local context change event listener to topics "
 					+ Arrays.toString(topics)
-					+ " with properties '" + props + "'");
-		this.bundleContext.registerService(EventHandler.class.getName(),
-				new LocalChangeEventHandler(listener), props);
+					+ " with filter '" + filter + "'");
+		this.eventMgr.subscribeInternalEvent(
+				new LocalChangeEventHandler(listener), topics, filter);
 	}
 	
 	private void registerRemoteChangeListener(final IIdentity pubsubId,
@@ -403,23 +394,20 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			final String[] topics, final CtxEntityIdentifier scope,
 			final String attrType) throws CtxException {
 		
-		final Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put(EventConstants.EVENT_TOPIC, topics);
 		final StringBuilder eventFilterSB = new StringBuilder();
 		eventFilterSB.append("(");
-		eventFilterSB.append(EVENT_ID_PROPERTY_KEY + "=" + scope + "/ATTRIBUTE/");
+		eventFilterSB.append(CSSEventConstants.EVENT_NAME + "=" + scope + "/ATTRIBUTE/");
 		if (attrType != null)
 			eventFilterSB.append(attrType + "/*");
 		else
 			eventFilterSB.append("*");
 		eventFilterSB.append(")");
-		props.put(EventConstants.EVENT_FILTER, eventFilterSB.toString());
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering local context change event listener to topics "
 					+ Arrays.toString(topics)
-					+ " with properties '" + props + "'");
-		this.bundleContext.registerService(EventHandler.class.getName(),
-				new LocalChangeEventHandler(listener), props);
+					+ " with filter '" + eventFilterSB.toString() + "'");
+		this.eventMgr.subscribeInternalEvent(
+				new LocalChangeEventHandler(listener), topics, eventFilterSB.toString());
 	}
 	
 	private void registerRemoteChangeListener(final IIdentity pubsubId,
@@ -454,7 +442,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		}
 	}
 	
-	private class LocalChangeEventHandler implements EventHandler {
+	private class LocalChangeEventHandler extends EventListener {
 
 		/** The listener to forward CtxChangeEvents. */
 		private final CtxChangeEventListener listener;
@@ -465,20 +453,28 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		}
 		
 		/*
-		 * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
+		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
 		 */
 		@Override
-		public void handleEvent(Event osgiEvent) {
+		public void handleExternalEvent(CSSEvent cssEvent) {
+			
+			LOG.warn("Received unexpected external CSS event"
+					+ ": type=" + cssEvent.geteventType()
+					+ ", name=" + cssEvent.geteventName()
+					+ ", source=" + cssEvent.geteventSource());
+		}
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+		 */
+		@Override
+		public void handleInternalEvent(InternalEvent internalEvent) {
 		
 			try {
-				this.checkEventProps(osgiEvent);
-
-				// Extract the String form of the CtxIdentifier
-				final String ctxIdStr = (String) osgiEvent.getProperty(EVENT_ID_PROPERTY_KEY);
-				final CtxIdentifier ctxId = CtxIdentifierFactory.getInstance().fromString(ctxIdStr);
-				
-				final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(ctxId);
-				final String topic = osgiEvent.getTopic();
+				this.checkEventProps(internalEvent);
+				final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(
+						(CtxIdentifier) internalEvent.geteventInfo());
+				final String topic = internalEvent.geteventType();
 				if (CtxChangeEventTopic.CREATED.equals(topic))
 					this.listener.onCreation(ctxChangeEvent);
 				else if (CtxChangeEventTopic.UPDATED.equals(topic))
@@ -494,17 +490,14 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 				
 				LOG.error("Malformed local context change event: " 
 						+ ceme.getLocalizedMessage(), ceme);
-			} catch (MalformedCtxIdentifierException mcie) {
-				
-				LOG.error("Malformed context identifier in local context change event: "
-						+ mcie.getLocalizedMessage(), mcie);
 			}
 		}
 		
-		private void checkEventProps(final Event osgiEvent) throws CtxEventMgrException {
+		private void checkEventProps(final InternalEvent internalEvent)
+				throws CtxEventMgrException {
 			
-			if (!(osgiEvent.getProperty("id") instanceof String))
-				throw new CtxEventMgrException("'id' property is missing or incorrect");
+			if (!(internalEvent.geteventInfo() instanceof CtxIdentifier))
+				throw new CtxEventMgrException("internal event info is missing or incorrect");
 		}
 	}
 	

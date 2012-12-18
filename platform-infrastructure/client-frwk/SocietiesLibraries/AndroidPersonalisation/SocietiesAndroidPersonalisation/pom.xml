@@ -38,12 +38,12 @@
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
-        
         <dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
@@ -59,11 +59,6 @@
 					<artifactId>jaxb-android-societies</artifactId>
 	 	   		</exclusion>
 			</exclusions-->
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
 		</dependency>
         
     </dependencies>

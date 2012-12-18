@@ -32,6 +32,7 @@
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
 
 

@@ -119,11 +119,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>assessment</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacynegotiationmanagement</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
@@ -143,7 +138,6 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
 							api;scope=compile|runtime,
-							assessment;scope=compile|runtime,
 							identityselection;scope=compile|runtime,
 							privacydatamanagement;scope=compile|runtime,
 							privacypolicymanagement;scope=compile|runtime,

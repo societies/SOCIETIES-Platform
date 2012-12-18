@@ -29,7 +29,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
@@ -50,7 +49,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyLogAppender.class);
 
 	private CommsFwTestBean testBean;
-	private ICommManager commMgr;
 	private PrivacyLog privacyLog;
 
 	public PrivacyLogAppender() {
@@ -71,10 +69,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		testBean.setAspectName("ahoj");
 //		aspectName = testBean.getAspectName();
 //		LOG.debug("init(): 4 aspectName = " + aspectName);
-		
-		LOG.debug("init(): 1");
-		commMgr.getIdManager();
-		LOG.debug("init(): 2");
 		
 //		try {
 //			LOG.debug("init(): 1");
@@ -99,14 +93,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	}
 
 	// Getters and setters for beans
-	public ICommManager getCommMgr() {
-		LOG.debug("getCommMgr()");
-		return commMgr;
-	}
-	public void setCommMgr(ICommManager commMgr) {
-		LOG.debug("setCommMgr()");
-		this.commMgr = commMgr;
-	}
 	public PrivacyLog getPrivacyLog() {
 		LOG.debug("getPrivacyLog()");
 		return privacyLog;

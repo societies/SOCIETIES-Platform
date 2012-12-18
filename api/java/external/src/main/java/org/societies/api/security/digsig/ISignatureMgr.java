@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-import org.w3c.dom.Document;
+//import org.w3c.dom.Document;  // Do not import this because Domain Authority Webapp would then fail to deploy
 
 /**
  * Methods to digitally sign given data and methods to verify given signatures.
@@ -59,15 +59,19 @@ public interface ISignatureMgr {
 	/**
 	 * Digitally sign given XML data and embed the signature in the given XML.
 	 * 
-	 * @param xml The XML Document to be signed.
+	 * @param doc The XML Document to be signed.
+	 * The type should be org.w3c.dom.Document.
+	 * <i>The type in the API is Object because if org.w3c.dom.Document is imported
+	 * in the API, the Domain Authority Webapp fails at deployment, unless it is
+	 * removed from the plan and started separately after the plan starts.</i>
 	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
 	 * @param identity The identity to be used for signature.
 	 * @throws DigsigException on any error when parsing XML document, finding the
 	 * reference to sign, error with private key, etc.
 	 * 
-	 * @return XML with embedded signature.
+	 * @return XML with embedded signature. The type is org.w3c.dom.Document
 	 */
-	public Document signXml(Document xml, String xmlNodeId, IIdentity identity) throws DigsigException;
+	public Object signXml(Object doc, String xmlNodeId, IIdentity identity) throws DigsigException;
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the
