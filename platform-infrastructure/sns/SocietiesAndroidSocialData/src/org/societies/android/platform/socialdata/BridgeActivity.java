@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -144,7 +145,7 @@ public class BridgeActivity extends Activity {
 	
 	public static void startActivityForSN(Context context, Socialnetwork socialNetwork) {
 		Intent intent = new Intent(context, BridgeActivity.class);
-		intent.putExtra(EXTRA_SOCIAL_NETWORK, socialNetwork);
+		intent.putExtra(EXTRA_SOCIAL_NETWORK, (Parcelable)socialNetwork);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
