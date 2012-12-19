@@ -29,11 +29,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.storage.ISecureStorage;
 import org.societies.api.osgi.event.CSSEvent;
@@ -90,11 +92,13 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 		LOG.info("Internal event received: {}", type);
 		LOG.debug("*** event name : " + event.geteventName());
 		LOG.debug("*** event source : " + event.geteventSource());
-		PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
-		NegotiationStatus status = payload.getNegotiationStatus();
-		LOG.debug("negotiation status : " + status);
 
 		if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
+			
+			PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
+			NegotiationStatus status = payload.getNegotiationStatus();
+			LOG.debug("negotiation status : " + status);
+
 			if (status == NegotiationStatus.SUCCESSFUL) {
 				logPerformance(true);
 				notifySuccess();
@@ -105,7 +109,15 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 			}
 		}
 		else if (type.equals(EventTypes.FAILED_NEGOTIATION_EVENT)) {
-			notifyFailure();
+			
+			FailedNegotiationEvent payload = (FailedNegotiationEvent) event.geteventInfo();
+			Requestor requestor = payload.getRequestor();
+			
+			LOG.debug("negotiation requestor : " + requestor);
+			
+			if (requestor.equals(requestor)) {  // FIXME
+				notifyFailure();
+			}
 		}
 		
 	}
@@ -134,7 +146,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	
 	private void notifyFailure() {
 		LOG.warn("Privacy policy negotiation failed");
-
+		
 		eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
 
 		finalCallback.onNegotiationError("");
