@@ -60,8 +60,6 @@ public class TestRequestorService extends AndroidTestCase{
 		requestor.setRequestorServiceId(serviceId);
 		assertNotNull(requestor);
 
-
-
 		assertEquals(0, requestor.describeContents());
 
 		Parcel parcel = Parcel.obtain();
@@ -70,11 +68,12 @@ public class TestRequestorService extends AndroidTestCase{
 		parcel.setDataPosition(0);
 		//finish round trip
 
-
 		RequestorServiceBean createFromParcel = RequestorServiceBean.CREATOR.createFromParcel(parcel);
 
 		assertNotNull(createFromParcel);
 		assertEquals(requestor.getRequestorId(), createFromParcel.getRequestorId());		
-		assertEquals(requestor.getRequestorServiceId(), createFromParcel.getRequestorServiceId());
+		//TEST SRI's
+		assertEquals(requestor.getRequestorServiceId().getServiceInstanceIdentifier(), createFromParcel.getRequestorServiceId().getServiceInstanceIdentifier());
+		assertEquals(requestor.getRequestorServiceId().getIdentifier(), createFromParcel.getRequestorServiceId().getIdentifier());
 	}
 }
