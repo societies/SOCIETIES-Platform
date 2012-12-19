@@ -26,20 +26,10 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.PostalLocation;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Status;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Temperature;
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.*;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.ActivityObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.PostalLocationObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.StatusObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.TemperatureObfuscator;
+import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.*;
 
 /**
  * Implementation of IDataObfuscationManager
@@ -129,8 +119,8 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		else if (dataWrapper.getData() instanceof Temperature) {
 			obfuscator = new TemperatureObfuscator((IDataWrapper<Temperature>) dataWrapper);
 		}
-		else if (dataWrapper.getData() instanceof Activity) {
-			obfuscator = new ActivityObfuscator((IDataWrapper<Activity>) dataWrapper);
+		else if (dataWrapper.getData() instanceof MarshaledActivity) {
+			obfuscator = new ActivityObfuscator((IDataWrapper<MarshaledActivity>) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Status) {
 			obfuscator = new StatusObfuscator((IDataWrapper<Status>) dataWrapper);

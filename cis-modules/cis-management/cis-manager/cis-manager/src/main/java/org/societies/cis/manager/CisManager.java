@@ -200,7 +200,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("pubsub set on CIS Manager");
 		this.pubsubClient = pubsubClient;
 		List<String> classList = Collections 
-				.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
+				.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.MarshaledActivity"));
 		
     	try {
     		pubsubClient.addSimpleClasses(classList);

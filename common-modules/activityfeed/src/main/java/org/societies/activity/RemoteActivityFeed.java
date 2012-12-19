@@ -26,28 +26,19 @@
 
 package org.societies.activity;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.activityfeed.*;
 
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.api.schema.activityfeed.AddActivity;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeed;
-import org.societies.api.schema.activityfeed.DeleteActivity;
-import org.societies.api.schema.activityfeed.GetActivities;
-
-
-
+import java.util.List;
 
 
 public class RemoteActivityFeed implements IActivityFeed {
@@ -69,7 +60,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 	/*
 	public boolean deleteActivity(IActivity activity) {
 		LOG.debug("client call to delete activity to a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+		MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		DeleteActivity d = new DeleteActivity();
 		ac.setDeleteActivity(d);
 		Activity a = new Activity();
@@ -91,7 +82,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 		}
 		
 		@Override
-		public void receiveResult(Activityfeed activityFeedObject) {
+		public void receiveResult(MarshaledActivityFeed activityFeedObject) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -108,7 +99,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 
 	public void getActivities(String timePeriod, IActivityFeedCallback c) {
 		LOG.debug("client call to get activities, without query, from a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		GetActivities g = new GetActivities();
 		g.setTimePeriod(timePeriod);
 		ac.setGetActivities(g);
@@ -118,7 +109,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 	public void getActivities(String query,
 			String timePeriod, IActivityFeedCallback c) {
 		LOG.debug("client call to get activities, with query, from a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		GetActivities g = new GetActivities();
 		g.setTimePeriod(timePeriod);
 		g.setQuery(query);
@@ -126,18 +117,41 @@ public class RemoteActivityFeed implements IActivityFeed {
 		this.sendXmpp(ac, c);
 	}
 
+    @Override
+    public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
+        LOG.debug("client call to get activities, with query, from a RemoteCIS");
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
+        GetNumberedActivities g = new GetNumberedActivities();
+        g.setTimePeriod(timePeriod);
+        g.setN(n);
+        ac.setGetNumberedActivities(g);
+        this.sendXmpp(ac, c);
+    }
 
-	public void addActivity(IActivity activity,IActivityFeedCallback c) {
+    @Override
+    public void getActivities(String query, String timePeriod, long n, IActivityFeedCallback c) {
+        LOG.debug("client call to get activities, with query, from a RemoteCIS");
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
+        GetNumberedActivities g = new GetNumberedActivities();
+        g.setQuery(query);
+        g.setTimePeriod(timePeriod);
+        g.setN(n);
+        ac.setGetNumberedActivities(g);
+        this.sendXmpp(ac, c);
+    }
+
+
+    public void addActivity(IActivity activity,IActivityFeedCallback c) {
 		LOG.debug("client call to add activity to a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		AddActivity g = new AddActivity();
-		Activity a = new Activity();
+		MarshaledActivity a = new MarshaledActivity();
 		a.setActor(activity.getActor());
 		a.setObject(activity.getObject());
 		a.setTarget(activity.getTarget());
 		a.setPublished(activity.getPublished());
 		a.setVerb(activity.getVerb());
-		g.setActivity(a);
+		g.setMarshaledActivity(a);
 		ac.setAddActivity(g);
 		this.sendXmpp(ac, c);
 		
@@ -145,7 +159,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 
 	public void cleanupFeed(String criteria,IActivityFeedCallback c) {
 		LOG.debug("client call to clean up an activity feed to a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		CleanUpActivityFeed cl = new CleanUpActivityFeed(); 
 		cl.setCriteria(criteria);
 		ac.setCleanUpActivityFeed(cl);
@@ -154,11 +168,11 @@ public class RemoteActivityFeed implements IActivityFeed {
 
 	public void deleteActivity(IActivity activity,IActivityFeedCallback c) {
 		LOG.debug("client call to delete activity to a RemoteCIS");
-		Activityfeed ac = new Activityfeed();
+        MarshaledActivityFeed ac = new MarshaledActivityFeed();
 		DeleteActivity d = new DeleteActivity();
 		ac.setDeleteActivity(d);
-		Activity a = new Activity();
-		d.setActivity(a);
+        MarshaledActivity a = new MarshaledActivity();
+		d.setMarshaledActivity(a);
 		a.setActor(activity.getActor());
 		a.setObject(activity.getObject());
 		a.setTarget(activity.getTarget());
@@ -182,7 +196,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 	
 	
 	
-	private void sendXmpp(Activityfeed c, IActivityFeedCallback callback){
+	private void sendXmpp(MarshaledActivityFeed c, IActivityFeedCallback callback){
 
 			Stanza stanza = new Stanza(remoteCISid);
 			ActivityFeedCallback commsCallback = new ActivityFeedCallback(

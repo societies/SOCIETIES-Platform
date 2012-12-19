@@ -1,9 +1,5 @@
 package org.societies.activity;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeedCallback;
@@ -11,9 +7,11 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class ActivityFeedCallback implements ICommCallback {
@@ -54,9 +52,9 @@ public class ActivityFeedCallback implements ICommCallback {
 	public void receiveResult(Stanza stanza, Object payload) {
 		LOG.info("receive result received");
 		// community namespace
-		if (payload instanceof Activityfeed) {
+		if (payload instanceof MarshaledActivityFeed) {
 			LOG.info("Callback with result");
-			Activityfeed a = (Activityfeed) payload ;
+            MarshaledActivityFeed a = (MarshaledActivityFeed) payload ;
 			
 			if(a.getDeleteActivityResponse() != null)
 				LOG.info("Delete Activity Response received and equal to " + a.getDeleteActivityResponse().isResult());
@@ -74,7 +72,7 @@ public class ActivityFeedCallback implements ICommCallback {
 		
 
 		// return callback for all cases
-		this.sourceCallback.receiveResult((Activityfeed)payload);
+		this.sourceCallback.receiveResult((MarshaledActivityFeed)payload);
 
 	}
 

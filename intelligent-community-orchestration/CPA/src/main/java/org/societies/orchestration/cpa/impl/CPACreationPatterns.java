@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
@@ -27,8 +27,9 @@ package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
-import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
+import org.societies.orchestration.cpa.impl.comparison.ContentComparator;
+import org.societies.orchestration.cpa.impl.comparison.MultiComparator;
 import org.societies.orchestration.cpa.impl.comparison.SimpleCounter;
 
 import java.util.ArrayList;
@@ -66,26 +67,28 @@ public class CPACreationPatterns
 			analyser = new JungBetweennessAnalyser(5);
 		}
 	}
-	private ActorComparator actComp = null;
-	public List<ICommunitySuggestion> analyze(List<IActivity> actDiff){
-		ArrayList<ICommunitySuggestion> ret = new ArrayList<ICommunitySuggestion>();
+	//private ActorComparator actComp = null;
+    private MultiComparator compSet = new MultiComparator();
+	public List<List<String>> analyze(List<IActivity> actDiff){
+		ArrayList<List<String>> ret = new ArrayList<List<String>>();
 		// = new ArrayList<IActivity>();
 		String lastTimeStr = Long.toString(lastTime);
 		String nowStr = Long.toString(System.currentTimeMillis());
 
 
-		actComp = new SimpleCounter();
+        compSet.addComparator(new SimpleCounter());
+        compSet.addComparator(new ContentComparator());
 		//1. make a graph of interactions, the weight on the links indicates level of interaction, 0 is none. 
-		graph.populateFromNewData(actDiff, lastTime, actComp);
+		graph.populateFromNewData(actDiff, lastTime, compSet);
 		//2. segment the graph nodes according to weights. suggest
 		
 		//TADA, the social graph should be created, phew
 		//Now for the analysis..
 		clusterSets = analyser.cluster(graph);
 		for(Set<SocialGraphVertex> set : clusterSets){
-            CommunitySuggestionImpl prop = new CommunitySuggestionImpl();
+            List<String> prop = new ArrayList<String>();
 			for(SocialGraphVertex member : set){
-				prop.addMember(member.getName());//TODO: role?
+				prop.add(member.getName());//TODO: role?
 			}
 			ret.add(prop);
 		}
