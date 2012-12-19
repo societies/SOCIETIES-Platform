@@ -158,7 +158,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
 			if (ack && (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
-				retrievedPrivacyPolicy = (RequestPolicy) intent.getParcelableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
+				retrievedPrivacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
 				sb.append("Privacy policy retrieved: "+(null != retrievedPrivacyPolicy));
 				if (null != retrievedPrivacyPolicy) {
 					sb.append(PrivacyPolicyUtil.toXmlString(retrievedPrivacyPolicy));

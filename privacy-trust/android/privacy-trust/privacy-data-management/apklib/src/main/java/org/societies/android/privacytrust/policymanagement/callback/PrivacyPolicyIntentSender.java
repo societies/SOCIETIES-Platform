@@ -25,6 +25,8 @@
 package org.societies.android.privacytrust.policymanagement.callback;
 
 
+import java.io.Serializable;
+
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.privacytrust.callback.PrivacyIntentSender;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -33,7 +35,6 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -50,7 +51,7 @@ public class PrivacyPolicyIntentSender extends PrivacyIntentSender {
 
 	public boolean sendIntentGetPrivacyPolicy(String clientPackage, PrivacyPolicyManagerBeanResult bean) {
 		Intent intent = prepareIntent(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), bean.isAck(), bean.getAckMessage());
-		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Parcelable) bean.getPrivacyPolicy());
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Serializable) bean.getPrivacyPolicy());
 		context.sendBroadcast(intent);
 		return true;
 	}
@@ -58,7 +59,7 @@ public class PrivacyPolicyIntentSender extends PrivacyIntentSender {
 	public boolean sendIntentSuccess(String clientPackage, PrivacyPolicyManagerBeanResult bean) {
 		Intent intent = prepareIntent(clientPackage, bean.getMethod().name(), bean.isAck(), bean.getAckMessage());
 		if (bean.getMethod().name().equals(MethodType.GET_PRIVACY_POLICY.name())) {
-			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Parcelable) bean.getPrivacyPolicy());
+			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Serializable) bean.getPrivacyPolicy());
 		}
 		context.sendBroadcast(intent);
 		return true;
@@ -66,7 +67,7 @@ public class PrivacyPolicyIntentSender extends PrivacyIntentSender {
 
 	public boolean sendIntentGetPrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) {
 		Intent intent = prepareIntent(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), true, null);
-		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Parcelable) privacyPolicy);
+		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, (Serializable) privacyPolicy);
 		context.sendBroadcast(intent);
 		return true;
 	}

@@ -140,7 +140,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
 			if (ack && (intent.getAction().equals(MethodType.CHECK_PERMISSION.name()))) {
-				retrievedpermission = (ResponseItem) intent.getParcelableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
+				retrievedpermission = (ResponseItem) intent.getSerializableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
 				sb.append("Privacy permission retrieved: "+(null != retrievedpermission));
 				if (null != retrievedpermission) {
 					sb.append("\nDecision: "+retrievedpermission.getDecision().name());
