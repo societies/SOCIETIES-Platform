@@ -581,7 +581,7 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (!isEnum || (isEnum && fieldClasses.size() > 0)) {
 			str.append("\t"+(isEnum ? "" : "public ")+"PARCELABLECLASSNAME(Parcel in) {\n");
-			// Call to super constructor: already done in read
+			// Call to super constructor: already done in read	
 //			if (isExtension) {
 //				str.append("\t\tsuper(in);\n");
 //			}
