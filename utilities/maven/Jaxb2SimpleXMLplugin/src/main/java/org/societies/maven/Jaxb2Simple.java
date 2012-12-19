@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Scanner;
@@ -508,7 +510,7 @@ public class Jaxb2Simple extends AbstractMojo
 		boolean requiredDefaultConstructor = !isPatternMatching("public "+className+"\\(", schemaContent);
 
 		// Retrieve all Fields information
-		NavigableMap<String, String> fields = new TreeMap<String, String>();
+		LinkedHashMap <String, String> fields = new LinkedHashMap <String, String>();
 		Pattern patternFields = Pattern.compile("(?:protected|private) (?:final )?(?:static )?([^ ]+) ([^ ]+);\n", Pattern.CASE_INSENSITIVE);
 		Matcher matcherFields = patternFields.matcher(schemaContent);
 		while (matcherFields.find()) {
@@ -571,7 +573,7 @@ public class Jaxb2Simple extends AbstractMojo
 	 * @param fieldClasses
 	 * @return
 	 */
-	private String generateParcelableStuff(boolean isEnum, boolean isExtension, boolean isAbstract, boolean requiredDefaultConstructor, String className, NavigableMap<String, String> fieldClasses) {
+	private String generateParcelableStuff(boolean isEnum, boolean isExtension, boolean isAbstract, boolean requiredDefaultConstructor, String className, LinkedHashMap <String, String> fieldClasses) {
 		StringBuilder str = new StringBuilder();
 		// Constructors
 		if (requiredDefaultConstructor && !isEnum) {
@@ -579,9 +581,10 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (!isEnum || (isEnum && fieldClasses.size() > 0)) {
 			str.append("\t"+(isEnum ? "" : "public ")+"PARCELABLECLASSNAME(Parcel in) {\n");
-			if (isExtension) {
-				str.append("\t\tsuper(in);\n");
-			}
+			// Call to super constructor: already done in read
+//			if (isExtension) {
+//				str.append("\t\tsuper(in);\n");
+//			}
 			if (isEnum) {
 				str.append("READPARCELABLE");
 			}
@@ -591,18 +594,23 @@ public class Jaxb2Simple extends AbstractMojo
 			str.append("\t}\n\n");
 		}
 
-
+		str.append("\tpublic int describeContents() {\n");
+		str.append("\t\treturn 0;\n");
+		str.append("\t}\n\n");
+		
 		if (!isEnum) {
 			str.append("\tprotected void readFromParcel(Parcel in) {\n");
+			if (isExtension) {
+				str.append("\t\tsuper.readFromParcel(in);\n");
+			}
 			str.append("READPARCELABLE");
 			str.append("\t}\n\n");
 		}
 
-		str.append("\tpublic int describeContents() {\n");
-		str.append("\t\treturn 0;\n");
-		str.append("\t}\n\n");
-
 		str.append("\tpublic void writeToParcel(Parcel dest, int flags) {\n");
+		if (isExtension) {
+			str.append("\t\tsuper.writeToParcel(dest, flags);\n");
+		}
 		str.append("WRITEPARCELABLE");
 		str.append("\t}\n\n");
 
@@ -636,7 +644,7 @@ public class Jaxb2Simple extends AbstractMojo
 		// Write/Read Parcel
 		StringBuilder strWrite = new StringBuilder();
 		StringBuilder strRead = new StringBuilder();
-		for(String fieldName : fieldClasses.descendingMap().keySet()) {
+		for (String fieldName : fieldClasses.keySet()) {
 			String type = fieldClasses.get(fieldName);
 			String writedMethod = "dest.write"+type2ParcelableAction(type);
 			strWrite.append("\t\t"+type2ParcelableWriteData(type, fieldName, writedMethod)+";\n");
@@ -663,8 +671,8 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (isListOrArray(type)) {
 			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
-//				writedMethod = writedMethod.replace("List", "Array");
-//				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
+				//				writedMethod = writedMethod.replace("List", "Array");
+				//				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
 				return "dest.writeTypedList("+fieldName+")";
 			}
 			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
