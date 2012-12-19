@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.cis.management;
 
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 
 /**
@@ -75,7 +75,7 @@ public interface ICisSubscribed {
 	 * @param cisId
 	 * @return
 	 */
-	public Activity[] getActivityFeed(String client, String cisId);
+	public MarshaledActivity[] getActivityFeed(String client, String cisId);
 	
 	/**
 	 * Add an activity to this community

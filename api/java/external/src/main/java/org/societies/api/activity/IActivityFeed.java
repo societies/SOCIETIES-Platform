@@ -82,6 +82,42 @@ public interface IActivityFeed {
      */
 	public void getActivities(String query,
 			String timePeriod, IActivityFeedCallback c) ;
+    /**
+     * This method will parse a timeperiod and return a subset of the actitvies
+     *  in this activityfeed that is within the given timeperiod
+     *
+     * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n"
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return a @List of {@link IActivity}
+     * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
+     */
+    public void getActivities(String timePeriod, long n, IActivityFeedCallback c);
+    /**
+     * This method will parse a query and a timeperiod and return a subset of the actitvies
+     *  in this activityfeed that matches the query constraints and is within the given timeperiod
+     *
+     * @param {@link String} is defined as such (as per http://opensocial-resources.googlecode.com/svn/spec/2.0.1/Core-API-Server.xml#Request-Parameter-FilterBy-Value but with one addition):
+     * The Query String should be a JSON String that is structured as follows:
+     * { ... "filterBy" : "name", "filterOp" : "startsWith", "filterValue" : "John" ... }@
+     * Thus it needs to contain the keys (and their corresponding values) "filterBy", "filterOp" and "filterValue" (the last one can have a empty value given certain filterOps, see below)
+     *
+     * Filter operators:
+     *
+     * The operation to use when filtering a collection by a field specified in 'filterBy', defaults to "contains". Valid values:
+     * contains Return elements where filterValue appears somewhere in the element's filterBy field value.
+     * equals Return elements where filterValue exactly matches the element's filterBy field value.
+     * startsWith Return elements where filterValue exactly matches the first N characters of the element's filterBy field value, where N is the length of the filterValue string.
+     * present Return elements where the element's filterBy field value is not empty or null.
+     * isNull The exact opposite of "present", NOTE: this is in addition to the opensocial specification.
+
+     * The last two filterOperators does not need to have a value for the "filterValue" values.
+     * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n"
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return a @List of {@link IActivity}
+     * or a empty list if the parameters are wrong or the query and/or timeperiod did not match any activties
+     */
+    public void getActivities(String query,
+                              String timePeriod, long n, IActivityFeedCallback c) ;
 
 	public void addActivity(IActivity activity,IActivityFeedCallback c) ;
     /**

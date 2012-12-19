@@ -24,25 +24,20 @@
  */
 package org.societies.webapp.controller;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.validation.Valid;
-
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.webapp.models.CisFeedForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 
@@ -84,7 +79,7 @@ public class ActivityFeedController {
 		
 		class DummyActFeedCback implements IActivityFeedCallback {
 
-			public void receiveResult(Activityfeed activityFeedObject){
+			public void receiveResult(MarshaledActivityFeed activityFeedObject){
 				
 			}
 		}

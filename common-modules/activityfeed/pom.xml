@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.societies.platform</groupId>
             <artifactId>socialdata</artifactId>
-            <version>0.1</version>
+            <version>${release.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -162,7 +162,7 @@
                             org.societies.activity.model,
                             org.societies.activity.model.*
                         </Export-Package>
-                        <Import-Package>*;resolution:=optional</Import-Package>
+                        <Import-Package>org.hibernate.proxy;resolution:=optional,*;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

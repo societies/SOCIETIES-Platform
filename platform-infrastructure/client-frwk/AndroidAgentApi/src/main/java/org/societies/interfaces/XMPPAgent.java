@@ -32,6 +32,8 @@ public interface XMPPAgent {
 	
 	public String login(String identifier, String domain, String password);
 	
+	public String login(String identifier, String domain, String password, String host);
+	
 	public String loginFromConfig();
 	
 	public boolean logout();

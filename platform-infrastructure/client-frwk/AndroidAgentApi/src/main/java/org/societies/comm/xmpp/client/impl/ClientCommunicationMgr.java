@@ -318,6 +318,24 @@ public class ClientCommunicationMgr {
 		}
 	}
 	
+	public INetworkNode login(final String identifier, final String domain, final String password, final String host) {		
+		Log.d(LOG_TAG, "login domain: " + domain + " identifier: " + identifier + " password: " + password + " host: "+ host);
+		try {
+			String rv;
+			rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.login(identifier, domain, password, host);
+				}
+			});
+			if(rv == null)
+				return null;
+			idm = createIdentityManager(rv, getDomainAuthorityNode());
+			return idm.getThisNetworkNode();
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
 	public INetworkNode loginFromConfig() {
 		Log.d(LOG_TAG, "loginFromConfig");
 		try {

@@ -1,8 +1,8 @@
-/**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+/*
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp.,
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -31,16 +31,16 @@ import org.societies.api.internal.orchestration.ISocialGraphEdge;
 import org.societies.api.internal.orchestration.ISocialGraphVertex;
 import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph {
 	private ArrayList<ISocialGraphEdge> edges;
 	private ArrayList<ISocialGraphVertex> vertices;
+    private HashMap<String,TrendStats> trends;
 	public SocialGraph(){
 		edges = new ArrayList<ISocialGraphEdge>();
 		vertices = new ArrayList<ISocialGraphVertex>();
+        setTrends(new HashMap<String, TrendStats>());
 	}
 	public List<ISocialGraphEdge> getEdges() {
 		return edges;
@@ -121,6 +121,22 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 	public <T> T[] toArray(T[] a) {
 		return vertices.toArray(a);
 	}
+    public synchronized void handleTrends (String text){
+        if(getTrends().containsKey(text)){
+            getTrends().get(text).increment();
+        } else {
+            TrendStats ts = new TrendStats();
+            ts.setTrendText(text);
+            getTrends().put(text,ts);
+        }
+        //cleanup
+        for(Iterator<String> it = getTrends().keySet().iterator() ; it.hasNext();)
+            if(getTrends().get(it.next()).tooOld())
+                it.remove();
+/*        for(String trend : getTrends().keySet())
+            if(getTrends().get(trend).tooOld())
+                getTrends().remove(trend);*/
+    }
 	public UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> toJung(){
 		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> ret = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
 		for(ISocialGraphVertex vertex : this.vertices){
@@ -138,13 +154,25 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 
 
 		//actDiff = cis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr);
+        SocialGraphVertex newVertex = null;
+        SocialGraphVertex found = null;
 		for(IActivity act : actDiff){
-			if(hasVertex(act.getActor()) == null){
-				getVertices().add(new SocialGraphVertex(act.getActor()));
-			}
-			if(hasVertex(act.getTarget()) == null){
-				getVertices().add(new SocialGraphVertex(act.getTarget()));
-			}
+            found = hasVertex(act.getActor());
+			if(found == null){
+                newVertex = new SocialGraphVertex(act.getActor());
+                newVertex.addAct(act.getObject());
+				getVertices().add(newVertex);
+			} else
+                found.addAct(act.getObject());
+            found = hasVertex(act.getTarget());
+			if(found == null){
+                newVertex = new SocialGraphVertex(act.getTarget());
+                newVertex.addAct(act.getObject());
+				getVertices().add(newVertex);
+			} else
+                found.addAct(act.getObject());
+            //do some more trend calculation : Update Trend tables..
+            handleTrends(act.getObject());
 		}
 		//creating the edges..
 		//this aswell !
@@ -157,7 +185,7 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 				searchEdge = hasEdge(edge);
 				if(searchEdge == null){
 					newEdges++;
-					edge.setWeight(actComp.compare((SocialGraphVertex)vertex1,(SocialGraphVertex)vertex2,actDiff));
+					edge.setWeight(actComp.compare((SocialGraphVertex) vertex1, (SocialGraphVertex) vertex2, actDiff));
 					getEdges().add(edge);
 				}else{
 					hasEdges++;
@@ -167,4 +195,36 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		}
 		System.out.println("newEdges: "+newEdges);
 	}
+
+    public HashMap<String, TrendStats> getTrends() {
+        return trends;
+    }
+
+    public void setTrends(HashMap<String, TrendStats> trends) {
+        this.trends = trends;
+    }
+    public class TrendSorter implements Comparator<TrendStats>{
+
+        @Override
+        public int compare(TrendStats o1, TrendStats o2) {
+            return (o1.getCount()==o2.getCount()) ? 0 : ( (o1.getCount()>o2.getCount()) ? -1 : 1) ; //returns 0 if they are equal..
+        }
+
+    }
+    public List<String> topTrends(int n)
+    {
+        List<String> ret = new ArrayList<String>();
+        System.out.println("trends.keySet().size(): "+trends.keySet().size());
+        int m = (n>trends.keySet().size()) ? trends.keySet().size() : n;
+        List<TrendStats> values = new ArrayList<TrendStats>();
+        values.addAll(trends.values());
+        System.out.println("m: "+m);
+        Collections.sort(values,new TrendSorter());
+        for(int i=0;i<m;i++){
+            System.out.println("setting trend: "+values.get(i).getTrendText()+" count: "+values.get(i).getCount()+" trend: "+values.get(i).isTrend());
+            ret.add(values.get(i).getTrendText());
+        }
+        return ret;
+
+    }
 }

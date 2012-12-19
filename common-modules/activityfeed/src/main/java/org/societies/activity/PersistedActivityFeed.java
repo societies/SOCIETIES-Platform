@@ -33,19 +33,16 @@ import org.hibernate.criterion.Restrictions;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed{//, Subscriber {
 	
@@ -67,7 +64,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	}
 	
 	private final static List<String> classList = Collections 
-			.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.Activity"));
+			.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.MarshaledActivity"));
 	
 	@Override
     synchronized public void startUp(SessionFactory sessionFactory, String id){
@@ -180,6 +177,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 				if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
                     act.repopHash();
 					ret.add(act);
+                    System.out.println("adding: actor: "+act
+                            .getActor()+" time: "+act.getPublished());
 				}
 			}
 				
@@ -367,7 +366,66 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 
 		return ret;
 	}
-	public String getContentIfNotNull(ActivityObject a){
+
+    @Override
+    public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
+        LOG.debug("local get activities WITH CALLBACK called");
+
+        List<IActivity> iActivityList = this.getActivities(timePeriod);
+        List<IActivity> ret = new ArrayList<IActivity>();
+        Collections.sort(iActivityList,new Comparator<IActivity>() {
+            @Override
+            public int compare(IActivity iActivity, IActivity iActivity1) {
+                return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
+            }
+        });
+        if(iActivityList.size()<n)
+            n = iActivityList.size();
+        for(int i=0;i<n;i++)
+            ret.add(iActivityList.get(i));
+
+        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+        GetActivitiesResponse g = new GetActivitiesResponse();
+        ac.setGetActivitiesResponse(g);
+
+        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
+
+        this.iactivToMarshActvList(ret, marshalledActivList);
+
+        g.setMarshaledActivity(marshalledActivList);
+
+        c.receiveResult(ac);
+    }
+
+    @Override
+    public void getActivities(String query, String timePeriod, long n, IActivityFeedCallback c) {
+        LOG.debug("local get activities WITH CALLBACK called");
+
+        List<IActivity> iActivityList = this.getActivities(query,timePeriod);
+        List<IActivity> ret = new ArrayList<IActivity>();
+        Collections.sort(iActivityList,new Comparator<IActivity>() {
+            @Override
+            public int compare(IActivity iActivity, IActivity iActivity1) {
+                return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
+            }
+        });
+        for(int i=0;i<n;i++)
+            ret.add(iActivityList.get(i));
+
+        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+        GetActivitiesResponse g = new GetActivitiesResponse();
+        ac.setGetActivitiesResponse(g);
+
+        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
+
+        this.iactivToMarshActvList(ret, marshalledActivList);
+
+        g.setMarshaledActivity(marshalledActivList);
+
+        c.receiveResult(ac);
+    }
+
+    public String getContentIfNotNull(ActivityObject a){
 		if(a == null) return null;
 		if(a.getObjectType().contains("person"))
 			return a.getDisplayName();
