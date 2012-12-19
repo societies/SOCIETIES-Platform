@@ -1,15 +1,12 @@
 package org.societies.android.api.internal.cssmanager;
 
-import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssNode;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
-
-
-public class TestAndroidCSSNode extends AndroidTestCase{
+public class TestCssNode extends AndroidTestCase{
 
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
@@ -26,7 +23,7 @@ public class TestAndroidCSSNode extends AndroidTestCase{
 
 	@MediumTest
 	public void testConstructor() throws Exception {
-		AndroidCSSNode cssNode = new AndroidCSSNode();
+		CssNode cssNode = new CssNode();
 		assertNotNull(cssNode);
 		
 		cssNode.setIdentity(TEST_IDENTITY_1);
@@ -40,7 +37,7 @@ public class TestAndroidCSSNode extends AndroidTestCase{
 	
 	@MediumTest
 	public void testAlternativeConstructor() {
-		AndroidCSSNode cssNode = new AndroidCSSNode();
+		CssNode cssNode = new CssNode();
 		cssNode.setIdentity(TEST_IDENTITY_1);
 		cssNode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode.setType(CSSManagerEnums.nodeType.Rich.ordinal());
@@ -50,35 +47,13 @@ public class TestAndroidCSSNode extends AndroidTestCase{
 	}
 	
 	@MediumTest
-	public void testConversion() {
+	public void testParcelable() {
 		CssNode cssNode = new CssNode();
 		assertNotNull(cssNode);
 		
 		cssNode.setIdentity(TEST_IDENTITY_1);
 		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
-		
-		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
-		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), cssNode.getStatus());
-		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), cssNode.getType());
-
-		AndroidCSSNode aNode = AndroidCSSNode.convertCssNode(cssNode);
-
-		assertEquals(TEST_IDENTITY_1, aNode.getIdentity());
-		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), aNode.getStatus());
-		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), aNode.getType());
-		
-	}
-	
-	@MediumTest
-	public void testParcelable() {
-		AndroidCSSNode cssNode = new AndroidCSSNode();
-		assertNotNull(cssNode);
-		
-		cssNode.setIdentity(TEST_IDENTITY_1);
-		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
-		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
-
 		
 		assertEquals(0, cssNode.describeContents());
 		
@@ -87,7 +62,7 @@ public class TestAndroidCSSNode extends AndroidTestCase{
         //done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
-        AndroidCSSNode createFromParcel = AndroidCSSNode.CREATOR.createFromParcel(parcel);
+        CssNode createFromParcel = CssNode.CREATOR.createFromParcel(parcel);
        
         assertEquals(cssNode.getIdentity(), createFromParcel.getIdentity());		
         assertEquals(cssNode.getStatus(), createFromParcel.getStatus());		

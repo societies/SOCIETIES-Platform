@@ -1,7 +1,9 @@
 package org.societies.android.api.internal.cssmanager;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.css.management.CSSManagerEnums;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
 import android.os.Parcel;
@@ -11,9 +13,9 @@ import android.util.Log;
 
 import org.societies.android.platform.androidutils.SocietiesSerialiser;
 
-public class TestAndroidCSSRecord extends AndroidTestCase{
+public class TestCSSRecord extends AndroidTestCase{
 
-	private static final String LOG_TAG = TestAndroidCSSRecord.class.getName();
+	private static final String LOG_TAG = TestCSSRecord.class.getName();
 	
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
@@ -31,29 +33,29 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private AndroidCSSNode cssNode_1, cssNode_2;
-	private AndroidCSSNode cssNodes [];
-	private AndroidCSSNode cssArchivedNodes [];
+	private CssNode cssNode_1, cssNode_2;
+	private List<CssNode> cssNodes;
+	private List<CssNode> cssArchivedNodes;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		cssNode_1 = new AndroidCSSNode();
+		cssNode_1 = new CssNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 
-		cssNode_2 = new AndroidCSSNode();
+		cssNode_2 = new CssNode();
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
-		cssNodes = new AndroidCSSNode[2];
-		cssNodes[0] = cssNode_1;
-		cssNodes[1] = cssNode_2;
+		cssNodes = new ArrayList<CssNode>();
+		cssNodes.add(cssNode_1);
+		cssNodes.add(cssNode_2);
 		
-		cssArchivedNodes = new AndroidCSSNode[2];
-		cssArchivedNodes[0] = cssNode_1;
-		cssArchivedNodes[1] = cssNode_2;
+		cssArchivedNodes = new ArrayList<CssNode>();
+		cssArchivedNodes.add(cssNode_1);
+		cssArchivedNodes.add(cssNode_2);
 	}
 
 	protected void tearDown() throws Exception {
@@ -68,8 +70,8 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 
 	@MediumTest
 	public void testConstructor() {
-		AndroidCSSRecord cssProfile = new AndroidCSSRecord();
-		cssProfile.setCSSNodes(cssNodes);
+		CssRecord cssProfile = new CssRecord();
+		cssProfile.setCssNodes(cssNodes);
 		cssProfile.setArchiveCSSNodes(cssArchivedNodes);
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
@@ -89,12 +91,12 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-		assertEquals(cssArchivedNodes.length, cssProfile.getArchivedCSSNodes().length);
-		assertEquals(cssArchivedNodes[0].getIdentity(), cssProfile.getArchivedCSSNodes()[0].getIdentity());
+		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
+		assertEquals(cssArchivedNodes.get(0).getIdentity(), cssProfile.getArchiveCSSNodes().get(0).getIdentity());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-		assertEquals(cssNodes.length, cssProfile.getCSSNodes().length);
-		assertEquals(cssNodes[0].getIdentity(), cssProfile.getCSSNodes()[0].getIdentity());
+		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
+		assertEquals(cssNodes.get(0).getIdentity(), cssProfile.getCssNodes().get(0).getIdentity());
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
@@ -113,82 +115,14 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 
 	@MediumTest
 	public void testArrays() {
-		AndroidCSSRecord cssProfile = new AndroidCSSRecord();
-		assertEquals(0, cssProfile.getArchivedCSSNodes().length);
-		assertEquals(0, cssProfile.getCSSNodes().length);
+		CssRecord cssProfile = new CssRecord();
+		assertEquals(0, cssProfile.getArchiveCSSNodes().size());
+		assertEquals(0, cssProfile.getCssNodes().size());
 	}
 	
 	@MediumTest
-	public void testConversion() {
-		CssRecord cssProfile = new CssRecord();
-		
-		cssProfile.getCssNodes().add(cssNode_1);
-		cssProfile.getCssNodes().add(cssNode_2);
-		cssProfile.getArchiveCSSNodes().add(cssNode_1);
-		cssProfile.getArchiveCSSNodes().add(cssNode_2);
-		
-		cssProfile.setCssIdentity(TEST_IDENTITY);
-		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		cssProfile.setCssUpTime(TEST_UPTIME);
-		cssProfile.setEmailID(TEST_EMAIL);
-		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
-		cssProfile.setForeName(TEST_FORENAME);
-		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
-		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
-		cssProfile.setImID(TEST_IM_ID);
-		cssProfile.setName(TEST_NAME);
-		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
-		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-		cssProfile.setSocialURI(TEST_SOCIAL_URI);
-		
-		
-		assertEquals(2, cssProfile.getArchiveCSSNodes().size());
-		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-		assertEquals(2, cssProfile.getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
-		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
-		assertEquals(TEST_EMAIL, cssProfile.getEmailID());
-		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), cssProfile.getEntity());
-		assertEquals(TEST_FORENAME, cssProfile.getForeName());
-		assertEquals(TEST_HOME_LOCATION, cssProfile.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
-		assertEquals(TEST_IM_ID, cssProfile.getImID());
-		assertEquals(TEST_NAME, cssProfile.getName());
-		assertEquals(TEST_PASSWORD, cssProfile.getPassword());
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
-		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
-		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
-		
-		AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(cssProfile);
-		
-		assertEquals(2, aRecord.getArchivedCSSNodes().length);
-		assertEquals(TEST_IDENTITY, aRecord.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, aRecord.getCssInactivation());
-		assertEquals(2, aRecord.getCSSNodes().length);
-		assertEquals(TEST_REGISTERED_DATE, aRecord.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), aRecord.getStatus());
-		assertEquals(TEST_UPTIME, aRecord.getCssUpTime());
-		assertEquals(TEST_EMAIL, aRecord.getEmailID());
-		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), aRecord.getEntity());
-		assertEquals(TEST_FORENAME, aRecord.getForeName());
-		assertEquals(TEST_HOME_LOCATION, aRecord.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, aRecord.getIdentityName());
-		assertEquals(TEST_IM_ID, aRecord.getImID());
-		assertEquals(TEST_NAME, aRecord.getName());
-		assertEquals(TEST_PASSWORD, aRecord.getPassword());
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), aRecord.getPresence());
-		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), aRecord.getSex());
-		assertEquals(TEST_SOCIAL_URI, aRecord.getSocialURI());
-
-	}
-	@MediumTest
 	public void testParcelable() {
-		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		CssRecord cssRecord = new CssRecord();
 		assertNotNull(cssRecord);
 		
 		cssRecord.getCssNodes().add(cssNode_1);
@@ -226,11 +160,9 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
 		//done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
-        AndroidCSSRecord createFromParcel = AndroidCSSRecord.CREATOR.createFromParcel(parcel);
+        CssRecord createFromParcel = CssRecord.CREATOR.createFromParcel(parcel);
         
 		Log.d(LOG_TAG, "Finish Serialise : " + System.currentTimeMillis());
-
-       
         assertEquals(cssRecord.getCssHostingLocation(), createFromParcel.getCssHostingLocation());		
         assertEquals(cssRecord.getCssIdentity(), createFromParcel.getCssIdentity());		
         assertEquals(cssRecord.getCssInactivation(), createFromParcel.getCssInactivation());		
@@ -249,8 +181,8 @@ public class TestAndroidCSSRecord extends AndroidTestCase{
         assertEquals(cssRecord.getSex(), createFromParcel.getSex());		
         assertEquals(cssRecord.getSocialURI(), createFromParcel.getSocialURI());		
         assertEquals(cssRecord.getStatus(), createFromParcel.getStatus());		
-        assertEquals(cssRecord.getArchivedCSSNodes().length, createFromParcel.getArchivedCSSNodes().length);
-        assertEquals(cssRecord.getCSSNodes().length, createFromParcel.getCSSNodes().length);
+        assertEquals(cssRecord.getArchiveCSSNodes().size(), createFromParcel.getArchiveCSSNodes().size());
+        assertEquals(cssRecord.getCssNodes().size(), createFromParcel.getCssNodes().size());
 	}
 	@MediumTest
 	public void testSimpleSerialisation() throws Exception {
