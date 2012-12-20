@@ -34,6 +34,7 @@ import java.util.concurrent.Future;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
@@ -113,9 +114,9 @@ public class NegotiationProviderUnitTest {
 		Future<SlaBean> result1;
 		Future<SlaBean> result2;
 		
-		result1 = classUnderTest.getPolicyOptions("1");
+		result1 = classUnderTest.getPolicyOptions("1", NegotiationType.CIS);
 		assertNotNull(result1.get());
-		result2 = classUnderTest.getPolicyOptions("1");
+		result2 = classUnderTest.getPolicyOptions("1", NegotiationType.SERVICE);
 		assertNotNull(result2.get());
 		
 		assertTrue("Different negotiation processes got same session ID!",

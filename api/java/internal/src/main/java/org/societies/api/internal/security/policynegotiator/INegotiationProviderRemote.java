@@ -28,6 +28,7 @@ package org.societies.api.internal.security.policynegotiator;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 
 /**
  * Interface for invoking the provider.
@@ -41,7 +42,7 @@ public interface INegotiationProviderRemote {
 	/**
 	 * See {@link INegotiationProvider#getPolicyOptions(String)}
 	 */
-	public void getPolicyOptions(String serviceId, Requestor provider, INegotiationProviderCallback callback);
+	public void getPolicyOptions(String serviceId, NegotiationType type, Requestor provider, INegotiationProviderCallback callback);
 
 	/**
 	 * See {@link INegotiationProvider#acceptPolicyAndGetSla(int, String, boolean)}

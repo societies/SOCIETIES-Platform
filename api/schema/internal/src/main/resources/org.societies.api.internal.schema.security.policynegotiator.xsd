@@ -17,6 +17,7 @@
 				<xs:element name="sessionId" type="xs:int"/>
 				<!--xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0"/-->
 				<xs:element name="serviceId" type="xs:string" minOccurs="0"/>
+				<xs:element name="negotiationType" type="tns:negotiationType" minOccurs="0"/>
 				<xs:element name="signedPolicyOption" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -47,6 +48,13 @@
 			<xs:enumeration value="acceptPolicyAndGetSla"/>
 			<xs:enumeration value="getPolicyOptions"/>
 			<xs:enumeration value="reject"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="negotiationType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="service"/>
+			<xs:enumeration value="cis"/>
 		</xs:restriction>
 	</xs:simpleType>
 

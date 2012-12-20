@@ -118,42 +118,46 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			if (result.isSuccess()) {
 				String sla;
 				sla = result.getSla();
-				if (requester.getSignatureMgr().verifyXml(sla)) {
-					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
-					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
-					LOG.debug("receiveResult(): final SLA: {}", sla);
-					
-					// Store the SLA into secure storage
-					String agreementKey = generateKey();
-					requester.getSecureStorage().putDocument(agreementKey, sla.getBytes());
-					
-					// Get service URL if applicable
-					List<URI> fileUris = result.getFileUris();
-					LOG.debug("URLs = {}", fileUris);
-					if (fileUris != null) {
-						for (URI u : fileUris) {
-							LOG.debug("--> URI = {}", u);
+				try {
+					if (requester.getSignatureMgr().verifyXml(sla).size() >= 3) {
+						LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
+						LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
+						LOG.debug("receiveResult(): final SLA: {}", sla);
+						
+						// Store the SLA into secure storage
+						String agreementKey = generateKey();
+						requester.getSecureStorage().putDocument(agreementKey, sla.getBytes());
+						
+						// Get service URL if applicable
+						List<URI> fileUris = result.getFileUris();
+						LOG.debug("URLs = {}", fileUris);
+						if (fileUris != null) {
+							for (URI u : fileUris) {
+								LOG.debug("--> URI = {}", u);
+							}
 						}
-					}
-					
-					if (includePrivacyPolicyNegotiation) {
-						if (requester.isPrivacyPolicyNegotiationMgrAvailable()) {
-							startPrivacyPolicyNegotiation(provider, agreementKey, fileUris);
+						
+						if (includePrivacyPolicyNegotiation) {
+							if (requester.isPrivacyPolicyNegotiationMgrAvailable()) {
+								startPrivacyPolicyNegotiation(provider, agreementKey, fileUris);
+							}
+							else {
+								LOG.warn("Privacy Policy Negotiation Manager not available");
+								finalCallback.onNegotiationError("Privacy Policy Negotiation Manager not available");
+							}
 						}
 						else {
-							LOG.warn("Privacy Policy Negotiation Manager not available");
-							finalCallback.onNegotiationError("Privacy Policy Negotiation Manager not available");
+							// Notify successful end of negotiation
+							LOG.debug("invoking final callback.");
+							finalCallback.onNegotiationComplete(agreementKey, fileUris);
+							LOG.info("negotiation finished, final callback invoked");
 						}
 					}
 					else {
-						// Notify successful end of negotiation
-						LOG.debug("invoking final callback.");
-						finalCallback.onNegotiationComplete(agreementKey, fileUris);
-						LOG.info("negotiation finished, final callback invoked");
+						LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
 					}
-				}
-				else {
-					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
+				} catch (DigsigException e) {
+					LOG.warn("receiveResult(): session = {}, invalid signature!", sessionId);
 				}
 			}
 			break;

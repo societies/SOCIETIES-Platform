@@ -27,6 +27,7 @@ package org.societies.security.digsig.main;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.apache.xml.security.Init;
@@ -167,8 +168,16 @@ public class XmlDSig {
 		return str;
 	}
 
-	public boolean verifyXml(String xml) {
+	public HashMap<String, X509Certificate> verifyXml(String xml) {
+		
 		LOG.debug("verifyXml()");
-		return true; // FIXME
+		
+		HashMap<String, X509Certificate> result = new HashMap<String, X509Certificate>();
+
+		result.put("1", null);
+		result.put("2", null);
+		result.put("3", null);
+		
+		return result;
 	}
 }

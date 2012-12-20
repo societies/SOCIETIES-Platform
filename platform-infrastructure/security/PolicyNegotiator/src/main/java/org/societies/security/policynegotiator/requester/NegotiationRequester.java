@@ -31,6 +31,7 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
@@ -123,9 +124,11 @@ public class NegotiationRequester implements INegotiation {
 			INegotiationCallback callback) {
 
 		String serviceOrCisId;
+		NegotiationType type;
 		
 		if (provider instanceof RequestorService) {
 			RequestorService providerService = (RequestorService) provider;
+			type = NegotiationType.SERVICE;
 			LOG.info("startNegotiation([{}; {}], " + includePrivacyPolicyNegotiation + ")",
 					providerService.getRequestorId(),
 					providerService.getRequestorServiceId());
@@ -133,6 +136,7 @@ public class NegotiationRequester implements INegotiation {
 		}
 		else if (provider instanceof RequestorCis) {
 			RequestorCis providerCis = (RequestorCis) provider;
+			type = NegotiationType.CIS;
 			LOG.info("startNegotiation([{}; {}], " + includePrivacyPolicyNegotiation + ")",
 					providerCis.getRequestorId(),
 					providerCis.getCisRequestorId());
@@ -147,7 +151,7 @@ public class NegotiationRequester implements INegotiation {
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
 				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
-		groupMgr.getPolicyOptions(serviceOrCisId, provider, providerCallback);
+		groupMgr.getPolicyOptions(serviceOrCisId, type, provider, providerCallback);
 	}
 
 	@Override
