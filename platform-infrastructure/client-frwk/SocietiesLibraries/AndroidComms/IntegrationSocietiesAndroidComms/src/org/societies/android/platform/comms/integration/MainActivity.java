@@ -139,14 +139,20 @@ public class MainActivity extends Activity {
         intentFilter.addAction(XMPPAgent.DESTROY_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
-        intentFilter.addAction(XMPPAgent.GET_ITEMS);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_RESULT);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_ERROR);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_RESULT);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_ERROR);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
         intentFilter.addAction(XMPPAgent.LOGOUT);
         intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER);
         intentFilter.addAction(XMPPAgent.CONFIGURE_AGENT);
+        intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.REGISTER_EXCEPTION);
         return intentFilter;
-
     }
 
     /**

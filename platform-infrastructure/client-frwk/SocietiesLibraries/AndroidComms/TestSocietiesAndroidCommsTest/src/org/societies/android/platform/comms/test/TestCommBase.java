@@ -2,6 +2,7 @@ package org.societies.android.platform.comms.test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.jivesoftware.smack.XMPPException;
 import org.societies.android.api.comms.Callback;
@@ -53,6 +54,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
                                         "org.jabber.protocol.pubsub.owner",
                                         "org.jabber.protocol.pubsub.event");
 
+    private Random random;
     
     private static final int DELAY = 3000;
     
@@ -76,6 +78,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     
 	public TestCommBase() {
 		super(ServicePlatformCommsTest.class);
+		this.random = new Random();
 	}
 
     
@@ -99,13 +102,13 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			Thread.sleep(DELAY);
 
-			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
+			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
 			
-			commsService.isConnected(CLIENT);
+			commsService.isConnected(CLIENT, this.random.nextLong());
 			Thread.sleep(DELAY);
 
 			
@@ -113,7 +116,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				assertEquals(2, elementNames.length);
 				assertEquals(1, nameSpaces.length);
 				
-				commsService.register(CLIENT, elementNames, nameSpaces, new TestCallback());
+				commsService.register(CLIENT, elementNames, nameSpaces, this.random.nextLong());
 				Thread.sleep(DELAY);
 
 //				commsService.UnRegisterCommManager(CLIENT);
@@ -130,7 +133,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			e.printStackTrace();
 			fail();
 		} finally {
-			commsService.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
@@ -147,26 +150,26 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			Thread.sleep(DELAY);
 			
-			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
+			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
 			
-			commsService.isConnected(CLIENT);
+			commsService.isConnected(CLIENT, this.random.nextLong());
 			Thread.sleep(DELAY);
 			
-			commsService.getIdentity(CLIENT);
+			commsService.getIdentity(CLIENT, this.random.nextLong());
 			Thread.sleep(DELAY);
 
-			commsService.getDomainAuthorityNode(CLIENT);
+			commsService.getDomainAuthorityNode(CLIENT, this.random.nextLong());
 			Thread.sleep(DELAY);			
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
-			commsService.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
@@ -183,17 +186,17 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			Thread.sleep(DELAY);
 
-			commsService.login(CLIENT, XMPP_BAD_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
+			commsService.login(CLIENT, XMPP_BAD_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {			
-			commsService.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
@@ -210,17 +213,17 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			Thread.sleep(DELAY);
 
-			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_BAD_PASSWORD);
+			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_BAD_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {		
-			commsService.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
@@ -236,13 +239,13 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
-		commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+		commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 		Thread.sleep(DELAY);
 			
 		try {
-			commsService.newMainIdentity(CLIENT, XMPP_NEW_IDENTIFIER, XMPP_DOMAIN, XMPP_NEW_PASSWORD);
+			commsService.newMainIdentity(CLIENT, XMPP_NEW_IDENTIFIER, XMPP_DOMAIN, XMPP_NEW_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
-			commsService.destroyMainIdentity(CLIENT);
+			commsService.destroyMainIdentity(CLIENT, this.random.nextLong());
 			Thread.sleep(DELAY);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -263,13 +266,13 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			Thread.sleep(DELAY);
 			
-			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
+			commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, this.random.nextLong());
 
 			Thread.sleep(DELAY);
-			commsService.isConnected(CLIENT);
+			commsService.isConnected(CLIENT, this.random.nextLong());
 
 			Thread.sleep(DELAY);
 			commsService.sendMessage(CLIENT, SIMPLE_XML_MESSAGE);
@@ -280,7 +283,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			e.printStackTrace();
 			fail();
 		} finally {
-			commsService.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
@@ -292,61 +295,36 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	public void testSendIQ() throws Exception {
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
-		AndroidCommsBase base = new AndroidCommsBase(getContext(), true);
-		assertTrue(null != base);
+		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
+		TestPlatformCommsBinder binder = (TestPlatformCommsBinder) bindService(commsIntent);
+    	assertNotNull(binder);
+    	
+    	XMPPAgent commsService = (XMPPAgent) binder.getService();
 
 		try {
-			base.setResource(CLIENT, XMPP_RESOURCE);
-			base.setPortNumber(CLIENT, XMPP_PORT);
-			base.setDomainAuthorityNode(CLIENT, XMPP_DOMAIN_AUTHORITY);
+			commsService.configureAgent(CLIENT, XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, this.random.nextLong());
 			
-			String jid = base.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD);
+			String jid = commsService.login(CLIENT, XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, this.random.nextLong());
 			Log.d(LOG_TAG, "Logged in JID: " + jid);
 			assertEquals(XMPP_SUCCESSFUL_JID, jid);
 
 //			Thread.sleep(DELAY);
 			
-			assertTrue(base.isConnected(CLIENT));
+			assertTrue(commsService.isConnected(CLIENT, this.random.nextLong()));
 
-			base.sendIQ(CLIENT, SIMPLE_XML_MESSAGE, new TestCallback());
+			commsService.sendIQ(CLIENT, SIMPLE_XML_MESSAGE, this.random.nextLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
-			base.logout(CLIENT);
+			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
 		}
 
 	}
 
-	/**
-	 * Callback used with Android Comms for CSSManager
-	 *
-	 */
-	private class TestCallback implements Callback {
-
-		@Override
-		public void receiveError(String arg0) {
-			Log.d(LOG_TAG, "Callback receiveError");
-		}
-
-		@Override
-		public void receiveItems(String arg0) {
-			Log.d(LOG_TAG, "Callback receiveItems");
-		}
-
-		@Override
-		public void receiveMessage(String arg0) {
-			Log.d(LOG_TAG, "Callback receiveMessage");
-		}
-
-		@Override
-		public void receiveResult(String arg0) {
-			Log.d(LOG_TAG, "Callback receiveResult");
-		}
-	}
 
     /**
      * Create a broadcast receiver
@@ -457,7 +435,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         intentFilter.addAction(XMPPAgent.DESTROY_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
-        intentFilter.addAction(XMPPAgent.GET_ITEMS);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_RESULT);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
         intentFilter.addAction(XMPPAgent.LOGOUT);
