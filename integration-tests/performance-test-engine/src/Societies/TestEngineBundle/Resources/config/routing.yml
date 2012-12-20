@@ -1,3 +1,9 @@
 societies_test_engine_homepage:
     pattern:  /hello/{name}
     defaults: { _controller: SocietiesTestEngineBundle:Default:index }
+
+societies_test_engine_join_cis_result:
+    pattern:  /testcase/joincis
+    defaults: { _controller: SocietiesTestEngineBundle:Default:joinCisResult }
+    requirements:
+        _method: GET

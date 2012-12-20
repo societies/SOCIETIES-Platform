@@ -30,7 +30,7 @@
     <parameter key="database_driver">pdo_mysql</parameter>
     <parameter key="database_host">localhost</parameter>
     <parameter key="database_port">null</parameter>
-    <parameter key="database_name">symfony</parameter>
+    <parameter key="database_name">societies_performance_test</parameter>
     <parameter key="database_user">root</parameter>
     <parameter key="database_password">null</parameter>
     <parameter key="mailer_transport">smtp</parameter>
@@ -459,7 +459,7 @@
     <parameter key="jms_di_extra.cache_dir">C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/cache/dev/jms_diextra</parameter>
     <parameter key="jms_di_extra.doctrine_integration">true</parameter>
     <parameter key="jms_di_extra.doctrine_integration.entity_manager.file">C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/cache/dev/jms_diextra/doctrine/EntityManager.php</parameter>
-    <parameter key="jms_di_extra.doctrine_integration.entity_manager.class">EM50cefc9a9e9f3_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager</parameter>
+    <parameter key="jms_di_extra.doctrine_integration.entity_manager.class">EM50d1db80efcb2_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager</parameter>
     <parameter key="security.secured_services" type="collection"/>
     <parameter key="security.access.method_interceptor.class">JMS\SecurityExtraBundle\Security\Authorization\Interception\MethodSecurityInterceptor</parameter>
     <parameter key="security.access.method_access_control" type="collection"/>
@@ -2075,7 +2075,7 @@
     <service id="doctrine.dbal.logger.profiling.default" class="Doctrine\DBAL\Logging\DebugStack" public="false"/>
     <service id="doctrine.dbal.default_connection" class="stdClass" factory-method="createConnection" factory-service="doctrine.dbal.connection_factory">
       <argument type="collection">
-        <argument key="dbname">symfony</argument>
+        <argument key="dbname">societies_performance_test</argument>
         <argument key="host">localhost</argument>
         <argument key="port">null</argument>
         <argument key="user">root</argument>
@@ -2132,7 +2132,7 @@
     <service id="doctrine.orm.default_manager_configurator" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator">
       <argument type="collection"/>
     </service>
-    <service id="doctrine.orm.default_entity_manager" class="EM50cefc9a9e9f3_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager">
+    <service id="doctrine.orm.default_entity_manager" class="EM50d1db80efcb2_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager">
       <file>C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/cache/dev/jms_diextra/doctrine/EntityManager.php</file>
       <argument type="service">
         <service class="Doctrine\ORM\EntityManager" factory-method="create" public="false">
@@ -2140,7 +2140,9 @@
           <argument type="service">
             <service class="Doctrine\ORM\Configuration" public="false">
               <call method="setEntityNamespaces">
-                <argument type="collection"/>
+                <argument type="collection">
+                  <argument key="SocietiesTestEngineBundle">Societies\TestEngineBundle\Entity</argument>
+                </argument>
               </call>
               <call method="setMetadataCacheImpl">
                 <argument type="service">
@@ -2171,7 +2173,19 @@
               </call>
               <call method="setMetadataDriverImpl">
                 <argument type="service">
-                  <service class="Doctrine\ORM\Mapping\Driver\DriverChain" public="false"/>
+                  <service class="Doctrine\ORM\Mapping\Driver\DriverChain" public="false">
+                    <call method="addDriver">
+                      <argument type="service">
+                        <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
+                          <argument type="service" id="annotation_reader"/>
+                          <argument type="collection">
+                            <argument>C:\Users\Rafik\Projects\Societies\Societies_Local\git\SOCIETIES-Platform\integration-tests\performance-test-engine\src\Societies\TestEngineBundle\Entity</argument>
+                          </argument>
+                        </service>
+                      </argument>
+                      <argument>Societies\TestEngineBundle\Entity</argument>
+                    </call>
+                  </service>
                 </argument>
               </call>
               <call method="setProxyDir">

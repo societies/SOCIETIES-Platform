@@ -167,6 +167,17 @@ class appdevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             return array_merge($this->mergeDefaults($matches, array (  '_controller' => 'Societies\\TestEngineBundle\\Controller\\DefaultController::indexAction',)), array('_route' => 'societies_test_engine_homepage'));
         }
 
+        // societies_test_engine_join_cis_result
+        if ($pathinfo === '/testcase/joincis') {
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
+                goto not_societies_test_engine_join_cis_result;
+            }
+
+            return array (  '_controller' => 'Societies\\TestEngineBundle\\Controller\\DefaultController::joinCisResultAction',  '_route' => 'societies_test_engine_join_cis_result',);
+        }
+        not_societies_test_engine_join_cis_result:
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }
