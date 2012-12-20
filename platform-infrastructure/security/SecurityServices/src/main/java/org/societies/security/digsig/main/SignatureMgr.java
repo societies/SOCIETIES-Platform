@@ -155,7 +155,7 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	}
 	
 	@Override
-	public HashMap<String, X509Certificate> verifyXml(String xml) {
+	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException {
 		return xmlDSig.verifyXml(xml);
 	}
 	
@@ -202,20 +202,20 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	@Override
 	public X509Certificate getCertificate(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
-		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only certificate is used.");
+		//LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only certificate is used.");
 		return certStorage.getOurCert();
 	}
 	
 	@Override
 	public PrivateKey getPrivateKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
-		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only private key is used.");
+		//LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only private key is used.");
 		return certStorage.getOurKey();
 	}
 	
 	private PublicKey getPublicKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
-		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
+		//LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
 		
 		X509Certificate cert = certStorage.getOurCert();
 		
