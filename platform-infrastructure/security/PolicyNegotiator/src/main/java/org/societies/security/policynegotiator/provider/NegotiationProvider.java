@@ -198,7 +198,7 @@ public class NegotiationProvider implements INegotiationProvider {
 				}
 			}
 		} catch (DigsigException e) {
-			LOG.warn("acceptPolicyAndGetSla({}): invalid signature", sessionId);
+			LOG.warn("acceptPolicyAndGetSla({}): invalid signature, {}", sessionId, e);
 			sla.setSuccess(false);
 			return result;
 		}
