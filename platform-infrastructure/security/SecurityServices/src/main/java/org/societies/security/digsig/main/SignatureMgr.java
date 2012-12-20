@@ -77,7 +77,7 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		LOG.debug("Public key: {}", publicKey);
 		LOG.debug("Private key: {}", privateKey);
 		
-		test();
+		//test();
 	}
 	
 	private void test() throws DigsigException {
