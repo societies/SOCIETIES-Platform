@@ -27,6 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.util.concurrent.Future;
 
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 
 /**
@@ -41,9 +42,12 @@ public interface INegotiationProvider {
 	/**
 	 * Get all available options for the policy.
 	 * 
+	 * @param serviceId ID of the service or CIS
+	 * @param type type of negotiation
+	 * 
 	 * @return All available options embedded in a single XML document.
 	 */
-	public Future<SlaBean> getPolicyOptions(String serviceId);
+	public Future<SlaBean> getPolicyOptions(String serviceId, NegotiationType type);
 
 	/**
 	 * Accept given policy option and get the final legal agreement signed by

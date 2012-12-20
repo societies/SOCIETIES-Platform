@@ -34,6 +34,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.societies.api.identity.IIdentity;
@@ -154,7 +155,7 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	}
 	
 	@Override
-	public boolean verifyXml(String xml) {
+	public HashMap<String, X509Certificate> verifyXml(String xml) {
 		return xmlDSig.verifyXml(xml);
 	}
 	

@@ -40,6 +40,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
@@ -138,20 +139,22 @@ public class CommsServer implements IFeatureServer {
 			// Method parameters
 			ProviderBean providerBean = (ProviderBean) messageBean;
 			String serviceId = providerBean.getServiceId();
+			NegotiationType negotiationType = providerBean.getNegotiationType();
 			int sessionId = providerBean.getSessionId();
 			String signedPolicyOption = providerBean.getSignedPolicyOption();
 			boolean isModified = providerBean.isModified();
 			
 			MethodType method = providerBean.getMethod();
 			
-			LOG.debug("getQuery(): NegotiationProvider. Method: " + method);
+			LOG.debug("getQuery(): NegotiationProvider. Method: " + method +
+					", NegotiationType: " + negotiationType);
 			LOG.debug("getQuery(): NegotiationProvider. Params: " + serviceId + ", " +
 					isModified + ", " +	sessionId);
 
 				switch (method) {
 				case GET_POLICY_OPTIONS:
 					LOG.debug("getQuery(): NegotiationProvider.getPolicyOptions({})", serviceId);
-					resultFuture = negotiationProvider.getPolicyOptions(serviceId);
+					resultFuture = negotiationProvider.getPolicyOptions(serviceId, negotiationType);
 					break;
 				case ACCEPT_POLICY_AND_GET_SLA:
 					resultFuture = negotiationProvider.acceptPolicyAndGetSla(sessionId,

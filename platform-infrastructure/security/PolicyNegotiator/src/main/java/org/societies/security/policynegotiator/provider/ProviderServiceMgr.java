@@ -56,7 +56,7 @@ import org.societies.security.policynegotiator.util.Net;
  */
 public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
-	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
+	private static Logger LOG = LoggerFactory.getLogger(ProviderServiceMgr.class);
 
 	private IClientJarServerRemote clientJarServer;
 	private ISignatureMgr signatureMgr;

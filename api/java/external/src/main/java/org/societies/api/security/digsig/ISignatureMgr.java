@@ -28,6 +28,7 @@ package org.societies.api.security.digsig;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -79,10 +80,12 @@ public interface ISignatureMgr {
 	 * 
 	 * @param xml The XML containing embedded digital signatures to be verified.
 	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
+	 * @return List of references of all valid digital signatures and their
+	 * corresponding certificates.
+	 * 
+	 * @throws DigsigException If any signature is invalid
 	 */
-	public boolean verifyXml(String xml);
+	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException;
 
 	/**
 	 * Digitally sign given data.

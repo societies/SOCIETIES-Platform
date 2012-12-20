@@ -139,12 +139,13 @@ public class NominalTestCaseLowerTester {
 
 	private static void invokeAddService(String serviceId, List<String> files) throws Exception {
 		
-		LOG.info("invokeAddService({}, {})", serviceId, files);
+		LOG.info("invokeAddService({}, List<String>: {})", serviceId, files);
 		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
 		id.setIdentifier(new URI(serviceId));
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
 		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
 		assertTrue(callback.isSuccessful());
@@ -152,7 +153,7 @@ public class NominalTestCaseLowerTester {
 
 	private static void invokeAddService(String serviceId, URL[] files) throws Exception {
 		
-		LOG.info("invokeAddService({}, {})", serviceId, files);
+		LOG.info("invokeAddService({}, URL[]: {})", serviceId, files);
 		
 		String directory = LocalPath.PATH_3P_SERVICES + File.separator +
 				FileName.removeUnsupportedChars(serviceId) + File.separator;
@@ -177,6 +178,7 @@ public class NominalTestCaseLowerTester {
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
 		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
 		assertTrue(callback.isSuccessful());
