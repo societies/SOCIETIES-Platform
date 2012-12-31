@@ -39,7 +39,7 @@ public class NominalTestCaseLowerTester {
 	private static final String SERVICE_CLIENT_FILENAME = "/" + LocalPath.PATH_3P_SERVICES + "/" + SERVICE_CLIENT_BASENAME;
 	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = LocalPath.PATH_3P_SERVICES + "/" + "foo.bar";
 	
-	private static final String SERVER_HOSTNAME = "http://localhost:8080";
+	private String serverUrl;
 	
 	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
 	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
@@ -61,6 +61,20 @@ public class NominalTestCaseLowerTester {
 
 	public NominalTestCaseLowerTester() {
 		integrationTestUtils = new IntegrationTestUtils();
+	}
+
+	/**
+	 * @return the serverUrl
+	 */
+	public String getServerUrl() {
+		return serverUrl;
+	}
+
+	/**
+	 * @param serverUrl the serverUrl to set
+	 */
+	public void setServerUrl(String serverUrl) {
+		this.serverUrl = serverUrl;
 	}
 
 	/**
@@ -136,7 +150,7 @@ public class NominalTestCaseLowerTester {
 		id.setIdentifier(new URI(serviceId));
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		negotiationProviderServiceMgmt.addService(id, null, new URI(serverUrl), files, callback);
 		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
@@ -169,7 +183,7 @@ public class NominalTestCaseLowerTester {
 		id.setIdentifier(new URI(serviceId));
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
+		negotiationProviderServiceMgmt.addService(id, null, new URI(serverUrl), files, callback);
 		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
