@@ -6,20 +6,10 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-	<artifact type="bundle" name="org.societies.api.external.societies-api" />
-	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal" />
-
-	<artifact type="bundle" name="org.societies.comm.CommonLibraries" />
-	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr" />
-	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
-	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
-
-	<artifact type="bundle" name="org.societies.data-source"/>
-	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
-	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
-	<artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
-
-	<artifact type="bundle" name="societies-webapp"/>
-
+	<artifact type="plan" name="org.societies.css.commfrwk"/>
+	<artifact type="plan" name="org.societies.common.modules"/>
+	<artifact type="plan" name="org.societies.security"/>
+	<artifact type="bundle" name="DomainAuthorityRest"/>
 	<artifact type="bundle" name="org.societies.integration.test.bit.bit-policy-negotiate" />
+
 </plan>
