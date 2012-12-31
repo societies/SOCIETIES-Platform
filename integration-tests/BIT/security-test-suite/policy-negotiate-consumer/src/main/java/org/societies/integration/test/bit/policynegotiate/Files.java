@@ -58,6 +58,7 @@ public class Files {
         long length = file.length();
 
         if (length > Integer.MAX_VALUE) {
+        	is.close();
         	throw new IOException("File is too large " + file.getName());
         }
     
@@ -74,6 +75,7 @@ public class Files {
     
         // Ensure all the bytes have been read in
         if (offset < bytes.length) {
+        	is.close();
             throw new IOException("Could not completely read file " + file.getName());
         }
     
@@ -100,16 +102,16 @@ public class Files {
 		if (directory != null) {
 			directory.mkdirs();
 		}
-		
+
 		// Create the byte array to hold the data
 		FileOutputStream os = new FileOutputStream(file);
 
 		// Read in the bytes and write on the fly
 		int numRead = 0;
-		long totalRead = 0;
+//		long totalRead = 0;
 		while ((bytes.length > 0) && (numRead = is.read(bytes, 0, bytes.length)) >= 0) {
 			os.write(bytes, 0, numRead);
-			totalRead += numRead;
+//			totalRead += numRead;
 		}
 
 		// Close input and output streams
