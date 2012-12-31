@@ -113,10 +113,10 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1001] testNegotiationServiceWith0Files()");
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity myId = idMgr.getThisNetworkNode();
+		IIdentity providerId = idMgr.getDomainAuthorityNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI(SERVICE_ID_1));
-		Requestor provider = new RequestorService(myId, serviceId);
+		Requestor provider = new RequestorService(providerId, serviceId);
 
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
@@ -148,10 +148,10 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1001] testNegotiationServiceWith2Files()");
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity myId = idMgr.getThisNetworkNode();
+		IIdentity providerId = idMgr.getDomainAuthorityNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI(serviceIdStr));
-		Requestor provider = new RequestorService(myId, serviceId);
+		Requestor provider = new RequestorService(providerId, serviceId);
 
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
@@ -195,7 +195,7 @@ public class NominalTestCaseLowerTester {
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
-		IIdentity cisId = idMgr.getThisNetworkNode();
+		IIdentity cisId = idMgr.getDomainAuthorityNode();
 		Requestor provider = new RequestorCis(myId, cisId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
@@ -231,8 +231,8 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1001] testNegotiationInvalid()");
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity myId = idMgr.getThisNetworkNode();
-		Requestor provider = new Requestor(myId);
+		IIdentity providerId = idMgr.getDomainAuthorityNode();
+		Requestor provider = new Requestor(providerId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey, List<URI> fileUris) {
