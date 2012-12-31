@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.integration.test.bit.policynegotiate;
+package org.societies.integration.test.bit.policynegotiate.provider;
 
 /**
  * The test case 1001 aims to test policy negotiation.

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.integration.test.bit.policynegotiate;
+package org.societies.integration.test.bit.policynegotiate.consumer;
 
 /**
  * The test case 1001 aims to test 3P service installation.

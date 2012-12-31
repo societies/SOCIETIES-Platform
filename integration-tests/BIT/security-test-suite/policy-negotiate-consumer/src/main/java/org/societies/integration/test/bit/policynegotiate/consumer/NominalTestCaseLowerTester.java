@@ -1,4 +1,4 @@
-package org.societies.integration.test.bit.policynegotiate;
+package org.societies.integration.test.bit.policynegotiate.consumer;
 
 import static org.junit.Assert.*;
 
