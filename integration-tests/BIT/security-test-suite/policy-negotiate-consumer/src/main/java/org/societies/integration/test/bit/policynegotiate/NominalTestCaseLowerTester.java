@@ -2,15 +2,12 @@ package org.societies.integration.test.bit.policynegotiate;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -24,11 +21,9 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTestUtils;
@@ -43,21 +38,11 @@ public class NominalTestCaseLowerTester {
 
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
 	
-	private static final String SERVICE_CLIENT_BASENAME = "Calculator.jar";
-	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME2 = "META-INF/spring/bundle-context.xml";
-	// External requirement: service client jar filename may start with "/"
-	private static final String SERVICE_CLIENT_FILENAME = "/" + LocalPath.PATH_3P_SERVICES + "/" + SERVICE_CLIENT_BASENAME;
-	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = LocalPath.PATH_3P_SERVICES + "/" + "foo.bar";
-	
-	private static final String SERVER_HOSTNAME = "http://localhost:8080";
-	
 	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
-	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
 	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
 	private static final String SERVICE_ID_4 = "http://localhost/societies/services/service-4";
 	
 	private static INegotiation negotiator;
-	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
 	
 	/**
 	 * Tools for integration test
@@ -97,27 +82,6 @@ public class NominalTestCaseLowerTester {
 
 		negotiator = TestCase1001.getNegotiator();
 		assertNotNull(negotiator);
-
-		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
-		assertNotNull(negotiationProviderServiceMgmt);
-		
-		List<String> files0 = new ArrayList<String>();
-		invokeAddService(SERVICE_ID_1, files0);
-
-		List<String> files1 = new ArrayList<String>();
-		files1.add(SERVICE_CLIENT_FILENAME);
-		invokeAddService(SERVICE_ID_2, files1);
-
-		List<String> files2 = new ArrayList<String>();
-		files2.add(SERVICE_CLIENT_FILENAME);
-		files2.add(SERVICE_ADDITIONAL_RESOURCE_FILENAME);
-		invokeAddService(SERVICE_ID_3, files2);
-		
-		URL[] filesUrl = new URL[2];
-		filesUrl[0] = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_CLIENT_BASENAME);
-		filesUrl[1] = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_ADDITIONAL_RESOURCE_FILENAME2);
-		LOG.debug("URL = {}", filesUrl[0]);
-		invokeAddService(SERVICE_ID_4, filesUrl);
 	}
 
 	/**
@@ -136,64 +100,6 @@ public class NominalTestCaseLowerTester {
 	public void tearDown() {
 		LOG.info("[#1001] tearDown");
 	}
-
-	private static void invokeAddService(String serviceId, List<String> files) throws Exception {
-		
-		LOG.info("invokeAddService({}, List<String>: {})", serviceId, files);
-		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-		id.setIdentifier(new URI(serviceId));
-
-		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
-		LOG.debug("invokeAddService(): invoked");
-		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		assertTrue(callback.isInvoked());
-		assertTrue(callback.isSuccessful());
-	}
-
-	private static void invokeAddService(String serviceId, URL[] files) throws Exception {
-		
-		LOG.info("invokeAddService({}, URL[]: {})", serviceId, files);
-		
-		String directory = LocalPath.PATH_3P_SERVICES + File.separator +
-				FileName.removeUnsupportedChars(serviceId) + File.separator;
-		File file;
-		String basename;
-		String[] fileNames = new String[files.length];
-		
-		for (int k = 0; k < files.length; k++) {
-		
-			basename = FileName.getBasename(files[k].getPath());
-			LOG.debug("File basename: {}", basename);
-			fileNames[k] = directory + basename;
-
-			file = new File(fileNames[k]);
-			if (file.exists()) {
-				assertTrue(file.delete());
-			}
-		}
-		
-		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-		id.setIdentifier(new URI(serviceId));
-
-		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), files, callback);
-		LOG.debug("invokeAddService(): invoked");
-		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		assertTrue(callback.isInvoked());
-		assertTrue(callback.isSuccessful());
-		
-		for (int k = 0; k < files.length; k++) {
-			file = new File(fileNames[k]);
-			assertTrue("File " + fileNames[k] + " not found", file.exists());
-		}
-	}
-	
-	@Test
-	public void testFoo() {
-		// Empty test, so the integration test can run even if all tests are disabled and only initialization is performed
-	}
-	
 
 	/**
 	 * Try to consume the service
@@ -354,23 +260,12 @@ public class NominalTestCaseLowerTester {
 
 		String urlStr;
 		int httpCode;
-		String fileName = SERVICE_CLIENT_FILENAME;
 		
 		LOG.info("[#1001] testFilesDownloadManualFilePlacement()");
 		LOG.info("[#1001] *** Domain Authority Rest server is required for this test! ***");
 
 		testNegotiationServiceWith2Files(SERVICE_ID_3);
 
-		if (fileName.startsWith("/")) {
-			fileName = fileName.replaceFirst("/", "");
-		}
-		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
-		assertNotNull(is);
-		Files.writeFile(is, fileName);
-		is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
-		assertNotNull(is);
-		Files.writeFile(is, SERVICE_ADDITIONAL_RESOURCE_FILENAME);
-		
 		// URL 1 with valid signature
 		urlStr = serviceFiles.get(0).toString();
 		LOG.info("[#1001] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);

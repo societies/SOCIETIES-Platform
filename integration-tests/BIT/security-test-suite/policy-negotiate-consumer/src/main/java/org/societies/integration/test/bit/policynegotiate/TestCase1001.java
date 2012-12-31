@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.integration.test.IntegrationTestCase;
 
 public class TestCase1001 extends IntegrationTestCase {
@@ -26,8 +25,6 @@ public class TestCase1001 extends IntegrationTestCase {
 	 */
 	private static INegotiationProviderRemote groupMgr;
 	
-	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
-
 	public TestCase1001() {
 		// Call the super constructor
 		// with test case number
@@ -53,14 +50,5 @@ public class TestCase1001 extends IntegrationTestCase {
 	
 	protected static INegotiationProviderRemote getGroupMgr() {
 		return groupMgr;
-	}
-
-	public void setNegotiationProviderServiceMgmt(INegotiationProviderServiceMgmt negotiationProviderServiceMgmt) {
-		LOG.debug("[#1001] setNegotiationProviderServiceMgmt()");
-		TestCase1001.negotiationProviderServiceMgmt = negotiationProviderServiceMgmt;
-	}
-	
-	protected static INegotiationProviderServiceMgmt getNegotiationProviderServiceMgmt() {
-		return negotiationProviderServiceMgmt;
 	}
 }
