@@ -16,6 +16,8 @@ public class TestCase1001 extends IntegrationTestCase {
 
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
 
+	private static String serverUrl;
+	
 	public TestCase1001() {
 		// Call the super constructor
 		// with test case number
@@ -32,5 +34,20 @@ public class TestCase1001 extends IntegrationTestCase {
 	
 	protected static INegotiationProviderServiceMgmt getNegotiationProviderServiceMgmt() {
 		return negotiationProviderServiceMgmt;
+	}
+
+	/**
+	 * @return the serverUrl
+	 */
+	protected static String getServerUrl() {
+		return serverUrl;
+	}
+
+	/**
+	 * @param serverUrl the serverUrl to set
+	 */
+	public void setServerUrl(String serverUrl) {
+		LOG.debug("[#1001] setServerUrl({})", serverUrl);
+		TestCase1001.serverUrl = serverUrl;
 	}
 }

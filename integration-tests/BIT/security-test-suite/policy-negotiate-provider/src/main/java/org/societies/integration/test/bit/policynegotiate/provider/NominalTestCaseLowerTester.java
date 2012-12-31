@@ -39,14 +39,13 @@ public class NominalTestCaseLowerTester {
 	private static final String SERVICE_CLIENT_FILENAME = "/" + LocalPath.PATH_3P_SERVICES + "/" + SERVICE_CLIENT_BASENAME;
 	private static final String SERVICE_ADDITIONAL_RESOURCE_FILENAME = LocalPath.PATH_3P_SERVICES + "/" + "foo.bar";
 	
-	private String serverUrl;
-	
 	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
 	private static final String SERVICE_ID_2 = "http://localhost/societies/services/service-2";
 	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
 	private static final String SERVICE_ID_4 = "http://localhost/societies/services/service-4";
 	
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
+	private static URI serverUrl;
 	
 	/**
 	 * Tools for integration test
@@ -61,20 +60,6 @@ public class NominalTestCaseLowerTester {
 
 	public NominalTestCaseLowerTester() {
 		integrationTestUtils = new IntegrationTestUtils();
-	}
-
-	/**
-	 * @return the serverUrl
-	 */
-	public String getServerUrl() {
-		return serverUrl;
-	}
-
-	/**
-	 * @param serverUrl the serverUrl to set
-	 */
-	public void setServerUrl(String serverUrl) {
-		this.serverUrl = serverUrl;
 	}
 
 	/**
@@ -94,6 +79,9 @@ public class NominalTestCaseLowerTester {
 
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
+		
+		String serverUrlStr = TestCase1001.getServerUrl();
+		serverUrl = new URI(serverUrlStr);
 	}
 
 	/**
@@ -150,7 +138,7 @@ public class NominalTestCaseLowerTester {
 		id.setIdentifier(new URI(serviceId));
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(serverUrl), files, callback);
+		negotiationProviderServiceMgmt.addService(id, null, serverUrl, files, callback);
 		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
@@ -183,7 +171,7 @@ public class NominalTestCaseLowerTester {
 		id.setIdentifier(new URI(serviceId));
 
 		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
-		negotiationProviderServiceMgmt.addService(id, null, new URI(serverUrl), files, callback);
+		negotiationProviderServiceMgmt.addService(id, null, serverUrl, files, callback);
 		LOG.debug("invokeAddService(): invoked");
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		assertTrue(callback.isInvoked());
