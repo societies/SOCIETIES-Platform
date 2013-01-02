@@ -8,5 +8,4 @@
 
     <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
     <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
-	<artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
 </plan>

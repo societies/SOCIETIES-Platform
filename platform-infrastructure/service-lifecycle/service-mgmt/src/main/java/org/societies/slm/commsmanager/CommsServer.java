@@ -73,12 +73,12 @@ public class CommsServer implements IFeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	
-	public ICommManager getCommManager() {
-		return commManager;
+	public void setCommMngr(ICommManager commMngr) {
+		this.commManager = commMngr;
 	}
-
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	
+	public ICommManager getCommMngr() {
+		return commManager;
 	}
 	
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
@@ -102,12 +102,17 @@ public class CommsServer implements IFeatureServer {
 	
 	//METHODS
 	public CommsServer() {
+		if(LOG.isDebugEnabled())
+			LOG.debug("Constructor: CommsService of SLM");
+		
 	}
 	
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
-			getCommManager().register(this); 
+			if(LOG.isDebugEnabled())
+				LOG.debug("InitService of SLM: CommsServer");
+			getCommMngr().register(this); 
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}

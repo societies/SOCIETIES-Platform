@@ -71,7 +71,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 							"org.societies.api.schema.servicelifecycle.servicecontrol"));
 	
 	//PRIVATE VARIABLES
-	private ICommManager commManager;
+	private ICommManager commMngr;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
 	private CommsServer slmCommManager;
@@ -84,15 +84,13 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		this.slmCommManager = slmCommManager;	
 	}
 	
-	//PROPERTIES
-	public ICommManager getCommManager() {
-		return commManager;
+	public void setCommMngr(ICommManager commMngr) {
+		this.commMngr = commMngr;
 	}
-
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	
+	public ICommManager getCommMngr() {
+		return commMngr;
 	}
-
 	public CommsClient() {	}
 
 	public void InitService() {
@@ -101,11 +99,11 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		if(LOG.isDebugEnabled()) LOG.debug("Registering the SLM Communication Manager with the XMPP Communication Manager");
 		
 		try {
-			getCommManager().register(this); 
+			getCommMngr().register(this); 
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-		idMgr = commManager.getIdManager();
+		idMgr = commMngr.getIdManager();
 	}
 	
 
@@ -126,7 +124,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		bean.setMethod(MethodName.GET_LOCAL_SERVICES);
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -152,7 +150,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -179,7 +177,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -208,7 +206,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -238,7 +236,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -269,7 +267,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (Exception e) {
 			LOG.warn(e.getMessage());
@@ -302,7 +300,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -333,7 +331,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -365,7 +363,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
 
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			commManager.sendIQGet(stanza, bean, callback);
+			getCommMngr().sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
