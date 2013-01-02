@@ -8,6 +8,7 @@ package org.societies.integration.test.bit.policynegotiate.provider;
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.integration.test.IntegrationTestCase;
 
@@ -15,6 +16,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1001.class);
 
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
+	private static ICommManager commMgr;
 
 	private static String serverUrl;
 	
@@ -49,5 +51,20 @@ public class TestCase1001 extends IntegrationTestCase {
 	public void setServerUrl(String serverUrl) {
 		LOG.debug("[#1001] setServerUrl({})", serverUrl);
 		TestCase1001.serverUrl = serverUrl;
+	}
+
+	/**
+	 * @return the commMgr
+	 */
+	protected static ICommManager getCommMgr() {
+		return commMgr;
+	}
+
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public void setCommMgr(ICommManager commMgr) {
+		LOG.debug("[#1001] setCommMgr()");
+		TestCase1001.commMgr = commMgr;
 	}
 }

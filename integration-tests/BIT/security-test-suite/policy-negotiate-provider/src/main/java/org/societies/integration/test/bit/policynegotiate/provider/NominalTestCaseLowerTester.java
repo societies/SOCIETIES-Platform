@@ -17,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
@@ -45,6 +47,8 @@ public class NominalTestCaseLowerTester {
 	private static final String SERVICE_ID_4 = "http://localhost/societies/services/service-4";
 	
 	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
+	private static ICommManager commMgr;
+	private static IIdentityManager idMgr;
 	private static URI serverUrl;
 	
 	/**
@@ -79,6 +83,12 @@ public class NominalTestCaseLowerTester {
 
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
+		
+		commMgr = TestCase1001.getCommMgr();
+		assertNotNull(commMgr);
+		
+		idMgr = commMgr.getIdManager();
+		assertNotNull(idMgr);
 		
 		String serverUrlStr = TestCase1001.getServerUrl();
 		serverUrl = new URI(serverUrlStr);
@@ -177,9 +187,12 @@ public class NominalTestCaseLowerTester {
 		assertTrue(callback.isInvoked());
 		assertTrue(callback.isSuccessful());
 		
-		for (int k = 0; k < files.length; k++) {
-			file = new File(fileNames[k]);
-			assertTrue("File " + fileNames[k] + " not found", file.exists());
+		if (idMgr.isMine(idMgr.getDomainAuthorityNode())) {
+			LOG.info("Domain Authority node is the local node. Will check if files are created.");
+			for (int k = 0; k < files.length; k++) {
+				file = new File(fileNames[k]);
+				assertTrue("File " + fileNames[k] + " not found", file.exists());
+			}
 		}
 	}
 	

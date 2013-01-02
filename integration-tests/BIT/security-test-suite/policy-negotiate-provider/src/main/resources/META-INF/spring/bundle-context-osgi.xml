@@ -14,5 +14,6 @@
                       	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <osgi:reference id="NegotiationProviderServiceMgmt" interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt"/>
+    <osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 
 </beans>

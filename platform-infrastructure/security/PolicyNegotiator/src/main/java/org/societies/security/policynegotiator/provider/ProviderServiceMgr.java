@@ -48,6 +48,7 @@ import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
+import org.societies.security.policynegotiator.util.UrlParamName;
 
 /**
  * 
@@ -266,10 +267,12 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
 
+		pubkey = UrlParamName.base64ToUrl(pubkey);
+		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString() +
-				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey;
+				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey + 
+				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString();
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
 		return uriStr;

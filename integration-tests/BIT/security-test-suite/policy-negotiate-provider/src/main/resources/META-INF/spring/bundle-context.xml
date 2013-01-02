@@ -34,9 +34,10 @@
     <bean
         id="TestCase1001_provider"
         class="org.societies.integration.test.bit.policynegotiate.provider.TestCase1001"
-		depends-on="NegotiationProviderServiceMgmt,bit1001Properties"
+		depends-on="NegotiationProviderServiceMgmt,CommManager,bit1001Properties"
         init-method="run">
         <property name="negotiationProviderServiceMgmt" ref ="NegotiationProviderServiceMgmt" />
+        <property name="commMgr" ref ="CommManager" />
         <property name="serverUrl" value="${domain_authority.rest.serverurl}" />
     </bean>
     

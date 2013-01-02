@@ -56,6 +56,7 @@ import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
+import org.societies.domainauthority.rest.util.UrlParamName;
 
 /**
  * Class for hosting jar files for clients of 3rd party services.
@@ -151,6 +152,9 @@ public class ServiceClientJar {
 		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);
 
+		cert = UrlParamName.url2Base64(cert);
+		LOG.debug("HTTP PUT: cert fixed to {}", cert);
+		
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
 
