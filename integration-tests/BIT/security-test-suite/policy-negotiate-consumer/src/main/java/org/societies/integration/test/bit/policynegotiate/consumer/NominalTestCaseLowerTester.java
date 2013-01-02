@@ -112,8 +112,7 @@ public class NominalTestCaseLowerTester {
 		
 		LOG.info("[#1001] testNegotiationServiceWith0Files()");
 
-		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity providerId = idMgr.getDomainAuthorityNode();
+		IIdentity providerId = getProvider();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI(SERVICE_ID_1));
 		Requestor provider = new RequestorService(providerId, serviceId);
@@ -147,8 +146,7 @@ public class NominalTestCaseLowerTester {
 		
 		LOG.info("[#1001] testNegotiationServiceWith2Files()");
 
-		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity providerId = idMgr.getDomainAuthorityNode();
+		IIdentity providerId = getProvider();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI(serviceIdStr));
 		Requestor provider = new RequestorService(providerId, serviceId);
@@ -195,7 +193,7 @@ public class NominalTestCaseLowerTester {
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
-		IIdentity cisId = idMgr.getDomainAuthorityNode();
+		IIdentity cisId = getProvider();
 		Requestor provider = new RequestorCis(myId, cisId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
@@ -230,8 +228,7 @@ public class NominalTestCaseLowerTester {
 		
 		LOG.info("[#1001] testNegotiationInvalid()");
 
-		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		IIdentity providerId = idMgr.getDomainAuthorityNode();
+		IIdentity providerId = getProvider();
 		Requestor provider = new Requestor(providerId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
@@ -324,6 +321,12 @@ public class NominalTestCaseLowerTester {
 		assertEquals(serviceFiles.get(0).toString().length(), urlStr.length(), 0.0);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
+	}
+	
+	private IIdentity getProvider() {
+		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
+		return idMgr.getDomainAuthorityNode();
+		//return idMgr.getThisNetworkNode();
 	}
 	
 	private int getHttpCode(URL resource) throws IOException {
