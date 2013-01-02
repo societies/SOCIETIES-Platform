@@ -24,49 +24,35 @@
  */
 package org.societies.domainauthority.rest.control;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.societies.api.identity.IIdentity;
+import java.security.PublicKey;
 
 /**
- * A model of a service, not service instance.
+ * Description of a resource, e.g., a service file
  *
  * @author Mitja Vardjan
  *
  */
-public class Service {
+public class Resource {
+
+	private String path;
+	private PublicKey ownerKey;
 	
-	private URI id;
-	private IIdentity provider;
-	private List<String> files = new ArrayList<String>();
-	
-	public Service(URI id, IIdentity provider, List<String> files) {
-		this.id = id;
-		this.provider = provider;
-		this.files = files;
+	public Resource(String path, PublicKey ownerKey) {
+		this.path = path;
+		this.ownerKey = ownerKey;
 	}
 
 	/**
-	 * @return ID of the service, not ID of a service instance
+	 * @return Public key of the one who has uploaded the files, e.g., the service provider
 	 */
-	public URI getId() {
-		return id;
+	public PublicKey getOwnerKey() {
+		return ownerKey;
 	}
 
 	/**
-	 * @return The provider of this service.
+	 * @return Relative path to the file
 	 */
-	public IIdentity getProvider() {
-		return provider;
-	}
-
-	/**
-	 * @return Paths to all files that are associated with the service and
-	 * service consumers can potentially download.
-	 */
-	public List<String> getFiles() {
-		return files;
+	public String getPath() {
+		return path;
 	}
 }

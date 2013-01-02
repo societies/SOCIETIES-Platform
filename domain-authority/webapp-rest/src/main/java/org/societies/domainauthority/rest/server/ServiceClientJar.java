@@ -178,6 +178,7 @@ public class ServiceClientJar {
 		    	LOG.debug("Saving to file {}", path);
 				try {
 					Files.writeFile(item.getInputStream(), path);
+					ServiceClientJarAccess.addResource(path, pubKey);
 				} catch (IOException e) {
 					LOG.warn("Could not write to file {}", path, e);
 					// Return HTTP status code 500 - Internal Server Error

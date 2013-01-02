@@ -215,7 +215,8 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		return certStorage.getOurKey();
 	}
 	
-	private PublicKey getPublicKey(IIdentity identity) {
+	@Override
+	public PublicKey getPublicKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
 		//LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
 		

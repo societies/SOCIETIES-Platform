@@ -28,6 +28,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,7 +155,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			URI server;
 			String uploadUri;
 			uploadUri = uriForFileUpload(fileServer.toASCIIString(), fileName,
-					serviceId.getIdentifier(), "FIXMEpublicKey");
+					serviceId.getIdentifier(), getMyPublicKey());
 			try {
 				server = new URI(uploadUri);
 			} catch (URISyntaxException e) {
@@ -273,6 +274,15 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
 		return uriStr;
+	}
+	
+	private String getMyPublicKey() {
+		
+		IIdentity myIdentity = groupMgr.getIdMgr().getThisNetworkNode();
+		PublicKey key = signatureMgr.getPublicKey(myIdentity);
+		String keyStr = signatureMgr.key2str(key);
+		
+		return keyStr;
 	}
 
 	/**

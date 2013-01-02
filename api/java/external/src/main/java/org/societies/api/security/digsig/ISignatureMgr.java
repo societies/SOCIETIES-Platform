@@ -190,7 +190,7 @@ public interface ISignatureMgr {
 	public X509Certificate getCertificate(IIdentity identity);
 	
 	/**
-	 * Gets private key for the given identity.
+	 * Gets the private key for the given identity.
 	 * If the identity is not one of own identities (of this CSS), then null is returned.
 	 * 
 	 * @param identity The identity to get private key for
@@ -199,6 +199,15 @@ public interface ISignatureMgr {
 	 */
 	@Deprecated
 	public PrivateKey getPrivateKey(IIdentity identity);
+	
+	/**
+	 * Gets the public key for the given identity.
+	 * 
+	 * @param identity The identity to get private key for
+	 * 
+	 * @return The private key
+	 */
+	public PublicKey getPublicKey(IIdentity identity);
 
 	/**
 	 * Convert Base64 {@link String} representation of public or private key to {@link Key}

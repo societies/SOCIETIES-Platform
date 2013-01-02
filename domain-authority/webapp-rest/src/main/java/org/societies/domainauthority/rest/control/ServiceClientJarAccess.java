@@ -25,13 +25,13 @@
 package org.societies.domainauthority.rest.control;
 
 import java.net.URI;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
@@ -48,7 +48,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
-	private static HashMap<URI, Service> services = new HashMap<URI, Service>();
+	private static HashMap<String, Resource> resources = new HashMap<String, Resource>();
 
 	private static ISignatureMgr sigMgr;
 	private static boolean accessControlEnabled;
@@ -63,7 +63,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		LOG.debug("init()");
 	}
 
-	public ISignatureMgr getSigMgr() {
+	public static ISignatureMgr getSigMgr() {
 		return sigMgr;
 	}
 	public void setSigMgr(ISignatureMgr sigMgr) {
@@ -78,50 +78,11 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		ServiceClientJarAccess.accessControlEnabled = accessControlEnabled;
 	}
 	
-//	@Override
-//	public Future<UrlBean> addKey(URI hostname, String filePath) {
-//		
-//		String key = generateKey();
-//		UrlBean result = new UrlBean();
-//		URI url;
-//		String urlStr;
-//
-//		List<String> fileKeys = keys.get(filePath);
-//		
-//		if (fileKeys == null) {
-//			LOG.debug("Adding key {} for new file {}", key, filePath);
-//			fileKeys = new ArrayList<String>();
-//			fileKeys.add(key);
-//			keys.put(filePath, fileKeys);
-//		}
-//		else {
-//			if (fileKeys.contains(key)) {
-//				LOG.warn("Key {} for file {} already exists", key, filePath);
-//			}
-//			else {
-//				LOG.debug("Adding key {} for existing file {}", key, filePath);
-//				fileKeys.add(key);
-//			}
-//		}
-//		urlStr = hostname + Path.BASE + ServiceClientJar.PATH + "/" + filePath +
-//				"?" + ServiceClientJar.URL_PARAM_SERVICE_ID + "=" + key;
-//		try {
-//			url = new URI(urlStr);
-//			result.setUrl(url);
-//			result.setSuccess(true);
-//		} catch (URISyntaxException e) {
-//			LOG.warn("Could not create URI from {}", urlStr, e);
-//			result.setSuccess(false);
-//		}
-//		
-//		return new AsyncResult<UrlBean>(result);
-//	}
-
 	@Override
 	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String signature, List<String> files) {
 		
 		UrlBean result = new UrlBean();
-		Service service;
+		Resource resource;
 		String dataToVerify;
 		
 		dataToVerify = serviceId.toASCIIString();
@@ -129,13 +90,13 @@ public class ServiceClientJarAccess implements IClientJarServer {
 			dataToVerify += file;
 		}
 		if (sigMgr.verify(dataToVerify, signature, provider)) {
-			service = new Service(serviceId, provider, files);
-			services.put(serviceId, service);
-			result.setSuccess(true);
 			String fileList = "";
 			for (String f : files) {
+				resource = new Resource(f, sigMgr.getCertificate(provider).getPublicKey());
+				resources.put(resource.getPath(), resource);
 				fileList += f;
 			}
+			result.setSuccess(true);
 			LOG.info("Registered new files for sharing. Service: {}. Files: {}", serviceId, fileList);
 		}
 		else {
@@ -148,35 +109,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		return new AsyncResult<UrlBean>(result);
 	}
 	
-	private boolean isOwner(URI serviceId, IIdentity provider) {
-		
-		Service s = services.get(serviceId);
-		
-		if (s == null) {
-			return false;
-		}
-		else {
-			return s.getProvider().getJid().equals(provider.getJid());
-		}
-	}
-
-//	private String generateKey() {
-//		
-//		Random rnd = new Random();
-//		int num;
-//		String key;
-//		
-//		num = rnd.nextInt();
-//		if (num < 0) {
-//			num = -num;
-//		}
-//		key = String.valueOf(num);
-//		if (key.length() > 5) {
-//			key = key.substring(0, 5);
-//		}
-//		return key;
-//	}
-
 	public static boolean isAuthorized(String filePath, String signature) {
 		
 		LOG.debug("isAuthorized({}, {})", filePath, signature);
@@ -185,15 +117,21 @@ public class ServiceClientJarAccess implements IClientJarServer {
 			return true;
 		}
 
-		for (Service s : services.values()) {
-			for (String file : s.getFiles()) {
-				if (file.equals(filePath)) {
-					LOG.debug("isAuthorized(): file {} found", filePath);
-					return sigMgr.verify(filePath, signature, s.getProvider());
-				}
+		for (Resource r : resources.values()) {
+			if (r.getPath().equals(filePath)) {
+				LOG.debug("isAuthorized(): file {} found", filePath);
+				return sigMgr.verify(filePath, signature, r.getOwnerKey());
 			}
 		}
 		LOG.debug("isAuthorized(): file {} NOT found", filePath);
 		return false;
+	}
+	
+	public static void addResource(String path, String pubKeyStr) {
+		
+		PublicKey ownerKey = (PublicKey) sigMgr.str2key(pubKeyStr);
+		Resource resource = new Resource(path, ownerKey);
+		
+		resources.put(resource.getPath(), resource);
 	}
 }
