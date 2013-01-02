@@ -42,7 +42,7 @@
 		<!-- Service Management: 3 bundles (to be merged) -->
 		<module>../../css-modules/serviceRegistry</module>
 		<module>../../platform-infrastructure/service-lifecycle/service-mgmt/</module>
-		<module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
+		<!--  <module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>-->
 
 		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->	
 		<module>../../platform-infrastructure/security/SecurityServices</module>
