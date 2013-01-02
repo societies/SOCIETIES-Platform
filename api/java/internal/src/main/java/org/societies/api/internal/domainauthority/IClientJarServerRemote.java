@@ -85,12 +85,15 @@ public interface IClientJarServerRemote {
 	 * @param toIdentity The identity of the server
 	 * @param serviceId The ID of the service
 	 * @param provider The service provider
+	 * @param providerPublicKey Base64 encoded public key associated with the provider identity,
+	 * as returned by {@link ISignatureMgr#key2str(java.security.Key)}
 	 * @param signature Digital signature of <b>serviceId</b> and <b>files</b> parameters,
 	 * created with provider's private key
 	 * @param files List of files to be shared. All the files are associated to the given
 	 * service and will not be shared for other services.
 	 * @param callback the callback to receive the result of this asynchronous method
 	 */
-	public void shareFiles(IIdentity toIdentity, URI serviceId, IIdentity provider, String signature,
+	public void shareFiles(IIdentity toIdentity, URI serviceId, IIdentity provider,
+			String providerPublicKey, String signature,
 			List<String> files,	IClientJarServerCallback callback);
 }

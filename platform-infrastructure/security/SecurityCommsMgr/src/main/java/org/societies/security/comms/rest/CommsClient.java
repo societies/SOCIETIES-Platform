@@ -100,11 +100,12 @@ public class CommsClient implements IClientJarServerRemote {
 	@Override
 	@Async
 	public void shareFiles(IIdentity toIdentity, URI serviceId, IIdentity provider,
-			String signature, List<String> files, IClientJarServerCallback callback) {
+			String publicKey, String signature, List<String> files,
+			IClientJarServerCallback callback) {
 		
 		LOG.debug("shareFiles(..., {}, {}, ...)", serviceId, provider);
 		
-		sendIQ(toIdentity, MethodType.SHARE_FILES, serviceId, provider, signature, files, callback);
+		sendIQ(toIdentity, MethodType.SHARE_FILES, serviceId, provider, publicKey, signature, files, callback);
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class CommsClient implements IClientJarServerRemote {
 	 * @return Stanza ID for success, null for error
 	 */
 	private String sendIQ(IIdentity toIdentity, MethodType method, URI serviceId, IIdentity provider,
-			String signature, List<String> files, IClientJarServerCallback callback) {
+			String publicKey, String signature, List<String> files, IClientJarServerCallback callback) {
 		
 		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
 				", " + provider + ", " + signature + ", ...)");
@@ -129,6 +130,7 @@ public class CommsClient implements IClientJarServerRemote {
 		payload.setMethod(method);
 		payload.setServiceId(serviceId);
 		payload.setProviderIdentity(provider.getJid());
+		payload.setProviderPublicKey(publicKey);
 		payload.setSignature(signature);
 		//payload.setFiles(files);  // ArrayList causes org.simpleframework.xml.transform.TransformException
 		if (files != null && files.size() > 0) {

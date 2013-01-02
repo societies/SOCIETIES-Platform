@@ -122,9 +122,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				throw new NegotiationException(e);
 			}
 			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
-			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-					serviceId.getIdentifier(), provider, signature, files, cb);
+					serviceId.getIdentifier(), provider, getMyPublicKey(), signature, files, cb);
 			services.put(idStr, s);
 		}
 		else {

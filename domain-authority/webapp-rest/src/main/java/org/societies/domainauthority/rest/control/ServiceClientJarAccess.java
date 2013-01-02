@@ -79,7 +79,8 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	}
 	
 	@Override
-	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String signature, List<String> files) {
+	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String providerPublicKey,
+			String signature, List<String> files) {
 		
 		UrlBean result = new UrlBean();
 		Resource resource;
@@ -92,7 +93,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		if (sigMgr.verify(dataToVerify, signature, provider)) {
 			String fileList = "";
 			for (String f : files) {
-				resource = new Resource(f, sigMgr.getCertificate(provider).getPublicKey());
+				resource = new Resource(f, (PublicKey) sigMgr.str2key(providerPublicKey));
 				resources.put(resource.getPath(), resource);
 				fileList += f;
 			}

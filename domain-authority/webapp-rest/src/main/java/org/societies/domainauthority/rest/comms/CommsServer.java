@@ -153,6 +153,7 @@ public class CommsServer implements IFeatureServer {
 			
 			URI serviceId = clientJarBean.getServiceId();
 			String providerIdentity = clientJarBean.getProviderIdentity();
+			String providerPublicKey = clientJarBean.getProviderPublicKey();
 			String signature = clientJarBean.getSignature();
 			
 			MethodType method = clientJarBean.getMethod();
@@ -166,7 +167,8 @@ public class CommsServer implements IFeatureServer {
 					IIdentity provider;
 					try {
 						provider = idMgr.fromJid(providerIdentity);
-						resultFuture = clientJarServer.shareFiles(serviceId, provider, signature, files);
+						resultFuture = clientJarServer.shareFiles(serviceId, provider,
+								providerPublicKey, signature, files);
 					} catch (InvalidFormatException e) {
 						LOG.warn("Could not get identity", e);
 						return failure();
