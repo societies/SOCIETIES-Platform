@@ -25,7 +25,6 @@
 
 package org.societies.api.security.digsig;
 
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -186,7 +185,6 @@ public interface ISignatureMgr {
 	 * @return The certificate, or null if identity not found or no certificate
 	 * is associated with the identity
 	 */
-	@Deprecated
 	public X509Certificate getCertificate(IIdentity identity);
 	
 	/**
@@ -210,18 +208,20 @@ public interface ISignatureMgr {
 	public PublicKey getPublicKey(IIdentity identity);
 
 	/**
-	 * Convert Base64 {@link String} representation of public or private key to {@link Key}
+	 * Convert Base64 {@link String} representation of X.509 certificate to {@link X509Certificate}
 	 * 
-	 * @param keyStr Base64 representation of the {@link Key}
-	 * @return The {@link Key}
+	 * @param certStr Base64 representation of the {@link X509Certificate}
+	 * @return The X.509 certificate
+	 * @throws DigsigException
 	 */
-	public Key str2key(String keyStr);
+	public X509Certificate str2cert(String certStr) throws DigsigException;
 	
 	/**
-	 * Convert public or private {@link Key} to {@link String}
+	 * Convert {@link X509Certificate} to {@link String}
 	 * 
-	 * @param key The key to convert
-	 * @return Base64 representation of the {@link Key}
+	 * @param cert The certificate to convert
+	 * @return Base64 representation of the {@link X509Certificate}
+	 * @throws DigsigException if an encoding error occurs
 	 */
-	public String key2str(Key key);
+	public String cert2str(X509Certificate cert) throws DigsigException;
 }

@@ -28,7 +28,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +123,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			}
 			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-					serviceId.getIdentifier(), provider, getMyPublicKey(), signature, files, cb);
+					serviceId.getIdentifier(), provider, getMyCertificate(), signature, files, cb);
 			services.put(idStr, s);
 		}
 		else {
@@ -154,7 +154,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			URI server;
 			String uploadUri;
 			uploadUri = uriForFileUpload(fileServer.toASCIIString(), fileName,
-					serviceId.getIdentifier(), getMyPublicKey());
+					serviceId.getIdentifier(), getMyCertificate());
 			try {
 				server = new URI(uploadUri);
 			} catch (URISyntaxException e) {
@@ -275,13 +275,19 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		return uriStr;
 	}
 	
-	private String getMyPublicKey() {
+	private String getMyCertificate() throws NegotiationException {
 		
 		IIdentity myIdentity = groupMgr.getIdMgr().getThisNetworkNode();
-		PublicKey key = signatureMgr.getPublicKey(myIdentity);
-		String keyStr = signatureMgr.key2str(key);
-		
-		return keyStr;
+		X509Certificate cert = signatureMgr.getCertificate(myIdentity);
+		String certStr;
+		try {
+			certStr = signatureMgr.cert2str(cert);
+		} catch (DigsigException e) {
+			LOG.warn("getMyCertificate(): Could not get my own (provider's) certificate");
+			throw new NegotiationException(e);
+		}
+
+		return certStr;
 	}
 
 	/**

@@ -27,7 +27,6 @@ package org.societies.security.storage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -82,9 +81,9 @@ public class CertStorage {
 		this.certPassword = certPassword;
 	}
 
-	public void initOurIdentity() throws StorageException {
+	public void init() throws StorageException {
 		
-		LOG.info("initOurIdentity()");
+		LOG.info("init()");
 		
 		InputStream ksStream;
 		
@@ -107,9 +106,12 @@ public class CertStorage {
 			ourCert = (X509Certificate) ks.getCertificate(alias);
 			ourKey = (PrivateKey) ks.getKey(alias, certPassword.toCharArray());
 
-			if (ourCert == null || ourKey == null)
-				throw new NullPointerException();
+			if (ourCert == null || ourKey == null) {
+				LOG.error("init(): ourCert = {}, ourKey = {}", ourCert, ourKey);
+				throw new StorageException();
+			}
 		} catch (Exception e) {
+			LOG.error("init(): ", e);
 			throw new StorageException("Failed to initialize identity information", e);
 		} finally {
 			StreamUtil.closeStream(ksStream);

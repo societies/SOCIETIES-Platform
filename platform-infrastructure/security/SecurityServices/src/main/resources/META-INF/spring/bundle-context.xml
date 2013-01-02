@@ -45,7 +45,7 @@
 		<property name="certStorage" ref="certStorage"/>
 	</bean>
 
-	<bean id="certStorage" class="org.societies.security.storage.CertStorage" depends-on="securServicesProperties" init-method="initOurIdentity">
+	<bean id="certStorage" class="org.societies.security.storage.CertStorage" depends-on="securServicesProperties" init-method="init">
 		<property name="certFile" value="${cert.file}" />
 		<property name="certPassword" value="${cert.password}" />
 	</bean>

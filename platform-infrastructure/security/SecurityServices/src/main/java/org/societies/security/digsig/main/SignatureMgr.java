@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -235,12 +234,12 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	}
 	
 	@Override
-	public Key str2key(String keyStr) {
-		return KeyUtil.str2key(keyStr);
+	public X509Certificate str2cert(String certStr) throws DigsigException {
+		return KeyUtil.str2cert(certStr);
 	}
 
 	@Override
-	public String key2str(Key key) {
-		return KeyUtil.key2str(key);
+	public String cert2str(X509Certificate cert) throws DigsigException {
+		return KeyUtil.cert2str(cert);
 	}
 }

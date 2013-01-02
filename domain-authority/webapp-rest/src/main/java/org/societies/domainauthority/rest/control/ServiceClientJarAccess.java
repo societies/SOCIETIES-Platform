@@ -26,6 +26,7 @@ package org.societies.domainauthority.rest.control;
 
 import java.net.URI;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -79,21 +81,30 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	}
 	
 	@Override
-	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String providerPublicKey,
+	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String providerCertStr,
 			String signature, List<String> files) {
 		
 		UrlBean result = new UrlBean();
 		Resource resource;
 		String dataToVerify;
+		X509Certificate providerCert;
+		
+		try {
+			providerCert = sigMgr.str2cert(providerCertStr);
+		} catch (DigsigException e) {
+			LOG.warn("Could not deserialize provider's certificate from: " + providerCertStr, e);
+			result.setSuccess(false);
+			return new AsyncResult<UrlBean>(result);
+		}
 		
 		dataToVerify = serviceId.toASCIIString();
 		for (String file : files) {
 			dataToVerify += file;
 		}
-		if (sigMgr.verify(dataToVerify, signature, provider)) {
+		if (sigMgr.verify(dataToVerify, signature, providerCert.getPublicKey())) {
 			String fileList = "";
 			for (String f : files) {
-				resource = new Resource(f, (PublicKey) sigMgr.str2key(providerPublicKey));
+				resource = new Resource(f, providerCert.getPublicKey());
 				resources.put(resource.getPath(), resource);
 				fileList += f;
 			}
@@ -128,9 +139,10 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		return false;
 	}
 	
-	public static void addResource(String path, String pubKeyStr) {
+	public static void addResource(String path, String certStr) throws DigsigException {
 		
-		PublicKey ownerKey = (PublicKey) sigMgr.str2key(pubKeyStr);
+		X509Certificate cert = sigMgr.str2cert(certStr);
+		PublicKey ownerKey = cert.getPublicKey();
 		Resource resource = new Resource(path, ownerKey);
 		
 		resources.put(resource.getPath(), resource);

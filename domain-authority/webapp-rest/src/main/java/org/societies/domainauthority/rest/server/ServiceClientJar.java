@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
@@ -145,9 +146,9 @@ public class ServiceClientJar {
     		@Context HttpServletRequest request,
     		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
+    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String cert) {
 
-		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
+		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);
 
 		// Create a factory for disk-based file items
@@ -178,9 +179,13 @@ public class ServiceClientJar {
 		    	LOG.debug("Saving to file {}", path);
 				try {
 					Files.writeFile(item.getInputStream(), path);
-					ServiceClientJarAccess.addResource(path, pubKey);
+					ServiceClientJarAccess.addResource(path, cert);
 				} catch (IOException e) {
 					LOG.warn("Could not write to file {}", path, e);
+					// Return HTTP status code 500 - Internal Server Error
+					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (DigsigException e) {
+					LOG.warn("Could not store public key", e);
 					// Return HTTP status code 500 - Internal Server Error
 					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}

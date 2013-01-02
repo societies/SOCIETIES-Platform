@@ -24,12 +24,22 @@
  */
 package org.societies.security.digsig.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.Key;
-
-import javax.crypto.spec.SecretKeySpec;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-import org.societies.security.digsig.main.DigSig;
+import org.societies.api.security.digsig.DigsigException;
 
 /**
  * Encryption key manipulation
@@ -40,18 +50,46 @@ import org.societies.security.digsig.main.DigSig;
 public class KeyUtil {
 
 	/**
-	 * Convert Base64 {@link String} representation of public or private key to {@link Key}
+	 * Convert Base64 {@link String} representation of public key to {@link PublicKey}
 	 * 
-	 * @param keyStr Base64 representation of the {@link Key}
-	 * @return The {@link Key}
+	 * @param keyStr Base64 representation of the {@link PublicKey}
+	 * @return The {@link PublicKey}
+	 * @throws CertificateException 
 	 */
-	public static Key str2key(String keyStr) {
-
-		byte[] keyBytes = Base64.decodeBase64(keyStr);
-		Key key = new SecretKeySpec(keyBytes, DigSig.ALGORITHM);
-		
-		return key;
-	}
+//	public static PublicKey str2key(String keyStr) throws DigsigException {
+//
+//		byte[] keyBytes = Base64.decodeBase64(keyStr);
+////		Key key = new SecretKeySpec(keyBytes, DigSig.ALGORITHM);
+//
+//		// get the public key
+////		try {
+////			CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+////			Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(keyBytes));
+////			PublicKey key = certificate.getPublicKey();
+////	
+////			return key;
+////		} catch (CertificateException e) {
+////			throw new DigsigException(e);
+////		}
+//
+////		try {
+////			Key key = (Key) PublicKeyFactory.createKey(keyBytes);
+////		} catch (IOException e) {
+////			throw new DigsigException(e);
+////		}
+//		
+//		KeyFactory keyFactory;
+//		KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+//		try {
+//			keyFactory = KeyFactory.getInstance("RSA");
+//			PublicKey key = keyFactory.generatePublic(keySpec);
+//			return key;
+//		} catch (NoSuchAlgorithmException e) {
+//			throw new DigsigException(e);
+//		} catch (InvalidKeySpecException e) {
+//			throw new DigsigException(e);
+//		}
+//	}
 
 	/**
 	 * Convert public or private {@link Key} to {@link String}
@@ -59,12 +97,42 @@ public class KeyUtil {
 	 * @param key The key to convert
 	 * @return Base64 representation of the {@link Key}
 	 */
-	public static String key2str(Key key) {
+//	public static String key2str(Key key) {
+//		
+//		byte[] keyBytes = key.getEncoded();
+//		String keyStr = Base64.encodeBase64String(keyBytes);
+//		
+//		return keyStr;
+//	}
+	
+	public static String cert2str(X509Certificate cert) throws DigsigException {
 		
-		byte[] keyBytes = key.getEncoded();
-		String keyStr = Base64.encodeBase64String(keyBytes);
+		byte[] certBytes;
+		String certStr;
 		
-		return keyStr;
+		try {
+			certBytes = cert.getEncoded();
+		} catch (CertificateEncodingException e) {
+			throw new DigsigException(e);
+		}
+		certStr = Base64.encodeBase64String(certBytes);
+		
+		return certStr;
 	}
+	
+	public static X509Certificate str2cert(String certStr) throws DigsigException {
 
+		byte[] certBytes = Base64.decodeBase64(certStr);
+		InputStream is = new ByteArrayInputStream(certBytes);
+		CertificateFactory cf;
+		X509Certificate cert;
+
+		try {
+			cf = CertificateFactory.getInstance("X.509");
+			cert = (X509Certificate) cf.generateCertificate(is);
+			return cert;
+		} catch (CertificateException e) {
+			throw new DigsigException(e);
+		}
+	}
 }
