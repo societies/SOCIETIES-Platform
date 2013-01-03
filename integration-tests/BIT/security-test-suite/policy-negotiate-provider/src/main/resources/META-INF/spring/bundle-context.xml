@@ -38,7 +38,7 @@
         init-method="run">
         <property name="negotiationProviderServiceMgmt" ref ="NegotiationProviderServiceMgmt" />
         <property name="commMgr" ref ="CommManager" />
-        <property name="serverUrl" value="${domain_authority.rest.serverurl}" />
+        <property name="serverUrl" value="${test.security.daRestUrl}" />
     </bean>
     
     <bean

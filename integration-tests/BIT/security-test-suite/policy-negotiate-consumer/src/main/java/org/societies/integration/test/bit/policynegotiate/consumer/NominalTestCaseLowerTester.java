@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -108,7 +108,7 @@ public class NominalTestCaseLowerTester {
 	 * @throws URISyntaxException 
 	 */
 	@Test
-	public void testNegotiationServiceWith0Files() throws InterruptedException, URISyntaxException {
+	public void testNegotiationServiceWith0Files() throws Exception {
 		
 		LOG.info("[#1001] testNegotiationServiceWith0Files()");
 
@@ -142,7 +142,7 @@ public class NominalTestCaseLowerTester {
 	}
 
 	//@Test // Invoked by other test methods
-	public void testNegotiationServiceWith2Files(String serviceIdStr) throws InterruptedException, URISyntaxException {
+	public void testNegotiationServiceWith2Files(String serviceIdStr) throws Exception {
 		
 		LOG.info("[#1001] testNegotiationServiceWith2Files()");
 
@@ -185,9 +185,10 @@ public class NominalTestCaseLowerTester {
 	/**
 	 * Try to join a CIS
 	 * @throws InterruptedException 
+	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testNegotiationCis() throws InterruptedException {
+	public void testNegotiationCis() throws InterruptedException, InvalidFormatException {
 		
 		LOG.info("[#1001] testNegotiationCis()");
 
@@ -222,9 +223,10 @@ public class NominalTestCaseLowerTester {
 	/**
 	 * Negotiation with invalid parameter
 	 * @throws InterruptedException 
+	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testNegotiationInvalid() throws InterruptedException {
+	public void testNegotiationInvalid() throws InterruptedException, InvalidFormatException {
 		
 		LOG.info("[#1001] testNegotiationInvalid()");
 
@@ -252,8 +254,7 @@ public class NominalTestCaseLowerTester {
 	}
 	
 	@Test
-	public void testFilesDownloadManualFilePlacement() throws InterruptedException, URISyntaxException,
-			MalformedURLException, IOException {
+	public void testFilesDownloadManualFilePlacement() throws Exception {
 
 		String urlStr;
 		int httpCode;
@@ -288,8 +289,7 @@ public class NominalTestCaseLowerTester {
 	}
 	
 	@Test
-	public void testFilesDownloadAutomaticFilePlacement() throws InterruptedException, URISyntaxException,
-			MalformedURLException, IOException {
+	public void testFilesDownloadAutomaticFilePlacement() throws Exception {
 
 		String urlStr;
 		int httpCode;
@@ -323,10 +323,15 @@ public class NominalTestCaseLowerTester {
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
 	}
 	
-	private IIdentity getProvider() {
+	private IIdentity getProvider() throws InvalidFormatException {
+		
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
-		return idMgr.getDomainAuthorityNode();
+		String providerJid = TestCase1001.getProviderJid();
+		
+		//return idMgr.getDomainAuthorityNode();
 		//return idMgr.getThisNetworkNode();
+		LOG.debug("getProvider(): using JID {}", providerJid);
+		return idMgr.fromFullJid(providerJid);
 	}
 	
 	private int getHttpCode(URL resource) throws IOException {
