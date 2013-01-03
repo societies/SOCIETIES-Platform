@@ -47,6 +47,7 @@ public class CertStorage {
 	private static Logger LOG = LoggerFactory.getLogger(CertStorage.class);
 
 	private static final String defaultCertificate = "default_certificate.p12";
+	private static final String defaultCertPassword = "p";
 	
 	//private static CertStorage instance;
 
@@ -94,6 +95,7 @@ public class CertStorage {
 		} catch (FileNotFoundException e) {
 			LOG.warn("Certificate file \"{}\" not found. Using default built-in certificate.", certFile);
 			ksStream = getClass().getClassLoader().getResourceAsStream(defaultCertificate);
+			certPassword = defaultCertPassword;
 		}
 
 		try {
