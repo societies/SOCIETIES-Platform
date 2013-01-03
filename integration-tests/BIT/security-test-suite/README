@@ -1,0 +1,30 @@
+The test for secure policy negotiation has two parts:
+1. provider - to be run on the provider side
+2. consumer - to be run on the consumer side
+
+3 nodes are used. Their roles are:
+- domain authority
+- provider
+- consumer
+
+Any roles can be grouped into one node. E.g., you can use only one node that
+has all 3 roles, i.e., run both parts of test on domain authority node.
+
+How to run the test:
+
+Set these properties:
+
+# Tell the provider part of the test which host name and port shall be used for
+# service file sharing.
+# This should be the host and port of the domain authority REST server, as seen
+# from service consumer side. Obviously, localhost is fine only if you will run
+# the consumer part of test on the domain authority node.
+test.security.daRestUrl=http://localhost:8080
+
+# Tell the consumer part of the test which identity is the provider.
+# On that node the provider part of the test should be run.
+test.security.providerJid=admin.societies.local
+
+Run the provider part. Wait for the test end.
+
+Run the consumer part.

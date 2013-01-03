@@ -28,6 +28,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
+import org.societies.security.policynegotiator.util.UrlParamName;
 
 /**
  * 
@@ -121,9 +123,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				throw new NegotiationException(e);
 			}
 			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
-			//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
-					serviceId.getIdentifier(), provider, signature, files, cb);
+					serviceId.getIdentifier(), provider, getMyCertificate(), signature, files, cb);
 			services.put(idStr, s);
 		}
 		else {
@@ -154,7 +155,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			URI server;
 			String uploadUri;
 			uploadUri = uriForFileUpload(fileServer.toASCIIString(), fileName,
-					serviceId.getIdentifier(), "FIXMEpublicKey");
+					serviceId.getIdentifier(), getMyCertificate());
 			try {
 				server = new URI(uploadUri);
 			} catch (URISyntaxException e) {
@@ -266,13 +267,30 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
 
+		pubkey = UrlParamName.base64ToUrl(pubkey);
+		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString() +
-				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey;
+				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey + 
+				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString();
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
 		return uriStr;
+	}
+	
+	private String getMyCertificate() throws NegotiationException {
+		
+		IIdentity myIdentity = groupMgr.getIdMgr().getThisNetworkNode();
+		X509Certificate cert = signatureMgr.getCertificate(myIdentity);
+		String certStr;
+		try {
+			certStr = signatureMgr.cert2str(cert);
+		} catch (DigsigException e) {
+			LOG.warn("getMyCertificate(): Could not get my own (provider's) certificate");
+			throw new NegotiationException(e);
+		}
+
+		return certStr;
 	}
 
 	/**

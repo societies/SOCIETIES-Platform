@@ -25,6 +25,8 @@ public class TestCase1001 extends IntegrationTestCase {
 	 */
 	private static INegotiationProviderRemote groupMgr;
 	
+	private static String providerJid;
+	
 	public TestCase1001() {
 		// Call the super constructor
 		// with test case number
@@ -50,5 +52,14 @@ public class TestCase1001 extends IntegrationTestCase {
 	
 	protected static INegotiationProviderRemote getGroupMgr() {
 		return groupMgr;
+	}
+
+	public void setProviderJid(String providerJid) {
+		LOG.debug("[#1001] setProviderJid()");
+		TestCase1001.providerJid = providerJid;
+	}
+	
+	protected static String getProviderJid() {
+		return providerJid;
 	}
 }

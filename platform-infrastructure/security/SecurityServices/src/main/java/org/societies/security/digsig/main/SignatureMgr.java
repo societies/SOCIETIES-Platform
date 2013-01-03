@@ -42,6 +42,7 @@ import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.digsig.util.DOMHelper;
+import org.societies.security.digsig.util.KeyUtil;
 import org.societies.security.digsig.util.StreamUtil;
 import org.societies.security.storage.CertStorage;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * Wrapper around {@link DigSig} and {@link XmlDSig}
+ * Wrapper around {@link DigSig}, {@link XmlDSig} and {@link KeyUtil}
  * 
  * @author Mitja Vardjan
  */
@@ -213,7 +214,8 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		return certStorage.getOurKey();
 	}
 	
-	private PublicKey getPublicKey(IIdentity identity) {
+	@Override
+	public PublicKey getPublicKey(IIdentity identity) {
 		// FIXME: return the correct result for the given identity
 		//LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
 		
@@ -229,5 +231,15 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	@Override
 	public String getRequesterSignatureId(Object doc) {
 		return xmlDSig.getRequesterSignatureId((Document) doc);
+	}
+	
+	@Override
+	public X509Certificate str2cert(String certStr) throws DigsigException {
+		return KeyUtil.str2cert(certStr);
+	}
+
+	@Override
+	public String cert2str(X509Certificate cert) throws DigsigException {
+		return KeyUtil.cert2str(cert);
 	}
 }
