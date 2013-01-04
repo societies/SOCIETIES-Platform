@@ -1,7 +1,5 @@
 package org.societies.android.platform.comms.helper;
 
-import static android.content.Context.BIND_AUTO_CREATE;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +31,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class ClientCommunicationMgr {
@@ -48,16 +45,20 @@ public class ClientCommunicationMgr {
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
-	private ServiceConnection registerConnection;	
 	private HashMap<Long, ICommCallback> xmppCallbackMap;
 	private HashMap<Long, IMethodCallback> methodCallbackMap;
 	
 	private String identityJID;
 	private String domainAuthority;
+	private IIdentityManager idManager;
 	
-	protected IIdentityManager idManager;
-	
-	public ClientCommunicationMgr(Context androidContext) {
+	/**
+	 * Default constructor
+	 * 
+	 * @param androidContext
+	 * @param loginCompleted true if XMPP login has takem place
+	 */
+	public ClientCommunicationMgr(Context androidContext, boolean loginCompleted) {
 		Log.d(LOG_TAG, "Instantiate ClientCommunicationMgr");
 		this.androidContext = androidContext;
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
@@ -69,9 +70,15 @@ public class ClientCommunicationMgr {
 		
 		this.identityJID = null;
 		this.domainAuthority = null;
+		this.idManager = null;
 		
 		this.setupBroadcastReceiver();
-		this.bindToService();
+		
+		if (loginCompleted) {
+			this.bindToServiceAfterLogin();
+		} else {
+			this.bindToServiceBeforeLogin();
+		}
 	}
 	
 	public void register(final List<String> elementNames, final ICommCallback callback) {
@@ -94,17 +101,6 @@ public class ClientCommunicationMgr {
 		InvokeRegister invoke = new InvokeRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoke.execute();
 		
-//		registerConnection = new ServiceConnection() {
-//			public void onServiceConnected(ComponentName cn, IBinder binder) {
-//				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
-//				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller));				
-//			}
-//
-//			public void onServiceDisconnected(ComponentName cn) {				
-//			}			
-//		};
-		
-//		bindService(registerConnection);
 	}
 	
 	public void unregister(final List<String> elementNames, final ICommCallback callback) {
@@ -125,26 +121,6 @@ public class ClientCommunicationMgr {
 		InvokeUnRegister invoke = new InvokeUnRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoke.execute();
 		
-//		ServiceConnection connection = new ServiceConnection() {			
-//			public void onServiceConnected(ComponentName cn, IBinder binder) {
-//				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
-//				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));
-//				try {
-//					Log.d(LOG_TAG, "unregister element names unbindService for : " + this.toString() + " " + System.currentTimeMillis());
-//					androidContext.unbindService(this);
-//					
-//					Log.d(LOG_TAG, "unregister element names previous registration unbindService for: " + registerConnection.toString() + " " + System.currentTimeMillis());
-//					androidContext.unbindService(registerConnection);
-//				} catch(Exception e) {
-//					Log.e(LOG_TAG, "Exception while unbinding service.", e);
-//				}
-//			}
-//			
-//			public void onServiceDisconnected(ComponentName cn) {				
-//			}			
-//		};
-//		
-//		bindService(connection);
 	}
 	
 	public boolean UnRegisterCommManager(IMethodCallback callback) {
@@ -157,15 +133,7 @@ public class ClientCommunicationMgr {
 
 		InvokeUnRegisterCommManager invoke = new InvokeUnRegisterCommManager(this.clientPackageName, callbackID);
 		invoke.execute();
-//		try {
-//			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.UnRegisterCommManager();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
+
 		return false;
 	}
 	/**
@@ -266,6 +234,15 @@ public class ClientCommunicationMgr {
 		return this.idManager;
 	}
 	
+	/**
+	 * Get XMPP items
+	 * 
+	 * @param entity
+	 * @param node
+	 * @param callback
+	 * @return
+	 * @throws CommunicationException
+	 */
 	public String getItems(final IIdentity entity, final String node, final ICommCallback callback) throws CommunicationException {
 		Dbc.require("Entity cannot be null", null != entity);
 		Dbc.require("Node must be specified", null != node && node.length() > 0);
@@ -280,42 +257,15 @@ public class ClientCommunicationMgr {
 		InvokeGetItems invoke = new InvokeGetItems(this.clientPackageName, entity.getJid(), node, callbackID);
 		invoke.execute();
 		
-//		try {
-//			return (String)miServiceConnection.invokeAndKeepBound(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.getItems(entity.getJid(), node, new CallbackAdapter(callback, androidContext, miServiceConnection, marshaller));
-//				}
-//			});
-//		} catch (Throwable e) {
-//			if(e instanceof CommunicationException)
-//				throw (CommunicationException)e;
-//			else
-//				throw new CommunicationException(e.getMessage(), e);
-//		}
 		return null;
 	}
+	
 	
 	private void sendMessage(final String xml) {
 
 		InvokeSendMessage invoke = new InvokeSendMessage(this.clientPackageName, xml);
 		invoke.execute();
 		
-//		ServiceConnection connection = new ServiceConnection() {
-//
-//			public void onServiceConnected(ComponentName cn, IBinder binder) {
-//				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
-//				agent.sendMessage(xml);		
-//				
-//				Log.d(LOG_TAG, "sendMessage unbindService for: " + this.toString() + " " + System.currentTimeMillis());
-//				androidContext.unbindService(this);
-//			}
-//
-//			public void onServiceDisconnected(ComponentName cn) {				
-//			}
-//			
-//		};
-//		
-//		bindService(connection);
 	}
 	
 	private void sendIQ(final String xml, long remoteCallID) {
@@ -323,45 +273,14 @@ public class ClientCommunicationMgr {
 		InvokeSendIQ invoke = new InvokeSendIQ(this.clientPackageName, xml, remoteCallID);
 		invoke.execute();
 		
-//		ServiceConnection connection = new ServiceConnection() {
-//
-//			public void onServiceConnected(ComponentName cn, IBinder binder) {
-//				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
-//				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller));
-//			}
-//
-//			public void onServiceDisconnected(ComponentName cn) {				
-//			}
-//			
-//		};
-//		
-//		bindService(connection);
 	}
 	
-//	private void bindService(ServiceConnection connection) {
-//		Log.d(LOG_TAG, "bindService bindService for: " + connection.toString() + " " + System.currentTimeMillis());
-//		Intent intent = new Intent();
-//        intent.setComponent(serviceCN);
-//        androidContext.bindService(intent, connection, BIND_AUTO_CREATE);
-//	}
 	
 	private String getIdentityJid() {
 		Log.d(LOG_TAG, "getIdentityJid");
 		
 		InvokeGetIdentityJid invoke  = new InvokeGetIdentityJid(this.clientPackageName);
 		invoke.execute();
-		
-//		String identityJid;
-//		try {
-//			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.getIdentity();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
-//		Log.d(LOG_TAG, "getIdentityJid: " + identityJid);
 		
 		return null;
 	}
@@ -372,16 +291,6 @@ public class ClientCommunicationMgr {
 		InvokeGetDomainAuthorityNode invoke  = new InvokeGetDomainAuthorityNode(this.clientPackageName);
 		invoke.execute();
 		
-//		String daNode;
-//		try {
-//			daNode = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.getDomainAuthorityNode();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
 		return null;
 	}
 
@@ -396,17 +305,6 @@ public class ClientCommunicationMgr {
 		InvokeIsConnected invoke = new InvokeIsConnected(this.clientPackageName, callbackID);
 		invoke.execute();
 		
-//		boolean connected;
-//		try {
-//			connected = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					Log.d(LOG_TAG, "connect ?: " + agent.isConnected());
-//					return agent.isConnected();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
 		return false;
 	}
 	
@@ -424,19 +322,7 @@ public class ClientCommunicationMgr {
 
 		InvokeNewMainIdentity invoke  = new InvokeNewMainIdentity(this.clientPackageName, identifier, domain, password, callbackID);
 		invoke.execute();
-//		try {
-//			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.newMainIdentity(identifier, domain, password);
-//				}
-//			});
-//			if(rv == null)
-//				return null;
-//			idManager = createIdentityManager(rv, getDomainAuthorityNode());
-//			return idManager.getThisNetworkNode();
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
+
 		return null;
 	}
 	
@@ -454,39 +340,9 @@ public class ClientCommunicationMgr {
 		InvokeLogin invoke = new InvokeLogin(this.clientPackageName, identifier, domain, password, callbackID);
 		invoke.execute();
 		
-//		try {
-//			String rv;
-//			rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.login(identifier, domain, password);
-//				}
-//			});
-//			if(rv == null)
-//				return null;
-//			idManager = createIdentityManager(rv, getDomainAuthorityNode());
-//			return idManager.getThisNetworkNode();
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
 		return null;
 	}
 	
-//	public INetworkNode loginFromConfig() {
-//		Log.d(LOG_TAG, "loginFromConfig");
-//		try {
-//			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.loginFromConfig();
-//				}
-//			});
-//			if(rv == null)
-//				return null;
-//			idManager = createIdentityManager(rv, getDomainAuthorityNode());
-//			return idManager.getThisNetworkNode();
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
-//	}
 	
 	public boolean logout(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
@@ -499,16 +355,6 @@ public class ClientCommunicationMgr {
 		InvokeLogout invoke = new InvokeLogout(this.clientPackageName, callbackID);
 		invoke.execute();
 		
-		//		boolean rv;
-//		try {
-//			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.logout();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
 		return false;
 	}
 	
@@ -523,16 +369,6 @@ public class ClientCommunicationMgr {
 		InvokeDestroyMainIdentity invoke  = new InvokeDestroyMainIdentity(this.clientPackageName, callbackID);
 		invoke.execute();
 		
-//		boolean rv;
-//		try {
-//			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					return agent.destroyMainIdentity();
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
 		return false;
 	}	
 	
@@ -546,57 +382,6 @@ public class ClientCommunicationMgr {
 		invoke.execute();
 	}
 	
-//	public void setDomainAuthorityNode(final String domainAuthorityNode) {
-//		try {
-//			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					agent.setDomainAuthorityNode(domainAuthorityNode);
-//					return null;
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
-//	}
-//	
-//	public void setPortNumber(final int port) {
-//		try {
-//			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					agent.setPortNumber(port);
-//					return null;
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
-//	}
-//	
-//	public void setResource(final String resource) {
-//		try {
-//			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					agent.setResource(resource);
-//					return null;
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}		
-//	}
-//	
-//	public void setDebug(final boolean enabled) {
-//		try {
-//			miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-//				public Object invoke(XMPPAgent agent) throws Throwable {
-//					agent.setDebug(enabled);
-//					return null;
-//				}
-//			});
-//		} catch (Throwable e) {
-//			throw new RuntimeException(e.getMessage(), e);
-//		}
-//	}
 	
 	private static IIdentityManager createIdentityManager(String thisNode, String daNode) throws InvalidFormatException {
 		IIdentityManager idManager;
@@ -641,6 +426,10 @@ public class ClientCommunicationMgr {
 			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
 				ClientCommunicationMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
 			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
+		    	//Get the values for these properties as soon as the XMPP login has been performed
+		    	ClientCommunicationMgr.this.getDomainAuthorityNode();
+		    	ClientCommunicationMgr.this.getIdentityJid();
+
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
 			} else if (intent.getAction().equals(XMPPAgent.CONFIGURE_AGENT)) {
@@ -686,15 +475,22 @@ public class ClientCommunicationMgr {
         return intentFilter;
     }
     
-    private void bindToService() {
+    private void bindToServiceAfterLogin() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
     	Log.d(LOG_TAG, "Bind to Societies Android Comms Service: ");
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
+    private void bindToServiceBeforeLogin() {
+    	Intent serviceIntent = new Intent(SERVICE_ACTION);
+    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service: ");
+    	this.androidContext.bindService(serviceIntent, serviceConnectionLogin, Context.BIND_AUTO_CREATE);
+    }
+
     
     /**
-     * Create Service Connection to remote service
+     * Create Service Connection to remote service. Assumes that XMPP login and configuration 
+     * has taken place
      */
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
@@ -710,6 +506,22 @@ public class ClientCommunicationMgr {
 	    	//Get the values for these properties as soon as the service is bound to.
 	    	ClientCommunicationMgr.this.getDomainAuthorityNode();
 	    	ClientCommunicationMgr.this.getIdentityJid();
+		}
+	};
+	
+    /**
+     * Create Service Connection to remote service with XMPP login
+     */
+	private ServiceConnection serviceConnectionLogin = new ServiceConnection() {
+		public void onServiceDisconnected(ComponentName name) {
+			ClientCommunicationMgr.this.boundToService = false;
+	    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) disconnected");
+		}
+		
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			ClientCommunicationMgr.this.boundToService = true;
+			targetService = new Messenger(service);
+	    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) connected");
 		}
 	};
 	
