@@ -86,7 +86,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.serviceContext = serviceContext;
 	}
 	
-	public String register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
+	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.length > 0);
 		Dbc.require("Namespaces must be specified", null != namespaces && namespaces.length > 0);
@@ -107,30 +107,35 @@ public class AndroidCommsBase implements XMPPAgent {
 			}
 		}
 		
+		//Send intent
+		Intent intent = new Intent();
+		if (AndroidCommsBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+
 		try {
 			connect();
 			
 			// TODO remove packet listener on unregister
 			connection.addPacketListener( new RegisterPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(Message.class), 
 											new NamespaceFilter(namespaces)));
+			intent.setAction(XMPPAgent.REGISTER_RESULT);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
-			//Send intent
-			Intent intent = new Intent(REGISTER_EXCEPTION);
-			if (AndroidCommsBase.this.restrictBroadcast) {
-				intent.setPackage(client);
-			}
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
-			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
-			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			intent.setAction(XMPPAgent.REGISTER_EXCEPTION);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 		}
 		
-		return null;
+		return false;
 	}
 	
-	public void unregister(String client, String[] elementNames, String[] namespaces) {
+	public boolean unregister(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.length > 0);
 		Dbc.require("Namespaces must be specified", null != namespaces && namespaces.length > 0);
@@ -143,17 +148,38 @@ public class AndroidCommsBase implements XMPPAgent {
 //			Log.d(LOG_TAG, "unregister namespace: " + namespace);
 //		}
 		
-		for(int i=0; i<elementNames.length; i++) {
-			for(int j=0; j<namespaces.length; j++) {
-				ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
-				providerRegistrar.unregister(tuple);
-				if(!providerRegistrar.isRegistered(tuple)) { 
-					removeProviders(tuple);
+		//Send intent
+		Intent intent = new Intent();
+		if (AndroidCommsBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+		try {
+			for(int i=0; i<elementNames.length; i++) {
+				for(int j=0; j<namespaces.length; j++) {
+					ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
+					providerRegistrar.unregister(tuple);
+					if(!providerRegistrar.isRegistered(tuple)) { 
+						removeProviders(tuple);
+					}
 				}
 			}
+			intent.setAction(XMPPAgent.UNREGISTER_RESULT);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
+			
+			disconnect();
+
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage(), e);			
+			intent.setAction(XMPPAgent.REGISTER_EXCEPTION);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+		} finally {
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 		}
-		
-		disconnect();
+
+		return false;
 	}
 	
 	public boolean UnRegisterCommManager(String client, long remoteCallId) {
@@ -163,28 +189,43 @@ public class AndroidCommsBase implements XMPPAgent {
 		boolean retValue = false;
 		
 		//Send intent
-		Intent intent = new Intent(UN_REGISTER_COMM_MANAGER);
-		if (this.restrictBroadcast) {
+		Intent intent = new Intent();
+		if (AndroidCommsBase.this.restrictBroadcast) {
 			intent.setPackage(client);
 		}
+		intent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 
 		try {
 			retValue = UnRegisterCommManagerInternal();
+			
+			intent.setAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
+
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
-		} finally {
+			intent.setAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+
+		} finally {
 			this.serviceContext.sendBroadcast(intent);
 		}
 
 		return false;
 	}
 	
-	public void sendMessage(String client, String messageXml) {
+	public boolean sendMessage(String client, String messageXml, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("XML must be specified", null != messageXml && messageXml.length() > 0);
 		
+		//Send intent
+		Intent intent = new Intent();
+		if (AndroidCommsBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+
 		Packet formattedMessage = createPacketFromXml(messageXml);
 		
 		Log.d(LOG_TAG, "sendMessage xml message size: " + formattedMessage.toXML().length());
@@ -196,12 +237,22 @@ public class AndroidCommsBase implements XMPPAgent {
 			connection.sendPacket(formattedMessage);
 		
 			disconnect();
+			intent.setAction(XMPPAgent.SEND_MESSAGE_RESULT);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 		} catch (Exception e) {
-			Log.d(LOG_TAG, e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
+			intent.setAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+
+		} finally {
+			this.serviceContext.sendBroadcast(intent);
 		}
+		return false;
 	}	
 
-	public String sendIQ(String client, String xml, long remoteCallId) {
+	public boolean sendIQ(String client, String xml, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("XML must be specified", null != xml && xml.length() > 0);
 		Log.d(LOG_TAG, "sendIQ xml: " + xml);
@@ -233,7 +284,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 
 		}
-		return null;
+		return false;
 	}
 	
 	public String getIdentity(String client, long remoteCallId) {

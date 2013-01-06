@@ -10,9 +10,9 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
  */
 public interface XMPPAgent {
 	String methodsArray [] = {"register(String client, String[] elementNames, String[] namespaces, long remoteCallId)",
-							  "unregister(String client, String[] elementNames, String[] namespaces)",
+							  "unregister(String client, String[] elementNames, String[] namespaces, long remoteCallId)",
 							  "UnRegisterCommManager(String client, long remoteCallId)",
-							  "sendMessage(String client, String messageXml)",
+							  "sendMessage(String client, String messageXml, long remoteCallId)",
 							  "sendIQ(String client, String xml, long remoteCallId)",
 							  "getIdentity(String client, long remoteCallId)",
 							  "getDomainAuthorityNode(String client, long remoteCallId)",
@@ -36,7 +36,8 @@ public interface XMPPAgent {
 	public static final String INTENT_RETURN_EXCEPTION_TRACE_KEY = "org.societies.android.platform.comms.ReturnExceptionTrace";
 	public static final String INTENT_RETURN_CALL_ID_KEY = "org.societies.android.platform.comms.ReturnCallId";
 
-	public static final String UN_REGISTER_COMM_MANAGER = "org.societies.android.platform.comms.UN_REGISTER_COMM_MANAGER";
+	public static final String UN_REGISTER_COMM_MANAGER_RESULT = "org.societies.android.platform.comms.UN_REGISTER_COMM_MANAGER_RESULT";
+	public static final String UN_REGISTER_COMM_MANAGER_EXCEPTION = "org.societies.android.platform.comms.UN_REGISTER_COMM_MANAGER_EXCEPTION";
 	public static final String GET_IDENTITY = "org.societies.android.platform.comms.GET_IDENTITY";
 	public static final String GET_DOMAIN_AUTHORITY_NODE = "org.societies.android.platform.comms.GET_DOMAIN_AUTHORITY_NODE";
 	public static final String GET_ITEMS_RESULT = "org.societies.android.platform.comms.GET_ITEMS_RESULT";
@@ -48,22 +49,26 @@ public interface XMPPAgent {
 	public static final String LOGOUT = "org.societies.android.platform.comms.LOGOUT";
 	public static final String DESTROY_MAIN_IDENTITY = "org.societies.android.platform.comms.DESTROY_MAIN_IDENTITY";
 	public static final String CONFIGURE_AGENT = "org.societies.android.platform.comms.CONFIGURE_AGENT";
+	public static final String UNREGISTER_RESULT = "org.societies.android.platform.comms.UNREGISTER_RESULT";
+	public static final String UNREGISTER_EXCEPTION = "org.societies.android.platform.comms.UNREGISTER_EXCEPTION";
 	public static final String REGISTER_RESULT = "org.societies.android.platform.comms.REGISTER_RESULT";
 	public static final String REGISTER_EXCEPTION = "org.societies.android.platform.comms.REGISTER_EXCEPTION";
 	public static final String SEND_IQ_RESULT = "org.societies.android.platform.comms.SEND_IQ_RESULT";
-	public static final String SEND_IQ_ERROR = "org.societies.android.platform.comms.SEND_IQ_ERROR";
 	public static final String SEND_IQ_EXCEPTION = "org.societies.android.platform.comms.SEND_IQ_EXCEPTION";
+	public static final String SEND_IQ_ERROR = "org.societies.android.platform.comms.SEND_IQ_ERROR";
+	public static final String SEND_MESSAGE_RESULT = "org.societies.android.platform.comms.SEND_MESSAGE_RESULT";
+	public static final String SEND_MESSAGE_EXCEPTION = "org.societies.android.platform.comms.SEND_MESSAGE_EXCEPTION";
 
 
-	public String register(String client, String[] elementNames, String[] namespaces, long remoteCallId);
+	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId);
 	
-	public void unregister(String client, String[] elementNames, String[] namespaces);
+	public boolean unregister(String client, String[] elementNames, String[] namespaces, long remoteCallId);
 	
 	public boolean UnRegisterCommManager(String client, long remoteCallId);
 	
-	public void sendMessage(String client, String messageXml);
+	public boolean sendMessage(String client, String messageXml, long remoteCallId);
 
-	public String sendIQ(String client, String xml, long remoteCallId);
+	public boolean sendIQ(String client, String xml, long remoteCallId);
 	
 	public String getIdentity(String client, long remoteCallId);
 	

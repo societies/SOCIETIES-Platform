@@ -5,6 +5,14 @@ package org.societies.android.api.comms;
  *
  */
 public interface IMethodCallback {
-
-	void returnAction(Object o);
+	/**
+	 * A generic method to receive the callback action
+	 * @param resultFlag
+	 */
+	void returnAction(boolean resultFlag);
+	/**
+	 * A generic method to receive the callback action
+	 * @param result
+	 */
+	void returnAction(String result);
 }

@@ -44,13 +44,12 @@
 		<!-- Utilities -->
 		<module>../../utilities/DBC</module>
 
-		<!-- Android Communication components -->
+		<!-- Android Communication components
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgent</module>
-		<module>../../platform-infrastructure/client-frwk/AndroidPubsub</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidComms</module>
+		<module>../../platform-infrastructure/client-frwk/AndroidPubsub</module-->
 
 		<!-- API -->
 		<!--module>../../platform-infrastructure/client-frwk/CoreInterfaces</module -->
@@ -66,7 +65,11 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
+                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
  
+                <!-- Android Communications -->
+                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidComms</module>
+
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>

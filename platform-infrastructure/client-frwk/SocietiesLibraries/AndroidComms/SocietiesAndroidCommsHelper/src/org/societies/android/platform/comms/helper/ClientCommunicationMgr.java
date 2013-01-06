@@ -1,9 +1,12 @@
 package org.societies.android.platform.comms.helper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import org.societies.android.api.comms.ICallback;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
@@ -37,7 +40,6 @@ public class ClientCommunicationMgr {
 	
 	private static final String LOG_TAG = ClientCommunicationMgr.class.getName();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
-    
 	private boolean boundToService;
 	private Messenger targetService = null;
 	private String clientPackageName;
@@ -45,49 +47,89 @@ public class ClientCommunicationMgr {
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
-	private HashMap<Long, ICommCallback> xmppCallbackMap;
-	private HashMap<Long, IMethodCallback> methodCallbackMap;
+	private Map<Long, ICommCallback> xmppCallbackMap;
+	private Map<Long, IMethodCallback> methodCallbackMap;
 	
 	private String identityJID;
 	private String domainAuthority;
 	private IIdentityManager idManager;
+	private boolean loginCompleted;
+	private BroadcastReceiver receiver;
+	private IMethodCallback bindCallback;
 	
 	/**
 	 * Default constructor
 	 * 
 	 * @param androidContext
-	 * @param loginCompleted true if XMPP login has takem place
+	 * @param loginCompleted true if XMPP login has taken place
 	 */
 	public ClientCommunicationMgr(Context androidContext, boolean loginCompleted) {
+		Dbc.require("Android context must be supplied", null != androidContext);
+		
 		Log.d(LOG_TAG, "Instantiate ClientCommunicationMgr");
 		this.androidContext = androidContext;
+		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
 		
 		this.randomGenerator = new Random(System.currentTimeMillis());
 		
-		this.xmppCallbackMap = new HashMap<Long, ICommCallback>();
-		this.methodCallbackMap = new HashMap<Long, IMethodCallback>();
+		this.xmppCallbackMap = Collections.synchronizedMap(new HashMap<Long, ICommCallback>());
+		this.methodCallbackMap = Collections.synchronizedMap(new HashMap<Long, IMethodCallback>());
 		
 		this.identityJID = null;
 		this.domainAuthority = null;
 		this.idManager = null;
+		this.loginCompleted = loginCompleted;
+		this.receiver = null;
 		
 		this.setupBroadcastReceiver();
-		
-		if (loginCompleted) {
+		//TODO: methods for this service should only be invoked when this service has been 
+		// bound to successfully. The Bind action should return a callback to signal the bind status
+	}
+	
+	/**
+	 * Binds to Android Comms Service
+	 */
+	public void bindCommsService(IMethodCallback bindCallback) {
+		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
+		Log.d(LOG_TAG, "Bind to Android Comms Service");
+		this.bindCallback = bindCallback;
+
+		if (this.loginCompleted) {
 			this.bindToServiceAfterLogin();
 		} else {
 			this.bindToServiceBeforeLogin();
 		}
+
 	}
-	
+	/**
+	 * Unbinds from the Android Comms service
+	 * 
+	 * @return true if no more requests queued
+	 */
+	public boolean unbindCommsService() {
+		Log.d(LOG_TAG, "Unbind from Android Comms Service");
+		boolean retValue = false;
+		synchronized (this.xmppCallbackMap) {
+			if (this.methodCallbackMap.isEmpty() && this.xmppCallbackMap.isEmpty()) {
+				this.teardownBroadcastReceiver();
+				unBindService();
+				retValue = true;
+			}
+		}
+		
+		return retValue;
+	}
 	public void register(final List<String> elementNames, final ICommCallback callback) {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
 
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.xmppCallbackMap.put(callbackID, callback);
+
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
 		
 		Log.d(LOG_TAG, "register element names");
 		
@@ -108,10 +150,12 @@ public class ClientCommunicationMgr {
 		Dbc.require("Callback object must be supplied", null != callback);
 		Log.d(LOG_TAG, "unregister");
 		
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.xmppCallbackMap.put(callbackID, callback);
 
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
 		for (String element : elementNames) {
 //			Log.d(LOG_TAG, "unregister element: " + element);
 		}
@@ -127,10 +171,13 @@ public class ClientCommunicationMgr {
 		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "UnRegisterCommManager");
 
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
 		InvokeUnRegisterCommManager invoke = new InvokeUnRegisterCommManager(this.clientPackageName, callbackID);
 		invoke.execute();
 
@@ -182,11 +229,14 @@ public class ClientCommunicationMgr {
 		Dbc.require("IQ Type must be specified", null != type);
 		Dbc.require("Payload must be specified", null != payload);
 		Dbc.require("Callback object must be supplied", null != callback);
-		
-		//store callback in order to activate required methods
-		long callbackID = this.randomGenerator.nextLong();
-		this.xmppCallbackMap.put(callbackID, callback);
 
+		long callbackID = this.randomGenerator.nextLong();
+
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
+		
 		try {
 			stanza.setFrom(getIdManager().getThisNetworkNode());
 			Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
@@ -250,9 +300,12 @@ public class ClientCommunicationMgr {
 		
 		Log.d(LOG_TAG, "getItems for node: " + node);
 
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.xmppCallbackMap.put(callbackID, callback);
+
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
 		
 		InvokeGetItems invoke = new InvokeGetItems(this.clientPackageName, entity.getJid(), node, callbackID);
 		invoke.execute();
@@ -276,19 +329,19 @@ public class ClientCommunicationMgr {
 	}
 	
 	
-	private String getIdentityJid() {
+	private String getIdentityJid(long callbackID) {
 		Log.d(LOG_TAG, "getIdentityJid");
 		
-		InvokeGetIdentityJid invoke  = new InvokeGetIdentityJid(this.clientPackageName);
+		InvokeGetIdentityJid invoke  = new InvokeGetIdentityJid(this.clientPackageName, callbackID);
 		invoke.execute();
 		
 		return null;
 	}
 	
-	private String getDomainAuthorityNode() {
+	private String getDomainAuthorityNode(long callbackID) {
 		Log.d(LOG_TAG, "getDomainAuthorityNode");
-		
-		InvokeGetDomainAuthorityNode invoke  = new InvokeGetDomainAuthorityNode(this.clientPackageName);
+
+		InvokeGetDomainAuthorityNode invoke  = new InvokeGetDomainAuthorityNode(this.clientPackageName, callbackID);
 		invoke.execute();
 		
 		return null;
@@ -298,10 +351,14 @@ public class ClientCommunicationMgr {
 		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "isConnected");
 		
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+			Dbc.ensure("Callback has to be added to map", this.methodCallbackMap.containsKey(callbackID));
+		}
+		
 		InvokeIsConnected invoke = new InvokeIsConnected(this.clientPackageName, callbackID);
 		invoke.execute();
 		
@@ -316,10 +373,13 @@ public class ClientCommunicationMgr {
 		
 		Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password);
 
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
 		InvokeNewMainIdentity invoke  = new InvokeNewMainIdentity(this.clientPackageName, identifier, domain, password, callbackID);
 		invoke.execute();
 
@@ -333,10 +393,13 @@ public class ClientCommunicationMgr {
 		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "login domain: " + domain + " identifier: " + identifier + " password: " + password);
 		
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
 		InvokeLogin invoke = new InvokeLogin(this.clientPackageName, identifier, domain, password, callbackID);
 		invoke.execute();
 		
@@ -348,10 +411,13 @@ public class ClientCommunicationMgr {
 		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "logout");
 		
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
 		InvokeLogout invoke = new InvokeLogout(this.clientPackageName, callbackID);
 		invoke.execute();
 		
@@ -362,23 +428,34 @@ public class ClientCommunicationMgr {
 		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "destroyMainIdentity");
 
-		//store callback in order to activate required methods
 		long callbackID = this.randomGenerator.nextLong();
-		this.methodCallbackMap.put(callbackID, callback);
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
 		InvokeDestroyMainIdentity invoke  = new InvokeDestroyMainIdentity(this.clientPackageName, callbackID);
 		invoke.execute();
 		
 		return false;
 	}	
 	
-	public void configureAgent(String domainAuthorityNode, int xmppPort, String resource, boolean debug) {
+	public void configureAgent(String domainAuthorityNode, int xmppPort, String resource, boolean debug, IMethodCallback callback) {
 		Dbc.require("Domain Authority Node must be specified", null != domainAuthorityNode && domainAuthorityNode.length() > 0);
 		Dbc.require("XMPP Port must be greater than zero", xmppPort > 0);
 		Dbc.require("JID resource must be specified", null != resource && resource.length() > 0);
+		Dbc.require("Method callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "configureAgent");
 		
-		InvokeConfigureAgent invoke  = new InvokeConfigureAgent(this.clientPackageName, domainAuthorityNode, xmppPort, resource, debug);
+		long callbackID = this.randomGenerator.nextLong();
+
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, callback);
+		}
+		
+		InvokeConfigureAgent invoke  = new InvokeConfigureAgent(this.clientPackageName, domainAuthorityNode, xmppPort, resource, debug, callbackID);
 		invoke.execute();
 	}
 	
@@ -398,15 +475,20 @@ public class ClientCommunicationMgr {
      * @return the created broadcast receiver
      */
     private BroadcastReceiver setupBroadcastReceiver() {
-    	BroadcastReceiver receiver = null;
-    	
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        receiver = new MainReceiver();
-        this.androidContext.registerReceiver(receiver, createTestIntentFilter());    
+        this.receiver = new MainReceiver();
+        this.androidContext.registerReceiver(this.receiver, createTestIntentFilter());    
         Log.d(LOG_TAG, "Register broadcast receiver");
 
         return receiver;
+    }
+    /**
+     * Unregister the broadcast receiver
+     */
+    private void teardownBroadcastReceiver() {
+        Log.d(LOG_TAG, "Tear down broadcast receiver");
+    	this.androidContext.unregisterReceiver(this.receiver);
     }
 
     /**
@@ -419,31 +501,72 @@ public class ClientCommunicationMgr {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			long callbackId = intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0);
 			
 			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					Dbc.ensure(ClientCommunicationMgr.this.methodCallbackMap.size() > 0);
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					Dbc.ensure("Callback must exist", null != callback);
+					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				}
+				
 			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
 				ClientCommunicationMgr.this.identityJID = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+				//Having logged in and obtained the DomainAuthority and Identity JID through chained calls
+				//invoke the login callback 
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+				}
 			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
+		    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
 				ClientCommunicationMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
 			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
-		    	//Get the values for these properties as soon as the XMPP login has been performed
-		    	ClientCommunicationMgr.this.getDomainAuthorityNode();
-		    	ClientCommunicationMgr.this.getIdentityJid();
-
+		    	//Get the values for DomainAuthority and Identity JID after the XMPP login has been performed
+		    	ClientCommunicationMgr.this.getDomainAuthorityNode(callbackId);
+		    	
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				}
+			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				}
 			} else if (intent.getAction().equals(XMPPAgent.CONFIGURE_AGENT)) {
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				}
+			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.DESTROY_MAIN_IDENTITY)) {
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+					callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				}
+
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
+			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_RESULT)) {
+			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY)) {
 			}
+			
 		}
     }
 
@@ -455,7 +578,8 @@ public class ClientCommunicationMgr {
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER);
+        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT);
+        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.DESTROY_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
@@ -465,28 +589,47 @@ public class ClientCommunicationMgr {
         intentFilter.addAction(XMPPAgent.SEND_IQ_RESULT);
         intentFilter.addAction(XMPPAgent.SEND_IQ_ERROR);
         intentFilter.addAction(XMPPAgent.SEND_IQ_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.SEND_MESSAGE_RESULT);
+        intentFilter.addAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
         intentFilter.addAction(XMPPAgent.LOGOUT);
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER);
         intentFilter.addAction(XMPPAgent.CONFIGURE_AGENT);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
         intentFilter.addAction(XMPPAgent.REGISTER_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         return intentFilter;
     }
     
     private void bindToServiceAfterLogin() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service: ");
+    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void bindToServiceBeforeLogin() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service: ");
+    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service before Login");
     	this.androidContext.bindService(serviceIntent, serviceConnectionLogin, Context.BIND_AUTO_CREATE);
     }
 
+    /**
+     * Unbind from Android Comms service
+     */
+    private void unBindService() {
+    	Log.d(LOG_TAG, "Unbind from Societies Android Comms Service");
+    	if (this.loginCompleted) {
+    		if (this.boundToService) {
+            	this.androidContext.unbindService(serviceConnection);
+    		}
+    	} else {
+    		if (this.boundToService) {
+            	this.androidContext.unbindService(serviceConnectionLogin);
+    		}
+    	}
+    }
     
     /**
      * Create Service Connection to remote service. Assumes that XMPP login and configuration 
@@ -502,10 +645,7 @@ public class ClientCommunicationMgr {
 			ClientCommunicationMgr.this.boundToService = true;
 			targetService = new Messenger(service);
 	    	Log.d(LOG_TAG, "Societies Android Comms Service connected");
-
-	    	//Get the values for these properties as soon as the service is bound to.
-	    	ClientCommunicationMgr.this.getDomainAuthorityNode();
-	    	ClientCommunicationMgr.this.getIdentityJid();
+	    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
 		}
 	};
 	
@@ -522,6 +662,7 @@ public class ClientCommunicationMgr {
 			ClientCommunicationMgr.this.boundToService = true;
 			targetService = new Messenger(service);
 	    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) connected");
+	    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
 		}
 	};
 	
@@ -882,14 +1023,18 @@ public class ClientCommunicationMgr {
 
     	private final String LOCAL_LOG_TAG = InvokeGetIdentityJid.class.getName();
     	private String client;
+    	private long remoteCallId;
+
     	/**
     	 * Default Constructor
     	 * 
     	 * @param packageName
     	 * @param client
     	 */
-    	public InvokeGetIdentityJid(String client) {
+    	public InvokeGetIdentityJid(String client, long remoteCallId) {
     		this.client = client;
+        	this.remoteCallId = remoteCallId;
+
     	}
 
     	protected Void doInBackground(Void... args) {
@@ -903,6 +1048,9 @@ public class ClientCommunicationMgr {
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
 
     		outMessage.setData(outBundle);
 
@@ -929,6 +1077,7 @@ public class ClientCommunicationMgr {
 
     	private final String LOCAL_LOG_TAG = InvokeGetDomainAuthorityNode.class.getName();
     	private String client;
+    	private long remoteCallId;
 
     	/**
     	 * Default Constructor
@@ -936,8 +1085,10 @@ public class ClientCommunicationMgr {
     	 * @param packageName
     	 * @param client
     	 */
-    	public InvokeGetDomainAuthorityNode(String client) {
+    	public InvokeGetDomainAuthorityNode(String client, long remoteCallId) {
     		this.client = client;
+        	this.remoteCallId = remoteCallId;
+
     	}
 
     	protected Void doInBackground(Void... args) {
@@ -951,6 +1102,9 @@ public class ClientCommunicationMgr {
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
 
     		outMessage.setData(outBundle);
 
@@ -1273,6 +1427,7 @@ public class ClientCommunicationMgr {
     	private int xmppPort;
     	private String resource;
     	private boolean debug;
+    	private long callbackID;
 
     	/**
     	 * Default Constructor
@@ -1280,12 +1435,13 @@ public class ClientCommunicationMgr {
     	 * @param packageName
     	 * @param client
     	 */
-    	public InvokeConfigureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug) {
+    	public InvokeConfigureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long callbackID) {
     		this.client = client;
     		this.domainAuthorityNode = domainAuthorityNode;
     		this.xmppPort = xmppPort;
     		this.resource = resource;
     		this.debug = debug;
+    		this.callbackID = callbackID;
    	}
 
     	protected Void doInBackground(Void... args) {
@@ -1311,6 +1467,9 @@ public class ClientCommunicationMgr {
 
     		outBundle.putBoolean(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.debug);
     		Log.d(LOCAL_LOG_TAG, "Debug Flag: " + this.debug);
+
+       		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.callbackID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.callbackID);
 
     		outMessage.setData(outBundle);
 
