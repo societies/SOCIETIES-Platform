@@ -72,7 +72,10 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		super.tearDown();
 	}
 
-	@MediumTest
+//	@MediumTest
+	/**
+	 * Used to determine Android or Java array class names
+	 */
 	public void testAndroidArrayClassTypes() {
 		int integerArray [] = new int [10];
 		Log.d(LOG_TAG, "Class integer array: " + integerArray.getClass().getName());

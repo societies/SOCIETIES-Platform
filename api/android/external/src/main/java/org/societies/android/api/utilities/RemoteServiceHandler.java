@@ -35,10 +35,16 @@ import android.util.Log;
 
 
 public class RemoteServiceHandler extends Handler {
+	private static final String BUNDLE_GET_METHOD_PREFIX = "get";
+	private static final String BUNDLE_ARRAY_GET_METHOD_SUFFIX = "Array";
+	private static final String BUNDLE_GET_PARCELABLE_METHOD = "getParcelable";
+	public static final String JAVA_ARRAY = "[]";
+
 	private static final String LOG_TAG = RemoteServiceHandler.class.getName();
 	private Class <?> container;
 	private Object containerObject;
 	private String [] methodsArray;
+	
 		
 	/**
 	 * Default constructor 
@@ -68,25 +74,21 @@ public class RemoteServiceHandler extends Handler {
 					Log.d(LOG_TAG,"Target method param types: " + element.getName());
 				}
 
-				Method method = this.container.getMethod(
-								ServiceMethodTranslator.getMethodName(
-										this.methodsArray,
-										message.what), parameterClasses);
+				Method method = this.container.getMethod(ServiceMethodTranslator.getMethodName(this.methodsArray,message.what), parameterClasses);
+				
 				Log.d(LOG_TAG, "Found method: " + method.getName());
 				try {
 					Object params[] = new Object[ServiceMethodTranslator
 							.getParameterNumber(targetMethod)];
 					Log.d(LOG_TAG, "Number of parameters: " + params.length);
 
-					String paramTypeList[] = ServiceMethodTranslator
-							.getMethodParameterTypesCapitalised(targetMethod);
+					String paramTypeList[] = ServiceMethodTranslator.getMethodParameterTypesCapitalised(targetMethod);
 
 					for (String type : paramTypeList) {
 						Log.d(LOG_TAG, "Parameter type: " + type);
 					}
 
-					String paramNameList[] = ServiceMethodTranslator
-							.getMethodParameterNames(targetMethod);
+					String paramNameList[] = ServiceMethodTranslator.getMethodParameterNames(targetMethod);
 
 					// unless the class loader is set bad things happen
 					Bundle bundle = message.getData();
@@ -101,12 +103,12 @@ public class RemoteServiceHandler extends Handler {
 
 						if (implementsParcelable(parameterClasses[i])) {
 							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an instance of Parcelable");
-							bundleMethod = Bundle.class.getMethod("getParcelable", bundleParam);
+							bundleMethod = Bundle.class.getMethod(BUNDLE_GET_PARCELABLE_METHOD, bundleParam);
 						} else if (parameterClasses[i].isArray()) {
 							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an array");
-							bundleMethod = Bundle.class.getMethod("get" + paramTypeList[i], bundleParam);
+							bundleMethod = Bundle.class.getMethod(createBundleArrayMethod(paramTypeList[i]), bundleParam);
 						} else {
-							bundleMethod = Bundle.class.getMethod("get" + paramTypeList[i], bundleParam);
+							bundleMethod = Bundle.class.getMethod(BUNDLE_GET_METHOD_PREFIX + paramTypeList[i], bundleParam);
 						}
 						Log.d(LOG_TAG,"Method invoked: " + bundleMethod.getName());
 
@@ -153,6 +155,22 @@ public class RemoteServiceHandler extends Handler {
 		}
 
 		return retValue;
+	}
+	/**
+	 * Get the relevant Android Bundle get array method for a given array parameter type
+	 * 
+	 * @param parameterType
+	 * @return String method
+	 */
+	private String createBundleArrayMethod(String parameterType) {
+		StringBuffer method = new StringBuffer();
+		
+		if (parameterType.contains(JAVA_ARRAY)) {
+			method.append(BUNDLE_GET_METHOD_PREFIX);
+			method.append(parameterType.replace(JAVA_ARRAY, ""));
+			method.append(BUNDLE_ARRAY_GET_METHOD_SUFFIX);
+		}
+		return method.toString();
 	}
 }
 
