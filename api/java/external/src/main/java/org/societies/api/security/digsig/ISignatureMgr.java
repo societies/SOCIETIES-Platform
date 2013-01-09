@@ -28,6 +28,7 @@ package org.societies.api.security.digsig;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -79,10 +80,12 @@ public interface ISignatureMgr {
 	 * 
 	 * @param xml The XML containing embedded digital signatures to be verified.
 	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
+	 * @return List of references of all valid digital signatures and their
+	 * corresponding certificates.
+	 * 
+	 * @throws DigsigException If any signature is invalid
 	 */
-	public boolean verifyXml(String xml);
+	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException;
 
 	/**
 	 * Digitally sign given data.
@@ -182,11 +185,10 @@ public interface ISignatureMgr {
 	 * @return The certificate, or null if identity not found or no certificate
 	 * is associated with the identity
 	 */
-	@Deprecated
 	public X509Certificate getCertificate(IIdentity identity);
 	
 	/**
-	 * Gets private key for the given identity.
+	 * Gets the private key for the given identity.
 	 * If the identity is not one of own identities (of this CSS), then null is returned.
 	 * 
 	 * @param identity The identity to get private key for
@@ -195,4 +197,31 @@ public interface ISignatureMgr {
 	 */
 	@Deprecated
 	public PrivateKey getPrivateKey(IIdentity identity);
+	
+	/**
+	 * Gets the public key for the given identity.
+	 * 
+	 * @param identity The identity to get private key for
+	 * 
+	 * @return The private key
+	 */
+	public PublicKey getPublicKey(IIdentity identity);
+
+	/**
+	 * Convert Base64 {@link String} representation of X.509 certificate to {@link X509Certificate}
+	 * 
+	 * @param certStr Base64 representation of the {@link X509Certificate}
+	 * @return The X.509 certificate
+	 * @throws DigsigException
+	 */
+	public X509Certificate str2cert(String certStr) throws DigsigException;
+	
+	/**
+	 * Convert {@link X509Certificate} to {@link String}
+	 * 
+	 * @param cert The certificate to convert
+	 * @return Base64 representation of the {@link X509Certificate}
+	 * @throws DigsigException if an encoding error occurs
+	 */
+	public String cert2str(X509Certificate cert) throws DigsigException;
 }

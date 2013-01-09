@@ -24,29 +24,11 @@
  */
 package org.societies.context.example.broker;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.management.ICSSLocalManager;
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -55,32 +37,24 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeBond;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxBond;
-import org.societies.api.context.model.CtxBondOriginType;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.*;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * This class provides examples for using the internal Context Broker in OSGi. 
@@ -946,8 +920,8 @@ public class CtxBrokerExample implements Subscriber{
 	public void pubsubEvent(IIdentity pubsubService, String node,
 			String itemId, Object item) {
 
-		if(item.getClass().equals(org.societies.api.schema.activity.Activity.class)){
-			Activity a = (Activity)item;
+		if(item.getClass().equals(org.societies.api.schema.activity.MarshaledActivity.class)){
+            MarshaledActivity a = (MarshaledActivity)item;
 			LOG.info("*************************** pubsubevent with acitvity " + a.getActor() + " " +a.getVerb());
 		}
 	}

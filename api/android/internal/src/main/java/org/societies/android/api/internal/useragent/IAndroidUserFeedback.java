@@ -30,6 +30,13 @@ import org.societies.api.internal.useragent.model.ImpProposalContent;
 
 public interface IAndroidUserFeedback{
 
+	//Array of interface method signatures
+	String methodsArray [] = {
+			"getExplicitFB(String client, int type, ExpProposalContent content)",
+			"getImplicitFB(String client, int type, ImpProposalContent content)",
+			"showNotification(String client, String notificationText)"
+			};
+	
 	/**
 	 * Get explicit feedback from the user - force them to interact with notification box
 	 * @param client

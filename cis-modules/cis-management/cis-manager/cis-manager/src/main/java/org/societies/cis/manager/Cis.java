@@ -48,11 +48,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierFactory;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.*;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -63,7 +59,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activityfeed.*;
@@ -1138,14 +1133,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			
 		}
-		if (payload.getClass().equals(Activityfeed.class)) {
-			LOG.debug("activity feed type received");
-			Activityfeed c = (Activityfeed) payload;
+		if (payload.getClass().equals(MarshaledActivityFeed.class)) {
+			LOG.info("activity feed type received");
+            MarshaledActivityFeed c = (MarshaledActivityFeed) payload;
 			
 			// delete Activity
 
 			if (c.getDeleteActivity() != null) {
-				Activityfeed result = new Activityfeed();
+                MarshaledActivityFeed result = new MarshaledActivityFeed();
 				DeleteActivityResponse r = new DeleteActivityResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				
@@ -1154,11 +1149,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 				IActivity iActivity = new org.societies.activity.model.Activity();
-				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
-				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
-				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
-				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+				iActivity.setActor(c.getDeleteActivity().getMarshaledActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getMarshaledActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getMarshaledActivity().getTarget());
+				iActivity.setPublished(c.getDeleteActivity().getMarshaledActivity().getPublished());
+				iActivity.setVerb(c.getDeleteActivity().getMarshaledActivity().getVerb());
 
 				r.setResult(activityFeed.deleteActivity(iActivity));
 
@@ -1171,12 +1166,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// get Activities
 			if (c.getGetActivities() != null) {
-				LOG.debug("get activities called");
-				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+				LOG.info("get activities called");
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				List<IActivity> iActivityList;
-				List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+				List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 				
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
@@ -1196,7 +1191,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 				while(it.hasNext()){
 					IActivity element = it.next();
-					org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+					org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
 					a.setActor(element.getActor());
 					a.setObject(a.getObject());
 					a.setPublished(a.getPublished());
@@ -1204,8 +1199,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 					marshalledActivList.add(a);
 			     }
 				*/
-					LOG.debug("finished the marshling");
-				r.setActivity(marshalledActivList);
+					LOG.info("finished the marshling");
+				r.setMarshaledActivity(marshalledActivList);
 				result.setGetActivitiesResponse(r);		
 				return result;
 
@@ -1214,7 +1209,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// add Activity
 
 			if (c.getAddActivity() != null) {
-				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				AddActivityResponse r = new AddActivityResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				
@@ -1223,11 +1218,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 				IActivity iActivity = new org.societies.activity.model.Activity();
-				iActivity.setActor(c.getAddActivity().getActivity().getActor());
-				iActivity.setObject(c.getAddActivity().getActivity().getObject());
-				iActivity.setTarget(c.getAddActivity().getActivity().getTarget());
-				iActivity.setPublished(c.getAddActivity().getActivity().getPublished());
-				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
+				iActivity.setActor(c.getAddActivity().getMarshaledActivity().getActor());
+				iActivity.setObject(c.getAddActivity().getMarshaledActivity().getObject());
+				iActivity.setTarget(c.getAddActivity().getMarshaledActivity().getTarget());
+				iActivity.setPublished(c.getAddActivity().getMarshaledActivity().getPublished());
+				iActivity.setVerb(c.getAddActivity().getMarshaledActivity().getVerb());
 
 				activityFeed.addActivity(iActivity);
 				
@@ -1243,7 +1238,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// cleanup activities
 			if (c.getCleanUpActivityFeed() != null) {
-				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				

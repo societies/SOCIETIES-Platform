@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildpath>
+	<buildpathentry excluding="**/skeleton/|**/Tests/|**/tests/|**/CG/**/Fixture/" kind="src" path="vendor"/>
+	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
+	<buildpathentry excluding="bundles/*" kind="src" path="web"/>
+	<buildpathentry kind="src" path="src"/>
+	<buildpathentry excluding="**/cache/|**/logs/" kind="src" path="app"/>
+</buildpath>

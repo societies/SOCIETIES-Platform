@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.integration.test.bit.1001.provider.plan" version="3.0.0" scoped="false"
+	atomic="false" xmlns="http://www.eclipse.org/virgo/schema/plan"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" 
+                http://www.eclipse.org/virgo/schema/plan 
+                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- Dependencies for the test -->
+<!--
+	<artifact type="plan" name="org.societies.css.commfrwk"/>
+	<artifact type="plan" name="org.societies.common.modules"/>
+	<artifact type="plan" name="org.societies.security"/>
+	<artifact type="bundle" name="DomainAuthorityRest"/>
+-->
+
+	<!-- The test -->
+	<artifact type="bundle" name="org.societies.integration.test.bit.bit-1001-policy-negotiate-provider" />
+
+</plan>

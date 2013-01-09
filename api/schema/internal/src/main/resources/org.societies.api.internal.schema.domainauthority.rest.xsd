@@ -15,6 +15,7 @@
 				<xs:element name="method" type="tns:methodType" minOccurs="0"/>
 				<xs:element name="serviceId" type="xs:anyURI" minOccurs="0" />
 				<xs:element name="providerIdentity" type="xs:string" minOccurs="0"/>
+				<xs:element name="providerX509Certificate" type="xs:string" minOccurs="0"/>
 				<xs:element name="signature" type="xs:string" minOccurs="0"/>
 				<xs:element name="files" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 				<!--xs:choice minOccurs="0" maxOccurs="unbounded">

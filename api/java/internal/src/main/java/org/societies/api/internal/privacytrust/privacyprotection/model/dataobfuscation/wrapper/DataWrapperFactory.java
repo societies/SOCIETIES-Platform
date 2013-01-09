@@ -28,7 +28,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.SimpleDataIdentifier;
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 
@@ -162,15 +162,15 @@ public class DataWrapperFactory {
 	 * @param object
 	 * @return
 	 */
-	public static IDataWrapper<Activity> getActivityWrapper(String actor, String verb, String object) {
+	public static IDataWrapper<MarshaledActivity> getActivityWrapper(String actor, String verb, String object) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.ACTION);
-		Activity data = new Activity();
+        MarshaledActivity data = new MarshaledActivity();
 		data.setActor(actor);
 		data.setVerb(verb);
 		data.setObject(object);
-		return new DataWrapper<Activity>(dataId, data);
+		return new DataWrapper<MarshaledActivity>(dataId, data);
 	}
 
 

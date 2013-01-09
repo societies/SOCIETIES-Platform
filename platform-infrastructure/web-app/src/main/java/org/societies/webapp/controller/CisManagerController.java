@@ -65,7 +65,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.JoinResponse;
@@ -338,8 +338,9 @@ public class CisManagerController {
 				// GET ACIVITIES
 				ActivityFeedClient activityFeedCallback = new ActivityFeedClient();
 				icis.getActivityFeed().getActivities(0 + " " + System.currentTimeMillis(), activityFeedCallback);
-				org.societies.api.schema.activityfeed.Activityfeed actFeedResponse = activityFeedCallback.getActivityFeed();
-				model.put("activities",actFeedResponse.getGetActivitiesResponse().getActivity());
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed actFeedResponse = activityFeedCallback.getActivityFeed();
+				model.put("activities",actFeedResponse.getGetActivitiesResponse().getMarshaledActivity());
+						
 				
 				//actFeedResponse.getGetActivitiesResponse().getActivity().get(0).ge
 				AddActivityForm form = new AddActivityForm();
@@ -376,7 +377,7 @@ public class CisManagerController {
 		
 		icis.getActivityFeed().addActivity(act, activityFeedCallback);
 		LOG.info("add act");
-		Activityfeed ac= activityFeedCallback.getActivityFeed();
+		MarshaledActivityFeed ac= activityFeedCallback.getActivityFeed();
 		if(null != ac && ac.getAddActivityResponse().isResult()){
 			return communityProfilePage(addActForm.getCisId(),null);
 		}

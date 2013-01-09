@@ -25,30 +25,14 @@
 
 package org.societies.cis.manager.tester;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.xml.bind.JAXBException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisManagerCallback;
-import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -59,17 +43,10 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.css.management.ICSSManagerCallback;
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.Criteria;
-import org.societies.api.schema.cis.community.MembershipCrit;
-import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.manager.CommunityManager;
-import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
+
+import java.util.*;
 
 
 /**
@@ -211,7 +188,7 @@ public class CisMgmtTester implements Subscriber{
 
 
 		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.api.schema.activity.Activity");
+		packageList.add("org.societies.api.schema.activity.MarshaledActivity");
 		try {
 			pubsubClient.addSimpleClasses(packageList);
 		} catch (Exception e) {
@@ -389,19 +366,19 @@ public class CisMgmtTester implements Subscriber{
 	
 
 		@Override
-		public void receiveResult(Activityfeed activityFeedObject) {
+		public void receiveResult(MarshaledActivityFeed activityFeedObject) {
 			if(activityFeedObject ==null || activityFeedObject.getGetActivitiesResponse() == null){
 				LOG.info("callback response was empty");
 				return;
 			}
-			if (activityFeedObject.getGetActivitiesResponse().getActivity() != null ){
-				if (activityFeedObject.getGetActivitiesResponse().getActivity().size() < 1){
+			if (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity() != null ){
+				if (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() < 1){
 					LOG.info("empty list");
 				}else{
-					if(activityFeedObject.getGetActivitiesResponse().getActivity().get(0) == null)
+					if(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0) == null)
 						LOG.info("null activity in non null list");
 					else
-						LOG.info("activity eq " + activityFeedObject.getGetActivitiesResponse().getActivity().get(0).getVerb());
+						LOG.info("activity eq " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0).getVerb());
 					return;
 				}
 				
@@ -421,8 +398,8 @@ public class CisMgmtTester implements Subscriber{
 	public void pubsubEvent(IIdentity pubsubService, String node,
 			String itemId, Object item) {
 		// TODO Auto-generated method stub
-		if(item.getClass().equals(org.societies.api.schema.activity.Activity.class)){
-			Activity a = (Activity)item;
+		if(item.getClass().equals(MarshaledActivity.class)){
+            MarshaledActivity a = (MarshaledActivity)item;
 			
 			LOG.info("pubsubevent with acitvity " + a.getActor() + " " +a.getVerb()+ " " +a.getTarget());
 		}else{

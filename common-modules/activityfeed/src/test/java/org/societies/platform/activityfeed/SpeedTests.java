@@ -37,7 +37,7 @@ import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -112,7 +112,7 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
     }
 
     @Override
-    public void receiveResult(Activityfeed activityFeedObject) {
+    public void receiveResult(MarshaledActivityFeed activityFeedObject) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

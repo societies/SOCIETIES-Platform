@@ -40,6 +40,7 @@ import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
@@ -128,11 +129,11 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@Override
-	public Future<SlaBean> getPolicyOptions(String serviceId) {
+	public Future<SlaBean> getPolicyOptions(String serviceId, NegotiationType type) {
 		
 		LOG.debug("getPolicyOptions({})", serviceId);
 
-		Session session = new Session();
+		Session session = new Session(type);
 		boolean success;
 		String slaStr = null;
 		Document doc;
@@ -179,45 +180,54 @@ public class NegotiationProvider implements INegotiationProvider {
 		String finalSla;
 		List<URI> signedUris;
 		String serviceId;
+		Future<SlaBean> result = new AsyncResult<SlaBean>(sla);
 		
 		sla.setSessionId(sessionId);
 		
-		if (session != null && signatureMgr.verifyXml(signedPolicyOption)) {
-			
-			// FIXME: only in case of service negotiation, not in case of CIS negotiation
-			if (true) {
-				serviceId = session.getServiceId();
-				try {
-					signedUris = providerServiceMgr.getSignedUris(serviceId);
-					sla.setFileUris(signedUris);
-				} catch (NegotiationException e) {
-					LOG.warn("acceptPolicyAndGetSla()", e);
-					//sla.setSuccess(false);
+		try {
+			if (session == null) {
+				LOG.warn("acceptPolicyAndGetSla({}): invalid session", sessionId);
+				sla.setSuccess(false);
+				return result;
+			}
+			else {
+				if (signatureMgr.verifyXml(signedPolicyOption).size() < 2) {
+					LOG.warn("acceptPolicyAndGetSla({}): signatures missing", sessionId);
+					sla.setSuccess(false);
+					return result;
 				}
 			}
+		} catch (DigsigException e) {
+			LOG.warn("acceptPolicyAndGetSla({}): invalid signature, {}", sessionId, e);
+			sla.setSuccess(false);
+			return result;
+		}
 
+		serviceId = session.getServiceId();
+		if (session.getType() == NegotiationType.SERVICE) {
 			try {
-				Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(signedPolicyOption));
-				finalSla = signatureMgr.signXml(signedPolicyOption, slaSignatureMgr.getRequesterSignatureId(doc),
-						groupMgr.getIdMgr().getThisNetworkNode());
-				sla.setSla(finalSla);
-				sla.setSuccess(true);
-			} catch (UnsupportedEncodingException e) {
-				LOG.warn("acceptPolicyAndGetSla(): Could not parse XML string", e);
-				sla.setSuccess(false);
-			} catch (DigsigException e) {
-				LOG.warn("acceptPolicyAndGetSla(): Could not append final signature", e);
+				signedUris = providerServiceMgr.getSignedUris(serviceId);
+				sla.setFileUris(signedUris);
+			} catch (NegotiationException e) {
+				LOG.warn("acceptPolicyAndGetSla()", e);
 				sla.setSuccess(false);
 			}
-
 		}
-		else {
-			LOG.info("acceptPolicyAndGetSla({}): invalid signature", sessionId);
+
+		try {
+			Document doc = DOMHelper.parseDocument(StreamUtil.str2stream(signedPolicyOption));
+			finalSla = signatureMgr.signXml(signedPolicyOption, slaSignatureMgr.getRequesterSignatureId(doc),
+					groupMgr.getIdMgr().getThisNetworkNode());
+			sla.setSla(finalSla);
+			sla.setSuccess(true);
+		} catch (UnsupportedEncodingException e) {
+			LOG.warn("acceptPolicyAndGetSla(): Could not parse XML string", e);
+			sla.setSuccess(false);
+		} catch (DigsigException e) {
+			LOG.warn("acceptPolicyAndGetSla(): Could not append final signature", e);
 			sla.setSuccess(false);
 		}
 		
-		Future<SlaBean> result = new AsyncResult<SlaBean>(sla);
-
 		return result;
 	}
 

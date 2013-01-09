@@ -45,9 +45,10 @@
 			<version>${release.version}</version>
 		</dependency> -->
 		<dependency>
-   			<groupId>org.societies.android.api.external</groupId>
-   			<artifactId>societies-android-api</artifactId>
-  			<version>${release.version}</version>
+		        <groupId>org.societies.android.api.external</groupId>
+        		<artifactId>societies-android-api</artifactId>
+        		<version>${release.version}</version>
+       			<type>apklib</type>
 		</dependency> 
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>

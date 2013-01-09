@@ -32,6 +32,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -110,7 +111,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
 		
-		sendIQ(toIdentity, MethodType.ACCEPT_POLICY_AND_GET_SLA, null,
+		sendIQ(toIdentity, MethodType.ACCEPT_POLICY_AND_GET_SLA, null, null,
 				sessionId, signedPolicyOption, modified, callback);
 	}
 
@@ -124,11 +125,12 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void getPolicyOptions(String serviceId, Requestor provider, INegotiationProviderCallback callback) {
+	public void getPolicyOptions(String serviceId, NegotiationType type, Requestor provider,
+			INegotiationProviderCallback callback) {
 		
 		LOG.debug("getPolicyOptions({})", provider.getRequestorId());
 		
-		sendIQ(provider.getRequestorId(), MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
+		sendIQ(provider.getRequestorId(), MethodType.GET_POLICY_OPTIONS, serviceId, type, -1, null, false, callback);
 	}
 
 	/*
@@ -143,7 +145,7 @@ public class CommsClient implements INegotiationProviderRemote {
 
 		LOG.debug("reject({})", sessionId);
 
-		sendIQ(toIdentity, MethodType.REJECT, null, sessionId, null, false, callback);
+		sendIQ(toIdentity, MethodType.REJECT, null, null, sessionId, null, false, callback);
 	}
 	
 	/**
@@ -158,12 +160,12 @@ public class CommsClient implements INegotiationProviderRemote {
 	 * @param modified
 	 * @return Stanza ID for success, null for error
 	 */
-	private String sendIQ(IIdentity toIdentity, MethodType method,
-			String serviceId, int sessionId, String sla, boolean modified,
+	private String sendIQ(IIdentity toIdentity, MethodType method, String serviceId,
+			NegotiationType type, int sessionId, String sla, boolean modified,
 			INegotiationProviderCallback callback) {
 		
 		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
-				", " + sessionId + ", ..., " + modified + ")");
+				", " + type + ", " + sessionId + ", ..., " + modified + ")");
 		
 		// Create stanza
 		Stanza stanza = new Stanza(toIdentity);
@@ -174,6 +176,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		ProviderBean provider = new ProviderBean();
 		provider.setMethod(method);
 		provider.setServiceId(serviceId);
+		provider.setNegotiationType(type);
 		provider.setSessionId(sessionId);
 		provider.setSignedPolicyOption(sla);
 		provider.setModified(modified);

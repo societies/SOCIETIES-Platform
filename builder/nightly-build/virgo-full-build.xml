@@ -54,6 +54,7 @@
 		<module>../../css-modules/device-mgmt/devicemanagerconsumer/</module>
 		
 		<!-- Intelligent Community Orchestration: 4 bundles (not included in cloud node distribution until more integrated)-->
+		<!-- <module>../../intelligent-community-orchestration</module> -->
 		<!-- 
 		<module>../../intelligent-community-orchestration/API</module>
 		<module>../../intelligent-community-orchestration/CommunityLifecycleManagement</module> 

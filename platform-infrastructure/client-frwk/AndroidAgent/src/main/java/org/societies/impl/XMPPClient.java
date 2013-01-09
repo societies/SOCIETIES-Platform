@@ -350,12 +350,16 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public String login(String identifier, String domain, String password) {
-		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password);
+		return login(identifier, domain, password, null);
+	}
+	
+	public String login(String identifier, String domain, String password, String host) {
+		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host);
 		
 		if(isConnected())
 			logout();
 		String username = username(identifier, domain);
-		loadConfig(domain, username, password);
+		loadConfig(domain, username, password, host);
 		try {
 			connect();
 			return username + "/" + resource;
@@ -410,16 +414,19 @@ public class XMPPClient implements XMPPAgent {
 		port = defaultConfig.getPort();
 		resource = defaultConfig.getResource();
 		debug = defaultConfig.getDebug();
-		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword());	
+		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword(), defaultConfig.getHost());	
 	}
 	
-	private void loadConfig(String server, String username, String password) {
-		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password);
+	private void loadConfig(String serviceName, String username, String password, String host) {
+		Log.d(LOG_TAG, "loadConfig serviceName: " + serviceName + " username: " + username + " password: " + password + " host: " + host);
+		
+		if(host == null)
+			host = serviceName;
 		
 		this.username = username;
 		this.password = password;
-		
-		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
+			
+		ConnectionConfiguration config = new ConnectionConfiguration(host, port, serviceName);
 
 		connection = new XMPPConnection(config);
 		
