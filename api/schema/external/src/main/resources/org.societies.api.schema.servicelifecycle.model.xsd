@@ -12,9 +12,6 @@
 			Schema doc to generate the model objects required to interface with the ServiceManagement service
 		</xs:documentation>
 		<xs:appinfo>
-			<jaxb:schemaBindings>
-	        	<jaxb:package name="org.societies.maven.converters" />
-	    	</jaxb:schemaBindings>
 			<jaxb:globalBindings>
 				<jaxb:javaType name="java.net.URI" xmlType="xs:anyURI" parseMethod="create" printMethod="toASCIIString"/>
 				<jaxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="parse" printMethod="toString"/>
