@@ -32,29 +32,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 
 /**
  * @phase process-sources
@@ -119,7 +108,7 @@ public class Jaxb2Simple extends AbstractMojo
 			// Process all java files now and delete unwanted ones
 			for (File javaFile : files) {
 				if (javaFile.isFile()) { //IGNORE DIRECTORIES
-					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java")) {
+					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java") || javaFile.getName().equals("Adapter2.java")) {
 						getLog().debug("Deleting: " + javaFile.getAbsolutePath());
 						javaFile.delete();
 
@@ -289,6 +278,11 @@ public class Jaxb2Simple extends AbstractMojo
 		textToReplace = "import org.societies.maven.converters.URIConverter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
+		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.maven.converters.URIConverter;
+		textToFind = "import org.w3._2001.xmlschema.Adapter2;";
+		textToReplace = "import org.societies.maven.converters.DateConverter;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		//import javax.xml.bind.annotation.adapters.CollapsedStringAdapter; -> import org.societies.maven.converters.CollapsedStringAdapter;
 		textToFind = "import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;";
 		textToReplace = "import org.societies.maven.converters.CollapsedStringAdapter;";
@@ -298,7 +292,16 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "@XmlJavaTypeAdapter\\(Adapter1.*\\.class?\\)";
 		textToReplace = "@Convert(URIConverter.class)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)
+		textToFind = "@XmlJavaTypeAdapter\\(Adapter2.*\\.class?\\)";
+		textToReplace = "@Convert(DateConverter.class)";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
+		textToFind = "import java.util.Date;";
+		textToReplace = "import java.text.DateFormat;\nimport java.text.SimpleDateFormat;\nimport java.util.Date;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		//@XmlJavaTypeAdapter(CollapsedStringAdapter.class) -> @Convert(CollapsedStringAdapter.class)
 		textToFind = "@XmlJavaTypeAdapter\\(CollapsedStringAdapter.class?\\)";
 		textToReplace = "@Convert(CollapsedStringAdapter.class)";
@@ -477,12 +480,14 @@ public class Jaxb2Simple extends AbstractMojo
 		return newSchemaContent;
 	}
 
-	private String replaceParcelableStuff(File javaFile,
-			String schemaContent) {
+	private String replaceParcelableStuff(File javaFile, String schemaContent) {
 		String textToFind; String textToReplace;
 
 		// -- Check if this file has to be Parcelable
 		if (isPatternMatching("Adapter1", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+		if (isPatternMatching("Adapter2", javaFile.getAbsolutePath())) {
 			return schemaContent;
 		}
 		if (!isPatternMatching("xjc", javaFile.getAbsolutePath())) {
@@ -694,6 +699,9 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
 			return "dest.writeString("+fieldName+".toString())";
 		}
+		if ("Date".equals(typeToParcelableRawType(type, false))) {
+			return "DateFormat df = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss Z\");\n\t\tString val = df.format(" +fieldName+ ");\n\t\tdest.writeString(val); ";
+		}
 		return writedMethod+"("+fieldName+")";
 	}
 
@@ -733,6 +741,9 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
 			return "try { "+fieldName+" = DatatypeFactory.newInstance().newXMLGregorianCalendar(in.readString()); } catch(DatatypeConfigurationException e) { System.out.println(\"Arg, can't create XMLGregorianCalendar for field "+fieldName+"\"); }";
+		}
+		if ("Date".equals(typeToParcelableRawType(type, false))) {
+			return "DateFormat df = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss Z\");\n\t\ttry { " + fieldName + " = df.parse(in.readString()); } catch(java.text.ParseException pEx) { System.out.println(\"Arg, can't parse DateTime for field "+fieldName+"\"); }";
 		}
 		return fieldName+" = "+readMethod+"()";
 	}
@@ -776,11 +787,11 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("float".equals(type)) {
 			return "Float";
 		}
-		if ("long".equals(type)) {
+		if ("long".equals(type) ) {
 			return "Long";
 		}
 		// Manual steps
-		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type) || "Date".equals(type)) {
 			return "String";
 		}
 		// Parcelable
@@ -815,11 +826,11 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("float".equals(type)) {
 			return "Float";
 		}
-		if ("long".equals(type)) {
+		if ("long".equals(type) ) {
 			return "Long";
 		}
 		// Manual steps
-		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type) || "Date".equals(type)) {
 			return type;
 		}
 		// Parcelable
