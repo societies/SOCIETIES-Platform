@@ -83,12 +83,11 @@ public class ClientCommunicationMgr {
 		this.receiver = null;
 		
 		this.setupBroadcastReceiver();
-		//TODO: methods for this service should only be invoked when this service has been 
-		// bound to successfully. The Bind action should return a callback to signal the bind status
 	}
 	
 	/**
 	 * Binds to Android Comms Service
+	 * @param bindCallback callback 
 	 */
 	public void bindCommsService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
@@ -110,11 +109,13 @@ public class ClientCommunicationMgr {
 	public boolean unbindCommsService() {
 		Log.d(LOG_TAG, "Unbind from Android Comms Service");
 		boolean retValue = false;
-		synchronized (this.xmppCallbackMap) {
-			if (this.methodCallbackMap.isEmpty() && this.xmppCallbackMap.isEmpty()) {
-				this.teardownBroadcastReceiver();
-				unBindService();
-				retValue = true;
+		synchronized (this.methodCallbackMap) {
+			synchronized (this.xmppCallbackMap) {
+				if (this.methodCallbackMap.isEmpty() && this.xmppCallbackMap.isEmpty()) {
+					this.teardownBroadcastReceiver();
+					unBindService();
+					retValue = true;
+				}
 			}
 		}
 		
@@ -493,8 +494,9 @@ public class ClientCommunicationMgr {
 
     /**
      * Broadcast receiver to receive intent return values from service method calls
-     * Essentially this receiver re-broadcasts relevant intents received from Android Communications. It uses a LocalBroadcastManager
-     * to ensure that the intents can only be received by components in the same application process.
+     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications. 
+     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
+     * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
     private class MainReceiver extends BroadcastReceiver {
 		
@@ -503,70 +505,118 @@ public class ClientCommunicationMgr {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
 			long callbackId = intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0);
-			
+
 			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
-					Dbc.ensure(ClientCommunicationMgr.this.methodCallbackMap.size() > 0);
 					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
-					Dbc.ensure("Callback must exist", null != callback);
-					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 				
 			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
-				ClientCommunicationMgr.this.identityJID = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
-				//Having logged in and obtained the DomainAuthority and Identity JID through chained calls
-				//invoke the login callback 
-				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
-					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
-					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-					callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
+					ClientCommunicationMgr.this.identityJID = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+					//Having logged in and obtained the DomainAuthority and Identity JID through chained calls
+					//invoke the appropriate callback
+					if (ClientCommunicationMgr.this.loginCompleted) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+				    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
+					} else {
+						synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+							IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+							ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+							callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						}
+					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
-		    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
-				ClientCommunicationMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
+			    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
+					ClientCommunicationMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+				}
+
 			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
-		    	//Get the values for DomainAuthority and Identity JID after the XMPP login has been performed
-		    	ClientCommunicationMgr.this.getDomainAuthorityNode(callbackId);
-		    	
+				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
+			    	//Get the values for DomainAuthority and Identity JID after the XMPP login has been performed
+			    	ClientCommunicationMgr.this.getDomainAuthorityNode(callbackId);
+				}
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
 					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
-					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
 					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
-					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.CONFIGURE_AGENT)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
 					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
-					ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-					callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.DESTROY_MAIN_IDENTITY)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
 				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
-					ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-					callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
+			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
+
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_RESULT)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+					}
+				}
 			}
-			
 		}
     }
 
@@ -645,7 +695,15 @@ public class ClientCommunicationMgr {
 			ClientCommunicationMgr.this.boundToService = true;
 			targetService = new Messenger(service);
 	    	Log.d(LOG_TAG, "Societies Android Comms Service connected");
-	    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
+	    	//The Domain Authority and Identity must now be retrieved before any other calls
+			long callbackID = ClientCommunicationMgr.this.randomGenerator.nextLong();
+
+			synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+				//store callback in order to activate required methods
+				ClientCommunicationMgr.this.methodCallbackMap.put(callbackID, null);
+			}
+
+	    	ClientCommunicationMgr.this.getDomainAuthorityNode(callbackID);
 		}
 	};
 	
