@@ -14,7 +14,7 @@ import android.test.suitebuilder.annotation.MediumTest;
 
 public class TestAndroidCtxQuality extends AndroidTestCase{
 
-	private final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; 
+	private final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -35,13 +35,13 @@ public class TestAndroidCtxQuality extends AndroidTestCase{
 	    //XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
 		//
 		
-	    String text = "2011-08-10 00:00:00-06:00";  
+	    String text = "2011-08-10T00:00:00-06:00";  
 	    //XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(text);
 	    
 	    try {
-	    DateFormat df = new SimpleDateFormat(DATE_TIME_FORMAT);
-	    Date xgcal = df.parse(text);
-		quality.setLastUpdated(xgcal);
+		    DateFormat df = new SimpleDateFormat(DATE_TIME_FORMAT);
+		    Date xgcal = df.parse(text);
+			quality.setLastUpdated(xgcal);
 	    } catch (ParseException pEx) {
 	    	fail("Exception parsing LastUpdated Date: " + pEx.getStackTrace());
 	    }

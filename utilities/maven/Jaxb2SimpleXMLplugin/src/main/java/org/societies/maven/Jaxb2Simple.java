@@ -691,6 +691,11 @@ public class Jaxb2Simple extends AbstractMojo
 				strList.append("\t\tdest.writeStringList("+fieldName+"StringList)");
 				return strList.toString();
 			}
+			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
+				String sByteCode = "dest.writeInt(" + fieldName + ".length);\n\t\t" + 
+								   "dest.writeByteArray(" + fieldName + ")";
+				return sByteCode;
+			}
 			return writedMethod+"("+fieldName+")";
 		}
 		if ("URI".equals(typeToParcelableRawType(type, false))) {
@@ -733,6 +738,11 @@ public class Jaxb2Simple extends AbstractMojo
 				strList.append("\t\t} catch(URISyntaxException e) { System.out.println(\"Arg, can't create URI for field fileUris\"); }\n");
 				strList.append("\t\tint i=0");
 				return strList.toString();
+			}
+			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
+				String sByteCode = fieldName + " = new byte[in.readInt()];\n\t\t" + 
+								   "in.readByteArray(" + fieldName + ")";
+				return sByteCode;
 			}
 			return readMethod+"("+fieldName+")";
 		}

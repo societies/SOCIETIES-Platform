@@ -31,7 +31,6 @@ public class TestAndroidCtxEntity extends AndroidTestCase{
 		CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();	
 		entityId.setString("ownerId/ENTITY/type/15");
 		
-//		ACtxEntity entity = new ACtxEntity(entityId);
 		CtxEntityBean entity = new CtxEntityBean();
 		try {
 			String text = "2011-08-10 00:00:00-06:00";
@@ -45,21 +44,18 @@ public class TestAndroidCtxEntity extends AndroidTestCase{
 		
 		assertNotNull(entityId);
 		assertNotNull(entity);
-		
 		assertEquals(0, entityId.describeContents());
 		assertEquals(0, entity.describeContents());
 		
         Parcel parcel = Parcel.obtain();
-//        entityId.writeToParcel(parcel, 0);
         entity.writeToParcel(parcel, 0);
+
         //done writing, now reset parcel for reading
         parcel.setDataPosition(0);
-        //finish round trip
-//        CtxEntityIdentifierBean createFromParcel = CtxEntityIdentifierBean.CREATOR.createFromParcel(parcel);
         CtxEntityBean createFromParcelEntity = CtxEntityBean.CREATOR.createFromParcel(parcel);
        
         assertNotNull(createFromParcelEntity);
-//        assertEquals(entityId.getString(), createFromParcel.getString());
-        assertEquals(entity.getId(), createFromParcelEntity.getId());
+        assertEquals(entity.getId().getString(), createFromParcelEntity.getId().getString());
+        assertEquals(entity.getLastModified() , createFromParcelEntity.getLastModified());
 	}
 }
