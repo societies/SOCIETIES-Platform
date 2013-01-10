@@ -25,9 +25,11 @@
 	<modules>
 		<module>schema/external/android-pom.xml</module>
 		<module>schema/internal/android-pom.xml</module>
+		<!-- NOT BUILDING THE JAVA API'S
 		<module>java/external/android-pom.xml</module>
 		<module>java/internal/android-pom.xml</module>
-		<module>android/external</module>
-		<module>android/internal</module>
+		 -->
+		<module>android/external2</module>
+		<module>android/internal2</module>
 	</modules>
 </project>

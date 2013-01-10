@@ -69,6 +69,7 @@
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
         <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
         <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
        <service
         	android:name="org.societies.android.platform.events.ServicePlatformEventsLocal">
         </service>

@@ -24,12 +24,7 @@
  */
 package org.societies.android.api.internal.privacytrust;
 
-import java.util.Map;
-
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.RequestorBean;
@@ -45,6 +40,11 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  * @created 09-nov.-2011 16:45:29
  */
 public interface IPrivacyPolicyManager {
+	/**
+	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
+	 * Must be used in the listening IntentFilter
+	 */
+	public static final String INTENT_DEFAULT_ACTION = "org.societies.android.privacytrust.DefaultAction";
 	/**
 	 * Intent field: Return value of the request
 	 */
@@ -96,68 +96,4 @@ public interface IPrivacyPolicyManager {
 	 * @throws PrivacyException
 	 */
 	public void deletePrivacyPolicy(String client, RequestorBean owner) throws PrivacyException;
-
-	/**
-	 * General function to help a developer or a user to create a privacy policy by inferring a default
-	 * one using information about the CIS or the service. The privacy policy in
-	 * result will be slightly completed but still need to be filled.
-	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
-	 * the inference engine will add geolocation data line to the privacy policy.
-	 * @param privacyPolicyType Type of the privacy policy: for a CIS or a 3P service
-	 * @param configuration Configuration of the CIS or the 3P service
-	 * @return A slightly completed privacy policy
-	 */
-	@SuppressWarnings("rawtypes")
-	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
-	
-	/**
-	 * Help a developer or a user to create a CIS privacy policy by inferring a default
-	 * one using information about the CIS. The privacy policy in
-	 * result will be slightly completed but still need to be filled.
-	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
-	 * the inference engine will add geolocation data line to the privacy policy.
-	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
-	 * @param membershipCriteria Membership criteria of the CIS (optional)
-	 * @param configuration Other optional configuration
-	 * @return A slightly completed privacy policy
-	 */
-	public RequestPolicy inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants globalBehaviour, MembershipCriteria membershipCriteria, Map<String, String> configuration) throws PrivacyException;
-	
-	/**
-	 * Help a developer or a user to create a CIS privacy policy by inferring a default
-	 * one using information about the CIS. The privacy policy in
-	 * result will be slightly completed but still need to be filled.
-	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
-	 * the inference engine will add geolocation data line to the privacy policy.
-	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
-	 * @param membershipCriteria Membership criteria of the CIS
-	 * @return A slightly completed privacy policy
-	 */
-	public RequestPolicy inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants globalBehaviour, MembershipCriteria membershipCriteria) throws PrivacyException;
-	
-	/**
-	 * Help a developer or a user to create a 3P-service privacy policy by inferring a default
-	 * one using information about the 3P-service. The privacy policy in
-	 * result will be slightly completed but still need to be filled.
-	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
-	 * the inference engine will add geolocation data line to the privacy policy.
-	 * @param configuration Configuration of the 3P service
-	 * @return A slightly completed privacy policy
-	 */
-	public RequestPolicy infer3pServicePrivacyPolicy(Map<String, String> configuration) throws PrivacyException;
-	
-	/**
-	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy
-	 * @param privacyPolicy Privacy policy
-	 * @return A string containing the XML version the privacy policy
-	 */
-	public String toXmlString(RequestPolicy privacyPolicy);
-	
-	/**
-	 * Create a Privacy Policy in a Java format from a XML format Privacy Policy
-	 * @param privacyPolicy Privacy policy
-	 * @return A Java object containing the privacy policy
-	 * @throws PrivacyException 
-	 */
-	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException;
 }

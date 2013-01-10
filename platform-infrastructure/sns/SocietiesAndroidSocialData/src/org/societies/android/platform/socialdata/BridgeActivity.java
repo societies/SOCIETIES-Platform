@@ -25,7 +25,7 @@
 package org.societies.android.platform.socialdata;
 
 import org.societies.android.platform.socialdata.SocialTokenManager.LocalBinder;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.platfrom.sns.android.socialapp.Constants;
 import org.societies.platfrom.sns.android.socialapp.WebActivity;
 
@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -55,19 +56,19 @@ public class BridgeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		Intent intent = getIntent();
-		SocialNetwork socialNetwork = (SocialNetwork)intent.getSerializableExtra(EXTRA_SOCIAL_NETWORK);
+		Socialnetwork socialNetwork = (Socialnetwork)intent.getSerializableExtra(EXTRA_SOCIAL_NETWORK);
 		
 		switch(socialNetwork) {
-		case Facebook:
+		case FACEBOOK :
 			openBrowser(Constants.FB_URL, Constants.FB_CODE);
 			break;
-		case Foursquare:
+		case FOURSQUARE:
 			openBrowser(Constants.FQ_URL, Constants.FQ_CODE);
 			break;
-		case twitter:
+		case TWITTER:
 			openBrowser(Constants.TW_URL, Constants.TW_CODE);
 			break;
-		case linkedin:
+		case LINKEDIN:
 			openBrowser(Constants.LK_URL, Constants.LK_CODE);
 			break;
 		}
@@ -91,7 +92,7 @@ public class BridgeActivity extends Activity {
 		}
 	}	
 	
-	private void returnToken(final SocialNetwork socialNetwork, final String token, final String expires) {
+	private void returnToken(final Socialnetwork socialNetwork, final String token, final String expires) {
 		final ServiceConnection connection = new ServiceConnection() {
 
 	        public void onServiceConnected(ComponentName name, IBinder service) {
@@ -125,26 +126,26 @@ public class BridgeActivity extends Activity {
 		returnToken(socialNetwork(requestCode), null, null);
 	}
 	
-	private SocialNetwork socialNetwork(int requestCode) {
+	private Socialnetwork socialNetwork(int requestCode) {
 		if (requestCode == Constants.FB_CODE){				
-			return SocialNetwork.Facebook;			
+			return Socialnetwork.FACEBOOK;			
 		}
 		else if(requestCode == Constants.TW_CODE){
-			return SocialNetwork.twitter;
+			return Socialnetwork.TWITTER;
 		}
 		else if(requestCode == Constants.FQ_CODE){
-			return SocialNetwork.Foursquare;
+			return Socialnetwork.FOURSQUARE;
 		}	
 		else if(requestCode == Constants.LK_CODE) {
-			return SocialNetwork.linkedin;
+			return Socialnetwork.LINKEDIN;
 		}
 		
 		throw new IllegalArgumentException("No social network bound to requestCode: "+requestCode); 
 	}
 	
-	public static void startActivityForSN(Context context, SocialNetwork socialNetwork) {
+	public static void startActivityForSN(Context context, Socialnetwork socialNetwork) {
 		Intent intent = new Intent(context, BridgeActivity.class);
-		intent.putExtra(EXTRA_SOCIAL_NETWORK, socialNetwork);
+		intent.putExtra(EXTRA_SOCIAL_NETWORK, (Parcelable)socialNetwork);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}

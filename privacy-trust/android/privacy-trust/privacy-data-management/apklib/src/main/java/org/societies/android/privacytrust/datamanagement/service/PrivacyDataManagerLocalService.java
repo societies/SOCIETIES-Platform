@@ -24,89 +24,43 @@
  */
 package org.societies.android.privacytrust.datamanagement.service;
 
-import java.util.List;
-
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManagerLocalService extends Service implements IPrivacyDataManager {
+public class PrivacyDataManagerLocalService extends Service {
 	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
 
-	private final IBinder binder;
-	private IPrivacyDataManager privacyDataManager;
-	
-	
-	public PrivacyDataManagerLocalService() {
-		super();
-		// Creation of a binder for the service
-		binder = new LocalBinder();
-		// Creation of an instance of the Java implementation
-		privacyDataManager = new PrivacyDataManager(this);
-	}
-	
-	
-	/* ***
-	 * Service Method Implementation
-	 **** */
+	private IBinder binder;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions)
-			throws PrivacyException {
-		Log.d(TAG, "Local call to service checkPermission()");
-		return privacyDataManager.checkPermission(requestor, dataId, actions);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
-	 */
-	@SuppressWarnings("rawtypes")
-	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
-		Log.d(TAG, "Local call to service obfuscateData()");
-		return privacyDataManager.obfuscateData(requestor, dataWrapper);
+
+	public void onCreate() {
+		this.binder = new LocalBinder();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
-	 */
-	@SuppressWarnings("rawtypes")
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
-		Log.d(TAG, "Local call to service hasObfuscatedVersion()");
-		return privacyDataManager.hasObfuscatedVersion(requestor, dataWrapper);
-	}
-	
 
-	/* ***
-	 * Android Service Management
-	 **** */
-	
+	/* ****************************
+	 * Android Service Management *
+	 **************************** */
+	/**
+	 * Create Binder object for local service invocation
+	 */
 	public class LocalBinder extends Binder {
-		public PrivacyDataManagerLocalService getService() {
-			return PrivacyDataManagerLocalService.this;
+		public IPrivacyDataManager getService() {
+			// Creation of an instance
+			IPrivacyDataManager privacyManager = new PrivacyDataManager(getApplicationContext());
+			return privacyManager;
 		}
 	}
-	
+
 	/**
 	 * Return binder object to allow calling component access to service's
 	 * public methods

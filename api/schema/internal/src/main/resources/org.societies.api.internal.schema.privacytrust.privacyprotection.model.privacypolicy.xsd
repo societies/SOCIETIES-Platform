@@ -2,7 +2,10 @@
 <xs:schema version="1.0" elementFormDefault="qualified"
 	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
 	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
-	xmlns:ns1="http://societies.org/api/schema/identity" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	xmlns:ns1="http://societies.org/api/schema/identity" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc">
 
 	<xs:import namespace="http://societies.org/api/schema/identity"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
@@ -12,6 +15,16 @@
 			<xs:element name="decision" type="tns:decision" minOccurs="0" />
 			<xs:element name="requestItem" type="tns:requestItem"
 				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="privacyPermission">
+		<xs:sequence>
+			<xs:element name="requestItem" type="tns:requestItem" />
+			<xs:element name="decision" type="tns:decision" />
+			<xs:element name="obfuscationLevel" type="xs:double" />
+			<xs:element name="creationDate" type="xs:dateTime" />
+			<xs:element name="validityDuration" type="xs:long" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -90,51 +103,58 @@
 
 	<xs:simpleType name="actionConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="READ" />
-			<xs:enumeration value="WRITE" />
-			<xs:enumeration value="CREATE" />
-			<xs:enumeration value="DELETE" />
+			<xs:enumeration value="read" />
+			<xs:enumeration value="write" />
+			<xs:enumeration value="create" />
+			<xs:enumeration value="delete" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="privacyPolicyTypeConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="SERVICE" />
-			<xs:enumeration value="CIS" />
-			<xs:enumeration value="OTHER" />
+			<xs:enumeration value="service" />
+			<xs:enumeration value="cis" />
+			<xs:enumeration value="other" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="privacyPolicyBehaviourConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="PRIVATE" />
-			<xs:enumeration value="MEMBERS_ONLY" />
-			<xs:enumeration value="PUBLIC" />
+			<xs:enumeration value="private" />
+			<xs:enumeration value="membersOnly" />
+			<xs:enumeration value="public" />
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="decision">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="PERMIT" />
-			<xs:enumeration value="DENY" />
-			<xs:enumeration value="INDETERMINATE" />
-			<xs:enumeration value="NOT_APPLICABLE" />
+			<xs:enumeration value="permit" />
+			<xs:enumeration value="deny" />
+			<xs:enumeration value="indeterminate" />
+			<xs:enumeration value="notApplicable" />
 		</xs:restriction>
 	</xs:simpleType>
 
+
 	<xs:simpleType name="conditionConstants">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="SHARE_WITH_3RD_PARTIES" />
-			<xs:enumeration value="SHARE_WITH_CIS_MEMBERS_ONLY" />
-			<xs:enumeration value="SHARE_WITH_CIS_OWNER_ONLY" />
-			<xs:enumeration value="MAY_BE_INFERRED" />
-			<xs:enumeration value="DATA_RETENTION_IN_SECONDS" />
-			<xs:enumeration value="DATA_RETENTION_IN_MINUTES" />
-			<xs:enumeration value="DATA_RETENTION_IN_HOURS" />
-			<xs:enumeration value="RIGHT_TO_OPTOUT" />
-			<xs:enumeration value="STORE_IN_SECURE_STORAGE" />
-			<xs:enumeration value="RIGHT_TO_ACCESS_HELD_DATA" />
-			<xs:enumeration value="RIGHT_TO_CORRECT_INCORRECT_DATA" />
+			<xs:enumeration value="shareWith3RdParties">
+				<xs:annotation>
+					<xs:appinfo>
+						<jaxb:typesafeEnumMember name="SHARE_WITH_3RD_PARTIES" />
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="shareWithCisMembersOnly" />
+			<xs:enumeration value="shareWithCisOnwerOnly" />
+			<xs:enumeration value="mayBeInferred" />
+			<xs:enumeration value="dataRetentionInSeconds" />
+			<xs:enumeration value="dataRetentionInMinutes" />
+			<xs:enumeration value="dataRetentionInHours" />
+			<xs:enumeration value="rightToOptout" />
+			<xs:enumeration value="storeInSecureStorage" />
+			<xs:enumeration value="rightToAccessHeldData" />
+			<xs:enumeration value="rightToCorrectIncorrectData" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

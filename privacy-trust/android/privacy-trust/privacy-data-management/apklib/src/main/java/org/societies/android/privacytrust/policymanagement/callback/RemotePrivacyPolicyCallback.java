@@ -27,11 +27,13 @@ package org.societies.android.privacytrust.policymanagement.callback;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
+import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
@@ -53,60 +55,41 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	private RequestPolicy privacyPolicy;
 	private boolean ack;
 	private String ackMessage;
-	private Context contexte;
+	private Context context;
 	private String clientPackage;
+	private PrivacyPolicyIntentSender intentSender;
 
 
-	public RemotePrivacyPolicyCallback(Context contexte, String clientPackage, List<String> eLEMENT_NAMES,
+	public RemotePrivacyPolicyCallback(Context context, String clientPackage, List<String> eLEMENT_NAMES,
 			List<String> nAME_SPACES, List<String> pACKAGES) {
 		super();
-		this.contexte = contexte;
+		this.context = context;
 		this.clientPackage = clientPackage;
 		ELEMENT_NAMES = eLEMENT_NAMES;
 		NAME_SPACES = nAME_SPACES;
 		PACKAGES = pACKAGES;
+		intentSender = new PrivacyPolicyIntentSender(context);
 	}
 
 
 	public void receiveResult(Stanza stanza, Object payload) {
 		Log.d(TAG, "receiveResult");
 		debugStanza(stanza);
-		if (null == payload) {
-			Log.e(TAG, "Arg, the payload is null!");
+		// - Wrong payload
+		if (null == payload || !(payload instanceof PrivacyPolicyManagerBeanResult)) {
+			intentSender.sendIntentError(clientPackage, IPrivacyPolicyManager.INTENT_DEFAULT_ACTION, "Wrong payload received.");
 			return;
 		}
-		Log.d(TAG, "Payload class of type: " + payload.getClass().getName());
-		Intent intent = new Intent();
-		intent.setPackage(clientPackage);
-		// -- Privacy
-		if (payload instanceof PrivacyPolicyManagerBeanResult) {
-			receiveResult(stanza, (PrivacyPolicyManagerBeanResult)payload, intent);
-		}
-		Log.d(TAG, "privacyPolicy result sent");
-		contexte.sendBroadcast(intent);
-	}
 
-	public void receiveResult(Stanza stanza, PrivacyPolicyManagerBeanResult payload, Intent intent) {
-		MethodType methodType = payload.getMethod();
-		boolean ack = payload.isAck();
-		String ackMsg = payload.getAckMessage();
-		intent.setAction(methodType.name());
-		intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, ack);
-		Log.d(TAG, "PrivacyPolicyManager: " +methodType+" "+(ack ? "success" : "faillure")+(null != ackMsg ? " - "+ackMsg : ""));
-		if (!ack) {
-			if (null != ackMsg) {
-				intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_MSG_KEY, ackMsg);
-			}
-			return;
-		}
-		if (MethodType.GET_PRIVACY_POLICY.equals(methodType)) {
-			privacyPolicy = payload.getPrivacyPolicy();
-			intent.putExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY, privacyPolicy);
-		}
+		// - Send valid intent
+		// Send intent
+		PrivacyPolicyManagerBeanResult privacyPaylaod = (PrivacyPolicyManagerBeanResult)payload;
+		intentSender.sendIntentSuccess(clientPackage, privacyPaylaod);
 	}
 
 	public void receiveError(Stanza stanza, XMPPError error) {
 		Log.d(TAG, "receiveError");
+		intentSender.sendIntentError(clientPackage, IPrivacyPolicyManager.INTENT_DEFAULT_ACTION, "Error: "+error.getGenericText());
 	}
 
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {

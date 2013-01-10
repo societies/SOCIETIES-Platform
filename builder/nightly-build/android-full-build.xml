@@ -54,8 +54,11 @@
 
 		<!-- API -->
 		<!--module>../../platform-infrastructure/client-frwk/CoreInterfaces</module -->
+		<module>../../api/android-pom.xml</module>
+		<!--
 		<module>../../api/android/external</module>
 		<module>../../api/android/internal</module>
+		 -->
 
 		<!-- Client Framework Libraries -->
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/ServiceLifecycle/SocietiesServiceMonitor</module>
@@ -79,7 +82,7 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy -->
-		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/apklib</module>
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management</module>
 
 	</modules>
 </project>

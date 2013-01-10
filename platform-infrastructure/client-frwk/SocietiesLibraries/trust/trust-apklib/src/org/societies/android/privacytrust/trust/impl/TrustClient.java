@@ -35,9 +35,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.privacytrust.trust.ITrustClient;
-import org.societies.android.api.privacytrust.trust.model.ADate;
-import org.societies.android.api.privacytrust.trust.model.ATrustEvidenceType;
-import org.societies.android.api.privacytrust.trust.model.ATrustedEntityId;
+import org.societies.android.api.privacytrust.trust.ADate;
 import org.societies.android.privacytrust.trust.org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
@@ -46,12 +44,12 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.privacytrust.trust.TrustException;
-import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
+import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
@@ -263,23 +261,18 @@ public class TrustClient extends Service implements ITrustClient {
 		}
 	}
 
-	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrust(java.lang.String, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId)
-	 */
+	@Override
 	public void retrieveTrust(final String client, 
-			final ATrustedEntityId trustorId, final ATrustedEntityId trusteeId)
-					throws TrustException {
+			final TrustedEntityIdBean trustorId, final TrustedEntityIdBean trusteeId) {
 		
 	}
 	
-	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addTrustEvidence(java.lang.String, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustedEntityId, org.societies.android.api.privacytrust.trust.model.ATrustEvidenceType, org.societies.android.api.privacytrust.trust.model.ADate, java.io.Serializable)
-	 */
+	@Override
 	public void addTrustEvidence(final String client, 
-			final ATrustedEntityId subjectId, final ATrustedEntityId objectId,
-			final ATrustEvidenceType type, final ADate timestamp, 
-			final Serializable info) throws TrustException {
-		
+			final TrustedEntityIdBean subjectId, final TrustedEntityIdBean objectId,
+			final TrustEvidenceTypeBean type, final ADate timestamp, 
+			final Serializable info) {
+		/*
 		if (client == null)
 			throw new NullPointerException("client can't be null");
 		if (subjectId == null)
@@ -311,13 +304,11 @@ public class TrustClient extends Service implements ITrustClient {
 			final AddDirectEvidenceRequestBean addEvidenceBean = 
 					new AddDirectEvidenceRequestBean();
 			// 1. subjectId
-			addEvidenceBean.setSubjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId.getTeid()));
+			addEvidenceBean.setSubjectId(subjectId);
 			// 2. objectId
-			addEvidenceBean.setObjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId.getTeid()));
+			addEvidenceBean.setObjectId(objectId);
 			// 3. type
-			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.getType().name()));
+			addEvidenceBean.setType(type);
 			// 4. timestamp
 			final GregorianCalendar gregCal = new GregorianCalendar();
 			gregCal.setTime(timestamp.getDate());
@@ -336,8 +327,8 @@ public class TrustClient extends Service implements ITrustClient {
 			this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, this.callback);
 			this.cdLatch = new CountDownLatch(1);
 			this.cdLatch.await();
-			if (this.callbackException != null)
-				throw this.callbackException;
+			//if (this.callbackException != null)
+			//	throw this.callbackException;
 			
 		} catch (IOException ioe) {
 
@@ -347,7 +338,7 @@ public class TrustClient extends Service implements ITrustClient {
 					+ ": Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage();
 			Log.e(TAG, errorMessage);
-			throw new TrustClientException(errorMessage, ioe);
+			//throw new TrustClientException(errorMessage, ioe);
 			
 		} catch (Exception e) {
 			
@@ -356,8 +347,8 @@ public class TrustClient extends Service implements ITrustClient {
 					+ subjectId	+ "' and object '" + objectId + "' of type '"
 					+ type + ": " + e.getLocalizedMessage();
 			Log.e(TAG, errorMessage);
-			throw new TrustClientException(errorMessage, e);
-		}
+			//throw new TrustClientException(errorMessage, e);
+		}*/
 	}
 	
 	public class LocalBinder extends Binder {
