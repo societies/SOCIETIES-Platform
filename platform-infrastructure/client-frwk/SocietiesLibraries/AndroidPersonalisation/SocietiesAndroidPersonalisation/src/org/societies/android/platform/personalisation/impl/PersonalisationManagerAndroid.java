@@ -28,28 +28,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.identity.ARequestor;
-import org.societies.android.api.identity.ARequestorCis;
-import org.societies.android.api.identity.ARequestorService;
+import javax.naming.CommunicationException;
+
+import org.simpleframework.xml.transform.InvalidFormatException;
+import org.societies.android.api.internal.personalisation.IPersonalisationManagerInternalAndroid;
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.android.api.personalisation.model.AAction;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.personalisation.mgmt.PersonalisationManagerBean;
 import org.societies.api.schema.personalisation.mgmt.PersonalisationMethodType;
 import org.societies.api.schema.personalisation.model.ActionBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
@@ -59,7 +56,7 @@ import android.util.Log;
  * @author Eliza
  *
  */
-public class PersonalisationManagerAndroid implements IPersonalisationManagerAndroid{
+public class PersonalisationManagerAndroid implements IPersonalisationManagerInternalAndroid{
 
 	private static final List<String> ELEMENT_NAMES = Collections.unmodifiableList(Arrays.asList("PersonalisationManagerBean","ActionBean"));
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
@@ -89,8 +86,8 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerAnd
 	}
 
 	@Override
-	public AAction getIntentAction(String clientID, ARequestor requestor,
-			String ownerID, AServiceResourceIdentifier serviceID,
+	public ActionBean getIntentAction(String clientID, RequestorBean requestor,
+			String ownerID, ServiceResourceIdentifier serviceID,
 			String preferenceName) {
 		// TODO Auto-generated method stub
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_INTENT_ACTION, clientID);
@@ -124,31 +121,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerAnd
 	}
 
 
-	private RequestorBean toRequestorBean(ARequestor requestor) {
-
-		if (requestor instanceof ARequestorService){
-			RequestorServiceBean bean = new RequestorServiceBean();
-			bean.setRequestorId(requestor.getRequestorId());
-			bean.setRequestorServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(((ARequestorService) requestor).getRequestorServiceId()));
-			return bean;
-		}else if (requestor instanceof ARequestorCis){
-			RequestorCisBean bean = new RequestorCisBean();
-			bean.setRequestorId(requestor.getRequestorId());
-			bean.setCisRequestorId(((ARequestorCis) requestor).getCisRequestorId());
-			return bean;
-		}
-
-		RequestorBean bean = new RequestorBean();
-		bean.setRequestorId(requestor.getRequestorId());
-
-
-		return bean;
-	}
-
 	@Override
-	public AAction getPreference(String clientID, ARequestor requestor,
+	public ActionBean getPreference(String clientID, RequestorBean requestor,
 			String ownerID, String serviceType,
-			AServiceResourceIdentifier serviceID, String preferenceName) {
+			ServiceResourceIdentifier serviceID, String preferenceName) {
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_PREFERENCE, clientID);
 		IIdentityManager idm = this.commMgr.getIdManager();
 		//only service my identities
@@ -232,9 +208,9 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerAnd
 					return;
 				}
 				if (bean instanceof ActionBean){
-					AAction toReturn = toAAction((ActionBean) bean);
+					//AAction toReturn = toAAction((ActionBean) bean);
 					Intent intent = new Intent(returnIntent);
-					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) toReturn);
+					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) bean);
 					if (restrictBroadcast){
 						intent.setPackage(client);
 					}
@@ -250,17 +226,6 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerAnd
 			}
 		}
 
-		private AAction toAAction(ActionBean bean){
-			AAction action  = new AAction();
-			action.setparameterName(bean.getParameterName());
-			action.setServiceID(AServiceResourceIdentifier.convertServiceResourceIdentifier(bean.getServiceID()));
-			if (null!=bean.getServiceType()){
-				action.setServiceType(bean.getServiceType());
-			}
-			action.setServiceType(bean.getServiceType());
-			action.setvalue(bean.getValue());
-			return action;
-		}
 
 	}
 }
