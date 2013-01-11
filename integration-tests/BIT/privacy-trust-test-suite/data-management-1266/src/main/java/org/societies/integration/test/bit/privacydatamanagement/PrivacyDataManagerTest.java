@@ -99,7 +99,7 @@ public class PrivacyDataManagerTest
 		}
 		// Data
 		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
-		otherCssId =  TestCase1266.commManager.getIdManager().fromJid("emma.societies.local");
+		otherCssId =  TestCase1266.commManager.getIdManager().fromJid("othercss.societies.local");
 		cisPublicId =  TestCase1266.commManager.getIdManager().fromJid("cis-public.societies.local");
 		cisPrivateId =  TestCase1266.commManager.getIdManager().fromJid("cis-private.societies.local");
 		requestorCis = getRequestorCis();

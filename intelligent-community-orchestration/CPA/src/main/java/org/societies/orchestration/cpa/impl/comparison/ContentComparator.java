@@ -29,6 +29,7 @@ import gate.*;
 import gate.corpora.DocumentContentImpl;
 import gate.corpora.DocumentImpl;
 import gate.creole.ANNIEConstants;
+import gate.creole.ExecutionException;
 import gate.creole.SerialAnalyserController;
 import gate.util.GateException;
 import gate.util.Out;
@@ -109,21 +110,30 @@ public class ContentComparator implements ActorComparator {
     public double compare(SocialGraphVertex member1, SocialGraphVertex member2, List<IActivity> activityDiff)  {
         double ret = 0;
 
-        String member1Text = "";
-        String member2Text = "";
+        String member1Text = "";  int m1count = 0;
+        String member2Text = "";  int m2count = 0;
         for(IActivity act: activityDiff){
             if(contains(member1,act)){
+                m1count ++;
                 //add new link (or add weight to an old link)
                 member1Text += ". "+act.getObject();
             }
             else if( contains(member2,act) ) {
+                m2count ++;
                 member2Text += ". "+act.getObject();
             }
 
         }
-
+        System.out.println("comparing two members m1 totaltextlength: "+member1Text.length()+" numberof: "+m1count+ " ratio: "+((double)member1Text.length())/((double)m1count));
+        System.out.println("comparing two members m1 totaltextlength: "+member2Text.length()+" numberof: "+m2count+ " ratio: "+((double)member2Text.length())/((double)m2count));
+        long start = System.currentTimeMillis();
         Map<String,AnnotationSet> m1annotations = getAnnotations(member1Text);
+        long timespent = (System.currentTimeMillis()-start);
+        System.out.println("annotating "+member1Text.length()+" time spent: "+timespent+" per char: "+((double)(System.currentTimeMillis()-start))/((double)member1Text.length()));
+        start = System.currentTimeMillis();
         Map<String,AnnotationSet> m2annotations = getAnnotations(member2Text);
+        timespent = (System.currentTimeMillis()-start);
+        System.out.println("annotating "+member2Text.length()+" time spent: "+timespent+" per char: "+((double)(System.currentTimeMillis()-start))/((double)member2Text.length()));
 
         //check if the two members have talked about the same locations.
         AnnotationSet l1 = m1annotations.get("Location");
@@ -147,11 +157,11 @@ public class ContentComparator implements ActorComparator {
             }
         }
         //look for ..
-
+        System.out.println("ret: "+ret);
         return ret;
     }
     private Map<String,AnnotationSet> getAnnotations(String str){
-        System.out.println("trying to annotate: \""+str+"\"");
+        System.out.println("trying to annotate str of size: "+str.length());
         Map<String,AnnotationSet> ret = new HashMap<String,AnnotationSet>();
         Corpus corp = null;
         try {
@@ -161,10 +171,15 @@ public class ContentComparator implements ActorComparator {
         }
 
         annieController.setCorpus(corp);
+        try {
+            annieController.execute();
+        } catch (ExecutionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         Document doc = null;
         if(corp.size()>0){
             doc = corp.get(0);
-            System.out.println("corp size over 0");
+            System.out.println("corp size: "+corp.size());
         }else{
             System.out.println("corp size 0 ret:"+ret);
             return ret;

@@ -29,6 +29,7 @@ import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -41,12 +42,17 @@ import java.util.StringTokenizer;
 public class SentenceExtractor {
     private File f = null;
 
-    private String[] allsentences = null;
+    private ArrayList<String> allsentences = null;
     public SentenceExtractor(String file){
+        allsentences = new ArrayList<String>();
         String data = SentenceExtractor.readFile(file);
         //System.out.println("data start: "+data.substring(0,3000));
         //allsentences = data.split("[\\p{P}]");
-        allsentences = data.split("(?<=[a-z])\\.\\s+");
+        String[] templist = data.split("(?<=[a-z])\\.\\s+");
+        for(int i=0;i<templist.length;i++)
+            if(templist[i].length()<500)
+                allsentences.add(templist[i]);
+        templist = null;
         //System.out.println("allsentences lenght: "+allsentences.length);
         //for(int i=0;i<10;i++)
         //    System.out.println("i: "+i+" sentence: \""+allsentences[i]+"\"");
@@ -79,23 +85,36 @@ public class SentenceExtractor {
     }
     public String[] getSentences(int start, int n){
         String[] ret = new String[n];
-        for(int i=start;(i-start)<n && i<allsentences.length;i++)
-            ret[(i-start)] = allsentences[i].trim();
+        for(int i=start;(i-start)<n && i<allsentences.size();i++)
+            ret[(i-start)] = allsentences.get(i).trim();
         return ret;
     }
+    public int size(){return allsentences.size();}
     public static void main(String args[]){
         SentenceExtractor extractor = new SentenceExtractor("./src/test/resources/reuters21578content.txt");
         String sentence = extractor.getSentences(20,1)[0];
         System.out.println("sentence 1 : \""+sentence+"\"");
 
         //small test of lengths..
-
-        for(int i =0; i <100;i++)     {
+        int count = 0;
+        int count2 = 0;
+        for(int i =0; i <extractor.size();i++)     {
             sentence = extractor.getSentences(i,1)[0];
             if(sentence.length()>500){
-                System.out.println("very long sentence ("+sentence.length()+"): \""+sentence+"\"");
+                //System.out.println("very long sentence ("+sentence.length()+"): \""+sentence+"\"");
+                count ++;
+            }
+            if(sentence.length()>1500){
+                //System.out.println("very long sentence ("+sentence.length()+"): \""+sentence+"\"");
+                count2 ++;
+                System.out.println("found very long sentence of length: "+sentence.length());
+                /*if(sentence.length()>4800)
+                    System.out.println("longest sentence: \""+sentence+"\"");*/
             }
         }
 
+        System.out.println("count: "+count);
+        System.out.println("count2: "+count2);
+        System.out.println("totalcount: "+extractor.size());
     }
 }
