@@ -42,7 +42,7 @@ import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.cis.CisDirectoryLocal;
 import org.societies.android.platform.cis.CommunityManagementLocal;
 import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.JoinResponse;
@@ -301,7 +301,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3))) {
 				try { //ADD AN ACTIVITY TO THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					Activity activity = CreateActivityFromJSON(jObj); 
+					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
 					this.serviceCISsubscribe.addActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -309,7 +309,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4))) {
 				try { //DELETE AN ACTIVITY FROM THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					Activity activity = CreateActivityFromJSON(jObj); 
+					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
 					this.serviceCISsubscribe.deleteActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -532,7 +532,7 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE ACTIVITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					Activity activities[] = (Activity[]) parcels;
+					MarshaledActivity activities[] = (MarshaledActivity[]) parcels;
 					//AActivity activities[] = new AActivity[parcels.length];
 					//for (int i = 0; i < parcels.length; i++) {
 					//	activities[i] = (AActivity) parcels[i];
@@ -691,7 +691,7 @@ public class PluginCISFunctions extends Plugin {
 	 * @param communities
 	 * @return
 	 */
-	private JSONArray convertActiviesToJSONArray(Activity[] array) {
+	private JSONArray convertActiviesToJSONArray(MarshaledActivity[] array) {
 		JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
@@ -757,13 +757,13 @@ public class PluginCISFunctions extends Plugin {
 	}
 	
 	/**
-	 * Creates an Activity from a JSON object
+	 * Creates an MarshaledActivity from a JSON object
 	 * @param jObj
 	 * @return
 	 * @throws JSONException
 	 */
-	private Activity CreateActivityFromJSON(JSONObject jObj) throws JSONException {
-		Activity act = new Activity();
+	private MarshaledActivity CreateActivityFromJSON(JSONObject jObj) throws JSONException {
+		MarshaledActivity act = new MarshaledActivity();
 		act.setActor(jObj.getString("actor"));
 		act.setObject(jObj.getString("object"));
 		act.setPublished(jObj.getString("published"));
