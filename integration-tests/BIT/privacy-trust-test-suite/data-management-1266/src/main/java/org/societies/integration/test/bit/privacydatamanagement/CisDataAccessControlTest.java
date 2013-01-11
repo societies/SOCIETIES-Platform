@@ -174,9 +174,15 @@ public class CisDataAccessControlTest
 	public static void tearDownClass() throws Exception
 	{
 		LOG.info("[#"+testCaseNumber+"] CisDataAccessControl::tearDownClass");
+		try {
 		TestCase1266.cisManager.deleteCis(cisPublic.getCisId());
 		TestCase1266.cisManager.deleteCis(cisMembersOnly.getCisId());
 		TestCase1266.cisManager.deleteCis(cisPrivate.getCisId());
+		}
+		catch(Exception e) {
+			LOG.error("tearDownClass(): Can't delete CISs "+e.getMessage()+"\n", e);
+			fail("tearDownClass(): Can't delete CISs "+e.getMessage());
+		}
 	}
 
 
