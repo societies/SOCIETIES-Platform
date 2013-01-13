@@ -1,0 +1,21 @@
+CheckList:
++++++++++++++++++++++++++
+
+
+
+1. In "pz.properties"
+	a. update the PZ_PRD_SERVER_URL property
+	b. update the PZ_PRD_SERVER_ADMIN_URL property
+	c. Make sure translation map between PZ to GPS coordinates exists and that it can be 
+	   accessed using the values in the PZ_MAP_QUERY_SUFFIX property
+2. In "bundle-context.xml"  
+	a. Uncomment the PZWrapperBean bean
+	b. comment out the mock bean
+3. Update the serviceability XML with the bean appenders
+4. Make sure WAS is Up & Running
+5. Make sure the VG application is running (use Bertail to check logs for errors)
+
+
+
+
+ 
