@@ -317,7 +317,15 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 															
 															public void returnAction(boolean flag) {
 																assertTrue(flag);
-																assertTrue(ccm.unbindCommsService());
+																ccm.UnRegisterCommManager(new IMethodCallback() {
+																	
+																	public void returnAction(String arg0) {
+																	}
+																	
+																	public void returnAction(boolean arg0) {
+																		assertTrue(ccm.unbindCommsService());
+																	}
+																});
 															}
 														});
 													}

@@ -53,6 +53,7 @@ public class ClientCommunicationMgr {
 	private String identityJID;
 	private String domainAuthority;
 	private IIdentityManager idManager;
+
 	private boolean loginCompleted;
 	private BroadcastReceiver receiver;
 	private IMethodCallback bindCallback;
@@ -85,6 +86,14 @@ public class ClientCommunicationMgr {
 		this.setupBroadcastReceiver();
 	}
 	
+	public boolean isLoginCompleted() {
+		return loginCompleted;
+	}
+
+	public void setLoginCompleted(boolean loginCompleted) {
+		this.loginCompleted = loginCompleted;
+	}
+
 	/**
 	 * Binds to Android Comms Service
 	 * @param bindCallback callback 
@@ -879,7 +888,7 @@ public class ClientCommunicationMgr {
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
 
-    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.remoteCallId);
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
     		Log.d(LOCAL_LOG_TAG, "Remote Caller identity: " + this.remoteCallId);
 
     		outMessage.setData(outBundle);

@@ -643,8 +643,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			Node query = element.getChildNodes().item(0);
 			return query.getNodeName().equals("query") && query.lookupNamespaceURI(query.getPrefix()).equals(XMPPNode.ITEM_NAMESPACE);
 		}
-		else
+		else {
 			return false;
+		}
 	}
 	
 	private static class NamespaceFilter implements PacketFilter {
