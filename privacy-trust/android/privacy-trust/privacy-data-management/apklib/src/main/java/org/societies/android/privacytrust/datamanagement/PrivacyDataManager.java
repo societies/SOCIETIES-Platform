@@ -251,7 +251,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				// Remote obfuscation needed
 				else {
 					Log.d(TAG, "Remote obfuscation required");
-					privacyDataManagerRemote.obfuscateData(requestor, dataWrapper);
+					privacyDataManagerRemote.obfuscateData(clientPackage, requestor, dataWrapper);
 					// Publish progress
 					if (!checkAndPublishProgress((progress = progress+30), "Remote obfuscation required: request sent")) {
 						return false;

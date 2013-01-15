@@ -101,7 +101,7 @@ public class PrivacyDataManagerRemote {
 	}
 
 	// -- Obfuscation
-	public void obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		// -- Destination
 		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
@@ -113,7 +113,6 @@ public class PrivacyDataManagerRemote {
 		messageBean.setMethod(MethodType.OBFUSCATE_DATA);
 		messageBean.setRequestor(requestor);
 //		messageBean.setDataWrapper(dataWrapper);
-		messageBean.setDataIdUri(dataId.getUri());
 
 		// -- Send
 		RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
