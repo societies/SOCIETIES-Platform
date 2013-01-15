@@ -561,6 +561,11 @@ public class Jaxb2Simple extends AbstractMojo
 			textToReplace = "package $1;\n\n\nimport javax\\.xml\\.datatype\\.DatatypeConfigurationException;\nimport javax\\.xml\\.datatype\\.DatatypeFactory;\nimport javax\\.xml\\.datatype\\.XMLGregorianCalendar;\n";
 			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		}
+		if (isPatternMatching(" Object ", newSchemaContent)) {
+			textToFind = "([\\(| ])Object ";
+			textToReplace = "$1Parcelable ";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		}
 
 		// -- Generate the parcelable inherited methods
 		String parcelableStuff = generateParcelableStuff(isEnum, isExtension, isAbstract, requiredDefaultConstructor, className, fields);
