@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation"
+	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation"
+	xmlns:ns1="http://societies.org/api/schema/identity" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc">
+
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
+
+	<xs:complexType name="dataWrapper">
+		<xs:sequence>
+			<xs:element name="dataId" type="ns1:dataIdentifier" />
+			<xs:element name="data" type="tns:obfuscationData"
+				minOccurs="0" />
+			<xs:element name="persistenceEnabled" type="xs:boolean"
+				minOccurs="0" />
+			<xs:element name="readyForObfuscation" type="xs:boolean"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="obfuscationData">
+	</xs:complexType>
+
+	<xs:complexType name="locationCoordinates">
+		<xs:complexContent>
+			<xs:extension base="tns:obfuscationData">
+				<xs:sequence>
+					<xs:element name="latitude" type="xs:double" />
+					<xs:element name="longitude" type="xs:double" />
+					<xs:element name="accuracy" type="xs:double" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="name">
+		<xs:complexContent>
+			<xs:extension base="tns:obfuscationData">
+				<xs:sequence>
+					<xs:element name="firstName" type="xs:string" minOccurs="0" />
+					<xs:element name="lastName" type="xs:string" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="postalLocation">
+		<xs:complexContent>
+			<xs:extension base="tns:obfuscationData">
+				<xs:sequence>
+					<xs:element name="logicalName" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="streetNumber" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="streetName" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="district" type="xs:string" minOccurs="0" />
+					<xs:element name="town" type="xs:string" minOccurs="0" />
+					<xs:element name="postalCode" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="department" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="region" type="xs:string" minOccurs="0" />
+					<xs:element name="country" type="xs:string" minOccurs="0" />
+					<xs:element name="continent" type="xs:string" minOccurs="0" />
+					<xs:element name="planet" type="xs:string" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="status">
+		<xs:complexContent>
+			<xs:extension base="tns:obfuscationData">
+				<xs:sequence>
+					<xs:element name="status" type="xs:string" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="temperature">
+		<xs:complexContent>
+			<xs:extension base="tns:obfuscationData">
+				<xs:sequence>
+					<xs:element name="degree" type="xs:double" />
+					<xs:element name="degreeString" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="resultIsString" type="xs:boolean"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="heat">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="burny" />
+			<xs:enumeration value="hot" />
+			<xs:enumeration value="cool" />
+			<xs:enumeration value="cold" />
+			<xs:enumeration value="freezy" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="obfuscationLevelType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="continuous" />
+			<xs:enumeration value="discrete" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+
