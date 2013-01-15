@@ -41,13 +41,14 @@ xmlns="http://societies.org/api/schema/activityfeed"
 <xs:import namespace="http://societies.org/api/schema/activity" 
            schemaLocation="org.societies.api.schema.activity.xsd"/>
 
-<xs:element name='activityfeed' >
+<xs:element name="marshaledActivityFeed" >
 	
 	<xs:complexType>
 			<xs:choice minOccurs='0' maxOccurs='1'>
 				<xs:element ref='deleteActivity'/>
 				<xs:element ref='deleteActivityResponse'/>
 				<xs:element ref='getActivities'/>
+                <xs:element ref='getNumberedActivities'/>
 				<xs:element ref='getActivitiesResponse'/>
 				<xs:element ref='addActivity'/>
 				<xs:element ref='addActivityResponse'/>
@@ -61,7 +62,7 @@ xmlns="http://societies.org/api/schema/activityfeed"
 		<xs:element name='deleteActivity'>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref='ins:Activity'/>
+				<xs:element ref='ins:MarshaledActivity'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -90,11 +91,18 @@ xmlns="http://societies.org/api/schema/activityfeed"
 					<xs:attribute name='query' type='xs:string'/>
 		</xs:complexType>
 	</xs:element>
+    <xs:element name='getNumberedActivities'>
+        <xs:complexType>
+            <xs:attribute name='timePeriod' type='xs:string' use='required'/>
+            <xs:attribute name='query' type='xs:string'/>
+            <xs:attribute name='n' type='xs:long'/>
+        </xs:complexType>
+    </xs:element>
 	
 	<xs:element name='getActivitiesResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-				<xs:element ref='ins:Activity'/>
+				<xs:element ref='ins:MarshaledActivity'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -103,7 +111,7 @@ xmlns="http://societies.org/api/schema/activityfeed"
 	<xs:element name='addActivity'>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref='ins:Activity'/>
+				<xs:element ref='ins:MarshaledActivity'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

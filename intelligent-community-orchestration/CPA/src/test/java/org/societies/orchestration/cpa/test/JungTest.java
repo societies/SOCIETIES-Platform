@@ -1,13 +1,27 @@
 /*
-* Copyright (c) 2003, SOCIETIES and the JUNG Project and the Regents of the University
-* of California
-* All rights reserved.
-*
-* This software is open-source under the BSD license; see either
-* "license.txt" or
-* http://jung.sourceforge.net/license.txt for a description.
-* This file is based on the JUNG project's example
-*/
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp.,
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 package org.societies.orchestration.cpa.test;
 
@@ -28,11 +42,13 @@ import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.apache.commons.collections15.functors.MapTransformer;
 import org.apache.commons.collections15.map.LazyMap;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVStrategy;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.orchestration.cpa.impl.CPACreationPatterns;
 import org.societies.orchestration.cpa.impl.SocialGraphEdge;
 import org.societies.orchestration.cpa.impl.SocialGraphVertex;
@@ -47,16 +63,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
 public class JungTest extends JApplet 
 {
 	VisualizationViewer<SocialGraphVertex,SocialGraphEdge> vv;
-	
-//	Factory<Graph<Number,Number>> graphFactory;
-	
+
 	Map<SocialGraphVertex,Paint> vertexPaints = 
 		LazyMap.<SocialGraphVertex,Paint>decorate(new HashMap<SocialGraphVertex,Paint>(),
 				new ConstantTransformer(Color.white));
@@ -97,58 +111,49 @@ public class JungTest extends JApplet
 		}
 	}
 	public UndirectedSparseGraph makeGraph(){
-//		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> g = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
-//		SocialGraphVertex v1 = new SocialGraphVertex("BM");
-//		SocialGraphVertex v2 = new SocialGraphVertex("Thomas");
-//		SocialGraphVertex v3 = new SocialGraphVertex("Babak");
-//		SocialGraphVertex v4 = new SocialGraphVertex("Kevin");
-//		SocialGraphVertex v5 = new SocialGraphVertex("Alec");
-//		SocialGraphVertex v6 = new SocialGraphVertex("Jaqueline");
-//		SocialGraph sg = new SocialGraph();
-//		sg.add(v1);sg.add(v2);sg.add(v3);sg.add(v4);sg.add(v5);sg.add(v6);
-//		g.addVertex(v1);
-//		g.addVertex(v2);
-//		g.addVertex(v3);
-//		g.addVertex(v4);
-//		g.addVertex(v5);
-//		g.addVertex(v6);
-//		
-//		g.addEdge(new SocialGraphEdge(v1,v2,1.0),v1,v2);
-//		g.addEdge(new SocialGraphEdge(v1,v3,1.0),v1,v3);
-//		//g.addEdge(new SocialGraphEdge(v1,v4,0.1),v1,v4);
-//		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v5);
-//		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v6);
-//		
-//		g.addEdge(new SocialGraphEdge(v2,v3,1.0),v2,v3);
-//		g.addEdge(new SocialGraphEdge(v2,v4,0.1),v2,v4);
-//		g.addEdge(new SocialGraphEdge(v2,v5,0.8),v2,v5);
-//		g.addEdge(new SocialGraphEdge(v2,v5,0.7),v2,v6);
-//		
-//		g.addEdge(new SocialGraphEdge(v3,v4,0.1),v3,v4);
-//		g.addEdge(new SocialGraphEdge(v3,v5,0.6),v3,v5);
-//		g.addEdge(new SocialGraphEdge(v3,v5,0.5),v3,v6);
-//		
-//		g.addEdge(new SocialGraphEdge(v4,v5,0.7),v4,v5);
-//		g.addEdge(new SocialGraphEdge(v4,v6,0.3),v4,v6);
-//		
-//		g.addEdge(new SocialGraphEdge(v5,v6,0.2),v5,v6);
-//		
-//		System.out.println(""+g.toString());
-CISSimulator sim = new CISSimulator(10,10);
+        InputStream is = null;
+        ArrayList<String[]> data = new ArrayList<String[]>();
+        File directory = new File (".");
+        try {
+            System.out.println ("Current directory's canonical path: "
+                    + directory.getCanonicalPath());
+            System.out.println ("Current directory's absolute  path: "
+                    + directory.getAbsolutePath());
+        }catch(Exception e) {
+            System.out.println("Exceptione is ="+e.getMessage());
+        }
+
+        try {
+            CSVParser parser = new CSVParser(new FileReader("./src/test/resources/msn-data-xml.csv"), CSVStrategy.EXCEL_STRATEGY);
+            String[] value =  parser.getLine();
+            while(value!=null){
+                data.add(value);
+                value = parser.getLine();
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        int maxMem = 20000;
+        CISSimulator sim = new CISSimulator(10,10);
 		final ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
         ApplicationContextLoader loader = new ApplicationContextLoader();
         loader.load(sim, "SimTest-context.xml");
 		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
 		cises = new ArrayList<ICisOwned>();
-		sim.setMaxActs(2000);
-		cises.add(sim.simulate(1));
+		sim.setMaxActs(70000);
+		//cises.add(sim.simulate(1));
+        cises.add(sim.simulate("./src/test/resources/msn-data-xml.csv"));
         final CPACreationPatterns cpa = new CPACreationPatterns();
         class GetActFeedCB implements IActivityFeedCallback{
 
             @Override
-            public void receiveResult(Activityfeed activityFeedObject) {
-                System.out.println("in receiveresult: "+activityFeedObject.getGetActivitiesResponse().getActivity().size());
-                for(org.societies.api.schema.activity.Activity act : activityFeedObject.getGetActivitiesResponse().getActivity())  {
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                System.out.println("in receiveresult: "+activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size());
+                for(org.societies.api.schema.activity.MarshaledActivity act : activityFeedObject.getGetActivitiesResponse().getMarshaledActivity())  {
                     actDiff.add(new Activity(act));
                 }
                 cpa.init();
@@ -156,7 +161,7 @@ CISSimulator sim = new CISSimulator(10,10);
             }
         }
         GetActFeedCB dummyFeedback = new GetActFeedCB();
-        cises.get(0).getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000L),dummyFeedback);
+        cises.get(0).getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000L),maxMem,dummyFeedback);
 
         System.out.println("cises.get(0).getActivityFeed(): "+cises.get(0).getActivityFeed());
         

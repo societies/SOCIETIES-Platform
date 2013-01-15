@@ -24,11 +24,11 @@
  */
 package org.societies.android.api.cis.management;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.societies.api.schema.activity.Activity;
 import android.os.Parcel;
 import android.os.Parcelable;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.societies.api.schema.activity.MarshaledActivity;
 
 /**
  * Describe your class here...
@@ -36,7 +36,7 @@ import android.os.Parcelable;
  * @author aleckey
  *
  */
-public class AActivity extends Activity implements Parcelable {
+public class AActivity extends MarshaledActivity implements Parcelable {
 
 	private static final long serialVersionUID = 2942344377976155227L;
 
@@ -77,7 +77,7 @@ public class AActivity extends Activity implements Parcelable {
 		}
 	};
 
-	public static AActivity convertActivity(Activity activity) {
+	public static AActivity convertActivity(MarshaledActivity activity) {
 		AActivity aact = new AActivity();
 		aact.setActor(activity.getActor());
 		aact.setObject(activity.getObject());
@@ -88,8 +88,8 @@ public class AActivity extends Activity implements Parcelable {
 		return aact;
 	}
 	
-	public static Activity convertAActivity(Activity aactivity) {
-		Activity act = new Activity();
+	public static MarshaledActivity convertAActivity(MarshaledActivity aactivity) {
+        MarshaledActivity act = new MarshaledActivity();
 		act.setActor(aactivity.getActor());
 		act.setObject(aactivity.getObject());
 		act.setPublished(aactivity.getPublished());

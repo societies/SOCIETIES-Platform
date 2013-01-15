@@ -65,7 +65,7 @@
 				<xs:element ref='deleteMemberResponse'/>
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
-				<xs:element ref='insact:activityfeed'/>
+				<xs:element ref='insact:marshaledActivityFeed'/>
 				<xs:element ref='setMembershipCriteria'/>
 				<xs:element ref='setMembershipCriteriaResponse'/>
 				<xs:element ref='getMembershipCriteria'/>

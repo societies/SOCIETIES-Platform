@@ -32,31 +32,31 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
 public class ActivityFeedClient implements IActivityFeedCallback {
 
-	org.societies.api.schema.activityfeed.Activityfeed act = null;
+	org.societies.api.schema.activityfeed.MarshaledActivityFeed act = null;
 	
 	private final long TIMEOUT = 15;
 
-	private BlockingQueue<org.societies.api.schema.activityfeed.Activityfeed> returnList;	
+	private BlockingQueue<org.societies.api.schema.activityfeed.MarshaledActivityFeed> returnList;
 	
 	private static Logger logger = LoggerFactory.getLogger(ActivityFeedClient.class);
 	
 	public ActivityFeedClient() {
 		logger.info("ActivityFeedClient called ###########: ");
 		
-		returnList = new ArrayBlockingQueue<org.societies.api.schema.activityfeed.Activityfeed>(1);
+		returnList = new ArrayBlockingQueue<org.societies.api.schema.activityfeed.MarshaledActivityFeed>(1);
 	}
 
 	@Override
-	public void receiveResult(Activityfeed activityFeedObject) {
+	public void receiveResult(MarshaledActivityFeed activityFeedObject) {
 		act = activityFeedObject;
 		insertComObjInQueue(act);
 	}
 	
-	public org.societies.api.schema.activityfeed.Activityfeed getActivityFeed(){
+	public org.societies.api.schema.activityfeed.MarshaledActivityFeed getActivityFeed(){
 		try {
 			return returnList.poll(TIMEOUT, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
@@ -66,7 +66,7 @@ public class ActivityFeedClient implements IActivityFeedCallback {
 		}
 	}
 	
-	private void insertComObjInQueue(Activityfeed activityFeedObject){
+	private void insertComObjInQueue(MarshaledActivityFeed activityFeedObject){
 		try {
 			returnList.put(activityFeedObject);
 		} catch (InterruptedException e) {

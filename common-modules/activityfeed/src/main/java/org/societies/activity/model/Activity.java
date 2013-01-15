@@ -74,7 +74,7 @@ public class Activity implements IActivity {
 		this.setVerb(iact.getVerb());
 		this.setPublished(iact.getPublished());
 	}
-    public Activity(org.societies.api.schema.activity.Activity iAct)
+    public Activity(org.societies.api.schema.activity.MarshaledActivity iAct)
     {
         data = new HashMap<String,ActivityString>();
         this.setActor(iAct.getActor());

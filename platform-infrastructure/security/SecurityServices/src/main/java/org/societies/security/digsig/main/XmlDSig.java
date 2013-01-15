@@ -27,6 +27,7 @@ package org.societies.security.digsig.main;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.apache.xml.security.Init;
@@ -51,9 +52,9 @@ public class XmlDSig {
 	private static Logger LOG = LoggerFactory.getLogger(XmlDSig.class);
 
 	/** Our certificate */
-	X509Certificate cert;
+	private X509Certificate cert;
 	
-	PrivateKey key;
+	private PrivateKey key;
 	
 	public XmlDSig(X509Certificate cert, PrivateKey key) throws DigsigException {
 		this.cert = cert;
@@ -106,7 +107,7 @@ public class XmlDSig {
 	// TODO: move to PolicyNegotiator
 	public String getRequesterSignatureId(Document doc) {
 
-		SignatureCheck check = new SignatureCheck(doc, cert);
+		SignatureCheck check = new SignatureCheck(doc);
 		XMLSignature xmlSig;
 		
 		try {
@@ -167,8 +168,29 @@ public class XmlDSig {
 		return str;
 	}
 
-	public boolean verifyXml(String xml) {
+	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException {
+		
 		LOG.debug("verifyXml()");
-		return true; // FIXME
+		
+		HashMap<String, X509Certificate> result;
+		SignatureCheck sigCheck;
+		Document doc;
+		XmlManipulator xmlManipulator = new XmlManipulator();
+		
+		xmlManipulator.load(xml);
+		doc = xmlManipulator.getDocument();
+
+		sigCheck = new SignatureCheck(doc);
+		
+		try {
+			result = sigCheck.verifyAllSignatures();
+		} catch (DigsigException e) {
+			LOG.warn("verifyXml(): ", e);
+			throw e;
+		}
+		
+		LOG.debug("verifyXml(): found {} signatures, all valid", result.size());
+		
+		return result;
 	}
 }

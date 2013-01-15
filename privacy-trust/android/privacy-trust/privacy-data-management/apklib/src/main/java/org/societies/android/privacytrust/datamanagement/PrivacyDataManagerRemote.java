@@ -51,7 +51,7 @@ import android.util.Log;
 public class PrivacyDataManagerRemote {
 	private final static String TAG = PrivacyDataManagerRemote.class.getSimpleName();
 
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("PrivacyDataManagerBean", "PrivacyDataManagerBeanResult");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("privacyDataManagerBean", "privacyDataManagerBeanResult"); // /!\ First letter in lowercase
 	private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
 			"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 			"http://societies.org/api/schema/identity", 
@@ -74,7 +74,7 @@ public class PrivacyDataManagerRemote {
 	}
 
 
-	public boolean checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		// -- Destination
 		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
@@ -97,15 +97,33 @@ public class PrivacyDataManagerRemote {
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
-			return false;
 		}
-		return true;
 	}
 
 	// -- Obfuscation
-	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
-		Log.i(TAG, "Remote obfuscation not available yet.");
-		return dataWrapper;
+	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+		String action = MethodType.OBFUSCATE_DATA.name();
+		// -- Destination
+		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+		Stanza stanza = new Stanza(cloudNode);
+		Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
+
+		// -- Message
+		PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
+		messageBean.setMethod(MethodType.OBFUSCATE_DATA);
+		messageBean.setRequestor(requestor);
+//		messageBean.setDataWrapper(dataWrapper);
+
+		// -- Send
+		RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		try {
+			clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
+		}
 	}
 	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");

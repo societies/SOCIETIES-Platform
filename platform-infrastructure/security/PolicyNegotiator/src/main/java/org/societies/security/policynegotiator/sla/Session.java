@@ -27,6 +27,7 @@ package org.societies.security.policynegotiator.sla;
 import java.util.Random;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 
 /**
  * 
@@ -43,20 +44,23 @@ public class Session {
 	private IIdentity provider;
 	private SLA sla;
 	private String serviceId;
+	private NegotiationType type;
 
 	/**
 	 * Constructor. Session ID is generated automatically.
 	 */
-	public Session() {
-		sessionId = rnd.nextInt();
+	public Session(NegotiationType type) {
+		this.sessionId = rnd.nextInt();
+		this.type = type;
 	}
 	
 	/**
-	 * Constructor. Session ID is generated automatically.
+	 * Constructor. Session ID is specified explicitly.
 	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
-	}
+//	public Session(int sessionId, NegotiationType type) {
+//		this.sessionId = sessionId;
+//		this.type = type;
+//	}
 
 	/**
 	 * @return Session ID
@@ -105,5 +109,9 @@ public class Session {
 
 	public void setServiceId(String serviceId) {
 		this.serviceId = serviceId;
+	}
+	
+	public NegotiationType getType() {
+		return type;
 	}
 }

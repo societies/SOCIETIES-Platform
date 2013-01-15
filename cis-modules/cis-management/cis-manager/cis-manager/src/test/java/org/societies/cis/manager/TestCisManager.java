@@ -49,25 +49,21 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
@@ -788,9 +784,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		iActivity2.setVerb("verb2");
 
 		class DummyAddActFeedCback implements IActivityFeedCallback {
-
-			public void receiveResult(Activityfeed activityFeedObject){
-				assertEquals(activityFeedObject.getAddActivityResponse().isResult(),true);
+			public void receiveResult(MarshaledActivityFeed activityFeedObject){
+                assertEquals(activityFeedObject.getAddActivityResponse().isResult(),true);
 			}
 		}
 		
@@ -809,16 +804,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				this.parentJid = parentJid;
 			}
 			
-			public void receiveResult(Activityfeed activityFeedObject){
+			public void receiveResult(MarshaledActivityFeed activityFeedObject){
 
 				int[] check = {0,0};
 				
-				List<Activity> l = activityFeedObject.getGetActivitiesResponse().getActivity();
+				List<MarshaledActivity> l = activityFeedObject.getGetActivitiesResponse().getMarshaledActivity();
 				
-				Iterator<Activity> it = l.iterator();
+				Iterator<MarshaledActivity> it = l.iterator();
 				
 				while(it.hasNext()){
-					Activity element = it.next();
+                    MarshaledActivity element = it.next();
 					if(element.getActor().equals("act") )
 						check[0] = 1;
 					if(element.getActor().equals("act2") )

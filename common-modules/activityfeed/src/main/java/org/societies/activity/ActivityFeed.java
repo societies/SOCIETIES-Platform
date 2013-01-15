@@ -40,8 +40,6 @@ import org.societies.activity.model.ActivityString;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
@@ -402,7 +400,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 
 	/**
 	 * This method just translates an existing list of iActivities (IActivity) into a new list of
-	 *  marshalledActivities org.societies.api.schema.activity.Activity
+	 *  marshaledActivities org.societies.api.schema.activity.MarshaledActivity
 	 *  
 	 *  
 	 * @param iActivityList list with iactivities (IActivity) objects
@@ -413,7 +411,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	// TODO: perhaps change to static
 	
 
-	public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.Activity> marshalledActivList){
+	public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList){
 		
 		Iterator<IActivity> it = iActivityList.iterator();
 		
@@ -424,8 +422,8 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	
 
-	public org.societies.api.schema.activity.Activity iactivToMarshActiv(IActivity iActivity){
-		org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+	public org.societies.api.schema.activity.MarshaledActivity iactivToMarshActiv(IActivity iActivity){
+		org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
 		a.setActor(iActivity.getActor());
 		a.setVerb(iActivity.getVerb());
 		if(iActivity.getObject()!=null && iActivity.getObject().isEmpty() == false )
@@ -445,15 +443,15 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		LOG.debug("local get activities WITH CALLBACK called");
 
 		List<IActivity> iActivityList = this.getActivities(timePeriod);
-		org.societies.api.schema.activityfeed.Activityfeed ac = new org.societies.api.schema.activityfeed.Activityfeed();
+		org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		GetActivitiesResponse g = new GetActivitiesResponse();
 		ac.setGetActivitiesResponse(g);		
 
-		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 		
 		this.iactivToMarshActvList(iActivityList, marshalledActivList);
 
-		g.setActivity(marshalledActivList);
+		g.setMarshaledActivity(marshalledActivList);
 		
 		c.receiveResult(ac);	
 		
@@ -465,22 +463,33 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		LOG.debug("local get activities using query WITH CALLBACK called");
 
 		List<IActivity> iActivityList = this.getActivities(query,timePeriod);
-		org.societies.api.schema.activityfeed.Activityfeed ac = new org.societies.api.schema.activityfeed.Activityfeed();
+		org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		GetActivitiesResponse g = new GetActivitiesResponse();
 		ac.setGetActivitiesResponse(g);		
 
-		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 		
 		this.iactivToMarshActvList(iActivityList, marshalledActivList);
 
-		g.setActivity(marshalledActivList);
+		g.setMarshaledActivity(marshalledActivList);
 		
 		c.receiveResult(ac);	
 		
 	}
-	@Override
+
+    @Override
+    public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void getActivities(String query, String timePeriod, long n, IActivityFeedCallback c) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
 	public void addActivity(IActivity activity, IActivityFeedCallback c) {
-		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		AddActivityResponse r = new AddActivityResponse();
 
 		this.addActivity(activity);		
@@ -493,7 +502,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	@Override
 	public void cleanupFeed(String criteria, IActivityFeedCallback c) {
-		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
 		
 		r.setResult(this.cleanupFeed(criteria)); 
@@ -506,7 +515,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	@Override
 	public void deleteActivity(IActivity activity, IActivityFeedCallback c) {
-		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		DeleteActivityResponse r = new DeleteActivityResponse();
 		
 		r.setResult(this.deleteActivity(activity));

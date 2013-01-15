@@ -53,7 +53,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -157,17 +157,17 @@ public class CisCtxMonitor extends EventListener implements Subscriber {
 		if (LOG.isInfoEnabled()) // TODO DEBUG
 			LOG.info("Received CIS Activity Feed pubsub event: " + item);
 		
-		if (!(item instanceof Activity)) {
+		if (!(item instanceof MarshaledActivity)) {
 			
 			LOG.error("Could not handle CIS Activity Feed pubsub event: " 
-					+ "Expected item of type " + Activity.class.getName()
+					+ "Expected item of type " + MarshaledActivity.class.getName()
 					+ " but was " + ((item != null) ? item.getClass() : "null"));
 			return;
 		}
 		
-		final String cisIdStr = ((Activity) item).getObject();
-		final String cssIdStr = ((Activity) item).getActor();
-		final String verb = ((Activity) item).getVerb();
+		final String cisIdStr = ((MarshaledActivity) item).getObject();
+		final String cssIdStr = ((MarshaledActivity) item).getActor();
+		final String verb = ((MarshaledActivity) item).getVerb();
 		if (verb.equals(VERB_CSS_JOINED)) {
 			this.executorService.execute(
 					new CisMemberJoinedCtxHandler(cisIdStr, cssIdStr));

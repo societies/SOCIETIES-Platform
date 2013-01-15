@@ -41,8 +41,8 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
 import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
@@ -136,8 +136,8 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
     }
     @Override
     public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-        if(item.getClass().equals(org.societies.api.schema.activity.Activity.class)){
-            Activity a = (Activity)item;
+        if(item.getClass().equals(org.societies.api.schema.activity.MarshaledActivity.class)){
+            MarshaledActivity a = (MarshaledActivity)item;
             LOG.info("pubsubevent with acitvity " + a.getActor() + " " +a.getVerb()+ " " +a.getTarget());
         }else{
             LOG.info("something weird came on the pubsub");
@@ -163,10 +163,10 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
         return this.getHistory(timePeriod);
     }
 
-    private List<Activity> incomingActHist;
+    private List<MarshaledActivity> incomingActHist;
     @Override
-    public void receiveResult(Activityfeed activityFeedObject) {
-        incomingActHist =  activityFeedObject.getGetActivitiesResponse().getActivity();
+    public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+        incomingActHist =  activityFeedObject.getGetActivitiesResponse().getMarshaledActivity();
         synchronized (syncObj){
             syncObj.notify();
         }

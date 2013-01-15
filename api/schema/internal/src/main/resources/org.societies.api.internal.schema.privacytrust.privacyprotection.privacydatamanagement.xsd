@@ -25,7 +25,7 @@
     <xs:sequence>
       <xs:element name="method" type="tns:methodType"/>
       <xs:element name="requestor" type="ns2:requestorBean"/>
-      <xs:element name="dataIdUri" type="xs:string"/>
+      <xs:element name="dataIdUri" type="xs:string" minOccurs="0" />
       <xs:element name="actions" type="ns1:action" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   	</xs:complexType>

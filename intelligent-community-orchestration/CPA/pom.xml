@@ -136,6 +136,11 @@
             <artifactId>com.springsource.org.apache.commons.collections</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.csv</artifactId>
+            <version>1.0.0.BUILD-20080106</version>
+        </dependency>
 
 
         <dependency>
@@ -143,12 +148,12 @@
             <artifactId>societies-api-internal</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.societies.orchestration.api</groupId>
             <artifactId>intelligent-community-orchestration-api</artifactId>
             <scope>provided</scope>
             <version>${version.ico}</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
@@ -170,13 +175,19 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-visualization</artifactId>
             <version>2.0.1</version>
-            <scope>provided</scope>
+            <scope>test</scope>
 
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <version>4.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.gate</groupId>
+            <artifactId>gate-core</artifactId>
+            <version>7.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -190,9 +201,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator></Bundle-Activator>
-                        <Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
                     </instructions>
                 </configuration>
             </plugin>
@@ -236,4 +246,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+       
+      
+      
+      <osgi:reference id="CisManager" interface="org.societies.api.cis.management.ICisManager"/>
+      
+      <osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	
+	  <osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
+      
+      <osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
+      
+       
+       <osgi:service ref="UpperTester">	
+			<osgi:interfaces>
+				<value>org.societies.integration.performance.test.upper_tester.IUpperTester</value>
+			</osgi:interfaces>
+			<osgi:service-properties>
+				<entry key="service.exported.interfaces" value="*"/>
+				<!-- <entry key="org.apache.cxf.ws.httpservice.context" value="/upper-tester"/> -->
+				<entry key="org.apache.cxf.ws.address" value="${ws.address}"/>
+			</osgi:service-properties>
+       </osgi:service>
+</beans>

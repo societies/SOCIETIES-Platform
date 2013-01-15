@@ -71,9 +71,11 @@ public class PrivacyPermissionUtils {
 		privacyPermissionBean.setDecision(DecisionUtils.toDecisionBean(privacyPermission.getDecision()));
 		privacyPermissionBean.setRequestItem(RequestItemUtils.toRequestItemBean(privacyPermission.getRequestItem()));
 		privacyPermissionBean.setObfuscationLevel(privacyPermission.getObfuscationLevel());
-		GregorianCalendar gCalendar = new GregorianCalendar();
-		gCalendar.setTime(privacyPermission.getCreationDate());
-		privacyPermissionBean.setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gCalendar));
+		//GregorianCalendar gCalendar = new GregorianCalendar();
+		//gCalendar.setTime(privacyPermission.getCreationDate());
+		//privacyPermissionBean.setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(gCalendar));
+		Date now = new Date();
+		privacyPermissionBean.setCreationDate(now);
 		privacyPermissionBean.setValidityDuration(privacyPermission.getValidityDuration());
 		return privacyPermissionBean;
 	}
@@ -95,6 +97,7 @@ public class PrivacyPermissionUtils {
 	 */
 	public boolean isStillValid(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission privacyPermissionBean) {
 		Date now = new Date();
-		return (now.getTime() > (privacyPermissionBean.getCreationDate().toGregorianCalendar().getTimeInMillis()+privacyPermissionBean.getValidityDuration()));
+		//return (now.getTime() > (privacyPermissionBean.getCreationDate().toGregorianCalendar().getTimeInMillis()+privacyPermissionBean.getValidityDuration()));
+		return (now.getTime() > (privacyPermissionBean.getCreationDate().getTime() + privacyPermissionBean.getValidityDuration()));
 	}
 }

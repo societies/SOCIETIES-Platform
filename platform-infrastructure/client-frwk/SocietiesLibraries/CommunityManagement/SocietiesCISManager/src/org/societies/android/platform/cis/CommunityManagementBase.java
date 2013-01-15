@@ -41,13 +41,8 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.api.schema.activityfeed.AddActivity;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeed;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.activityfeed.DeleteActivity;
-import org.societies.api.schema.activityfeed.GetActivities;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.activityfeed.*;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
@@ -87,7 +82,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 														    	  "http://societies.org/api/schema/activityfeed",	  		
 																  "http://societies.org/api/schema/cis/community");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.cis.manager",
-													    	   "org.societies.api.schema.activityfeed",
+													    	   "org.societies.api.schema.marshaledactivityfeed",
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
@@ -285,16 +280,15 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#addActivity(java.lang.String, org.societies.api.schema.activityfeed.AddActivity)*/
-	public Boolean addActivity(String client, String cisId, Activity activity) {
+	public Boolean addActivity(String client, String cisId, MarshaledActivity activity) {
 		Log.d(LOG_TAG, "addActivity called by client: " + client);
 
 		//GETFEED OBJECT
 		activity.setActor(commMgr.getIdManager().getCloudNode().getJid());
 		AddActivity addAct = new AddActivity();
-		//addAct.setActivity(AActivity.convertAActivity(activity));
-		addAct.setActivity(activity);
+		addAct.setMarshaledActivity(activity);
 		//CREATE MESSAGE BEAN
-		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
+		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
 		messageBean.setAddActivity(addAct);
 
 		//COMMS STUFF
@@ -323,7 +317,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		//GETFEED OBJECT
 		CleanUpActivityFeed feed = new CleanUpActivityFeed();
 		//CREATE MESSAGE BEAN
-		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
+		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
 		messageBean.setCleanUpActivityFeed(feed);
 
 		//COMMS STUFF
@@ -346,14 +340,14 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/*@see org.societies.android.api.cis.management.ICisSubscribed#deleteActivity(java.lang.String, org.societies.api.schema.activityfeed.DeleteActivity)*/
-	public Boolean deleteActivity(String client, String cisId, Activity activity) {
+	public Boolean deleteActivity(String client, String cisId, MarshaledActivity activity) {
 		Log.d(LOG_TAG, "deleteActivity called by client: " + client);
 
 		//GETFEED OBJECT
 		DeleteActivity getFeed = new DeleteActivity();
-		getFeed.setActivity(activity);
+		getFeed.setMarshaledActivity(activity);
 		//CREATE MESSAGE BEAN
-		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
+		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
 		messageBean.setDeleteActivity(getFeed);
 
 		//COMMS STUFF
@@ -376,7 +370,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#getActivityFeed(java.lang.String, java.lang.String)*/
-	public Activity[] getActivityFeed(String client, String cisId) {
+	public MarshaledActivity[] getActivityFeed(String client, String cisId) {
 		Log.d(LOG_TAG, "getActivityFeed called by client: " + client);
 
 		//GETFEED OBJECT
@@ -398,7 +392,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		getFeed.setTimePeriod(longFrom + " " + longNow);
 		
 		//CREATE MESSAGE BEAN
-		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
+		MarshaledActivityFeed messageBean = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 		messageBean.setGetActivities(getFeed);
 
 		//COMMS STUFF
@@ -625,13 +619,13 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 				}
 				
 				// --------- ACTIVITY FEED BEAN---------
-				else if(msgBean instanceof Activityfeed) {
+				else if(msgBean instanceof MarshaledActivityFeed) {
 					Log.d(LOG_TAG, "Activity Feed Result!");
-					Activityfeed response = (Activityfeed)msgBean;
+                    MarshaledActivityFeed response = (MarshaledActivityFeed)msgBean;
 					
 					//GET ACTIVITIES RESULT
 					if (response.getGetActivitiesResponse() != null) {
-						List<Activity> listReturned = response.getGetActivitiesResponse().getActivity();
+						List<MarshaledActivity> listReturned = response.getGetActivitiesResponse().getMarshaledActivity();
 						//CONVERT TO PARCEL BEANS
 						//Parcelable returnArray[] = new Parcelable[listReturned.size()];
 						//for (int i=0; i<listReturned.size(); i++) {
@@ -639,7 +633,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						//	returnArray[i] = activity;
 						//	Log.d(LOG_TAG, "publish: " + activity.getPublished());
 						//}
-						Activity returnArray[] = listReturned.toArray(new Activity[listReturned.size()]);
+						MarshaledActivity returnArray[] = listReturned.toArray(new MarshaledActivity[listReturned.size()]);
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}

@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.cis.management;
 
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 import org.societies.api.schema.cis.community.Community;
 
@@ -49,8 +49,8 @@ public interface ICisSubscribed {
 	public String methodsArray[] = {"getMembers(String client, String cisId)",
 							 		"getCisInformation(String client, String cisId)",
 							 		"getActivityFeed(String client, String cisId)",
-							 		"addActivity(String client, String cisId, AActivity activity)",
-							 		"deleteActivity(String client, String cisId, AActivity activity)",
+							 		"addActivity(String client, String cisId, MarshaledActivity activity)",
+							 		"deleteActivity(String client, String cisId, MarshaledActivity activity)",
 							 		"cleanActivityFeed(String client, String cisId)"
 								};
 	
@@ -76,19 +76,19 @@ public interface ICisSubscribed {
 	 * @param cisId
 	 * @return
 	 */
-	public Activity[] getActivityFeed(String client, String cisId);
+	public MarshaledActivity[] getActivityFeed(String client, String cisId);
 	
 	/**
 	 * Add an activity to this community
 	 * @param activity
 	 * @return
 	 */
-	public Boolean addActivity(String client, String cisId, Activity activity);
+	public Boolean addActivity(String client, String cisId, MarshaledActivity activity);
 	
 	/**
 	 * Deletes the relevant activty from the feed
 	 */
-	public Boolean deleteActivity(String client, String cisId, Activity activity);
+	public Boolean deleteActivity(String client, String cisId, MarshaledActivity  activity);
 	/**
 	 * Clean up the activity feed for this community
 	 * @return

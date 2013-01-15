@@ -55,7 +55,7 @@
 	</parent>
 	
 	<modules>
-		<module>API</module>
+		<!-- <module>API</module> -->
 		<module>CISDataCollector</module>
 		<module>CPA</module>
 	</modules>

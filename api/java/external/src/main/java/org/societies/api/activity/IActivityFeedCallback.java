@@ -25,14 +25,14 @@
 
 package org.societies.api.activity;
 
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-import org.societies.api.schema.activityfeed.Activityfeed;
 
 
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeedCallback {
 	
-	void receiveResult(Activityfeed activityFeedObject);
+	void receiveResult(MarshaledActivityFeed activityFeedObject);
 
 }

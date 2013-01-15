@@ -11,11 +11,16 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
   
-<!--<osgi:service ref="serListener" interface="org.societies.slm.servicecontrol.ServiceRegistryListener"/>-->	
 <osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 <osgi:service ref="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"/>
 <osgi:service ref="serviceManagement" interface="org.societies.api.services.IServices"/>
-
+<osgi:service ref="ServiceLifecycleManagementRemote">
+  	<osgi:interfaces>
+    	<value>org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote</value>
+     	<value>org.societies.api.internal.servicelifecycle.IServiceControlRemote</value>
+  	</osgi:interfaces>
+</osgi:service>
+	
 <osgi:reference id="serviceRegRef" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
 <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 <osgi:reference id="eventManagerRef" interface="org.societies.api.osgi.event.IEventMgr" />

@@ -1,0 +1,7 @@
+parameters:
+#    societies_test_engine.example.class: Societies\TestEngineBundle\Example
+
+services:
+#    societies_test_engine.example:
+#        class: %societies_test_engine.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

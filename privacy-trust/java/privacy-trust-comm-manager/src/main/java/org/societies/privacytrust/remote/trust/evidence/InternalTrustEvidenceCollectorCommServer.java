@@ -194,8 +194,8 @@ public class InternalTrustEvidenceCollectorCommServer implements IFeatureServer 
 				final TrustEvidenceType type = TrustEvidenceType.valueOf(
 						addEvidenceRequestBean.getType().toString());
 				// 4. timestamp
-				final Date timestamp = addEvidenceRequestBean.
-						getTimestamp().toGregorianCalendar().getTime();
+				//final Date timestamp = addEvidenceRequestBean.getTimestamp().toGregorianCalendar().getTime();
+				final Date timestamp = addEvidenceRequestBean.getTimestamp();
 				// 5. info
 				final Serializable info;
 				if (addEvidenceRequestBean.getInfo() != null)

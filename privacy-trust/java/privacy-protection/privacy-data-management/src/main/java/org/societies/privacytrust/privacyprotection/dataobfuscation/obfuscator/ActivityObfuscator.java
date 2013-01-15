@@ -27,7 +27,7 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activity.MarshaledActivity;
 
 /**
  * Obfuscator for activity from activity feed
@@ -35,15 +35,15 @@ import org.societies.api.schema.activity.Activity;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class ActivityObfuscator extends DataObfuscator<IDataWrapper<Activity>> {
+public class ActivityObfuscator extends DataObfuscator<IDataWrapper<MarshaledActivity>> {
 	/**
 	 * @param data
 	 */
-	public ActivityObfuscator(IDataWrapper<Activity> data) {
+	public ActivityObfuscator(IDataWrapper<MarshaledActivity> data) {
 		super(data);
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		stepNumber = 1;
-		dataType = Activity.class;
+		dataType = MarshaledActivity.class;
 	}
 
 
@@ -52,7 +52,7 @@ public class ActivityObfuscator extends DataObfuscator<IDataWrapper<Activity>> {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override
-	public IDataWrapper<Activity> obfuscateData(double obfuscationLevel)
+	public IDataWrapper<MarshaledActivity> obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		return dataWrapper;
 	}

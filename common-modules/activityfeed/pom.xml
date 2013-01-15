@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.societies.platform</groupId>
             <artifactId>socialdata</artifactId>
-            <version>0.1</version>
+            <version>${release.version}</version>
             <scope>provided</scope>
         </dependency>
 

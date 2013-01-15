@@ -120,9 +120,11 @@ public class TrustEvidenceCollectorCommClient implements
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 4. timestamp
 			// TODO Uncomment once #1310 is resolved
-			final GregorianCalendar gregCal = new GregorianCalendar();
-			gregCal.setTime(timestamp);
-			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			//final GregorianCalendar gregCal = new GregorianCalendar();
+			//gregCal.setTime(timestamp);
+			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			Date now = new Date();
+			addEvidenceBean.setTimestamp(now);
 			// 5. info
 			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
@@ -141,12 +143,12 @@ public class TrustEvidenceCollectorCommClient implements
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
 		// TODO Uncomment once #1310 is resolved
-		} catch (DatatypeConfigurationException dce) {
-			
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence with subjectId '" 
-					+ subjectId + "' and objectId '" + objectId 
-					+ "': " + dce.getLocalizedMessage(), dce);
+		//} catch (DatatypeConfigurationException dce) {
+		//	
+		//	throw new TrustEvidenceCollectorCommException(
+		//			"Could not add direct trust evidence with subjectId '" 
+		//			+ subjectId + "' and objectId '" + objectId 
+		//			+ "': " + dce.getLocalizedMessage(), dce);
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommException(
@@ -202,9 +204,11 @@ public class TrustEvidenceCollectorCommClient implements
 			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 4. timestamp
-			final GregorianCalendar gregCal = new GregorianCalendar();
-			gregCal.setTime(timestamp);
-			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			//final GregorianCalendar gregCal = new GregorianCalendar();
+			//gregCal.setTime(timestamp);
+			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			Date now = new Date();
+			addEvidenceBean.setTimestamp(now);
 			// 5. info
 			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
@@ -225,12 +229,12 @@ public class TrustEvidenceCollectorCommClient implements
 					+ subjectId + "' and objectId '" + objectId	
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
-		} catch (DatatypeConfigurationException dce) {
-			
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add indirect trust evidence with subjectId '"	
-					+ subjectId + "' and objectId '" + objectId	
-					+ "': " + dce.getLocalizedMessage(), dce);
+		//} catch (DatatypeConfigurationException dce) {
+		//	
+		//	throw new TrustEvidenceCollectorCommException(
+		//			"Could not add indirect trust evidence with subjectId '"	
+		//			+ subjectId + "' and objectId '" + objectId	
+		//			+ "': " + dce.getLocalizedMessage(), dce);
 			
 		} catch (IOException ioe) {
 		

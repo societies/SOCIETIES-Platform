@@ -24,15 +24,22 @@
  */
 package org.societies.integration.test.bit.cpa;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVStrategy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -47,7 +54,7 @@ import static org.junit.Assert.*;
 /**
  * @author  Bjørn Magnus based on work from Rafik and Olivier
  */
-public class NominalTestCase {
+public class NominalTestCase implements IActivityFeedCallback {
     private static Logger LOG = LoggerFactory.getLogger(NominalTestCase.class.getSimpleName());
     public static Integer testCaseNumber;
 
@@ -123,11 +130,48 @@ public class NominalTestCase {
             assertEquals("New CIS and retrived CIS should be the same but are not", newCis, cisRetrieved);
         }
         LOG.info("Starting simulation and injection of fake activities..");
+        ArrayList<String[]> data = new ArrayList<String[]>();
+        try {
+            URL u = NominalTestCase.class.getClassLoader().getResource("msn-data-xml.csv");
+            BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream()));
+            CSVParser parser = new CSVParser(br, CSVStrategy.EXCEL_STRATEGY);
+            String[] value =  parser.getLine();
+            while(value!=null){
+                data.add(value);
+                value = parser.getLine();
 
-
-
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        long msgCounter = 0;
+        for(String[] line : data){
+            msgCounter++;
+            TestCase1096.cisManager.getCis(cisIds.get(0)).getActivityFeed().addActivity(makeMessage(line[1], line[2], "nonsense", "0"), this);
+            if(msgCounter > 2000){
+                break;
+            }
+        }
         LOG.info("cisIds.size(): "+cisIds.size());
         assert(cisIds.size()==this.numCIS);
     }
 
+
+    //util methods
+
+    public Activity makeMessage(String user1, String user2, String message, String published){
+        Activity ret = new Activity();
+        ret.setActor(user1);
+        ret.setObject(message);
+        ret.setTarget(user2);
+        ret.setPublished(published);
+        return ret;
+    }
+
+    @Override
+    public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

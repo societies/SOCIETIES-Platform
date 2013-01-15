@@ -1,8 +1,8 @@
-/**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+/*
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp.,
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -24,6 +24,8 @@
  */
 package org.societies.orchestration.cpa.test;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVStrategy;
 import org.hibernate.SessionFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.activity.PersistedActivityFeed;
@@ -31,10 +33,15 @@ import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.orchestration.cpa.impl.CPACreationPatterns;
+import org.societies.orchestration.cpa.test.util.SentenceExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +77,7 @@ public class CISSimulator implements IActivityFeedCallback {
 		userToUserMap = new HashMap<String,HashMap<String,Double>>();
 		init(initUsers);
 	}
-	
+
 	public ActivityFeed getActFeed() {
 		return actFeed;
 	}
@@ -108,6 +115,41 @@ public class CISSimulator implements IActivityFeedCallback {
 	public void addUser(String user){
 		userToUserMap.put(user, new HashMap<String,Double>());
 	}
+    public ICisOwned simulate(String file){
+        ArrayList<String[]> data = new ArrayList<String[]>();
+        ICISSimulated ret = new ICISSimulated();
+        ret.setFeed(actFeed);
+        actFeed.setId("simId");
+        try {
+            CSVParser parser = new CSVParser(new FileReader(file), CSVStrategy.EXCEL_STRATEGY);
+            String[] value =  parser.getLine();
+            while(value!=null){
+                data.add(value);
+                value = parser.getLine();
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        init(users); //using the same code even though the rates set will be ignored in generating traffic
+        long msgCounter = 0;
+        SentenceExtractor extractor = new SentenceExtractor("./src/test/resources/reuters21578content.txt");
+        //String sentence = extractor.getSentences(20,1)[0];
+        String tmpSentence = "";
+        for(String[] line : data){
+            msgCounter++;
+            tmpSentence = extractor.getSentences((int)msgCounter,1)[0];
+            if(tmpSentence.length()>254)
+                tmpSentence = tmpSentence.substring(0,253);
+            ret.getActivityFeed().addActivity(makeMessage(line[1],line[2],tmpSentence,"0"),this);
+            if(msgCounter > this.getMaxActs()){
+                break;
+            }
+        }
+        return ret;
+    }
 	public ICisOwned simulate(long days){
 		ICISSimulated ret = new ICISSimulated();
 		ret.setFeed(actFeed);
@@ -131,24 +173,24 @@ public class CISSimulator implements IActivityFeedCallback {
 						user1=usersList.get(u1);
 						user2=usersList.get(u2);
 						if(Math.random()>this.userToUserMap.get(user1).get(user2)){
-							System.out.println("msgCounter: "+ (++msgCounter) + " maxActs: "+maxActs+" count: "+((ActivityFeed)ret.getFeed()).count());
+							System.out.println("msgCounter: "+ (++msgCounter) + " maxActs: "+ getMaxActs() +" count: "+((ActivityFeed)ret.getFeed()).count());
 							ret.getActivityFeed().addActivity(makeMessage(user1,user2,"message",Long.toString((long)(Math.random()*(24L*3600L*1000L)))),this); //add message to random time of this day given probabilities in the table..
 						}
-						if(msgCounter > this.maxActs){
+						if(msgCounter > this.getMaxActs()){
 							break;
 						}
 					}
-					if(msgCounter > this.maxActs){
+					if(msgCounter > this.getMaxActs()){
 						break;
 					}
 					
 				}
-				if(msgCounter > this.maxActs){
+				if(msgCounter > this.getMaxActs()){
 					break;
 				}
 				
 			}
-			if(msgCounter > this.maxActs){
+			if(msgCounter > this.getMaxActs()){
 				break;
 			}
 			timecounter += (24L*3600L*1000L);
@@ -172,7 +214,7 @@ public class CISSimulator implements IActivityFeedCallback {
         loader.load(sim, "SimTest-context.xml");
 		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
         sim.simulate(1);
-        sim.maxActs = 2000;
+        sim.setMaxActs(2000);
         
         CPACreationPatterns cpa = new CPACreationPatterns();
         cpa.init();
@@ -181,7 +223,7 @@ public class CISSimulator implements IActivityFeedCallback {
 	}
 
     @Override
-    public void receiveResult(Activityfeed activityFeedObject) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+
     }
 }

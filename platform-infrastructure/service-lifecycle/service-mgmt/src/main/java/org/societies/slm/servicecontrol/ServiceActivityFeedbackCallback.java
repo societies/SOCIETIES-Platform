@@ -27,7 +27,7 @@ package org.societies.slm.servicecontrol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
 /**
  * Describe your class here...
@@ -47,7 +47,7 @@ public class ServiceActivityFeedbackCallback implements IActivityFeedCallback {
 	 * @see org.societies.api.activity.IActivityFeedCallback#receiveResult(org.societies.api.schema.activityfeed.Activityfeed)
 	 */
 	@Override
-	public void receiveResult(Activityfeed activityFeedObject) {
+	public void receiveResult(MarshaledActivityFeed activityFeedObject) {
 		if(logger.isDebugEnabled())
 			logger.debug("Activity Feed callback!");
 

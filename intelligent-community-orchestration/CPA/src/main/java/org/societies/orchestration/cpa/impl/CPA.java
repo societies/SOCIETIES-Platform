@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is the class for the Egocentric Community Analyser component
  * 
  * Driver code for the CPA process of analysing CIS activity, 
  * and trigger suggestions for new CISes if applicable.
@@ -70,6 +69,7 @@ public class CPA implements IDataCollectorSubscriber, Runnable
 //	}
 	private void process() {
 		cpaCreationPatterns.analyze(newActivities);
+        newActivities.clear();
 	}
 	
 	
@@ -85,6 +85,8 @@ public class CPA implements IDataCollectorSubscriber, Runnable
            List<CtxChangeEvent> tmpCtxList = (List<CtxChangeEvent>)newData;
            this.newContext.addAll(tmpCtxList);
         }
+
+
     }
 
     public ICisDataCollector getCollector() {
@@ -149,9 +151,10 @@ public class CPA implements IDataCollectorSubscriber, Runnable
         this.newActivities = new ArrayList<IActivity>();
     }
     public List<String> getTrends(int n){
-        ArrayList<String> ret = new ArrayList<String>();
-        //TODO: implement
-        return ret;
+        //ArrayList<String> ret = new ArrayList<String>();
+        //this.cpaCreationPatterns.getGraph().getTrends();
+        //return ret;
+        return cpaCreationPatterns.getGraph().topTrends(n);
     }
     
 }
