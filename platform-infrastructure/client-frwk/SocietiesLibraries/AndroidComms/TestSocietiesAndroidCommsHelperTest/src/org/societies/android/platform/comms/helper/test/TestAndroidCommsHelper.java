@@ -31,6 +31,7 @@ import android.util.Log;
  */
 
 public class TestAndroidCommsHelper extends AndroidTestCase {
+	private final static String LOG_TAG = TestAndroidCommsHelper.class.getName(); 
 	private static final int DELAY = 10000;
 	
 	private final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
@@ -202,6 +203,149 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		
 		Thread.sleep(DELAY);
 	}
+	@MediumTest 
+	/**
+	 * Test for the case where the class is used by a component which does not login (assumes that another component has logged in)
+	 * and tries to retrieve Items
+	 * @throws Exception
+	 */
+	public void testGetItems() throws Exception {
+		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
+		final ClientCommunicationMgr ccmOther = new ClientCommunicationMgr(this.getContext(), true);
+		
+		assertNotNull(ccm);
+		assertNotNull(ccmOther);
+		
+		ccm.bindCommsService(new IMethodCallback() {
+			
+			public void returnAction(String arg0) {
+				fail("Incorrect return object");
+			}
+			
+			public void returnAction(boolean flag) {
+				assertTrue(flag);
+				ccm.isConnected(new IMethodCallback() {
+					
+					public void returnAction(String arg0) {
+					}
+					
+					public void returnAction(boolean flag) {
+						assertFalse(flag);
+						ccm.configureAgent(XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, new IMethodCallback() {
+							
+							public void returnAction(String arg0) {
+							}
+							
+							public void returnAction(boolean flag) {
+								assertTrue(flag);
+								ccm.login(XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, new IMethodCallback() {
+									
+									public void returnAction(String loginResult) {
+										
+										assertEquals(XMPP_SUCCESSFUL_JID, loginResult);
+										ccmOther.bindCommsService(new IMethodCallback() {
+											
+											public void returnAction(String arg0) {
+											}
+											
+											public void returnAction(boolean flag) {
+												try {
+													
+													assertEquals(XMPP_SUCCESSFUL_JID, ccmOther.getIdentity().getJid());
+													IIdentityManager idManager = ccmOther.getIdManager();
+													assertNotNull(idManager);
+													
+													assertEquals(XMPP_SUCCESSFUL_CLOUD_NODE, idManager.getCloudNode().getJid());
+													assertEquals(XMPP_SUCCESSFUL_DA_NODE, idManager.getDomainAuthorityNode().getJid());
+													try {
+													ccm.getItems(idManager.fromJid(idManager.getDomainAuthorityNode().getJid()), null, new ICommCallback() {
+														
+														public void receiveResult(Stanza arg0, Object result) {
+															assertTrue(result instanceof String);
+															Log.d(LOG_TAG, "Received result: " + result);
+															
+															ccm.logout(new IMethodCallback() {
+																
+																public void returnAction(String arg0) {
+																}
+																
+																public void returnAction(boolean flag) {
+																	assertTrue(flag);
+																	assertTrue(ccm.unbindCommsService());
+																	assertTrue(ccmOther.unbindCommsService());
+																}
+															});
+
+														}
+														
+														public void receiveMessage(Stanza arg0, Object message) {
+															assertTrue(message instanceof String);
+															Log.d(LOG_TAG, "Received message: " + message);
+															ccm.logout(new IMethodCallback() {
+																
+																public void returnAction(String arg0) {
+																}
+																
+																public void returnAction(boolean flag) {
+																	assertTrue(flag);
+																	assertTrue(ccm.unbindCommsService());
+																	assertTrue(ccmOther.unbindCommsService());
+																}
+															});
+														}
+														
+														public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+															// TODO Auto-generated method stub
+															
+														}
+														
+														public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+															// TODO Auto-generated method stub
+															
+														}
+														
+														public void receiveError(Stanza arg0, XMPPError arg1) {
+															// TODO Auto-generated method stub
+															
+														}
+														
+														public List<String> getXMLNamespaces() {
+															// TODO Auto-generated method stub
+															return null;
+														}
+														
+														public List<String> getJavaPackages() {
+															// TODO Auto-generated method stub
+															return null;
+														}
+													});
+													} catch (CommunicationException e) {
+														e.printStackTrace();
+														fail();
+													}
+												} catch (Exception e) {
+													e.printStackTrace();
+													fail();
+												}
+											}
+										});
+									}
+									
+									public void returnAction(boolean loginResult) {
+										fail();
+									}
+								});
+							}
+						});
+
+					}
+				});
+			}
+		});
+		
+		Thread.sleep(DELAY);
+	}
+
 	@MediumTest
 	/**
 	 * Tests the minimum amount of calls required to login and logout 

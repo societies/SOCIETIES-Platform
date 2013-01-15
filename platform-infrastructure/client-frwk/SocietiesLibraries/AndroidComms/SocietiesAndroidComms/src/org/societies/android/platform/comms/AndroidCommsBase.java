@@ -334,7 +334,8 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	public String getItems(String client, String entity, String node, long remoteCallId) {		
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Dbc.require("Node must be specified", null != node && node.length() > 0);
+		Dbc.require("Entity must be specified", null != entity && entity.length() > 0);
+//		Dbc.require("Node must be specified", null != node && node.length() > 0);
 		Log.d(LOG_TAG, "getItems entity: " + entity);
 		
 		String retValue = null;
@@ -448,12 +449,12 @@ public class AndroidCommsBase implements XMPPAgent {
 		return null;
 	}
 	
-	public String login(String client, String identifier, String domain, String password, long remoteCallId) {
+	public String login(String client, String identifier, String domain, String password, String host, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("Password must be specified", null != password && password.length() > 0);
-		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password);
+		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host);
 		
 		String retValue = null;
 		Intent intent = new Intent(LOGIN);
@@ -467,7 +468,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			logoutInternal();
 		}
 		String username = username(identifier, domain);
-		loadConfig(domain, username, password);
+		loadConfig(domain, username, password, host);
 		try {
 			connect();
 			retValue = username + "/" + resource;
@@ -478,6 +479,12 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
 		}
+		return null;
+	}
+
+	
+	public String login(String client, String identifier, String domain, String password, long remoteCallId) {
+		this.login(client, identifier, domain, password, null, remoteCallId);
 		return null;
 	}	
 	
@@ -694,13 +701,24 @@ public class AndroidCommsBase implements XMPPAgent {
 		return identifier + "@" + domain;
 	}
 	
-	private void loadConfig(String server, String username, String password) {
-		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password);
+	/**
+	 * Create XMPP Configuration object
+	 * 
+	 * @param server DNS name of XMPP server
+	 * @param username 
+	 * @param password
+	 * @param host IP address of XMPP server (optional). If used, the DNS lookup to resolve the server is overridden.
+	 */
+	private void loadConfig(String server, String username, String password, String host) {
+		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password + " host: " + host);
 		
 		this.username = username;
 		this.password = password;
-		
-		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
+		String xmppHost = server;
+		if (null != host) {
+			xmppHost = host;
+		}
+		ConnectionConfiguration config = new ConnectionConfiguration(xmppHost, port, server);
 
 		connection = new XMPPConnection(config);
 		
@@ -892,4 +910,5 @@ public class AndroidCommsBase implements XMPPAgent {
 		  }
 		  return stackTracelines;
 		}
+
 }

@@ -22,7 +22,8 @@ public interface XMPPAgent {
 							  "login(String client, String identifier, String domain, String password, long remoteCallId)",
 							  "logout(String client, long remoteCallId)",
 							  "destroyMainIdentity(String client, long remoteCallId)",
-							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)"
+							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)",
+							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId"
 	};
 	
 	/**
@@ -79,8 +80,28 @@ public interface XMPPAgent {
 	public boolean isConnected(String client, long remoteCallId);
 	
 	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId);
-	
+	/**
+	 * Allows a user to login to the a designated XMPP server
+	 * 
+	 * @param client Calling component's app package. Used to restrict broadcast of return value via intent.
+	 * @param identifier User's user name
+	 * @param domain XMPP Domain server (DNS name)
+	 * @param password User's password
+	 * @param remoteCallId Callback identifier to allow ClientCommunicationMgr to invoke correct callback action
+	 * @return identity but via Intent
+	 */
 	public String login(String client, String identifier, String domain, String password, long remoteCallId);
+	/**
+	 * Allows a user to login to the a designated XMPP server
+	 * @param client Calling component's app package. Used to restrict broadcast of return value via intent.
+	 * @param identifier User's user name
+	 * @param domain XMPP Domain server (DNS name)
+	 * @param password User's password
+	 * @param host IP address of XMPP server. Prevents DNS lookup to resolve XMPP server address
+	 * @param remoteCallId Callback identifier to allow ClientCommunicationMgr to invoke correct callback action
+	 * @return
+	 */
+	public String login(String client, String identifier, String domain, String password, String host, long remoteCallId);
 	
 	public boolean logout(String client, long remoteCallId);
 	

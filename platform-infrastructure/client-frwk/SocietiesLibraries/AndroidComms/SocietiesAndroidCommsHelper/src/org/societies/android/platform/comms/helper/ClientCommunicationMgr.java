@@ -305,10 +305,10 @@ public class ClientCommunicationMgr {
 	 */
 	public String getItems(final IIdentity entity, final String node, final ICommCallback callback) throws CommunicationException {
 		Dbc.require("Entity cannot be null", null != entity);
-		Dbc.require("Node must be specified", null != node && node.length() > 0);
+//		Dbc.require("Node must be specified", null != node && node.length() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
 		
-		Log.d(LOG_TAG, "getItems for node: " + node);
+		Log.d(LOG_TAG, "getItems for entity: " + entity + " and node " + node);
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -395,8 +395,31 @@ public class ClientCommunicationMgr {
 
 		return null;
 	}
-	
-	public INetworkNode login(final String identifier, final String domain, final String password, IMethodCallback callback) {		
+	/**
+	 * Log a user into a designated XMPP server. Provides for case where login only knows the XMPP server DNS name
+	 * 
+	 * @param identifier User name
+	 * @param domain XMPP server (DNS name)
+	 * @param password User password
+	 * @param callback Callback to allow asynchronous update
+	 * @return null Return value delivered by callback
+	 */
+	public INetworkNode login(final String identifier, final String domain, final String password, IMethodCallback callback) {	
+		this.login(identifier, domain, password, null, callback);
+		return null;
+	}
+
+	/**
+	 * Log a user into a designated XMPP server. Provides for case where login knows the IP address of the XMPP server. Useful for testing purposes.
+	 * 
+	 * @param identifier User name
+	 * @param domain XMPP server (DNS name)
+	 * @param password User password
+	 * @param host XMPP server IP address (optional). If supplied overrides DNS lookup
+	 * @param callback Callback to allow asynchronous update
+	 * @return null Return value delivered by callback
+	 */
+	public INetworkNode login(final String identifier, final String domain, final String password, String host, IMethodCallback callback) {		
 		Dbc.require("User identifier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("User password must be specified", null != password && password.length() > 0);
@@ -410,7 +433,7 @@ public class ClientCommunicationMgr {
 			this.methodCallbackMap.put(callbackID, callback);
 		}
 		
-		InvokeLogin invoke = new InvokeLogin(this.clientPackageName, identifier, domain, password, callbackID);
+		InvokeLogin invoke = new InvokeLogin(this.clientPackageName, identifier, domain, password, host, callbackID);
 		invoke.execute();
 		
 		return null;
@@ -577,6 +600,23 @@ public class ClientCommunicationMgr {
 				}
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_RESULT)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+					}
+				}
+
+			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_ERROR)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+					}
+				}
+				
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.DESTROY_MAIN_IDENTITY)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
@@ -1029,7 +1069,7 @@ public class ClientCommunicationMgr {
     	private String client;
     	private String entity;
     	private String node;
-    	private long remoteCallID;
+    	private long remoteCallId;
 
     	/**
     	 * Default Constructor
@@ -1041,7 +1081,7 @@ public class ClientCommunicationMgr {
     		this.client = client;
     	   	this.entity = entity;
         	this.node = node;
-        	this.remoteCallID = remoteCallID;
+        	this.remoteCallId = remoteCallId;
     	}
 
     	protected Void doInBackground(Void... args) {
@@ -1062,8 +1102,8 @@ public class ClientCommunicationMgr {
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
     		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
 
-    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteCallID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
 
     		outMessage.setData(outBundle);
 
@@ -1323,24 +1363,30 @@ public class ClientCommunicationMgr {
     	private String domain;
     	private String password;
     	private long remoteCallId;
+    	private String host;
 
     	/**
     	 * Default Constructor
     	 * 
-    	 * @param packageName
     	 * @param client
+    	 * @param identifier
+    	 * @param domain
+    	 * @param password
+    	 * @param host
+    	 * @param remoteCallId
     	 */
-    	public InvokeLogin(String client, String identifier, String domain, String password, long remoteCallId) {
+    	public InvokeLogin(String client, String identifier, String domain, String password, String host, long remoteCallId) {
     		this.client = client;
            	this.identifier = identifier;
         	this.domain = domain;
         	this.password = password;
+        	this.host = host;
         	this.remoteCallId = remoteCallId;
     	}
 
     	protected Void doInBackground(Void... args) {
 
-    		String targetMethod = XMPPAgent.methodsArray[10];
+    		String targetMethod = XMPPAgent.methodsArray[14];
     		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
     		Bundle outBundle = new Bundle();
     		/*
@@ -1359,7 +1405,10 @@ public class ClientCommunicationMgr {
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.password);
     		Log.d(LOCAL_LOG_TAG, "Password: " + this.password);
 
-       		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.remoteCallId);
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.host);
+    		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
+
+       		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.remoteCallId);
     		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
 
     		outMessage.setData(outBundle);
