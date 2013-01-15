@@ -51,6 +51,7 @@ import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.util.Log;
 
 
@@ -92,13 +93,19 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		CheckPermissionTask task = new CheckPermissionTask(context, clientPackage); 
 		task.execute(requestor, dataId, actions);
 	}
-	private class CheckPermissionTask extends AsyncTask<Object, Void, Boolean> {
+	private class CheckPermissionTask extends AsyncTask<Object, Object, Boolean> {
 		private Context context;
 		private String clientPackage;
+		private int progress = 0;
 
 		public CheckPermissionTask(Context context, String clientPackage) {
 			this.context = context;
 			this.clientPackage = clientPackage;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			publishProgress(progress, "Loading...");
 		}
 
 		protected Boolean doInBackground(Object... args) {
@@ -111,22 +118,49 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				ResponseItem privacyPermission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
 				if (null != privacyPermission) {
 					Log.d(TAG, "Local Permission retrieved");
+					// Publish progress
+					if (!checkAndPublishProgress((progress = 100), "Local permission retrieved")) {
+						return false;
+					}
 					intentSender.sendIntentCheckPermission(clientPackage, privacyPermission);
 					return true;
 				}
+				
 
 				// -- Permission not available: remote call
 				Log.d(TAG, "No Local Permission retrieved: remote call");
-				return privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
+				privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+30), "Remote access control required: request sent")) {
+					return false;
+				}
 			}
 			catch (PrivacyException e) {
 				intentSender.sendIntentError(clientPackage, MethodType.CHECK_PERMISSION.name(), "Unexpected error during access control: "+e.getMessage());
+				publishProgress((progress = 100), "Unexpected error during access control: "+e.getMessage());
 				return false;
 			}
+			publishProgress((progress = 100), "Access control finished");
+			return true;
+		}
+		
+		/**
+		 * Publish progress and if cancel is required: send cancel intent
+		 * @param progress Progress number
+		 * @param msg Progress message description
+		 * @return true if the process can continue, false if it needs to stop
+		 */
+		private boolean checkAndPublishProgress(int progress, String msg) {
+			publishProgress(progress, msg);
+			if (isCancelled()) {
+				intentSender.sendIntentCancel(clientPackage, MethodType.CHECK_PERMISSION.name());
+				return false;
+			}
+			return true;
 		}
 	}
 
-	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
@@ -147,64 +181,114 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
 			throw new NullPointerException("Not enought information: data id is missing");
 		}
-
-		//		// -- Retrieve the obfuscation level
-		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
-		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
-		double obfuscationLevel = 1;
-		// If no obfuscation is required: return directly the wrapped data
-		if (obfuscationLevel >= 1) {
-			//			return dataWrapper;
-		}
-
-		// -- Verify params
 		// Wrapper ready for obfuscation
 		if (!dataWrapper.isReadyForObfuscation()) {
 			throw new PrivacyException("This data wrapper is not ready for obfuscation. Data are needed.");
 		}
-		// Obfuscation level in [0, 1]
-		if (obfuscationLevel > 1) {
-			obfuscationLevel = 1;
+
+		// -- Launch action
+		ObfuscationTask task = new ObfuscationTask(context, clientPackage); 
+		task.execute(requestor, dataWrapper);
+
+	}
+	private class ObfuscationTask extends AsyncTask<Object, Object, Boolean> {
+		private Context context;
+		private String clientPackage;
+		private int progress = 0;
+
+		public ObfuscationTask(Context context, String clientPackage) {
+			this.context = context;
+			this.clientPackage = clientPackage;
 		}
-		if (obfuscationLevel < 0) {
-			obfuscationLevel = 0.001;
-		}
-		// Return directly if obfuscation level is 1
-		if (1 == obfuscationLevel) {
-			//			return dataWrapper;
+		
+		@Override
+		protected void onPreExecute() {
+			publishProgress(progress, "Loading...");
 		}
 
-		// -- Mapping: retrieve the relevant obfuscator
-		IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+		protected Boolean doInBackground(Object... args) {
+			RequestorBean requestor = (RequestorBean) args[0];
+			IDataWrapper<Parcelable> dataWrapper = (IDataWrapper<Parcelable>) args[1];
 
-		// -- Obfuscate
-		IDataWrapper obfuscatedDataWrapper = null;
-		try {
-			// - Obfuscation
-			// Local obfuscation
-			if (obfuscator.isAvailable()) {
-				Log.d(TAG, "Local obfuscation");
-				obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
+			try {
+				// -- Retrieve the obfuscation level
+				double obfuscationLevel = privacyDataManagerInternal.getObfuscationLevel(requestor, dataWrapper.getDataId());
+				// If no obfuscation is required: return directly the wrapped data
+				if (-1 == obfuscationLevel || obfuscationLevel >= 1) {
+					publishProgress(100, "Obfuscation finished");
+					intentSender.sendIntentDataObfuscation(clientPackage, dataWrapper);
+				}
+				// Obfuscation level in [0, 1]
+				if (obfuscationLevel < 0) {
+					obfuscationLevel = 0.001;
+				}
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+10), "Obfuscation level retrieved")) {
+					return false;
+				}
+				
+				// -- Mapping: retrieve the relevant obfuscator
+				IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+5), "Obfuscator algorithm identified")) {
+					return false;
+				}
+
+				// -- Obfuscate
+				IDataWrapper<Parcelable> obfuscatedDataWrapper = null;
+				// - Obfuscation
+				// Local obfuscation
+				if (obfuscator.isAvailable()) {
+					Log.d(TAG, "Local obfuscation");
+					obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
+					// Publish progress
+					if (!checkAndPublishProgress((progress = 100), "Obfuscation done")) {
+						return false;
+					}
+					// Send data
+					intentSender.sendIntentDataObfuscation(clientPackage, obfuscatedDataWrapper);
+				}
+				// Remote obfuscation needed
+				else {
+					Log.d(TAG, "Remote obfuscation required");
+					privacyDataManagerRemote.obfuscateData(requestor, dataWrapper);
+					// Publish progress
+					if (!checkAndPublishProgress((progress = progress+30), "Remote obfuscation required: request sent")) {
+						return false;
+					}
+				}
 			}
-			// Remote obfuscation needed
-			else {
-				Log.d(TAG, "Remote obfuscation needed");
-				// TODO: remote call
+			catch(PrivacyException e) {
+				intentSender.sendIntentError(clientPackage, MethodType.OBFUSCATE_DATA.name(), "Unexpected error during obfuscation: "+e.getMessage());
+				publishProgress(100, "Unexpected error during obfuscation: "+e.getMessage());
+				return false;
 			}
-
-			// - Persistence
-			//			if (dataWrapper.isPersistenceEnabled()) {
-			// TODO: persiste the obfuscated data using a data broker
-			//				System.out.println("Persist the data "+dataWrapper.getDataId());
-			//			}
+			catch(Exception e) {
+				intentSender.sendIntentError(clientPackage, MethodType.OBFUSCATE_DATA.name(), "Unexpected error during obfuscation: "+e.getMessage());
+				publishProgress(100, "Unexpected error during obfuscation: "+e.getMessage());
+				return false;
+			}
+			publishProgress(100, "Obfuscation finished");
+			return true;
 		}
-		catch(Exception e) {
-			throw new PrivacyException("Obfuscation aborted", e);
+		
+		/**
+		 * Publish progress and if cancel is required: send cancel intent
+		 * @param progress Progress number
+		 * @param msg Progress message description
+		 * @return true if the process can continue, false if it needs to stop
+		 */
+		private boolean checkAndPublishProgress(int progress, String msg) {
+			publishProgress(progress, msg);
+			if (isCancelled()) {
+				intentSender.sendIntentCancel(clientPackage, MethodType.OBFUSCATE_DATA.name());
+				return false;
+			}
+			return true;
 		}
-		//		return obfuscatedDataWrapper;
 	}
 
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		//		if (null == requestor) {
 		//			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");

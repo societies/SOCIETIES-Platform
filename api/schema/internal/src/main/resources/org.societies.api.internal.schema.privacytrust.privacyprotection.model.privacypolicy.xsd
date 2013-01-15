@@ -19,13 +19,15 @@
 	</xs:complexType>
 
 	<xs:complexType name="privacyPermission">
-		<xs:sequence>
-			<xs:element name="requestItem" type="tns:requestItem" />
-			<xs:element name="decision" type="tns:decision" />
-			<xs:element name="obfuscationLevel" type="xs:double" />
-			<xs:element name="creationDate" type="xs:dateTime" />
-			<xs:element name="validityDuration" type="xs:long" />
-		</xs:sequence>
+		<xs:complexContent>
+			<xs:extension base="tns:responseItem">
+				<xs:sequence>
+					<xs:element name="obfuscationLevel" type="xs:double" />
+					<xs:element name="creationDate" type="xs:dateTime" />
+					<xs:element name="validityDuration" type="xs:long" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:complexType name="requestItem">

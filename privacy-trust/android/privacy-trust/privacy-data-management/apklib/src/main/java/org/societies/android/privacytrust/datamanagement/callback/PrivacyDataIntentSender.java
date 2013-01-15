@@ -27,6 +27,7 @@ package org.societies.android.privacytrust.datamanagement.callback;
 import java.io.Serializable;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.privacytrust.callback.PrivacyIntentSender;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -34,6 +35,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -62,9 +64,22 @@ public class PrivacyDataIntentSender extends PrivacyIntentSender {
 		context.sendBroadcast(intent);
 		return true;
 	}
+	
+	public boolean sendIntentDataObfuscation(String clientPackage, IDataWrapper<Parcelable> dataWrapper) {
+		Intent intent = prepareIntent(clientPackage, MethodType.OBFUSCATE_DATA.name(), null != dataWrapper.getData(), null);
+		intent.putExtra(returnValueKey, dataWrapper.getData());
+		context.sendBroadcast(intent);
+		return true;
+	}
 
 	public boolean sendIntentSuccess(String clientPackage, String action) {
 		Intent intent = prepareIntent(clientPackage, action, true, null);
+		context.sendBroadcast(intent);
+		return true;
+	}
+	
+	public boolean sendIntentCancel(String clientPackage, String action) {
+		Intent intent = prepareIntent(clientPackage, action, false, "Action cancelled");
 		context.sendBroadcast(intent);
 		return true;
 	}

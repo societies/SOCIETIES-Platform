@@ -38,6 +38,8 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 
+import android.os.Parcelable;
+
 /**
  * Interface exposed to Societies components in order to manage access control over resources
  * @author Olivier Maridat (Trialog)
@@ -85,7 +87,7 @@ public interface IPrivacyDataManager {
 	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link IDataWrapper} wrapping the obfuscated data
 	 * @throws PrivacyException
 	 */
-	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -95,5 +97,5 @@ public interface IPrivacyDataManager {
 	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link DataIdentifier} containing the id of the data to use
 	 * @throws PrivacyException
 	 */
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException;
 }
