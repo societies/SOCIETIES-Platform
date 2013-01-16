@@ -22,39 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 
 /**
- * Obfuscator for name
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
- *
  */
-public class StatusObfuscator extends DataObfuscator<DataWrapper> {
-	/**
-	 * @param data
-	 */
-	public StatusObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Status.class;
+public class ActionUtils {
+	public static List<Action> fromFormattedString(String actionsString) {
+		List<Action> actions = new ArrayList<Action>();
+		if (null != actionsString && !"".equals(actionsString)) {
+			int pos = 0, end;
+			// Loop over actions
+			while ((end = actionsString.indexOf('/', pos)) >= 0) {
+				String actionString = actionsString.substring(pos, end);
+				int positionOptional = actionString.indexOf(':');
+				Action action = new Action();
+				action.setActionConstant(ActionConstants.fromValue(actionString.substring(0, positionOptional)));
+				action.setOptional("false".equals(actionString.substring(positionOptional+1, actionString.length())) ? false : true);
+				actions.add(action);
+				pos = end + 1;
+			}
+		}
+		return actions;
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+	public static String toFormattedString(List<Action> actions) {
+		StringBuilder sb = new StringBuilder();
+		if (null != actions) {
+			for(int i=0; i<actions.size(); i++) {
+				sb.append(actions.get(i).getActionConstant().name()+":"+(actions.get(i).isOptional() ? "true" : "false")+"/");
+			}
+		}
+		return sb.toString();
 	}
-
 }

@@ -27,9 +27,8 @@ package org.societies.android.api.internal.privacytrust;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapper;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapperFactory;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -37,8 +36,6 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
-
-import android.os.Parcelable;
 
 /**
  * Interface exposed to Societies components in order to manage access control over resources
@@ -54,17 +51,17 @@ public interface IPrivacyDataManager {
 	/**
 	 * Intent field: Return value of the request
 	 */
-    public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.datamanagement.ReturnValue";
-    /**
-     * Intent field: Status of the request
-     */
-    public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatus";
-    /**
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.privacytrust.datamanagement.ReturnValue";
+	/**
+	 * Intent field: Status of the request
+	 */
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatus";
+	/**
 	 * Intent field: Error description if the request status is failure
 	 */
-    public static final String INTENT_RETURN_STATUS_MSG_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatusMsg";
+	public static final String INTENT_RETURN_STATUS_MSG_KEY = "org.societies.android.privacytrust.datamanagement.ReturnStatusMsg";
 
-    
+
 	/**
 	 * Check permission to access/update/disclose a data
 	 * @param clientPackage Client package name
@@ -87,7 +84,7 @@ public interface IPrivacyDataManager {
 	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link IDataWrapper} wrapping the obfuscated data
 	 * @throws PrivacyException
 	 */
-	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException;
+	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -97,5 +94,5 @@ public interface IPrivacyDataManager {
 	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link DataIdentifier} containing the id of the data to use
 	 * @throws PrivacyException
 	 */
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException;
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
 }

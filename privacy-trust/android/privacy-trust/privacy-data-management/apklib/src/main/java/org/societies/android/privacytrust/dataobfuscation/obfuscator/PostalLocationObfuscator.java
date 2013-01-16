@@ -25,9 +25,9 @@
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.PostalLocation;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
 
 /**
  * Obfuscator for name
@@ -35,11 +35,11 @@ import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wra
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<PostalLocation>> {
+public class PostalLocationObfuscator extends DataObfuscator<DataWrapper> {
 	/**
 	 * @param data
 	 */
-	public PostalLocationObfuscator(IDataWrapper<PostalLocation> data) {
+	public PostalLocationObfuscator(DataWrapper data) {
 		super(data);
 		available = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
@@ -52,7 +52,7 @@ public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<Postal
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	public IDataWrapper<PostalLocation> obfuscateData(double obfuscationLevel)
+	public DataWrapper obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		return dataWrapper;
 	}

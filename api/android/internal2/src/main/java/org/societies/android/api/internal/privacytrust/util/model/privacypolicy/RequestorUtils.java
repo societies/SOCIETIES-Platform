@@ -22,17 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.android.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
@@ -43,68 +34,7 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  * @author Olivier Maridat (Trialog)
  */
 public class RequestorUtils {
-	public static Requestor toRequestor(RequestorBean requestorBean, IIdentityManager identityManager) throws InvalidFormatException
-	{
-		if (null == requestorBean) {
-			return null;
-		}
-		IIdentity requestorId = identityManager.fromJid(requestorBean.getRequestorId());
-		if (requestorBean instanceof RequestorCisBean) {
-			return new RequestorCis(requestorId, identityManager.fromJid(((RequestorCisBean) requestorBean).getCisRequestorId()));
-
-		}
-		else if (requestorBean instanceof RequestorServiceBean) {
-			RequestorService requestor = new RequestorService(requestorId, ((RequestorServiceBean) requestorBean).getRequestorServiceId());
-			return requestor;
-		}
-		return new Requestor(requestorId);
-	}
-	public static List<Requestor> toRequestors(List<RequestorBean> requestorBeans, IIdentityManager identityManager) throws InvalidFormatException
-	{
-		if (null == requestorBeans) {
-			return null;
-		}
-		List<Requestor> requestors = new ArrayList<Requestor>();
-		for(RequestorBean requestorBean : requestorBeans) {
-			requestors.add(RequestorUtils.toRequestor(requestorBean, identityManager));
-		}
-		return requestors;
-	}
-
-	public static RequestorBean toRequestorBean(Requestor requestor)
-	{
-		if (null == requestor) {
-			return null;
-		}
-		String requestorId = requestor.getRequestorId().getJid();
-		if (requestor instanceof RequestorCis) {
-			RequestorCisBean requestorBean = new RequestorCisBean();
-			requestorBean.setRequestorId(requestorId);
-			requestorBean.setCisRequestorId(((RequestorCis)requestor).getCisRequestorId().getJid());
-			return requestorBean;
-		}
-		else if (requestor instanceof RequestorService) {
-			RequestorServiceBean requestorBean = new RequestorServiceBean();
-			requestorBean.setRequestorId(requestorId);
-			requestorBean.setRequestorServiceId(((RequestorService)requestor).getRequestorServiceId());
-			return requestorBean;
-		}
-		RequestorBean requestorBean = new RequestorBean();
-		requestorBean.setRequestorId(requestorId);
-		return requestorBean;
-	}
-	public static List<RequestorBean> toRequestorBeans(List<Requestor> requestors)
-	{
-		if (null == requestors) {
-			return null;
-		}
-		List<RequestorBean> requestorBeans = new ArrayList<RequestorBean>();
-		for(Requestor requestor : requestors) {
-			requestorBeans.add(RequestorUtils.toRequestorBean(requestor));
-		}
-		return requestorBeans;
-	}
-	public static String getRequestorId(RequestorBean requestor) {
+	public static String toFormattedString(RequestorBean requestor) {
 		StringBuilder sb = new StringBuilder();
 		if (requestor instanceof RequestorCisBean) {
 			sb.append("CIS:");
@@ -125,5 +55,31 @@ public class RequestorUtils {
 			sb.append(requestor.getRequestorId());
 		}
 		return sb.toString();
+	}
+	
+	public static RequestorBean fromFormattedString(String requestorString) {
+		String[] requestorInfo = requestorString.split(":");
+		// CIS
+		if (requestorString.startsWith("CIS:")) {
+			requestorInfo = requestorInfo[1].split("|");
+			RequestorCisBean requestor = new RequestorCisBean();
+			requestor.setRequestorId(requestorInfo[0]);
+			requestor.setCisRequestorId(requestorInfo[1]);
+			return requestor;
+		}
+		// Service
+		else if (requestorString.startsWith("Service:")) {
+			requestorInfo = requestorInfo[1].split("|");
+			RequestorServiceBean requestor = new RequestorServiceBean();
+			requestor.setRequestorId(requestorInfo[0]);
+			requestor.setRequestorServiceId(ServiceModelUtils.generateServiceResourceIdentifierFromString(requestorInfo[1]));
+			return requestor;
+		}
+		// CSS
+		else {
+			RequestorBean requestor = new RequestorBean();
+			requestor.setRequestorId(requestorInfo[1]);
+			return requestor;
+		}
 	}
 }

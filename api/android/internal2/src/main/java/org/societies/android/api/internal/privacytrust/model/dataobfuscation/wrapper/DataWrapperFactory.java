@@ -24,11 +24,12 @@
  */
 package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
 
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Name;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.PostalLocation;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Status;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
 
 
 
@@ -53,9 +54,14 @@ public class DataWrapperFactory {
 	 * @param accuracy Accuracy in meters
 	 * @return A LocationCoordinatesWrapper
 	 */
-	public static IDataWrapper<LocationCoordinates> getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
-		LocationCoordinates data = new LocationCoordinates(latitude, longitude, accuracy);
-		return new DataWrapper<LocationCoordinates>(data);
+	public static DataWrapper getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
+		LocationCoordinates data = new LocationCoordinates();
+		data.setLatitude(latitude);
+		data.setLongitude(longitude);
+		data.setAccuracy(accuracy);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 	
 	/**
@@ -73,12 +79,25 @@ public class DataWrapperFactory {
 	 * @param planet
 	 * @return
 	 */
-	public static IDataWrapper<PostalLocation> getPostalLocationWrapper(String logicalName, String streetNumber,
+	public static DataWrapper getPostalLocationWrapper(String logicalName, String streetNumber,
 			String streetName, String district, String town, String postalCode,
 			String department, String region, String country, String continent,
 			String planet) {
-		PostalLocation data = new PostalLocation(logicalName, streetNumber, streetName, district, town, postalCode, department, region, country, continent, planet);
-		return new DataWrapper<PostalLocation>(data);
+		PostalLocation data = new PostalLocation();
+		data.setLogicalName(logicalName);
+		data.setStreetNumber(streetNumber);
+		data.setStreetName(streetName);
+		data.setDistrict(district);
+		data.setTown(town);
+		data.setPostalCode(postalCode);
+		data.setDepartment(department);
+		data.setRegion(region);
+		data.setCountry(country);
+		data.setContinent(continent);
+		data.setPlanet(planet);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 
 
@@ -91,9 +110,13 @@ public class DataWrapperFactory {
 	 * @param lastName
 	 * @return the NameWrapper
 	 */
-	public static IDataWrapper<Name> getNameWrapper(String firstName, String lastName) {
-		Name data = new Name(firstName, lastName);
-		return new DataWrapper<Name>(data);
+	public static DataWrapper getNameWrapper(String firstName, String lastName) {
+		Name data = new Name();
+		data.setFirstName(firstName);
+		data.setLastName(lastName);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 
 	
@@ -105,9 +128,12 @@ public class DataWrapperFactory {
 	 * @param degree Degree in number value
 	 * @return the Temperature wrapper
 	 */
-	public static IDataWrapper<Temperature> getTemperatureWrapper(double degree) {
-		Temperature data = new Temperature(degree);
-		return new DataWrapper<Temperature>(data);
+	public static DataWrapper getTemperatureWrapper(double degree) {
+		Temperature data = new Temperature();
+		data.setDegree(degree);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 	/**
 	 * To get a TemperatureWrapper
@@ -115,9 +141,12 @@ public class DataWrapperFactory {
 	 * @param degree Degree in string value @see {@value org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature#heatString}
 	 * @return the Temperature wrapper
 	 */
-	public static IDataWrapper<Temperature> getTemperatureWrapper(String degree) {
-		Temperature data = new Temperature(degree);
-		return new DataWrapper<Temperature>(data);
+	public static DataWrapper getTemperatureWrapper(String degree) {
+		Temperature data = new Temperature();
+		data.setDegreeString(degree);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 	
 	
@@ -146,8 +175,11 @@ public class DataWrapperFactory {
 	 * @param status
 	 * @return
 	 */
-	public static IDataWrapper<Status> getStatusWrapper(String status) {
-		Status data = new Status(status);
-		return new DataWrapper<Status>(data);
+	public static DataWrapper getStatusWrapper(String status) {
+		Status data = new Status();
+		data.setStatus(status);
+		DataWrapper wrapper = new DataWrapper();
+		wrapper.setData(data);
+		return wrapper;
 	}
 }

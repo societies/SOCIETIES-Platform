@@ -22,39 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.privacytrust.data.accessor;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
-
-/**
- * Obfuscator for name
- *
- * @author Olivier Maridat (Trialog)
- *
- */
-public class StatusObfuscator extends DataObfuscator<DataWrapper> {
-	/**
-	 * @param data
-	 */
-	public StatusObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Status.class;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
-	}
-
-}
+public class Constants {
+	/* --- DB --- */
+	public static final String TABLE_PRIVACY_PERMISSION = "privacypermission";
+	public static final int DB_VERSION = 1;
+	public static final String DB_NAME = "societiesprivacy.db";
+	public static final String[] TABLE_PRIVACY_PERMISSION_FIELDS = new String[] {"rowid", "requestor", "data_id_uri", "actions", "decision", "conditions", "obfuscation_level", "creation_date", "validity_duration"};
+}   

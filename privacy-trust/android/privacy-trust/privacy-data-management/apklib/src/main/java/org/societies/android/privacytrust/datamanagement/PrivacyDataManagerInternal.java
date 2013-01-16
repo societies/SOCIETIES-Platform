@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.identity.DataIdentifierFactory;
+import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
@@ -35,8 +36,14 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.model.pr
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 
 
 /**

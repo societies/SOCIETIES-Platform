@@ -22,39 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.privacytrust.data.accessor;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Obfuscator for name
- *
- * @author Olivier Maridat (Trialog)
- *
- */
-public class StatusObfuscator extends DataObfuscator<DataWrapper> {
-	/**
-	 * @param data
-	 */
-	public StatusObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Status.class;
+
+public class DBHelper extends SQLiteOpenHelper {
+	
+	public DBHelper(Context context) {
+    	super(context, Constants.DB_NAME, null, Constants.DB_VERSION);
+    }
+	
+	
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		String sqlCreateTableCIS = "CREATE TABLE "+Constants.TABLE_PRIVACY_PERMISSION+" ("
+		+" requestor TEXT, "
+		+" data_id_uri TEXT, "
+		+" actions TEXT, "
+		+" decision TEXT, "
+		+" conditions TEXT, "
+		+" obfuscation_level REAL, "
+		+" creation_date TEXT, "
+		+" validity_duration INTEGER "
+		+");";
+		db.execSQL(sqlCreateTableCIS);
 	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL("DROP TABLE IF EXISTS "+Constants.TABLE_PRIVACY_PERMISSION+";");
+		onCreate(db);
 	}
-
+	
+	public SQLiteDatabase getDbWrite() {
+		return this.getWritableDatabase();
+	}
+	
+	@Deprecated
+	public SQLiteDatabase getDbRead() {
+		return this.getReadableDatabase();
+	}
 }

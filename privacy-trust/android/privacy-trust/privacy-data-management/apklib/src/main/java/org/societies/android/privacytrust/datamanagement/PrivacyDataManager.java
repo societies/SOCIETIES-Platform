@@ -28,13 +28,7 @@ import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Name;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.PostalLocation;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Status;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
@@ -43,6 +37,12 @@ import org.societies.android.privacytrust.dataobfuscation.obfuscator.NameObfusca
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.PostalLocationObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.StatusObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.TemperatureObfuscator;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -160,7 +160,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 	}
 
-	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException {
+	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
@@ -208,7 +208,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 		protected Boolean doInBackground(Object... args) {
 			RequestorBean requestor = (RequestorBean) args[0];
-			IDataWrapper<Parcelable> dataWrapper = (IDataWrapper<Parcelable>) args[1];
+			DataWrapper dataWrapper = (DataWrapper) args[1];
 
 			try {
 				// -- Retrieve the obfuscation level
@@ -235,7 +235,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				}
 
 				// -- Obfuscate
-				IDataWrapper<Parcelable> obfuscatedDataWrapper = null;
+				DataWrapper obfuscatedDataWrapper = null;
 				// - Obfuscation
 				// Local obfuscation
 				if (obfuscator.isAvailable()) {
@@ -288,7 +288,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 	}
 
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, IDataWrapper<Parcelable> dataWrapper) throws PrivacyException {
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		//		if (null == requestor) {
 		//			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
@@ -320,22 +320,22 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return false;
 	}
 
-	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
+	private IDataObfuscator getDataObfuscator(DataWrapper dataWrapper) throws PrivacyException {
 		IDataObfuscator obfuscator = null;
 		if (dataWrapper.getData() instanceof LocationCoordinates) {
-			obfuscator = new LocationCoordinatesObfuscator((IDataWrapper<LocationCoordinates>) dataWrapper);
+			obfuscator = new LocationCoordinatesObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Name) {
-			obfuscator = new NameObfuscator((IDataWrapper<Name>) dataWrapper);
+			obfuscator = new NameObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Temperature) {
-			obfuscator = new TemperatureObfuscator((IDataWrapper<Temperature>) dataWrapper);
+			obfuscator = new TemperatureObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Status) {
-			obfuscator = new StatusObfuscator((IDataWrapper<Status>) dataWrapper);
+			obfuscator = new StatusObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof PostalLocation) {
-			obfuscator = new PostalLocationObfuscator((IDataWrapper<PostalLocation>) dataWrapper);
+			obfuscator = new PostalLocationObfuscator((DataWrapper) dataWrapper);
 		}
 		else {
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");

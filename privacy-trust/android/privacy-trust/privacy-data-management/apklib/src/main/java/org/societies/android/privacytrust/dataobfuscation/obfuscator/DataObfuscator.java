@@ -26,9 +26,9 @@ package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
 import java.lang.reflect.Type;
 
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
 
 /**
  * Abstract class helping the creation of an obfuscator
@@ -36,7 +36,7 @@ import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wra
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObfuscator {
+public abstract class DataObfuscator<E extends DataWrapper> implements IDataObfuscator {
 	/**
 	 * Data to obfuscate
 	 */
@@ -78,7 +78,7 @@ public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObf
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
 	 */
-	public IDataWrapper getDataWrapper() {
+	public DataWrapper getDataWrapper() {
 		return dataWrapper;
 	}
 	/*

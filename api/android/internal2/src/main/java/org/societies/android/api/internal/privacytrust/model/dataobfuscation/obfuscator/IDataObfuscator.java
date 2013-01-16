@@ -27,8 +27,8 @@ package org.societies.android.api.internal.privacytrust.model.dataobfuscation.ob
 import java.lang.reflect.Type;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
 
 
 /**
@@ -46,7 +46,7 @@ public interface IDataObfuscator {
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instanciate the obfuscator)
 	 * @throws Exception
 	 */
-	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException;
+	public DataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException;
 
 	/**
 	 * To know if obfuscation of this type of data is available on this node or not
@@ -67,7 +67,7 @@ public interface IDataObfuscator {
 	 * Wrapper of the data to obfuscate
 	 * @return the wrapped data to obfuscate
 	 */
-	public IDataWrapper getDataWrapper();
+	public DataWrapper getDataWrapper();
 	/**
 	 * Type of the data wrapper to obfuscate
 	 * @return the type of the data wrapper to obfuscate

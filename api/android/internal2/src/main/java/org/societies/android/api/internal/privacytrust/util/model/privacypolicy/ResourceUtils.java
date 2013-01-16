@@ -22,100 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model.dataobfuscation;
+package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
 
 /**
- * Status
- *
- * @author olivierm
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public class Status implements Parcelable {
-	private String status;
-	
-	public Status() {
-		super();
+public class ResourceUtils {
+	public static String getDataIdUri(Resource resource) {
+		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
 	}
-	/**
-	 * @param firstName
-	 * @param lastName
-	 */
-	public Status(String status) {
-		super();
-		this.status = status;
-	}
-	
-	
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// -- Verify reference equality
-		if (obj == this) {
-			return true;
-		}
-
-		// -- Verify obj type
-		if (obj instanceof Status) {
-			Status other = (Status) obj;
-			return (this.getStatus().equals(other.getStatus()));
-		}
-		return false;
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Name [status=" + status + "]";
-	}
-	
-	/* ************************
-	 * Parcelable Management
-	 * ************************ */
-	
-	public Status(Parcel in) {
-		readFromParcel(in);
-	}
-	
-	/*
-	 * @see android.os.Parcelable#describeContents()
-	 */
-	public int describeContents() {
-		return 0;
-	}
-
-	/*
-	 * 
-	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
-	 */
-	public void writeToParcel(Parcel out, int flag) {
-		out.writeString(status);
-	}
-	
-	private void readFromParcel(Parcel in) {
-		status = in.readString();
-	}
-	
-	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-		public Status createFromParcel(Parcel in) {
-			return new Status(in);
-		}
-
-		public Status[] newArray(int size) {
-			return new Status[size];
-		}
-	};
 }

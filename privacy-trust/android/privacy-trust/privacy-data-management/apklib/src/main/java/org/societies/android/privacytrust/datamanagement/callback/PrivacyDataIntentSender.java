@@ -27,8 +27,8 @@ package org.societies.android.privacytrust.datamanagement.callback;
 import java.io.Serializable;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.privacytrust.callback.PrivacyIntentSender;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
@@ -65,7 +65,7 @@ public class PrivacyDataIntentSender extends PrivacyIntentSender {
 		return true;
 	}
 	
-	public boolean sendIntentDataObfuscation(String clientPackage, IDataWrapper<Parcelable> dataWrapper) {
+	public boolean sendIntentDataObfuscation(String clientPackage, DataWrapper dataWrapper) {
 		Intent intent = prepareIntent(clientPackage, MethodType.OBFUSCATE_DATA.name(), null != dataWrapper.getData(), null);
 		intent.putExtra(returnValueKey, dataWrapper.getData());
 		context.sendBroadcast(intent);
