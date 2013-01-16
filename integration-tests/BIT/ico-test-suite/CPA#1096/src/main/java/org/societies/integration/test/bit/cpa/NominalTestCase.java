@@ -38,9 +38,8 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -133,7 +132,9 @@ public class NominalTestCase implements IActivityFeedCallback {
         LOG.info("Starting simulation and injection of fake activities..");
         ArrayList<String[]> data = new ArrayList<String[]>();
         try {
-            CSVParser parser = new CSVParser(new FileReader("./src/test/resources/msn-data-xml.csv"), CSVStrategy.EXCEL_STRATEGY);
+            URL u = NominalTestCase.class.getClassLoader().getResource("msn-data-xml.csv");
+            BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream()));
+            CSVParser parser = new CSVParser(br, CSVStrategy.EXCEL_STRATEGY);
             String[] value =  parser.getLine();
             while(value!=null){
                 data.add(value);
