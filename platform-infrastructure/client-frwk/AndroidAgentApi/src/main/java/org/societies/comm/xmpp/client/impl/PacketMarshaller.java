@@ -29,7 +29,7 @@ import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
-import org.societies.maven.converters.URIConverter;
+import org.societies.simple.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;

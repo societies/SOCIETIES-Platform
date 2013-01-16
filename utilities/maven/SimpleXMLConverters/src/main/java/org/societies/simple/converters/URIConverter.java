@@ -22,18 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.androidutils;
+package org.societies.simple.converters;
 
-import java.io.ByteArrayOutputStream;
+import java.net.URI;
 
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.convert.RegistryStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-import org.societies.simple.converters.URIConverter;
-
-import android.util.Log;
+import org.simpleframework.xml.convert.Converter;
+import org.simpleframework.xml.stream.InputNode;
+import org.simpleframework.xml.stream.OutputNode;
 
 /**
  * Describe your class here...
@@ -41,35 +36,18 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class SocietiesSerialiser {
-
-	private static final String LOG_TAG = SocietiesSerialiser.class.getName();
-	private static Serializer s;
-	
-	public SocietiesSerialiser() {
-		Registry registry = new Registry();
-		Strategy strategy = new RegistryStrategy(registry);
+public class URIConverter  implements Converter<URI> {
+	@Override
+	public URI read(InputNode node) throws Exception {
+		String URIstr = node.getValue();
 		
-		try {
-			registry.bind(java.net.URI.class, URIConverter.class);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		s = new Persister(strategy);
+		return new URI(URIstr);
 	}
-	
-	public String Write(Object payload) throws Exception {
-		Log.d(LOG_TAG, "Serialising payload: " + payload.getClass().getName());
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		s.write(payload, os);
-		return os.toString();
-	}
-	
-	public Object Read(Class<? extends Object> c, String xml) throws Exception {
-		//GET CLASS FIRST
-		Object payload = s.read(c, xml);		
-		return payload;
-	}
-	
-}
 
+	@Override
+	public void write(OutputNode node, URI uri) throws Exception {
+		String URIstr = uri.toASCIIString();
+
+		node.setValue(URIstr);		
+	}
+}
