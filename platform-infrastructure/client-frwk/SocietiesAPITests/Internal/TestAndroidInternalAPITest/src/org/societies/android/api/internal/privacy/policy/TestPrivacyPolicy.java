@@ -32,10 +32,14 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.model.pr
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -119,14 +123,40 @@ public class TestPrivacyPolicy extends AndroidTestCase{
 		RequestPolicy fromParcel = RequestPolicy.CREATOR.createFromParcel(parcel);
 		assertNotNull(fromParcel);
 		
+		
+		
+		ArrayList<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+		ResponseItem responseItem = new ResponseItem();
+		responseItem.setRequestItem(requestItem);
+		responseItem.setDecision(Decision.PERMIT);
+		responseItems.add(responseItem);
+		
+		ResponseItem responseItem2 = new ResponseItem();
+		responseItem2.setRequestItem(requestItem2);
+		responseItem2.setDecision(Decision.DENY);
+		responseItems.add(responseItem2);
+		
+		ResponsePolicy responsePolicy = new ResponsePolicy();
+		responsePolicy.setRequestor(this.getRequestorServiceBean());
+		responsePolicy.setResponseItems(responseItems);
+		responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
+		
+		assertEquals(0, responsePolicy.describeContents());
+		
+		Parcel parcel2 = Parcel.obtain();
+		responsePolicy.writeToParcel(parcel2, 0);
+		parcel2.setDataPosition(0);
+		ResponsePolicy fromParcel2 = ResponsePolicy.CREATOR.createFromParcel(parcel2);
+		assertNotNull(fromParcel2);
+		
 	}
 	
 	private RequestorBean getRequestorServiceBean() throws URISyntaxException{
 		RequestorServiceBean requestor = new RequestorServiceBean();
 		requestor.setRequestorId("emma.societies.local");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setIdentifier(new URI("http://alec.societies.org"));
-		serviceId.setServiceInstanceIdentifier("alecBundle123");
+		serviceId.setIdentifier(new URI("http://eliza.societies.org"));
+		serviceId.setServiceInstanceIdentifier("elizaBundle123");
 		requestor.setRequestorServiceId(serviceId);
 		assertNotNull(requestor);
 		return requestor;

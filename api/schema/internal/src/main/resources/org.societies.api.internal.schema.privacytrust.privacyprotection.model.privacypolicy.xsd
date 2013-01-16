@@ -102,6 +102,14 @@
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:complexType name="responsePolicy">
+		<xs:sequence>
+			<xs:element name="responseItems" type="tns:responseItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="negotiationStatus" type="tns:negotiationStatus" nillable="false" minOccurs="1" maxOccurs="1" />
+			<xs:element name="requestor" type="ns1:requestorBean" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
 
 	<xs:simpleType name="actionConstants">
 		<xs:restriction base="xs:string">
@@ -112,6 +120,13 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:simpleType name="negotiationStatus">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="successful" />
+			<xs:enumeration value="ongoing" />
+			<xs:enumeration value="failed"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="privacyPolicyTypeConstants">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="service" />
