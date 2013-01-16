@@ -29,11 +29,11 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
@@ -53,10 +53,12 @@ public class PrivacyDataManagerRemote {
 
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("privacyDataManagerBean", "privacyDataManagerBeanResult"); // /!\ First letter in lowercase
 	private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
+			"http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation",
 			"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 			"http://societies.org/api/schema/identity", 
 			"http://societies.org/api/schema/servicelifecycle/model");
 	private static final List<String> PACKAGES = Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
+			"org.societies.api.internal.schema.privacytrust.model.dataobfuscation",
 			"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.servicelifecycle.model");
@@ -101,7 +103,7 @@ public class PrivacyDataManagerRemote {
 	}
 
 	// -- Obfuscation
-	public void obfuscateData(String clientPackage, RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		// -- Destination
 		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
@@ -112,7 +114,7 @@ public class PrivacyDataManagerRemote {
 		PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
 		messageBean.setMethod(MethodType.OBFUSCATE_DATA);
 		messageBean.setRequestor(requestor);
-//		messageBean.setDataWrapper(dataWrapper);
+		messageBean.setDataWrapper(dataWrapper);
 
 		// -- Send
 		RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
@@ -125,7 +127,7 @@ public class PrivacyDataManagerRemote {
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
 	}
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");
 		return dataWrapper.getDataId();
 	}

@@ -1,0 +1,24 @@
+PubSubSkeleton implements Pubsub
+
+	private PubsubClientImpl pubsubClientImpl;
+
+
+PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub, ICommCallback 
+
+Note: PubSubSkeleton should be rolled into PubsubSkeleton
+
+
+PubsubService implements Service
+
+	ccm = new ClientCommunicationMgr(PubsubService.this);
+        ICommManager endpoint = new CommManagerAdapter(ccm);
+        pubsubClient = new PubsubClientImpl(endpoint);
+        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
+	try {
+		skeleton = new Skeleton(pubsub);
+	} catch (InterruptedException e) {
+		throw new RuntimeException(e);
+	}	
+
+	private static class CommManagerAdapter implements ICommManager
+		Note: Manipulates ClientCommunicationManager

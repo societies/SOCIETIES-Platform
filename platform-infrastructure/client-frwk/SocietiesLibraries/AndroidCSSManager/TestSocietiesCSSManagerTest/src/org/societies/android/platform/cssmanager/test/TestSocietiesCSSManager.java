@@ -1,0 +1,215 @@
+package org.societies.android.platform.cssmanager.test;
+
+import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
+import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.androidutils.AppPreferences;
+import org.societies.android.platform.cssmanager.CSSManagerServiceBase;
+import org.societies.android.platform.cssmanager.container.TestServiceCSSManagerLocal;
+import org.societies.android.platform.cssmanager.container.TestServiceCSSManagerLocal.LocalCSSManagerBinder;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.test.ServiceTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
+import android.util.Log;
+
+/**
+ * Created identity must be deleted prior to test
+ *
+ */
+public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManagerLocal> {
+	private static final String LOG_TAG = TestSocietiesCSSManager.class.getName();
+	private static final String CLIENT = "org.societies.android.platform.cssmanager.test";
+	private static final int DELAY = 10000;
+	
+	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
+	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "alan.societies.bespoke";
+	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
+
+	
+    public static final String TEST_IDENTITY_1 = "alan";
+    public static final String TEST_IDENTITY_2 = "gollum";
+
+    public static final String TEST_INACTIVE_DATE = "20121029";
+    public static final String TEST_REGISTERED_DATE = "20120229";
+    public static final int TEST_UPTIME = 7799;
+    public static final String TEST_EMAIL = "somebody@tssg.org";
+    public static final String TEST_FORENAME = "4Name";
+    public static final String TEST_HOME_LOCATION = "The Hearth";
+    public static final String TEST_IDENTITY_NAME = "Id Name";
+    public static final String TEST_IM_ID = "somebody.tssg.org";
+    public static final String TEST_NAME = "The CSS";
+    public static final String TEST_PASSWORD_1 = "midge";
+    public static final String TEST_PASSWORD_2 = "bilbo";
+    public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+    public static final String TEST_DOMAIN_AUTHORITY = "societies.bespoke";
+
+    private IAndroidCSSManager cssService;
+    private BroadcastReceiver receiver;
+    private long testStartTime, testEndTime;
+    
+	
+    public TestSocietiesCSSManager() {
+        super(TestServiceCSSManagerLocal.class);
+    }
+
+	protected void setUp() throws Exception {
+		super.setUp();
+		
+		//Create shared preferences for later use
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
+		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
+		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
+		
+		editor.commit();
+
+        Intent commsIntent = new Intent(getContext(), TestServiceCSSManagerLocal.class);
+        LocalCSSManagerBinder binder = (LocalCSSManagerBinder) bindService(commsIntent);
+        assertNotNull(binder);
+        this.cssService = (IAndroidCSSManager) binder.getService();
+	}
+
+	protected void tearDown() throws Exception {
+		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
+        unregisterReceiver(this.receiver);
+        //ensure that service is shutdown to test if service leakage occurs
+        shutdownService();
+		super.tearDown();
+	}
+
+	@MediumTest
+	public void testConnectToService() throws Exception {
+		this.receiver = this.setupBroadcastReceiver();
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+		
+		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		cssRecord.setCssIdentity(TEST_IDENTITY_1);
+		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
+		cssRecord.setPassword(TEST_PASSWORD_1);
+
+		
+		Log.d(LOG_TAG, "testConnectToService start time: " + this.testStartTime);
+        try {
+        	this.cssService.loginXMPPServer(CLIENT, cssRecord);
+        } catch (Exception e) {
+        	Log.d(LOG_TAG, "");
+        }
+        Thread.sleep(DELAY);
+	}
+	@MediumTest
+	public void testCreateNewIdentity() throws Exception {
+		this.receiver = this.setupBroadcastReceiver();
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+		
+		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		cssRecord.setCssIdentity(TEST_IDENTITY_2);
+		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
+		cssRecord.setPassword(TEST_PASSWORD_2);
+
+		
+		Log.d(LOG_TAG, "testCreateNewIdentity start time: " + this.testStartTime);
+        try {
+        	this.cssService.registerXMPPServer(CLIENT, cssRecord);
+        } catch (Exception e) {
+        	Log.d(LOG_TAG, "");
+        }
+        Thread.sleep(DELAY);
+	}
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupBroadcastReceiver() {
+        BroadcastReceiver receiver = null;
+
+        Log.d(LOG_TAG, "Set up broadcast receiver");
+
+        receiver = new MainReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());
+        Log.d(LOG_TAG, "Register broadcast receiver");
+
+        return receiver;
+    }
+
+    /**
+     * Unregister a broadcast receiver
+     * @param receiver
+     */
+    private void unregisterReceiver(BroadcastReceiver receiver) {
+        Log.d(LOG_TAG, "Unregister broadcast receiver");
+        getContext().unregisterReceiver(receiver);
+    }
+
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class MainReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+	        Log.d(LOG_TAG, "Received action: " + intent.getAction());
+	
+	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Login elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+
+                TestSocietiesCSSManager.this.cssService.logoutXMPPServer(CLIENT);
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Logout elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+	        } else if (intent.getAction().equals(IAndroidCSSManager.REGISTER_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Register identity elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+	        	
+	        }
+        }
+    }
+
+    /**
+     * Create a suitable intent filter
+     * @return IntentFilter
+     */
+    private IntentFilter createTestIntentFilter() {
+        //register broadcast receiver to receive SocietiesEvents return values 
+        IntentFilter intentFilter = new IntentFilter();
+
+        intentFilter.addAction(IAndroidCSSManager.ACCEPT_FRIEND_REQUEST);
+        intentFilter.addAction(IAndroidCSSManager.CHANGE_CSS_NODE_STATUS);
+        intentFilter.addAction(IAndroidCSSManager.GET_ANDROID_CSS_RECORD);
+        intentFilter.addAction(IAndroidCSSManager.GET_CSS_FRIENDS);
+        intentFilter.addAction(IAndroidCSSManager.GET_FRIEND_REQUESTS);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_CSS);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_CSS);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
+        intentFilter.addAction(IAndroidCSSManager.READ_PROFILE_REMOTE);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_CSS);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_CSS_DEVICE);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.SEND_FRIEND_REQUEST);
+        intentFilter.addAction(IAndroidCSSManager.SET_PRESENCE_STATUS);
+        intentFilter.addAction(IAndroidCSSManager.SUGGESTED_FRIENDS);
+        intentFilter.addAction(IAndroidCSSManager.SYNCH_PROFILE);
+        intentFilter.addAction(IAndroidCSSManager.UNREGISTER_CSS);
+        intentFilter.addAction(IAndroidCSSManager.UNREGISTER_XMPP_SERVER);
+
+        return intentFilter;
+    }
+
+}

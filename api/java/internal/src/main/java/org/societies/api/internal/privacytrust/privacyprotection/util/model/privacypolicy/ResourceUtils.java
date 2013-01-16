@@ -106,4 +106,9 @@ public class ResourceUtils {
 		}
 		return resourceBeans;
 	}
+	
+	public static String getDataIdUri(
+			org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resource) {
+		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+	}
 }

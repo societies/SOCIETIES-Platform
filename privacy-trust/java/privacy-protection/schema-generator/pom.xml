@@ -4,8 +4,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<groupId>org.societies.privacytrust.privacyprotection</groupId>
 	<artifactId>schemagenerator</artifactId>
@@ -37,6 +36,12 @@
 			<version>2.0.3</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>4.1.1.4</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -57,31 +62,31 @@
 					<includes>
 						<include>**/*.java</include>
 					</includes>
-					<packageName>org.societies.api.internal.privacytrust.privacyprotection</packageName>
+					<packageName>org.societies.api.internal.privacytrust.mode.dataobfuscation</packageName>
 				</configuration>
 			</plugin>
 			<plugin>
-		<groupId>org.societies.maven</groupId>
-		<artifactId>societies-xmpp-maven-plugin</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<executions>
-			<execution>
-				<phase>generate-sources</phase>
-				<goals>
-					<goal>xsd</goal>
-				</goals>
-			</execution>
-		</executions>
-		<configuration>
-			<!-- Namespace define in the CommClient and CommServer of the beans -->
-			<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy</packageName>
-			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy</httpNamespace>
-			<!-- Output and input directories -->
-			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema1.xsd</file>
-			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
-		</configuration>
-	</plugin>
+				<groupId>org.societies.maven</groupId>
+				<artifactId>societies-xmpp-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xsd</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Namespace define in the CommClient and CommServer of the beans -->
+					<packageName>org.societies.api.schema.internal.privacytrust.mode.dataobfuscation</packageName>
+					<httpNamespace>http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation</httpNamespace>
+					<!-- Output and input directories -->
+					<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
+					<file>schema2.xsd</file>
+					<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

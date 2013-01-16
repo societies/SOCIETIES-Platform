@@ -28,11 +28,11 @@
 			<version>${release.version}</version>
         </dependency>
 
-    	<dependency>
+    	<!--dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+		</dependency-->
 		
 		<!-- Android -->
 		<dependency>
@@ -42,9 +42,9 @@
 			<type>apklib</type>
 		</dependency>
         <dependency>
-         		<groupId>com.google.android</groupId>
-         		<artifactId>android</artifactId>
-         		<scope>provided</scope>
+        		<groupId>com.google.android</groupId>
+        		<artifactId>android</artifactId>
+        		<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
