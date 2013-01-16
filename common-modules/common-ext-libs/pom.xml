@@ -1,216 +1,262 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.societies</groupId>
-        <artifactId>spring-osgi-parent</artifactId>
-        <version>RELEASE</version>
-    </parent>
-    <groupId>org.societies</groupId>
-    <artifactId>common-ext-libs</artifactId>
-    <packaging>bundle</packaging>
-    <version>${release.version}</version>
-    <name>Common External Libraries</name>
-    <properties>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.igniterealtime</groupId>
-            <artifactId>whack</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime.smack</groupId>
-            <artifactId>smack</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime.smack</groupId>
-            <artifactId>smackx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime.smack</groupId>
-            <artifactId>smackx-debug</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.core</artifactId>
-            <version>1.2.1</version>
-        </dependency>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+	<groupId>org.societies</groupId>
+	<artifactId>common-ext-libs</artifactId>
+	<packaging>bundle</packaging>
+	<version>${release.version}</version>
+	<name>Common External Libraries</name>
+	<properties>
+		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
+		<spring.osgi.version>1.2.1</spring.osgi.version>
+		<equinox.ver>3.2.2</equinox.ver>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx-debug</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.core</artifactId>
+			<version>1.2.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.1.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <version>4.1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+		</dependency>
 
-        <!-- databases -->
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>com.springsource.org.hsqldb</artifactId>
-            <version>1.8.0.10</version>
-        </dependency>
+		<!-- databases -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb</artifactId>
+			<version>1.8.0.10</version>
+		</dependency>
 
-        <!-- apache commons -->
+		<!-- apache commons -->
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.pool</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-graph-impl</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-algorithms</artifactId>
-            <version>2.0.1</version>
-        </dependency>
+		<dependency>
+			<groupId>net.sf.jung</groupId>
+			<artifactId>jung-graph-impl</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jung</groupId>
+			<artifactId>jung-algorithms</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math</artifactId>
-            <version>2.2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
+		</dependency>
 
 
-        <dependency>
-            <groupId>org.apache.shindig</groupId>
-            <artifactId>shindig-social-api</artifactId>
-            <version>3.0.0-beta4</version>
-        </dependency>
-			
+		<dependency>
+			<groupId>org.apache.shindig</groupId>
+			<artifactId>shindig-social-api</artifactId>
+			<version>3.0.0-beta4</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.47</version>
 		</dependency>
-		
+
 		<dependency>
-	        <groupId>nz.ac.waikato.cms.weka</groupId>
-    	    <artifactId>weka-stable</artifactId>
-	        <version>3.6.8</version>
-    	</dependency>
- 	
- 		<dependency>
+			<groupId>nz.ac.waikato.cms.weka</groupId>
+			<artifactId>weka-stable</artifactId>
+			<version>3.6.8</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.scribe</groupId>
 			<artifactId>scribe</artifactId>
 			<version>1.3.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
 			<version>1.6.9</version>
 		</dependency>
-		
-		
-			<dependency>
+
+
+		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
 			<version>1.3</version>
 		</dependency>
-		
-				<dependency>
+
+		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.5</version>
 		</dependency>
-		
-		
-		
-        <dependency>
+
+
+
+		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20070829</version>
 		</dependency>
-		
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.log4j</artifactId>
-				<version>${slf4j.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.log4j</groupId>
-						<artifactId>com.springsource.org.apache.log4j</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			
-			<dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.log4j</artifactId>
+			<version>${slf4j.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.log4j</groupId>
+					<artifactId>com.springsource.org.apache.log4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>org.dom4j</groupId>
 			<artifactId>com.springsource.org.dom4j</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
 			<version>2.6.6</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
-        <dependency>
-            <groupId>uk.ac.gate</groupId>
-            <artifactId>gate-core</artifactId>
-            <version>7.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>urbanophile</groupId>
-                    <artifactId>java-getopt</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>uk.ac.gate</groupId>
+			<artifactId>gate-core</artifactId>
+			<version>7.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>urbanophile</groupId>
+					<artifactId>java-getopt</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>gate-asm</artifactId>
+					<groupId>uk.ac.gate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>gate-compiler-jdt</artifactId>
+					<groupId>uk.ac.gate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tika-parsers</artifactId>
+					<groupId>org.apache.tika</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jaxen</artifactId>
+					<groupId>jaxen</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jdom</artifactId>
+					<groupId>jdom</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nekohtml</artifactId>
+					<groupId>net.sourceforge.nekohtml</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>wstx-lgpl</artifactId>
+					<groupId>org.codehaus.woodstox</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ivy</artifactId>
+					<groupId>org.apache.ivy</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>org.apache.ant</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xmlunit</artifactId>
+					<groupId>xmlunit</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -236,9 +282,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-					<!-- 
-						<Bundle-Activator>org.societies.comm.common.CommonLibraryActivator</Bundle-Activator>
-					-->
+						<!-- <Bundle-Activator>org.societies.comm.common.CommonLibraryActivator</Bundle-Activator> -->
 						<Import-Package>
 							org.osgi.framework,
 							!com.sun.*,
@@ -246,10 +290,7 @@
 							!org.relaxng.*,
 							*;resolution:=optional
 						</Import-Package>
-						<!-- 
-						<Export-Package>
-							*
-						</Export-Package> -->
+						<!-- <Export-Package> * </Export-Package> -->
 						<_exportcontents>*</_exportcontents>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
