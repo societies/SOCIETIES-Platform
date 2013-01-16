@@ -38,6 +38,7 @@ import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
@@ -214,7 +215,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 		this.assignConnectionParameters();
 		
-		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		final CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		CssRecord localCssrecord = convertAndroidCSSRecord(record);
 		
 		//add the local Android node information
@@ -223,14 +224,53 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		messageBean.setProfile(localCssrecord);
 		messageBean.setMethod(MethodType.LOGIN_CSS);
 
-		Stanza stanza = new Stanza(cloudNodeIdentity);
+		final Stanza stanza = new Stanza(cloudNodeIdentity);
 		
-		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.LOGIN_CSS);
+		final ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.LOGIN_CSS);
 
 		try {
-    		ccm.register(ELEMENT_NAMES, callback);
-			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(LOG_TAG, "Send stanza");
+    		ccm.register(ELEMENT_NAMES, new ICommCallback() {
+				
+				@Override
+				public void receiveResult(Stanza arg0, Object result) {
+					boolean status = (Boolean) result;
+					if (status) {
+						try {
+							ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+						} catch (CommunicationException e) {
+							// TODO Auto-generated catch block
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
+						Log.d(LOG_TAG, "Send stanza");
+					}
+				}
+				
+				@Override
+				public void receiveMessage(Stanza arg0, Object arg1) {
+				}
+				
+				@Override
+				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+				}
+				
+				@Override
+				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+				}
+				
+				@Override
+				public void receiveError(Stanza arg0, XMPPError arg1) {
+				}
+				
+				@Override
+				public List<String> getXMLNamespaces() {
+					return NAME_SPACES;
+				}
+				
+				@Override
+				public List<String> getJavaPackages() {
+					return PACKAGES;
+				}
+			});
 		} catch (Exception e) {
 			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
         } 
@@ -255,7 +295,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		Log.d(LOG_TAG, "CSSManager unregistering from Pubsub events");
 //		this.unregisterFromPubsub();
 
-		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, IAndroidCSSManager.LOGOUT_CSS));
+//		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, IAndroidCSSManager.LOGOUT_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		CssRecord localCssrecord = convertAndroidCSSRecord(record);
@@ -271,7 +311,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		
 		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.LOGOUT_CSS);
         try {
-    		ccm.register(ELEMENT_NAMES, callback);
+//    		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
@@ -295,38 +335,53 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			
 			public void returnAction(boolean resultFlag) {
 				if (resultFlag) {
-					CSSManagerServiceBase.this.ccm.UnRegisterCommManager(new IMethodCallback() {
+					
+					CSSManagerServiceBase.this.ccm.unregister(CSSManagerServiceBase.ELEMENT_NAMES, CSSManagerServiceBase.NAME_SPACES, new IMethodCallback() {
 						
+						@Override
 						public void returnAction(String result) {
 						}
 						
+						@Override
 						public void returnAction(boolean resultFlag) {
-							if (CSSManagerServiceBase.this.ccm.unbindCommsService()) {
+							if (resultFlag) {
 								
-								Intent intent = new Intent(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
+								CSSManagerServiceBase.this.ccm.UnRegisterCommManager(new IMethodCallback() {
+									
+									public void returnAction(String result) {
+									}
+									
+									public void returnAction(boolean resultFlag) {
+										if (CSSManagerServiceBase.this.ccm.unbindCommsService()) {
+											
+											Intent intent = new Intent(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
 
-								if (resultFlag) {
-									Log.d(LOG_TAG, "CSSManager service successfully unbound from Android Comms");
-									intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
-								} else {
-									Log.d(LOG_TAG, "CSSManager service unsuccessfully unbound from Android Comms");
-									intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
-								}
-								
-								AndroidCSSRecord aRecord = new AndroidCSSRecord();
-								
-								intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-								
-								if (restrictBroadcast) {
-									intent.setPackage(client);
-								}
+											if (resultFlag) {
+												Log.d(LOG_TAG, "CSSManager service successfully unbound from Android Comms");
+												intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+											} else {
+												Log.d(LOG_TAG, "CSSManager service unsuccessfully unbound from Android Comms");
+												intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
+											}
+											
+											AndroidCSSRecord aRecord = new AndroidCSSRecord();
+											
+											intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+											
+											if (restrictBroadcast) {
+												intent.setPackage(client);
+											}
 
-								Log.d(LOG_TAG, "DomainLogout result sent");
+											Log.d(LOG_TAG, "DomainLogout result sent");
 
-								CSSManagerServiceBase.this.context.sendBroadcast(intent);
+											CSSManagerServiceBase.this.context.sendBroadcast(intent);
+										}
+									}
+								});
 							}
 						}
 					});
+
 				}
 			}
 		});
@@ -351,7 +406,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
 
 		try {
-    		ccm.register(ELEMENT_NAMES, callback);
+//    		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
@@ -398,7 +453,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.SYNCH_PROFILE);
 		
         try {
-    		ccm.register(ELEMENT_NAMES, callback);
+//    		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
@@ -459,7 +514,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.GET_CSS_FRIENDS);
 		
         try {
-    		ccm.register(ELEMENT_NAMES, callback);
+//    		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
@@ -481,7 +536,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.SUGGESTED_FRIENDS);
 		
         try {
-    		ccm.register(ELEMENT_NAMES, callback);
+//    		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
@@ -502,7 +557,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			Stanza stanza = new Stanza(ccm.getIdManager().fromJid(cssId));
 			ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.READ_PROFILE_REMOTE);
 			
-			ccm.register(ELEMENT_NAMES, callback);
+//			ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Sent stanza");
 		} catch (InvalidFormatException ex) {
@@ -571,7 +626,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			ICommCallback discoCallback = new CSSManagerCallback(params[0], IAndroidCSSManager.GET_FRIEND_REQUESTS); 
 			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
-	        	ccm.register(ELEMENT_NAMES, discoCallback);
+//	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
@@ -615,7 +670,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			ICommCallback discoCallback = new CSSManagerCallback(client, method);
 			Stanza stanza = new Stanza(cloudNodeIdentity);
 	        try {
-	        	ccm.register(ELEMENT_NAMES, discoCallback);
+//	        	ccm.register(ELEMENT_NAMES, discoCallback);
 	        	ccm.sendMessage(stanza, messageBean);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
@@ -915,7 +970,6 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 				}
 				CSSManagerServiceBase.this.context.sendBroadcast(intent);
 				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
-				CSSManagerServiceBase.this.ccm.unregister(CSSManagerServiceBase.ELEMENT_NAMES, this);
 			}
 		}
 		

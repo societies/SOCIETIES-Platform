@@ -1,7 +1,5 @@
 package org.societies.android.api.comms;
 
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-
 /**
  * Mirror interface of org.societies.api.comm.xmpp.interfaces.ICommManager, adapted for Android. Check javadoc there.
  * 
@@ -23,7 +21,7 @@ public interface XMPPAgent {
 							  "logout(String client, long remoteCallId)",
 							  "destroyMainIdentity(String client, long remoteCallId)",
 							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)",
-							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId"
+							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId)"
 	};
 	
 	/**
