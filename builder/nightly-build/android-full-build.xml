@@ -49,8 +49,8 @@
 		<!-- API -->
 		<module>../../api/android-pom.xml</module>
 		<!--
-		<module>../../api/android/external</module>
-		<module>../../api/android/internal</module>
+		<module>../../api/android/external2</module>
+		<module>../../api/android/internal2</module>
 		 -->
 		 				
 		<!-- Android Communication components -->
@@ -71,7 +71,12 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
+                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
+                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
  
+                <!-- Android Communications -->
+                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
+
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>

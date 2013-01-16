@@ -34,13 +34,14 @@ import java.util.List;
 import org.societies.utilities.DBC.Dbc;
 
 import android.os.Parcelable;
+import android.util.Log;
 
 
 /**
  * This class provides a set of static methods to help make the Service Messenger API calling mechanism
  * as simple as possible while allowing the service and the consumer to share a common service API. 
  * 
- * TODO parameter arrays 
+ * Parameter arrays of String and primitives now supported but only one-dimensional
  */
 
 public class ServiceMethodTranslator {
@@ -51,11 +52,22 @@ public class ServiceMethodTranslator {
 	private static final String ParameterDelimiter = ",";
 	private static final String ParameterSeparator = " ";
 	public static final String JAVA_LANG_PREFIX = "java.lang.";
+	public static final String JAVA_LANG_PREFIX_ARRAY = "[Ljava.lang.";
+	public static final String JAVA_LANG_SUFFIX_ARRAY = ";";
+	public static final String JAVA_ARRAY = "[]";
+	public static final String JAVA_ARRAY_START = "[";
+	public static final String JAVA_ARRAY_FINISH = "]";
 	public static final String ANDROID_OS_PREFIX = "android.os.";
 	
 	public static final String JAVA_PRIMITIVES [] = {"int", "long", "double", "float", "byte", "char", "boolean", "short"};
-	public static final String JAVA_LANG_CLASSES [] = {"String"};
 	
+	public static final String JAVA_PRIMITIVES_ARRAYS_CLASS_TYPE []    = {"[I", "[L", "[D", "[F", "[B", "[C", "[Z", "[S"};
+	public static final String ANDROID_PRIMITIVES_ARRAYS_CLASS_TYPE [] = {"[I", "[J", "[D", "[F", "[B", "[C", "[Z", "[S"};
+	public static final String JAVA_PRIMITIVE_ARRAYS [] = {"int[]", "long[]", "double[]", "float[]", "byte[]", "char[]", "boolean[]", "short[]"};
+	public static final String JAVA_LANG_CLASSES [] = {"String"};
+	public static final String JAVA_LANG_CLASSES_ARRAYS [] = {"String[]"};
+	
+	private static final String LOG_TAG = ServiceMethodTranslator.class.getName();
 	/**
 	 * Determine whether a method signature exists and if it does what is its
 	 * index number.
@@ -199,7 +211,9 @@ public class ServiceMethodTranslator {
 			for (int i = 0; i < paramArray.length; i++) {
 				String paramType = paramArray[i].trim();
 				
-				paramTypes.add(paramType.substring(0, paramType.indexOf(ParameterSeparator)));
+				String attemptedType = paramType.substring(0, paramType.indexOf(ParameterSeparator));
+						
+				paramTypes.add(arrayTypeCheck(paramArray[i], attemptedType));
 			}
 
 			return paramTypes.toArray(new String [paramTypes.size()]);
@@ -252,7 +266,8 @@ public class ServiceMethodTranslator {
 	
 			for (int i = 0; i < paramArray.length; i++) {
 				String paramName = paramArray[i].trim();
-				paramNames.add(paramName.substring(paramName.indexOf(ParameterSeparator) + 1, paramName.length()));
+
+				paramNames.add(removeArraySymbols(paramName.substring(paramName.indexOf(ParameterSeparator) + 1, paramName.length())));
 			}
 			return paramNames.toArray(new String [paramNames.size()]);
 			
@@ -349,10 +364,20 @@ public class ServiceMethodTranslator {
 		Class paramClasses [] = new Class [paramTypes.length];
 		for (int i = 0; i < paramTypes.length; i++) {
 			try {
-				if (arrayContains(JAVA_PRIMITIVES, paramTypes[i])) {
+				Log.d(LOG_TAG, "Parameter type: " + paramTypes[i]);
+				
+				if (arrayContains(JAVA_PRIMITIVE_ARRAYS, paramTypes[i])) {
+					paramClasses[i] = getPrimitiveClassArray(paramTypes[i]);
+					
+				} else if (arrayContains(JAVA_PRIMITIVES, paramTypes[i])) {
 					paramClasses[i] = getPrimitiveClass(paramTypes[i]);
+					
+				} else if (arrayContains(JAVA_LANG_CLASSES_ARRAYS, paramTypes[i])) {
+					paramClasses[i] = Class.forName(JAVA_LANG_PREFIX_ARRAY + removeArraySymbols(paramTypes[i]) + JAVA_LANG_SUFFIX_ARRAY);
+					
 				} else if (arrayContains(JAVA_LANG_CLASSES, paramTypes[i])) {
 					paramClasses[i] = Class.forName(JAVA_LANG_PREFIX + paramTypes[i]);
+					
 				} else {
 					paramClasses[i] = Class.forName(paramTypes[i]);
 				}
@@ -472,4 +497,64 @@ public class ServiceMethodTranslator {
 		}
 		return clazz;
 	}
+	
+	/**
+	 * Determine the class of a given primitive array type
+	 * 
+	 * @param parameter
+	 * @return Class of primitive array
+	 */
+	static Class getPrimitiveClassArray(String parameter) {
+		Class clazz = null;
+		String classType = null;
+		
+		for (int i  = 0; i < JAVA_PRIMITIVE_ARRAYS.length; i++) {
+			if (parameter.equals(JAVA_PRIMITIVE_ARRAYS[i])) {
+				classType = ANDROID_PRIMITIVES_ARRAYS_CLASS_TYPE[i];
+				break;
+			}
+		}
+		if (null != classType) {
+			try {
+				clazz = Class.forName(classType);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		}
+		return clazz;
+	}
+
+	/**
+	 * Check if the parameter is an array type
+	 * @param fullParam
+	 * @param paramType
+	 * @return String param type
+	 */
+	private static String arrayTypeCheck(String fullParam, String paramType) {
+		StringBuffer name = new StringBuffer(removeArraySymbols(paramType));
+		
+		if (fullParam.contains(JAVA_ARRAY_START)) {
+			name.append(JAVA_ARRAY);
+		}
+		return name.toString();
+	}
+	
+	/**
+	 * Remove Java array symbols from parameter name
+	 * 
+	 * @param paramName
+	 * @return String with Java array symbols removed
+	 */
+	private static String removeArraySymbols(String paramName) {
+		String retValue = null;
+		
+		String firstPass = paramName.replace(JAVA_ARRAY_START, "");
+		String secondPass = firstPass.replace(JAVA_ARRAY_FINISH, "");
+		retValue = secondPass.trim();
+		
+		return retValue;
+	}
+		
 }

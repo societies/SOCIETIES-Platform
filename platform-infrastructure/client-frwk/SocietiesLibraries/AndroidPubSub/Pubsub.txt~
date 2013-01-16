@@ -1,0 +1,13 @@
+PubSubSkeleton implements Pubsub
+
+	private PubsubClientImpl pubsubClientImpl;
+
+
+PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub, ICommCallback 
+
+Note: PubSubSkeleton should be rolled into PubsubSkeleton
+
+
+PubsubService implements Service
+
+	private static class CommManagerAdapter implements ICommManager
