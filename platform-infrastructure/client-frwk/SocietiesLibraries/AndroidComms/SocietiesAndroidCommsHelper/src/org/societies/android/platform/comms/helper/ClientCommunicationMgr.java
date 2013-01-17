@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.societies.android.api.comms.ICallback;
 import org.societies.android.api.comms.IMethodCallback;
@@ -606,7 +607,13 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						try {
+							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+						} catch (Exception e) {
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
 					}
 				}
 
@@ -615,7 +622,13 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						try {
+							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+						} catch (Exception e) {
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
 					}
 				}
 				
