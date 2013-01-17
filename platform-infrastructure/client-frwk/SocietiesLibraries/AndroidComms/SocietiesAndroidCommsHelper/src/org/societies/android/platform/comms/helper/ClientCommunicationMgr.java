@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.societies.android.api.comms.ICallback;
 import org.societies.android.api.comms.IMethodCallback;
@@ -22,6 +23,7 @@ import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -124,6 +126,9 @@ public class ClientCommunicationMgr {
 					this.teardownBroadcastReceiver();
 					unBindService();
 					retValue = true;
+				} else {
+					Log.d(LOG_TAG, "Methodcallback entries: " + this.methodCallbackMap.size());
+					Log.d(LOG_TAG, "XmppCallbackMap entries: " + this.xmppCallbackMap.size());
 				}
 			}
 		}
@@ -155,23 +160,21 @@ public class ClientCommunicationMgr {
 		
 	}
 	
-	public void unregister(final List<String> elementNames, final ICommCallback callback) {
+	public void unregister(final List<String> elementNames, final List<String> namespaces, final IMethodCallback callback) {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
 		Log.d(LOG_TAG, "unregister");
 		
 		long callbackID = this.randomGenerator.nextLong();
 
-		synchronized(this.xmppCallbackMap) {
+		synchronized(this.methodCallbackMap) {
 			//store callback in order to activate required methods
-			this.xmppCallbackMap.put(callbackID, callback);
+			this.methodCallbackMap.put(callbackID, callback);
 		}
 		for (String element : elementNames) {
 //			Log.d(LOG_TAG, "unregister element: " + element);
 		}
-		
-		final List<String> namespaces = callback.getXMLNamespaces();		
-		
+				
 		InvokeUnRegister invoke = new InvokeUnRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoke.execute();
 		
@@ -604,7 +607,13 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						try {
+							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+						} catch (Exception e) {
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
 					}
 				}
 
@@ -613,7 +622,13 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						try {
+							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+						} catch (Exception e) {
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
 					}
 				}
 				
@@ -637,11 +652,11 @@ public class ClientCommunicationMgr {
 
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
-				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
-					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
 					if (null != callback) {
-						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
 
@@ -650,10 +665,33 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						Packet packet;
+						try {
+							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Object payload = marshaller.unmarshallPayload(packet);
+							callback.receiveResult(stanzaFromPacket(packet), payload);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						
+						Packet packet;
+						try {
+							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Object payload = marshaller.unmarshallPayload(packet);
+							callback.receiveResult(stanzaFromPacket(packet), payload);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_EXCEPTION)) {
@@ -1601,4 +1639,22 @@ public class ClientCommunicationMgr {
     		return null;
     	}
     }
+    /**
+     * Create a stanza from a received packet
+     * @param packet
+     * @return
+     */
+	private Stanza stanzaFromPacket(Packet packet) {
+		Log.d(LOG_TAG, "stanzaFromPacket packet: " + packet.getPacketID());
+		try {
+			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
+			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());
+			Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
+			return returnStanza;
+		} catch (InvalidFormatException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+>>>>>>> refs/heads/AndroidComms
 }

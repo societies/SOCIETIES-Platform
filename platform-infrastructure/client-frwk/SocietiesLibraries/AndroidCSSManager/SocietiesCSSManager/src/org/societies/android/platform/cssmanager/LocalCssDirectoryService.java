@@ -220,7 +220,7 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 
 				LocalCssDirectoryService.this.sendBroadcast(intent);
 				Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveResult sent return value: " + retValue);
-				LocalCssDirectoryService.this.ccm.unregister(LocalCssDirectoryService.ELEMENT_NAMES, this);
+//				LocalCssDirectoryService.this.ccm.unregister(LocalCssDirectoryService.ELEMENT_NAMES, this);
 			}
 		}
 	}

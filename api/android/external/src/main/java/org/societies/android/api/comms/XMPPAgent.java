@@ -1,7 +1,5 @@
 package org.societies.android.api.comms;
 
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-
 /**
  * Mirror interface of org.societies.api.comm.xmpp.interfaces.ICommManager, adapted for Android. Check javadoc there.
  * 

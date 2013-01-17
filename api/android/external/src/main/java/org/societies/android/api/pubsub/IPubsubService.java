@@ -1,15 +1,14 @@
 package org.societies.android.api.pubsub;
 
-
 public interface IPubsubService {
-	String methodsArray [] = {	"discoItems(String pubsubService, String node, long remoteCallID)",
-								"ownerCreate(String pubsubService, String node, long remoteCallID)",
-								"ownerDelete(String pubsubService, String node, long remoteCallID)",
-								"ownerPurgeItems(String pubsubServiceJid, String node, long remoteCallID)",
-								"publisherPublish(String pubsubService, String node, String itemId, String item, long remoteCallID)",
-								"publisherDelete(String pubsubServiceJid, String node, String itemId, long remoteCallID)",
-								"subscriberSubscribe(String pubsubService, String node, long remoteCallID)",
-								"subscriberUnsubscribe(String pubsubService, String node, long remoteCallID)"
+	String methodsArray [] = {	"discoItems(String client, String pubsubService, String node, long remoteCallID)",
+								"ownerCreate(String client, String pubsubService, String node, long remoteCallID)",
+								"ownerDelete(String client, String pubsubService, String node, long remoteCallID)",
+								"ownerPurgeItems(String client, String pubsubServiceJid, String node, long remoteCallID)",
+								"publisherPublish(String client, String pubsubService, String node, String itemId, String item, long remoteCallID)",
+								"publisherDelete(String client, String pubsubServiceJid, String node, String itemId, long remoteCallID)",
+								"subscriberSubscribe(String client, String pubsubService, String node, ISubscriber subscriber, long remoteCallID)",
+								"subscriberUnsubscribe(String client, String pubsubService, String node, ISubscriber subscriber, long remoteCallID)"
 	};
 
 	/**
@@ -23,22 +22,29 @@ public interface IPubsubService {
 	public static final String INTENT_RETURN_EXCEPTION_TRACE_KEY = "org.societies.android.platform.comms.ReturnExceptionTrace";
 	public static final String INTENT_RETURN_CALL_ID_KEY = "org.societies.android.platform.comms.ReturnCallId";
 	
-	public static final String UN_REGISTER_COMM_MANAGER_RESULT = "org.societies.android.platform.comms.UN_REGISTER_COMM_MANAGER_RESULT";
+	public static final String DISCO_ITEMS = "org.societies.android.api.pubsub.DISCO_ITEMS";
+	public static final String OWNER_CREATE = "org.societies.android.api.pubsub.OWNER_CREATE";
+	public static final String OWNER_DELETE = "org.societies.android.api.pubsub.OWNER_DELETE";
+	public static final String OWNER_PURGE_ITEMS = "org.societies.android.api.pubsub.OWNER_PURGE_ITEMS";
+	public static final String PUBLISHER_PUBLISH = "org.societies.android.api.pubsub.PUBLISHER_PUBLISH";
+	public static final String PUBLISHER_DELETE = "org.societies.android.api.pubsub.PUBLISHER_DELETE";
+	public static final String SUBSCRIBER_SUBSCRIBE = "org.societies.android.api.pubsub.SUBSCRIBER_SUBSCRIBE";
+	public static final String SUBSCRIBER_UNSUBSCRIBE = "org.societies.android.api.pubsub.SUBSCRIBER_UNSUBSCRIBE";
 
 	
-	public String [] discoItems(String pubsubService, String node, long remoteCallID);
+	public String [] discoItems(String client, String pubsubService, String node, long remoteCallID);
 	
-	public boolean ownerCreate(String pubsubService, String node, long remoteCallID);
+	public boolean ownerCreate(String client, String pubsubService, String node, long remoteCallID);
 	
-	public boolean ownerDelete(String pubsubService, String node, long remoteCallID);
+	public boolean ownerDelete(String client, String pubsubService, String node, long remoteCallID);
 	
-	public boolean ownerPurgeItems(String pubsubServiceJid, String node, long remoteCallID);
+	public boolean ownerPurgeItems(String client, String pubsubServiceJid, String node, long remoteCallID);
 	
-	public String publisherPublish(String pubsubService, String node, String itemId, String item, long remoteCallID);
+	public String publisherPublish(String client, String pubsubService, String node, String itemId, String item, long remoteCallID);
 	
-	public boolean publisherDelete(String pubsubServiceJid, String node, String itemId, long remoteCallID);
+	public boolean publisherDelete(String client, String pubsubServiceJid, String node, String itemId, long remoteCallID);
 	
-	public SubscriptionParcelable subscriberSubscribe(String pubsubService,	String node, long remoteCallID);
+	public SubscriptionParcelable subscriberSubscribe(String client, String pubsubService,	String node, ISubscriber subscriber, long remoteCallID);
 	
-	public boolean subscriberUnsubscribe(String pubsubService,	String node, long remoteCallID);
+	public boolean subscriberUnsubscribe(String client, String pubsubService,	String node, ISubscriber subscriber, long remoteCallID);
 }

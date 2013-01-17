@@ -71,11 +71,11 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
-                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
-                <module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
  
-                <!-- Android Communications -->
-                <module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
+		<!-- Android Communications -->
+		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
