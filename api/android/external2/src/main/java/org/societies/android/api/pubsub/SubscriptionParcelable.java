@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.pubsub;
 
-import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.android.api.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
