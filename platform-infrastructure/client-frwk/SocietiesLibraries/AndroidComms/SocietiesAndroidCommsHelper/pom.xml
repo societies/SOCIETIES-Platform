@@ -33,10 +33,6 @@
   			<version>${release.version}</version>
          	<scope>compile</scope>
         </dependency>
-    	<dependency>
-			<groupId>org.asmack</groupId>
-		    <artifactId>asmack</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
@@ -58,17 +54,17 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.android.api.external</groupId>
-			<artifactId>societies-android-api</artifactId>
+		   <groupId>org.societies.android.platform.androidutils</groupId>
+		   <artifactId>SocietiesAndroidUtilities</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
 		
-		<dependency>
+		<!--dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
-		</dependency>
+		</dependency-->
 		
     	<dependency>
 			<artifactId>xpp3</artifactId>

@@ -1,4 +1,4 @@
-package org.societies.android.platform.comms.helper;
+package org.societies.android.platform.androidutils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

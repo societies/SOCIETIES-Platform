@@ -1,4 +1,4 @@
-package org.societies.android.platform.comms.helper;
+package org.societies.android.platform.androidutils;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

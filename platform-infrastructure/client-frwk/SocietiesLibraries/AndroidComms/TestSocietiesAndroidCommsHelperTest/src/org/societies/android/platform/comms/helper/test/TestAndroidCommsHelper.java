@@ -32,7 +32,7 @@ import android.util.Log;
 
 public class TestAndroidCommsHelper extends AndroidTestCase {
 	private final static String LOG_TAG = TestAndroidCommsHelper.class.getName(); 
-	private static final int DELAY = 10000;
+	private static final int DELAY = 15000;
 	
 	private final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
     private final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cssmanagement");
@@ -62,9 +62,11 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
     
 	protected void setUp() throws Exception {
 		super.setUp();
+		Log.d(LOG_TAG, "Test setup");
 	}
 
 	protected void tearDown() throws Exception {
+		Log.d(LOG_TAG, "Test teardown");
 		super.tearDown();
 	}
 	@MediumTest
@@ -84,7 +86,6 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);
-
 	}
 	@MediumTest
 	public void testIsConnected() throws Exception {
@@ -203,7 +204,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		
 		Thread.sleep(DELAY);
 	}
-	@MediumTest 
+//	@MediumTest 
 	/**
 	 * Test for the case where the class is used by a component which does not login (assumes that another component has logged in)
 	 * and tries to retrieve Items
