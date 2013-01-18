@@ -82,6 +82,7 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	private boolean activated;
 
 	public DIANNE(){
+		
 		d_nets = new HashMap<IIdentity, Network>();
 		runnerMappings = new HashMap<String, NetworkRunner>();
 		outcomes = null;
@@ -254,6 +255,9 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		Thread persistThread = new Thread(new PersistenceManager(this, ctxBroker));
 		persistThread.setName("DIANNE Persistence Thread");
 		persistThread.start();
+		
+		//TEMPORARY FIX FOR #751 -
+		this.disableDIANNELearning(cssID);
 	}
 
 	private void retrieveNetworks(){

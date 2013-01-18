@@ -82,11 +82,13 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 
 	@Override
 	public boolean setIAction(IIdentity userId, IAction action) {
-		log("Received action: "+action.toString());
+		log("Received action: \nParameter:"+action.getparameterName()+"\nValue: "+action.getvalue());
 		if (action.getparameterName().equalsIgnoreCase("bgColour")){
 			this.bgColour = action.getvalue();
+			log("Personalised bgColour with: "+action.getvalue());
 		}else if (action.getparameterName().equalsIgnoreCase("volume")){
 			this.volume = action.getvalue();
+			log("Personalised volume with: "+action.getvalue());
 		}
 		return true;
 	}
