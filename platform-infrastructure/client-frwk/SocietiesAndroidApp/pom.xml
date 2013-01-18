@@ -56,6 +56,7 @@
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
