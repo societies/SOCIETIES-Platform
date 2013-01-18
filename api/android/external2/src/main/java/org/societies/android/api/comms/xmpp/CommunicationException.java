@@ -23,25 +23,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.pubsub;
 
-public enum Affiliation {
-	OWNER("owner"), 
-	MEMBER("member"), 
-	PUBLISHER("publisher"), 
-	PUBLISH_ONLY("publish-only"),
-	OUTCAST("outcast"),
-	NONE("none");
+package org.societies.android.api.comms.xmpp;
+
+
+/**
+ * The Class CommunicationException.
+ *
+ * @author Joao M. Goncalves (PTIN)
+ * 
+ * Exception that the Communication Framework may throw in case of communication (XMPP) error.
+ */
+
+public class CommunicationException extends Exception {
+
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 3326282689258654587L;
+
+	/**
+	 * Instantiates a new communication exception.
+	 *
+	 * @param m the detail message (which is saved for later retrieval by the Throwable.getMessage() method
+	 * @param t the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+	 */
 	
-	private String str;
-	
-	private Affiliation(String str) {
-		this.str = str;
+	public CommunicationException(String m, Throwable t) {
+		super(m,t);
 	}
 
-	@Override
-	public String toString() {
-		return str;
+	/**
+	 * Instantiates a new communication exception.
+	 *
+	 * @param m the detail message (which is saved for later retrieval by the Throwable.getMessage() method
+	 */
+	public CommunicationException(String m) {
+		super(m);
 	}
-	
 }

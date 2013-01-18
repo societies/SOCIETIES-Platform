@@ -59,13 +59,12 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		
-		<!--dependency>
+		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
-		</dependency-->
-		
+		    <type>apklib</type>
+		</dependency>
     	<dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>

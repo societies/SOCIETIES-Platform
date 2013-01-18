@@ -11,10 +11,10 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
@@ -1655,6 +1655,4 @@ public class ClientCommunicationMgr {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
-
->>>>>>> refs/heads/AndroidComms
 }

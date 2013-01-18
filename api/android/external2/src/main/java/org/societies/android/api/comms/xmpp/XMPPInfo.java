@@ -23,23 +23,82 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.pubsub;
+package org.societies.android.api.comms.xmpp;
+
+import java.util.List;
 
 
-
-public enum SubscriptionState {
-	SUBSCRIBED("subscribed"),
-	UNCONFIGURED("unconfigured"),
-	NONE("none");
+// TODO change this to interface that Identity and Node implement
+/**
+ * The Class XMPPInfo.
+ */
+public class XMPPInfo {
 	
-	private String str;
+	/** The Constant INFO_NAMESPACE. */
+	public static final String INFO_NAMESPACE = "http://jabber.org/protocol/disco#info";
+
+	/** The identity category. */
+	private String identityCategory;
 	
-	private SubscriptionState(String str) {
-		this.str = str;
+	/** The identity type. */
+	private String identityType;
+	
+	/** The identity name. */
+	private String identityName;
+	
+	/** The feature namespaces. */
+	private List<String> featureNamespaces;
+	
+	/**
+	 * Instantiates a new XMPP info.
+	 *
+	 * @param identityCategory the identity category
+	 * @param identityType the identity type
+	 * @param identityName the identity name
+	 * @param featureNamespaces the feature namespaces
+	 */
+	public XMPPInfo(String identityCategory, String identityType,
+			String identityName, List<String> featureNamespaces) {
+		this.identityCategory = identityCategory;
+		this.identityType = identityType;
+		this.identityName = identityName;
+		this.featureNamespaces = featureNamespaces;
 	}
 
-	@Override
-	public String toString() {
-		return str;
+
+	/**
+	 * Gets the identity category.
+	 *
+	 * @return the identity category
+	 */
+	public String getIdentityCategory() {
+		return identityCategory;
+	}
+
+	/**
+	 * Gets the identity type.
+	 *
+	 * @return the identity type
+	 */
+	public String getIdentityType() {
+		return identityType;
+	}
+
+	/**
+	 * Gets the identity name.
+	 *
+	 * @return the identity name
+	 */
+	public String getIdentityName() {
+		return identityName;
+	}
+
+	/**
+	 * Gets the feature namespaces.
+	 *
+	 * @return the feature namespaces
+	 */
+	public List<String> getFeatureNamespaces() {
+		return featureNamespaces;
 	}
 }
