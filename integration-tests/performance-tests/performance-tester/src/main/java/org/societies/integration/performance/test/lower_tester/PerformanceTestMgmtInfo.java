@@ -29,24 +29,58 @@ package org.societies.integration.performance.test.lower_tester;
  * @author Rafik
  *
  */
-public class PerformanceTestInfo {
+public class PerformanceTestMgmtInfo {
 	
 	private String testCaseId;
+	private String performanceTestEngineHost;
+	private String testMode;
 	
 	
 	/**
 	 * 
 	 */
-	public PerformanceTestInfo() {
+	public PerformanceTestMgmtInfo() {
 	}
 	
 	/**
 	 * @param testCaseId
-	 * @param testCaseName
-	 * @param nodeId
+	 * @param performanceTestEngineUrl
+	 * @param testMode
 	 */
-	public PerformanceTestInfo(String testCaseId) {
+	public PerformanceTestMgmtInfo(String testCaseId,
+			String performanceTestEngineHost, String testMode) {
+		super();
 		this.testCaseId = testCaseId;
+		this.performanceTestEngineHost = performanceTestEngineHost;
+		this.testMode = testMode;
+	}
+
+	/**
+	 * @return the performanceTestEngineHost
+	 */
+	public String getPerformanceTestEngineHost() {
+		return performanceTestEngineHost;
+	}
+
+	/**
+	 * @param performanceTestEngineHost the performanceTestEngineHost to set
+	 */
+	public void setPerformanceTestEngineHost(String performanceTestEngineHost) {
+		this.performanceTestEngineHost = performanceTestEngineHost;
+	}
+
+	/**
+	 * @return the testMode
+	 */
+	public String getTestMode() {
+		return testMode;
+	}
+
+	/**
+	 * @param testMode the testMode to set
+	 */
+	public void setTestMode(String testMode) {
+		this.testMode = testMode;
 	}
 
 	/**

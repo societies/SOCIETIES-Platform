@@ -40,42 +40,40 @@ import com.restfb.json.JsonObject;
  */
 public class PerformanceLowerTester {
 	
-	private PerformanceTestInfo performanceTestInfo;
+	private PerformanceTestMgmtInfo performanceTestMgmtInfo;
+	
+	private String performanceTestEngineHost;
+	private String testMode;
 	
 	private static final String PENDING_STATUS = "pending";
 	
-	private long startTestDate;
-	private long endTestDate;
-	
 	private String testId;
 	private String testName;
-	private String nodeId;
-	
-	private String testStatus;
-	private String className;
-	private String testResultMessage;
 	private String testDescription;
+	private String nodeId;
+	private String className;
+	private long startTestDate;
+	private long endTestDate;
+	private String testStatus;
+	private String testResultMessage;
 	
 	private Calendar calendar;
 	
 	private JsonObject startTestResponse;
-	
 	private JsonObject finishTestResponse;
 	
-	private static Logger LOG = LoggerFactory.getLogger(PerformanceLowerTester.class);
-	
-	//TODO has to be get from the property file or sent by the test engine server on each test.
-	private static final String TEST_ENGINE_HOST = "http://localhost/societies_tester/app_dev.php"; 
-	
+	private static Logger LOG = LoggerFactory.getLogger(PerformanceLowerTester.class);	
 	
 	/**
 	 * 
 	 */
-	public PerformanceLowerTester(PerformanceTestInfo performanceTestInfo) {
+	public PerformanceLowerTester(PerformanceTestMgmtInfo performanceTestMgmtInfo) {
 		
-		this.performanceTestInfo = performanceTestInfo;
+		this.performanceTestMgmtInfo = performanceTestMgmtInfo;
 		
-		this.testId = this.performanceTestInfo.getTestCaseId();
+		this.testId = this.performanceTestMgmtInfo.getTestCaseId();
+		this.performanceTestEngineHost = this.performanceTestMgmtInfo.getPerformanceTestEngineHost();
+		this.testMode = this.performanceTestMgmtInfo.getTestMode();
 	}
 	
 	/**
@@ -107,9 +105,17 @@ public class PerformanceLowerTester {
 			startTestResponse.put("start_test_date", ""+startTestDate);
 			
 
+			if (this.testMode.equalsIgnoreCase("dev_mode")) 
+			{
+				LOG.info("### DEV MODE SELECTED ###");
+				LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
+			}
+			else if (this.testMode.equalsIgnoreCase("prod_mode")) 
+			{
+				LOG.info("### PROD MODE SELECTED ###");
+				WebServiceCommunication.sendStartResponse(this.performanceTestEngineHost, startTestResponse.toString());
+			}
 			
-			LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
-			WebServiceCommunication.sendStartResponse(TEST_ENGINE_HOST+"/start-test", startTestResponse.toString());
 		}
 		else
 		{
@@ -139,7 +145,15 @@ public class PerformanceLowerTester {
 		finishTestResponse.put("end_test_date", ""+endTestDate);
 		finishTestResponse.put("test_result_message", this.testResultMessage);
 
-		LOG.info("### [PerformanceLowerTester] result: " + finishTestResponse.toString());		
-		WebServiceCommunication.sendFinishResponse(TEST_ENGINE_HOST+"/end-test", finishTestResponse.toString());
+		if (this.testMode.equalsIgnoreCase("dev_mode")) 
+		{
+			LOG.info("### DEV MODE SELECTED ###");
+			LOG.info("### [PerformanceLowerTester] result: " + finishTestResponse.toString());
+		}
+		else if (this.testMode.equalsIgnoreCase("prod_mode")) 
+		{
+			LOG.info("### PROD MODE SELECTED ###");
+			WebServiceCommunication.sendFinishResponse(this.performanceTestEngineHost, finishTestResponse.toString());
+		}
 	}
 }

@@ -31,7 +31,7 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.integration.performance.test.lower_tester.PerformanceLowerTester;
-import org.societies.integration.performance.test.lower_tester.PerformanceTestInfo;
+import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
 import org.societies.integration.performance.test.lower_tester.PerformanceTestResult;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CisManagerClientCallback;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest;
@@ -100,10 +100,10 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 
 
 	@Override
-	public void joinCisTest(PerformanceTestInfo performanceTestInfo ,String cssOwnerId, String cisId) 
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo ,String cssOwnerId, String cisId) 
 	{
 		//The following 2 lines are mandatory in the beginning of the test 
-		performanceLowerTester = new PerformanceLowerTester(performanceTestInfo);
+		performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
 		performanceLowerTester.testStart(this.joinCisTestName, this.joinCisTestDescription, this.getClass().getName(), getCommManager());	
 
 		LOG.info("### [JoinCisPerformanceTestImpl] cssOwnerId: " + cssOwnerId + "  cisId: "+ cisId);

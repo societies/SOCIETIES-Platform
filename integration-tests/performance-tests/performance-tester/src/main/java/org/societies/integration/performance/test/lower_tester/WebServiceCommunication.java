@@ -18,7 +18,7 @@ public class WebServiceCommunication {
 
 	private static Logger LOG = LoggerFactory.getLogger(WebServiceCommunication.class);
 
-	
+	private static String URL = "";
 	
 	/**
 	 * 
@@ -26,10 +26,12 @@ public class WebServiceCommunication {
 	 * @param startTestResponse
 	 * @return
 	 */
-	public static String sendStartResponse(String URL, String startTestResponse)
+	public static String sendStartResponse(String host, String startTestResponse)
 	{	
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("start_test_response", startTestResponse));
+		
+		URL = host+"/start-test";
 		
 		LOG.info("### [WebServiceCommunication] sendStartResponse URL: " + URL);
 		
@@ -54,11 +56,13 @@ public class WebServiceCommunication {
 	 * @param finishTestResponse
 	 * @return
 	 */
-	public static String sendFinishResponse(String URL, String finishTestResponse)
+	public static String sendFinishResponse(String host, String finishTestResponse)
 	{
 		
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("end_test_response", finishTestResponse));
+		
+		URL = host + "/end-test";
 		
 		LOG.info("### [WebServiceCommunication] sendFinishResponse URL: " + URL);
 		

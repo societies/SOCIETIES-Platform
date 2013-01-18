@@ -24,7 +24,7 @@
  */
 package org.societies.integration.performance.test.upper_tester.rafik.cismgmt;
 
-import org.societies.integration.performance.test.lower_tester.PerformanceTestInfo;
+import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
 
 /**
  * 
@@ -42,6 +42,6 @@ public interface ICisMgmtPerformanceTest {
 	 * @param cisId Represents the JID of CIS that we want to join
 	 * @return
 	 */
-	public void joinCisTest(PerformanceTestInfo performanceTestInfo, String cssOwnerId, String cisId);
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestInfo, String cssOwnerId, String cisId);
 }
 
