@@ -36,6 +36,11 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		<dependency>
+			<groupId>org.asmack</groupId>
+		    <artifactId>asmack</artifactId>
+		</dependency>
+		
 		
     </dependencies>
 

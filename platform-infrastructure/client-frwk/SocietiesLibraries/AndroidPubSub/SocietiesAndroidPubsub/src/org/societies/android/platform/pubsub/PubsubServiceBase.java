@@ -36,12 +36,11 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.platform.comms.helper.MarshallUtils;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.api.pubsub.SubscriptionParcelable;
+import org.societies.android.platform.androidutils.MarshallUtils;
 import org.societies.utilities.DBC.Dbc;
 import org.xml.sax.SAXException;
 
@@ -71,13 +70,13 @@ public class PubsubServiceBase implements IPubsubService {
 					      "event", 
 					      "query"));
 	
-	private ClientCommunicationMgr ccm;
+	private PubsubCommsMgr ccm;
 	private Context androidContext;
 	private boolean restrictBroadcast;
 	private Map<Subscription,List<ISubscriber>> subscribers;	
 
 	
-	public PubsubServiceBase (Context androidContext, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
+	public PubsubServiceBase (Context androidContext, PubsubCommsMgr ccm, boolean restrictBroadcast) {
 		this.ccm = ccm;
 		this.androidContext = androidContext;
 		this.restrictBroadcast = restrictBroadcast;
@@ -495,7 +494,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public SubscriptionParcelable subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriber subscriber, final long remoteCallID) {
+	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriber subscriber, final long remoteCallID) {
 		try {
 			final IIdentity pubsubServiceIdentity;
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
@@ -579,7 +578,7 @@ public class PubsubServiceBase implements IPubsubService {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		return null;
+		return false;
 	}
 
 

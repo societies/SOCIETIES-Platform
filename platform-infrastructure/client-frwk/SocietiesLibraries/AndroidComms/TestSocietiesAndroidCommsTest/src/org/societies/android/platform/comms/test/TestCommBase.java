@@ -126,7 +126,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				Log.e(LOG_TAG, "Exception thrown: " + e.getMessage(), e);
 				fail();
 			} finally {
-				commsService.unregister(CLIENT, elementNames, nameSpaces);
+				commsService.unregister(CLIENT, elementNames, nameSpaces, this.random.nextLong());
 				Thread.sleep(DELAY);
 			}
 		} catch (Exception e) {
@@ -275,7 +275,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.isConnected(CLIENT, this.random.nextLong());
 
 			Thread.sleep(DELAY);
-			commsService.sendMessage(CLIENT, SIMPLE_XML_MESSAGE);
+			commsService.sendMessage(CLIENT, SIMPLE_XML_MESSAGE, this.random.nextLong());
 			Thread.sleep(DELAY);
 
 
@@ -390,7 +390,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				assertEquals(XMPP_SUCCESSFUL_JID, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
+			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			}
 		}
@@ -416,7 +416,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				assertNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER)) {
+			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				Log.d(LOG_TAG, "Un-Register Comm Manager: " + intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 				assertEquals(true, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			}
@@ -431,7 +431,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER);
+        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT);
         intentFilter.addAction(XMPPAgent.DESTROY_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
@@ -439,7 +439,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
         intentFilter.addAction(XMPPAgent.LOGOUT);
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER);
+        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
         
         return intentFilter;
 

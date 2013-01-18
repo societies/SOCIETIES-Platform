@@ -364,7 +364,7 @@ public class ServiceMethodTranslator {
 		Class paramClasses [] = new Class [paramTypes.length];
 		for (int i = 0; i < paramTypes.length; i++) {
 			try {
-				Log.d(LOG_TAG, "Parameter type: " + paramTypes[i]);
+//				Log.d(LOG_TAG, "Parameter type: " + paramTypes[i]);
 				
 				if (arrayContains(JAVA_PRIMITIVE_ARRAYS, paramTypes[i])) {
 					paramClasses[i] = getPrimitiveClassArray(paramTypes[i]);
