@@ -81,7 +81,7 @@
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
 		<module>../../platform-infrastructure/sns/SocialDataCommsMgr</module>
 		
-		<!-- Context Management: 9 bundles (can some be merged?) -->
+		<!-- Context Management: 2 bundles -->
 		<module>../../context-management</module>
 		<module>../../context-management/context-cloud-bundle/</module>
 		<module>../../context-management/LocationManagement/</module>
@@ -98,8 +98,7 @@
 	      
 		<!-- Privacy & Trust: 5 bundles (including 1 test bundle & 1 GUI bundle... move to nightly build pom?) -->
 		<module>../../privacy-trust/java/privacy-protection</module>
-		<module>../../privacy-trust/java/trust</module>
-		<module>../../privacy-trust/java/privacy-trust-comm-manager</module>
+		<module>../../privacy-trust/java/trust/trust-cloud-bundle</module>
 
 		<!-- PlatForm Web App: 1 WAR -->
 		<module>../../platform-infrastructure/service-lifecycle/platform-webapp/</module>

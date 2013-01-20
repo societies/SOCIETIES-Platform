@@ -28,10 +28,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust</groupId>
-	<artifactId>privacyprotection</artifactId>
-	<name>Privacy Protection Bundle</name>
-	<packaging>bundle</packaging>
+	<groupId>org.societies.privacytrust.privacyprotection</groupId>
+	<artifactId>privacycommmanagement</artifactId>
+	<name>Privacy Communication Management</name>
+	<packaging>jar</packaging>
 	<version>${version.pt}</version>
 	<developers>
 		<developer>
@@ -43,16 +43,6 @@
 				<role>Owner</role>
 				<role>Developer</role>
 			</roles>
-		</developer>
-		<developer>
-			<name>Elizabeth Papadopoulou</name>
-			<email>E.Papadopoulou@hw.ac.uk</email>
-			<organization>HWU</organization>
-			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
-			<roles>
-				<role>Senior Developer</role>
-			</roles>
-			<timezone>+0</timezone>
 		</developer>
 	</developers>
 
@@ -73,6 +63,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
@@ -90,91 +81,50 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- Societies Privacy -->
-		<dependency>
+		
+				<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- Communication Manager -->
+		<!-- The version has to be updated accordingly -->
+		<!-- <dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>  -->
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>identityselection</artifactId>
-			<version>${version.pt}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacydatamanagement</artifactId>
-			<version>${version.pt}</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacypolicymanagement</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacypreferencemanagement</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacynegotiationmanagement</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacycommmanagement</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${project.name}</Bundle-Name>
-						<Bundle-Version>${project.version}</Bundle-Version>
-						<Embed-Dependency>
-							api;scope=compile|runtime,
-							identityselection;scope=compile|runtime,
-							privacydatamanagement;scope=compile|runtime,
-							privacypolicymanagement;scope=compile|runtime,
-							privacypreferencemanagement;scope=compile|runtime,
-							privacynegotiationmanagement;scope=compile|runtime
-						</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
-							org.societies.identity,
-							*;resolution:=optional
-						</Import-Package> <!-- Added org.societies.identity import because of Privacy policy serialization -->
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<type>jar</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

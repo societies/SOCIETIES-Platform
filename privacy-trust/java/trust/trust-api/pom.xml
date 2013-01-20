@@ -2,21 +2,37 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<!-- The Basics -->
 	<groupId>org.societies.privacytrust.trust</groupId>
-	<artifactId>trust-builder</artifactId>
+	<artifactId>trust-api</artifactId>
 	<version>${version.pt}</version>
-	<packaging>pom</packaging>
-	
-	<modules>
-		<module>trust-api</module>
-		<module>trust-comms</module>
-		<module>trust-cloud-bundle</module>
-	</modules>
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<!-- Build Settings -->
 
 	<!-- More Project Information -->
-	<name>Trust Management and Evaluation builder</name>
+	<name>
+		Trust Management and Evaluation API
+	</name>
 	<description>
-    	Trust Management and Evaluation builder
+		Trust Management and Evaluation API
 	</description>
 	<developers>
 		<developer>

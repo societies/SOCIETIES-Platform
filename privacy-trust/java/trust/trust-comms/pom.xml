@@ -26,42 +26,85 @@
 	OF SUCH DAMAGE. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>builder</artifactId>
-	<name>Privacy Protection Builder</name>
-	<packaging>pom</packaging>
+	
+	<groupId>org.societies.privacytrust.trust</groupId>
+	<artifactId>trust-comms</artifactId>
 	<version>${version.pt}</version>
-	<developers>
-		<developer>
-			<name>Olivier Maridat</name>
-			<email>olivier.maridat@trialog.com</email>
-			<organization>Trialog</organization>
-			<timezone>+1</timezone>
-			<roles>
-				<role>Owner</role>
-				<role>Developer</role>
-			</roles>
-		</developer>
-	</developers>
-
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.trust</groupId>
+			<artifactId>trust-api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
+		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
 	
-	<modules>
-		<module>api</module>
-		<module>assessment</module>
-		<module>identity-selection</module>
-		<module>privacy-data-management</module>
-		<module>privacy-policy-management</module>
-		<module>privacy-preference-management</module>
-		<module>privacy-negotiation-management</module>
-		<module>privacy-comm-manager</module>
-		<module>privacy-protection-bundle</module>
-		<module>privacy-preference-GUI</module>
-	</modules>
+	<!-- Build Settings -->
+
+	<!-- More Project Information -->
+	<name>
+		Trust Management and Evaluation Remote Comms
+	</name>
+	<description>
+		Trust Management and Evaluation Remote Communications
+	</description>
+	<developers>
+		<developer>
+			<id>NicolasLiampotis</id>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
 </project>
