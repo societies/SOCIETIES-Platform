@@ -28,11 +28,11 @@ import org.societies.api.schema.servicelifecycle.model.ServiceType;
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public class ServiceModelUtils {
+public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 
 
 	private ServiceModelUtils() {
-		
+		super();
 	}
 
 
@@ -74,26 +74,6 @@ public class ServiceModelUtils {
 		filter.setServiceInstance(filterInstance);
 		
 		return filter;
-	}
-	
-	/**
-	 *  This method compares to ServiceResourceIdentifiers to determine if they are equal. It is, effectively, an "equals" method
-	 *  as the ServiceResourceIdentifier does not have one, since it is a bean.
-	 *  
-	 * @param serviceId
-	 * @param otherServiceId
-	 * @return true if they are equal, false otherwise.
-	 */
-	public static boolean compare(ServiceResourceIdentifier serviceId, ServiceResourceIdentifier otherServiceId){
-		
-		if(serviceId == null || otherServiceId == null)
-			return false;
-		
-		if(serviceId.getIdentifier().equals(otherServiceId.getIdentifier()) && serviceId.getServiceInstanceIdentifier().equals(otherServiceId.getServiceInstanceIdentifier()))
-			return true;
-		else
-			return false;
-			
 	}
 	
 	/**
@@ -189,21 +169,7 @@ public class ServiceModelUtils {
 		}
 		
 		return result;
-	}	
-	
-	/**
-	 * This method returns the Jid of the node where the service exists
-	 * 
-	 * @param serviceId
-	 * @return the requested Jid
-	 */
-	public static String getJidFromServiceIdentifier(ServiceResourceIdentifier serviceId){
-		
-		String identifier = serviceId.getIdentifier().toString();
-		int lastIndex = identifier.lastIndexOf('/');
-		return identifier.substring(0, lastIndex);
 	}
-	
 	
 	/**
 	 * This method takes a Service Resource Identifier and returns the id of the bundle
@@ -357,54 +323,18 @@ public class ServiceModelUtils {
 		return clients;
 		
 	}
-	
-	/**
-	 * 
-	 * Please use the external API method
-	 *
-	 * @param serviceId
-	 * @return
-	 */
-	@Deprecated
-	public static ServiceResourceIdentifier generateServiceResourceIdentifierFromString(String serviceId){
-		
-		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
-		
-		int index = serviceId.indexOf(' ');	
-		String instanceExtract = serviceId.substring(0, index);
-		String identifierExtract = serviceId.substring(index+1);
-				
-		result.setServiceInstanceIdentifier(instanceExtract);
-		try {
-			result.setIdentifier(new URI(identifierExtract));
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * 
-	 * Please use the external API method
-	 *
-	 * @param serviceId
-	 * @return
-	 */
-	@Deprecated
-	public static String serviceResourceIdentifierToString(ServiceResourceIdentifier serviceId){
-		
-		return serviceId.getServiceInstanceIdentifier() + " " + serviceId.getIdentifier().toString();
-	}
-	
 
 	public static String getServiceId64Encode(ServiceResourceIdentifier serviceId){
 
 		return new String(Base64.encode(serviceResourceIdentifierToString(serviceId).getBytes()));
+		
 	}
+
 	
 	public static ServiceResourceIdentifier getServiceId64Decode(String encoded64){
+		
 		return generateServiceResourceIdentifierFromString(new String(Base64.decode(encoded64.getBytes())));
+	
 	}
+
 }
