@@ -100,7 +100,9 @@
 		<module>../../privacy-trust/java/privacy-protection</module>
 		<module>../../privacy-trust/java/trust/trust-cloud-bundle</module>
 
-		<!-- PlatForm Web App: 1 WAR -->
+		<!-- PlatForm Test Web App: 1 WAR -->
 		<module>../../platform-infrastructure/service-lifecycle/platform-webapp/</module>
+		<!-- PlatForm Web App: 1 WAR -->
+		<module>../../platform-infrastructure/web-app/</module>
 	</modules>
 </project>
