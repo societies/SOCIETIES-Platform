@@ -3,7 +3,19 @@ societies_test_engine_homepage:
     defaults: { _controller: SocietiesTestEngineBundle:Default:index }
 
 societies_test_engine_join_cis_result:
-    pattern:  /testcase/joincis
+    pattern:  /test/join-cis/{test_id}/{css_owner_jid}/{cis_jid}
     defaults: { _controller: SocietiesTestEngineBundle:Default:joinCisResult }
     requirements:
         _method: GET
+
+societies_test_engine_start_test:
+    pattern:  /start-test
+    defaults: { _controller: SocietiesTestEngineBundle:TestResult:startTest }
+    requirements:
+        _method: GET
+        
+societies_test_engine_end_test:
+    pattern:  /end-test
+    defaults: { _controller: SocietiesTestEngineBundle:TestResult:endTest }
+    requirements:
+        _method: POST
