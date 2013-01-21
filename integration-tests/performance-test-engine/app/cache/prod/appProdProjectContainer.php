@@ -86,7 +86,7 @@ class appProdProjectContainer extends Container
         $e->setNamingStrategy(new \Doctrine\ORM\Mapping\DefaultNamingStrategy());
         $f = call_user_func(array('Doctrine\\ORM\\EntityManager', 'create'), $this->get('doctrine.dbal.default_connection'), $e);
         $this->get('doctrine.orm.default_manager_configurator')->configure($f);
-        return $this->services['doctrine.orm.default_entity_manager'] = new \EM50fd02a4b58ac_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager($f, $this);
+        return $this->services['doctrine.orm.default_entity_manager'] = new \EM50fd493ea12a7_546a8d27f194334ee012bfe64f629947b07e4919\__CG__\Doctrine\ORM\EntityManager($f, $this);
     }
     protected function getDoctrine_Orm_DefaultManagerConfiguratorService()
     {
@@ -1327,7 +1327,7 @@ class appProdProjectContainer extends Container
             'jms_di_extra.cache_dir' => 'C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/cache/prod/jms_diextra',
             'jms_di_extra.doctrine_integration' => true,
             'jms_di_extra.doctrine_integration.entity_manager.file' => 'C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/cache/prod/jms_diextra/doctrine/EntityManager.php',
-            'jms_di_extra.doctrine_integration.entity_manager.class' => 'EM50fd02a4b58ac_546a8d27f194334ee012bfe64f629947b07e4919\\__CG__\\Doctrine\\ORM\\EntityManager',
+            'jms_di_extra.doctrine_integration.entity_manager.class' => 'EM50fd493ea12a7_546a8d27f194334ee012bfe64f629947b07e4919\\__CG__\\Doctrine\\ORM\\EntityManager',
             'security.secured_services' => array(
             ),
             'security.access.method_interceptor.class' => 'JMS\\SecurityExtraBundle\\Security\\Authorization\\Interception\\MethodSecurityInterceptor',
