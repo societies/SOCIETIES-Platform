@@ -32,10 +32,11 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -46,7 +47,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlRe
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
@@ -86,7 +87,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
     	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			this.commMgr = new ClientCommunicationMgr(androidContext);
+			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }
@@ -258,7 +259,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					intent.setPackage(client);
 				}
 				ServiceManagementBase.this.androidContext.sendBroadcast(intent);
-				ServiceManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
+				//ServiceManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}
@@ -296,11 +297,12 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
 
 			//Communications configuration
-			ICommCallback discoCallback = new ServiceLifecycleCallback(params[0], GET_MY_SERVICES); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Log.e(LOG_TAG, "Cloud Node: " + toID.getJid());
-			Stanza stanza = new Stanza(toID);
-	        try {
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(params[0], GET_MY_SERVICES); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Log.e(LOG_TAG, "Cloud Node: " + toID.getJid());
+				Stanza stanza = new Stanza(toID);
+	        
 	        	commMgr.register(ELEMENT_NAMES, discoCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 				Log.d(LOG_TAG, "Sending stanza");
@@ -346,12 +348,8 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			IIdentity toID;
 			try {
 				toID = commMgr.getIdManager().fromJid(params[1]);
-			} catch (InvalidFormatException e1) {
-				toID = commMgr.getIdManager().getCloudNode();
-				e1.printStackTrace();
-			}
-			Stanza stanza = new Stanza(toID);
-	        try {
+
+				Stanza stanza = new Stanza(toID);
 	        	commMgr.register(ELEMENT_NAMES, discoCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 				Log.d(LOG_TAG, "Sending stanza");
@@ -404,10 +402,11 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 				messageBean.setMethod(MethodType.UNSHARE_SERVICE);
 			
 			//Communications configuration
-			ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
-	        try {
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(toID);
+	        
 	        	commMgr.register(ELEMENT_NAMES, discoCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 				Log.d(LOG_TAG, "Sending stanza");
@@ -452,10 +451,11 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 				messageBean.setMethod(MethodType.STOP_SERVICE);
 			
 			//Communications configuration
-			ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
-	        try {
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(toID);
+	        
 	        	commMgr.register(ELEMENT_NAMES, discoCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 				Log.d(LOG_TAG, "Sending stanza");

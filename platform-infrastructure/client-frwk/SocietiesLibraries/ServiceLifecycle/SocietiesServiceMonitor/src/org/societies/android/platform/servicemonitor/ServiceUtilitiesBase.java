@@ -30,8 +30,9 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.societies.android.api.servicelifecycle.IServiceUtilities;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
@@ -63,7 +64,7 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
     	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			this.commMgr = new ClientCommunicationMgr(androidContext);
+			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }
@@ -130,11 +131,14 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 			
 			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
 			String appName = getCallingAppName(params[0]);
-			String uri = "http://" + commMgr.getIdManager().getThisNetworkNode().getJid() + "/" + appName;
 			try {
+				String uri = "http://" + commMgr.getIdManager().getThisNetworkNode().getJid() + "/" + appName;
+			
 				sri.setIdentifier(new URI(uri));
 			} catch (URISyntaxException e) {
-				Log.d(LOG_TAG, "Exception parsing URI: " + uri);
+				Log.d(LOG_TAG, "Exception parsing URI");
+			} catch (InvalidFormatException e) {
+				Log.d(LOG_TAG, "Exception getting Network node id");
 			}
 			sri.setServiceInstanceIdentifier(params[0]);
 
