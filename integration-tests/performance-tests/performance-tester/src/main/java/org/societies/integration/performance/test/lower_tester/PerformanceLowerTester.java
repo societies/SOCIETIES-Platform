@@ -48,8 +48,6 @@ public class PerformanceLowerTester {
 	private static final String PENDING_STATUS = "pending";
 	
 	private String testId;
-	private String testName;
-	private String testDescription;
 	private String nodeId;
 	private String className;
 	private long startTestDate;
@@ -79,15 +77,13 @@ public class PerformanceLowerTester {
 	/**
 	 * 
 	 */
-	public void testStart(String testName, String testDescription, String className, ICommManager commManager) 
+	public void testStart(String className, ICommManager commManager) 
 	{
 		
 		calendar = Calendar.getInstance();
 		startTestDate = calendar.getTime().getTime();
 		this.testStatus = this.PENDING_STATUS;
 		this.className = className;
-		this.testName = testName;
-		this.testDescription = testDescription;
 		
 		startTestResponse = new JsonObject();
 		
@@ -97,8 +93,6 @@ public class PerformanceLowerTester {
 			
 			
 			startTestResponse.put("test_id", this.testId);
-			startTestResponse.put("test_name", this.testName);
-			startTestResponse.put("test_description", this.testDescription);
 			startTestResponse.put("node_id", this.nodeId);
 			startTestResponse.put("class_name", this.className);
 			startTestResponse.put("status", this.testStatus);

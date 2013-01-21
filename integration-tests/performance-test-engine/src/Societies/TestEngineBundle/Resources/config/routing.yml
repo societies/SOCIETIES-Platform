@@ -12,7 +12,7 @@ societies_test_engine_start_test:
     pattern:  /start-test
     defaults: { _controller: SocietiesTestEngineBundle:TestResult:startTest }
     requirements:
-        _method: POST
+        _method: GET
         
 societies_test_engine_end_test:
     pattern:  /end-test

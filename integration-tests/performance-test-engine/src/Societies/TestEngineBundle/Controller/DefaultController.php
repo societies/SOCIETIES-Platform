@@ -2,6 +2,8 @@
 
 namespace Societies\TestEngineBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
 use Societies\TestEngineBundle\Entity\JoinCisTestResult;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -21,10 +23,19 @@ class DefaultController extends Controller
     	
     	$client = new \SoapClient("http://localhost:29092/rafik-performance-test?wsdl");
     	
-    	$client->joinCisTest(array("arg0"=>array("testCaseId"=>$test_id), "arg1"=>$css_owner_jid, "arg2"=>$cis_jid));
     	
     	
+    	var_dump($client->__getFunctions());
     	
+    	
+    	var_dump($client->__getTypes());
+    	
+    	//$client->joinCisTest(array("arg0"=>array("testCaseId"=>$test_id), "arg1"=>$css_owner_jid, "arg2"=>$cis_jid));
+    
+    	$session = $this->get('session');
+    	
+    	
+    	$session->set("nom", "Olivier");
     	
 //     	//create JoinCisTestResult Entity
 //     	$joinCisTestResult = new JoinCisTestResult();
@@ -50,9 +61,8 @@ class DefaultController extends Controller
 //     	$em->flush();
     	
 //     	$response = "id: ".$joinCisTestResult->getId();
+    
     	
-    	$response = "Test Sent";
-    	
-    	return new Response("$response", 200);
+    	return $this->render('SocietiesTestEngineBundle:Default:index.html.twig', array('nom' => $session->get("nom")));
     }
 }

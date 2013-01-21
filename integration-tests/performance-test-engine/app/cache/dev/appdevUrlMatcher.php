@@ -180,8 +180,8 @@ class appdevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
 
         // societies_test_engine_start_test
         if ($pathinfo === '/start-test') {
-            if ($this->context->getMethod() != 'POST') {
-                $allow[] = 'POST';
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
                 goto not_societies_test_engine_start_test;
             }
 

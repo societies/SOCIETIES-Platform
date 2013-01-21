@@ -49,9 +49,6 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	private PerformanceLowerTester performanceLowerTester;
 	private PerformanceTestResult performanceTestResult;
 
-	private final String joinCisTestName = "Join CIS Performance Test";
-	private final String joinCisTestDescription = "This test permits to verify if a JoinCis action sent from multiple CSSs to a given CSS to Join a CIS in this CSS doesn't cause any problem";
-
 	public PerformanceTestImpl(){
 		LOG.info("### [JoinCisPerformanceTestImpl] IJoinCisPerformanceTest registred");	
 	}
@@ -104,7 +101,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	{
 		//The following 2 lines are mandatory in the beginning of the test 
 		performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
-		performanceLowerTester.testStart(this.joinCisTestName, this.joinCisTestDescription, this.getClass().getName(), getCommManager());	
+		performanceLowerTester.testStart(this.getClass().getName(), getCommManager());	
 
 		LOG.info("### [JoinCisPerformanceTestImpl] cssOwnerId: " + cssOwnerId + "  cisId: "+ cisId);
 
