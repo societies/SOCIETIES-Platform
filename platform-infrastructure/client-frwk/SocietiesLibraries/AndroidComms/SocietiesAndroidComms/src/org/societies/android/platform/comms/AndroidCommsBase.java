@@ -53,7 +53,6 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.utilities.DBC.Dbc;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

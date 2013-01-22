@@ -24,6 +24,13 @@
    			</intent-filter>
         </service>
         <service
+        	android:name="org.societies.android.platform.pubsub.ServicePlatformPubsubRemote"
+        	android:label="SocietiesRemotePubsub">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.comms.app.ServicePlatformPubsubRemote"></action>
+   			</intent-filter>
+        </service>
+        <service
         	android:name="org.societies.android.platform.comms.ServicePlatformCommsLocal">
         </service>
         

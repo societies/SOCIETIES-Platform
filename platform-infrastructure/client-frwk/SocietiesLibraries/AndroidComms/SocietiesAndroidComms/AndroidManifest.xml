@@ -14,10 +14,10 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <service
-        	android:name=".ServicePlatformCommsLocal">
+        	android:name="org.societies.android.platform.comms.ServicePlatformCommsLocal">
         </service>
         <service
-        	android:name=".ServicePlatformCommsRemote">
+        	android:name="org.societies.android.platform.comms.ServicePlatformCommsRemote">
         </service>
         
      </application>

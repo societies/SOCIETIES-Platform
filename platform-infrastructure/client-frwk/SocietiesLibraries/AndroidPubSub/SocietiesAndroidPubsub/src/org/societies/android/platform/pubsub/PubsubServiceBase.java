@@ -1,6 +1,5 @@
 package org.societies.android.platform.pubsub;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,22 +9,17 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.societies.api.comm.xmpp.pubsub.Affiliation;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
-import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
-import org.jabber.protocol.pubsub.Items;
 import org.jabber.protocol.pubsub.Publish;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.Retract;
 import org.jabber.protocol.pubsub.Subscribe;
 import org.jabber.protocol.pubsub.Unsubscribe;
-import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
-import org.jabber.protocol.pubsub.owner.Subscriptions;
 import org.jivesoftware.smack.packet.IQ;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -36,10 +30,9 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.api.pubsub.ISubscriber;
-import org.societies.android.api.pubsub.SubscriptionParcelable;
 import org.societies.android.platform.androidutils.MarshallUtils;
 import org.societies.utilities.DBC.Dbc;
 import org.xml.sax.SAXException;
@@ -50,8 +43,6 @@ import android.util.Log;
 
 public class PubsubServiceBase implements IPubsubService {
 	private static final String LOG_TAG = PubsubServiceBase.class.getName();
-	
-	public static final int TIMEOUT = 10000;
 	
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
@@ -74,18 +65,50 @@ public class PubsubServiceBase implements IPubsubService {
 	private Context androidContext;
 	private boolean restrictBroadcast;
 	private Map<Subscription,List<ISubscriber>> subscribers;	
-
 	
 	public PubsubServiceBase (Context androidContext, PubsubCommsMgr ccm, boolean restrictBroadcast) {
 		this.ccm = ccm;
 		this.androidContext = androidContext;
 		this.restrictBroadcast = restrictBroadcast;
+		Log.d(LOG_TAG, "Broadcast restricted : " + this.restrictBroadcast);
+		Log.d(LOG_TAG, "PubsubServiceBase object constructed");
+	}
+
+	@Override
+	public boolean bindToAndroidComms(final String client, final long remoteCallID) {
+		this.ccm.bindCommsService(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				//Send intent
+				Intent intent = new Intent();
+				if (PubsubServiceBase.this.restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+				intent.setAction(IPubsubService.BIND_TO_ANDROID_COMMS);
+				intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, resultFlag);
+				PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+			}
+		});
+		return false;
+	}
+
+	@Override
+	public boolean unBindFromAndroidComms(String client, long remoteCallID) {
+		return this.ccm.unbindCommsService();
 	}
 
 
-
 	public String[] discoItems(final String client, String pubsubService, String node, final long remoteCallID) {
-		Dbc.require("Pubsub domain authority must be specified", null != pubsubService && pubsubService.length() > 0);
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
 		Log.d(LOG_TAG, "discoItems called with domain authority: " + pubsubService + " and node: " + node);
 		
 		try {
@@ -98,6 +121,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public void receiveItems(Stanza stanza, String mapKey, List<String> mapValue) {
+					
+					String returnValue [] = new String [mapValue.size()];
+					for (int i = 0; i < mapValue.size(); i++) {
+						returnValue[i] = mapValue.get(i);
+					}
 					//Send intent
 					Intent intent = new Intent();
 					if (PubsubServiceBase.this.restrictBroadcast) {
@@ -105,7 +133,7 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.DISCO_ITEMS);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, returnValue);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
@@ -116,11 +144,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public List<String> getXMLNamespaces() {
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -136,6 +164,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean ownerCreate(final String client, String pubsubService, String node, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
+		Log.d(LOG_TAG, "ownerCreate called with domain authority: " + pubsubService + " and node: " + node);
+
 		Stanza stanza = null;
 		try {
 			stanza = new Stanza(convertStringToIdentity(pubsubService));
@@ -151,7 +185,22 @@ public class PubsubServiceBase implements IPubsubService {
 		try {
 			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
-				public void receiveResult(Stanza arg0, Object arg1) {
+				public void receiveResult(Stanza stanza, Object payload) {
+//					if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
+//						org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
+//						String node = items.getNode();
+//						Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
+//						org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
+//						try {
+//							List<ISubscriber> subscriberList = subscribers.get(sub);
+//							for (ISubscriber subscriber : subscriberList)
+//								subscriber.pubsubEvent(stanza.getFrom().getJid(), node, i.getId(), MarshallUtils.nodeToString((Element)i.getAny()));
+//
+//						} catch (TransformerException e) {
+//							Log.e(LOG_TAG, "Error while unmarshalling pubsub event payload", e);
+//						}
+//					}
+
 					//Send intent
 					Intent intent = new Intent();
 					if (PubsubServiceBase.this.restrictBroadcast) {
@@ -159,38 +208,28 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.OWNER_CREATE);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) payload);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
 				public void receiveMessage(Stanza arg0, Object arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveError(Stanza arg0, XMPPError arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public List<String> getXMLNamespaces() {
-					// TODO Auto-generated method stub
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					// TODO Auto-generated method stub
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -205,6 +244,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean ownerDelete(final String client, String pubsubService, String node, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
+		Log.d(LOG_TAG, "ownerDelete called with domain authority: " + pubsubService + " and node: " + node);
+
 		Stanza stanza = null;
 		try {
 			stanza = new Stanza(convertStringToIdentity(pubsubService));
@@ -228,7 +273,7 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.OWNER_DELETE);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
@@ -253,13 +298,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public List<String> getXMLNamespaces() {
-					// TODO Auto-generated method stub
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					// TODO Auto-generated method stub
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -272,6 +315,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean ownerPurgeItems(final String client, String pubsubServiceJid, String node, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubServiceJid && pubsubServiceJid.length() > 0);
+		
+		Log.d(LOG_TAG, "ownerPurgeItems called with domain authority: " + pubsubServiceJid + " and node: " + node);
+		
 		IIdentity pubsubService = null;
 		try {
 			pubsubService = convertStringToIdentity(pubsubServiceJid);
@@ -296,7 +345,7 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.OWNER_PURGE_ITEMS);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
@@ -321,13 +370,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public List<String> getXMLNamespaces() {
-					// TODO Auto-generated method stub
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					// TODO Auto-generated method stub
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -340,6 +387,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public String publisherPublish(final String client, String pubsubService, String node, String itemId, String item, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
+		Log.d(LOG_TAG, "publisherPublish called with domain authority: " + pubsubService + " and node: " + node);
+
 		Stanza stanza = null;
 		try {
 			stanza = new Stanza(convertStringToIdentity(pubsubService));
@@ -378,7 +431,7 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.PUBLISHER_PUBLISH);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
@@ -403,13 +456,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public List<String> getXMLNamespaces() {
-					// TODO Auto-generated method stub
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					// TODO Auto-generated method stub
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -423,6 +474,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean publisherDelete(final String client, String pubsubServiceJid, String node, String itemId, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubServiceJid && pubsubServiceJid.length() > 0);
+		
+		Log.d(LOG_TAG, "publisherDelete called with domain authority: " + pubsubServiceJid + " and node: " + node);
+
 		IIdentity pubsubService = null;
 		try {
 			pubsubService = convertStringToIdentity(pubsubServiceJid);
@@ -451,7 +508,7 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 					intent.setAction(IPubsubService.PUBLISHER_DELETE);
-					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 				
@@ -476,13 +533,11 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public List<String> getXMLNamespaces() {
-					// TODO Auto-generated method stub
-					return null;
+					return NAMESPACES;
 				}
 				
 				public List<String> getJavaPackages() {
-					// TODO Auto-generated method stub
-					return null;
+					return PACKAGES;
 				}
 			});
 		} catch (CommunicationException e) {
@@ -495,6 +550,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriber subscriber, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
+		Log.d(LOG_TAG, "subscriberSubscribe called with domain authority: " + pubsubService + " and node: " + node);
+
 		try {
 			final IIdentity pubsubServiceIdentity;
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
@@ -516,9 +577,9 @@ public class PubsubServiceBase implements IPubsubService {
 					this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 						
 						public void receiveResult(Stanza arg0, Object response) {
-							String subId = ((Pubsub)response).getSubscription().getSubid();
-							Subscription newSubscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, subId);
-							subscribers.put(newSubscription, subscriberList);
+//							String subId = ((Pubsub)response).getSubscription().getSubid();
+//							Subscription newSubscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, subId);
+//							subscribers.put(newSubscription, subscriberList);
 							//Send intent
 							Intent intent = new Intent();
 							if (PubsubServiceBase.this.restrictBroadcast) {
@@ -526,7 +587,7 @@ public class PubsubServiceBase implements IPubsubService {
 							}
 							intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 							intent.setAction(IPubsubService.SUBSCRIBER_SUBSCRIBE);
-							intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+							intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) response);
 							PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 							
 //							newSubscriberList.add(subscriber);
@@ -560,13 +621,11 @@ public class PubsubServiceBase implements IPubsubService {
 						}
 						
 						public List<String> getXMLNamespaces() {
-							// TODO Auto-generated method stub
-							return null;
+							return NAMESPACES;
 						}
 						
 						public List<String> getJavaPackages() {
-							// TODO Auto-generated method stub
-							return null;
+							return PACKAGES;
 						}
 					});
 				} catch (CommunicationException e) {
@@ -584,6 +643,12 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, ISubscriber subscriber, final long remoteCallID) {
+		Dbc.require("Client must be supplied", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
+		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		
+		Log.d(LOG_TAG, "subscriberUnsubscribe called with domain authority: " + pubsubService + " and node: " + node);
+
 		IIdentity pubsubServiceIdentity = null;
 		try {
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
@@ -615,7 +680,7 @@ public class PubsubServiceBase implements IPubsubService {
 						}
 						intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 						intent.setAction(IPubsubService.SUBSCRIBER_UNSUBSCRIBE);
-						intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+						intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
 						PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 
 					}
@@ -641,13 +706,11 @@ public class PubsubServiceBase implements IPubsubService {
 					}
 					
 					public List<String> getXMLNamespaces() {
-						// TODO Auto-generated method stub
 						return NAMESPACES;
 					}
 					
 					public List<String> getJavaPackages() {
-						// TODO Auto-generated method stub
-						return null;
+						return PACKAGES;
 					}
 				});
 			} catch (CommunicationException e) {
