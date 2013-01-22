@@ -2,19 +2,18 @@ package org.societies.android.platform.events.mocks;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.pubsub.ISubscriber;
+import org.societies.android.platform.pubsub.helper.PubsubClient;
 import org.societies.api.identity.IIdentity;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
 import android.content.Context;
 
 /**
  * Mock version of {@link MockPubsubClientAndroid} class for use in testing
  */
-public class MockPubsubClientAndroid extends PubsubClientAndroid {
+public class MockPubsubClientAndroid extends PubsubClient {
 
 	public MockPubsubClientAndroid(Context androidContext) {
 		super(androidContext);
@@ -24,12 +23,12 @@ public class MockPubsubClientAndroid extends PubsubClientAndroid {
     }
 	
     public void subscriberUnsubscribe(final IIdentity pubsubService, final String node,
-            Subscriber subscriber) throws XMPPError, CommunicationException {
+            ISubscriber subscriber) throws XMPPError, CommunicationException {
     }
     
-    public Subscription subscriberSubscribe(IIdentity pubsubService,
-            final String node, final Subscriber subscriber) throws XMPPError,
+    public boolean subscriberSubscribe(IIdentity pubsubService,
+            final String node, final ISubscriber subscriber) throws XMPPError,
             CommunicationException {
-    	return null;
+    	return true;
     }
 }

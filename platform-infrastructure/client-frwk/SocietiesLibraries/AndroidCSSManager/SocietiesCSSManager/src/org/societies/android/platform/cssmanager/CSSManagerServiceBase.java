@@ -1027,25 +1027,6 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	private ISubscriber createSubscriber() {
 		ISubscriber subscriber = new ISubscriber() {
 		
-			public void pubsubEvent(IIdentity identity, String node, String itemId, Object payload) {
-				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
-				if (payload instanceof CssEvent) {
-					CssEvent event = (CssEvent) payload;
-					Log.d(LOG_TAG, "Received event is :" + event.getType());
-					
-					//Create Android Notification
-					int flags [] = new int [1];
-					flags[0] = Notification.FLAG_AUTO_CANCEL;
-
-					//Create Android Notification
-					int notifierflags [] = new int [1];
-					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-					AndroidNotifier notifier = new AndroidNotifier(CSSManagerServiceBase.this.context, Notification.DEFAULT_SOUND, notifierflags);
-
-					notifier.notifyMessage(event.getDescription(), event.getType(), CSSManagerServiceBase.class);
-				}
-			}
-
 			public void pubsubEvent(String pubsubService, String node, String itemId, String item) {
 				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 				if (payload instanceof CssEvent) {

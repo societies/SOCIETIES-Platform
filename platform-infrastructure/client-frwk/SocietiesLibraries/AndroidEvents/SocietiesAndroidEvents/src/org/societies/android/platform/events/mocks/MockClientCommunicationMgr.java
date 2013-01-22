@@ -2,18 +2,15 @@ package org.societies.android.platform.events.mocks;
 
 import java.util.Set;
 
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityContextMapper;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.android.ipc.IMethodInvocation;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.interfaces.XMPPAgent;
 
 import android.content.Context;
-import android.util.Log;
 
 /**
  * Mock version of {@link MockClientCommunicationMgr} class for use in testing
@@ -26,7 +23,7 @@ public class MockClientCommunicationMgr extends ClientCommunicationMgr {
 
 	
 	public MockClientCommunicationMgr(Context androidContext) {
-		super(androidContext);
+		super(androidContext, true);
 	}
 
 	public IIdentityManager getIdManager() {

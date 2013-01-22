@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import org.jivesoftware.smack.packet.Packet;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.platform.androidutils.PacketMarshaller;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.BroadcastReceiver;

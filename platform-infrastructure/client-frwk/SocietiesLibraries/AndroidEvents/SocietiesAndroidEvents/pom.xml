@@ -21,9 +21,7 @@
 		 <email>http://www.ict-societies.eu</email>
 		<!-- Component author e-mail-->
 	  </developer>
-   </developers>
-
-
+	</developers>
     <dependencies>
         <dependency>
 			<groupId>com.google.android</groupId>
@@ -54,9 +52,15 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		 <dependency>
+		<dependency>
    			<groupId>org.societies.android.platform.androidutils</groupId>
 		    <artifactId>SocietiesAndroidUtilities</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
+		<dependency>
+   			<groupId>org.societies.android.platform.pubsub.helper</groupId>
+		    <artifactId>societies-android-pubsub-helper</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
