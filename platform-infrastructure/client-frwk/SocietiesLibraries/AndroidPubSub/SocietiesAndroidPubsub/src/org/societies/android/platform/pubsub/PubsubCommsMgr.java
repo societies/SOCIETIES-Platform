@@ -2,31 +2,23 @@ package org.societies.android.platform.pubsub;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Map.Entry;
 
-import org.societies.android.api.comms.ICallback;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
-import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.android.platform.comms.ServicePlatformCommsLocal;
 import org.societies.android.platform.comms.ServicePlatformCommsLocal.LocalPlatformCommsBinder;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -35,17 +27,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 public class PubsubCommsMgr {
 	
 	private static final String LOG_TAG = PubsubCommsMgr.class.getName();
 	private boolean boundToService;
-	private Messenger targetService = null;
 	private String clientPackageName;
 	private Random randomGenerator;
 	private PacketMarshaller marshaller = new PacketMarshaller();
@@ -59,9 +47,8 @@ public class PubsubCommsMgr {
 	private IIdentityManager idManager;
 
 	private BroadcastReceiver receiver;
-	private IMethodCallback bindCallback;
 	private XMPPAgent localAndroidComms;
-	
+	private long bindCallbackID;
 	/**
 	 * Default constructor
 	 * 
@@ -85,6 +72,7 @@ public class PubsubCommsMgr {
 		this.domainAuthority = null;
 		this.idManager = null;
 		this.receiver = null;
+		this.bindCallbackID = 0;
 		
 		this.setupBroadcastReceiver();
 	}
@@ -97,8 +85,14 @@ public class PubsubCommsMgr {
 	public void bindCommsService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Comms Service");
-		this.bindCallback = bindCallback;
+		
+		long callbackID = this.randomGenerator.nextLong();
 
+		synchronized(this.methodCallbackMap) {
+			//store callback in order to activate required methods
+			this.methodCallbackMap.put(callbackID, bindCallback);
+		}
+		this.bindCallbackID = callbackID;
 		this.bindToServiceAfterLogin();
 
 	}
@@ -315,67 +309,25 @@ public class PubsubCommsMgr {
 			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
 				if (PubsubCommsMgr.this.methodCallbackMap.containsKey(callbackId)) {
 					PubsubCommsMgr.this.identityJID = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
-					//Having logged in and obtained the DomainAuthority and Identity JID through chained calls
-					//invoke the appropriate callback
-//					if (PubsubCommsMgr.this.loginCompleted) {
-//						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-//				    	PubsubCommsMgr.this.bindCallback.returnAction(true);
-//					} else {
-//						synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-//							IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-//							PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-//							callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-//						}
-//					}
-				}
-			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
-				if (PubsubCommsMgr.this.methodCallbackMap.containsKey(callbackId)) {
-			    	PubsubCommsMgr.this.getIdentityJid(callbackId);
-					PubsubCommsMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
-				}
-
-			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
-				if (PubsubCommsMgr.this.methodCallbackMap.containsKey(callbackId)) {
-			    	//Get the values for DomainAuthority and Identity JID after the XMPP login has been performed
-			    	PubsubCommsMgr.this.getDomainAuthorityNode(callbackId);
-				}
-			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
+					synchronized(PubsubCommsMgr.this.methodCallbackMap) {
+						IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
 						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-					}
-				}
-			} else if (intent.getAction().equals(XMPPAgent.CONFIGURE_AGENT)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-					}
-				}
-			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_RESULT)) {
 				synchronized(PubsubCommsMgr.this.xmppCallbackMap) {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						try {
-							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
-							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
-						} catch (Exception e) {
-							Log.e(LOG_TAG, e.getMessage(), e);
-						}
+						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+//						try {
+//							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+//							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+//							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+//						} catch (Exception e) {
+//							Log.e(LOG_TAG, e.getMessage(), e);
+//						}
 					}
 				}
 
@@ -384,58 +336,35 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						try {
-							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
-							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
-						} catch (Exception e) {
-							Log.e(LOG_TAG, e.getMessage(), e);
-						}
+						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+
+//						try {
+//							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+//							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+//							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+//						} catch (Exception e) {
+//							Log.e(LOG_TAG, e.getMessage(), e);
+//						}
 					}
 				}
 				
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_EXCEPTION)) {
-			} else if (intent.getAction().equals(XMPPAgent.DESTROY_MAIN_IDENTITY)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-					}
-				}
-			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
-				synchronized(PubsubCommsMgr.this.xmppCallbackMap) {
-					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-					}
-				}
-
-			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
-			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
-					}
-				}
-
+				
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_RESULT)) {
 				synchronized(PubsubCommsMgr.this.xmppCallbackMap) {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
 						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-						Packet packet;
-						try {
-							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Object payload = marshaller.unmarshallPayload(packet);
-							callback.receiveResult(stanzaFromPacket(packet), payload);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+						//						Packet packet;
+//						try {
+//							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+//							Object payload = marshaller.unmarshallPayload(packet);
+//							callback.receiveResult(stanzaFromPacket(packet), payload);
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
@@ -443,28 +372,21 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
+						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
 						
-						Packet packet;
-						try {
-							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Object payload = marshaller.unmarshallPayload(packet);
-							callback.receiveResult(stanzaFromPacket(packet), payload);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+//						Packet packet;
+//						try {
+//							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+//							Object payload = marshaller.unmarshallPayload(packet);
+//							callback.receiveResult(stanzaFromPacket(packet), payload);
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
-			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_RESULT)) {
-			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_EXCEPTION)) {
-			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
-					if (null != callback) {
-						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-					}
-				}
+				
 			}
 		}
     }
@@ -477,8 +399,6 @@ public class PubsubCommsMgr {
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT);
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_ITEMS_RESULT);
@@ -522,15 +442,15 @@ public class PubsubCommsMgr {
 			LocalPlatformCommsBinder binder = (LocalPlatformCommsBinder) service;
 			localAndroidComms = (XMPPAgent) binder.getService();
 			Log.d(LOG_TAG, "Societies Android Comms Service connected");
-	    	//The Domain Authority and Identity must now be retrieved before any other calls
-			long callbackID = PubsubCommsMgr.this.randomGenerator.nextLong();
-
-			synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-				//store callback in order to activate required methods
-				PubsubCommsMgr.this.methodCallbackMap.put(callbackID, null);
+			
+			if (PubsubCommsMgr.this.methodCallbackMap.containsKey(PubsubCommsMgr.this.bindCallbackID)) {
+				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
+					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(PubsubCommsMgr.this.bindCallbackID);
+					PubsubCommsMgr.this.methodCallbackMap.remove(PubsubCommsMgr.this.bindCallbackID);
+					callback.returnAction(true);
+				}
 			}
 
-	    	PubsubCommsMgr.this.getDomainAuthorityNode(callbackID);
 		}
 	};
 	
@@ -690,20 +610,4 @@ public class PubsubCommsMgr {
     	}
     }
 
-    /**
-     * Create a stanza from a received packet
-     * @param packet
-     * @return
-     */
-	private Stanza stanzaFromPacket(Packet packet) {
-		Log.d(LOG_TAG, "stanzaFromPacket packet: " + packet.getPacketID());
-		try {
-			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
-			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());
-			Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
-			return returnStanza;
-		} catch (InvalidFormatException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
 }
