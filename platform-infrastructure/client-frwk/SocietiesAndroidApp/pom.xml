@@ -66,6 +66,13 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		<dependency>
+   			<groupId>org.societies.android.platform</groupId>
+   			<artifactId>personalisation</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+				
 		<!-- 
 		<dependency>
 			<groupId>org.societies</groupId>

@@ -70,6 +70,14 @@
         <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
         <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
+        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
+        <service
+        	android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
+        	android:label="SocietiesPersonalisation">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"></action>
+   			</intent-filter>
+        </service>
        <service
         	android:name="org.societies.android.platform.events.ServicePlatformEventsLocal">
         </service>
