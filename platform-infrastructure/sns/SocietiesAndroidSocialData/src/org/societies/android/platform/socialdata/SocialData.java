@@ -28,18 +28,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.internal.sns.ISocialData;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
-import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
@@ -74,7 +73,7 @@ public class SocialData extends Service implements ISocialData {
 		
 		try {
 			//INSTANTIATE COMMS MANAGER
-			commMgr = new ClientCommunicationMgr(this);
+			commMgr = new ClientCommunicationMgr(this, true);
 			commMgr.register(ELEMENT_NAMES, nullCallback);		
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception creating ClientCommunicationMgr instance.", e);
@@ -85,8 +84,7 @@ public class SocialData extends Service implements ISocialData {
 
 	@Override
 	public void onDestroy() {
-		commMgr.unregister(ELEMENT_NAMES, nullCallback);
-		
+		//commMgr.unregister(ELEMENT_NAMES, nullCallback);		
 		Log.d(LOG_TAG, "SocialData service terminating");
 	}
 
@@ -113,9 +111,10 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
 
 		//COMMS STUFF
-		IIdentity toId = commMgr.getIdManager().getCloudNode();	
-		Stanza stanza = new Stanza(toId);
-        try {
+		try {
+			IIdentity toId = commMgr.getIdManager().getCloudNode();	
+			Stanza stanza = new Stanza(toId);
+        
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
@@ -130,9 +129,10 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
 
 		//COMMS STUFF
-		IIdentity toId = commMgr.getIdManager().getCloudNode();	
-		Stanza stanza = new Stanza(toId);
-        try {
+		try {
+			IIdentity toId = commMgr.getIdManager().getCloudNode();	
+			Stanza stanza = new Stanza(toId);
+        
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
@@ -147,9 +147,10 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
 
 		//COMMS STUFF
-		IIdentity toId = commMgr.getIdManager().getCloudNode();	
-		Stanza stanza = new Stanza(toId);
-        try {
+		try {
+			IIdentity toId = commMgr.getIdManager().getCloudNode();	
+			Stanza stanza = new Stanza(toId);
+        
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
