@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+//import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 
