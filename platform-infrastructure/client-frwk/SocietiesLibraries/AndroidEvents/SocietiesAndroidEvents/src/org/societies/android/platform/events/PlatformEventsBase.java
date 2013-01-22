@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.android.platform.pubsub.helper.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-//import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 
@@ -37,11 +37,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     private static final String KEY_DIVIDER = "$";
 
 	private Context androidContext;
-	private PubsubClientAndroid pubsubClient = null;
+	private PubsubClient pubsubClient = null;
 
 	//Synchronised Maps - require manual synchronisation 
 	private Map<String, String> subscribedClientEvents = null;
-	private Map<String, Subscriber> pubsubSubscribes = null;
+	private Map<String, ISubscriber> pubsubSubscribes = null;
 	private ArrayList <String> allPlatformEvents = null; 
 
 	private String cloudCommsDestination = null;
@@ -56,7 +56,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     /**
      * Default constructor
      */
-    public PlatformEventsBase(Context androidContext, PubsubClientAndroid pubsubClient, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
+    public PlatformEventsBase(Context androidContext, PubsubClient pubsubClient, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.pubsubClient = pubsubClient;
@@ -65,7 +65,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	this.restrictBroadcast = restrictBroadcast;
     	
     	this.subscribedClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
-    	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, Subscriber>());
+    	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, ISubscriber>());
     	
     	//create list of event classes for Pubsub registration 
         this.classList = new ArrayList<String>();
@@ -239,25 +239,22 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		
 		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
 		
-        try {
-            this.pubsubClient.addSimpleClasses(classList);
-
-            Log.d(LOG_TAG, "Subscribing to pubsub");
-            
-
-        } catch (ClassNotFoundException e) {
-                Log.e(LOG_TAG, "ClassNotFoundException loading " + Arrays.toString(classList.toArray()), e);
-        }
+        //try {
+        //    this.pubsubClient.addSimpleClasses(classList);
+        //    Log.d(LOG_TAG, "Subscribing to pubsub");
+        //} catch (ClassNotFoundException e) {
+        //        Log.e(LOG_TAG, "ClassNotFoundException loading " + Arrays.toString(classList.toArray()), e);
+        //}
 	}
+	
 	/**
 	 * Create a new Subscriber object for Pubsub
 	 * @return Subscriber
 	 */
-	private Subscriber createSubscriber() {
-		Subscriber subscriber = new Subscriber() {
+	private ISubscriber createSubscriber() {
+		ISubscriber subscriber = new ISubscriber() {
 		
-			public void pubsubEvent(IIdentity identity, String node, String itemId,
-					Object payload) {
+			public void pubsubEvent(IIdentity identity, String node, String itemId, Object payload) {
 				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 				
 				String intentTarget = PlatformEventsBase.this.translatePlatformEvent(node);
@@ -312,7 +309,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be un-subscribed: " + events.size());
 
-    		PubsubClientAndroid pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
+    		PubsubClient pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
 
     		IIdentity pubsubService = null;
     		
@@ -414,7 +411,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be subscribed: " + events.size());
     		
-    		PubsubClientAndroid pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
+    		PubsubClient pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
 
     		IIdentity pubsubService = null;
     		
@@ -491,7 +488,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
         	if (null == this.cloudCommsDestination) {
             	Log.d(LOG_TAG, "determine destinations");
             	
-            	Log.d(LOG_TAG, "Is CCM connected ? " + this.ccm.isConnected());
+            	//Log.d(LOG_TAG, "Is CCM connected ? " + this.ccm.isConnected());
 
         		//Get the Cloud destination
             	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();

@@ -30,7 +30,13 @@ public interface IPubsubService {
 	public static final String PUBLISHER_DELETE = "org.societies.android.api.pubsub.PUBLISHER_DELETE";
 	public static final String SUBSCRIBER_SUBSCRIBE = "org.societies.android.api.pubsub.SUBSCRIBER_SUBSCRIBE";
 	public static final String SUBSCRIBER_UNSUBSCRIBE = "org.societies.android.api.pubsub.SUBSCRIBER_UNSUBSCRIBE";
+	public static final String BIND_TO_ANDROID_COMMS = "org.societies.android.api.pubsub.BIND_TO_ANDROID_COMMS";
+	public static final String UNBIND_FROM_ANDROID_COMMS = "org.societies.android.api.pubsub.UNBIND_FROM_ANDROID_COMMS";
 
+	
+	public boolean bindToAndroidComms(String client, long remoteCallID);
+
+	public boolean unBindFromAndroidComms(String client, long remoteCallID);
 	
 	public String [] discoItems(String client, String pubsubService, String node, long remoteCallID);
 	

@@ -42,8 +42,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.android.platform.comms</groupId>
-		    <artifactId>AndroidCommunications</artifactId>
+		    <groupId>org.societies.android.platform.pubsub</groupId>
+		    <artifactId>AndroidCommsPubsub</artifactId>
 			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
