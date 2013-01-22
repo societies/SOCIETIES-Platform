@@ -35,7 +35,7 @@ import java.util.Collections;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.CSSManagerEnums;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
-//import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
@@ -115,7 +115,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	
 //	private PubsubClientAndroid pubsubClient = null;
 	
-	private HashMap<String, Subscriber> pubsubSubscribes = new HashMap<String, Subscriber>();
+	private HashMap<String, ISubscriber> pubsubSubscribes = new HashMap<String, ISubscriber>();
 	
 	/**
 	 * Default Constructor
@@ -1024,11 +1024,29 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	 * Create a new Subscriber object for Pubsub
 	 * @return Subscriber
 	 */
-	private Subscriber createSubscriber() {
-		Subscriber subscriber = new Subscriber() {
+	private ISubscriber createSubscriber() {
+		ISubscriber subscriber = new ISubscriber() {
 		
-			public void pubsubEvent(IIdentity identity, String node, String itemId,
-					Object payload) {
+			public void pubsubEvent(IIdentity identity, String node, String itemId, Object payload) {
+				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
+				if (payload instanceof CssEvent) {
+					CssEvent event = (CssEvent) payload;
+					Log.d(LOG_TAG, "Received event is :" + event.getType());
+					
+					//Create Android Notification
+					int flags [] = new int [1];
+					flags[0] = Notification.FLAG_AUTO_CANCEL;
+
+					//Create Android Notification
+					int notifierflags [] = new int [1];
+					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+					AndroidNotifier notifier = new AndroidNotifier(CSSManagerServiceBase.this.context, Notification.DEFAULT_SOUND, notifierflags);
+
+					notifier.notifyMessage(event.getDescription(), event.getType(), CSSManagerServiceBase.class);
+				}
+			}
+
+			public void pubsubEvent(String pubsubService, String node, String itemId, String item) {
 				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 				if (payload instanceof CssEvent) {
 					CssEvent event = (CssEvent) payload;
