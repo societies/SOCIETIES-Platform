@@ -34,23 +34,23 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.privacytrust.trust.ITrustClient;
 import org.societies.android.api.privacytrust.trust.ADate;
-import org.societies.android.privacytrust.trust.org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+//import org.societies.android.privacytrust.trust.org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.android.api.privacytrust.trust.TrustException;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Service;
@@ -235,7 +235,7 @@ public class TrustClient extends Service implements ITrustClient {
 				this.cloudNodeId = IdentityManagerImpl.staticfromJid(cloudNodeJid);
 			Log.d(TAG, "Hardcoded cloud node IIdentity " + this.cloudNodeId);
 			if (this.clientCommMgr == null)
-				this.clientCommMgr = new ClientCommunicationMgr(this);
+				this.clientCommMgr = new ClientCommunicationMgr(this, true);
 			this.clientCommMgr.register(ELEMENT_NAMES, this.callback);
 		} catch (InvalidFormatException ife) {
 			
@@ -256,7 +256,7 @@ public class TrustClient extends Service implements ITrustClient {
 		Log.i(TAG, "Stopping");
 		this.cloudNodeId = null;
 		if (this.clientCommMgr != null) {
-			this.clientCommMgr.unregister(ELEMENT_NAMES, this.callback);
+			//this.clientCommMgr.unregister(ELEMENT_NAMES, this.callback);
 			this.clientCommMgr = null;
 		}
 	}
