@@ -59,6 +59,7 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsub</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsubHelper</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
 		<!-- 
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
@@ -66,7 +67,6 @@
 		<module>../../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsub</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidComms</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
 		-->
 
 		<!-- Client Framework Libraries -->
