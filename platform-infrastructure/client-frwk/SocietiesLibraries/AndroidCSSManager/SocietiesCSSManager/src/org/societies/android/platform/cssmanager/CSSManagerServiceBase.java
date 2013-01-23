@@ -1027,7 +1027,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	private ISubscriber createSubscriber() {
 		ISubscriber subscriber = new ISubscriber() {
 		
-			public void pubsubEvent(String pubsubService, String node, String itemId, String item) {
+			public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object payload) {
 				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 				if (payload instanceof CssEvent) {
 					CssEvent event = (CssEvent) payload;
@@ -1295,7 +1295,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 													intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
 												}
 
-												AndroidCSSRecord aRecord = new AndroidCSSRecord();
+												CssRecord aRecord = new CssRecord();
 												aRecord.setCssIdentity(identity);
 												aRecord.setDomainServer(domainAuthority);
 												aRecord.setPassword(password);
@@ -1378,7 +1378,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 												intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
 											}
 
-											AndroidCSSRecord aRecord = new AndroidCSSRecord();
+											CssRecord aRecord = new CssRecord();
 											aRecord.setCssIdentity(identity);
 											aRecord.setDomainServer(domainAuthority);
 											aRecord.setPassword(password);
