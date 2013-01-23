@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.societies.api.comm.xmpp.pubsub.Subscription;
-
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Publish;
@@ -22,17 +20,19 @@ import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jivesoftware.smack.packet.IQ;
 
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.StanzaError;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.StanzaError;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.api.pubsub.ISubscriber;
+import org.societies.android.api.pubsub.ISubscriberInternal;
+import org.societies.android.api.pubsub.Subscription;
 import org.societies.android.platform.androidutils.MarshallUtils;
 import org.societies.utilities.DBC.Dbc;
 import org.xml.sax.SAXException;
@@ -549,7 +549,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriber subscriber, final long remoteCallID) {
+	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriberInternal subscriber, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
@@ -642,7 +642,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, ISubscriber subscriber, final long remoteCallID) {
+	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, ISubscriberInternal subscriber, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);

@@ -7,12 +7,12 @@ import java.util.Random;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.android.platform.comms.ServicePlatformCommsLocal;
 import org.societies.android.platform.comms.ServicePlatformCommsLocal.LocalPlatformCommsBinder;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
