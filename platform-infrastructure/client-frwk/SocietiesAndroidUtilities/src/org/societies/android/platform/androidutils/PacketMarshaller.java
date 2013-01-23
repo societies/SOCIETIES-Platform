@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.jivesoftware.smack.packet.IQ;
@@ -27,11 +25,11 @@ import org.simpleframework.xml.strategy.Strategy;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.StanzaError;
 import org.societies.android.api.comms.xmpp.XMPPError;
-import org.societies.maven.converters.URIConverter;
+
+import org.societies.simple.basic.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
-import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
