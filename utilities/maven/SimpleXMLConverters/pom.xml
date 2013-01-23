@@ -22,9 +22,10 @@
 		    <version>2.6.9</version>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
 			<scope>provided</scope>
+			<version>RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
