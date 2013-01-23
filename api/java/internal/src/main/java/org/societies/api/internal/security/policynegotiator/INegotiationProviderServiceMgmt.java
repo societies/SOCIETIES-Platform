@@ -40,8 +40,8 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public interface INegotiationProviderServiceMgmt {
 
 	/**
-	 * Please use {@link #addService(ServiceResourceIdentifier, String, URI,
-	 * List, INegotiationProviderSLMCallback)
+	 * Please use
+	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)
 	 * instead.
 	 */
 	@Deprecated
@@ -50,6 +50,10 @@ public interface INegotiationProviderServiceMgmt {
 			throws NegotiationException;
 
 	/**
+	 * Please use
+	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)
+	 * instead.
+	 * 
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 
 	 * @param serviceId ID of the service. The service instance need not exist at this point.
