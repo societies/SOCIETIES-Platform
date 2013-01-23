@@ -275,17 +275,17 @@ public class Jaxb2Simple extends AbstractMojo
 
 		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.simple.converters.URIConverter;
 		textToFind = "import org.w3._2001.xmlschema.Adapter1;";
-		textToReplace = "import org.societies.simple.converters.URIConverter;";
+		textToReplace = "import org.societies.simple.basic.URIConverter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
 		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.simple.converters.URIConverter;
 		textToFind = "import org.w3._2001.xmlschema.Adapter2;";
-		textToReplace = "import org.societies.simple.converters.DateConverter;";
+		textToReplace = "import org.societies.simple.basic.DateConverter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//import javax.xml.bind.annotation.adapters.CollapsedStringAdapter; -> import org.societies.simple.converters.CollapsedStringAdapter;
 		textToFind = "import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;";
-		textToReplace = "import org.societies.simple.converters.CollapsedStringAdapter;";
+		textToReplace = "import org.societies.simple.basic.CollapsedStringAdapter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
 		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)

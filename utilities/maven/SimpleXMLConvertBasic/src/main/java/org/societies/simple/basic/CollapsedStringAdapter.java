@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package org.societies.simple.converters;
+package org.societies.simple.basic;
 
 import org.simpleframework.xml.convert.Converter;
 import org.simpleframework.xml.stream.InputNode;

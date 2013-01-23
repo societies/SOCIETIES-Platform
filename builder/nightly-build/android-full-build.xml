@@ -43,6 +43,7 @@
 
 		<!-- Utilities -->
 		<module>../../utilities/DBC</module>
+		<module>../../utilities/maven/SimpleXMLConvertBasic</module>
 		<module>../../utilities/maven/SimpleXMLConverters</module>
 		<module>../../utilities/maven/Jaxb2SimpleXMLplugin</module>
 
