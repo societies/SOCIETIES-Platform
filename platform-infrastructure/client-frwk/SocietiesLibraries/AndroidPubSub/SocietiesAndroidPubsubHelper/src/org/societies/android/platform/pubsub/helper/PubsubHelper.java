@@ -1,17 +1,30 @@
 package org.societies.android.platform.pubsub.helper;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Map.Entry;
 
-import org.jivesoftware.smack.packet.Packet;
+import javax.xml.bind.JAXBException;
+
+import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Root;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.platform.androidutils.PacketMarshaller;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.pubsub.Affiliation;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.identity.IIdentity;
 import org.societies.utilities.DBC.Dbc;
+import org.w3c.dom.Element;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,8 +37,8 @@ import android.os.Messenger;
 import android.util.Log;
 
 
-public class PubsubClient {
-	private static final String LOG_TAG = PubsubClient.class.getName();
+public class PubsubHelper implements PubsubClient {
+	private static final String LOG_TAG = PubsubHelper.class.getName();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformPubsubRemote";
 	private boolean boundToService;
 	private Messenger targetService = null;
@@ -36,7 +49,8 @@ public class PubsubClient {
 	private PacketMarshaller marshaller = new PacketMarshaller();
 	private Map<Long, ICommCallback> xmppCallbackMap;
 	private Map<Long, IMethodCallback> methodCallbackMap;
-	
+	private Map<String,Class<?>> elementToClass;
+
 	private String identityJID;
 	private String domainAuthority;
 
@@ -44,7 +58,7 @@ public class PubsubClient {
 	private BroadcastReceiver receiver;
 	private IMethodCallback bindCallback;
 
-	public PubsubClient(Context androidContext) {
+	public PubsubHelper(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
 		Log.d(LOG_TAG, "Instantiate PubsubClient");
@@ -52,6 +66,10 @@ public class PubsubClient {
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
 		this.randomGenerator = new Random(System.currentTimeMillis());
+		
+		this.xmppCallbackMap = Collections.synchronizedMap(new HashMap<Long, ICommCallback>());
+		this.methodCallbackMap = Collections.synchronizedMap(new HashMap<Long, IMethodCallback>());
+		this.elementToClass = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 		
 		this.setupBroadcastReceiver();
 	}
@@ -91,6 +109,128 @@ public class PubsubClient {
 		return retValue;
 	}
 
+
+	@Override
+	/**
+	 * No longer required as JAXB unsupported
+	 */
+	public void addJaxbPackages(List<String> arg0) throws JAXBException {
+	}
+
+	@Override
+	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
+		for (String c : classList) {
+			Class<?> clazz = Class.forName(c);
+			Root rootAnnotation = clazz.getAnnotation(Root.class);
+			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+			}
+		}
+	}
+
+	@Override
+	public List<String> discoItems(IIdentity arg0, String arg1)
+			throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void ownerCreate(IIdentity arg0, String arg1) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ownerDelete(IIdentity arg0, String arg1) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity arg0,
+			String arg1) throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(
+			IIdentity arg0, String arg1) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void ownerPurgeItems(IIdentity arg0, String arg1) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ownerSetAffiliations(IIdentity arg0, String arg1,
+			Map<IIdentity, Affiliation> arg2) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ownerSetSubscriptions(IIdentity arg0, String arg1,
+			Map<IIdentity, SubscriptionState> arg2) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void publisherDelete(IIdentity arg0, String arg1, String arg2)
+			throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String publisherPublish(IIdentity arg0, String arg1, String arg2,
+			Object arg3) throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Element> subscriberRetrieveLast(IIdentity arg0, String arg1,
+			String arg2) throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Element> subscriberRetrieveSpecific(IIdentity arg0,
+			String arg1, String arg2, List<String> arg3) throws XMPPError,
+			CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Subscription subscriberSubscribe(IIdentity arg0, String arg1,
+			Subscriber arg2) throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void subscriberUnsubscribe(IIdentity arg0, String arg1,
+			Subscriber arg2) throws XMPPError, CommunicationException {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/**
 	 * Bind to remote Android Pubsub Service
 	 */
@@ -116,12 +256,12 @@ public class PubsubClient {
      */
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
-			PubsubClient.this.boundToService = false;
+			PubsubHelper.this.boundToService = false;
 	    	Log.d(LOG_TAG, "Societies Android Pubsub Service disconnected");
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			PubsubClient.this.boundToService = true;
+			PubsubHelper.this.boundToService = true;
 			targetService = new Messenger(service);
 	    	Log.d(LOG_TAG, "Societies Android Pubsub Service connected");
 		}
@@ -197,6 +337,5 @@ public class PubsubClient {
         
         return intentFilter;
     }
-
 
 }
