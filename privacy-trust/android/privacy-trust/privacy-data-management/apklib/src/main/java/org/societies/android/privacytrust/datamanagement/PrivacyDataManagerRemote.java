@@ -28,10 +28,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
@@ -39,7 +40,6 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
 import android.util.Log;
@@ -71,29 +71,30 @@ public class PrivacyDataManagerRemote {
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
-		clientCommManager = new ClientCommunicationMgr(context);
+		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
-		// -- Destination
-		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-		Stanza stanza = new Stanza(cloudNode);
-		Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
-
-		// -- Message
-		PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
-		messageBean.setMethod(MethodType.CHECK_PERMISSION);
-		messageBean.setRequestor(requestor);
-		messageBean.setDataIdUri(dataId.getUri());
-		messageBean.setActions(actions);
-
-		// -- Send
-		RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		try {
-			clientCommManager.register(ELEMENT_NAMES, callback);
+			// -- Destination
+			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
+	
+			// -- Message
+			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
+			messageBean.setMethod(MethodType.CHECK_PERMISSION);
+			messageBean.setRequestor(requestor);
+			messageBean.setDataIdUri(dataId.getUri());
+			messageBean.setActions(actions);
+	
+			// -- Send
+			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		
+			//clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
 		} catch (Exception e) {
@@ -105,21 +106,22 @@ public class PrivacyDataManagerRemote {
 	// -- Obfuscation
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
-		// -- Destination
-		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-		Stanza stanza = new Stanza(cloudNode);
-		Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
-
-		// -- Message
-		PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
-		messageBean.setMethod(MethodType.OBFUSCATE_DATA);
-		messageBean.setRequestor(requestor);
-		messageBean.setDataWrapper(dataWrapper);
-
-		// -- Send
-		RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		try {
-			clientCommManager.register(ELEMENT_NAMES, callback);
+			// -- Destination
+			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
+	
+			// -- Message
+			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
+			messageBean.setMethod(MethodType.OBFUSCATE_DATA);
+			messageBean.setRequestor(requestor);
+			messageBean.setDataWrapper(dataWrapper);
+	
+			// -- Send
+			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		
+			//clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
 		} catch (Exception e) {

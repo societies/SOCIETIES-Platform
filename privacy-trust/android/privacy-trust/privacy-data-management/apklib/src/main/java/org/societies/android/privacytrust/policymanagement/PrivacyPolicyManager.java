@@ -41,7 +41,6 @@ import org.societies.android.api.internal.privacytrust.util.model.privacypolicy.
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
-import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;

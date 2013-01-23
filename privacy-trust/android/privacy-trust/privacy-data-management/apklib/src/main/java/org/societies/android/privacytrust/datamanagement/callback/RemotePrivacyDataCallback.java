@@ -26,12 +26,12 @@ package org.societies.android.privacytrust.datamanagement.callback;
 
 import java.util.List;
 
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 

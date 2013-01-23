@@ -28,11 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
@@ -42,7 +43,6 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -72,7 +72,7 @@ public class PrivacyPolicyManagerRemote {
 
 	public PrivacyPolicyManagerRemote(Context context)  {
 		this.context = context;
-		clientCommManager = new ClientCommunicationMgr(context);
+		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyPolicyIntentSender(context);
 	}
 
@@ -92,7 +92,7 @@ public class PrivacyPolicyManagerRemote {
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			clientCommManager.register(ELEMENT_NAMES, callback);
+			//clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
 		} catch (InvalidFormatException e) {
@@ -124,20 +124,20 @@ public class PrivacyPolicyManagerRemote {
 
 
 	public boolean updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
-		// -- Destination
-		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-		Stanza stanza = new Stanza(cloudNode);
-		Log.d(TAG, "Send "+MethodType.UPDATE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
-
-		// -- Message
-		PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
-		messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-		messageBean.setPrivacyPolicy(privacyPolicy);
-
-		// -- Send
-		RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		try {
-			clientCommManager.register(ELEMENT_NAMES, callback);
+			// -- Destination
+			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "Send "+MethodType.UPDATE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+	
+			// -- Message
+			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
+			messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
+			messageBean.setPrivacyPolicy(privacyPolicy);
+	
+			// -- Send
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			//clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
 		} catch (Exception e) {
@@ -149,20 +149,21 @@ public class PrivacyPolicyManagerRemote {
 	}
 
 	public boolean deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
-		// -- Destination
-		INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-		Stanza stanza = new Stanza(cloudNode);
-		Log.d(TAG, "Send "+MethodType.DELETE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
-
-		// -- Message
-		PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
-		messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-		messageBean.setRequestor(owner);
-
-		// -- Send
-		RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		try {
-			clientCommManager.register(ELEMENT_NAMES, callback);
+			// -- Destination
+			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "Send "+MethodType.DELETE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+	
+			// -- Message
+			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
+			messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
+			messageBean.setRequestor(owner);
+	
+			// -- Send
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		
+			//clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
 		} catch (Exception e) {
