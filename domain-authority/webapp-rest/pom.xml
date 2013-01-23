@@ -58,12 +58,6 @@
 	<dependencies>
 		
 		<dependency>
-			<groupId>org.objectweb.asm</groupId>
-			<artifactId>com.springsource.org.objectweb.asm</artifactId>
-			<version>3.2.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
@@ -97,7 +91,7 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<!--exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
@@ -125,7 +119,7 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey-version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<!--exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
@@ -149,20 +143,6 @@
 				</exclusion>
 			</exclusions-->
 		</dependency>
-<!-- 	<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey-version}</version>
-			<scope>provided</scope>
-			  <exclusions>
-			    <exclusion>
-			        <artifactId>stax-api</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			</exclusions>
-		
-		</dependency>
--->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -287,7 +267,9 @@
 						<manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
 					<!-- Make a skinny WAR -->
+<!--
 					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+-->
 				</configuration>
 			</plugin>
 			
@@ -324,6 +306,7 @@
 									<version>1.2.1</version>
 									<type>jar</type>
 								</artifactItem> -->
+<!--
 								<artifactItem>
 									<groupId>com.sun.jersey</groupId>
 									<artifactId>jersey-core</artifactId>
@@ -336,6 +319,7 @@
 									<version>${jersey-version}</version>
 									<type>jar</type>
 								</artifactItem>
+-->
 								<artifactItem>
 									<groupId>org.objectweb.asm</groupId>
 									<artifactId>com.springsource.org.objectweb.asm</artifactId>
