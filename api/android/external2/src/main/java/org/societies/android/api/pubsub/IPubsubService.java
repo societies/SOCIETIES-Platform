@@ -50,7 +50,7 @@ public interface IPubsubService {
 	
 	public boolean publisherDelete(String client, String pubsubServiceJid, String node, String itemId, long remoteCallID);
 	
-	public boolean subscriberSubscribe(String client, String pubsubService,	String node, ISubscriber subscriber, long remoteCallID);
+	public boolean subscriberSubscribe(String client, String pubsubService,	String node, ISubscriberInternal subscriber, long remoteCallID);
 	
-	public boolean subscriberUnsubscribe(String client, String pubsubService,	String node, ISubscriber subscriber, long remoteCallID);
+	public boolean subscriberUnsubscribe(String client, String pubsubService,	String node, ISubscriberInternal subscriber, long remoteCallID);
 }
