@@ -11,7 +11,7 @@ import java.util.Set;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.platform.pubsub.helper.PubsubClient;
+import org.societies.android.platform.pubsub.helper.PubsubHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
@@ -37,7 +37,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     private static final String KEY_DIVIDER = "$";
 
 	private Context androidContext;
-	private PubsubClient pubsubClient = null;
+	private PubsubHelper pubsubClient = null;
 
 	//Synchronised Maps - require manual synchronisation 
 	private Map<String, String> subscribedClientEvents = null;
@@ -56,7 +56,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     /**
      * Default constructor
      */
-    public PlatformEventsBase(Context androidContext, PubsubClient pubsubClient, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
+    public PlatformEventsBase(Context androidContext, PubsubHelper pubsubClient, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.pubsubClient = pubsubClient;
@@ -309,7 +309,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be un-subscribed: " + events.size());
 
-    		PubsubClient pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
+    		PubsubHelper pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
 
     		IIdentity pubsubService = null;
     		
@@ -411,7 +411,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be subscribed: " + events.size());
     		
-    		PubsubClient pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
+    		PubsubHelper pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
 
     		IIdentity pubsubService = null;
     		
