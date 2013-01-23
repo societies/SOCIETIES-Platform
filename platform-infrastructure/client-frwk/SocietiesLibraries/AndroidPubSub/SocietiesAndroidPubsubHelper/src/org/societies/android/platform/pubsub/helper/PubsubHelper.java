@@ -12,16 +12,15 @@ import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.pubsub.Affiliation;
+import org.societies.android.api.pubsub.IPubsubClient;
 import org.societies.android.api.pubsub.IPubsubService;
+import org.societies.android.api.pubsub.ISubscriber;
+import org.societies.android.api.pubsub.SubscriptionState;
 import org.societies.android.platform.androidutils.PacketMarshaller;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.comm.xmpp.pubsub.Affiliation;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.comm.xmpp.pubsub.Subscription;
-import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.DBC.Dbc;
 import org.w3c.dom.Element;
@@ -37,7 +36,7 @@ import android.os.Messenger;
 import android.util.Log;
 
 
-public class PubsubHelper implements PubsubClient {
+public class PubsubHelper implements IPubsubClient {
 	private static final String LOG_TAG = PubsubHelper.class.getName();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformPubsubRemote";
 	private boolean boundToService;
@@ -172,17 +171,19 @@ public class PubsubHelper implements PubsubClient {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.pubsub.IPubsubClient#ownerSetAffiliations(org.societies.api.identity.IIdentity, java.lang.String, java.util.Map)
+	 */
 	@Override
-	public void ownerSetAffiliations(IIdentity arg0, String arg1,
-			Map<IIdentity, Affiliation> arg2) throws XMPPError,
+	public void ownerSetAffiliations(IIdentity pubsubService, String node,
+			Map<IIdentity, Affiliation> affiliations) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void ownerSetSubscriptions(IIdentity arg0, String arg1,
-			Map<IIdentity, SubscriptionState> arg2) throws XMPPError,
+	public void ownerSetSubscriptions(IIdentity arg0, String arg1, Map<IIdentity, SubscriptionState> arg2) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		
@@ -196,39 +197,33 @@ public class PubsubHelper implements PubsubClient {
 	}
 
 	@Override
-	public String publisherPublish(IIdentity arg0, String arg1, String arg2,
-			Object arg3) throws XMPPError, CommunicationException {
+	public String publisherPublish(IIdentity arg0, String arg1, String arg2, Object arg3) throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveLast(IIdentity arg0, String arg1,
-			String arg2) throws XMPPError, CommunicationException {
+	public List<Element> subscriberRetrieveLast(IIdentity arg0, String arg1, String arg2) throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveSpecific(IIdentity arg0,
-			String arg1, String arg2, List<String> arg3) throws XMPPError,
+	public List<Element> subscriberRetrieveSpecific(IIdentity arg0, String arg1, String arg2, List<String> arg3) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Subscription subscriberSubscribe(IIdentity arg0, String arg1,
-			Subscriber arg2) throws XMPPError, CommunicationException {
+	public boolean subscriberSubscribe(IIdentity arg0, String arg1, ISubscriber arg2) throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
-	public void subscriberUnsubscribe(IIdentity arg0, String arg1,
-			Subscriber arg2) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public boolean subscriberUnsubscribe(IIdentity arg0, String arg1, ISubscriber arg2) throws XMPPError, CommunicationException {
+		return false;
 	}
 	
 	/**
@@ -337,5 +332,4 @@ public class PubsubHelper implements PubsubClient {
         
         return intentFilter;
     }
-
 }
