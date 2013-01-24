@@ -151,13 +151,13 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 					+ subjectId + "' and objectId '" + objectId 
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
-		// TODO Uncomment once #1310 is resolved
+		/** TODO Uncomment once #1310 is resolved
 		} catch (DatatypeConfigurationException dce) {
 			
 			throw new TrustEvidenceCollectorCommsException(
 					"Could not add direct trust evidence with subjectId '" 
 					+ subjectId + "' and objectId '" + objectId 
-					+ "': " + dce.getLocalizedMessage(), dce);
+					+ "': " + dce.getLocalizedMessage(), dce);*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(
@@ -239,12 +239,12 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
 		//} catch (DatatypeConfigurationException dce) {
-			
+		/** Removed as dce does not exist	
 			throw new TrustEvidenceCollectorCommsException(
 					"Could not add indirect trust evidence with subjectId '"	
 					+ subjectId + "' and objectId '" + objectId	
 					+ "': " + dce.getLocalizedMessage(), dce);
-			
+			*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(

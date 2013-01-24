@@ -1,11 +1,11 @@
 package org.societies.android.platform.cssmanager.test;
 
-import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.cssmanager.CSSManagerServiceBase;
 import org.societies.android.platform.cssmanager.container.TestServiceCSSManagerLocal;
 import org.societies.android.platform.cssmanager.container.TestServiceCSSManagerLocal.LocalCSSManagerBinder;
+import org.societies.api.schema.cssmanagement.CssRecord;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -93,7 +93,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
 		
-		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		CssRecord cssRecord = new CssRecord();
 		cssRecord.setCssIdentity(TEST_IDENTITY_1);
 		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
 		cssRecord.setPassword(TEST_PASSWORD_1);
@@ -116,7 +116,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
 		
-		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		CssRecord cssRecord = new CssRecord();
 		cssRecord.setCssIdentity(TEST_IDENTITY_2);
 		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
 		cssRecord.setPassword(TEST_PASSWORD_2);
@@ -139,7 +139,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
 		
-		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+		CssRecord cssRecord = new CssRecord();
 		cssRecord.setCssIdentity(TEST_IDENTITY_1);
 		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
 		cssRecord.setPassword(TEST_PASSWORD_1);
@@ -212,7 +212,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 
                 
-        		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+                CssRecord cssRecord = new CssRecord();
         		cssRecord.setCssIdentity(TEST_IDENTITY_1 + "@" + TEST_DOMAIN_AUTHORITY);
 
                 TestSocietiesCSSManager.this.cssService.loginCSS(CLIENT, cssRecord);
@@ -221,7 +221,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 	        	
-        		AndroidCSSRecord cssRecord = new AndroidCSSRecord();
+                CssRecord cssRecord = new CssRecord();
         		cssRecord.setCssIdentity(TEST_IDENTITY_1 + "@" + TEST_DOMAIN_AUTHORITY);
 
         		TestSocietiesCSSManager.this.cssService.logoutCSS(CLIENT, cssRecord);

@@ -128,9 +128,10 @@ public class TrustEvidenceCollectorRemoteClient implements
 			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 4. timestamp
+			/** removed as class no longer exists
 			final GregorianCalendar gregCal = new GregorianCalendar();
 			gregCal.setTime(timestamp);
-			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));*/
 			// 5. info
 			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
@@ -148,13 +149,13 @@ public class TrustEvidenceCollectorRemoteClient implements
 					+ subjectId + "' and objectId '" + objectId 
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
-		// TODO Uncomment once #1310 is resolved
+		/** TODO Uncomment once #1310 is resolved
 		} catch (DatatypeConfigurationException dce) {
 			
 			throw new TrustEvidenceCollectorCommsException(
 					"Could not add direct trust evidence with subjectId '" 
 					+ subjectId + "' and objectId '" + objectId 
-					+ "': " + dce.getLocalizedMessage(), dce);
+					+ "': " + dce.getLocalizedMessage(), dce);*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(
@@ -234,14 +235,14 @@ public class TrustEvidenceCollectorRemoteClient implements
 					"Could not add indirect trust evidence with subjectId '"	
 					+ subjectId + "' and objectId '" + objectId	
 					+ "': " + ce.getLocalizedMessage(), ce);
-			
+		/** Removed as dce does not exist	
 		} catch (DatatypeConfigurationException dce) {
 			
 			throw new TrustEvidenceCollectorCommsException(
 					"Could not add indirect trust evidence with subjectId '"	
 					+ subjectId + "' and objectId '" + objectId	
 					+ "': " + dce.getLocalizedMessage(), dce);
-			
+			*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(
