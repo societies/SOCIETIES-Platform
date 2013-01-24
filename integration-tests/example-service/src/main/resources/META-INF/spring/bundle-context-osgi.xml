@@ -24,7 +24,6 @@
 		<property name="serviceDescription" value="Example Service to test Integration" />
 		<property name="serviceName" value="IntegrationExample" />
 		<property name="serviceType" value="THIRD_PARTY_SERVER" />
-		<property name="privacyPolicy" value="http://societies.local/local_file" />
 	</bean>
 
 </beans>

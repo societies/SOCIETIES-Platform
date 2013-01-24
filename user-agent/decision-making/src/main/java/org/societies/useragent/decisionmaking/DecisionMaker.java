@@ -46,6 +46,7 @@ import org.societies.api.personalisation.model.IActionConsumer;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 
 public class DecisionMaker extends AbstractDecisionMaker implements
 		BundleContextAware {
@@ -165,8 +166,7 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 						+ consumer.getServiceIdentifier()
 								.getServiceInstanceIdentifier() + " with: "
 						+ action.getServiceID().getServiceInstanceIdentifier());
-				if (consumer.getServiceIdentifier().equals(
-						action.getServiceID())) {
+				if (ServiceModelUtils.compare(consumer.getServiceIdentifier(),action.getServiceID())){
 					consumer.setIAction(this.entityID, action);
 					logging.debug("Service has been matched. IAction has been sent to the service");
 					found = true;

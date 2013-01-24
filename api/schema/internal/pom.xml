@@ -37,20 +37,20 @@
 			<version>2.6.9</version>
 			<scope>compile</scope>
 			<exclusions>
-			    <!-- StAX is not available on Android -->
-			    <exclusion>
-			        <artifactId>stax</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <exclusion>
-			        <artifactId>stax-api</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <!-- Provided by Android -->
-			    <exclusion>
-			        <artifactId>xpp3</artifactId>
-			        <groupId>xpp3</groupId>
-			    </exclusion>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -74,10 +74,8 @@
 			</resource>
 		</resources>
 		<plugins>
-		    <!-- 1) generate-sources jaxb2:generate
-			 	 2) process-sources  jaxb2simple:convert
-				 3) compile 		 maven-compiler-plugin 
-			-->
+			<!-- 1) generate-sources jaxb2:generate 2) process-sources jaxb2simple:convert 
+				3) compile maven-compiler-plugin -->
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -123,7 +121,7 @@
 					</execution>
 				</executions>
 				<configuration>
-			 	 <!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
+					<!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -177,7 +175,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

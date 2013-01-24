@@ -7,23 +7,41 @@
        
       
       
+      <!-- Add your references to the societies components, if not already present, between this............................................... -->
+      
       <osgi:reference id="CisManager" interface="org.societies.api.cis.management.ICisManager"/>
       
-      <osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+      <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	
 	  <osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
       
       <osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
       
+
+
+
+      <!--...............................................................and this.............................................................. -->
+      
+      
+      
+      
+      <!-- Add your Web Service Declaration, between this...................................................................................... --> 
        
-       <osgi:service ref="UpperTester">	
+       <osgi:service ref="PerformanceTest">	
 			<osgi:interfaces>
-				<value>org.societies.integration.performance.test.upper_tester.IUpperTester</value>
+				<value>org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest</value>
 			</osgi:interfaces>
 			<osgi:service-properties>
 				<entry key="service.exported.interfaces" value="*"/>
-				<!-- <entry key="org.apache.cxf.ws.httpservice.context" value="/upper-tester"/> -->
-				<entry key="org.apache.cxf.ws.address" value="${ws.address}"/>
+				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik}"/>
 			</osgi:service-properties>
        </osgi:service>
+       
+       
+       
+       
+       
+       
+       <!--...............................................................and this.............................................................. -->
+       
 </beans>

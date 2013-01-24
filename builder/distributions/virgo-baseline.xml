@@ -67,6 +67,10 @@
 		<module>../../platform-infrastructure/comms-frwk/CloudCommsBundle</module>
 		<module>../../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		
+		<!-- Trust libraries -->    
+		<module>../../privacy-trust/java/trust/trust-api</module>
+		<module>../../privacy-trust/java/trust/trust-comms</module>
+
 		<!-- Common External Libraries: 3 bundles -->
 		<!-- Not in use
 		<module>../../common-modules/common-ext-libs</module>

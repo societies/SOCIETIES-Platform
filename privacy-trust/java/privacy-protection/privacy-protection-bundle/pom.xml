@@ -122,7 +122,11 @@
 			<artifactId>privacynegotiationmanagement</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>privacycommmanagement</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

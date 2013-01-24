@@ -60,6 +60,7 @@
 		<module>privacy-policy-management</module>
 		<module>privacy-preference-management</module>
 		<module>privacy-negotiation-management</module>
+		<module>privacy-comm-manager</module>
 		<module>privacy-protection-bundle</module>
 		<module>privacy-preference-GUI</module>
 	</modules>

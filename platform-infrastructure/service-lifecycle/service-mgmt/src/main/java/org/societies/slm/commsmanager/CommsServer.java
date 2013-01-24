@@ -134,7 +134,8 @@ public class CommsServer implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		
+		if(LOG.isDebugEnabled())
+			LOG.debug("receiveMessage in org.societies.slm.commsmanager");
 	}
 
 	/* Put your functionality here if there IS a return object */

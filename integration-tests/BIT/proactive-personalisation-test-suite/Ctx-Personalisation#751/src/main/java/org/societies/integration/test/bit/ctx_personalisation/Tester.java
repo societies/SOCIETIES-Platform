@@ -97,28 +97,32 @@ public class Tester {
 		
 		for (int i=0; i<10; i++){
 			log("Step: "+i);
-			changeContext("home", "free");
-			Thread.sleep(1000);
+			setContext("home", "free");
+			Thread.sleep(500);
 			this.helloWorldService.setBackgroundColour(userId, "red");
-			changeContext("home", "busy");
-			Thread.sleep(1000);
+			Thread.sleep(2500);
+			setContext("home", "busy");
+			Thread.sleep(500);
 			this.helloWorldService.setVolume(userId, "10");
-			changeContext("work", "busy");
-			Thread.sleep(1000);
+			Thread.sleep(2500);
+			setContext("work", "busy");
+			Thread.sleep(500);
 			this.helloWorldService.setBackgroundColour(userId, "black");
-			changeContext("work", "free");
-			Thread.sleep(1000);
+			Thread.sleep(2500);
+			setContext("work", "free");
+			Thread.sleep(500);
 			this.helloWorldService.setVolume(userId, "50");
+			Thread.sleep(5000);
 			
 			
 		}
-		changeContext("home", "free");
-		Thread.sleep(5000);
+		setContext("home", "free");
+		Thread.sleep(1000);
 			
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
-		changeContext("work", "busy");
-		Thread.sleep(5000);
+		setContext("work", "busy");
+		Thread.sleep(1000);
 		
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
@@ -134,13 +138,18 @@ public class Tester {
 	
 	
 	
-	private void changeContext(String symLocValue, String statusValue){
+	private void setContext(String symLocValue, String statusValue){
 		try {
-			this.symLocAttribute.setStringValue(symLocValue);
-			this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
+			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(symLocAttribute.getId(), symLocValue).get();
 			
-			this.statusAttribute.setStringValue(statusValue);
-			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
+			//the code below was replaced by the call to updateAttribute with the id and value above. 
+			//the code below doesn't work unless a fresh copy of the attribute is retrieved 
+			//this.symLocAttribute.setStringValue(symLocValue);
+			//this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
+			
+			this.statusAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(statusAttribute.getId(), statusValue).get();
+//			this.statusAttribute.setStringValue(statusValue);
+//			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
 			logging.debug("changeContext("+symLocValue+", "+statusValue+");");
 
 		} catch (CtxException e) {
@@ -248,6 +257,8 @@ public class Tester {
 				log(CtxAttributeTypes.STATUS+" CtxAttribute is null");
 			}else{
 				log(CtxAttributeTypes.STATUS+" CtxAttribute - NOT NULL");
+				statusAttribute.setHistoryRecorded(true);
+				statusAttribute = (CtxAttribute) ctxBroker.update(statusAttribute).get();
 			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block

@@ -162,6 +162,14 @@
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:element name="ctxChangeEventBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="tns:ctxIdentifierBean" minOccurs="1" nillable="false"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:simpleType name="brokerMethodBean">
 		<xs:restriction base="xs:string">

@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- The Basics -->
+	<groupId>org.societies.privacytrust.trust</groupId>
+	<artifactId>trust-api</artifactId>
+	<version>${version.pt}</version>
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<!-- Build Settings -->
+
+	<!-- More Project Information -->
+	<name>
+		Trust Management and Evaluation API
+	</name>
+	<description>
+		Trust Management and Evaluation API
+	</description>
+	<developers>
+		<developer>
+			<id>NicolasLiampotis</id>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
+</project>
