@@ -21,7 +21,7 @@ public interface XMPPAgent {
 							  "logout(String client, long remoteCallId)",
 							  "destroyMainIdentity(String client, long remoteCallId)",
 							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)",
-							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId"
+							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId)"
 	};
 	
 	/**
