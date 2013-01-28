@@ -79,7 +79,8 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>
+		<!-- Not building
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
@@ -93,7 +94,7 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy -->
-		<module>../../privacy-trust/android/privacy-trust/privacy-data-management</module>
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/apklib</module>
 
 	</modules>
 </project>
