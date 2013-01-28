@@ -2,6 +2,7 @@ package org.societies.android.platform.pubsub;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -119,6 +120,31 @@ public class PubsubCommsMgr {
 		
 		return retValue;
 	}
+	
+	public void register(final List<String> elementNames, final ICommCallback callback) {
+		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
+		Dbc.require("Callback object must be supplied", null != callback);
+
+		long callbackID = this.randomGenerator.nextLong();
+
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
+		
+		Log.d(LOG_TAG, "register element names");
+		
+//		for (String element : elementNames) {
+//			Log.d(LOG_TAG, "register element: " + element);
+//		}
+
+		final List<String> namespaces = callback.getXMLNamespaces();
+		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
+		
+		InvokeRegister invoker = new InvokeRegister(this.clientPackageName, elementNames, namespaces, callbackID);
+		invoker.execute();
+	}
+
 	
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload, ICommCallback callback) throws CommunicationException {
 		Dbc.require("Stanza must be specified", null != stanza);
@@ -387,6 +413,15 @@ public class PubsubCommsMgr {
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
 				
+			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
+				synchronized (PubsubCommsMgr.this.xmppCallbackMap) {
+					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
+						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
 			}
 		}
     }
@@ -408,6 +443,8 @@ public class PubsubCommsMgr {
         intentFilter.addAction(XMPPAgent.SEND_IQ_ERROR);
         intentFilter.addAction(XMPPAgent.SEND_IQ_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
+        intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
         return intentFilter;
     }
     
@@ -454,6 +491,40 @@ public class PubsubCommsMgr {
 		}
 	};
 	
+	/**
+     * 
+     * Async task to invoke remote service method register
+     *
+     */
+    private class InvokeRegister extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeRegister.class.getName();
+    	private String client;
+    	private List<String> elementNames; 
+    	private List<String> nameSpaces;
+    	private long remoteID;
+
+   	 /**
+   	 * Default Constructor
+   	  * @param client
+   	  * @param elementNames
+   	  * @param nameSpaces
+   	  * @param remoteID
+   	  */
+    	public InvokeRegister(String client, List<String> elementNames, List<String> nameSpaces, long remoteID) {
+    		this.client = client;
+    		this.elementNames = elementNames;
+    		this.nameSpaces = nameSpaces;
+    		this.remoteID = remoteID;
+   	}
+
+    	protected Void doInBackground(Void... args) {
+
+			PubsubCommsMgr.this.localAndroidComms.register(client, elementNames.toArray(new String[0]), nameSpaces.toArray(new String[0]), remoteID);
+	    		
+	    	return null;
+    	}
+    }
 
 	/**
      * 

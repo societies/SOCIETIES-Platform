@@ -61,13 +61,13 @@ public class PubsubServiceBase implements IPubsubService {
 					      "event", 
 					      "query"));
 	
-	private PubsubCommsMgr ccm;
+	private PubsubCommsMgr pubsubClientMgr;
 	private Context androidContext;
 	private boolean restrictBroadcast;
 	private Map<Subscription,List<ISubscriber>> subscribers;	
 	
-	public PubsubServiceBase (Context androidContext, PubsubCommsMgr ccm, boolean restrictBroadcast) {
-		this.ccm = ccm;
+	public PubsubServiceBase (Context androidContext, PubsubCommsMgr pubsubClientMgr, boolean restrictBroadcast) {
+		this.pubsubClientMgr = pubsubClientMgr;
 		this.androidContext = androidContext;
 		this.restrictBroadcast = restrictBroadcast;
 		Log.d(LOG_TAG, "Broadcast restricted : " + this.restrictBroadcast);
@@ -76,23 +76,63 @@ public class PubsubServiceBase implements IPubsubService {
 
 	@Override
 	public boolean bindToAndroidComms(final String client, final long remoteCallID) {
-		this.ccm.bindCommsService(new IMethodCallback() {
+		this.pubsubClientMgr.bindCommsService(new IMethodCallback() {
 			
 			@Override
 			public void returnAction(String result) {
+				// TODO Auto-generated method stub
+				
 			}
 			
 			@Override
 			public void returnAction(boolean resultFlag) {
-				//Send intent
-				Intent intent = new Intent();
-				if (PubsubServiceBase.this.restrictBroadcast) {
-					intent.setPackage(client);
+				if (resultFlag) {
+					PubsubServiceBase.this.pubsubClientMgr.register(ELEMENTS, new ICommCallback() {
+						
+						@Override
+						public void receiveResult(Stanza stanza, Object payload) {
+							boolean result = (Boolean) payload;
+							if (result) {
+								//Send intent
+								Intent intent = new Intent();
+								if (PubsubServiceBase.this.restrictBroadcast) {
+									intent.setPackage(client);
+								}
+								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+								intent.setAction(IPubsubService.BIND_TO_ANDROID_COMMS);
+								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, result);
+								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+
+							}
+						}
+						
+						@Override
+						public void receiveMessage(Stanza stanza, Object payload) {
+						}
+						
+						@Override
+						public void receiveItems(Stanza stanza, String node, List<String> items) {
+						}
+						
+						@Override
+						public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+						}
+						
+						@Override
+						public void receiveError(Stanza stanza, XMPPError error) {
+						}
+						
+						@Override
+						public List<String> getXMLNamespaces() {
+							return NAMESPACES;
+						}
+						
+						@Override
+						public List<String> getJavaPackages() {
+							return PACKAGES;
+						}
+					});
 				}
-				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-				intent.setAction(IPubsubService.BIND_TO_ANDROID_COMMS);
-				intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, resultFlag);
-				PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 			}
 		});
 		return false;
@@ -100,7 +140,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 	@Override
 	public boolean unBindFromAndroidComms(String client, long remoteCallID) {
-		return this.ccm.unbindCommsService();
+		return this.pubsubClientMgr.unbindCommsService();
 	}
 
 
@@ -112,7 +152,7 @@ public class PubsubServiceBase implements IPubsubService {
 		Log.d(LOG_TAG, "discoItems called with domain authority: " + pubsubService + " and node: " + node);
 		
 		try {
-			this.ccm.getItems(convertStringToIdentity(pubsubService), node, new ICommCallback() {
+			this.pubsubClientMgr.getItems(convertStringToIdentity(pubsubService), node, new ICommCallback() {
 				
 				public void receiveResult(Stanza arg0, Object arg1) {
 				}
@@ -183,7 +223,7 @@ public class PubsubServiceBase implements IPubsubService {
 		payload.setCreate(c);
 				
 		try {
-			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object payload) {
 //					if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
@@ -263,7 +303,7 @@ public class PubsubServiceBase implements IPubsubService {
 		payload.setDelete(delete);
 		
 		try {
-			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object object) {
 					//Send intent
@@ -335,7 +375,7 @@ public class PubsubServiceBase implements IPubsubService {
 		payload.setPurge(purge);
 		
 		try {
-			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object object) {
 					//Send intent
@@ -421,7 +461,7 @@ public class PubsubServiceBase implements IPubsubService {
 		payload.setPublish(publish);
 		
 		try {
-			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object object) {
 					//Send intent
@@ -498,7 +538,7 @@ public class PubsubServiceBase implements IPubsubService {
 		payload.setRetract(retract);
 		
 		try {
-			this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object object) {
 					//Send intent
@@ -549,7 +589,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final ISubscriberInternal subscriber, final long remoteCallID) {
+	public boolean subscriberSubscribe(final String client, String pubsubService, final String node, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
@@ -574,7 +614,7 @@ public class PubsubServiceBase implements IPubsubService {
 				payload.setSubscribe(sub);
 		
 				try {
-					this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+					this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 						
 						public void receiveResult(Stanza arg0, Object response) {
 //							String subId = ((Pubsub)response).getSubscription().getSubid();
@@ -592,7 +632,7 @@ public class PubsubServiceBase implements IPubsubService {
 							
 //							newSubscriberList.add(subscriber);
 //							try {
-//								return new SubscriptionParcelable(subscription, this.ccm.getIdManager());
+//								return new SubscriptionParcelable(subscription, this.pubsubClientMgr.getIdManager());
 //							} catch (InvalidFormatException e) {
 //								// TODO Auto-generated catch block
 //								e.printStackTrace();
@@ -642,7 +682,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, ISubscriberInternal subscriber, final long remoteCallID) {
+	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
@@ -670,7 +710,7 @@ public class PubsubServiceBase implements IPubsubService {
 			payload.setUnsubscribe(unsub);
 	
 			try {
-				this.ccm.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+				this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 					
 					public void receiveResult(Stanza stanza, Object object) {
 						//Send intent
@@ -724,7 +764,7 @@ public class PubsubServiceBase implements IPubsubService {
 	private IIdentity convertStringToIdentity(String jid) throws XMPPError {
 		IIdentity returnIdentity = null;
 		try {
-			this.ccm.getIdManager().fromJid(jid);
+			this.pubsubClientMgr.getIdManager().fromJid(jid);
 		} catch (InvalidFormatException e) {
 			throw new XMPPError(StanzaError.jid_malformed, "Invalid JID: "+jid);
 		}
@@ -735,7 +775,7 @@ public class PubsubServiceBase implements IPubsubService {
 		IIdentity returnIdentity = null;
 
 		try {
-			this.ccm.getIdManager().getThisNetworkNode();
+			this.pubsubClientMgr.getIdManager().getThisNetworkNode();
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

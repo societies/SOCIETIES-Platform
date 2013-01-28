@@ -65,6 +65,14 @@
    			<type>apklib</type>
    			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+			<type>apklib</type>
+		</dependency>   
+ 
         <dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>

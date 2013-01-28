@@ -41,6 +41,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.api.identity.IIdentity;
@@ -52,24 +53,12 @@ import org.w3c.dom.Element;
 public interface IPubsubClient {
 	
 	/**
-	 * Add the list of package names that will be used as payloads for pubsub events.
-	 * 
-	 * DEPRECATED METHOD
-	 *
-	 * @param packageList List of package names
-	 * @throws JAXBException the JAXB exception
-	 */
-	@Deprecated
-	public void addJaxbPackages(List<String> packageList) throws JAXBException;
-	
-	
-	/**
 	 * Add the list of classes that will be used as payloads for pubsub events.
 	 * 
 	 * @param classList
 	 * @throws ClassNotFoundException
 	 */
-	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException;
+	public void addSimpleClasses(List<String> classList, IMethodCallback callback) throws ClassNotFoundException;
 	
 	/**
 	 * Disco items.
@@ -80,7 +69,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public List<String> discoItems(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public List<String> discoItems(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	// TODO remove subId from interface - it's not interesting for the API users, only for the client implementation
 	// TODO disco info nodes
 	// TODO reception of notifications from a 3rd party subscription
@@ -95,7 +84,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public boolean subscriberSubscribe(IIdentity pubsubService, String node, ISubscriber subscriber) throws XMPPError, CommunicationException;
+	public boolean subscriberSubscribe(IIdentity pubsubService, String node, ISubscriber subscriber, IMethodCallback callback) throws XMPPError, CommunicationException;
 
 	/**
 	 * Unsubscribe from an pubsub node of this identity.
@@ -106,7 +95,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public boolean subscriberUnsubscribe(IIdentity pubsubService, String node, ISubscriber subscriber) throws XMPPError, CommunicationException;
+	public boolean subscriberUnsubscribe(IIdentity pubsubService, String node, ISubscriber subscriber, IMethodCallback callback) throws XMPPError, CommunicationException;
 
 	/**
 	 * Retrieve the last event that was published to this node.
@@ -118,7 +107,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public List<Element> subscriberRetrieveLast(IIdentity pubsubService, String node, String subId) throws XMPPError, CommunicationException;
+	public List<Element> subscriberRetrieveLast(IIdentity pubsubService, String node, String subId, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Subscriber retrieve specific.
@@ -131,7 +120,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService, String node, String subId, List<String> itemIdList) throws XMPPError, CommunicationException;
+	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService, String node, String subId, List<String> itemIdList, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Publishes an event for this identity, on this node of unique itemID and content of item.
@@ -144,7 +133,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public String publisherPublish(IIdentity pubsubService, String node, String itemId, Object item) throws XMPPError, CommunicationException;
+	public String publisherPublish(IIdentity pubsubService, String node, String itemId, Object item, IMethodCallback callback) throws XMPPError, CommunicationException;
 
 	/**
 	 * Remove an event for this node of provided itemID.
@@ -155,7 +144,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void publisherDelete(IIdentity pubsubService, String node, String itemId) throws XMPPError, CommunicationException;
+	public void publisherDelete(IIdentity pubsubService, String node, String itemId, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Creates a pubsub node for this identity using the provided node name ("topic").
@@ -165,7 +154,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void ownerCreate(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public void ownerCreate(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Deletes the pubsub node for this identity and node name.
@@ -175,7 +164,7 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void ownerDelete(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public void ownerDelete(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Deletes all the published events for this identity on this node.
@@ -185,18 +174,19 @@ public interface IPubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void ownerPurgeItems(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public void ownerPurgeItems(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Returns the list of identities of users who are subscribed to this pubsub node.
 	 *
 	 * @param pubsubService Identity of the pubsub service
 	 * @param node Pubsub event node
+	 * @param callback
 	 * @return the map
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Owner get affiliations.
@@ -204,10 +194,11 @@ public interface IPubsubClient {
 	 * @param pubsubService the pubsub service
 	 * @param node the node
 	 * @return the map
+	 * @param callback
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Owner set subscriptions.
@@ -215,10 +206,11 @@ public interface IPubsubClient {
 	 * @param pubsubService the pubsub service
 	 * @param node the node
 	 * @param subscriptions the subscriptions
+	 * @param callback
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void ownerSetSubscriptions(IIdentity pubsubService, String node, Map<IIdentity, SubscriptionState> subscriptions) throws XMPPError, CommunicationException;
+	public void ownerSetSubscriptions(IIdentity pubsubService, String node, Map<IIdentity, SubscriptionState> subscriptions, IMethodCallback callback) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Owner set affiliations.
@@ -226,8 +218,9 @@ public interface IPubsubClient {
 	 * @param pubsubService the pubsub service
 	 * @param node the node
 	 * @param affiliations the affiliations
+	 * @param callback
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public void ownerSetAffiliations(IIdentity pubsubService, String node, Map<IIdentity, Affiliation> affiliations) throws XMPPError, CommunicationException;
+	public void ownerSetAffiliations(IIdentity pubsubService, String node, Map<IIdentity, Affiliation> affiliations, IMethodCallback callback) throws XMPPError, CommunicationException;
 }

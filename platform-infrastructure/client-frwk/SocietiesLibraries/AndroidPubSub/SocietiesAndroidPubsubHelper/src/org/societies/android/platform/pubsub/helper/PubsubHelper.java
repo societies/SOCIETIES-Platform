@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.bind.JAXBException;
-
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 import org.societies.android.api.comms.IMethodCallback;
@@ -20,6 +18,7 @@ import org.societies.android.api.pubsub.IPubsubClient;
 import org.societies.android.api.pubsub.IPubsubService;
 import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.api.pubsub.SubscriptionState;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.DBC.Dbc;
@@ -31,8 +30,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 
@@ -48,6 +50,7 @@ public class PubsubHelper implements IPubsubClient {
 	private PacketMarshaller marshaller = new PacketMarshaller();
 	private Map<Long, ICommCallback> xmppCallbackMap;
 	private Map<Long, IMethodCallback> methodCallbackMap;
+	private Map<String, ISubscriber> subscriberCallbackMap;
 	private Map<String,Class<?>> elementToClass;
 
 	private String identityJID;
@@ -68,6 +71,7 @@ public class PubsubHelper implements IPubsubClient {
 		
 		this.xmppCallbackMap = Collections.synchronizedMap(new HashMap<Long, ICommCallback>());
 		this.methodCallbackMap = Collections.synchronizedMap(new HashMap<Long, IMethodCallback>());
+		this.subscriberCallbackMap = Collections.synchronizedMap(new HashMap<String, ISubscriber>());
 		this.elementToClass = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 		
 		this.setupBroadcastReceiver();
@@ -108,16 +112,12 @@ public class PubsubHelper implements IPubsubClient {
 		return retValue;
 	}
 
-
 	@Override
-	/**
-	 * No longer required as JAXB unsupported
-	 */
-	public void addJaxbPackages(List<String> arg0) throws JAXBException {
-	}
-
-	@Override
-	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
+	public void addSimpleClasses(List<String> classList, IMethodCallback callback) throws ClassNotFoundException {
+		Dbc.require("Class list must have at least one class", null != classList && classList.size() > 0);
+		Dbc.require("Method callback cannot be null", null != callback);
+		Log.d(LOG_TAG, "addSimpleClasses called");
+		
 		for (String c : classList) {
 			Class<?> clazz = Class.forName(c);
 			Root rootAnnotation = clazz.getAnnotation(Root.class);
@@ -129,100 +129,121 @@ public class PubsubHelper implements IPubsubClient {
 	}
 
 	@Override
-	public List<String> discoItems(IIdentity arg0, String arg1)
-			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+	public List<String> discoItems(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public void ownerCreate(IIdentity arg0, String arg1) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void ownerCreate(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	@Override
-	public void ownerDelete(IIdentity arg0, String arg1) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void ownerDelete(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	@Override
-	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity arg0,
-			String arg1) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(
-			IIdentity arg0, String arg1) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
+	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public void ownerPurgeItems(IIdentity arg0, String arg1) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void ownerPurgeItems(IIdentity arg0, String arg1, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.pubsub.IPubsubClient#ownerSetAffiliations(org.societies.api.identity.IIdentity, java.lang.String, java.util.Map)
 	 */
 	@Override
-	public void ownerSetAffiliations(IIdentity pubsubService, String node,
-			Map<IIdentity, Affiliation> affiliations) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void ownerSetAffiliations(IIdentity pubsubService, String node,Map<IIdentity, Affiliation> affiliations, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	@Override
-	public void ownerSetSubscriptions(IIdentity arg0, String arg1, Map<IIdentity, SubscriptionState> arg2) throws XMPPError,
-			CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void ownerSetSubscriptions(IIdentity arg0, String arg1, Map<IIdentity, SubscriptionState> arg2, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	@Override
-	public void publisherDelete(IIdentity arg0, String arg1, String arg2)
-			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void publisherDelete(IIdentity arg0, String arg1, String arg2, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 	}
 
 	@Override
-	public String publisherPublish(IIdentity arg0, String arg1, String arg2, Object arg3) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+	public String publisherPublish(IIdentity arg0, String arg1, String arg2, Object arg3, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveLast(IIdentity arg0, String arg1, String arg2) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+	public List<Element> subscriberRetrieveLast(IIdentity arg0, String arg1, String arg2, IMethodCallback callback) throws XMPPError, CommunicationException {
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveSpecific(IIdentity arg0, String arg1, String arg2, List<String> arg3) throws XMPPError,
+	public List<Element> subscriberRetrieveSpecific(IIdentity arg0, String arg1, String arg2, List<String> arg3, IMethodCallback callback) throws XMPPError,
 			CommunicationException {
-		// TODO Auto-generated method stub
+		Dbc.require("Method callback cannot be null", null != callback);
+		Dbc.invariant("Method currently unsupported", false);
 		return null;
 	}
 
 	@Override
-	public boolean subscriberSubscribe(IIdentity arg0, String arg1, ISubscriber arg2) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
+		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
+		Dbc.require("Subscriber callback cannot be null", null != callback);
+		Dbc.require("Method callback cannot be null", null != methodCallback);
+		Log.d(LOG_TAG, "subscriberSubscribe called for node: " + node);
+		
+		final String pubsubServiceJid = pubsubServiceID.getJid();
+		synchronized (this.subscriberCallbackMap) {
+			long remoteCallID = this.randomGenerator.nextLong();
+			this.subscriberCallbackMap.put(node, callback);
+			InvokeSubscriberSubscribe invoker = new InvokeSubscriberSubscribe(this.clientPackageName, pubsubServiceJid, node, remoteCallID);
+			invoker.execute();
+		}
 		return false;
 	}
 
 	@Override
-	public boolean subscriberUnsubscribe(IIdentity arg0, String arg1, ISubscriber arg2) throws XMPPError, CommunicationException {
+	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
+		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
+		Dbc.require("Subscriber callback cannot be null", null != callback);
+		Dbc.require("Method callback cannot be null", null != methodCallback);
+		Log.d(LOG_TAG, "subscriberUnsubscribe called for node: " + node);
+		
+		final String pubsubServiceJid = pubsubServiceID.getJid();
+		synchronized (this.subscriberCallbackMap) {
+			long remoteCallID = this.randomGenerator.nextLong();
+			this.subscriberCallbackMap.remove(node);
+			InvokeSubscriberUnSubscribe invoker = new InvokeSubscriberUnSubscribe(this.clientPackageName, pubsubServiceJid, node, remoteCallID);
+			invoker.execute();
+		}
+
 		return false;
 	}
 	
@@ -332,4 +353,134 @@ public class PubsubHelper implements IPubsubClient {
         
         return intentFilter;
     }
+    
+	/**
+     * 
+     * Async task to invoke Pubsub node subscription
+     *
+     */
+    private class InvokeSubscriberSubscribe extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeSubscriberSubscribe.class.getName();
+    	private String client;
+    	private long remoteID;
+    	private String pubsubServiceJid;
+    	private String node;
+
+   	 /**
+   	  * Default Constructor
+   	  * 
+   	  * @param client
+   	  * @param pubsubServiceJid
+   	  * @param node
+   	  * @param remoteID
+   	  */
+    	public InvokeSubscriberSubscribe(String client, String pubsubServiceJid, String node, long remoteID) {
+    		this.client = client;
+    		this.pubsubServiceJid = pubsubServiceJid;
+    		this.node = node;
+    		this.remoteID = remoteID;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+
+    		String targetMethod = IPubsubService.methodsArray[6];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IPubsubService.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
+    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
+    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+
+
+    		try {
+				PubsubHelper.this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+	/**
+     * 
+     * Async task to invoke Pubsub node unsubscription
+     *
+     */
+    private class InvokeSubscriberUnSubscribe extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeSubscriberUnSubscribe.class.getName();
+    	private String client;
+    	private long remoteID;
+    	private String pubsubServiceJid;
+    	private String node;
+
+   	 /**
+   	  * Default Constructor
+   	  * 
+   	  * @param client
+   	  * @param pubsubServiceJid
+   	  * @param node
+   	  * @param remoteID
+   	  */
+    	public InvokeSubscriberUnSubscribe(String client, String pubsubServiceJid, String node, long remoteID) {
+    		this.client = client;
+    		this.pubsubServiceJid = pubsubServiceJid;
+    		this.node = node;
+    		this.remoteID = remoteID;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+
+    		String targetMethod = IPubsubService.methodsArray[7];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IPubsubService.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
+    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
+    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+
+
+    		try {
+				PubsubHelper.this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+
 }
