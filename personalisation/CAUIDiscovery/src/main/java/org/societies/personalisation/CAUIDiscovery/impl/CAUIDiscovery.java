@@ -391,7 +391,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 							String location = locationValues.get(0);
 							int locValueOccurences = locMap.get(locationValues);
 							if(locValueOccurences/actionOccurences > 0.5){
-								contextList.add("location="+location);
+								contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="+location);
 							}
 						}
 					}
@@ -403,11 +403,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 							String status = statusValues.get(0);
 							int statusValueOccurences = statusMap.get(statusValues);
 							if(statusValueOccurences/actionOccurences > 0.5){
-								contextList.add("status="+status);
+								contextList.add(CtxAttributeTypes.STATUS+"="+status);
 							}
 						}
 					}
 				}
+				/*
 				if(dicObj.getTemperatureContextMap() != null){
 					HashMap<List<String>,Integer> temperatureMap = dicObj.getTemperatureContextMap();  
 					for(List<String> tempValues : temperatureMap.keySet()){
@@ -420,6 +421,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						}
 					}
 				}
+				*/
 				results.put(action, contextList);
 			
 			}

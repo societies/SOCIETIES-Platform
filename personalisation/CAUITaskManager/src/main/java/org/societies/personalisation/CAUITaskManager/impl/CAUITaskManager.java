@@ -22,6 +22,7 @@ package org.societies.personalisation.CAUITaskManager.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
@@ -42,6 +44,7 @@ import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 
 /**
  * CAUITaskManager
@@ -78,7 +81,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		//UserIntentModelData activeModel = new UserIntentModelData();
 	}
 
-/*
+	/*
 	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getActionModel() {
 		return actionModel;
 	}
@@ -87,7 +90,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 			HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actionModel) {
 		this.actionModel = actionModel;
 	}
-*/
+	 */
 
 	//******************************************
 	// interface implementation
@@ -97,9 +100,9 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public IUserIntentAction createAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val) {
-		
+
 		IUserIntentAction action = new UserIntentAction (serviceID, serviceType, par,val, UIModelObjectNumberGenerator.getNextValue());
-		
+
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
 		actionsMap.put(action,null);
@@ -111,10 +114,10 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public void setActionLink(IUserIntentAction sourceAction ,IUserIntentAction targetAction, Double transProb){
-		
+
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		if(actionsMap.keySet().contains(sourceAction)){
 
 			HashMap<IUserIntentAction,Double> targetActions2 = null; 
@@ -138,13 +141,13 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public IUserIntentAction retrieveAction(String actID) {
-		
+
 		if( actID == null ) throw new NullPointerException("actID can't be null" );
-		
+
 		IUserIntentAction actionResult = null;
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getActionID().equals(actID)) actionResult=action;
 		}		
@@ -156,12 +159,12 @@ public class CAUITaskManager implements ICAUITaskManager{
 	public List<IUserIntentAction> retrieveActionsByTypeValue(String actionType, String actionValue) {
 
 		if( actionType == null ||actionValue == null) throw new NullPointerException("actionType:"+actionType+" actionValue:"+ actionValue+" can't be null");
-		
-		
+
+
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) actionResult.add(action);
 		}
@@ -172,17 +175,17 @@ public class CAUITaskManager implements ICAUITaskManager{
 	public List<IUserIntentAction> retrieveActionsByServiceTypeValue(String serviceId,String actionType, String actionValue) {
 
 		if(serviceId ==  null || actionType == null ||actionValue == null) throw new NullPointerException("serviceId:"+serviceId + "actionType:"+actionType+" actionValue:"+ actionValue+" can't be null");
-		
+
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) actionResult.add(action);
 		}
 		return actionResult;
 	}
-	
+
 	@Override
 	public List<IUserIntentAction> retrieveActionsByServiceType (String serviceId,String actionType) {
 
@@ -190,40 +193,40 @@ public class CAUITaskManager implements ICAUITaskManager{
 		if(serviceId ==  null || actionType == null ) throw new NullPointerException("serviceId:"+serviceId + "actionType:"+actionType+" can't be null");
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
-		
+
 		if(model == null || model.getActionModel().size() == 0 ) throw new NullPointerException("UserIntentModelData is null");
-		
+
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
 		}
 		return actionResult;
 	}
-	
+
 	@Override
 	public List<IUserIntentAction> retrieveActionsByType(String actionType) {
 
 		if( actionType == null) throw new NullPointerException("serviceId or actionType can't be null");
-		
+
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		
+
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getparameterName().equals(actionType) ) actionResult.add(action);
 		}		
 		return actionResult;
 	}
 
-		
+
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	//Task management
 	@Override
 	public IUserIntentTask createTask(String taskName, LinkedHashMap<IUserIntentAction,HashMap<IUserIntentAction, Double>> actions) {
@@ -234,7 +237,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		taskMap.put(userTask,null);
 		model.setTaskModel(taskMap);
 		updateModel(model);
-		
+
 		return userTask;
 	}
 
@@ -242,14 +245,14 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public IUserIntentTask retrieveTask(String taskID) {
 		IUserIntentTask taskResult = null;
-		
+
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentTask, HashMap<IUserIntentTask,Double>> taskMap = model.getTaskModel();
-		
+
 		for(IUserIntentTask task : taskMap.keySet()){
 			if (task.getTaskID().equals(taskID)) taskResult=task;
 		}
-		 
+
 		return taskResult;
 	}
 
@@ -259,7 +262,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		return false;
 	}
 
-	
+
 	@Override
 	public boolean actionBelongsToModel(IUserIntentAction arg0) {
 		// TODO Auto-generated method stub
@@ -271,27 +274,27 @@ public class CAUITaskManager implements ICAUITaskManager{
 	 * 
 	 * @see org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager#identifyActionTaskInModel(java.lang.String, java.lang.String, java.util.HashMap, java.lang.String[])
 	 */
-	
+
 	@Override
 	public Map<IUserIntentAction, IUserIntentTask> identifyActionTaskInModel(
 			String actionType, String actionValue, HashMap<String, Serializable> context,
 			String[] lastAction) {
 
 		Map<IUserIntentAction, IUserIntentTask> results = new HashMap<IUserIntentAction, IUserIntentTask>();
-		
+
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
 		// !!! add code that identifies task
 		for(IUserIntentAction action : actionsMap.keySet()){
 			if (action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) results.put(action,null);
 		}
-	
+
 		return results;
 	}
 
 	@Override
 	public Map<IUserIntentAction, Double> retrieveNextActions(IUserIntentAction currentAction){
-		 
+
 		Map<IUserIntentAction, Double> results = new HashMap<IUserIntentAction, Double>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
@@ -339,7 +342,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}
 			System.out.println();
 		}
-	*/
+		 */
 	}
 
 
@@ -361,4 +364,86 @@ public class CAUITaskManager implements ICAUITaskManager{
 		 */
 	}
 
+	@Override
+	public List<IUserIntentAction> retrieveActionsByContext(
+			Map<String, Serializable> situationConext) {
+
+		List<IUserIntentAction> actionListResult = new ArrayList<IUserIntentAction>();
+
+		UserIntentModelData model = retrieveModel();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+
+		List<IUserIntentAction> actionList = new ArrayList<IUserIntentAction>(actionsMap.keySet());
+		actionListResult = this.findBestMatchingAction(actionList, situationConext);
+
+		return actionListResult;
+	}
+
+
+	/*
+	 * find best matching from the actions contained in list  actionList given the situation context map
+	 */
+	private List<IUserIntentAction> findBestMatchingAction(List<IUserIntentAction> actionList, Map<String, Serializable> situationConext ){
+
+		List<IUserIntentAction> bestActionList = new ArrayList<IUserIntentAction>();
+		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
+
+		String currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		String currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);
+		//Integer currentTempValue = (Integer) situationConext.get(CtxAttributeTypes.TEMPERATURE);
+
+		for(IUserIntentAction action : actionList ){
+
+			HashMap<String,Serializable> actionCtx = action.getActionContext();
+					
+			//System.out.println("String action :"+ action+" actionCtx:"+actionCtx);
+
+			for(String ctxType : actionCtx.keySet()){
+				int actionMatchScore = 0;	
+				Serializable ctxValue = actionCtx.get(ctxType);
+
+				if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC) && ctxValue instanceof String){
+					String actionLocation = (String) ctxValue;
+					//System.out.println(" --currentLocationValue :"+ currentLocationValue);			
+					//System.out.println("******** Action location value :"+ actionLocation);
+					if(currentLocationValue.equals(actionLocation)) {
+						//System.out.println("match... increase score +1 "+actionMatchScore);
+						actionMatchScore = actionMatchScore +1;
+					}
+
+				}  /*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Double ){
+					Integer actionTemperature= (Integer) ctxValue;
+					LOG.info("Double context temperature value :"+ actionTemperature);
+					if(currentTempValue.equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
+				}*/ else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
+					String actionStatus = (String) ctxValue;
+					//System.out.println(" --currentStatusValue :"+ currentStatusValue);
+					//System.out.println("********** Action status value :"+ actionStatus);
+					if(currentStatusValue.equals(actionStatus)) {
+						//System.out.println("match... increase score +1 "+actionMatchScore);
+						actionMatchScore = actionMatchScore +1;
+					}
+				} else {
+					LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
+				}
+				//System.out.println("String type :"+ ctxType+" ctxValue:"+ctxValue);
+	
+				if(actionsScoreMap.get(action) == null){
+					actionsScoreMap.put(action, actionMatchScore);
+				} else {
+					Integer oldScore =	actionsScoreMap.get(action);
+					actionsScoreMap.put(action, oldScore+actionMatchScore);
+				}
+			}	
+		}
+		//System.out.println("actionsScoreMap  " +actionsScoreMap);
+		int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
+		for(IUserIntentAction action  : actionsScoreMap.keySet()){
+			if(actionsScoreMap.get(action).equals(maxValueInMap)) {
+				bestActionList.add(action);
+			}
+		}
+		LOG.debug("best action "+bestActionList);
+		return bestActionList;
+	}
 }

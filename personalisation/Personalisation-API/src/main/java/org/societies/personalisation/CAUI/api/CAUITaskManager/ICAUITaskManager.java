@@ -118,6 +118,8 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param par    the parameter name
 	 */
+	public List<IUserIntentAction>  retrieveActionsByContext(Map<String,Serializable> situationConext);
+	
 	public List<IUserIntentAction> retrieveActionsByType(String par);
 	
 	public List<IUserIntentAction> retrieveActionsByServiceTypeValue(String serviceId,String actionType, String actionValue);

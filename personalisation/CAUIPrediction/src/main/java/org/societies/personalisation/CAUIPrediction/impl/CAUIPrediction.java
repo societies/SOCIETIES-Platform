@@ -44,6 +44,7 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -92,7 +93,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 	boolean modelExist = false;
 
 	private IIdentity cssOwnerId;
-
+	private CtxEntityIdentifier operatorEntId;
+	
 	//Services registration
 	public ICAUIDiscovery getCauiDiscovery() {
 		LOG.info(this.getClass().getName()+": Return cauiDiscovery");
@@ -180,7 +182,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
 
-
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
 
@@ -209,14 +210,20 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-			//LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+			LOG.debug("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 			if(actionsList.size()>0){
+				
 				// improve this to also use context for action identification
-				IUserIntentAction currentAction = actionsList.get(0);
-				//LOG.info("4. currentAction " +currentAction);
+				//IUserIntentAction currentAction = actionsList.get(0);
+				
+				IUserIntentAction currentAction = findBestMatchingAction(actionsList);
+								
+				LOG.debug("4. currentAction " +currentAction);
 				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
 				//LOG.info("5. nextActionsMap " +nextActionsMap);
+				
+				// no context
 				if(nextActionsMap.size()>0){
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
@@ -244,8 +251,50 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
-	// kalite mono otan allazei to attribute,,, synypologizei to teleutaio predicted/performed action 
-
+	
+	@Override
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
+		
+		
+		LOG.debug("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
+		LOG.debug("attr string value "+contextAttribute.getStringValue() );
+		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
+	
+		CtxAttribute currentLocation = null;
+		CtxAttribute currentStatus = null; 
+		retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+		//CtxAttribute currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		if(contextAttribute.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC)){
+			currentLocation = contextAttribute;					 
+		} else {
+			currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		}
+		
+		if(contextAttribute.getType().equals(CtxAttributeTypes.STATUS)){
+			currentStatus = contextAttribute;					 
+		} else {
+			currentStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+		}
+			
+		
+		//CtxAttribute currentTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
+		
+		Map<String,Serializable> situationContext = new HashMap<String,Serializable>(); 
+		
+		if(currentLocation.getStringValue() != null) situationContext.put(CtxAttributeTypes.LOCATION_SYMBOLIC, currentLocation.getStringValue());
+		if(currentStatus.getStringValue() != null) situationContext.put(CtxAttributeTypes.STATUS, currentStatus.getStringValue());
+		
+		LOG.debug("situationContext :"+ situationContext);
+						
+		if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) results = cauiTaskManager.retrieveActionsByContext(situationContext);
+					
+		LOG.info("action prediction based on ctx update :"+ results);		
+		
+		return new AsyncResult<List<IUserIntentAction>>(results);
+	}
+	
+	
+/*
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
@@ -298,7 +347,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		LOG.info("ctx update based action prediction:"+ results);		
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
-
+*/
 	// based on the current identity, serviceid and actionType what is the predicted action value?
 	// consider also context data
 	// i.e. userActionType:setDestination --> predict value:office
@@ -311,7 +360,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		IUserIntentAction predictedAction = null;
 		if(modelExist == true && enablePrediction == true){
-			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getServiceInstanceIdentifier(), userActionType);
+			//LOG.info("serviceID.getIdentifier().toString() "+serviceID.getIdentifier().toString() );
+			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getIdentifier().toString(), userActionType);
 			//LOG.info("action LIST "+actionList );
 			// compare current context and choose proper action
 			if(actionList.size()>0) predictedAction = findBestMatchingAction(actionList);
@@ -329,7 +379,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//the list should also consider the perso feedback  
 	private void recordPrediction(IUserIntentAction predAction){
 
-		LOG.info("predicted actions log: " +this.lastPredictedActions);
+		//LOG.info("predicted actions log: " +this.lastPredictedActions);
 		
 		if(this.lastPredictedActions.size()>100){
 			this.lastPredictedActions.remove(0);
@@ -363,7 +413,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
 
 		CtxAttribute currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		//CtxAttribute currentStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+		CtxAttribute currentStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
 		//CtxAttribute currentTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
 
 		for(IUserIntentAction action : actionList ){
@@ -377,23 +427,24 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 				if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
 					String actionLocation = (String) ctxValue;
-					//LOG.info("String context location value :"+ actionLocation);
+				//	LOG.info("String context location value :"+ actionLocation);
 					if(currentLocation.getStringValue().equals(actionLocation)) actionMatchScore = actionMatchScore +1;
 
-				} /* else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
+				}  /*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
 					Integer actionTemperature= (Integer) ctxValue;
-					//LOG.info("Integer context temperature value :"+ actionTemperature);
+					LOG.info("Integer context temperature value :"+ actionTemperature);
 					if(currentTemp.getIntegerValue().equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
 
-				} else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
+				}*/ else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
 					String actionStatus = (String) ctxValue;
 					//LOG.info("String context status value :"+ actionStatus);
 					if(currentStatus.getStringValue().equals(actionStatus)) actionMatchScore = actionMatchScore +1;
-				} */else {
-					LOG.info("findBestMatchingAction: context type:"+ctxType +" does not match");
+				} else {
+					LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 				}
 			}	
 			actionsScoreMap.put(action, actionMatchScore);
+		//System.out.println("actionsScoreMap  " +actionsScoreMap);
 		}
 
 		int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
@@ -401,7 +452,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if(actionsScoreMap.get(action).equals(maxValueInMap)) bestAction = action;
 		}
 
-		//LOG.info("best action "+bestAction);
+		LOG.debug("best action "+bestAction);
 
 		return bestAction;
 	}
@@ -430,9 +481,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			this.cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
 
-			operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
+			operator = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			//LOG.info("operator retrieved "+operator);
-
+			operatorEntId = operator.getId();
+			
 			List<CtxIdentifier> ls = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 			
 			if (ls.size()>0) {
@@ -485,7 +537,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if (newUIModelData != null){
 			cauiTaskManager.updateModel(newUIModelData);
 			modelExist = true;		 
-			LOG.info("caui model set - actions map: "+newUIModelData.getActionModel());
+			HashMap<IUserIntentAction,HashMap <IUserIntentAction,Double>> model = newUIModelData.getActionModel();
+			
+			LOG.info("caui model set - actions map: "+model);
+			
+			List<IUserIntentAction> actionsList = new ArrayList<IUserIntentAction>(model.keySet());
+			//for(IUserIntentAction action: actionsList){
+		//		LOG.info("action : "+action +" context:"+ action.getActionContext());
+		//	}
 			
 		}
 	}
@@ -520,15 +579,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
-						//LOG.info("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
+						LOG.info("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
 					}
-/*
 					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
 						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
-						//LOG.info("register with pers manager for ctxAttr STATUS update");
+						LOG.info("register with pers manager for ctxAttr STATUS update");
 					}
-*/
+
 /*	
 					if(retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE) != null){
 						CtxAttribute ctxAttrTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
@@ -573,10 +631,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//*** helper context class 
 	//***********************************
 
+	
+	
+	//	this.userId = idm.getThisNetworkNode();
+		
 	private CtxAttribute retrieveOperatorsCtx(String type){
 		CtxAttribute ctxAttr = null;
 		try {
-			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
+			
+			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+		
 			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
 			if(ctxAttrSet.size()>0){
 				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
@@ -612,43 +676,5 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		return cssOwnerId;
 	}
-
-	/*
-	private CtxAttributeIdentifier initialiseAttrId(String attrType){
-		CtxAttributeIdentifier attrid = null;
-		IndividualCtxEntity operator;
-
-		try {
-
-			//operator = this.ctxBroker.retrieveCssOperator().get();
-			final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
-
-			final String cssOwnerStr = cssNodeId.getBareJid();
-			IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
-			operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
-
-			Set<CtxAttribute> attrSet = operator.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
-			List<CtxAttribute> attrList = new ArrayList<CtxAttribute>(attrSet);
-			if (attrList.size()>0){
-				CtxAttribute attr = attrList.get(0);
-				String locationValue = attr.getStringValue();	
-			}
-
-		} catch (InterruptedException e) {
-			//
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// 
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// 
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// 
-			e.printStackTrace();
-		}
-
-		return attrid;	
-	}
-	 */
+	
 }

@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityTypes;
@@ -116,14 +117,16 @@ public class Tester {
 			
 			
 		}
+		//System.out.println("1Tester: set context home free");
 		setContext("home", "free");
 		Thread.sleep(1000);
-			
+		//System.out.println("1Tester: get background colour (red)");
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
+		//System.out.println("2Tester: set context work busy");
 		setContext("work", "busy");
 		Thread.sleep(1000);
-		
+		//System.out.println("2Tester: get background colour (black)");
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
 	
@@ -140,14 +143,17 @@ public class Tester {
 	
 	private void setContext(String symLocValue, String statusValue){
 		try {
-			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(symLocAttribute.getId(), symLocValue).get();
+			CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
+			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(locAttrId, symLocValue).get();
+			
 			
 			//the code below was replaced by the call to updateAttribute with the id and value above. 
 			//the code below doesn't work unless a fresh copy of the attribute is retrieved 
 			//this.symLocAttribute.setStringValue(symLocValue);
 			//this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
 			
-			this.statusAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(statusAttribute.getId(), statusValue).get();
+			CtxAttributeIdentifier statusAttrId = statusAttribute.getId();
+			this.statusAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(statusAttrId, statusValue).get();
 //			this.statusAttribute.setStringValue(statusValue);
 //			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
 			logging.debug("changeContext("+symLocValue+", "+statusValue+");");

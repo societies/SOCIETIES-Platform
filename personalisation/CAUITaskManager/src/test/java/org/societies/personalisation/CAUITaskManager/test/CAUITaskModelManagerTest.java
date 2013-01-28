@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -34,7 +35,7 @@ public class CAUITaskModelManagerTest {
 	String taskID = "";
 	final UserIntentModelData modelData = null;
 	String actionIDString = null;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
@@ -68,10 +69,10 @@ public class CAUITaskModelManagerTest {
 		assertEquals(3,modelData.getActionModel().size());
 	}
 
-	
+
 	@Test
 	public void testUpdateModel() {
-		
+
 		modelManager.updateModel(null);
 		UserIntentModelData modelData = modelManager.retrieveModel();
 		assertNull(modelData);
@@ -134,19 +135,19 @@ public class CAUITaskModelManagerTest {
 
 	@Test
 	public void testRetrieveAction() {
-		
+
 		System.out.println("testRetrieveAction");
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
 		assertNotNull(modelData);
 		IUserIntentAction action = modelManager.retrieveAction(this.actionIDString);
 		assertEquals(actionIDString, action.getActionID());
-		}
+	}
 
-	
+
 	@Test
 	public void testRetrieveActionsByTypeValue() {
-	
+
 		System.out.println("testRetrieveActionsByTypeValue");
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
@@ -157,28 +158,28 @@ public class CAUITaskModelManagerTest {
 		assertEquals("css://nikosk@societies.org/HelloEarth#A-homePc=off/13", userActionA.get(0).toString());
 	}
 
-	
+
 	@Test
 	public void testRetrieveActionsByServiceIDTypeValue() {
-		
+
 		System.out.println("testRetrieveActionsByServiceIDTypeValue");
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
 		System.out.println("testRetrieveActionsByServiceIDTypeValue getActionModel "+ modelData.getActionModel());
-		
+
 		List<IUserIntentAction> userActionList = modelManager.retrieveActionsByServiceTypeValue("css://nikosk@societies.org/HelloEarth","A-homePc", "off");
 		//System.out.println("userActionList:"+ userActionList);
-		
+
 		IUserIntentAction userActionA = userActionList.get(0);
 		//System.out.println("userAction:"+ userActionA.getServiceID().toString());
 		assertEquals("css://nikosk@societies.org/HelloEarth", userActionA.getServiceID().getServiceInstanceIdentifier());
 		assertEquals(userActionA.getparameterName(),"A-homePc");
 		assertEquals(userActionA.getvalue(),"off");
 	}
-	
+
 	@Test
 	public void testRetrieveActionsByServiceIDType() {
-	
+
 		System.out.println("testRetrieveActionsByServiceIDType");
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
@@ -189,13 +190,66 @@ public class CAUITaskModelManagerTest {
 		IUserIntentAction userActionA = userActionList.get(0);
 		System.out.println("userAction service id :"+ userActionA.getServiceID().getServiceInstanceIdentifier());
 	}
+
+
+	@Test
+	public void testRetrieveActionsByContext() {
+
+		System.out.println("testRetrieveActionsByContext");
+		createModel();
+		UserIntentModelData modelData = modelManager.retrieveModel();
+
+		System.out.println("actionsList  "+ modelData.getActionModel().keySet());
+
+		Map<String, Serializable> currentSituationConext1 = new HashMap<String, Serializable>();
+		currentSituationConext1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
+		currentSituationConext1.put(CtxAttributeTypes.STATUS, "busy");
+		List<IUserIntentAction> results1 =  modelManager.retrieveActionsByContext(currentSituationConext1);
+
+		assertEquals(1,results1.size());
+		IUserIntentAction action1 = results1.get(0);
+		assertEquals("A-homePc",action1.getparameterName());
+		assertEquals("on",action1.getvalue());
+		HashMap<String,Serializable> context = action1.getActionContext();
+		assertEquals( "moon" , context.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+		assertEquals( "busy" , context.get(CtxAttributeTypes.STATUS));
 		
+		System.out.println("estimated action  "+ action1);
+		System.out.println("context loc "+ context.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+		System.out.println("context status "+ context.get(CtxAttributeTypes.STATUS));
+
+///----------		
+		Map<String, Serializable> situationConext2 = new HashMap<String, Serializable>();
+		situationConext2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "mars");
+		situationConext2.put(CtxAttributeTypes.STATUS, "online");
+		List<IUserIntentAction> results2 =  modelManager.retrieveActionsByContext(situationConext2);
+		System.out.println("results2  "+ results2);
+		assertEquals(1,results2.size());
+		IUserIntentAction action2 = results2.get(0);
+		
+		assertEquals("C-radio",action2.getparameterName());
+		assertEquals("mute",action2.getvalue());
+		HashMap<String,Serializable> context2 = action2.getActionContext();
+		assertEquals( "mars" , context2.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+		assertEquals( "online" , context2.get(CtxAttributeTypes.STATUS));
+		
+		
+		Map<String, Serializable> situationConext3 = new HashMap<String, Serializable>();
+		situationConext3.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "null");
+		situationConext3.put(CtxAttributeTypes.STATUS, "free");
+		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		List<IUserIntentAction> results3 =  modelManager.retrieveActionsByContext(situationConext3);
+		//System.out.println("output 3 "+ results3);
+		assertEquals(1,results3.size());
+
+	}
+
 	@Ignore
 	@Test
 	public void testRetrieveActionsByType() {
-			
+
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSetNextActionLink() {
@@ -272,11 +326,11 @@ public class CAUITaskModelManagerTest {
 		fail("Not yet implemented");
 	}
 
-	
+
 	private void createModel(){
 
 		modelManager.createModel();
-		
+
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		try {
 			serviceId.setIdentifier(new URI("css://nikosk@societies.org/HelloEarth"));
@@ -290,7 +344,7 @@ public class CAUITaskModelManagerTest {
 		//create Task A
 		IUserIntentAction userActionA = modelManager.createAction(serviceId,"ServiceType","A-homePc","off");
 		this.actionIDString = userActionA.getActionID();
-		
+
 		HashMap<String,Serializable> contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"earth");
 		contextMap.put(CtxAttributeTypes.STATUS,"free");
@@ -298,14 +352,16 @@ public class CAUITaskModelManagerTest {
 		userActionA.setActionContext(contextMap);
 
 		IUserIntentAction userActionB = modelManager.createAction(serviceId,"ServiceType","A-homePc","on");
+		contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"moon");
-		contextMap.put(CtxAttributeTypes.STATUS,"free");
+		contextMap.put(CtxAttributeTypes.STATUS,"busy");
 		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
 		userActionB.setActionContext(contextMap);
 
 		IUserIntentAction userActionC = modelManager.createAction(serviceId,"ServiceType","C-radio","mute");
+		contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"mars");
-		contextMap.put(CtxAttributeTypes.STATUS,"free");
+		contextMap.put(CtxAttributeTypes.STATUS,"online");
 		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
 		userActionC.setActionContext(contextMap);
 
