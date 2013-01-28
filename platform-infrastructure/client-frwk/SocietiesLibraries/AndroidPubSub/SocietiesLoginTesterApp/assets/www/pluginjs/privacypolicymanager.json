@@ -1,0 +1,24 @@
+{
+"PrivacyPolicyManagerService" : {
+		"exceptionThreshold" : 0,
+		"getPrivacyPolicy" : {
+								"requestor": {"requestorId": "university.societies.local"},
+								"requestItems": [
+									{
+										"actions":  [{"actionConstant": "READ", "optional": false}],
+										"conditions": [{"conditionConstant": "SHARE_WITH_3RD_PARTIES", "value": "1", "optional": false}],
+										"resource": {"dataIdUri": "cis:///cis-member-list", "scheme": "cis", "dataType": "cis-member-list"},
+										"optional": false
+									},
+									{
+										"actions": [
+										    {"actionConstant": "READ", "optional": false},
+										    {"actionConstant": "WRITE", "optional": true}],
+										"conditions": [{"conditionConstant": "SHARE_WITH_CIS_MEMBERS_ONLY", "value": "1", "optional": false}],
+										"resource": {"dataIdUri": "context:///locationSymbolic", "scheme": "context", "dataType": "locationSymbolic"},
+										"optional": false
+									}
+								]
+							}
+	}
+}

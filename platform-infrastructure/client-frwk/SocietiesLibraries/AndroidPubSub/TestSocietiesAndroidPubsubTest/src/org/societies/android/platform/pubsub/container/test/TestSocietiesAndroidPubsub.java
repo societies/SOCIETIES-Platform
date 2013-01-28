@@ -1,15 +1,7 @@
 package org.societies.android.platform.pubsub.container.test;
 
-import java.util.List;
-
-import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
-import org.societies.android.api.comms.xmpp.ICommCallback;
-import org.societies.android.api.comms.xmpp.Stanza;
-import org.societies.android.api.comms.xmpp.XMPPError;
-import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.pubsub.IPubsubService;
-import org.societies.android.platform.comms.helper.test.ClientCommunicationMgr;
 import org.societies.android.platform.pubsub.container.ServicePlatformPubsubTest;
 import org.societies.android.platform.pubsub.container.ServicePlatformPubsubTest.LocalPlatformPubsubBinder;
 
@@ -87,120 +79,6 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
 		super.tearDown();
 	}
 	
-	@MediumTest
-	public void testRegistration() throws Exception {
-		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
-		assertTrue(null != ccm);
-		
-		ccm.bindCommsService(new IMethodCallback() {
-			
-			public void returnAction(String arg0) {
-				fail("Incorrect return object");
-			}
-			
-			public void returnAction(boolean flag) {
-				assertTrue(flag);
-				ccm.isConnected(new IMethodCallback() {
-					
-					public void returnAction(String arg0) {
-						fail("Incorrect return object");
-					}
-					
-					public void returnAction(boolean flag) {
-						assertFalse(flag);
-						ccm.configureAgent(XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, new IMethodCallback() {
-							
-							public void returnAction(String arg0) {
-								fail("Incorrect return object");
-							}
-							
-							public void returnAction(boolean flag) {
-								assertTrue(flag);
-								ccm.login(XMPP_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, new IMethodCallback() {
-									
-									public void returnAction(String loginResult) {
-										assertEquals(XMPP_SUCCESSFUL_JID, loginResult);
-										
-										ccm.register(ELEMENT_NAMES, new ICommCallback() {
-											
-											public void receiveResult(Stanza stanza, Object object) {
-												assertTrue((Boolean) object);
-												ccm.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
-													
-													@Override
-													public void returnAction(String arg0) {
-														fail("Incorrect return object");
-													}
-													
-													@Override
-													public void returnAction(boolean result) {
-														assertTrue(result);
-														ccm.logout(new IMethodCallback() {
-															
-															public void returnAction(String arg0) {
-																fail("Incorrect return object");
-															}
-															
-															public void returnAction(boolean flag) {
-																assertTrue(flag);
-																ccm.UnRegisterCommManager(new IMethodCallback() {
-																	
-																	public void returnAction(String arg0) {
-																	}
-																	
-																	public void returnAction(boolean result) {
-																		assertTrue(result);
-																		assertTrue(ccm.unbindCommsService());
-																	}
-																});
-															}
-														});
-													}
-												});
-													
-
-											}
-											public void receiveMessage(Stanza arg0, Object arg1) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveError(Stanza arg0, XMPPError arg1) {
-												fail("Incorrect callback method called");
-											}
-											
-											public List<String> getXMLNamespaces() {
-												return NAME_SPACES;
-											}
-											
-											public List<String> getJavaPackages() {
-												return CSS_PACKAGES;
-											}
-										});
-
-									}
-									
-									public void returnAction(boolean arg0) {
-										fail("Incorrect return object");
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		});
-
-		Thread.sleep(DELAY);
-	}
-
 	@MediumTest
 	/**
 	 * Test starting the Pubsub service and the AndroidComms service

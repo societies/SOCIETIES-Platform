@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
@@ -319,13 +320,25 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
     				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
 
-    				for (String event: events) {
+    				for (final String event: events) {
         				if (isValueEquals(PlatformEventsBase.this.pubsubSubscribes.keySet(), event) && !PlatformEventsBase.this.otherClientsSubscribed(client, event)) {
 
-	        				pubsubAndClient.subscriberUnsubscribe(pubsubService, event, PlatformEventsBase.this.pubsubSubscribes.get(event));
-	            			PlatformEventsBase.this.pubsubSubscribes.remove(event);
-	
-	               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + event);
+	        				pubsubAndClient.subscriberUnsubscribe(pubsubService, event, PlatformEventsBase.this.pubsubSubscribes.get(event), new IMethodCallback() {
+								
+								@Override
+								public void returnAction(String result) {
+								}
+								
+								@Override
+								public void returnAction(boolean resultFlag) {
+									if (resultFlag) {
+				            			PlatformEventsBase.this.pubsubSubscribes.remove(event);
+				            			
+				               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + event);
+
+									}
+								}
+							});
         				}
         			}
     				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
@@ -422,15 +435,27 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
        			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
     				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
     				
-        			for (String eventName: events) {
+        			for (final String eventName: events) {
     		    		Log.d(LOG_TAG, "Does event exist: " + eventName);
          				if (!isValueEquals(PlatformEventsBase.this.pubsubSubscribes.keySet(), eventName)) {
         		    		Log.d(LOG_TAG, "Store event : " + eventName);
         		    		PlatformEventsBase.this.pubsubSubscribes.put(eventName, PlatformEventsBase.this.createSubscriber());
         		    		Log.d(LOG_TAG, "Subscribe to Pubsub with event : " + eventName);
-                			pubsubAndClient.subscriberSubscribe(pubsubService, eventName, PlatformEventsBase.this.pubsubSubscribes.get(eventName));
-
-                			Log.d(LOG_TAG, "Pubsub subscription created for: " + eventName);
+                			pubsubAndClient.subscriberSubscribe(pubsubService, eventName, PlatformEventsBase.this.pubsubSubscribes.get(eventName), new IMethodCallback() {
+								
+								@Override
+								public void returnAction(String result) {
+									// TODO Auto-generated method stub
+									
+								}
+								
+								@Override
+								public void returnAction(boolean resultFlag) {
+									if (resultFlag) {
+			                			Log.d(LOG_TAG, "Pubsub subscription created for: " + eventName);
+									}
+								}
+							});
         				}
          			}
     				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
