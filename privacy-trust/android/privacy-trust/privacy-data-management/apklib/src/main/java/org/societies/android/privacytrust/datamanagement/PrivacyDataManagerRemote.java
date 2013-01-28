@@ -94,7 +94,7 @@ public class PrivacyDataManagerRemote {
 			// -- Send
 			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		
-			//clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
 		} catch (Exception e) {
@@ -121,7 +121,7 @@ public class PrivacyDataManagerRemote {
 			// -- Send
 			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		
-			//clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
 		} catch (Exception e) {

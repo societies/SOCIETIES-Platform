@@ -92,7 +92,7 @@ public class PrivacyPolicyManagerRemote {
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			//clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
 		} catch (InvalidFormatException e) {
@@ -137,7 +137,7 @@ public class PrivacyPolicyManagerRemote {
 	
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			//clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
 		} catch (Exception e) {
@@ -163,7 +163,7 @@ public class PrivacyPolicyManagerRemote {
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
 		
-			//clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.register(ELEMENT_NAMES, callback);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
 		} catch (Exception e) {
