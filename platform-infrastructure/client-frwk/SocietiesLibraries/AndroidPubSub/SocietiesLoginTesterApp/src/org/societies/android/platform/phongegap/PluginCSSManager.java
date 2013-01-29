@@ -36,6 +36,7 @@ import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
+import org.societies.android.platform.cssmanager.ServiceCSSManagerLocal;
 import org.societies.android.platform.cssmanager.ServiceCSSManagerLocal.LocalCSSManagerBinder;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
@@ -162,7 +163,7 @@ public class PluginCSSManager extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//Create intent to bind to CSSManager
-    	Intent cssManagerintent = new Intent(this.ctx.getContext(), LocalCSSManagerBinder.class);
+    	Intent cssManagerintent = new Intent(this.ctx.getContext(), ServiceCSSManagerLocal.class);
     	this.ctx.getContext().bindService(cssManagerintent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
 
     	//Create intent to bind to CSSDirectory

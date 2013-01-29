@@ -75,7 +75,7 @@ var	SocietiesLocalCSSManager = {
 
 	readProfile: function(successCallback, failureCallback) {
 		console.log("Call LocalCSSManagerService - readProfile");
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -92,7 +92,7 @@ var	SocietiesLocalCSSManager = {
 	 * @returns CSSrecord an updated version 
 	 */
 	loginCSS: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		var cssIdentity = jQuery("#loginUsername").val() + "@" + jQuery("#identitydomain").val();
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
@@ -134,7 +134,7 @@ var	SocietiesLocalCSSManager = {
 	 * @returns CSSrecord with registered values
 	 */
 	registerXMPPServer: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
 		                    "cssIdentity": jQuery("#regUsername").val(),
@@ -174,7 +174,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	loginXMPPServer: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
 		                    "cssIdentity": jQuery("#loginUsername").val(),
@@ -217,7 +217,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 
 	logoutCSS: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		var cssIdentity = jQuery("#loginUsername").val() + "@" + jQuery("#identitydomain").val();
 		var cssRecord = {
 				  			"archiveCSSNodes": [],
@@ -259,7 +259,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	logoutXMPPServer: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - logoutXMPPServer");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -276,7 +276,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 
 	modifyAndroidCSSRecord: function(successCallback, failureCallback, data) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - modifyAndroidCSSRecord");
 
 		var cssRecord = {
@@ -316,7 +316,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	getMyFriendsList: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - getMyFriendsList");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -333,7 +333,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	getSuggestedFriends: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -350,7 +350,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	readRemoteCSSProfile: function(css_id, successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -367,7 +367,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	sendFriendRequest: function(css_id, successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -384,7 +384,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	getFriendRequests: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - getFriendRequests");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -401,7 +401,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	acceptFriendRequest: function(css_id, successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - acceptFriendRequest");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -418,7 +418,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	findForAllCss: function(searchTerm, successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
@@ -435,7 +435,7 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
 	findAllCssAdvertisementRecords: function(successCallback, failureCallback) {
-		var client = "org.societies.android.platform.gui";
+		var client = "org.societies.android.platform.pubsub.login";
 		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful

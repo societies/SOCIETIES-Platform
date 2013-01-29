@@ -69,29 +69,29 @@ var SocietiesUtility = {
 		 
 		cordova.addConstructor(function() {
 			//Register the javascript plugin with PhoneGap
-			console.log("Register CoreServiceMonitorService plugin ");
-			cordova.addPlugin('SocietiesCoreServiceMonitor', SocietiesCoreServiceMonitor);
+//			console.log("Register CoreServiceMonitorService plugin ");
+//			cordova.addPlugin('SocietiesCoreServiceMonitor', SocietiesCoreServiceMonitor);
 			
 			console.log("Register LocalCSSManagerService plugin ");
 			cordova.addPlugin('SocietiesLocalCSSManager', SocietiesLocalCSSManager);
 			
-			console.log("Register DeviceStatus Service plugin ");
-			cordova.addPlugin("SocietiesDeviceStatusPlugin", SocietiesDeviceStatusPlugin);
+//			console.log("Register DeviceStatus Service plugin ");
+//			cordova.addPlugin("SocietiesDeviceStatusPlugin", SocietiesDeviceStatusPlugin);
 
 			console.log("Register Preferences plugin ");
 			cordova.addPlugin("SocietiesAppPreferences", SocietiesAppPreferences);
 			
-			console.log("Register CIS Manager plugin ");
-			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
-			
-			console.log("Register Service Management plugin ");
-			cordova.addPlugin("ServiceManagementService", ServiceManagementService);
-			
-			console.log("Register SNS plugin ");
-			cordova.addPlugin("SocialConnectorsService", SocialConnectorsService);
-			
-			console.log("Register PrivacyPolicyManager plugin ");
-			cordova.addPlugin("PrivacyPolicyManager", PrivacyPolicyManagerService);
+//			console.log("Register CIS Manager plugin ");
+//			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
+//			
+//			console.log("Register Service Management plugin ");
+//			cordova.addPlugin("ServiceManagementService", ServiceManagementService);
+//			
+//			console.log("Register SNS plugin ");
+//			cordova.addPlugin("SocialConnectorsService", SocialConnectorsService);
+//			
+//			console.log("Register PrivacyPolicyManager plugin ");
+//			cordova.addPlugin("PrivacyPolicyManager", PrivacyPolicyManagerService);
 		});
 		
 		//handle the Android Back button 

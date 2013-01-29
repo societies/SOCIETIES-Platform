@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -66,12 +67,15 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 
     private ClientCommunicationMgr ccm;
     private IBinder binder = null;
+    private boolean boundToAndroidComms;
     
     @Override
 	public void onCreate () {
 		this.binder = new LocalCssDirectoryBinder();
 	
 		this.ccm = new ClientCommunicationMgr(this, true);
+		this.boundToAndroidComms = false;
+		
 		Log.d(LOG_TAG, "CssDirectory service starting");
 	}
     
@@ -224,5 +228,18 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 //				LocalCssDirectoryService.this.ccm.unregister(LocalCssDirectoryService.ELEMENT_NAMES, this);
 			}
 		}
+	}
+	
+	private void bindToAndroidComms() {
+		this.ccm.bindCommsService(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+			}
+		});
 	}
 }

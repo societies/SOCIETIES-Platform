@@ -32,7 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.android.platform.androidutils.AppPreferences;
-import org.societies.android.platform.gui.MasterPreferences;
+import org.societies.android.platform.pubsub.login.MasterPreferences;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;

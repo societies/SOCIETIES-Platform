@@ -20,8 +20,9 @@ import android.util.Log;
 /**
  * 1. Created identity must be deleted prior to test on XMPP server
  * 2. Ensure that test data in test source matches XMPP server and Virgo details
+ * 3. Start Openfire with corresponding configuration details
+ * 4. Start Virgo container with xc.properties using identity properties used by these tests
  * 
- *
  */
 public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManagerLocal> {
 	private static final String LOG_TAG = TestSocietiesCSSManager.class.getName();
