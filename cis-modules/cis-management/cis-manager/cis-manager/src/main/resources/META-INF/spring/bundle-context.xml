@@ -83,15 +83,12 @@
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
         <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
-        <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
         <property name="privacyDataManager" ref="PrivacyDataManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
-       <property name="negotiator" ref="NegotiationRequester"/>
-        <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
-        <property name="iServCtrlLocal" ref="serviceControl"/>-->
-         <property name="pubsubClient" ref="PubsubClient"/>       
+        <property name="negotiator" ref="NegotiationRequester"/>
+        <property name="pubsubClient" ref="PubsubClient"/>       
         <property name="iUsrFeedback" ref="userFeedback"/>
         <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />  
         

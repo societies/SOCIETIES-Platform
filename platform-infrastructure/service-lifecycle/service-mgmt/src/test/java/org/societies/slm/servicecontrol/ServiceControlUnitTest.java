@@ -795,11 +795,6 @@ public class ServiceControlUnitTest {
 			
 		}
 
-		@Override
-		public void registerCISEndpoint(ICommManager endpoint) {
-			// TODO Auto-generated method stub
-			
-		}
 		
 	}
 

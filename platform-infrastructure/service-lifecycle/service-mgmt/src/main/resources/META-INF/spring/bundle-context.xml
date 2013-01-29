@@ -27,18 +27,11 @@
 		<property name="eventMgr" ref="eventManagerRef" />	
 	</bean>
 	
-	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
-		<property name="serviceReg" ref="serviceRegRef" /> 	
-		<property name="commMngr" ref="commMngrRef" />
-		<property name="cisManager" ref="cisManagerRef" />
-		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />		
-	</bean>
-
 	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
-		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
+		<property name="serviceControlRemote" ref="serviceControlRemote" />				
 		<property name="policyNegotiation" ref="policyNegotiatorRef" />
 		<property name="deviceMngr" ref="deviceMngrRef" />
 		<property name="userFeedback" ref="userFeedbackRef" />
@@ -46,21 +39,21 @@
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >
-		<property name="serviceDiscovery" ref="serviceDiscovery" /> 	
+		<property name="serviceDiscovery" ref="serviceDiscoveryRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />				
 	</bean>
 	
-	<bean id="SLMCommsManager" class="org.societies.slm.commsmanager.CommsServer"
+	<bean id="ServiceControlCommsManager" class="org.societies.slm.servicecontrol.comms.CommsServer"
   		depends-on="commMngrRef" init-method="InitService">
   		<property name="commMngr" ref="commMngrRef"/>
-  		<property name="serviceDiscovery" ref="serviceDiscovery"/> 
   		<property name="serviceControl" ref="serviceControl"/> 
+  		<property name="eventMgr" ref="eventManagerRef" />
+  		<property name="cisCommMgrFactory" ref="cisCommFactoryRef" />
    </bean>
   
-   <bean id="ServiceLifecycleManagementRemote" class="org.societies.slm.commsmanager.CommsClient" 
+   <bean id="serviceControlRemote" class="org.societies.slm.servicecontrol.comms.CommsClient" 
   		depends-on="commMngrRef" init-method="InitService" >
   		<property name="commMngr" ref="commMngrRef"/>
-  		<property name="slmCommManager" ref="SLMCommsManager"/>
   </bean>
   
 </beans>

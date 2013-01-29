@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.commsmanager;
+package org.societies.slm.servicecontrol.comms;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -60,14 +60,12 @@ import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemote, ICommCallback{
+public class CommsClient implements IServiceControlRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
-					  		"http://societies.org/api/schema/servicelifecycle/servicediscovery",
 					  		"http://societies.org/api/schema/servicelifecycle/servicecontrol"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
-							"org.societies.api.schema.servicelifecycle.servicediscovery",
 							"org.societies.api.schema.servicelifecycle.servicecontrol"));
 	
 	//PRIVATE VARIABLES
@@ -107,83 +105,6 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	}
 	
 
-	@Override
-	@Async
-	public void getServices(IIdentity node, IServiceDiscoveryCallback serviceDiscoveryCallback) {
-		
-
-		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: getServices called");
-		
-		Stanza stanza = new Stanza(node);
-
-		//SETUP CALC CLIENT RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
-
-		//CREATE MESSAGE BEAN
-		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
-		bean.setMethod(MethodName.GET_LOCAL_SERVICES);
-		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			getCommMngr().sendIQGet(stanza, bean, callback);
-			
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-	}
-	
-	@Override
-	@Async
-	public void getService(ServiceResourceIdentifier serviceId, IIdentity node,
-			IServiceDiscoveryCallback serviceDiscoveryCallback) {
-		
-		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: getService called");
-		
-		Stanza stanza = new Stanza(node);
-
-		//SETUP CALC CLIENT RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
-
-		//CREATE MESSAGE BEAN
-		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
-		bean.setMethod(MethodName.GET_SERVICE);
-		bean.setServiceId(serviceId);
-		
-		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			getCommMngr().sendIQGet(stanza, bean, callback);
-			
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-		
-	}
-
-	@Override
-	@Async
-	public void searchService(Service filter, IIdentity node,
-			IServiceDiscoveryCallback serviceDiscoveryCallback) {
-
-		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: searchService called");
-		
-		Stanza stanza = new Stanza(node);
-
-		//SETUP CALC CLIENT RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
-
-		//CREATE MESSAGE BEAN
-		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
-		bean.setMethod(MethodName.GET_SERVICE);
-		bean.setService(filter);
-		
-		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
-			getCommMngr().sendIQGet(stanza, bean, callback);
-			
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-		
-	}
 	@Override
 	@Async
 	public void startService(ServiceResourceIdentifier serviceId,
@@ -408,15 +329,9 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	@Override
 	public void installService(Service service, IIdentity node,
 			IServiceControlCallback callback) {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void registerCISEndpoint(ICommManager endpoint) {
 		if(LOG.isDebugEnabled())
-			LOG.debug("New CIS created, so we need to register to its endpoint!");
-		getSlmCommManager().registerCISendpoint(endpoint);
+			LOG.debug("SLM CommsClient: installService(service,node) called");		
 	}
 
 }

@@ -25,6 +25,7 @@
 package org.societies.slm.servicecontrol;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1564,6 +1565,16 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 		
 		restart = false;
+		
+		InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, "SLM_START", "org/societies/servicelifecycle", "SLM_START");
+		
+		try {
+			getEventMgr().publishInternalEvent(internalEvent);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error sending event!");
+		}
 		
 	}
 	

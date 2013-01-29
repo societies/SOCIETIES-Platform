@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.commsmanager;
+package org.societies.slm.servicecontrol.comms;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,28 +52,16 @@ public class CommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
-				  		"http://societies.org/api/schema/servicelifecycle/servicediscovery",
 				  		"http://societies.org/api/schema/servicelifecycle/servicecontrol"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
-						"org.societies.api.schema.servicelifecycle.servicediscovery",
 						"org.societies.api.schema.servicelifecycle.servicecontrol"));
 
 	private static Logger logger = LoggerFactory.getLogger(CommsClientCallback.class);
 	
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
-	private static final Map<String, IServiceDiscoveryCallback> serviceDiscoveryClients = new HashMap<String, IServiceDiscoveryCallback>();
 	private static final Map<String, IServiceControlCallback> serviceControlClients = new HashMap<String,IServiceControlCallback>();
-	
-	/** Constructor for callback
-	 * @param clientID unique ID of send request to comms framework
-	 * @param serviceDiscoveryClient callback from originating client
-	 */
-	public CommsClientCallback(String clientID, IServiceDiscoveryCallback serviceDiscoveryClient) {
-		//STORE THIS CALLBACK WITH THIS REQUEST ID
-		serviceDiscoveryClients.put(clientID, serviceDiscoveryClient);
-	}
-	
+
 	/** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
 	 * @param serviceControlClient callback from originating client
@@ -81,17 +69,6 @@ public class CommsClientCallback implements ICommCallback {
 	public CommsClientCallback(String clientID, IServiceControlCallback serviceControlClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
 		serviceControlClients.put(clientID, serviceControlClient);
-	}
-
-	/**Returns the correct calculator client callback for this request 
-	 * @param requestID the id of the initiating request
-	 * @return
-	 * @throws UnavailableException
-	 */
-	private IServiceDiscoveryCallback getRequestingClient(String requestID) {
-		IServiceDiscoveryCallback requestingClient = (IServiceDiscoveryCallback) serviceDiscoveryClients.get(requestID);
-		serviceDiscoveryClients.remove(requestID);
-		return requestingClient;
 	}
 
 	/**Returns the correct calculator client callback for this request 
@@ -113,18 +90,6 @@ public class CommsClientCallback implements ICommCallback {
 		if(logger.isDebugEnabled()) logger.debug("SLM Callback called!");
 		
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
-		
-		// --------- Service Discovery Bean ---------
-		if (msgBean.getClass().equals(ServiceDiscoveryResultBean.class)) {
-			
-			if(logger.isDebugEnabled()) logger.debug("ServiceDiscoveryBeanResult!");
-			
-			ServiceDiscoveryResultBean serviceDiscoveryResult = (ServiceDiscoveryResultBean) msgBean;
-			
-			IServiceDiscoveryCallback serviceDiscoveryClient = getRequestingClient(returnStanza.getId());
-				
-			serviceDiscoveryClient.getResult(serviceDiscoveryResult.getServices());	
-		} 
 		
 		if(msgBean.getClass().equals(ServiceControlResultBean.class)){
 		

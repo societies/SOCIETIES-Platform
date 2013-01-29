@@ -7,5 +7,10 @@
 
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	<osgi:service ref="serReg" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry" />
-	
+	<osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+
+	<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:reference id="eventManagerRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="cisCommFactoryRef" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
+	<osgi:reference id="cisManagerRef" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1"/>
 </beans>
