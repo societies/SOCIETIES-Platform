@@ -30,7 +30,6 @@
 	<groupId>org.societies.domain-authority</groupId>
 	<artifactId>DomainAuthorityRest</artifactId>
 	<packaging>war</packaging>
-	<!--version>1.0-SNAPSHOT</version-->
 	<version>${release.version}</version>
 	<name>Domain authority REST Jersey Webapp</name>
 	<description>REST server for sharing any files related to SOCIETIES 3rd party services, for example jar file for service client, any service specific resources like videos, etc. The server has access control and allows download only to clients that present a valid proof of authorization from the service provider (given by the service provider after a successful policy negotiation).</description>
@@ -58,44 +57,6 @@
 
 	<dependencies>
 		
-		
-		<!--dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate</artifactId>
-			<version>3.2.5.ga</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>cglib</groupId>
-					<artifactId>cglib</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>asm</groupId>
-					<artifactId>asm</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>asm</groupId>
-					<artifactId>asm-attrs</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.transaction</groupId>
-					<artifactId>jta</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency-->
-		
-		
-		
-		<dependency>
-			<groupId>org.objectweb.asm</groupId>
-			<artifactId>com.springsource.org.objectweb.asm</artifactId>
-			<version>3.2.0</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -130,7 +91,7 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<!--exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
@@ -158,7 +119,7 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey-version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<!--exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
@@ -182,20 +143,7 @@
 				</exclusion>
 			</exclusions-->
 		</dependency>
-<!-- 	<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey-version}</version>
-			<scope>provided</scope>
-			  <exclusions>
-			    <exclusion>
-			        <artifactId>stax-api</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			</exclusions>
-		
-		</dependency>
--->		<dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
@@ -281,69 +229,17 @@
 					<instructions>
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
 						<Import-Package>
-							<!--
-							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
-							-->
-						 <!-- javax.servlet;version="[3.0.0, 4.0.0)",
-							javax.servlet.resources;
-							version="[2.4.0, 4.0.0)",  -->
 							javax.servlet;version="[3.0.0, 4.0.0)";resolution:=optional,
 							javax.servlet.http;version="[3.0.0, 4.0.0)";resolution:=optional, 
 							<!-- spring DM -->
 							org.springframework.beans.factory.config;resolution:=optional,
 							org.springframework.osgi.web.context.support;resolution:=optional,
-							<!--
-							org.springframework.web.context.request,
-							org.springframework.web.context.support,
-							-->
 							org.springframework.web.context;resolution:=optional,
 							org.springframework.stereotype;resolution:=optional,
 							org.springframework.web.bind.annotation;resolution:=optional,
-							<!--org.springframework.web.servlet,-->
 							org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
 							org.springframework.beans.factory.annotation;resolution:=optional,
 							org.springframework.context.config;resolution:=optional,
-							<!--
-							org.springframework.web.util,
-							-->
-							<!-- servlet -->
-							<!--
-							org.springframework.web.servlet.config;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.view;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.handler;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.mvc;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.resource;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.support;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.tags;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.tags.form;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.theme;version="[3.0.0,4.0.0)",
-							-->
-							<!-- JSTL lib -->
-							<!--
-							org.apache.taglibs.standard; version="[1.2.0,2)",
-							org.apache.taglibs.standard.extra.spath; version="[1.2.0,2)",
-							org.apache.taglibs.standard.functions; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.parser;version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.test; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.test.beans;version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.support; version="[1.2.0,2)",
-							org.apache.taglibs.standard.resources; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
-							-->
 							org.osgi.framework;resolution:=optional,
 
 							com.sun.jersey.spi.container.servlet;resolution:=optional,
@@ -352,7 +248,6 @@
 							javax.annotation;resolution:=optional, 
 							*;resolution:=optional
 						</Import-Package>
-				<!-- 	<Export-Package>org.societies.domainauthority.rest.*</Export-Package> -->
 						<Export-Package>!*</Export-Package>
 						<_nouses>true</_nouses>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
@@ -372,7 +267,9 @@
 						<manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
 					<!-- Make a skinny WAR -->
+<!--
 					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+-->
 				</configuration>
 			</plugin>
 			
@@ -409,6 +306,7 @@
 									<version>1.2.1</version>
 									<type>jar</type>
 								</artifactItem> -->
+<!--
 								<artifactItem>
 									<groupId>com.sun.jersey</groupId>
 									<artifactId>jersey-core</artifactId>
@@ -421,6 +319,7 @@
 									<version>${jersey-version}</version>
 									<type>jar</type>
 								</artifactItem>
+-->
 								<artifactItem>
 									<groupId>org.objectweb.asm</groupId>
 									<artifactId>com.springsource.org.objectweb.asm</artifactId>

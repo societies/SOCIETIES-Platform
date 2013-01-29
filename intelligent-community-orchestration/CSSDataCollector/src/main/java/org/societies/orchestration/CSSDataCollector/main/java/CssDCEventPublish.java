@@ -28,11 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.osgi.event.EventListener;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
-import org.societies.orchestration.CSSDataCollector.main.java.CssDCEvent;
+import org.societies.api.osgi.event.*;
+import org.societies.orchestration.api.CssDCEvent;
 
 /**
  * Describe your class here...
@@ -50,7 +47,7 @@ public class CssDCEventPublish extends EventListener{
     public void manageEvent(CtxChangeEvent arg0, IIdentity myCssID){
     	LOG.info("publishing event to :   " + myCssID);
     	//send local event
-    	CssDCEvent payload = new CssDCEvent(myCssID, arg0);
+    	CssDCEvent payload = new CssDCEvent(myCssID, arg0,EventTypes.CSSDC_EVENT);
     	InternalEvent event = new InternalEvent(EventTypes.CSSDC_EVENT, "newaction", "org/societies/orchestration/CSSDC", payload);
     
     	try {
@@ -74,7 +71,12 @@ public class CssDCEventPublish extends EventListener{
     public void handleInternalEvent(InternalEvent arg0) {
     	LOG.info("CssDCEventPublish handleInternalEvent error ");
     }
-    
+
+    @Override
+    public void handleExternalEvent(CSSEvent event) {
+        LOG.info("CssDCEventPublish handleExternalEvent error ");
+    }
+
     public IEventMgr getEventMgr() {
 		return eventMgr;
 	}

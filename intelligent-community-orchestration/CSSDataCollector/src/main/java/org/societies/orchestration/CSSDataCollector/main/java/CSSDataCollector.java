@@ -43,7 +43,6 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.broker.impl.CtxBroker;
 
 
 /**
@@ -161,7 +160,7 @@ public class CSSDataCollector {
     public ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
-    public void setCtxBroker(CtxBroker ctxBroker) {
+    public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
 

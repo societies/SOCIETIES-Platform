@@ -22,38 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.webapp.controller;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+package org.societies.orchestration.api;
 
 /**
  * Describe your class here...
  *
- * @author aleckey
+ * @author John
+ *
  */
+import java.io.Serializable;
 
-@Controller
-public class DefaultController {
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.identity.IIdentity;
 
-	/**
-	 * This method get called when user request for login page by using
-	 * url http://localhost:8080/societies/login.html
-	 * @return login jsp page and model object
+public class CssDCEvent implements Serializable{
+
+    /**
+	 * 
 	 */
-	@RequestMapping(value="/index.html",method = RequestMethod.GET)
-	public ModelAndView DefaultPage() {
-		//model is nothing but a standard Map object
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
-
-		return new ModelAndView("index", model) ;
+	private static final long serialVersionUID = 1L;
+	private IIdentity userId;
+    private CtxChangeEvent evt;
+    private String eventType;
+    
+    public CssDCEvent(IIdentity userId, CtxChangeEvent evt, String evtT){
+        this.userId = userId;
+        this.evt = evt;
+        this.eventType = evtT;
+        
+    }
+	public IIdentity getUserId() {
+		return userId;
 	}
-	
-	
+	public CtxChangeEvent getEvt() {
+		return evt;
+	}
+
+	public String getEvtT(){
+		return eventType;
+	}
+
 }

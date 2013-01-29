@@ -38,9 +38,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.orchestration.CSM.main.java.Models.ModelManager;
 import org.societies.orchestration.CSM.main.java.csm.CSM;
 import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
-import org.societies.orchestration.CSSDataCollector.main.java.CssDCEvent;
 
 import org.societies.api.osgi.event.*;
+import org.societies.orchestration.api.CssDCEvent;
 //import org.societies.api.osgi.event.CSSEventConstants;
 //import org.societies.api.osgi.event.EventListener;
 //import org.societies.api.osgi.event.EventTypes;

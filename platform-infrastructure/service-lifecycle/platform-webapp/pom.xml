@@ -28,7 +28,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.wepapp</groupId>
-	<artifactId>societies-webapp</artifactId>
+	<artifactId>societies-test-webapp</artifactId>
 	<packaging>war</packaging>
 	<version>${release.version}</version>
 	<name>Platform Test Webapp</name>
@@ -232,7 +232,7 @@
 		
 	</dependencies>
 	<build>
-		<finalName>societies-webapp</finalName>
+		<finalName>societies-test-webapp</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -326,8 +326,8 @@
 							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
-						<Webapp-Context>societies</Webapp-Context>
-						<Web-ContextPath>societies</Web-ContextPath>
+						<Webapp-Context>societies-test</Webapp-Context>
+						<Web-ContextPath>societies-test</Web-ContextPath>
 					</instructions>
 				</configuration>
 			</plugin>

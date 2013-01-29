@@ -28,7 +28,7 @@ import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.services.ServiceModelUtils;
+//import org.societies.api.services.ServiceModelUtils;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -61,12 +61,12 @@ public class ARequestorService extends RequestorServiceBean implements Parcelabl
 	
 	private void readFromParcel(Parcel in) {
 		this.requestorId = in.readString();
-		this.requestorServiceId = AServiceResourceIdentifier.convertServiceResourceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierFromString(in.readString()));
+		//this.requestorServiceId = AServiceResourceIdentifier.convertServiceResourceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierFromString(in.readString()));
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeString(requestorId); 
-		out.writeString(ServiceModelUtils.serviceResourceIdentifierToString(requestorServiceId));
+		//out.writeString(ServiceModelUtils.serviceResourceIdentifierToString(requestorServiceId));
 	}
 	
 	public static final Parcelable.Creator<ARequestorService> CREATOR = new Parcelable.Creator<ARequestorService>() {
@@ -107,7 +107,7 @@ public class ARequestorService extends RequestorServiceBean implements Parcelabl
 		str.append("\n\t<Attribute AttributeId=\""+cisIdType+"\"");
 		str.append("\n\t\t\tDataType=\""+AServiceResourceIdentifier.class.getCanonicalName()+"\">");
 		str.append("\n\t\t<AttributeValue>");
-		str.append(ServiceModelUtils.serviceResourceIdentifierToString(requestorServiceId));
+		//str.append(ServiceModelUtils.serviceResourceIdentifierToString(requestorServiceId));
 		str.append("</AttributeValue>");
 		str.append("\n\t</Attribute>");
 		return str.toString();
