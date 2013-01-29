@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.servicecontrol;
+package org.societies.platform.servicelifecycle.servicecontrol;
 
 import java.io.File;
 import java.io.Serializable;
@@ -76,7 +76,7 @@ import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
+import org.societies.platform.servicelifecycle.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;

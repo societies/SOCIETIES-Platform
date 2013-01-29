@@ -81,14 +81,14 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
+	<bean id="serviceDiscovery" class="org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery" >
 		<property name="serviceReg" ref="serReg" />
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemote" />	
 	</bean>
 
-	<bean id="ServiceDiscoveryCommsManager" class="org.societies.slm.servicediscovery.comms.CommsServer"
+	<bean id="ServiceDiscoveryCommsManager" class="org.societies.platform.servicelifecycle.servicediscovery.comms.CommsServer"
 	depends-on="commMngrRef" init-method="InitService">
 		<property name="commMngr" ref="commMngrRef"/>
 		<property name="serviceDiscovery" ref="serviceDiscovery"/>
@@ -96,7 +96,7 @@
   		<property name="cisCommMgrFactory" ref="cisCommFactoryRef" />
    </bean>
   
-   <bean id="serviceDiscoveryRemote" class="org.societies.slm.servicediscovery.comms.CommsClient" 
+   <bean id="serviceDiscoveryRemote" class="org.societies.platform.servicelifecycle.servicediscovery.comms.CommsClient" 
 	depends-on="commMngrRef" init-method="InitService" >
 		<property name="commMngr" ref="commMngrRef"/>
   </bean>

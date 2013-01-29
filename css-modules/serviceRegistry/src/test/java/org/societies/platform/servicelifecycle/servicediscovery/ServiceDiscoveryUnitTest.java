@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.servicediscovery;
+package org.societies.platform.servicelifecycle.servicediscovery;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -45,6 +45,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery;
 
 /**
  * Describe your class here...
@@ -106,7 +107,7 @@ public class ServiceDiscoveryUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.slm.servicediscovery.ServiceDiscovery#getServices()}.
+	 * Test method for {@link org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery#getServices()}.
 	 */
 	@Test
 	public void testGetServicesLocalNoneAvailable() {
@@ -137,7 +138,7 @@ public class ServiceDiscoveryUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.slm.servicediscovery.ServiceDiscovery#getServices()}.
+	 * Test method for {@link org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery#getServices()}.
 	 */
 	@Test
 	public void testGetServicesLocalOneAvailable() {
@@ -170,7 +171,7 @@ public class ServiceDiscoveryUnitTest {
 
 
 	/**
-	 * Test method for {@link org.societies.slm.servicediscovery.ServiceDiscovery#getServices(org.societies.api.comm.xmpp.datatypes.Identity)}.
+	 * Test method for {@link org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery#getServices(org.societies.api.comm.xmpp.datatypes.Identity)}.
 	 */
 	@Test
 	public void testGetServicesIdentity() {

@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.slm.servicecontrol.comms;
+package org.societies.platform.servicelifecycle.servicecontrol.comms;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -172,7 +172,7 @@ public class CommsServer extends EventListener implements IFeatureServer {
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		if(LOG.isDebugEnabled())
-			LOG.debug("receiveMessage in org.societies.slm.servicecontrol.comms");
+			LOG.debug("receiveMessage in org.societies.platform.servicelifecycle.servicecontrol.comms");
 	}
 
 	/* Put your functionality here if there IS a return object */

@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.servicecontrol;
+package org.societies.platform.servicelifecycle.servicecontrol;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -55,6 +55,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.platform.servicelifecycle.servicecontrol.ServiceControl;
 
 /**
  * Junit Test for Service Control
