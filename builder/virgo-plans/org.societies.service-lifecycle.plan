@@ -6,6 +6,6 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
-    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
+    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceDiscovery"/>
+    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceControl"/>
 </plan>
