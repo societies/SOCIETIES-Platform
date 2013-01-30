@@ -677,7 +677,26 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		return mode;
 	}
-
+	
+	//method for splitting the LOCATION string. Location should be in String representation of a pair of double  values
+	public static void splitString (String s){
+		Point2D.Double p = new Point2D.Double();
+		double x=0.0;
+		double y=0.0;
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		String[] splited_string = s.split(",");
+		System.out.println("The size of splitted string is "+splited_string.length);
+		for (String st:splited_string){
+			System.out.println("The st is "+st);
+			x = Double.parseDouble(splited_string[0]);
+			y = Double.parseDouble(splited_string[1]);
+			p.setLocation(x, y);
+			points.add(p);
+			//returns the point with the coordinates
+		}
+				
+				
+	}
 
 	//@Override
 	public void cceSpecial1() {
