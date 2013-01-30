@@ -39,34 +39,16 @@
 
 	<xs:complexType name="cssRecord">
 		<xs:sequence>
-			<xs:element name="archiveCSSNodes" type="tns:cssNode"
-				nillable="true" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="cssHostingLocation" type="xs:string"
-				minOccurs="0" />
 			<xs:element name="cssIdentity" type="xs:string" minOccurs="0" />
-			<xs:element name="cssInactivation" type="xs:string"
-				minOccurs="0" />
 			<xs:element name="cssNodes" type="tns:cssNode" nillable="true"
 				minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="cssRegistration" type="xs:string"
-				minOccurs="0" />
-			<xs:element name="cssUpTime" type="xs:int" />
-			<xs:element name="domainServer" type="xs:string"
-				minOccurs="0" />
 			<xs:element name="emailID" type="xs:string" minOccurs="0" />
 			<xs:element name="entity" type="xs:int" />
 			<xs:element name="foreName" type="xs:string" minOccurs="0" />
-			<xs:element name="homeLocation" type="xs:string"
-				minOccurs="0" />
-			<xs:element name="identityName" type="xs:string"
-				minOccurs="0" />
-			<xs:element name="imID" type="xs:string" minOccurs="0" />
 			<xs:element name="name" type="xs:string" minOccurs="0" />
-			<xs:element name="password" type="xs:string" minOccurs="0" />
-			<xs:element name="presence" type="xs:int" />
 			<xs:element name="sex" type="xs:int" />
-			<xs:element name="socialURI" type="xs:string" minOccurs="0" />
-			<xs:element name="status" type="xs:int" />
+			<xs:element name="workplace" type="xs:string" minOccurs="0" />
+			<xs:element name="position" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 

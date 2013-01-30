@@ -23,8 +23,8 @@ public class TestXMPPBeans {
 	public static final String TEST_IDENTITY_NAME = "Id Name";
 	public static final String TEST_IM_ID = "somebody.tssg.org";
 	public static final String TEST_NAME = "The CSS";
-	public static final String TEST_PASSWORD = "P455W0RD";
-	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+	public static final String TEST_POSITION = "CEO";
+	public static final String TEST_WORKPLACE = "LAKE";
 
 	private CssRecord record;
 	private CssNode cssNode_1, cssNode_2;
@@ -58,44 +58,31 @@ public class TestXMPPBeans {
 		this.record.getCssNodes().add(cssNode_1);
 		this.record.getCssNodes().add(cssNode_2);
 		
-		this.record.getArchiveCSSNodes().add(cssNode_1);
-		this.record.getArchiveCSSNodes().add(cssNode_2);
 		
-		this.record.setCssInactivation(TEST_INACTIVE_DATE);
-		this.record.setCssRegistration(TEST_REGISTERED_DATE);
-		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		this.record.setCssUpTime(TEST_UPTIME);
 		this.record.setEmailID(TEST_EMAIL);
 		this.record.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		this.record.setForeName(TEST_FORENAME);
-		this.record.setHomeLocation(TEST_HOME_LOCATION);
-		this.record.setIdentityName(TEST_IDENTITY_NAME);
-		this.record.setImID(TEST_IM_ID);
+		
 		this.record.setName(TEST_NAME);
-		this.record.setPassword(TEST_PASSWORD);
-		this.record.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		
 		this.record.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-		this.record.setSocialURI(TEST_SOCIAL_URI);
+		this.record.setWorkplace(TEST_WORKPLACE);
+		this.record.setPosition(TEST_POSITION);
 		
 		
-		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
+		
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
+		
 		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
-		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
+		
 		assertEquals(TEST_EMAIL, this.record.getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), this.record.getEntity());
 		assertEquals(TEST_FORENAME, this.record.getForeName());
-		assertEquals(TEST_HOME_LOCATION, this.record.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, this.record.getIdentityName());
-		assertEquals(TEST_IM_ID, this.record.getImID());
+		
 		assertEquals(TEST_NAME, this.record.getName());
-		assertEquals(TEST_PASSWORD, this.record.password);
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), this.record.getPresence());
+		assertEquals(TEST_POSITION, this.record.getPosition());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), this.record.getSex());
-		assertEquals(TEST_SOCIAL_URI, this.record.getSocialURI());
+		assertEquals(TEST_WORKPLACE, this.record.getWorkplace());
 	}
 
 	@After
@@ -117,24 +104,20 @@ public class TestXMPPBeans {
 		assertEquals(bean.getMethod(), MethodType.LOGIN_CSS);
 		assertNotNull(bean.getProfile());
 		
-		assertEquals(cssArchivedNodes.size(), bean.getProfile().getArchiveCSSNodes().size());
+		
 		assertEquals(TEST_IDENTITY, bean.getProfile().getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, bean.getProfile().getCssInactivation());
+		
 		assertEquals(cssNodes.size(), bean.getProfile().getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, bean.getProfile().getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), bean.getProfile().getStatus());
-		assertEquals(TEST_UPTIME, bean.getProfile().getCssUpTime());
+		
 		assertEquals(TEST_EMAIL, bean.getProfile().getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), bean.getProfile().getEntity());
 		assertEquals(TEST_FORENAME, bean.getProfile().getForeName());
-		assertEquals(TEST_HOME_LOCATION, bean.getProfile().getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, bean.getProfile().getIdentityName());
-		assertEquals(TEST_IM_ID, bean.getProfile().getImID());
+		
 		assertEquals(TEST_NAME, bean.getProfile().getName());
-		assertEquals(TEST_PASSWORD, bean.getProfile().password);
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), bean.getProfile().getPresence());
+		
+		assertEquals(TEST_POSITION, bean.getProfile().getPosition());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), bean.getProfile().getSex());
-		assertEquals(TEST_SOCIAL_URI, bean.getProfile().getSocialURI());
+		assertEquals(TEST_WORKPLACE, bean.getProfile().getWorkplace());
 
 	}
 
