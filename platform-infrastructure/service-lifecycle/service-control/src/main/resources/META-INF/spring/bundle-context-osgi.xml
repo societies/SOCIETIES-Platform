@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+  <!-- definitions using elements of the osgi namespace can be included
+       in this file. There is no requirement to keep these definitions
+       in a separate file if you do not want to. The rationale for 
+       keeping these definitions separate is to facilitate integration
+       testing of the bundle outside of an OSGi container -->
+  
+<osgi:service ref="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"/>
+<osgi:service ref="serviceManagement" interface="org.societies.api.services.IServices"/>
+	
+<osgi:reference id="serviceRegRef" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
+<osgi:reference id="serviceDiscoveryRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+<osgi:reference id="eventManagerRef" interface="org.societies.api.osgi.event.IEventMgr" />
+<osgi:reference id="deviceMngrRef" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" />
+<osgi:reference id="cisManagerRef" interface="org.societies.api.cis.management.ICisManager" />
+<osgi:reference id="privacyManagerProviderRef" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
+<osgi:reference id="policyNegotiatorRef" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
+<osgi:reference id="negotiationProviderRef" interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" />
+<osgi:reference id="userFeedbackRef" interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
+<osgi:reference id="cisCommFactoryRef" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
+
+</beans>

@@ -163,8 +163,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote = null;
 
-	//IServiceDiscoveryRemote iServDiscRemote = null;
-	IServiceControlRemote iServCtrlRemote = null;
 	private IPrivacyPolicyManager privacyPolicyManager = null;
 	private IEventMgr eventMgr = null;
 	private ICtxBroker internalCtxBroker = null;
@@ -190,7 +188,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public INegotiation getNegotiator() {
 		return negotiator;
 	}
-
 
 	public PubsubClient getPubsubClient() {
 		return pubsubClient;
@@ -228,18 +225,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 		this.internalCtxBroker = internalCtxBroker;
 	}
-	/*public IServiceDiscoveryRemote getiServDiscRemote() {
-		return iServDiscRemote;
-	}
-	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
-		this.iServDiscRemote = iServDiscRemote;
-	}*/
-	public IServiceControlRemote getiServCtrlRemote() {
-		return iServCtrlRemote;
-	}
-	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
-		this.iServCtrlRemote = iServCtrlRemote;
-	}
 
 	public IEventMgr getEventMgr() {
 		return eventMgr;
@@ -254,19 +239,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return ccmFactory;
 	}
 
-
-
 	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
 		this.ccmFactory = ccmFactory;
 	}
 
 
-	
 	public ICommManager getICommMgr() {
 		return iCommMgr;
 	}
-
-
 
 	public void setICommMgr(ICommManager cSSendpoint) {
 		iCommMgr = cSSendpoint;
@@ -303,8 +283,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient,
-					 this.iServCtrlRemote, this.privacyDataManager);
+			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, 
+					 this.pubsubClient, this.privacyDataManager);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -342,6 +322,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 
 	}
+	
 	public void init(){
 		
 		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
@@ -403,6 +384,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		ICisOwned i = this.localCreateCis(cisName, cisType, description,cisCriteria ,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
 	}
+	
 	@Override
 	public Future<ICisOwned> createCis(String cisName, String cisType,
 			Hashtable<String, MembershipCriteria> cisCriteria,
@@ -470,9 +452,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 
-	
-	
-	
 	// local version of the createCis
 	private ICisOwned localCreateCis(String cisName, String cisType, String description, Hashtable<String, MembershipCriteria> cisCriteria, String privacyPolicy) {
 
@@ -491,7 +470,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
-		this.ccmFactory, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
+		this.ccmFactory, this.privacyPolicyManager,this.sessionFactory
 		,description,cisCriteria,this.pubsubClient);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
@@ -1629,14 +1608,6 @@ public class JoinCallBack implements ICisManagerCallback{
 				return false;
 			}
 			
-			/*if (null == iServDiscRemote) {
-				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
-				return false;
-			}*/
-			if (null == iServCtrlRemote) {
-				LOG.info("[Dependency Injection] Missing IServiceControlRemote");
-				return false;
-			}
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
 				return false;

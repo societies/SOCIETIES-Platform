@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
+	<osgi:service ref="serReg" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry" />
+	<osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+
+	<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:reference id="eventManagerRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="cisCommFactoryRef" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
+	<osgi:reference id="cisManagerRef" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1"/>
+</beans>

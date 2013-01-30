@@ -134,10 +134,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
-	//@Transient
-	//IServiceDiscoveryRemote iServDiscRemote = null;
-	@Transient
-	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
 	IPrivacyPolicyManager privacyPolicyManager = null;
 	@Transient
@@ -185,8 +181,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Set<String> membershipCritOnDb;// we will store it in the db as "context,rank,operator,value1,value2"
 
 
-	
-	
 	@Transient
 	Hashtable<String, MembershipCriteria> cisCriteria = null;
 	
@@ -342,25 +336,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.activityFeed = activityFeed;
 	}
 
-/*	public IServiceDiscoveryRemote getiServDiscRemote() {
-		return iServDiscRemote;
-	}
-
-	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
-		this.iServDiscRemote = iServDiscRemote;
-	}*/
-
-	public IServiceControlRemote getiServCtrlRemote() {
-		return iServCtrlRemote;
-	}
-
-	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
-		this.iServCtrlRemote = iServCtrlRemote;
-	}
-
-	
-
-
 	private static Logger LOG = LoggerFactory
 			.getLogger(Cis.class);	
 	
@@ -382,14 +357,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 
-
-
-
-
 	//  constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
-			,IServiceControlRemote iServCtrlRemote,
-			IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
+			,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
 			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
 			PubsubClient pubsubClient) {
 		
@@ -399,9 +369,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		//this.owner = cssOwner;
 		this.cisType = cisType;
-
-		
-		this.iServCtrlRemote = iServCtrlRemote;
 		
 		membershipCritOnDb= new HashSet<String>();
 		
@@ -448,11 +415,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 		LOG.debug("CIS endpoint created");
 		
-		
-		
+
 		try {
 			CISendpoint.register(this);
-			iServCtrlRemote.registerCISEndpoint(CISendpoint);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			this.unregisterCIS();
@@ -469,7 +434,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.psc = pubsubClient;
 		
 		LOG.debug("CIS pub sub service created");
-		
 
 		
 		LOG.debug("CIS autowired PubSubClient");
@@ -509,10 +473,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient,
-			IServiceControlRemote iServCtrlRemote, IPrivacyDataManager	privacyDataManager){
+			IPrivacyDataManager	privacyDataManager){
 				
 		this.psc = pubsubClient;
-		this.iServCtrlRemote = iServCtrlRemote;
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		this.privacyDataManager = privacyDataManager;
@@ -537,9 +500,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		try {
 			CISendpoint.register(this);
-			iServCtrlRemote.registerCISEndpoint(CISendpoint);
-//			CISendpoint.register((IFeatureServer) iServCtrlRemote);
-//			CISendpoint.register((IFeatureServer) iServDiscRemote);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.debug("could not start comm manager!");
@@ -648,8 +608,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	// internal implementation of the method above
 	private boolean insertMember(String jid, MembershipType role) {
-		
-
 		
 		LOG.debug("add member invoked");
 		if (role == null)
