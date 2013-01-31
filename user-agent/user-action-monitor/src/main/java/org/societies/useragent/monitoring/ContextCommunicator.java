@@ -51,6 +51,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -103,7 +104,7 @@ public class ContextCommunicator {
 											
 						//find SERVICE entity with correct ID
 						List<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
-						List<CtxEntityIdentifier> returnedServiceIDs = ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceID).get();
+						List<CtxEntityIdentifier> returnedServiceIDs = ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, ServiceModelUtils.serviceResourceIdentifierToString(serviceID)).get();
 						if(returnedServiceIDs.size() > 0){  //SERVICE entity with this serviceID found!
 							LOG.debug("Found SERVICE entity with serviceID: "+serviceID);
 							
@@ -232,8 +233,8 @@ public class ContextCommunicator {
 			LOG.debug("Creating ID attribute under SERVICE entity");
 			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
 			LOG.debug("Setting value of ID attribute to: "+serviceID);
-			ctxBroker.updateAttribute(newIDAttr.getId(), SerialisationHelper.serialise(serviceID));
-			LOG.debug("Testing serialisation and deserialisation");
+			ctxBroker.updateAttribute(newIDAttr.getId(), ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+			/*LOG.debug("Testing serialisation and deserialisation");
 			byte[] serialised = SerialisationHelper.serialise(serviceID);
 			LOG.debug("SERIALISED: "+serialised);
 			try {
@@ -241,7 +242,7 @@ public class ContextCommunicator {
 				LOG.debug("DESERIALISED: "+deserialised);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
+			}*/
 			
 			
 		} catch (InterruptedException e) {
@@ -250,9 +251,7 @@ public class ContextCommunicator {
 			e.printStackTrace();
 		} catch (CtxException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} 
 		
 		return serviceEntity;
 	}

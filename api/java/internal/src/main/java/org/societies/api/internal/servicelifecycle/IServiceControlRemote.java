@@ -107,12 +107,4 @@ public interface IServiceControlRemote {
 	 */
 	public void unshareService(Service service, IIdentity node, IServiceControlCallback callback);
 	
-	/**
-	 * This method is used to register a new CIS Endpoint with Service Control. It will allow service control to receive
-	 * meant for a particular CIS
-	 * 
-	 * @param endpoint
-	 */
-	public void registerCISEndpoint(ICommManager endpoint);
-	
 }
