@@ -91,7 +91,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 
 	public void initialiseUserFeedback(){
-		LOG.debug("User Feedback initialised!!");
+		LOG.debug("User Feedback initialising");
 
 		requestMgr = new RequestManager();
 		expResults = new HashMap<String, List<String>>();
@@ -129,7 +129,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-
+		this.LOG.debug("User Feedback Initialised!!!");
 	}
 
 	@Override

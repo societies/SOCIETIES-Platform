@@ -26,6 +26,7 @@ package org.societies.api.internal.personalisation.model;
 
 import java.io.Serializable;
 
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -95,7 +96,9 @@ public class PreferenceDetails implements Serializable {
 	 * @param sID
 	 */
 	private boolean compareServiceID(ServiceResourceIdentifier sID){
-		return this.serviceID.toString().equalsIgnoreCase(sID.toString());
+		//return this.serviceID.toString().equalsIgnoreCase(sID.toString());
+		return ServiceModelUtils.compare(serviceID, sID);
+		
 	}
 
 	/**
