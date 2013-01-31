@@ -53,7 +53,7 @@ public class Jane extends BaseUser{
 	@Override
 	public String getEmail() {
 		
-		return "john@societies.org";
+		return "jane@societies.org";
 	}
 
 	@Override
@@ -84,6 +84,12 @@ public class Jane extends BaseUser{
 	public String getFriends() {
 		
 		return "";
+	}
+
+	@Override
+	public String getSkills() {
+		
+		return "pilot,videoGames";
 	}
 	
 }

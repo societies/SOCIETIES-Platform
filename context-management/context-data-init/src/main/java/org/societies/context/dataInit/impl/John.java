@@ -86,4 +86,10 @@ public class John extends BaseUser {
 		return null;
 	}
 
+	@Override
+	public String getSkills() {
+		
+		return "scuba,aerobic";
+	}
+
 }
