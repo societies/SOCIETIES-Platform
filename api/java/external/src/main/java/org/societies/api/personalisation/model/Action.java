@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.IServices;
+import org.societies.api.services.ServiceUtils;
 
 
 
@@ -170,7 +172,7 @@ public class Action implements IAction, Serializable{
 			if (other.serviceID != null) {
 				return false;
 			}
-		} else if (!serviceID.getIdentifier().equals(other.serviceID.getIdentifier())) {
+		} else if (!ServiceUtils.compare(serviceID,other.serviceID)) {
 			return false;
 		}
 		if (value == null) {

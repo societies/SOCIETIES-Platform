@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -79,7 +80,7 @@ public class SA_SI extends Thread{
 	public void run(){
 		LOG.info("C45 REQUEST FROM: "+requestor.getClass().getName());
 		LOG.info("Starting C45 learning process for history owner: "+historyOwner.toString()+
-				" on action: "+parameterName+" for serviceId: "+serviceId.toString());
+				" on action: "+parameterName+" for serviceId: "+ServiceModelUtils.serviceResourceIdentifierToString(serviceId));
 
 		//create new Cache for cycle
 		CtxIdentifierCache cache = new CtxIdentifierCache();

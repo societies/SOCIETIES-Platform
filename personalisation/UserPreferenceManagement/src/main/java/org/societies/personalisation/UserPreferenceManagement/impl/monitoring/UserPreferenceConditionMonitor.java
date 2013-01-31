@@ -37,6 +37,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -237,7 +238,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 
 		
 		//JOptionPaneshowMessageDialog(null, "Processing service started event: "+serviceID.toUriString());
-		this.logging.debug("Adding "+serviceID.toString()+" preference details to tables");
+		this.logging.debug("Adding "+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+" preference details to tables");
 		List<IPreferenceConditionIOutcomeName> conditionIOutcomeName = this.prefMgr.getPreferenceConditions(userId, serviceType, serviceID);
 		//JOptionPaneshowMessageDialog(null, this.myUSERDPI.toUriString()+" received "+conditionIOutcomeName.size()+" preferenceConditions from PrefMgr");
 		for (IPreferenceConditionIOutcomeName info : conditionIOutcomeName){
