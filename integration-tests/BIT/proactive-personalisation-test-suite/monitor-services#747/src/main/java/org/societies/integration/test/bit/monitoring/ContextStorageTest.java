@@ -49,6 +49,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -59,13 +60,15 @@ public class ContextStorageTest {
 	
 	@Test
 	public void test() {
-		LOG.info("Monitor services #747 - Running ContextStorageTest....");
+		LOG.debug("Monitor services #747 - Running ContextStorageTest....");
 		//create actions
 		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		try {
+			serviceId1.setServiceInstanceIdentifier("http://testService1");
 			serviceId1.setIdentifier(new URI("http://testService1"));
+			serviceId2.setServiceInstanceIdentifier("http://testService2");
 			serviceId2.setIdentifier(new URI("http://testService2"));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -79,7 +82,7 @@ public class ContextStorageTest {
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
 		//send actions - 1 second apart
-		LOG.info("Monitor services #747 - sending mock actions for storage");
+		LOG.debug("Monitor services #747 - sending mock actions for storage");
 		TestCase747.uam.monitor(identity, action1);
 		try {
 			Thread.sleep(1000);
@@ -120,30 +123,30 @@ public class ContextStorageTest {
 			person = TestCase747.ctxBroker.retrieveIndividualEntity(identity).get();
 
 			if(person == null){
-				LOG.error("Person entity is NULL");
+				LOG.debug("Person entity is NULL");
 			}
 			Assert.assertNotNull(person);
-			LOG.info("PERSON entity ID is: "+person.getId());
+			LOG.debug("PERSON entity ID is: "+person.getId());
 			
 			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICES);
 			if(usesServiceAssocIDs == null){
-				LOG.error("USES_SERVICE association IDs in null");
+				LOG.debug("USES_SERVICE association IDs in null");
 			}
 			if(usesServiceAssocIDs.size() != 1){
-				LOG.error("Incorrect number of USES_SERVICES association IDs :"+usesServiceAssocIDs.size());
+				LOG.debug("Incorrect number of USES_SERVICES association IDs :"+usesServiceAssocIDs.size());
 			}
 			Assert.assertNotNull(usesServiceAssocIDs);
 			Assert.assertTrue(usesServiceAssocIDs.size() == 1);
 
 			CtxAssociation usesServiceAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
 			if(usesServiceAssoc == null){
-				LOG.error("USES_SERVICE association is NULL");
+				LOG.debug("USES_SERVICE association is NULL");
 			}
 			Assert.assertNotNull(usesServiceAssoc);
 
 			serviceEntityIDs = usesServiceAssoc.getChildEntities();
 			if(serviceEntityIDs.size() != 2){
-				LOG.error("Wrong number of SERVICE entity IDs for USES_SERVICE association: "+serviceEntityIDs.size());
+				LOG.debug("Wrong number of SERVICE entity IDs for USES_SERVICE association: "+serviceEntityIDs.size());
 			}
 			Assert.assertTrue(serviceEntityIDs.size() == 2);  //2 service entities
 		} catch (InterruptedException e1) {
@@ -161,14 +164,14 @@ public class ContextStorageTest {
 			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
 
 			List<CtxEntityIdentifier> check1ServiceIDs = 
-					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId1.getIdentifier()).get();
+					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, ServiceModelUtils.serviceResourceIdentifierToString(serviceId1)).get();
 
 			//Check number of service entities returned
 			if(check1ServiceIDs == null){
-				LOG.error("1) NULL - no SERVICE entity exists with ID: "+serviceId1.getIdentifier());
+				LOG.debug("1) NULL - no SERVICE entity exists with ID: "+serviceId1.getIdentifier());
 			}
 			if(check1ServiceIDs.size() != 1){
-				LOG.error("1) Wrong number of SERVICE entities with serviceID: "+serviceId1.getIdentifier()+" -> "+check1ServiceIDs.size());
+				LOG.debug("1) Wrong number of SERVICE entities with serviceID: "+serviceId1.getIdentifier()+" -> "+check1ServiceIDs.size());
 			}
 			Assert.assertNotNull(check1ServiceIDs);
 			Assert.assertTrue(check1ServiceIDs.size() == 1);	
@@ -178,41 +181,45 @@ public class ContextStorageTest {
 
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
 			if(attributes == null){
-				LOG.error("1) NULL - no attributes under SERVICE entity");
+				LOG.debug("1) NULL - no attributes under SERVICE entity");
 			}
 			if(attributes.size() != 1){
-				LOG.error("1) Wrong number of attributes under SERVICE entity: "+attributes.size());
+				LOG.debug("1) Wrong number of attributes under SERVICE entity: "+attributes.size());
 			}
 			Assert.assertNotNull(attributes);
 			Assert.assertTrue(attributes.size() == 1);
 
 			CtxAttribute idAttr = attributes.iterator().next();
-			URI actualServiceId = (URI)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
-			if(!serviceId1.getIdentifier().equals(actualServiceId)){
-				LOG.error("1) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId1.getIdentifier()+", Actual: "+actualServiceId);
+			ServiceResourceIdentifier actualServiceId = ServiceModelUtils.generateServiceResourceIdentifierFromString(idAttr.getStringValue());
+			
+			//URI actualServiceId = (URI)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
+			
+			if(!serviceId1.getIdentifier().equals(actualServiceId.getIdentifier())){
+				LOG.debug("1) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId1.getIdentifier()+", Actual: "+actualServiceId.getIdentifier());
 			}
-			Assert.assertEquals(serviceId1.getIdentifier(), actualServiceId);
-
+			Assert.assertEquals(serviceId1.getIdentifier(), actualServiceId.getIdentifier());
+			Assert.assertTrue(ServiceModelUtils.compare(serviceId1, actualServiceId));
+			
 			//check service HAS_PARAMETER associations
 			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
-				LOG.error("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
+				LOG.debug("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
 			if(hasParamIDs.size() != 1){
-				LOG.error("1) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
+				LOG.debug("1) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
 			}
 			Assert.assertNotNull(hasParamIDs);
 			Assert.assertTrue(hasParamIDs.size() == 1);
 
 			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
 			if(hasParamAssoc == null){
-				LOG.error("1) HAS_PARAMETER association is NULL");
+				LOG.debug("1) HAS_PARAMETER association is NULL");
 			}
 			Assert.assertNotNull(hasParamAssoc);
 
 			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
 			if(serviceParamIDs.size() != 1){
-				LOG.error("1) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
+				LOG.debug("1) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
 			}
 			Assert.assertTrue(serviceParamIDs.size() == 1);
 
@@ -224,13 +231,13 @@ public class ContextStorageTest {
 				if(nextAttr.getType().equals(CtxAttributeTypes.PARAMETER_NAME)){  //check name
 					String actualParameterName = nextAttr.getStringValue();
 
-					LOG.info("1) volume should be the same as "+actualParameterName);
+					LOG.debug("1) volume should be the same as "+actualParameterName);
 					Assert.assertEquals("volume", actualParameterName);
 
 				}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){  //check last action
 					IAction actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
 
-					LOG.info("1) "+action3+" should be the same as "+actualAction);
+					LOG.debug("1) "+action3+" should be the same as "+actualAction);
 					Assert.assertEquals(action3, actualAction);
 				}
 			}
@@ -254,14 +261,14 @@ public class ContextStorageTest {
 			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
 
 			List<CtxEntityIdentifier> check2ServiceIDs = 
-					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId2.getIdentifier()).get();
+					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, ServiceModelUtils.serviceResourceIdentifierToString(serviceId2)).get();
 
 			//Check number of service entities returned
 			if(check2ServiceIDs == null){
-				LOG.error("2) NULL - no SERVICE entity exists with ID: "+serviceId2.getIdentifier());
+				LOG.debug("2) NULL - no SERVICE entity exists with ID: "+serviceId2.getIdentifier());
 			}
 			if(check2ServiceIDs.size() != 1){
-				LOG.error("2) EMPTY - no SERVICE entity exists with ID: "+serviceId2.getIdentifier());
+				LOG.debug("2) EMPTY - no SERVICE entity exists with ID: "+serviceId2.getIdentifier());
 			}
 			Assert.assertNotNull(check2ServiceIDs);
 			Assert.assertTrue(check2ServiceIDs.size() == 1);	
@@ -271,41 +278,43 @@ public class ContextStorageTest {
 
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
 			if(attributes == null){
-				LOG.error("2) NULL - no attributes under SERVICE entity");
+				LOG.debug("2) NULL - no attributes under SERVICE entity");
 			}
 			if(attributes.size() != 1){
-				LOG.error("2) Wrong number of attributes under SERVICE entity: "+attributes.size());
+				LOG.debug("2) Wrong number of attributes under SERVICE entity: "+attributes.size());
 			}
 			Assert.assertNotNull(attributes);
 			Assert.assertTrue(attributes.size() == 1);
 
 			CtxAttribute idAttr = attributes.iterator().next();
-			URI actualServiceId = (URI)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
-			if(!serviceId2.getIdentifier().equals(actualServiceId)){
-				LOG.error("2) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId2.getIdentifier()+", Actual: "+actualServiceId);
+			//URI actualServiceId = (URI)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
+			
+			ServiceResourceIdentifier actualServiceId = ServiceModelUtils.generateServiceResourceIdentifierFromString(idAttr.getStringValue());
+			if(!serviceId2.getIdentifier().equals(actualServiceId.getIdentifier())){
+				LOG.debug("2) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId2.getIdentifier()+", Actual: "+actualServiceId.getIdentifier());
 			}
-			Assert.assertEquals(serviceId2.getIdentifier(), actualServiceId);
-
+			Assert.assertEquals(serviceId2.getIdentifier(), actualServiceId.getIdentifier());
+			Assert.assertTrue(ServiceModelUtils.compare(serviceId2, actualServiceId));
 			//check service HAS_PARAMETER associations
 			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
-				LOG.error("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
+				LOG.debug("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
 			if(hasParamIDs.size() != 1){
-				LOG.error("2) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
+				LOG.debug("2) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
 			}
 			Assert.assertNotNull(hasParamIDs);
 			Assert.assertTrue(hasParamIDs.size() == 1);
 
 			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
 			if(hasParamAssoc == null){
-				LOG.error("2) HAS_PARAMETER association is NULL");
+				LOG.debug("2) HAS_PARAMETER association is NULL");
 			}
 			Assert.assertNotNull(hasParamAssoc);
 
 			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
 			if(serviceParamIDs.size() != 2){
-				LOG.error("2) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
+				LOG.debug("2) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
 			}
 			Assert.assertTrue(serviceParamIDs.size() == 2);
 
@@ -329,14 +338,14 @@ public class ContextStorageTest {
 							//expectedParameterName = "colour";
 							expectedAction = action5;
 						}else{
-							LOG.error("2) Unknown PARAMETER_NAME value in attribute: "+nextAttr.getStringValue());
+							LOG.debug("2) Unknown PARAMETER_NAME value in attribute: "+nextAttr.getStringValue());
 							Assert.fail("Unknown parameter name value for serviceID2");
 						}
 					}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){
 						actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
 					}
 				}
-				LOG.info("2) Expected LAST_ACTION: "+expectedAction+", should equal actual LAST_ACTION: "+actualAction);
+				LOG.debug("2) Expected LAST_ACTION: "+expectedAction+", should equal actual LAST_ACTION: "+actualAction);
 				Assert.assertEquals(expectedAction, actualAction);
 			}
 		} catch (CtxException e) {
