@@ -260,6 +260,7 @@
 							org.simpleframework.xml;resolution:=optional,
 							org.simpleframework.xml.convert;resolution:=optional,
 							org.societies.maven.converters;resolution:=optional,
+							org.societies.simple.basic;resolution:=optional,
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
 							javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;
