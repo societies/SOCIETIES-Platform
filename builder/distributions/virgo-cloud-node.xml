@@ -39,9 +39,9 @@
 	<!-- All Spring-OSGi Java projects to be included in this distribution -->
 	<modules>
 		
-		<!-- Service Management: 3 bundles (to be merged) -->
-		<module>../../css-modules/serviceRegistry</module>
-		<module>../../platform-infrastructure/service-lifecycle/service-mgmt/</module>
+		<!-- Service Management: 2 bundles (to be merged) -->
+		<module>../../platform-infrastructure/service-lifecycle/service-discovery/</module>
+		<module>../../platform-infrastructure/service-lifecycle/service-control/</module>
 
 		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->	
 		<module>../../platform-infrastructure/security/SecurityServices</module>

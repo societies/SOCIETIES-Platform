@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task">
+
+	<!-- regular spring configuration file defining the beans for this bundle. 
+		We've kept the osgi definitions in a separate configuration file so that 
+		this file can easily be used for integration testing outside of an OSGi environment -->
+	<task:annotation-driven />
+
+	<bean id="serListener" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceRegistryListener"
+		init-method="registerListener" destroy-method="unRegisterListener" >	
+		<property name="serviceReg" ref="serviceRegRef" />
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="serviceControl" ref ="serviceControl"/>
+		<property name="privacyManager" ref="privacyManagerProviderRef" />
+		<property name="negotiationProvider" ref="negotiationProviderRef" />
+		<property name="eventMgr" ref="eventManagerRef" />	
+	</bean>
+	
+	<bean id="serviceControl" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceControl" >
+		<property name="serviceReg" ref="serviceRegRef" /> 	
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="cisManager" ref="cisManagerRef" />
+		<property name="serviceControlRemote" ref="serviceControlRemote" />				
+		<property name="policyNegotiation" ref="policyNegotiatorRef" />
+		<property name="deviceMngr" ref="deviceMngrRef" />
+		<property name="userFeedback" ref="userFeedbackRef" />
+		<property name="eventMgr" ref="eventManagerRef" />
+	</bean>
+	
+	<bean id="serviceManagement" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceMgmt" >
+		<property name="serviceDiscovery" ref="serviceDiscoveryRef" /> 	
+		<property name="commMngr" ref="commMngrRef" />				
+	</bean>
+	
+	<bean id="ServiceControlCommsManager" class="org.societies.platform.servicelifecycle.servicecontrol.comms.CommsServer"
+  		depends-on="commMngrRef" init-method="InitService">
+  		<property name="commMngr" ref="commMngrRef"/>
+  		<property name="serviceControl" ref="serviceControl"/> 
+  		<property name="eventMgr" ref="eventManagerRef" />
+  		<property name="cisCommMgrFactory" ref="cisCommFactoryRef" />
+   </bean>
+  
+   <bean id="serviceControlRemote" class="org.societies.platform.servicelifecycle.servicecontrol.comms.CommsClient" 
+  		depends-on="commMngrRef" init-method="InitService" >
+  		<property name="commMngr" ref="commMngrRef"/>
+  </bean>
+  
+</beans>

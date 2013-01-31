@@ -52,6 +52,11 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.societies.orchestration.api</groupId>
+            <artifactId>intelligent-community-orchestration-api</artifactId>
+            <version>${version.ico}</version>
+        </dependency>
         	<dependency>
         	    <groupId>junit</groupId>
         	    <artifactId>junit</artifactId>
