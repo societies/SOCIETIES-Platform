@@ -20,8 +20,7 @@ import android.util.Log;
  * 1. An Openfire XMPP server must be running
  * 2. A suitable AVD must be running
  * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid
- * 4. The user XMPP_NEW_IDENTIFIER must be removed prior to running the tests as the destroyMainIdentity
- *   method is not currently functioning.
+ * 4. The Android Client or Login Tester app must have already logged in successfully
  *
  */
 
@@ -47,12 +46,21 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
     private static final int XMPP_PORT = 5222;
     private static final String XMPP_DOMAIN_AUTHORITY = "danode." + XMPP_DOMAIN;
 
+    public static final String ADD_CSS_NODE = "addCSSNode";
+    public static final String ADD_CSS_NODE_DESC = "Additional node available on CSS";
+
+    public static final String DEPART_CSS_NODE = "departCSSNode";
+    public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
+
     private static final String SIMPLE_XML_MESSAGE = "<iq from='romeo@montague.net/orchard to='juliet@capulet.com/balcony'> " +
     													"<query xmlns='http://jabber.org/protocol/disco#info'/></iq>";
 
+	private static final long BIND_CALLBACK_ID = 34533;
+	private static final long UNBIND_CALLBACK_ID = 434335;
+	private static final long SUBSCRIBE_CALLBACK_ID = 67675;
+	private static final long UNSUBSCRIBE_CALLBACK_ID = 997968;
 	
     private static final int DELAY = 10000;
-    private BroadcastReceiver receiver;
     private IPubsubService commsService;
 
 	public TestSocietiesAndroidPubsub() {
@@ -61,7 +69,6 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.receiver = this.setupPubsubBroadcastReceiver();
 
 		Intent pubsubIntent = new Intent(getContext(), ServicePlatformPubsubTest.class);
 		LocalPlatformPubsubBinder binder = (LocalPlatformPubsubBinder) bindService(pubsubIntent);
@@ -74,7 +81,6 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
 	}
 
 	protected void tearDown() throws Exception {
-		unregisterReceiver(this.receiver);
 		this.commsService = null;
 		super.tearDown();
 	}
@@ -85,12 +91,23 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
 	 * @throws Exception
 	 */
 	public void testConnectAndroidComms() throws Exception {
-    	
-    	this.commsService.bindToAndroidComms(CLIENT, 34533);
+		BroadcastReceiver receiver = this.setupPubsubBroadcastReceiver();
+    	this.commsService.bindToAndroidComms(CLIENT, BIND_CALLBACK_ID);
     	
 		Thread.sleep(DELAY);
+		unregisterReceiver(receiver);
+		
 	}
 	
+	@MediumTest
+	public void testSubscribeToNode() throws Exception {
+		BroadcastReceiver receiver = this.setupSubscribeBroadcastReceiver();
+    	this.commsService.bindToAndroidComms(CLIENT, BIND_CALLBACK_ID);
+    	
+		Thread.sleep(DELAY);
+		unregisterReceiver(receiver);
+		
+	}
     /**
      * Create broadcast receiver for Android Pubsub 
      * and register it
@@ -103,6 +120,21 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
         BroadcastReceiver pubsubReceiver = new MainPubsubReceiver();
         getContext().registerReceiver(pubsubReceiver, createPubsubIntentFilter());    	
         Log.d(LOG_TAG, "Register Pubsub broadcast receiver");
+
+        return pubsubReceiver;
+    }
+    /**
+     * Create broadcast receiver for Android Pubsub 
+     * and register it
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupSubscribeBroadcastReceiver() {
+        Log.d(LOG_TAG, "Set up Pubsub Subscribe broadcast receiver");
+        
+        BroadcastReceiver pubsubReceiver = new SubscribePubsubReceiver();
+        getContext().registerReceiver(pubsubReceiver, createPubsubIntentFilter());    	
+        Log.d(LOG_TAG, "Register Pubsub Subscribe broadcast receiver");
 
         return pubsubReceiver;
     }
@@ -156,10 +188,56 @@ public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatfor
 				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(IPubsubService.SUBSCRIBER_UNSUBSCRIBE)) {
 				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
-			}  else if (intent.getAction().equals(IPubsubService.BIND_TO_ANDROID_COMMS)) {
+			} else if (intent.getAction().equals(IPubsubService.BIND_TO_ANDROID_COMMS)) {
 				assertTrue(intent.getBooleanExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false));
-				assertTrue(TestSocietiesAndroidPubsub.this.commsService.unBindFromAndroidComms(CLIENT, 1));
-			} 
+				assertEquals(BIND_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+				TestSocietiesAndroidPubsub.this.commsService.unBindFromAndroidComms(CLIENT, UNBIND_CALLBACK_ID);
+			} else if (intent.getAction().equals(IPubsubService.UNBIND_FROM_ANDROID_COMMS)) {
+				assertTrue(intent.getBooleanExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false));
+				assertEquals(UNBIND_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+			}
+		}
+    }
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class SubscribePubsubReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			
+			if (intent.getAction().equals(IPubsubService.DISCO_ITEMS)) {
+				assertNotNull(intent.getStringArrayExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.OWNER_CREATE)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.OWNER_DELETE)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.OWNER_PURGE_ITEMS)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.PUBLISHER_DELETE)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.PUBLISHER_PUBLISH)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+			} else if (intent.getAction().equals(IPubsubService.SUBSCRIBER_SUBSCRIBE)) {
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+				assertEquals(SUBSCRIBE_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+				Log.d(LOG_TAG, "Subscribe response: " + intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+				TestSocietiesAndroidPubsub.this.commsService.subscriberUnsubscribe(CLIENT, XMPP_SUCCESSFUL_CLOUD_NODE, ADD_CSS_NODE, UNSUBSCRIBE_CALLBACK_ID);
+
+			} else if (intent.getAction().equals(IPubsubService.SUBSCRIBER_UNSUBSCRIBE)) {
+				assertEquals(UNSUBSCRIBE_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+				assertNotNull(intent.getStringExtra(IPubsubService.INTENT_RETURN_VALUE_KEY));
+				TestSocietiesAndroidPubsub.this.commsService.unBindFromAndroidComms(CLIENT, UNBIND_CALLBACK_ID);
+
+			} else if (intent.getAction().equals(IPubsubService.BIND_TO_ANDROID_COMMS)) {
+				assertTrue(intent.getBooleanExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false));
+				assertEquals(BIND_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+				TestSocietiesAndroidPubsub.this.commsService.subscriberSubscribe(CLIENT, XMPP_SUCCESSFUL_CLOUD_NODE, ADD_CSS_NODE, SUBSCRIBE_CALLBACK_ID);
+			} else if (intent.getAction().equals(IPubsubService.UNBIND_FROM_ANDROID_COMMS)) {
+				assertTrue(intent.getBooleanExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false));
+				assertEquals(UNBIND_CALLBACK_ID, intent.getLongExtra(IPubsubService.INTENT_RETURN_CALL_ID_KEY, 0));
+			}
 		}
     }
 

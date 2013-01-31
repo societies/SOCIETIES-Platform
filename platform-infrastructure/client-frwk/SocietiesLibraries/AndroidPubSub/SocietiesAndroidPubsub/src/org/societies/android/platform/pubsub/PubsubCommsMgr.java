@@ -11,9 +11,8 @@ import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
-import org.societies.android.platform.comms.ServicePlatformCommsLocal;
-import org.societies.android.platform.comms.ServicePlatformCommsLocal.LocalPlatformCommsBinder;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -28,7 +27,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 public class PubsubCommsMgr {
@@ -38,6 +40,7 @@ public class PubsubCommsMgr {
 	private String clientPackageName;
 	private Random randomGenerator;
 	private PacketMarshaller marshaller = new PacketMarshaller();
+    private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
 
 	private Context androidContext;
 	private Map<Long, ICommCallback> xmppCallbackMap;
@@ -46,10 +49,10 @@ public class PubsubCommsMgr {
 	private String identityJID;
 	private String domainAuthority;
 	private IIdentityManager idManager;
+	private Messenger targetService;
 
 	private BroadcastReceiver receiver;
-	private XMPPAgent localAndroidComms;
-	private long bindCallbackID;
+	private IMethodCallback bindCallback;
 	/**
 	 * Default constructor
 	 * 
@@ -73,7 +76,7 @@ public class PubsubCommsMgr {
 		this.domainAuthority = null;
 		this.idManager = null;
 		this.receiver = null;
-		this.bindCallbackID = 0;
+		this.bindCallback = null;
 		
 		this.setupBroadcastReceiver();
 	}
@@ -87,13 +90,7 @@ public class PubsubCommsMgr {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Comms Service");
 		
-		long callbackID = this.randomGenerator.nextLong();
-
-		synchronized(this.methodCallbackMap) {
-			//store callback in order to activate required methods
-			this.methodCallbackMap.put(callbackID, bindCallback);
-		}
-		this.bindCallbackID = callbackID;
+		this.bindCallback = bindCallback;
 		this.bindToServiceAfterLogin();
 
 	}
@@ -332,13 +329,19 @@ public class PubsubCommsMgr {
 					}
 				}
 				
+			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
+				if (PubsubCommsMgr.this.methodCallbackMap.containsKey(callbackId)) {
+					PubsubCommsMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+					PubsubCommsMgr.this.getIdentityJid(callbackId);
+				}
+
 			} else if (intent.getAction().equals(XMPPAgent.GET_IDENTITY)) {
 				if (PubsubCommsMgr.this.methodCallbackMap.containsKey(callbackId)) {
 					PubsubCommsMgr.this.identityJID = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+
 					synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-						IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(callbackId);
 						PubsubCommsMgr.this.methodCallbackMap.remove(callbackId);
-						callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						PubsubCommsMgr.this.bindCallback.returnAction(true);
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.GET_ITEMS_RESULT)) {
@@ -418,7 +421,7 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
@@ -449,7 +452,7 @@ public class PubsubCommsMgr {
     }
     
     private void bindToServiceAfterLogin() {
-    	Intent serviceIntent = new Intent(this.androidContext, ServicePlatformCommsLocal.class);
+    	Intent serviceIntent = new Intent(SERVICE_ACTION);
     	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -476,18 +479,18 @@ public class PubsubCommsMgr {
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			PubsubCommsMgr.this.boundToService = true;
-			LocalPlatformCommsBinder binder = (LocalPlatformCommsBinder) service;
-			localAndroidComms = (XMPPAgent) binder.getService();
+			targetService = new Messenger(service);
 			Log.d(LOG_TAG, "Societies Android Comms Service connected");
 			
-			if (PubsubCommsMgr.this.methodCallbackMap.containsKey(PubsubCommsMgr.this.bindCallbackID)) {
-				synchronized(PubsubCommsMgr.this.methodCallbackMap) {
-					IMethodCallback callback = PubsubCommsMgr.this.methodCallbackMap.get(PubsubCommsMgr.this.bindCallbackID);
-					PubsubCommsMgr.this.methodCallbackMap.remove(PubsubCommsMgr.this.bindCallbackID);
-					callback.returnAction(true);
-				}
+	    	//The Domain Authority and Identity must now be retrieved before any other calls
+			long callbackID = PubsubCommsMgr.this.randomGenerator.nextLong();
+
+			synchronized(PubsubCommsMgr.this.methodCallbackMap) {
+				//store callback in order to activate required methods
+				PubsubCommsMgr.this.methodCallbackMap.put(callbackID, null);
 			}
 
+			PubsubCommsMgr.this.getDomainAuthorityNode(callbackID);
 		}
 	};
 	
@@ -520,9 +523,36 @@ public class PubsubCommsMgr {
 
     	protected Void doInBackground(Void... args) {
 
-			PubsubCommsMgr.this.localAndroidComms.register(client, elementNames.toArray(new String[0]), nameSpaces.toArray(new String[0]), remoteID);
-	    		
-	    	return null;
+    		String targetMethod = XMPPAgent.methodsArray[0];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
+    		
+    		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
+    		
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
     	}
     }
 
@@ -552,9 +582,35 @@ public class PubsubCommsMgr {
 
     	protected Void doInBackground(Void... args) {
 
-			PubsubCommsMgr.this.localAndroidComms.sendIQ(client, xml, remoteCallID);
-	    		
-	    	return null;
+    		String targetMethod = XMPPAgent.methodsArray[4];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.xml);
+    		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.remoteCallID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
     	}
     }
 
@@ -586,7 +642,36 @@ public class PubsubCommsMgr {
 
     	protected Void doInBackground(Void... args) {
 
-    		PubsubCommsMgr.this.localAndroidComms.getItems(client, entity, node, remoteCallId);
+    		String targetMethod = XMPPAgent.methodsArray[7];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.entity);
+    		Log.d(LOCAL_LOG_TAG, "Entity: " + this.entity);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
+    		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		
     		return null;
     	}
@@ -617,7 +702,30 @@ public class PubsubCommsMgr {
 
     	protected Void doInBackground(Void... args) {
 
-    		PubsubCommsMgr.this.localAndroidComms.getIdentity(client, remoteCallId);
+    		String targetMethod = XMPPAgent.methodsArray[5];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		
     		return null;
     	}
@@ -648,7 +756,31 @@ public class PubsubCommsMgr {
 
     	protected Void doInBackground(Void... args) {
 
-    		PubsubCommsMgr.this.localAndroidComms.getDomainAuthorityNode(client, remoteCallId);
+    		String targetMethod = XMPPAgent.methodsArray[6];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
     		return null;
     	}
     }
@@ -676,7 +808,31 @@ public class PubsubCommsMgr {
     	}
 
     	protected Void doInBackground(Void... args) {
-    		PubsubCommsMgr.this.localAndroidComms.isConnected(client, remoteCallId);
+    		String targetMethod = XMPPAgent.methodsArray[8];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
     		return null;
     	}
     }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,12 +65,16 @@ public class PubsubServiceBase implements IPubsubService {
 	private PubsubCommsMgr pubsubClientMgr;
 	private Context androidContext;
 	private boolean restrictBroadcast;
-	private Map<Subscription,List<ISubscriber>> subscribers;	
+//	private Map<Subscription,List<ISubscriber>> subscribers;	
+	private Map<String, Integer> subscribedNodes;
 	
 	public PubsubServiceBase (Context androidContext, PubsubCommsMgr pubsubClientMgr, boolean restrictBroadcast) {
 		this.pubsubClientMgr = pubsubClientMgr;
 		this.androidContext = androidContext;
 		this.restrictBroadcast = restrictBroadcast;
+//		this.subscribers = new HashMap<Subscription, List<ISubscriber>>();
+		this.subscribedNodes = Collections.synchronizedMap(new HashMap<String, Integer>());
+		
 		Log.d(LOG_TAG, "Broadcast restricted : " + this.restrictBroadcast);
 		Log.d(LOG_TAG, "PubsubServiceBase object constructed");
 	}
@@ -140,7 +145,19 @@ public class PubsubServiceBase implements IPubsubService {
 
 	@Override
 	public boolean unBindFromAndroidComms(String client, long remoteCallID) {
-		return this.pubsubClientMgr.unbindCommsService();
+		if (this.pubsubClientMgr.unbindCommsService()) {
+			//Send intent
+			Intent intent = new Intent();
+			if (PubsubServiceBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+			intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
+			intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+
+		}
+		return false;
 	}
 
 
@@ -600,78 +617,64 @@ public class PubsubServiceBase implements IPubsubService {
 			final IIdentity pubsubServiceIdentity;
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
 			
-			final Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, null);
-			final List<ISubscriber> subscriberList = subscribers.get(subscription);
+			synchronized (this.subscribedNodes) {
+				if (!this.subscribedNodes.containsKey(node)) {
+					
+					Stanza stanza = new Stanza(pubsubServiceIdentity);
+					Pubsub payload = new Pubsub();
+					Subscribe sub = new Subscribe();
+					sub.setJid(localIdentity().getJid());
+					sub.setNode(node);
+					payload.setSubscribe(sub);
 			
-			if (subscriberList==null) {
-				final List<ISubscriber> newSubscriberList = new ArrayList<ISubscriber>();
-				
-				Stanza stanza = new Stanza(pubsubServiceIdentity);
-				Pubsub payload = new Pubsub();
-				Subscribe sub = new Subscribe();
-				sub.setJid(localIdentity().getBareJid());
-				sub.setNode(node);
-				payload.setSubscribe(sub);
-		
-				try {
-					this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
-						
-						public void receiveResult(Stanza arg0, Object response) {
-//							String subId = ((Pubsub)response).getSubscription().getSubid();
-//							Subscription newSubscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, subId);
-//							subscribers.put(newSubscription, subscriberList);
-							//Send intent
-							Intent intent = new Intent();
-							if (PubsubServiceBase.this.restrictBroadcast) {
-								intent.setPackage(client);
-							}
-							intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-							intent.setAction(IPubsubService.SUBSCRIBER_SUBSCRIBE);
-							intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) response);
-							PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+					try {
+						this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 							
-//							newSubscriberList.add(subscriber);
-//							try {
-//								return new SubscriptionParcelable(subscription, this.pubsubClientMgr.getIdManager());
-//							} catch (InvalidFormatException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
+							public void receiveResult(Stanza arg0, Object response) {
+								//Send intent
+								Intent intent = new Intent();
+								if (PubsubServiceBase.this.restrictBroadcast) {
+									intent.setPackage(client);
+								}
+								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+								intent.setAction(IPubsubService.SUBSCRIBER_SUBSCRIBE);
+								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) response);
+								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+								//Add the node from the subscribed node store
 
-						}
-						
-						public void receiveMessage(Stanza arg0, Object arg1) {
-							// TODO Auto-generated method stub
+								PubsubServiceBase.this.subscribedNodes.put(node, 1);
+							}
 							
-						}
-						
-						public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-							// TODO Auto-generated method stub
+							public void receiveMessage(Stanza arg0, Object arg1) {
+							}
 							
-						}
-						
-						public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-							// TODO Auto-generated method stub
+							public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+							}
 							
-						}
-						
-						public void receiveError(Stanza arg0, XMPPError arg1) {
-							// TODO Auto-generated method stub
+							public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+							}
 							
-						}
-						
-						public List<String> getXMLNamespaces() {
-							return NAMESPACES;
-						}
-						
-						public List<String> getJavaPackages() {
-							return PACKAGES;
-						}
-					});
-				} catch (CommunicationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+							public void receiveError(Stanza arg0, XMPPError arg1) {
+							}
+							
+							public List<String> getXMLNamespaces() {
+								return NAMESPACES;
+							}
+							
+							public List<String> getJavaPackages() {
+								return PACKAGES;
+							}
+						});
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					//Increment the number of subscribers to a particular node
+					Integer subscribedCount = PubsubServiceBase.this.subscribedNodes.get(node);
+					PubsubServiceBase.this.subscribedNodes.put(node, subscribedCount + 1);
 				}
+				
 			}
 		} catch (XMPPError e1) {
 			// TODO Auto-generated catch block
@@ -682,7 +685,7 @@ public class PubsubServiceBase implements IPubsubService {
 
 
 
-	public boolean subscriberUnsubscribe(final String client, String pubsubService, String node, final long remoteCallID) {
+	public boolean subscriberUnsubscribe(final String client, String pubsubService, final String node, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
@@ -692,79 +695,84 @@ public class PubsubServiceBase implements IPubsubService {
 		IIdentity pubsubServiceIdentity = null;
 		try {
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
+
+			synchronized (this.subscribedNodes) {
+				if (1 == this.subscribedNodes.get(node)) {
+					Stanza stanza = new Stanza(pubsubServiceIdentity);
+					Pubsub payload = new Pubsub();
+					Unsubscribe unsub = new Unsubscribe();
+					unsub.setJid(localIdentity().getJid());
+					unsub.setNode(node);
+					payload.setUnsubscribe(unsub);
+			
+					try {
+						this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+							
+							public void receiveResult(Stanza stanza, Object object) {
+								//Send intent
+								Intent intent = new Intent();
+								if (PubsubServiceBase.this.restrictBroadcast) {
+									intent.setPackage(client);
+								}
+								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+								intent.setAction(IPubsubService.SUBSCRIBER_UNSUBSCRIBE);
+								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
+								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+								//Remove the node from the subscribed node store
+								PubsubServiceBase.this.subscribedNodes.remove(node);
+							}
+							
+							public void receiveMessage(Stanza arg0, Object arg1) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							public void receiveError(Stanza arg0, XMPPError arg1) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							public List<String> getXMLNamespaces() {
+								return NAMESPACES;
+							}
+							
+							public List<String> getJavaPackages() {
+								return PACKAGES;
+							}
+						});
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				} else {
+					//Decrement the number of subscribers to a particular node
+					Integer subscribedCount = PubsubServiceBase.this.subscribedNodes.get(node);
+					PubsubServiceBase.this.subscribedNodes.put(node, subscribedCount - 1);
+				}
+			}
 		} catch (XMPPError e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, null);
-		List<ISubscriber> subscriberList = subscribers.get(subscription);
-//		subscriberList.remove(subscriber);  // TODO Unsubscribes all subcribers. Change 
-		subscriberList.clear();             //  to allow single unsubscription.
-		
-		if (subscriberList.size()==0) {
-			Stanza stanza = new Stanza(pubsubServiceIdentity);
-			Pubsub payload = new Pubsub();
-			Unsubscribe unsub = new Unsubscribe();
-			unsub.setJid(localIdentity().getJid());
-			unsub.setNode(node);
-			payload.setUnsubscribe(unsub);
-	
-			try {
-				this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
-					
-					public void receiveResult(Stanza stanza, Object object) {
-						//Send intent
-						Intent intent = new Intent();
-						if (PubsubServiceBase.this.restrictBroadcast) {
-							intent.setPackage(client);
-						}
-						intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-						intent.setAction(IPubsubService.SUBSCRIBER_UNSUBSCRIBE);
-						intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
-						PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 
-					}
-					
-					public void receiveMessage(Stanza arg0, Object arg1) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					public void receiveError(Stanza arg0, XMPPError arg1) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					public List<String> getXMLNamespaces() {
-						return NAMESPACES;
-					}
-					
-					public List<String> getJavaPackages() {
-						return PACKAGES;
-					}
-				});
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		return false;
 	}
 
 	private IIdentity convertStringToIdentity(String jid) throws XMPPError {
 		IIdentity returnIdentity = null;
 		try {
-			this.pubsubClientMgr.getIdManager().fromJid(jid);
+			returnIdentity = this.pubsubClientMgr.getIdManager().fromJid(jid);
 		} catch (InvalidFormatException e) {
 			throw new XMPPError(StanzaError.jid_malformed, "Invalid JID: "+jid);
 		}
@@ -775,7 +783,7 @@ public class PubsubServiceBase implements IPubsubService {
 		IIdentity returnIdentity = null;
 
 		try {
-			this.pubsubClientMgr.getIdManager().getThisNetworkNode();
+			returnIdentity = this.pubsubClientMgr.getIdManager().getThisNetworkNode();
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

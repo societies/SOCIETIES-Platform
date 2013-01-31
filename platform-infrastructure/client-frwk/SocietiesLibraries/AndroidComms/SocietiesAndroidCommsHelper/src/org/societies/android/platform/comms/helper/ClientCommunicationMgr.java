@@ -556,8 +556,10 @@ public class ClientCommunicationMgr {
 					//Having logged in and obtained the DomainAuthority and Identity JID through chained calls
 					//invoke the appropriate callback
 					if (ClientCommunicationMgr.this.loginCompleted) {
-						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
-				    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
+						synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+							ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+					    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
+						}
 					} else {
 						synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
 							IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
@@ -568,8 +570,8 @@ public class ClientCommunicationMgr {
 				}
 			} else if (intent.getAction().equals(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE)) {
 				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
-			    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
 					ClientCommunicationMgr.this.domainAuthority = intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+			    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
 				}
 
 			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {

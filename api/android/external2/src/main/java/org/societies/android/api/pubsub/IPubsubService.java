@@ -8,11 +8,13 @@ public interface IPubsubService {
 								"publisherPublish(String client, String pubsubService, String node, String itemId, String item, long remoteCallID)",
 								"publisherDelete(String client, String pubsubServiceJid, String node, String itemId, long remoteCallID)",
 								"subscriberSubscribe(String client, String pubsubService, String node, long remoteCallID)",
-								"subscriberUnsubscribe(String client, String pubsubService, String node, long remoteCallID)"
+								"subscriberUnsubscribe(String client, String pubsubService, String node, long remoteCallID)",
+								"bindToAndroidComms(String client, long remoteCallID)",
+								"unBindFromAndroidComms(String client, long remoteCallID)"
 	};
 
 	/**
-	* Android Comms intents
+	* Android Pubsub intents
 	* Used to create to create Intents to signal return values of a called method
 	* If the method is locally bound it is possible to directly return a value but is discouraged
 	* as called methods usually involve making asynchronous calls. 
