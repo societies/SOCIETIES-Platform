@@ -23,9 +23,9 @@
 	</parent>
 	
 	<modules>
-		<module>../schema/external</module>
-		<module>../schema/internal</module>
-		<module>external</module>
-		<module>internal</module>
+		<module>../schema/external/android-pom.xml</module>
+		<module>../schema/internal/android-pom.xml</module>
+		<module>external2</module>
+		<module>internal2</module>
 	</modules>
 </project>
