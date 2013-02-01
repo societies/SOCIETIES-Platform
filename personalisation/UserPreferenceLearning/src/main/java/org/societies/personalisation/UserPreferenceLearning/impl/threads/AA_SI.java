@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -122,14 +123,16 @@ public class AA_SI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			LOG.error("No History found for historyOwner: "+historyOwner.toString());
+			LOG.debug("No History found for historyOwner: "+historyOwner.toString());
 		}
 		//send DPI based output to requestor
 		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
 		try{
 			requestor.handleC45Output(output);
         }catch(Exception e){
-            LOG.error("The C45 requestor service is not available to handle response");
+        	e.printStackTrace();
+        	
+            LOG.debug("The C45 requestor service is not available to handle response\nException: "+e.toString());
         }
 	}
 
@@ -150,7 +153,8 @@ public class AA_SI extends Thread{
 		try{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
-			System.out.println("No rules could be learned from the current history set");
+			e.printStackTrace();
+			System.out.println("No rules could be learned from the current history set\nException: "+e.toString());
 			return null;
 		}
 

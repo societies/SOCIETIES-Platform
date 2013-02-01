@@ -99,8 +99,10 @@ public class Tester {
 					"serviceintest", this.id, "volume");
 			logging.debug("query for preference learning");
 			IAction preference = value.get();
+			Assert.assertNotNull(preference);
 			logging.debug("get preference learning result");
-			Assert.assertTrue(preference.getvalue().equals("10"));
+			Assert.assertNotNull(preference.getvalue());
+			Assert.assertEquals(preference.getvalue(),"0");
 			logging.debug("check the result");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -212,6 +214,8 @@ public class Tester {
 						attrs.get(0)).get();
 			}
 
+			this.symLocAttribute.setHistoryRecorded(true);
+			this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -240,6 +244,8 @@ public class Tester {
 						attrs.get(0)).get();
 			}
 
+			this.statusAttribute.setHistoryRecorded(true);
+			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -265,6 +271,8 @@ public class Tester {
 						attrs.get(0)).get();
 			}
 
+			this.activitiesAttribute.setHistoryRecorded(true);
+			this.activitiesAttribute = (CtxAttribute) this.ctxBroker.update(activitiesAttribute).get();
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
