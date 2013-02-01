@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 /**
  * This Interface defines the methods exposed to a 3rd party service to manage and retrieve CSS related data on behalf of the user.
@@ -49,5 +50,10 @@ public interface ICSSManager {
 	 * @return a HashMap of the result set including the CSS JID of users and associated tags for ranking inspection
 	 */
 	public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetails(FriendFilter filter);
+	
+	/**
+	 * send a friend request to remote css to join
+	 */
+	public void sendCSSFriendRequest(IIdentity friendId, RequestorService service);
 	
 }

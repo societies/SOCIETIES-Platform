@@ -28,12 +28,13 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.css.ICSSManager;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
-import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 
 /**
  * This Interface defines the internal API methods to manage and retrieve CSS
@@ -142,20 +143,11 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<List<CssRequest>> findAllCssRequests();
 
-	/**
-	 * Add update a reuest sent to join your css
-	 */
-	public void updateCssRequest(CssRequest request);
 
 	/**
 	 * send a request to remote css to join
 	 */
 	public void sendCssFriendRequest(String friendCssId);
-
-	/**
-	 * Called by remote css is response t your request to join
-	 */
-	public void updateCssFriendRequest(CssRequest request);
 
 	/**
 	 * 
@@ -201,110 +193,131 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<List<CssAdvertisementRecord>> getFriendRequests();
 
-	/**
-	 * Accept
-	 * 
-	 * @param request
-	 */
-	public void acceptCssFriendRequest(CssRequest request);
-
-	/**
-	 * Decline
-	 * 
-	 * @param request
-	 */
-	public void declineCssFriendRequest(CssRequest request);
-	
-
-	
-	
-	// Proxy methods to CSS Directory and Service Discovery
-	
+	// New methods merging functionality of old methods (see below)
 	
 	/**
-	 * adds advertisement records to CssDirectory
-	 * 
-	 * @param record
+	 * To be called from clients within the same CSS
 	 */
-	public void addAdvertisementRecord(CssAdvertisementRecord record);
-
+	public void handleInternalFriendRequest(IIdentity externalCSS, CssRequestStatusType status);
+	
 	/**
-	 * deletes advertisement record from CssDirectory
-	 * 
-	 * @param record
+	 * To be called from clients external to this CSS
 	 */
-	public void deleteAdvertisementRecord(CssAdvertisementRecord record);
-
-	/**
-	 * updates advertisement records to CssDirectory
-	 * 
-	 * @param currentRecord
-	 *            , newRecord
-	 */
-	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
-			CssAdvertisementRecord updatedRecord);
-
-	/**
-	 * returns all advertisement records in CssDirectory
-	 * 
-	 * @return Future<List<CssAdvertisementRecord>>
-	 */
-	public Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords();
-
-	/**
-	 * finds all services for advertised Css's via service discovery
-	 * 
-	 * @param listCssAds
-	 * @return Future<List<Service>>
-	 */
-	public Future<List<Service>> findAllCssServiceDetails(
-			List<CssAdvertisementRecord> listCssAds);
+	public void handleExternalFriendRequest(IIdentity externalCSS, CssRequestStatusType status);
 
 	
+	// to be replaced by above
 	
+//	/**
+//	 * Add update a reuest sent to join your css
+//	 */
+//	public void updateCssRequest(CssRequest request);
+//	
+//	/**
+//	 * Called by remote css is response t your request to join
+//	 */
+//	public void updateCssFriendRequest(CssRequest request);
+//	
+//	/**
+//	 * Accept
+//	 * 
+//	 * @param request
+//	 */
+//	public void acceptCssFriendRequest(CssRequest request);
+//
+//	/**
+//	 * Decline
+//	 * 
+//	 * @param request
+//	 */
+//	public void declineCssFriendRequest(CssRequest request);
+//	
+
+	
+	// Proxy methods to CSS Directory and Service Discovery - to be removed
+		
+//	/**
+//	 * adds advertisement records to CssDirectory
+//	 * 
+//	 * @param record
+//	 */
+//	public void addAdvertisementRecord(CssAdvertisementRecord record);
+//
+//	/**
+//	 * deletes advertisement record from CssDirectory
+//	 * 
+//	 * @param record
+//	 */
+//	public void deleteAdvertisementRecord(CssAdvertisementRecord record);
+//
+//	/**
+//	 * updates advertisement records to CssDirectory
+//	 * 
+//	 * @param currentRecord
+//	 *            , newRecord
+//	 */
+//	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
+//			CssAdvertisementRecord updatedRecord);
+//
+//	/**
+//	 * returns all advertisement records in CssDirectory
+//	 * 
+//	 * @return Future<List<CssAdvertisementRecord>>
+//	 */
+//	public Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords();
+//
+//	/**
+//	 * finds all services for advertised Css's via service discovery
+//	 * 
+//	 * @param listCssAds
+//	 * @return Future<List<Service>>
+//	 */
+//	public Future<List<Service>> findAllCssServiceDetails(
+//			List<CssAdvertisementRecord> listCssAds);
+
 	
 	// No implementation of the following methods
 	
-	/**
-	 * Change the status a CSS device
-	 * 
-	 * @param profile
-	 * @return Future<CssInterfaceResult>
-	 */
-	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile);
-	
-	/**
-	 * Login with chosen Domain server
-	 * 
-	 * @param profile
-	 * @return Future<CssInterfaceResult>
-	 */
-	public Future<CssInterfaceResult> loginXMPPServer(CssRecord profile);
-	
-	/**
-	 * Logout from chosen Domain server
-	 * 
-	 * @param profile
-	 * @return Future<CssInterfaceResult>
-	 */
-	public Future<CssInterfaceResult> logoutXMPPServer(CssRecord profile);
-	
-	/**
-	 * Set the presence status of the user
-	 * 
-	 * @param profile
-	 * @return Future<CssInterfaceResult>
-	 */
-	public Future<CssInterfaceResult> setPresenceStatus(CssRecord profile);
-
-	/**
-	 * Synchronise the CSS profile. The CSS cloud node's current profile is
-	 * synchronised with the local device's cached version
-	 * 
-	 * @param profile
-	 * @return Future<CssInterfaceResult>
-	 */
-	public Future<CssInterfaceResult> synchProfile(CssRecord profile);
+//	/**
+//	 * Change the status a CSS device
+//	 * 
+//	 * @param profile
+//	 * @return Future<CssInterfaceResult>
+//	 */
+//	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile);
+//	
+//	/**
+//	 * Login with chosen Domain server
+//	 * 
+//	 * @param profile
+//	 * @return Future<CssInterfaceResult>
+//	 */
+//	public Future<CssInterfaceResult> loginXMPPServer(CssRecord profile);
+//	
+//	/**
+//	 * Logout from chosen Domain server
+//	 * 
+//	 * @param profile
+//	 * @return Future<CssInterfaceResult>
+//	 */
+//	public Future<CssInterfaceResult> logoutXMPPServer(CssRecord profile);
+//	
+//	/**
+//	 * Set the presence status of the user
+//	 * 
+//	 * @param profile
+//	 * @return Future<CssInterfaceResult>
+//	 */
+//	public Future<CssInterfaceResult> setPresenceStatus(CssRecord profile);
+//
+//	/**
+//	 * Synchronise the CSS profile. The CSS cloud node's current profile is
+//	 * synchronised with the local device's cached version
+//	 * 
+//	 * @param profile
+//	 * @return Future<CssInterfaceResult>
+//	 */
+//	public Future<CssInterfaceResult> synchProfile(CssRecord profile);
 	
 	// moved to external Interface
 	

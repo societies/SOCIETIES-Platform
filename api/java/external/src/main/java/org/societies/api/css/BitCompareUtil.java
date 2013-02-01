@@ -24,37 +24,43 @@
  */
 package org.societies.api.css;
 
-public class FlagUtility {
+/**
+ * 
+ * Util class to define and compare bit flags for filter and ranking properties.
+ *
+ * @author David McKitterick
+ */
+public class BitCompareUtil {
 
-	public static int FILTER_FACEBOOK 		= 0x0000000001;
-	public static int FILTER_TWITTER 		= 0x0000000010;
-	public static int FILTER_LINKEDIN 		= 0x0000000100;
-	public static int FILTER_FOURSQUARE 	= 0x0000001000;
-	public static int FILTER_GOOGLEPLUS 	= 0x0000010000;
-	public static int FILTER_CIS_MEMBERS 	= 0x0000100000;
+	public static int FACEBOOK_BIT 		= 0x0000000001;
+	public static int TWITTER_BIT 		= 0x0000000010;
+	public static int LINKEDIN_BIT 		= 0x0000000100;
+	public static int FOURSQUARE_BIT 	= 0x0000001000;
+	public static int GOOGLEPLUS_BIT 	= 0x0000010000;
+	public static int CIS_MEMBERS_BIT 	= 0x0000100000;
 	
 	public static boolean isFacebookFlagged(int flag) {
-		  return (flag & FILTER_FACEBOOK) == FILTER_FACEBOOK; 
+		  return (flag & FACEBOOK_BIT) == FACEBOOK_BIT; 
 	}
 	
 	public static boolean isTwitterFlagged(int flag) {
-		  return (flag & FILTER_TWITTER) == FILTER_TWITTER; 
+		  return (flag & TWITTER_BIT) == TWITTER_BIT; 
 	}
 	
 	public static boolean isLinkedinFlagged(int flag) {
-		  return (flag & FILTER_LINKEDIN) == FILTER_LINKEDIN; 
+		  return (flag & LINKEDIN_BIT) == LINKEDIN_BIT; 
 	}
 	
 	public static boolean isFoursquareFlagged(int flag) {
-		  return (flag & FILTER_FOURSQUARE) == FILTER_FOURSQUARE; 
+		  return (flag & FOURSQUARE_BIT) == FOURSQUARE_BIT; 
 	}
 	
 	public static boolean isGooglePlusFlagged(int flag) {
-		  return (flag & FILTER_GOOGLEPLUS) == FILTER_GOOGLEPLUS; 
+		  return (flag & GOOGLEPLUS_BIT) == GOOGLEPLUS_BIT; 
 	}
 	
 	public static boolean isCisMembersFlagged(int flag) {
-		  return (flag & FILTER_CIS_MEMBERS) == FILTER_CIS_MEMBERS; 
+		  return (flag & CIS_MEMBERS_BIT) == CIS_MEMBERS_BIT; 
 	}
 	
 }
