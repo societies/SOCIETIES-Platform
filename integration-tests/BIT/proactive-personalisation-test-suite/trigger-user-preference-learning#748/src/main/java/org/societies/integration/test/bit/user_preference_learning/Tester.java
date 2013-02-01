@@ -52,7 +52,7 @@ public class Tester {
 		try {
 			this.uam = Test748.getUam();
 			this.idm = Test748.getCommManager().getIdManager();
-			logging.debug("initializing UAM");
+			logging.debug("initializing test");
 			this.ctxBroker = Test748.getCtxBroker();
 			this.userId = idm.getThisNetworkNode();
 			id = new ServiceResourceIdentifier();
@@ -114,16 +114,34 @@ public class Tester {
 	private void changeContext(String symLocValue, String statusValue,
 			String activityValue) {
 		try {
-			this.symLocAttribute.setStringValue(symLocValue);
+			this.symLocAttribute = this.ctxBroker.updateAttribute(this.symLocAttribute.getId(), symLocValue).get();
+			
+			/* 31/1/2013: Eliza replaced the following lines with the above. 
+			 * Lines below assume that symlocAttribute is not changed in the DB which causes a conflict 
+			 * if another component has updated this attribute after it was retrieved by this instance
+			 */
+			
+			/*this.symLocAttribute.setStringValue(symLocValue);
 			this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(
-					symLocAttribute).get();
+					symLocAttribute).get();*/
 
-			this.statusAttribute.setStringValue(statusValue);
+			/*
+			 * 31/1/2013: same as above
+			 */
+			
+			this.statusAttribute = this.ctxBroker.updateAttribute(this.statusAttribute.getId(), statusValue).get();
+			/*this.statusAttribute.setStringValue(statusValue);
 			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(
-					statusAttribute).get();
-			this.activitiesAttribute.setStringValue(activityValue);
+					statusAttribute).get();*/
+			
+			/*
+			 * 31/1/2013: same as above
+			 */
+			
+			this.activitiesAttribute = this.ctxBroker.updateAttribute(this.activitiesAttribute.getId(), activityValue).get();
+			/*this.activitiesAttribute.setStringValue(activityValue);
 			this.activitiesAttribute = (CtxAttribute) this.ctxBroker.update(
-					activitiesAttribute).get();
+					activitiesAttribute).get();*/
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

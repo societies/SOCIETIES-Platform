@@ -32,8 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 //import org.societies.api.context.CtxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ActionSubset;
@@ -47,7 +50,7 @@ import weka.core.Instances;
 public class PreProcessor {
 
 	Map<String, ArrayList<String>> ruleVariables; //paramName, list of values
-
+	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 	public ServiceSubset extractServiceActions
 	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data, ServiceResourceIdentifier serviceId, String parameterName){
 
@@ -59,13 +62,16 @@ public class PreProcessor {
 			try {
 				CtxHistoryAttribute nextActionAttr = (CtxHistoryAttribute)data_it.next();
 				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
-				if(nextAction.getServiceID().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
+				if (ServiceModelUtils.compare(nextAction.getServiceID(), serviceId)){
+				// 31/1/13 eliza comments out: if(nextAction.getServiceID().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
+					this.LOG.debug("Found history for this serviceId: "+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
 					if(nextAction.getparameterName().equals(parameterName)){
 						//add action and snapshot to extracted list
 						actionSubset.put(nextActionAttr, data.get(nextActionAttr));
 						if(serviceType == null){
 							serviceType = nextAction.getServiceType();
 						}
+						this.LOG.debug("Adding history record to serviceSubset"+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
 					}
 				}
 			} catch (Exception e) {  //CtxException
@@ -443,7 +449,8 @@ public class PreProcessor {
 		Iterator<ServiceSubset> subsets_it = subsets.iterator();
 		while(subsets_it.hasNext()){
 			ServiceSubset nextSubset = (ServiceSubset)subsets_it.next();
-			if(nextSubset.getServiceId().getIdentifier().equals(serviceId.getIdentifier())){
+			if (ServiceModelUtils.compare(nextSubset.getServiceId(), serviceId)){
+			//31/1/13 eliza comments out: if(nextSubset.getServiceId().getIdentifier().equals(serviceId.getIdentifier())){
 				serviceSubset = nextSubset;
 				break;
 			}
