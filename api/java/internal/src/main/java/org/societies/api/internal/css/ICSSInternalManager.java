@@ -35,6 +35,7 @@ import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.servicelifecycle.model.Service;
 
 /**
  * This Interface defines the internal API methods to manage and retrieve CSS
@@ -208,72 +209,81 @@ public interface ICSSInternalManager extends ICSSManager {
 	
 	// to be replaced by above
 	
-//	/**
-//	 * Add update a reuest sent to join your css
-//	 */
-//	public void updateCssRequest(CssRequest request);
-//	
-//	/**
-//	 * Called by remote css is response t your request to join
-//	 */
-//	public void updateCssFriendRequest(CssRequest request);
-//	
-//	/**
-//	 * Accept
-//	 * 
-//	 * @param request
-//	 */
-//	public void acceptCssFriendRequest(CssRequest request);
-//
-//	/**
-//	 * Decline
-//	 * 
-//	 * @param request
-//	 */
-//	public void declineCssFriendRequest(CssRequest request);
-//	
+	/**
+	 * @deprecated
+	 * Add update a reuest sent to join your css
+	 */
+	public void updateCssRequest(CssRequest request);
+	
+	/**
+	 * @deprecated
+	 * Called by remote css is response t your request to join
+	 */
+	public void updateCssFriendRequest(CssRequest request);
+	
+	/**
+	 * @deprecated
+	 * Accept
+	 * 
+	 * @param request
+	 */
+	public void acceptCssFriendRequest(CssRequest request);
+
+	/**
+	 * @deprecated
+	 * Decline
+	 * 
+	 * @param request
+	 */
+	public void declineCssFriendRequest(CssRequest request);
+	
 
 	
 	// Proxy methods to CSS Directory and Service Discovery - to be removed
 		
-//	/**
-//	 * adds advertisement records to CssDirectory
-//	 * 
-//	 * @param record
-//	 */
-//	public void addAdvertisementRecord(CssAdvertisementRecord record);
-//
-//	/**
-//	 * deletes advertisement record from CssDirectory
-//	 * 
-//	 * @param record
-//	 */
-//	public void deleteAdvertisementRecord(CssAdvertisementRecord record);
-//
-//	/**
-//	 * updates advertisement records to CssDirectory
-//	 * 
-//	 * @param currentRecord
-//	 *            , newRecord
-//	 */
-//	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
-//			CssAdvertisementRecord updatedRecord);
-//
-//	/**
-//	 * returns all advertisement records in CssDirectory
-//	 * 
-//	 * @return Future<List<CssAdvertisementRecord>>
-//	 */
-//	public Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords();
-//
-//	/**
-//	 * finds all services for advertised Css's via service discovery
-//	 * 
-//	 * @param listCssAds
-//	 * @return Future<List<Service>>
-//	 */
-//	public Future<List<Service>> findAllCssServiceDetails(
-//			List<CssAdvertisementRecord> listCssAds);
+	/**
+	 * @deprecated
+	 * adds advertisement records to CssDirectory
+	 * 
+	 * @param record
+	 */
+	public void addAdvertisementRecord(CssAdvertisementRecord record);
+
+	/**
+	 * @deprecated
+	 * deletes advertisement record from CssDirectory
+	 * 
+	 * @param record
+	 */
+	public void deleteAdvertisementRecord(CssAdvertisementRecord record);
+
+	/**
+	 * @deprecated
+	 * updates advertisement records to CssDirectory
+	 * 
+	 * @param currentRecord
+	 *            , newRecord
+	 */
+	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
+			CssAdvertisementRecord updatedRecord);
+
+	/**
+	 * @deprecated
+	 * returns all advertisement records in CssDirectory
+	 * 
+	 * @return Future<List<CssAdvertisementRecord>>
+	 */
+	public Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords();
+
+	/**
+	 * @deprecated
+	 * finds all services for advertised Css's via service discovery
+	 * 
+	 * @param listCssAds
+	 * @return Future<List<Service>>
+	 */
+	public Future<List<Service>> findAllCssServiceDetails(
+			List<CssAdvertisementRecord> listCssAds);
 
 	
 	// No implementation of the following methods
