@@ -85,4 +85,13 @@
         </plugins>
     </build>
 
+	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>findbugs-maven-plugin</artifactId>
+	      </plugin>
+	    </plugins>
+	</reporting>
+
 </project>
