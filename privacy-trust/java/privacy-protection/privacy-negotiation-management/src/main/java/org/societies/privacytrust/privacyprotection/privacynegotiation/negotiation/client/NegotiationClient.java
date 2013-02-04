@@ -399,7 +399,7 @@ public class NegotiationClient implements INegotiationClient {
 	 * HELPER METHODS BELOW
 	 */
 
-	
+
 	private List<String> dataTypesExist(RequestPolicy policy){
 		List<String> notFoundContextTypes = new ArrayList<String>();
 		List<RequestItem> items = policy.getRequests();
@@ -408,11 +408,20 @@ public class NegotiationClient implements INegotiationClient {
 				String dataType = item.getResource().getDataType();
 
 				DataIdentifierScheme scheme = item.getResource().getScheme();
-				DataHelper helper = new DataHelper(ctxBroker, userIdentity);
-				if (!helper.dataTypeExists(item)){
-					notFoundContextTypes.add(dataType);
+				if (scheme.equals(DataIdentifierScheme.CONTEXT)){
+					DataHelper helper = new DataHelper(ctxBroker, userIdentity);
+					if (!helper.dataTypeExists(item)){
+						notFoundContextTypes.add(dataType);
+					}
+				}else if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.CIS)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.CSS)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.DEVICE)){
+					//TODO
 				}
-				
 			}
 		}
 		return notFoundContextTypes;
