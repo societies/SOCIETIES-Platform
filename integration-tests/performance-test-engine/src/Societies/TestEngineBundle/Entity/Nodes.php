@@ -24,7 +24,7 @@ class Nodes
     /**
      * @var string $node_id
      *
-     * @ORM\Column(name="node_id", type="string", length=255)
+     * @ORM\Column(name="node_id", type="string", length=255, unique=true)
      */
     private $node_id;
 
@@ -34,12 +34,19 @@ class Nodes
      * @ORM\Column(name="node_name", type="string", length=255)
      */
     private $node_name;
+    
+    /**
+     * @var string $node_host
+     *
+     * @ORM\Column(name="node_host", type="string", length=255, unique=true)
+     */
+    private $node_host;
 
     /**
-     * @ORM\OneToMany(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTestResult", mappedBy="node")
+     * @ORM\OneToMany(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTestResult", mappedBy="node", cascade={"persist"})
      */
     private $performanceTestResults;
-
+    
     /**
      * Constructor
      */
@@ -105,6 +112,29 @@ class Nodes
     }
 
     /**
+     * Set node_host
+     *
+     * @param string $nodeHost
+     * @return Nodes
+     */
+    public function setNodeHost($nodeHost)
+    {
+        $this->node_host = $nodeHost;
+    
+        return $this;
+    }
+
+    /**
+     * Get node_host
+     *
+     * @return string 
+     */
+    public function getNodeHost()
+    {
+        return $this->node_host;
+    }
+
+    /**
      * Add performanceTestResults
      *
      * @param Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults
@@ -113,7 +143,7 @@ class Nodes
     public function addPerformanceTestResult(\Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults)
     {
         $this->performanceTestResults[] = $performanceTestResults;
-    
+        $performanceTestResults->setNode($this);
         return $this;
     }
 

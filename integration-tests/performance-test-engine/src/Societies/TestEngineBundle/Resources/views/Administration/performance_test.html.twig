@@ -1,0 +1,25 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }} - Nodes{% endblock %}
+ 
+{% block body %}
+	{{ parent() }}
+	
+	
+	<h3>Perfomance Test List</h3>
+	<ul>
+  		{% for performance_test in performance_tests_list %}
+   			 <li><a href="{{path('admin_get_performance_test_by_id', {'test_id': performance_test.id})}}">{{performance_test.testName}}</a></li>
+ 		{% endfor %}
+	</ul>
+	
+	<br/>
+	
+	<h3>Add a New Performance Test</h3>
+	
+		{% if result is defined %}
+			<p>{{ result }}</p>
+		{% endif %}
+		
+ 		{% include "SocietiesTestEngineBundle:Administration:performance_test_form.htm.twig" %}
+{% endblock %}

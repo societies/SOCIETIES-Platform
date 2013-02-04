@@ -42,6 +42,6 @@ public interface ICisMgmtPerformanceTest {
 	 * @param cisId Represents the JID of CIS that we want to join
 	 * @return
 	 */
-	public void joinCisTest(PerformanceTestMgmtInfo performanceTestInfo, String cssOwnerId, String cisId);
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestInfo, JoinCisParameters joinCisParameters);
 }
 
