@@ -58,6 +58,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 
     private static final String SIMPLE_XML_MESSAGE = "<iq from='romeo@montague.net/orchard to='juliet@capulet.com/balcony'> " +
     													"<query xmlns='http://jabber.org/protocol/disco#info'/></iq>";
+    private boolean testCompleted;
     
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -70,6 +71,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	}
 	@MediumTest
 	public void testConstructorLogin() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertNotNull(ccm);
 		
@@ -82,12 +84,15 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 			public void returnAction(boolean flag) {
 				assertTrue(flag);
 				assertTrue(ccm.unbindCommsService());
+				TestAndroidCommsHelper.this.testCompleted = true;
 			}
 		});
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 	@MediumTest
 	public void testIsConnected() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		
 		assertNotNull(ccm);
@@ -110,11 +115,13 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 					public void returnAction(boolean flag) {
 						assertFalse(flag);
 						assertTrue(ccm.unbindCommsService());
+						TestAndroidCommsHelper.this.testCompleted = true;
 					}
 				});
 			}
 		});
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 	@MediumTest 
 	/**
@@ -122,6 +129,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	 * @throws Exception
 	 */
 	public void testNoLogin() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		final ClientCommunicationMgr ccmOther = new ClientCommunicationMgr(this.getContext(), true);
 		
@@ -179,6 +187,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 															assertTrue(flag);
 															assertTrue(ccm.unbindCommsService());
 															assertTrue(ccmOther.unbindCommsService());
+															TestAndroidCommsHelper.this.testCompleted = true;
 														}
 													});
 												} catch (Exception e) {
@@ -202,6 +211,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		});
 		
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 //	@MediumTest 
 	/**
@@ -210,6 +220,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	 * @throws Exception
 	 */
 	public void testGetItems() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		final ClientCommunicationMgr ccmOther = new ClientCommunicationMgr(this.getContext(), true);
 		
@@ -273,6 +284,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																	assertTrue(flag);
 																	assertTrue(ccm.unbindCommsService());
 																	assertTrue(ccmOther.unbindCommsService());
+																	TestAndroidCommsHelper.this.testCompleted = true;
 																}
 															});
 
@@ -290,6 +302,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																	assertTrue(flag);
 																	assertTrue(ccm.unbindCommsService());
 																	assertTrue(ccmOther.unbindCommsService());
+																	TestAndroidCommsHelper.this.testCompleted = true;
 																}
 															});
 														}
@@ -344,6 +357,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		});
 		
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 
 	@MediumTest
@@ -353,6 +367,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	 * @throws Exception
 	 */
 	public void testLogin() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertTrue(null != ccm);
 		
@@ -393,6 +408,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 											public void returnAction(boolean flag) {
 												assertTrue(flag);
 												assertTrue(ccm.unbindCommsService());
+												TestAndroidCommsHelper.this.testCompleted = true;
 											}
 										});
 									}
@@ -409,10 +425,12 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);	
+		assertTrue(this.testCompleted);
 	}
 	
 	@MediumTest
 	public void testRegistration() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertTrue(null != ccm);
 		
@@ -475,6 +493,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																	public void returnAction(boolean result) {
 																		assertTrue(result);
 																		assertTrue(ccm.unbindCommsService());
+																		TestAndroidCommsHelper.this.testCompleted = true;
 																	}
 																});
 															}
@@ -523,6 +542,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		});
 
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 	
 	@MediumTest
@@ -532,6 +552,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	 * @throws Exception
 	 */
 	public void testGetIdentity() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertTrue(null != ccm);
 		
@@ -585,6 +606,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 											public void returnAction(boolean flag) {
 												assertTrue(flag);
 												assertTrue(ccm.unbindCommsService());
+												TestAndroidCommsHelper.this.testCompleted = true;
 											}
 										});
 									}
@@ -601,6 +623,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);	
+		assertTrue(this.testCompleted);
 	}
 	@MediumTest
 	/**
@@ -609,6 +632,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 	 * @throws Exception
 	 */
 	public void testSendMessage() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertTrue(null != ccm);
 		
@@ -668,6 +692,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 											public void returnAction(boolean flag) {
 												assertTrue(flag);
 												assertTrue(ccm.unbindCommsService());
+												TestAndroidCommsHelper.this.testCompleted = true;
 											}
 										});
 									}
@@ -684,10 +709,12 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);	
+		assertTrue(this.testCompleted);
 	}
 
 	@MediumTest
 	public void testNewIdentity() throws Exception {
+		this.testCompleted = false;
 		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
 		assertTrue(null != ccm);
 		
@@ -721,6 +748,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 										public void returnAction(String value) {
 											assertEquals(XMPP_NEW_JID, value);
 											assertTrue(ccm.unbindCommsService());
+											TestAndroidCommsHelper.this.testCompleted = true;
 										}
 										
 										public void returnAction(boolean arg0) {
@@ -739,5 +767,6 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 		});
 
 		Thread.sleep(DELAY);	
+		assertTrue(this.testCompleted);
 	}
 }

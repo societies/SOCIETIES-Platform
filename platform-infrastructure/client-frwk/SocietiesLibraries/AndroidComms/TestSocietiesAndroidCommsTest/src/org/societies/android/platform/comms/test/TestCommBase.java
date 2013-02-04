@@ -24,6 +24,9 @@ import android.util.Log;
 import junit.framework.TestCase;
 
 /**
+ * This test suite tests the Android Comms service which provides the gateway to the XMPP Societies communications
+ * using asmack.
+ * 
  * In order to run the tests contained in this class ensure that the following steps are taken:
  * 
  * 1. An Openfire XMPP server must be running
@@ -55,7 +58,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
                                         "org.jabber.protocol.pubsub.event");
 
     private Random random;
-    
+    private boolean testCompleted;
+
     private static final int DELAY = 3000;
     
     //Modify these constants to suit local XMPP server
@@ -93,6 +97,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	
 	@MediumTest
 	public void testRegistration() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -136,11 +141,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 	}
 	
 	@MediumTest
 	public void testSuccessfulLogin() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -172,11 +180,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 	}
 
 	@MediumTest
 	public void testBadUserLogin() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupAlternativeReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -199,11 +210,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 	}
 
 	@MediumTest
 	public void testBadPasswordLogin() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupAlternativeReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -226,11 +240,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 	}
 
 	@MediumTest
 	public void testCreateIdentity() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -252,11 +269,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			fail();
 		} finally {
 			unregisterReceiver(receiver);
+			assertTrue(this.testCompleted);
+
 		}
 	}
 
 	@MediumTest
 	public void testSendMessage() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -286,6 +306,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 
 	}
@@ -293,6 +315,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	//@MediumTest
 	//TODO Requires more work or a sample XML message
 	public void testSendIQ() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 
 		Intent commsIntent = new Intent(getContext(), ServicePlatformCommsTest.class);
@@ -321,6 +344,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 			commsService.logout(CLIENT, this.random.nextLong());
 			unregisterReceiver(receiver);
 			Thread.sleep(DELAY);
+			assertTrue(this.testCompleted);
+
 		}
 
 	}
@@ -390,6 +415,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				assertEquals(XMPP_SUCCESSFUL_JID, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				TestCommBase.this.testCompleted = true;
+
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 			}
@@ -416,6 +443,8 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 				assertNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+				TestCommBase.this.testCompleted = true;
+
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				Log.d(LOG_TAG, "Un-Register Comm Manager: " + intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 				assertEquals(true, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));

@@ -15,6 +15,8 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
 /**
+ * The test suite tests the Pubsub service and its interaction with the Android Societies Comms service.
+ *
  * In order to run the tests contained in this class ensure that the following steps are taken:
  * 
  * 1. An Openfire XMPP server must be running
@@ -22,6 +24,8 @@ import android.util.Log;
  * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid
  * 4. The Android Client or Login Tester app must have already logged in successfully
  *
+ * Consult http://xmpp.org/extensions/xep-0060.html (Pubsub XMPP XEP) for more details especially 
+ * on Pubsub error messages (SEND_IQ_ERROR)
  */
 
 public class TestSocietiesAndroidPubsub  extends ServiceTestCase <ServicePlatformPubsubTest> {
