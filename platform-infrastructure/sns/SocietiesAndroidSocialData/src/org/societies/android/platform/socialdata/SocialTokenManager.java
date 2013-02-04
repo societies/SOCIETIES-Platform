@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.societies.android.api.internal.sns.ISocialTokenManager;
 import org.societies.android.platform.MultiValueMap;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.Service;
@@ -49,7 +49,7 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	private static final String LOG_TAG = SocialTokenManager.class.getName();
 
 	private IBinder binder = null;
-	private MultiValueMap<SocialNetwork, String> requests = new MultiValueMap<SocialNetwork, String>();
+	private MultiValueMap<Socialnetwork, String> requests = new MultiValueMap<Socialnetwork, String>();
 	
     @Override
 	public void onCreate () {
@@ -79,7 +79,7 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	
 	// Service API
 	
-	public synchronized void getToken(String client, SocialNetwork socialNetwork) {	
+	public synchronized void getToken(String client, Socialnetwork socialNetwork) {	
 		Dbc.require("client cannot be null", client != null && client.length() > 0);
 		Dbc.require("socialNetwork cannot be null", socialNetwork != null);		
 		
@@ -94,7 +94,7 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	}
 	
 	// To receive token from BridgeActivity
-	synchronized void returnToken(SocialNetwork socialNetwork, String token, String expires) {
+	synchronized void returnToken(Socialnetwork socialNetwork, String token, String expires) {
 		List<String> clients = requests.remove(socialNetwork);
 		
 		for(String client:clients) {
@@ -102,7 +102,7 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 		}
 	}
 	
-	private void sendReturnValue(String client, SocialNetwork socialNetwork, String token, String expires) {
+	private void sendReturnValue(String client, Socialnetwork socialNetwork, String token, String expires) {
 		Intent intent = new Intent(GET_TOKEN);
 		intent.putExtra(SOCIAL_NETWORK_KEY, socialNetwork.toString());
 		intent.putExtra(INTENT_RETURN_KEY, token);

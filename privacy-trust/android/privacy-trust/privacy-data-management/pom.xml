@@ -56,6 +56,6 @@
 	<modules>
 		<module>apklib</module>
 		<module>container</module>
-		<module>test</module>
+		<!-- <module>test</module> -->
 	</modules>
 </project>

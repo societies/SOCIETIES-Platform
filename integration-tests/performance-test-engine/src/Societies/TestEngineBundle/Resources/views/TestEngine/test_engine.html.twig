@@ -1,0 +1,12 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }} - Nodes{% endblock %}
+ 
+{% block body %}
+	{{ parent() }}
+	
+	<h3>Select a Performance test and Test Nodes</h3>
+	
+	{% include "SocietiesTestEngineBundle:TestEngine:test_engine_form.html.twig" %}
+
+{% endblock %}

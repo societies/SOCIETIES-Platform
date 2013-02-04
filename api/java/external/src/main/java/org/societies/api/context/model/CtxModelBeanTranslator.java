@@ -70,7 +70,8 @@ public final class CtxModelBeanTranslator {
 		IndividualCtxEntityBean bean=new IndividualCtxEntityBean();
 		bean.setId(fromCtxIdentifier(indiEntity.getId()));
 
-		XMLGregorianCalendar lastModifiedXML = this.DateToXMLGregorianCalendar(indiEntity.getLastModified());
+		//XMLGregorianCalendar lastModifiedXML = this.DateToXMLGregorianCalendar(indiEntity.getLastModified());
+		Date lastModifiedXML = indiEntity.getLastModified();
 		bean.setLastModified(lastModifiedXML);
 
 		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
@@ -102,7 +103,8 @@ public final class CtxModelBeanTranslator {
 		IndividualCtxEntity indiEntity = new IndividualCtxEntity(
 				(CtxEntityIdentifier) fromCtxIdentifierBean(indiEntityBean.getId()));
 
-		indiEntity.setLastModified(XMLGregorianCalendarToDate(indiEntityBean.getLastModified()));
+		//indiEntity.setLastModified(XMLGregorianCalendarToDate(indiEntityBean.getLastModified()));
+		indiEntity.setLastModified(indiEntityBean.getLastModified());
 		// Handle entity attributes
 		for (CtxAttributeBean attrBean : indiEntityBean.getAttributes()){
 			indiEntity.addAttribute(fromCtxAttributeBean(attrBean));
@@ -129,7 +131,9 @@ public final class CtxModelBeanTranslator {
 
 		CtxEntity entity = new CtxEntity(
 				(CtxEntityIdentifier) fromCtxIdentifierBean(entityBean.getId()));
-		entity.setLastModified(XMLGregorianCalendarToDate(entityBean.getLastModified()));
+		
+		//entity.setLastModified(XMLGregorianCalendarToDate(entityBean.getLastModified()));
+		entity.setLastModified(entityBean.getLastModified());
 		// Handle entity attributes
 		for (CtxAttributeBean attrBean : entityBean.getAttributes()){
 			entity.addAttribute(fromCtxAttributeBean(attrBean));
@@ -151,7 +155,8 @@ public final class CtxModelBeanTranslator {
 		CtxEntityBean bean=new CtxEntityBean();
 		bean.setId(fromCtxIdentifier(entity.getId()));
 
-		XMLGregorianCalendar lastModifiedXML = this.DateToXMLGregorianCalendar(entity.getLastModified());
+		//XMLGregorianCalendar lastModifiedXML = this.DateToXMLGregorianCalendar(entity.getLastModified());
+		Date lastModifiedXML = entity.getLastModified();
 		bean.setLastModified(lastModifiedXML);
 
 		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
@@ -203,7 +208,8 @@ public final class CtxModelBeanTranslator {
 		bean.setHistoryRecorded(attr.isHistoryRecorded());
 		bean.setId(fromCtxIdentifier(attr.getId()));
 		bean.setIntegerValue(attr.getIntegerValue());
-		bean.setLastModified(DateToXMLGregorianCalendar(attr.getLastModified()));
+		//bean.setLastModified(DateToXMLGregorianCalendar(attr.getLastModified()));
+		bean.setLastModified(attr.getLastModified());
 		bean.setSourceId(attr.getSourceId());
 		bean.setStringValue(attr.getStringValue());
 		bean.setValueMetric(attr.getValueMetric());
@@ -219,7 +225,8 @@ public final class CtxModelBeanTranslator {
 
 		final CtxAttribute object = new CtxAttribute(
 				(CtxAttributeIdentifier) fromCtxIdentifierBean(bean.getId()));
-		object.setLastModified(XMLGregorianCalendarToDate(bean.getLastModified()));
+		//object.setLastModified(XMLGregorianCalendarToDate(bean.getLastModified()));
+		object.setLastModified(bean.getLastModified());
 		// Handle value
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
@@ -236,8 +243,8 @@ public final class CtxModelBeanTranslator {
 		object.setHistoryRecorded(bean.isHistoryRecorded());
 		object.setSourceId(bean.getSourceId());
 		// Handle QoC
-		object.getQuality().setLastUpdated(
-				XMLGregorianCalendarToDate(bean.getQuality().getLastUpdated()));
+		//object.getQuality().setLastUpdated(XMLGregorianCalendarToDate(bean.getQuality().getLastUpdated()));
+		object.getQuality().setLastUpdated(bean.getQuality().getLastUpdated());
 		if(bean.getQuality().getOriginType() != null ){
 			object.getQuality().setOriginType(fromCtxOriginTypeBean(bean.getQuality().getOriginType()));
 		}
@@ -251,7 +258,8 @@ public final class CtxModelBeanTranslator {
 
 		CtxAssociationBean bean = new CtxAssociationBean();
 		bean.setId(fromCtxIdentifier(object.getId()));
-		bean.setLastModified(DateToXMLGregorianCalendar(object.getLastModified()));
+		//bean.setLastModified(DateToXMLGregorianCalendar(object.getLastModified()));
+		bean.setLastModified(object.getLastModified());
 		// Handle parent entity
 		if (object.getParentEntity() != null)
 			bean.setParentEntity(fromCtxEntityIdentifier(object.getParentEntity()));
@@ -268,7 +276,8 @@ public final class CtxModelBeanTranslator {
 
 		CtxAssociation assoc = new CtxAssociation(
 				(CtxAssociationIdentifier) fromCtxIdentifierBean(assocBean.getId()));
-		assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
+		//assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
+		assoc.setLastModified(assocBean.getLastModified());
 		// Handle parent entity
 		if (assocBean.getParentEntity() != null)
 			assoc.setParentEntity((CtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
@@ -346,7 +355,8 @@ public final class CtxModelBeanTranslator {
 		bean.setPrecision(quality.getPrecision());
 		bean.setUpdateFrequency(quality.getUpdateFrequency());
 		bean.setOriginType(fromCtxOriginType(quality.getOriginType()));
-		bean.setLastUpdated(DateToXMLGregorianCalendar(quality.getLastUpdated()));
+		//bean.setLastUpdated(DateToXMLGregorianCalendar(quality.getLastUpdated()));
+		bean.setLastUpdated(quality.getLastUpdated());
 
 		return bean;
 	}

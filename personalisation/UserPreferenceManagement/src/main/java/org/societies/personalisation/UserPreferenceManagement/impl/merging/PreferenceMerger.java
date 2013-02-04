@@ -86,27 +86,37 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 	
 	public ArrayList<SingleRule> convertToSingleRules(IPreference ptn){
 		ArrayList<SingleRule> singleRules = new ArrayList<SingleRule>();
-		//Enumeration<IPreference> newNodeEnum = ptn.depthFirstEnumeration();
-		Enumeration<IPreference> newNodeEnum = ptn.preorderEnumeration();
-		//we're going to construct SingleRule objects from the new tree to use as input to merge with the old tree
+		
+		
+		Enumeration<IPreference> newNodeEnum = ptn.depthFirstEnumeration();
+		
+		ArrayList<IPreference> leaves = new ArrayList<IPreference>();
+		
+		
 		while (newNodeEnum.hasMoreElements()){
-			IPreference temp = (IPreference) newNodeEnum.nextElement();
+			IPreference temp = newNodeEnum.nextElement();
+			
 			if (temp.isLeaf()){
-				Object[] userObjs = temp.getUserObjectPath();
-				SingleRule sr = new SingleRule();
-				for (int i=0; i<userObjs.length; i++){
-					if (userObjs!=null){
-						if (userObjs[i] instanceof IPreferenceCondition){
-							sr.addConditions((IPreferenceCondition) userObjs[i]); 
-						}else {
-							sr.setOutcome((IPreferenceOutcome) userObjs[i]);
-						}
+				leaves.add(temp);
+			}
+		}
+		//we're going to construct SingleRule objects from the new tree to use as input to merge with the old tree
+		
+		for (IPreference leaf : leaves){
+			SingleRule sr = new SingleRule();
+			Object[] userObjs = leaf.getUserObjectPath();
+			for (int i=0; i<userObjs.length; i++){
+				if (userObjs[i]!=null){
+					if (userObjs[i] instanceof IPreferenceCondition){
+						sr.addConditions((IPreferenceCondition) userObjs[i]); 
+					}else {
+						sr.setOutcome((IPreferenceOutcome) userObjs[i]);
 					}
 				}
-				singleRules.add(sr);
 			}
-			
-		}	
+			singleRules.add(sr);
+		}
+
 		
 		for (int i=0; i<singleRules.size(); i++){
 			logging.debug("::"+singleRules.get(i).toString());

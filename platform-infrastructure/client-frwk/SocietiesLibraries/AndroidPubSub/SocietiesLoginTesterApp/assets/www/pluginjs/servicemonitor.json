@@ -1,0 +1,38 @@
+{
+"CoreServiceMonitorService" : {
+		"exceptionThreshold" : 0,
+		"allArray" : true,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"activeServices" : [
+							{"className" : "service1",
+							 "activeSince" : 10000},
+							{"className" : "service2",
+							 "activeSince" : 400000},
+							{"className" : "service3",
+							 "activeSince" : 900000}
+							],
+		"activeTasks" : [
+							{"className" : "app1",
+							 "numRunningActivities" : 1},
+							{"className" : "app2",
+							 "numRunningActivities" : 4},
+							{"className" : "app3",
+							 "numRunningActivities" : 9}
+							],
+		"getInstalledApplications" : [ {
+	                "applicationName": "Foursquare",
+					"packageName": "org.foursquare.client",
+					"versionName ": "Icecream Sandwich",
+					"versionCode ": "1.0.0",
+					"icon": "data:image/png;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7" 
+					},
+					{
+	                "applicationName": "Linked-in",
+					"packageName": "org.linked-in.client",
+					"versionName ": "Icecream Sandwich",
+					"versionCode ": "2.1.0",
+					"icon": "data:image/png;base64,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" 
+					} ]
+	}
+}

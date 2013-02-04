@@ -59,7 +59,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.maven.converters.URIConverter;
+import org.societies.simple.basic.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;

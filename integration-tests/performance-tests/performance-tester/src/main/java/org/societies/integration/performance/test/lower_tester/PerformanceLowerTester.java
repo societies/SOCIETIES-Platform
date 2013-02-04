@@ -96,20 +96,33 @@ public class PerformanceLowerTester {
 			startTestResponse.put("node_id", this.nodeId);
 			startTestResponse.put("class_name", this.className);
 			startTestResponse.put("status", this.testStatus);
-			startTestResponse.put("start_test_date", ""+startTestDate);
+			startTestResponse.put("start_test_date", startTestDate/1000);
 			
-
-			if (this.testMode.equalsIgnoreCase("dev_mode")) 
+			if (null != testMode) 
 			{
-				LOG.info("### DEV MODE SELECTED ###");
+				if (this.testMode.equalsIgnoreCase("dev_mode")) 
+				{
+					LOG.info("### DEV MODE SELECTED ###");
+					LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
+				}
+				else if (this.testMode.equalsIgnoreCase("prod_mode")) 
+				{
+					LOG.info("### PROD MODE SELECTED ###");
+					WebServiceCommunication.sendStartResponse(this.performanceTestEngineHost, startTestResponse.toString());
+				}
+				else
+				{
+					LOG.info("### DEFAULT MODE ###");
+					LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
+				}
+			}
+			else
+			{
+				LOG.info("### DEFAULT MODE ###");
 				LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
 			}
-			else if (this.testMode.equalsIgnoreCase("prod_mode")) 
-			{
-				LOG.info("### PROD MODE SELECTED ###");
-				WebServiceCommunication.sendStartResponse(this.performanceTestEngineHost, startTestResponse.toString());
-			}
-			
+
+						
 		}
 		else
 		{
@@ -136,18 +149,32 @@ public class PerformanceLowerTester {
 		finishTestResponse.put("class_name", this.className);
 		finishTestResponse.put("node_id", this.nodeId);
 		finishTestResponse.put("status", this.testStatus);
-		finishTestResponse.put("end_test_date", ""+endTestDate);
+		finishTestResponse.put("end_test_date", endTestDate/1000);
 		finishTestResponse.put("test_result_message", this.testResultMessage);
 
-		if (this.testMode.equalsIgnoreCase("dev_mode")) 
+		if (null != testMode) 
 		{
-			LOG.info("### DEV MODE SELECTED ###");
-			LOG.info("### [PerformanceLowerTester] result: " + finishTestResponse.toString());
+			if (this.testMode.equalsIgnoreCase("dev_mode")) 
+			{
+				LOG.info("### DEV MODE SELECTED ###");
+				LOG.info("### [PerformanceLowerTester] result: " + finishTestResponse.toString());
+			}
+			else if (this.testMode.equalsIgnoreCase("prod_mode")) 
+			{
+				LOG.info("### PROD MODE SELECTED ###");
+				WebServiceCommunication.sendFinishResponse(this.performanceTestEngineHost, finishTestResponse.toString());
+			}
+			else
+			{
+				LOG.info("### DEFAULT MODE ###");
+				LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
+			}	
 		}
-		else if (this.testMode.equalsIgnoreCase("prod_mode")) 
+		else
 		{
-			LOG.info("### PROD MODE SELECTED ###");
-			WebServiceCommunication.sendFinishResponse(this.performanceTestEngineHost, finishTestResponse.toString());
+			LOG.info("### DEFAULT MODE ###");
+			LOG.info("### [PerformanceLowerTester] result: " + startTestResponse.toString());
 		}
+		
 	}
 }

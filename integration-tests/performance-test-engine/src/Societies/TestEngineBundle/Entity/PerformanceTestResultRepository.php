@@ -12,4 +12,15 @@ use Doctrine\ORM\EntityRepository;
  */
 class PerformanceTestResultRepository extends EntityRepository
 {
+	
+	public function myFindAll($index, $limit)
+	{
+		$qb = $this->createQueryBuilder('result');
+		
+		$qb->setFirstResult($index)
+			->setMaxResults($limit);
+		
+		return $qb->getQuery()
+					->getResult();
+	} 
 }

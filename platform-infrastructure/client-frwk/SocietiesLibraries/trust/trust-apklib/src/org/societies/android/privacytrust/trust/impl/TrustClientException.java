@@ -24,7 +24,8 @@
  */
 package org.societies.android.privacytrust.trust.impl;
 
-import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.android.api.privacytrust.trust.TrustException;
+
 
 /**
  * Thrown to indicate that the Trust Evidence Collector could not handle a

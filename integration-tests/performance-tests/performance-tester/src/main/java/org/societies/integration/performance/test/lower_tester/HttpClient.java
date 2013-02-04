@@ -13,16 +13,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpClient {
 
-
+	private static Logger LOG = LoggerFactory.getLogger(HttpClient.class);
+	
 	public static String sendHttpPost(String URL, ArrayList<NameValuePair> postParameters) 
 	{
+		
+		
 		try 
 		{
 			DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -35,6 +39,8 @@ public class HttpClient {
 
 			StatusLine statusLine = response.getStatusLine();
 
+			LOG.info("### [HttpClient] status code: " + statusLine.getReasonPhrase());
+			
 			if(statusLine.getStatusCode() == HttpStatus.SC_OK)
 			{
 				//Get hold of the response entity (-> the data):
@@ -50,8 +56,11 @@ public class HttpClient {
 			else
 			{
 				//Closes the connection.
-				response.getEntity().getContent().close();
-				throw new IOException(statusLine.getReasonPhrase());
+				try {
+					response.getEntity().getContent().close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		catch (Exception e)

@@ -144,6 +144,7 @@ public class PZWrapperImpl implements PZWrapper  {
 			}
 		}catch (Exception e) {
 			log.error("Exception msg: "+e.getMessage() +" ; cause: "+e.getCause(),e);
+			return null;
 		}
 		
 		log.debug("finish: getEntityFullLocation ; entityId ="+entityId);

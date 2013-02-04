@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventTypes;
@@ -171,10 +172,10 @@ public class MergingManager implements IC45Consumer{
 
 	public void processActionReceived(IIdentity userId, IAction action){
 		if (this.counters.containsKey(userId)){
-			logging.debug(this.getClass().getName()+"hashtable for identity: "+userId.toString()+" exists");
+			logging.debug("hashtable for identity: "+userId.toString()+" exists");
 			Hashtable<IAction, Integer> tempTable = counters.get(userId);
 			Enumeration<IAction> e = tempTable.keys();
-			logging.debug(this.getClass()+" Processing Action with serviceID: "+action.getServiceID()+ " and identity: "+userId.toString());
+			logging.debug(" Processing Action with serviceID: "+action.getServiceID()+ " and identity: "+userId.toString());
 			boolean actionExists = false;
 			while (e.hasMoreElements()){
 				IAction tempAction = e.nextElement();
@@ -183,7 +184,7 @@ public class MergingManager implements IC45Consumer{
 					actionExists = true;
 
 					int counter = tempTable.get(tempAction);
-					this.logging.debug("Counter for :"+action.toString()+" is "+counter);
+					this.logging.debug("Counter for service:"+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" parameter: "+action.getparameterName()+" is "+counter);
 					if (counter>=2){
 						this.logging.debug("Counter reached 2, requesting learning and resetting counter");
 						tempTable.put(tempAction, new Integer(0)); //reset counter

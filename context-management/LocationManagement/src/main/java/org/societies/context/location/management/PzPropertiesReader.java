@@ -22,6 +22,7 @@ public class PzPropertiesReader {
 	private final static String PZ_PRD_SERVER_ADMIN_URL = "PZ_PRD_SERVER_ADMIN_URL";
 	private final static String PZ_MAP_QUERY_SUFFIX = "PZ_MAP_QUERY_SUFFIX";
 	private final static String PZ_MOCK_GENERATE_LOCATIONS_CYCLE= "PZ_MOCK_GENERATE_LOCATIONS_CYCLE";
+	private final static String PZ_UPDATE_TASK_MAX_FAILURES= "PZ_UPDATE_TASK_MAX_FAILURES";
 		
 	static PzPropertiesReader instance = new PzPropertiesReader();
 	private final Properties prop;
@@ -92,4 +93,10 @@ public class PzPropertiesReader {
 		String value =  prop.getProperty(PZ_MOCK_GENERATE_LOCATIONS_CYCLE);
 		return Integer.valueOf(value);
 	}
+	
+	public int getPzUpdateTaskMaxFailures(){
+		String value =  prop.getProperty(PZ_UPDATE_TASK_MAX_FAILURES);
+		return Integer.valueOf(value);
+	}
+	
 }

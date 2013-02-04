@@ -24,7 +24,7 @@ class PerformanceTest
     /**
      * @var string $test_name
      *
-     * @ORM\Column(name="test_name", type="string", length=255)
+     * @ORM\Column(name="test_name", type="string", length=255, unique=true)
      */
     private $test_name;
 
@@ -43,16 +43,28 @@ class PerformanceTest
     private $test_developer_name;
     
     /**
-     * @ORM\OneToMany(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTestParameters", mappedBy="performanceTest")
+     * @var string $test_uri
+     *
+     * @ORM\Column(name="test_uri", type="string", length=255)
+     */
+    private $test_uri;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTestParameters", mappedBy="performanceTest", cascade={"persist"})
      */
     private $performanceTestParameters;
     
+    /**
+     * @ORM\OneToMany(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTestResult", mappedBy="performanceTest", cascade={"persist"})
+     */
+    private $performanceTestResults;
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->performanceTestParameters = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->performanceTestResults = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**
@@ -135,6 +147,29 @@ class PerformanceTest
     }
 
     /**
+     * Set test_uri
+     *
+     * @param string $testUri
+     * @return PerformanceTest
+     */
+    public function setTestUri($testUri)
+    {
+        $this->test_uri = $testUri;
+    
+        return $this;
+    }
+
+    /**
+     * Get test_uri
+     *
+     * @return string 
+     */
+    public function getTestUri()
+    {
+        return $this->test_uri;
+    }
+
+    /**
      * Add performanceTestParameters
      *
      * @param Societies\TestEngineBundle\Entity\PerformanceTestParameters $performanceTestParameters
@@ -143,7 +178,7 @@ class PerformanceTest
     public function addPerformanceTestParameter(\Societies\TestEngineBundle\Entity\PerformanceTestParameters $performanceTestParameters)
     {
         $this->performanceTestParameters[] = $performanceTestParameters;
-    
+        $performanceTestParameters->setPerformanceTest($this);
         return $this;
     }
 
@@ -165,5 +200,38 @@ class PerformanceTest
     public function getPerformanceTestParameters()
     {
         return $this->performanceTestParameters;
+    }
+
+    /**
+     * Add performanceTestResults
+     *
+     * @param Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults
+     * @return PerformanceTest
+     */
+    public function addPerformanceTestResult(\Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults)
+    {
+        $this->performanceTestResults[] = $performanceTestResults;
+        $performanceTestResults->setPerformanceTest($this);
+        return $this;
+    }
+
+    /**
+     * Remove performanceTestResults
+     *
+     * @param Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults
+     */
+    public function removePerformanceTestResult(\Societies\TestEngineBundle\Entity\PerformanceTestResult $performanceTestResults)
+    {
+        $this->performanceTestResults->removeElement($performanceTestResults);
+    }
+
+    /**
+     * Get performanceTestResults
+     *
+     * @return Doctrine\Common\Collections\Collection 
+     */
+    public function getPerformanceTestResults()
+    {
+        return $this->performanceTestResults;
     }
 }

@@ -32,27 +32,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 
 /**
  * @phase process-sources
@@ -117,7 +108,7 @@ public class Jaxb2Simple extends AbstractMojo
 			// Process all java files now and delete unwanted ones
 			for (File javaFile : files) {
 				if (javaFile.isFile()) { //IGNORE DIRECTORIES
-					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java")) {
+					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java") || javaFile.getName().equals("Adapter2.java")) {
 						getLog().debug("Deleting: " + javaFile.getAbsolutePath());
 						javaFile.delete();
 
@@ -282,21 +273,35 @@ public class Jaxb2Simple extends AbstractMojo
 		textToReplace = "import org.simpleframework.xml.convert.Convert;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
-		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.maven.converters.URIConverter;
+		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.simple.converters.URIConverter;
 		textToFind = "import org.w3._2001.xmlschema.Adapter1;";
-		textToReplace = "import org.societies.maven.converters.URIConverter;";
+		textToReplace = "import org.societies.simple.basic.URIConverter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
-		//import javax.xml.bind.annotation.adapters.CollapsedStringAdapter; -> import org.societies.maven.converters.CollapsedStringAdapter;
+		//import org.w3._2001.xmlschema.Adapter1; -> import org.societies.simple.converters.URIConverter;
+		textToFind = "import org.w3._2001.xmlschema.Adapter2;";
+		textToReplace = "import org.societies.simple.basic.DateConverter;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax.xml.bind.annotation.adapters.CollapsedStringAdapter; -> import org.societies.simple.converters.CollapsedStringAdapter;
 		textToFind = "import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;";
-		textToReplace = "import org.societies.maven.converters.CollapsedStringAdapter;";
+		textToReplace = "import org.societies.simple.basic.CollapsedStringAdapter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
 		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)
 		textToFind = "@XmlJavaTypeAdapter\\(Adapter1.*\\.class?\\)";
 		textToReplace = "@Convert(URIConverter.class)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)
+		textToFind = "@XmlJavaTypeAdapter\\(Adapter2.*\\.class?\\)";
+		textToReplace = "@Convert(DateConverter.class)";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
+		textToFind = "import java.util.Date;";
+		textToReplace = "import java.text.DateFormat;\nimport java.text.SimpleDateFormat;\nimport java.util.Date;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		//@XmlJavaTypeAdapter(CollapsedStringAdapter.class) -> @Convert(CollapsedStringAdapter.class)
 		textToFind = "@XmlJavaTypeAdapter\\(CollapsedStringAdapter.class?\\)";
 		textToReplace = "@Convert(CollapsedStringAdapter.class)";
@@ -475,12 +480,14 @@ public class Jaxb2Simple extends AbstractMojo
 		return newSchemaContent;
 	}
 
-	private String replaceParcelableStuff(File javaFile,
-			String schemaContent) {
+	private String replaceParcelableStuff(File javaFile, String schemaContent) {
 		String textToFind; String textToReplace;
 
 		// -- Check if this file has to be Parcelable
 		if (isPatternMatching("Adapter1", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+		if (isPatternMatching("Adapter2", javaFile.getAbsolutePath())) {
 			return schemaContent;
 		}
 		if (!isPatternMatching("xjc", javaFile.getAbsolutePath())) {
@@ -508,7 +515,7 @@ public class Jaxb2Simple extends AbstractMojo
 		boolean requiredDefaultConstructor = !isPatternMatching("public "+className+"\\(", schemaContent);
 
 		// Retrieve all Fields information
-		NavigableMap<String, String> fields = new TreeMap<String, String>();
+		LinkedHashMap <String, String> fields = new LinkedHashMap <String, String>();
 		Pattern patternFields = Pattern.compile("(?:protected|private) (?:final )?(?:static )?([^ ]+) ([^ ]+);\n", Pattern.CASE_INSENSITIVE);
 		Matcher matcherFields = patternFields.matcher(schemaContent);
 		while (matcherFields.find()) {
@@ -554,6 +561,11 @@ public class Jaxb2Simple extends AbstractMojo
 			textToReplace = "package $1;\n\n\nimport javax\\.xml\\.datatype\\.DatatypeConfigurationException;\nimport javax\\.xml\\.datatype\\.DatatypeFactory;\nimport javax\\.xml\\.datatype\\.XMLGregorianCalendar;\n";
 			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		}
+		if (isPatternMatching(" Object ", newSchemaContent)) {
+			textToFind = "([\\(| ])Object ";
+			textToReplace = "$1Parcelable ";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		}
 
 		// -- Generate the parcelable inherited methods
 		String parcelableStuff = generateParcelableStuff(isEnum, isExtension, isAbstract, requiredDefaultConstructor, className, fields);
@@ -571,7 +583,7 @@ public class Jaxb2Simple extends AbstractMojo
 	 * @param fieldClasses
 	 * @return
 	 */
-	private String generateParcelableStuff(boolean isEnum, boolean isExtension, boolean isAbstract, boolean requiredDefaultConstructor, String className, NavigableMap<String, String> fieldClasses) {
+	private String generateParcelableStuff(boolean isEnum, boolean isExtension, boolean isAbstract, boolean requiredDefaultConstructor, String className, LinkedHashMap <String, String> fieldClasses) {
 		StringBuilder str = new StringBuilder();
 		// Constructors
 		if (requiredDefaultConstructor && !isEnum) {
@@ -579,9 +591,10 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (!isEnum || (isEnum && fieldClasses.size() > 0)) {
 			str.append("\t"+(isEnum ? "" : "public ")+"PARCELABLECLASSNAME(Parcel in) {\n");
-			if (isExtension) {
-				str.append("\t\tsuper(in);\n");
-			}
+			// Call to super constructor: already done in read	
+//			if (isExtension) {
+//				str.append("\t\tsuper(in);\n");
+//			}
 			if (isEnum) {
 				str.append("READPARCELABLE");
 			}
@@ -591,18 +604,23 @@ public class Jaxb2Simple extends AbstractMojo
 			str.append("\t}\n\n");
 		}
 
-
+		str.append("\tpublic int describeContents() {\n");
+		str.append("\t\treturn 0;\n");
+		str.append("\t}\n\n");
+		
 		if (!isEnum) {
 			str.append("\tprotected void readFromParcel(Parcel in) {\n");
+			if (isExtension) {
+				str.append("\t\tsuper.readFromParcel(in);\n");
+			}
 			str.append("READPARCELABLE");
 			str.append("\t}\n\n");
 		}
 
-		str.append("\tpublic int describeContents() {\n");
-		str.append("\t\treturn 0;\n");
-		str.append("\t}\n\n");
-
 		str.append("\tpublic void writeToParcel(Parcel dest, int flags) {\n");
+		if (isExtension) {
+			str.append("\t\tsuper.writeToParcel(dest, flags);\n");
+		}
 		str.append("WRITEPARCELABLE");
 		str.append("\t}\n\n");
 
@@ -636,7 +654,7 @@ public class Jaxb2Simple extends AbstractMojo
 		// Write/Read Parcel
 		StringBuilder strWrite = new StringBuilder();
 		StringBuilder strRead = new StringBuilder();
-		for(String fieldName : fieldClasses.descendingMap().keySet()) {
+		for (String fieldName : fieldClasses.keySet()) {
 			String type = fieldClasses.get(fieldName);
 			String writedMethod = "dest.write"+type2ParcelableAction(type);
 			strWrite.append("\t\t"+type2ParcelableWriteData(type, fieldName, writedMethod)+";\n");
@@ -663,8 +681,8 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if (isListOrArray(type)) {
 			if (globalType.startsWith("Parcelable") && globalType.endsWith("List")) {
-//				writedMethod = writedMethod.replace("List", "Array");
-//				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
+				//				writedMethod = writedMethod.replace("List", "Array");
+				//				return writedMethod+"(("+typeToParcelableRawType(type, false)+"[]) "+fieldName+".toArray(), flags)";
 				return "dest.writeTypedList("+fieldName+")";
 			}
 			if ("Int".equals(typeToParcelableRawType(type, false)) && globalType.endsWith("List")) {
@@ -678,6 +696,11 @@ public class Jaxb2Simple extends AbstractMojo
 				strList.append("\t\tdest.writeStringList("+fieldName+"StringList)");
 				return strList.toString();
 			}
+			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
+				String sByteCode = "dest.writeInt(" + fieldName + ".length);\n\t\t" + 
+								   "dest.writeByteArray(" + fieldName + ")";
+				return sByteCode;
+			}
 			return writedMethod+"("+fieldName+")";
 		}
 		if ("URI".equals(typeToParcelableRawType(type, false))) {
@@ -685,6 +708,9 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
 			return "dest.writeString("+fieldName+".toString())";
+		}
+		if ("Date".equals(typeToParcelableRawType(type, false))) {
+			return "DateFormat df = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss Z\");\n\t\tString val = df.format(" +fieldName+ ");\n\t\tdest.writeString(val); ";
 		}
 		return writedMethod+"("+fieldName+")";
 	}
@@ -718,6 +744,11 @@ public class Jaxb2Simple extends AbstractMojo
 				strList.append("\t\tint i=0");
 				return strList.toString();
 			}
+			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
+				String sByteCode = fieldName + " = new byte[in.readInt()];\n\t\t" + 
+								   "in.readByteArray(" + fieldName + ")";
+				return sByteCode;
+			}
 			return readMethod+"("+fieldName+")";
 		}
 		if ("URI".equals(typeToParcelableRawType(type, false))) {
@@ -725,6 +756,9 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		if ("XMLGregorianCalendar".equals(typeToParcelableRawType(type, false))) {
 			return "try { "+fieldName+" = DatatypeFactory.newInstance().newXMLGregorianCalendar(in.readString()); } catch(DatatypeConfigurationException e) { System.out.println(\"Arg, can't create XMLGregorianCalendar for field "+fieldName+"\"); }";
+		}
+		if ("Date".equals(typeToParcelableRawType(type, false))) {
+			return "DateFormat df = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss Z\");\n\t\ttry { " + fieldName + " = df.parse(in.readString()); } catch(java.text.ParseException pEx) { System.out.println(\"Arg, can't parse DateTime for field "+fieldName+"\"); }";
 		}
 		return fieldName+" = "+readMethod+"()";
 	}
@@ -768,11 +802,11 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("float".equals(type)) {
 			return "Float";
 		}
-		if ("long".equals(type)) {
+		if ("long".equals(type) ) {
 			return "Long";
 		}
 		// Manual steps
-		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type) || "Date".equals(type)) {
 			return "String";
 		}
 		// Parcelable
@@ -807,11 +841,11 @@ public class Jaxb2Simple extends AbstractMojo
 		if ("float".equals(type)) {
 			return "Float";
 		}
-		if ("long".equals(type)) {
+		if ("long".equals(type) ) {
 			return "Long";
 		}
 		// Manual steps
-		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type)) {
+		if ("XMLGregorianCalendar".equals(type) || "URI".equals(type) || "Date".equals(type)) {
 			return type;
 		}
 		// Parcelable

@@ -35,6 +35,7 @@ import org.societies.integration.performance.test.lower_tester.PerformanceTestMg
 import org.societies.integration.performance.test.lower_tester.PerformanceTestResult;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CisManagerClientCallback;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest;
+import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.JoinCisParameters;
 
 
 public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
@@ -49,14 +50,13 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	private PerformanceLowerTester performanceLowerTester;
 	private PerformanceTestResult performanceTestResult;
 
-	public PerformanceTestImpl(){
-		LOG.info("### [JoinCisPerformanceTestImpl] IJoinCisPerformanceTest registred");	
+	public PerformanceTestImpl(){	
 	}
 
 	public void setCisManager(ICisManager cisManager) {
 		if (null != cisManager) 
 		{
-			LOG.info("### [JoinCisPerformanceTestImpl] cisManager injected");
+			LOG.info("### [PerformanceTestImpl] cisManager injected");
 			this.cisManager = cisManager;
 		}
 	}
@@ -64,11 +64,11 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	public ICisManager getCisManager()
 	{
 		if (null != cisManager) {
-			LOG.info("### [JoinCisPerformanceTestImpl] this.cisManager non null");
+			LOG.info("### [PerformanceTestImpl] this.cisManager non null");
 			return cisManager;
 		}
 		else {
-			LOG.info("### [JoinCisPerformanceTestImpl] this.cisManager null");
+			LOG.info("### [PerformanceTestImpl] this.cisManager null");
 			return null;
 		}
 	}
@@ -78,7 +78,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	public void setCommManager(ICommManager commManager) {
 		if (null != commManager) 
 		{
-			LOG.info("### [JoinCisPerformanceTestImpl] commManager injected");
+			LOG.info("### [PerformanceTestImpl] commManager injected");
 			this.commManager = commManager;
 		}
 	}
@@ -86,51 +86,63 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 	public ICommManager getCommManager()
 	{
 		if (null != commManager) {
-			LOG.info("### [JoinCisPerformanceTestImpl] this.commManager non null");
+			LOG.info("### [PerformanceTestImpl] this.commManager non null");
 			return commManager;
 		}
 		else {
-			LOG.info("### [JoinCisPerformanceTestImpl] this.commManager null");
+			LOG.info("### [PerformanceTestImpl] this.commManager null");
 			return null;
 		}
 	}
 
 
 	@Override
-	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo ,String cssOwnerId, String cisId) 
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, JoinCisParameters joinCisParameters) 
 	{
-		//The following 2 lines are mandatory in the beginning of the test 
-		performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
-		performanceLowerTester.testStart(this.getClass().getName(), getCommManager());	
-
-		LOG.info("### [JoinCisPerformanceTestImpl] cssOwnerId: " + cssOwnerId + "  cisId: "+ cisId);
-
-		if (null != cssOwnerId && null != cisId && !"".equals(cssOwnerId) && !"".equals(cisId)) 
+		if (null != performanceTestMgmtInfo && null != joinCisParameters)
 		{
-			CisAdvertisementRecord adv = new CisAdvertisementRecord();
+			String cssOwnerId = joinCisParameters.getCssOwnerId();
+			String cisId = joinCisParameters.getCisId();
+			
+			//The following 2 lines are mandatory in the beginning of the test 
+			performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
+			performanceLowerTester.testStart(this.getClass().getName(), getCommManager());	
 
-			adv.setCssownerid(cssOwnerId);
-			adv.setId(cisId);
+			LOG.info("### [PerformanceTestImpl] cssOwnerId: " + cssOwnerId + "  cisId: "+ cisId);
 
-			if(null != getCisManager()) 
+			if (null != cssOwnerId && null != cisId && !"".equals(cssOwnerId) && !"".equals(cisId)) 
 			{
-				//If the result will be provided by the a callback, the performanceLowerTester instance MUST be given to callback implementation so that this latter can return a result. 
-				cisManagerClientCallback = new CisManagerClientCallback(performanceLowerTester);
+				CisAdvertisementRecord adv = new CisAdvertisementRecord();
 
-				getCisManager().joinRemoteCIS(adv, cisManagerClientCallback);	
+				adv.setCssownerid(cssOwnerId);
+				adv.setId(cisId);
+
+				if(null != getCisManager()) 
+				{
+					//If the result will be provided by the a callback, the performanceLowerTester instance MUST be given to callback implementation so that this latter can return a result. 
+					cisManagerClientCallback = new CisManagerClientCallback(performanceLowerTester);
+
+					getCisManager().joinRemoteCIS(adv, cisManagerClientCallback);	
+				}
+				else
+				{
+					performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The CIS Manager instance is null!",
+																	PerformanceTestResult.ERROR_STATUS);
+					
+					performanceLowerTester.testFinish(performanceTestResult);
+				}
 			}
 			else
 			{
-				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The CIS Manager instance is null!",
+				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The cssOwnerId and/or cisId are null or empty!",
 																PerformanceTestResult.ERROR_STATUS);
-				
 				performanceLowerTester.testFinish(performanceTestResult);
 			}
 		}
 		else
 		{
-			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The cssOwnerId and/or cisId are null or empty!",
-															PerformanceTestResult.ERROR_STATUS);
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The performanceTestMgmtInfo and/or joinCisParameters are null!",
+																	PerformanceTestResult.ERROR_STATUS);
 			performanceLowerTester.testFinish(performanceTestResult);
 		}
 	}

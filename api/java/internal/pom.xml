@@ -78,10 +78,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.maven.converters</groupId>
-		    <artifactId>SimpleXMLConverters</artifactId>
-		    <version>${release.version}</version>
-		    <scope>provided</scope>
+			<groupId>org.societies.maven.converters</groupId>
+			<artifactId>SimpleXMLConverters</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -105,18 +105,18 @@
 							*
 						</_exportcontents>
 						<Import-Package>
-    						!javax.microedition.io,
-    						!org.jruby.*,
-    						!org.apache.*,
-    						!org.hibernate.*,
-    						!com.sun.net.*,
-    						!org.springframework.*,
-    						!org.joda.*,
-    						!javax.inject,
-    						!bsh,
-    						!edu.emory.*,
-    						!groovy.lang,
-    						*
+							!javax.microedition.io,
+							!org.jruby.*,
+							!org.apache.*,
+							!org.hibernate.*,
+							!com.sun.net.*,
+							!org.springframework.*,
+							!org.joda.*,
+							!javax.inject,
+							!bsh,
+							!edu.emory.*,
+							!groovy.lang,
+							*
 						</Import-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>

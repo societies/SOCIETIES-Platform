@@ -33,6 +33,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -102,5 +103,27 @@ public class RequestorUtils {
 			requestorBeans.add(RequestorUtils.toRequestorBean(requestor));
 		}
 		return requestorBeans;
+	}
+	public static String getRequestorId(RequestorBean requestor) {
+		StringBuilder sb = new StringBuilder();
+		if (requestor instanceof RequestorCisBean) {
+			sb.append("CIS:");
+			sb.append(requestor.getRequestorId());
+			sb.append("|");
+			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
+		}
+		else if (requestor instanceof RequestorServiceBean) {
+			String serviceOwnerJid = ServiceModelUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
+			String serviceId = ServiceModelUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
+			sb.append("Service:");
+			sb.append(serviceOwnerJid);
+			sb.append("|");
+			sb.append(serviceId);
+		}
+		else {
+			sb.append("CSS:");
+			sb.append(requestor.getRequestorId());
+		}
+		return sb.toString();
 	}
 }

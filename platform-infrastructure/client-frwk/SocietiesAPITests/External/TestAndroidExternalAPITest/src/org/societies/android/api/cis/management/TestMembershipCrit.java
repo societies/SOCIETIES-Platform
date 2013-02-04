@@ -3,11 +3,11 @@ package org.societies.android.api.cis.management;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.schema.cis.community.Criteria;
+
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
-
-import org.societies.android.api.cis.management.ACriteria;
 
 public class TestMembershipCrit extends AndroidTestCase {
 
@@ -23,9 +23,9 @@ public class TestMembershipCrit extends AndroidTestCase {
 	public void testParcelable() throws Exception {
 //		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		
-		List<ACriteria> l = new ArrayList<ACriteria>();
+		List<Criteria> l = new ArrayList<Criteria>();
 		
-		ACriteria a = new ACriteria();
+		Criteria a = new Criteria();
 		
 		a.setAttrib("location");
 		a.setOperator("equals");
@@ -33,7 +33,6 @@ public class TestMembershipCrit extends AndroidTestCase {
 		a.setValue1("Paris");
 		l.add(a);
 //		amembershipCrit.setACriteria(l);
-//		
 //		assertEquals(0, amembershipCrit.describeContents());
 //		
         Parcel parcel = Parcel.obtain();
@@ -55,7 +54,7 @@ public class TestMembershipCrit extends AndroidTestCase {
 	public void testEmptyMembershipParcelable() throws Exception {
 //		AMembershipCrit amembershipCrit = new AMembershipCrit();
 		
-		List<ACriteria> l = new ArrayList<ACriteria>();
+		List<Criteria> l = new ArrayList<Criteria>();
 		
 //		amembershipCrit.setACriteria(l);
 //		

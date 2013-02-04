@@ -1,0 +1,5 @@
+_assetic:
+    resource: .
+    type: assetic
+_app:
+    resource: 'C:/Users/Rafik/Projects/Societies/Societies_Local/git/SOCIETIES-Platform/integration-tests/performance-test-engine/app/config/routing_dev.yml'

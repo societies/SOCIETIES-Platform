@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -156,16 +157,19 @@ public class MonitoringTable {
 			info.deleteInfo(serviceType, serviceID);
 		}
 		
-		if (this.services.contains(serviceID)){
-			this.services.remove(serviceID);
+		for (ServiceResourceIdentifier sId : services){
+			if (ServiceModelUtils.compare(sId, serviceID)){
+				this.services.remove(sId);
+			}
 		}
+
 		
 		Enumeration<PreferenceDetails> fullPreferenceNames = this.fullPreferenceNametoServiceID.keys();
 		
 		while (fullPreferenceNames.hasMoreElements()){
 			PreferenceDetails temp = fullPreferenceNames.nextElement();
 			ServiceResourceIdentifier Id = this.fullPreferenceNametoServiceID.get(temp);
-			if (serviceID.equals(Id)){
+			if (ServiceModelUtils.compare(serviceID,Id)){
 				if (this.lastOutcomes.containsKey(temp)){
 					this.lastOutcomes.remove(temp);
 				}

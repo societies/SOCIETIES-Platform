@@ -42,16 +42,24 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<!--dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<!--
+		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
@@ -72,6 +80,11 @@
 			    </exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
     <build>
@@ -84,4 +97,13 @@
             </plugin>
         </plugins>
     </build>
+	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>findbugs-maven-plugin</artifactId>
+	      </plugin>
+	    </plugins>
+	</reporting>
+
 </project>

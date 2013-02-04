@@ -25,7 +25,7 @@
 package org.societies.android.privacytrust.api;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 
 
 /**
@@ -50,7 +50,7 @@ public interface IDataObfuscationManager {
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
 	 * @throws PrivacyException
 	 */
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
+	public DataWrapper obfuscateData(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -67,5 +67,5 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
+	public String hasObfuscatedVersion(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 }

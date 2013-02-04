@@ -40,7 +40,7 @@ public class ActionUtils {
 		if (null == actionBean) {
 			return null;
 		}
-		ActionConstants actionConstant = ActionConstants.valueOf(actionBean.getActionConstant().value());
+		ActionConstants actionConstant = ActionConstants.valueOf(actionBean.getActionConstant().name());
 		return new Action(actionConstant, actionBean.isOptional());
 	}
 	public static List<Action> toActions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action> actionBeans)
@@ -61,7 +61,7 @@ public class ActionUtils {
 			return null;
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action actionBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action();
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants actionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants.fromValue(action.getActionType().name());
+		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants actionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants.valueOf(action.getActionType().name());
 		actionBean.setActionConstant(actionConstant);
 		actionBean.setOptional(action.isOptional());
 		return actionBean;

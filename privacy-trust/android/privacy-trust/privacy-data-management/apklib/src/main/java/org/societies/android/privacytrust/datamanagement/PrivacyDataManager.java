@@ -24,38 +24,34 @@
  */
 package org.societies.android.privacytrust.datamanagement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Name;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.PostalLocation;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Status;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
+import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
+import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.NameObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.PostalLocationObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.StatusObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.TemperatureObfuscator;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.util.Log;
 
 
@@ -65,18 +61,25 @@ import android.util.Log;
 public class PrivacyDataManager implements IPrivacyDataManager {
 	private final static String TAG = PrivacyDataManager.class.getSimpleName();
 
+	private Context context;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
-	private IPrivacyDataManager privacyDataManagerRemote;
+	private PrivacyDataManagerRemote privacyDataManagerRemote;
+	private PrivacyDataIntentSender intentSender;
 
 
 	public PrivacyDataManager(Context context)  {
+		this.context = context;
 		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 		privacyDataManagerRemote = new PrivacyDataManagerRemote(context);
+		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException {
+	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == requestor) {
 			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
 			throw new NullPointerException("Not enought information: requestor is missing");
@@ -85,45 +88,83 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
 			throw new NullPointerException("Not enought information: data id is missing");
 		}
-		ResponseItem permission = null;
 
+		// -- Launch action
+		CheckPermissionTask task = new CheckPermissionTask(context, clientPackage); 
+		task.execute(requestor, dataId, actions);
+	}
+	private class CheckPermissionTask extends AsyncTask<Object, Object, Boolean> {
+		private Context context;
+		private String clientPackage;
+		private int progress = 0;
 
-		// -- Create Useful Values for NULL Result
-		// RequestItem
-		Resource resource = new Resource();
-		resource.setDataIdUri(dataId.getUri());
-		List<Condition> conditions = new ArrayList<Condition>();
-		RequestItem requestItemNull = new RequestItem();
-		requestItemNull.setResource(resource);
-		requestItemNull.setOptional(false);
-
-		// -- Retrieve a stored permission
-		List actionsList = Arrays.asList(actions);
-		permission = privacyDataManagerInternal.getPermission(requestor, dataId, actionsList);
-
-		// -- Permission not available: remote call
-		if (null == permission) {
-			Log.e(TAG, "No Permission retrieved: remote call");
-			try {
-				permission = privacyDataManagerRemote.checkPermission(requestor, dataId, actions);
-			} catch (Exception e) {
-				Log.e(TAG, "Error when retrieving permission from PrivacyDataManagerRemote", e);
-			}
-
-			// Permission still not available: deny access
-			if (null == permission) {
-				permission = new ResponseItem();
-				permission.setRequestItem(requestItemNull);
-				permission.setDecision(Decision.DENY);
-			}
-			// Store new permission retrieved from PrivacyPreferenceManager
-			privacyDataManagerInternal.updatePermission(requestor, permission);
+		public CheckPermissionTask(Context context, String clientPackage) {
+			this.context = context;
+			this.clientPackage = clientPackage;
 		}
-		return permission;
+		
+		@Override
+		protected void onPreExecute() {
+			publishProgress(progress, "Loading...");
+		}
+
+		protected Boolean doInBackground(Object... args) {
+			RequestorBean requestor = (RequestorBean) args[0];
+			DataIdentifier dataId = (DataIdentifier) args[1];
+			List<Action> actions = (List<Action>) args[2];
+
+			try {
+				// -- Retrieve a stored permission
+				ResponseItem privacyPermission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
+				if (null != privacyPermission) {
+					Log.d(TAG, "Local Permission retrieved");
+					// Publish progress
+					if (!checkAndPublishProgress((progress = 100), "Local permission retrieved")) {
+						return false;
+					}
+					intentSender.sendIntentCheckPermission(clientPackage, privacyPermission);
+					return true;
+				}
+				
+
+				// -- Permission not available: remote call
+				Log.d(TAG, "No Local Permission retrieved: remote call");
+				privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+30), "Remote access control required: request sent")) {
+					return false;
+				}
+			}
+			catch (PrivacyException e) {
+				intentSender.sendIntentError(clientPackage, MethodType.CHECK_PERMISSION.name(), "Unexpected error during access control: "+e.getMessage());
+				publishProgress((progress = 100), "Unexpected error during access control: "+e.getMessage());
+				return false;
+			}
+			publishProgress((progress = 100), "Access control finished");
+			return true;
+		}
+		
+		/**
+		 * Publish progress and if cancel is required: send cancel intent
+		 * @param progress Progress number
+		 * @param msg Progress message description
+		 * @return true if the process can continue, false if it needs to stop
+		 */
+		private boolean checkAndPublishProgress(int progress, String msg) {
+			publishProgress(progress, msg);
+			if (isCancelled()) {
+				intentSender.sendIntentCancel(clientPackage, MethodType.CHECK_PERMISSION.name());
+				return false;
+			}
+			return true;
+		}
 	}
 
-	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
+		if (null == clientPackage || "".equals(clientPackage)) {
+			throw new PrivacyException(new MissingClientPackageException());
+		}
 		if (null == requestor) {
 			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
 			throw new NullPointerException("Not enought information: requestor is missing");
@@ -140,79 +181,129 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
 			throw new NullPointerException("Not enought information: data id is missing");
 		}
-
-		//		// -- Retrieve the obfuscation level
-		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
-		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
-		double obfuscationLevel = 1;
-		// If no obfuscation is required: return directly the wrapped data
-		if (obfuscationLevel >= 1) {
-			return dataWrapper;
-		}
-
-		// -- Verify params
 		// Wrapper ready for obfuscation
 		if (!dataWrapper.isReadyForObfuscation()) {
 			throw new PrivacyException("This data wrapper is not ready for obfuscation. Data are needed.");
 		}
-		// Obfuscation level in [0, 1]
-		if (obfuscationLevel > 1) {
-			obfuscationLevel = 1;
+
+		// -- Launch action
+		ObfuscationTask task = new ObfuscationTask(context, clientPackage); 
+		task.execute(requestor, dataWrapper);
+
+	}
+	private class ObfuscationTask extends AsyncTask<Object, Object, Boolean> {
+		private Context context;
+		private String clientPackage;
+		private int progress = 0;
+
+		public ObfuscationTask(Context context, String clientPackage) {
+			this.context = context;
+			this.clientPackage = clientPackage;
 		}
-		if (obfuscationLevel < 0) {
-			obfuscationLevel = 0.001;
-		}
-		// Return directly if obfuscation level is 1
-		if (1 == obfuscationLevel) {
-			return dataWrapper;
+		
+		@Override
+		protected void onPreExecute() {
+			publishProgress(progress, "Loading...");
 		}
 
-		// -- Mapping: retrieve the relevant obfuscator
-		IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+		protected Boolean doInBackground(Object... args) {
+			RequestorBean requestor = (RequestorBean) args[0];
+			DataWrapper dataWrapper = (DataWrapper) args[1];
 
-		// -- Obfuscate
-		IDataWrapper obfuscatedDataWrapper = null;
-		try {
-			// - Obfuscation
-			// Local obfuscation
-			if (obfuscator.isAvailable()) {
-				Log.d(TAG, "Local obfuscation");
-				obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
+			try {
+				// -- Retrieve the obfuscation level
+				double obfuscationLevel = privacyDataManagerInternal.getObfuscationLevel(requestor, dataWrapper.getDataId());
+				// If no obfuscation is required: return directly the wrapped data
+				if (-1 == obfuscationLevel || obfuscationLevel >= 1) {
+					publishProgress(100, "Obfuscation finished");
+					intentSender.sendIntentDataObfuscation(clientPackage, dataWrapper);
+				}
+				// Obfuscation level in [0, 1]
+				if (obfuscationLevel < 0) {
+					obfuscationLevel = 0.001;
+				}
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+10), "Obfuscation level retrieved")) {
+					return false;
+				}
+				
+				// -- Mapping: retrieve the relevant obfuscator
+				IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+				// Publish progress
+				if (!checkAndPublishProgress((progress = progress+5), "Obfuscator algorithm identified")) {
+					return false;
+				}
+
+				// -- Obfuscate
+				DataWrapper obfuscatedDataWrapper = null;
+				// - Obfuscation
+				// Local obfuscation
+				if (obfuscator.isAvailable()) {
+					Log.d(TAG, "Local obfuscation");
+					obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
+					// Publish progress
+					if (!checkAndPublishProgress((progress = 100), "Obfuscation done")) {
+						return false;
+					}
+					// Send data
+					intentSender.sendIntentDataObfuscation(clientPackage, obfuscatedDataWrapper);
+				}
+				// Remote obfuscation needed
+				else {
+					Log.d(TAG, "Remote obfuscation required");
+					privacyDataManagerRemote.obfuscateData(clientPackage, requestor, dataWrapper);
+					// Publish progress
+					if (!checkAndPublishProgress((progress = progress+30), "Remote obfuscation required: request sent")) {
+						return false;
+					}
+				}
 			}
-			// Remote obfuscation needed
-			else {
-				Log.d(TAG, "Remote obfuscation needed");
-				// TODO: remote call
+			catch(PrivacyException e) {
+				intentSender.sendIntentError(clientPackage, MethodType.OBFUSCATE_DATA.name(), "Unexpected error during obfuscation: "+e.getMessage());
+				publishProgress(100, "Unexpected error during obfuscation: "+e.getMessage());
+				return false;
 			}
-
-			// - Persistence
-			//			if (dataWrapper.isPersistenceEnabled()) {
-			// TODO: persiste the obfuscated data using a data broker
-			//				System.out.println("Persist the data "+dataWrapper.getDataId());
-			//			}
+			catch(Exception e) {
+				intentSender.sendIntentError(clientPackage, MethodType.OBFUSCATE_DATA.name(), "Unexpected error during obfuscation: "+e.getMessage());
+				publishProgress(100, "Unexpected error during obfuscation: "+e.getMessage());
+				return false;
+			}
+			publishProgress(100, "Obfuscation finished");
+			return true;
 		}
-		catch(Exception e) {
-			throw new PrivacyException("Obfuscation aborted", e);
+		
+		/**
+		 * Publish progress and if cancel is required: send cancel intent
+		 * @param progress Progress number
+		 * @param msg Progress message description
+		 * @return true if the process can continue, false if it needs to stop
+		 */
+		private boolean checkAndPublishProgress(int progress, String msg) {
+			publishProgress(progress, msg);
+			if (isCancelled()) {
+				intentSender.sendIntentCancel(clientPackage, MethodType.OBFUSCATE_DATA.name());
+				return false;
+			}
+			return true;
 		}
-		return obfuscatedDataWrapper;
 	}
 
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
-//		if (null == requestor) {
-//			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
-//			throw new NullPointerException("Not enought information: requestor is missing");
-//		}
-//		if (null == dataWrapper) {
-//			Log.e(TAG, "verifyParemeters: Not enought information: data wrapper is missing");
-//			throw new NullPointerException("Not enought information: data wrapper is missing");
-//		}
-//		if (null == dataWrapper.getDataId()) {
-//			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
-//			throw new NullPointerException("Not enought information: data id is missing");
-//		}
+		//		if (null == requestor) {
+		//			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
+		//			throw new NullPointerException("Not enought information: requestor is missing");
+		//		}
+		//		if (null == dataWrapper) {
+		//			Log.e(TAG, "verifyParemeters: Not enought information: data wrapper is missing");
+		//			throw new NullPointerException("Not enought information: data wrapper is missing");
+		//		}
+		//		if (null == dataWrapper.getDataId()) {
+		//			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
+		//			throw new NullPointerException("Not enought information: data id is missing");
+		//		}
 
-		return dataWrapper.getDataId();
+		//		return dataWrapper.getDataId();
 	}
 
 
@@ -229,22 +320,22 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return false;
 	}
 
-	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
+	private IDataObfuscator getDataObfuscator(DataWrapper dataWrapper) throws PrivacyException {
 		IDataObfuscator obfuscator = null;
 		if (dataWrapper.getData() instanceof LocationCoordinates) {
-			obfuscator = new LocationCoordinatesObfuscator((IDataWrapper<LocationCoordinates>) dataWrapper);
+			obfuscator = new LocationCoordinatesObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Name) {
-			obfuscator = new NameObfuscator((IDataWrapper<Name>) dataWrapper);
+			obfuscator = new NameObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Temperature) {
-			obfuscator = new TemperatureObfuscator((IDataWrapper<Temperature>) dataWrapper);
+			obfuscator = new TemperatureObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof Status) {
-			obfuscator = new StatusObfuscator((IDataWrapper<Status>) dataWrapper);
+			obfuscator = new StatusObfuscator((DataWrapper) dataWrapper);
 		}
 		else if (dataWrapper.getData() instanceof PostalLocation) {
-			obfuscator = new PostalLocationObfuscator((IDataWrapper<PostalLocation>) dataWrapper);
+			obfuscator = new PostalLocationObfuscator((DataWrapper) dataWrapper);
 		}
 		else {
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");
