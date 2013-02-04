@@ -21,6 +21,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 
     public static final String DEPART_CSS_NODE = "departCSSNode";
     public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
+    private boolean testCompleted;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -32,6 +33,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 
 	@MediumTest
 	public void testBindToPubsubService() throws Exception {
+		this.testCompleted = false;
 		final PubsubHelper helper = new PubsubHelper(getContext());
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -54,16 +56,19 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						@Override
 						public void returnAction(boolean result) {
 							assertTrue(result);
+							TestAndroidPubsubHelper.this.testCompleted = true;
 						}
 					});
 				}
 			}
 		});
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 	
 	@MediumTest
 	public void testSubscribeToNode() throws Exception {
+		this.testCompleted = false;
 		final PubsubHelper helper = new PubsubHelper(getContext());
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -99,6 +104,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 												@Override
 												public void returnAction(boolean result) {
 													assertTrue(result);
+													TestAndroidPubsubHelper.this.testCompleted = true;
 												}
 											});
 										}
@@ -137,7 +143,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);
-
+		assertTrue(this.testCompleted);
 	}
 	
 	private class TestSubscriber implements ISubscriber {
