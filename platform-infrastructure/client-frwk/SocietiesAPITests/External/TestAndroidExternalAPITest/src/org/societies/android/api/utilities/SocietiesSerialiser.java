@@ -31,7 +31,7 @@ import org.simpleframework.xml.convert.Registry;
 import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
-import org.societies.maven.converters.URIConverter;
+import org.societies.simple.basic.URIConverter;
 
 import android.util.Log;
 

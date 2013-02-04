@@ -38,7 +38,7 @@
 	<!-- All Societies Android External API related poms -->
 	<modules>
 		<module>../../../../api/android/external2/pom.xml</module>
-		<module>ContainerAndroidExternalAPI/container-clean.xml</module>
+		<!--module>ContainerAndroidExternalAPI/container-clean.xml</module-->
 		<module>ContainerAndroidExternalAPI/pom.xml</module>
 		<module>TestAndroidExternalAPITest/pom.xml</module>
 	</modules>

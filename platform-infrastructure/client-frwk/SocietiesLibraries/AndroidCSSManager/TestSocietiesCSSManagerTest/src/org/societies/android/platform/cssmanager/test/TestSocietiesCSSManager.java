@@ -125,11 +125,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 		
 		Log.d(LOG_TAG, "testCreateNewIdentity start time: " + this.testStartTime);
-        try {
-        	this.cssService.registerXMPPServer(CLIENT, cssRecord);
-        } catch (Exception e) {
-        	Log.d(LOG_TAG, "");
-        }
+        this.cssService.registerXMPPServer(CLIENT, cssRecord);
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
@@ -356,6 +352,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Register identity elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+				TestSocietiesCSSManager.this.testCompleted = true;
 	        	
 	        }
         }
