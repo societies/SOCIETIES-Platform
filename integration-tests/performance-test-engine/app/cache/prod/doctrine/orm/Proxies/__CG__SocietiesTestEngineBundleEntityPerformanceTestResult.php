@@ -99,6 +99,42 @@ class PerformanceTestResult extends \Societies\TestEngineBundle\Entity\Performan
         return parent::getMessage();
     }
 
+    public function setStartTestClassName($startTestClassName)
+    {
+        $this->__load();
+        return parent::setStartTestClassName($startTestClassName);
+    }
+
+    public function getStartTestClassName()
+    {
+        $this->__load();
+        return parent::getStartTestClassName();
+    }
+
+    public function setEndTestClassName($endTestClassName)
+    {
+        $this->__load();
+        return parent::setEndTestClassName($endTestClassName);
+    }
+
+    public function getEndTestClassName()
+    {
+        $this->__load();
+        return parent::getEndTestClassName();
+    }
+
+    public function setNodeJid($nodeJid)
+    {
+        $this->__load();
+        return parent::setNodeJid($nodeJid);
+    }
+
+    public function getNodeJid()
+    {
+        $this->__load();
+        return parent::getNodeJid();
+    }
+
     public function setNode(\Societies\TestEngineBundle\Entity\Nodes $node = NULL)
     {
         $this->__load();
@@ -126,7 +162,7 @@ class PerformanceTestResult extends \Societies\TestEngineBundle\Entity\Performan
 
     public function __sleep()
     {
-        return array('__isInitialized__', 'id', 'testStartDate', 'testEndDate', 'status', 'message', 'node', 'performanceTest');
+        return array('__isInitialized__', 'id', 'testStartDate', 'testEndDate', 'status', 'message', 'start_test_class_name', 'end_test_class_name', 'node_jid', 'node', 'performanceTest');
     }
 
     public function __clone()

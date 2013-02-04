@@ -1,0 +1,46 @@
+<div class="well">
+	<form method="post" {{ form_enctype(form) }}>
+        {{ form_widget(form) }}
+        <br /><br />
+        <a href="#" id="add_parameter" class="btn btn-primary">Add Parameter</a><br /><br /><br />
+        <input value="save" type="submit" class="btn btn-primary" />
+    </form>
+</div>
+
+
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() 
+	{
+		var $container = $('#societies_testenginebundle_performancetesttype_performanceTestParameters');
+		var $label = $container.prev();
+
+		$container.attr('data-prototype').replace(/__name__label__/, 'Performance test parameter');
+
+		function add_parameter() 
+		{
+			index = $container.children().length;
+			$container.append($($container.attr('data-prototype').replace(/__name__/g, index)));
+			$container.append($('<a href="#" id="delete_parameter_' + index +'" class="btn btn-danger">Delete</a>'));
+
+			$('#delete_parameter_' + index).click(function() 
+			{
+				$(this).prev().remove();
+				$(this).remove();
+				return false;
+			});
+		}
+		
+		if($container.children().length == 0) 
+		{
+			$label.remove();
+			add_parameter();
+		}
+
+		$('#add_parameter').click(function() 
+		{
+			add_parameter();
+			return false;
+			});
+	});
+</script>

@@ -1,0 +1,14 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }} - Test Engine Administration{% endblock %}
+ 
+{% block body %}
+{{ parent() }}
+
+<ul class="nav nav-pills nav-stacked" >
+  <li> <a href="{{ path('admin_mgmt_info') }}">Management Info</a> </li>
+  <li> <a href="{{ path('admin_get_test_nodes') }}">Test Nodes Management</a> </li>
+  <li> <a href="{{ path('admin_get_performance_tests') }}">Performance Test Management</a> </li>
+</ul>
+
+{% endblock %}
