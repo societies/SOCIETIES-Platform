@@ -434,7 +434,7 @@ public class CSSManager implements ICSSLocalManager {
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
 		LOG.debug("Calling modifyCssRecord");
 
-		List<String> changedList = new ArrayList<String>();
+		
 		Dbc.require("CssRecord parameter cannot be null", profile != null);
 
         CssInterfaceResult result = new CssInterfaceResult();
@@ -443,71 +443,14 @@ public class CSSManager implements ICSSLocalManager {
 		
 		CssRecord cssRecord = null;
 		
-		try{
-			if (this.cssRegistry.cssRecordExists()) {
-				cssRecord = this.cssRegistry.getCssRecord();
-				
-				//Check the elements of the current record against the profile to see what has changed
-				
-				if(cssRecord.getEntity() != (profile.getEntity())) {
-					//Add to the changed list for event	
-					changedList.add("Entity");
-				}
-				if(!cssRecord.getForeName().equals(profile.getForeName())){
-					//Add to the changed list for event	
-					changedList.add("ForeName");
-					
-				}
-				if(!cssRecord.getName().equals(profile.getName())){
-					//Add to the changed list for event	
-					changedList.add("Name");
-				}
-				if(!cssRecord.getEmailID().equals(profile.getEmailID())){
-					//Add to the changed list for event	
-					changedList.add("EmailID");
-				}
-				if(cssRecord.getSex()!=(profile.getSex())){
-					//Add to the changed list for event	
-					changedList.add("Sex");
-				}
-				
-				// update profile information
-				cssRecord.setEntity(profile.getEntity());
-				cssRecord.setForeName(profile.getForeName());
-				cssRecord.setName(profile.getName());
-				cssRecord.setEmailID(profile.getEmailID());
-				cssRecord.setSex(profile.getSex());
-				
-				// internal eventing
-				LOG.info("Generating CSS_Record_Event to notify Record has changed");
-				if(this.getEventMgr() != null){
-					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), (Serializable) changedList);
-					try {
-						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-						this.getEventMgr().publishInternalEvent(event);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						LOG.error("error trying to internally publish SUBS CIS event");
-					}
-				}
-
-				this.updateCssRegistry(cssRecord);
-				LOG.debug("Updating CSS with local database");
-
-				result.setProfile(cssRecord);
-				result.setResultStatus(true);
-
-			} else {
-				LOG.equals("Css record does not exist");
-			}
-			
-
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// internal eventing
 		
+		LOG.info("Pushing CSS_Record to Context from modifyCssRecord");		
+		this.pushtoContext(profile);
+		
+		result.setProfile(cssRecord);
+		result.setResultStatus(true);
+				
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
@@ -565,7 +508,9 @@ public class CSSManager implements ICSSLocalManager {
 			
 			// insert internal event here for modified cssNodes
 			
-			this.modifyCssRecord(profile);
+			//this.pushtoContext(profile);
+			
+			//this.modifyCssRecord(profile);
 		//try {
 	//		LOG.info("+++++++++++++ Calling cssRegistry Register CSSRecord ");
 		//	result = cssRegistry.registerCss(profile);
@@ -1253,8 +1198,9 @@ public class CSSManager implements ICSSLocalManager {
 		}
 		
 		// insert internal event here for modified cssNodes
-		
-		this.modifyCssRecord(cssrecord); 
+		LOG.info(" pushing new css node to context ");
+		this.pushtoContext(cssrecord);
+		//this.modifyCssRecord(cssrecord); 
 	
 	}
 	
@@ -1304,7 +1250,8 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 		}
 		
 		// insert internal event here for modified cssNodes (node removed)
-		
+		LOG.info(" pushing css node removed to context ");
+		this.pushtoContext(cssrecord);
 		//this.modifyCssRecord(cssrecord); 
 	
 	}

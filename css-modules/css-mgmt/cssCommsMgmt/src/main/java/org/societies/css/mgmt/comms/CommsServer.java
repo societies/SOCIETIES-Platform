@@ -127,11 +127,11 @@ public class CommsServer implements IFeatureServer {
 				asyncResult = this.cssManager.registerXMPPServer((CssRecord) bean.getProfile());
 				break;
 			case LOGIN_CSS:
-				LOG.debug("Login - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity() + " and password: " + bean.getProfile().getPassword());
+				LOG.debug("Login - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity());
 				asyncResult = this.cssManager.loginCSS((CssRecord) bean.getProfile());
 				break;
 			case LOGOUT_CSS:
-				LOG.debug("Logout - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity() + " and password: " + bean.getProfile().getPassword());
+				LOG.debug("Logout - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity());
 				asyncResult = this.cssManager.logoutCSS((CssRecord) bean.getProfile());
 				break;
 			case LOGIN_XMPP_SERVER:
