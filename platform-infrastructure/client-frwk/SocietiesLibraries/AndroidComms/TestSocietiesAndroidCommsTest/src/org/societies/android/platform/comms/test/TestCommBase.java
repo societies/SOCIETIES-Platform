@@ -262,15 +262,14 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		try {
 			commsService.newMainIdentity(CLIENT, XMPP_NEW_IDENTIFIER, XMPP_DOMAIN, XMPP_NEW_PASSWORD, this.random.nextLong());
 			Thread.sleep(DELAY);
-			commsService.destroyMainIdentity(CLIENT, this.random.nextLong());
-			Thread.sleep(DELAY);
+//			commsService.destroyMainIdentity(CLIENT, this.random.nextLong());
+//			Thread.sleep(DELAY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		} finally {
 			unregisterReceiver(receiver);
 			assertTrue(this.testCompleted);
-
 		}
 	}
 
@@ -419,6 +418,10 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 
 			} else if (intent.getAction().equals(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY)) {
+				assertEquals(XMPP_NEW_JID, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+				TestCommBase.this.testCompleted = true;
+				
 			}
 		}
     }
@@ -469,6 +472,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         intentFilter.addAction(XMPPAgent.LOGIN);
         intentFilter.addAction(XMPPAgent.LOGOUT);
         intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         
         return intentFilter;
 

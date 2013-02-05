@@ -22,12 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.context;
+package org.societies.android.platform.context.container;
 
-import org.societies.android.api.context.ACtxClient;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+//import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
+import org.societies.android.api.context.ICtxClient;
+import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
+import org.societies.android.platform.context.impl.ContextBrokerBase;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -35,57 +36,46 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * This wrapper class acts as a local wrapper for the Service Context Android service.
- * It uses the base service implementation {@link PlatformContextBase} to provide the service functionality
+ * This wrapper class acts as a test wrapper for the ContextBroker Android service.
+ * It uses the base service implementation {@link ContextBrokerBase} to provide the service functionality
+ *
+ * @author pkosmides
  */
+public class TestAndroidContextBroker extends Service{
 
-public class ServicePlatformContextLocal extends Service {
+	private static final String LOG_TAG = TestAndroidContextBroker.class.getName();
+	private IBinder binder;
 	
-    private static final String LOG_TAG = ServicePlatformContextLocal.class.getName();
-    private IBinder binder = null;
-    
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return binder;
+	}
+
     @Override
 	public void onCreate () {
-		this.binder = new LocalPlatformEventsBinder();
-		Log.d(LOG_TAG, "ServicePlatformContextLocal service starting");
+		this.binder = new TestContextBrokerBinder();
+		Log.d(LOG_TAG, "TestAndroidContextBroker service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "ServicePlatformContextLocal service terminating");
+		Log.d(LOG_TAG, "TestAndroidContextBroker service terminating");
 	}
 
 	/**Create Binder object for local service invocation */
-	public class LocalPlatformEventsBinder extends Binder {
-		
-		public ACtxClient getService() {
+	public class TestContextBrokerBinder extends Binder {
+		public ICtxClient getService(){
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			
-			PlatformContextBase serviceBase = new PlatformContextBase(ServicePlatformContextLocal.this.getApplicationContext(), ccm, false);
-
-			return serviceBase;
+			ContextBrokerBase ctxBroker = new ContextBrokerBase(getApplicationContext(), ccm, false);
+			return ctxBroker;
 		}
 	}
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
-	
-//	/**
-//	 * Factory method to get instance of {@link PubsubClientAndroid}
-//	 * @return PubsubClientAndroid
-//	 */
-//	protected PubsubClientAndroid createPubSubClientAndroid() {
-//		return new PubsubClientAndroid(getApplicationContext());
-//	}
-	
 	/**
 	 * Factory method to get instance of {@link ClientCommunicationMgr}
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
+		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
 	}
-
 }

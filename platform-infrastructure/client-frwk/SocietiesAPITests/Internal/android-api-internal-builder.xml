@@ -38,7 +38,7 @@
 	<!-- All Societies Android Internal API related poms -->
 	<modules>
 		<module>../../../../api/android/internal2/pom.xml</module>
-		<module>ContainerAndroidInternalAPI/container-clean.xml</module>
+		<!--module>ContainerAndroidInternalAPI/container-clean.xml</module-->
 		<module>ContainerAndroidInternalAPI/pom.xml</module>
 		<module>TestAndroidInternalAPITest/pom.xml</module>
 	</modules>

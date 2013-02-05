@@ -73,7 +73,12 @@
 	   			<version>${release.version}</version>
 	   			<type>apklib</type>
 			</dependency>
- 
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
+			
     </dependencies>
 
     <build>

@@ -42,7 +42,7 @@
 		<module>../../parent/android.xml</module>
 
 		<!-- Societies Android Events -->
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/android-events-builder.xml</module>
+		<!--module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/android-events-builder.xml</module-->
 		<module>../../platform-infrastructure/client-frwk/SocietiesAPITests/Internal/android-api-internal-builder.xml</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesAPITests/External/android-api-external-builder.xml</module>
 	</modules>
