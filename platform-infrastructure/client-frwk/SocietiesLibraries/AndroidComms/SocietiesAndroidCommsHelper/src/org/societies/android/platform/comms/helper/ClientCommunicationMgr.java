@@ -84,8 +84,6 @@ public class ClientCommunicationMgr {
 		this.idManager = null;
 		this.loginCompleted = loginCompleted;
 		this.receiver = null;
-		
-		this.setupBroadcastReceiver();
 	}
 	
 	public boolean isLoginCompleted() {
@@ -103,6 +101,9 @@ public class ClientCommunicationMgr {
 	public void bindCommsService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Comms Service");
+		
+		this.setupBroadcastReceiver();
+
 		this.bindCallback = bindCallback;
 
 		if (this.loginCompleted) {

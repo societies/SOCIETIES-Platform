@@ -1,21 +1,148 @@
-societies_test_engine_homepage:
-    pattern:  /hello/{name}
+###################################################################################################################### home
+home:
+    pattern:  /index
     defaults: { _controller: SocietiesTestEngineBundle:Default:index }
+    requirements:
+        _method: GET
 
-societies_test_engine_join_cis_result:
+###################################################################################################################### End home
+
+
+###################################################################################################################### administration
+admin:
+    pattern:  /admin
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:admin }
+    requirements:
+        _method: GET
+        
+admin_mgmt_info:
+    pattern:  /admin/mgmt-info
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:setMgmtInfo }
+    requirements:
+        _method: GET
+        
+admin_store_mgmt_info:
+    pattern:  /admin/mgmt-info
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:storeMgmtInfo }
+    requirements:
+        _method: POST
+
+admin_get_test_nodes:
+    pattern:  /admin/test-nodes
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:getAllTestNodes }
+    requirements:
+        _method: GET
+        
+admin_add_test_node:
+    pattern:  /admin/test-nodes
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:addNewTestNode }
+    requirements:
+        _method: POST
+        
+admin_get_test_node:
+    pattern:  /admin/test-nodes/{node_id}
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:getTestNode }
+    requirements:
+        _method: GET
+
+admin_update_test_node:
+    pattern:  /admin/test-nodes/{node_id}
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:updateTestNode }
+    requirements:
+        _method: POST
+   
+#admin_delete_test_node:
+#    pattern:  /admin/test-nodes/{node_id}
+#    defaults: { _controller: SocietiesTestEngineBundle:Administration:deleteTestNode }
+#    requirements:
+#        _method: DELETE
+#        
+
+admin_get_performance_tests:
+    pattern:  /admin/performance-tests
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:getPerformanceTests }
+    requirements:
+        _method: GET
+
+admin_add_performance_test:
+    pattern:  /admin/performance-tests
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:addPerformanceTest }
+    requirements:
+        _method: POST
+
+admin_get_performance_test_by_id:
+    pattern:  /admin/performance-tests/{test_id}
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:getPerformanceTestById }
+    requirements:
+        _method: GET
+
+admin_update_performance_test_by_id:
+    pattern:  /admin/performance-tests/{test_id}
+    defaults: { _controller: SocietiesTestEngineBundle:Administration:updatePerformanceTest }
+    requirements:
+        _method: POST
+
+#admin_get_performance_tests_by_developer:
+#    pattern:  /admin/performance-tests/{developer_name}
+#    defaults: { _controller: SocietiesTestEngineBundle:Administration:getPerformanceTestsByDeveloper }
+#    requirements:
+#        _method: GET
+        
+#admin_delete_performance_test_by_id:
+#    pattern:  /admin/performance-tests/{test_id}
+#    defaults: { _controller: SocietiesTestEngineBundle:Administration:deletePerformanceTest }
+#    requirements:
+#        _method: DELETE
+ 
+###################################################################################################################### End administration
+
+
+ 
+###################################################################################################################### test engine       
+test_engine:
+    pattern:  /test-engine
+    defaults: { _controller: SocietiesTestEngineBundle:TestEngine:index }
+    requirements:
+        _method: GET
+
+test_engine_configure:
+    pattern:  /test-engine
+    defaults: { _controller: SocietiesTestEngineBundle:TestEngine:configureTest }
+    requirements:
+        _method: POST
+        
+test_engine_send_test:
+    pattern:  /send-test
+    defaults: { _controller: SocietiesTestEngineBundle:TestEngine:sendTest }
+    requirements:
+        _method: POST
+
+test_engine_join_cis:
     pattern:  /test/join-cis/{test_id}/{css_owner_jid}/{cis_jid}
     defaults: { _controller: SocietiesTestEngineBundle:Default:joinCisResult }
     requirements:
         _method: GET
 
-societies_test_engine_start_test:
+###################################################################################################################### End test engine
+
+
+###################################################################################################################### test result
+test_results:
+    pattern:  /test-results/{page}
+    defaults: { _controller: SocietiesTestEngineBundle:TestResult:getAllResults }
+    requirements:
+        _method: GET
+
+test_result_start_test:
     pattern:  /start-test
     defaults: { _controller: SocietiesTestEngineBundle:TestResult:startTest }
     requirements:
-        _method: GET
+        _method: POST
         
-societies_test_engine_end_test:
+test_result_end_test:
     pattern:  /end-test
     defaults: { _controller: SocietiesTestEngineBundle:TestResult:endTest }
     requirements:
         _method: POST
+
+###################################################################################################################### End test result

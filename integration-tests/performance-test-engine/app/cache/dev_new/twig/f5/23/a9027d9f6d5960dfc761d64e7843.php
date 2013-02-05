@@ -1,0 +1,129 @@
+<?php
+
+/* SocietiesTestEngineBundle:TestEngine:test_config.html.twig */
+class __TwigTemplate_f523a9027d9f6d5960dfc761d64e7843 extends Twig_Template
+{
+    public function __construct(Twig_Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->parent = $this->env->loadTemplate("SocietiesTestEngineBundle::layout.html.twig");
+
+        $this->blocks = array(
+            'title' => array($this, 'block_title'),
+            'body' => array($this, 'block_body'),
+        );
+    }
+
+    protected function doGetParent(array $context)
+    {
+        return "SocietiesTestEngineBundle::layout.html.twig";
+    }
+
+    protected function doDisplay(array $context, array $blocks = array())
+    {
+        $this->parent->display($context, array_merge($this->blocks, $blocks));
+    }
+
+    // line 3
+    public function block_title($context, array $blocks = array())
+    {
+        $this->displayParentBlock("title", $context, $blocks);
+        echo " - Nodes";
+    }
+
+    // line 5
+    public function block_body($context, array $blocks = array())
+    {
+        // line 6
+        $this->displayParentBlock("body", $context, $blocks);
+        echo "
+
+\t<h4>
+\t\tYou are going to send a \"";
+        // line 9
+        echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "performance_test"), "testName"), "html", null, true);
+        echo "\" performance test to the following nodes:
+\t</h4>
+\t
+\t<ul>
+\t\t";
+        // line 13
+        $context['_parent'] = (array) $context;
+        $context['_seq'] = twig_ensure_traversable($this->getContext($context, "node_ids_list"));
+        foreach ($context['_seq'] as $context["_key"] => $context["item"]) {
+            // line 14
+            echo "\t \t\t
+\t \t\t<li> ";
+            // line 15
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "nodeId"), "html", null, true);
+            echo " </li>
+  \t\t
+\t\t";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['item'], $context['_parent'], $context['loop']);
+        $context = array_merge($_parent, array_intersect_key($context, $_parent));
+        // line 18
+        echo "\t</ul>
+
+\t
+\t<br/>
+\t
+<div class=\"well\">
+<h4>
+Test Parameters
+</h4>
+
+\t<form method=\"post\" action=\"send-test\">\t
+\t\t";
+        // line 29
+        $context['_parent'] = (array) $context;
+        $context['_seq'] = twig_ensure_traversable($this->getContext($context, "performanceTestParameters"));
+        foreach ($context['_seq'] as $context["_key"] => $context["item"]) {
+            echo "\t \t
+\t \t\t
+\t \t\t<label class=\"required\" for=\"";
+            // line 31
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "id"), "html", null, true);
+            echo "\" >";
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "parameterName"), "html", null, true);
+            echo "</label>
+\t \t\t<input type=\"text\" id=\"";
+            // line 32
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "id"), "html", null, true);
+            echo "\" name=\"";
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "id"), "html", null, true);
+            echo "\" required=\"required\" value=\"";
+            echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "parameterValue"), "html", null, true);
+            echo "\" />\t
+\t \t<br/>
+\t\t";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['item'], $context['_parent'], $context['loop']);
+        $context = array_merge($_parent, array_intersect_key($context, $_parent));
+        // line 35
+        echo "\t\t
+\t\t<input value=\"send\" type=\"submit\" class=\"btn btn-primary\" />
+\t</form>
+</div>
+
+";
+    }
+
+    public function getTemplateName()
+    {
+        return "SocietiesTestEngineBundle:TestEngine:test_config.html.twig";
+    }
+
+    public function isTraitable()
+    {
+        return false;
+    }
+
+    public function getDebugInfo()
+    {
+        return array (  105 => 35,  54 => 14,  21 => 1,  38 => 6,  51 => 22,  47 => 10,  299 => 100,  293 => 96,  290 => 95,  287 => 94,  285 => 93,  280 => 90,  274 => 86,  271 => 85,  268 => 84,  266 => 83,  261 => 80,  247 => 79,  243 => 77,  228 => 75,  220 => 73,  218 => 72,  213 => 70,  209 => 69,  202 => 66,  196 => 63,  183 => 61,  181 => 60,  175 => 58,  158 => 57,  107 => 41,  101 => 34,  80 => 24,  63 => 16,  36 => 6,  156 => 58,  148 => 55,  142 => 50,  140 => 50,  127 => 45,  123 => 44,  115 => 42,  110 => 40,  85 => 28,  65 => 19,  59 => 24,  45 => 10,  103 => 28,  91 => 20,  74 => 22,  70 => 14,  66 => 18,  25 => 4,  89 => 20,  82 => 45,  92 => 32,  86 => 31,  77 => 23,  57 => 15,  19 => 2,  42 => 12,  29 => 5,  26 => 3,  223 => 96,  214 => 90,  210 => 88,  203 => 84,  199 => 83,  194 => 80,  192 => 62,  189 => 78,  187 => 77,  184 => 76,  178 => 72,  170 => 67,  157 => 61,  152 => 59,  145 => 53,  130 => 48,  125 => 49,  119 => 45,  116 => 44,  112 => 43,  102 => 36,  98 => 33,  76 => 24,  73 => 23,  69 => 20,  56 => 12,  32 => 7,  24 => 3,  22 => 3,  23 => 3,  17 => 1,  68 => 30,  61 => 14,  44 => 7,  20 => 2,  161 => 63,  153 => 50,  150 => 49,  147 => 51,  143 => 46,  137 => 45,  129 => 42,  121 => 47,  118 => 43,  113 => 41,  104 => 35,  99 => 33,  94 => 21,  81 => 18,  78 => 24,  72 => 16,  64 => 15,  53 => 10,  50 => 13,  48 => 10,  41 => 7,  39 => 7,  35 => 5,  33 => 5,  30 => 4,  27 => 3,  182 => 70,  176 => 71,  169 => 62,  163 => 58,  160 => 57,  155 => 56,  151 => 54,  149 => 52,  141 => 54,  136 => 47,  134 => 50,  131 => 43,  128 => 47,  120 => 37,  117 => 36,  114 => 35,  109 => 38,  106 => 29,  100 => 30,  96 => 8,  93 => 7,  90 => 28,  87 => 5,  83 => 24,  79 => 29,  71 => 21,  62 => 17,  58 => 23,  55 => 23,  52 => 10,  49 => 14,  46 => 11,  43 => 9,  40 => 7,  37 => 6,  34 => 5,  31 => 4,  28 => 3,);
+    }
+}

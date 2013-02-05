@@ -11,6 +11,20 @@ import org.societies.api.identity.IdentityType;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
+/**
+ * The test suite tests the Pubsub helper class and its interaction with the remote Android Societies Pubsub service.
+ * 
+ * In order to run the tests contained in this class ensure that the following steps are taken:
+ * 
+ * 1. An Openfire XMPP server must be running
+ * 2. A suitable AVD must be running
+ * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid
+ * 4. The Android Client or Login Tester app must have already logged in successfully
+ *
+ * Consult http://xmpp.org/extensions/xep-0060.html (Pubsub XMPP XEP) for more details especially 
+ * on Pubsub error messages (SEND_IQ_ERROR)
+ */
+
 public class TestAndroidPubsubHelper extends AndroidTestCase {
 	private static final int DELAY = 10000;
     private static final String XMPP_DOMAIN = "societies.bespoke";
@@ -21,6 +35,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 
     public static final String DEPART_CSS_NODE = "departCSSNode";
     public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
+    private boolean testCompleted;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -32,6 +47,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 
 	@MediumTest
 	public void testBindToPubsubService() throws Exception {
+		this.testCompleted = false;
 		final PubsubHelper helper = new PubsubHelper(getContext());
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -54,16 +70,19 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						@Override
 						public void returnAction(boolean result) {
 							assertTrue(result);
+							TestAndroidPubsubHelper.this.testCompleted = true;
 						}
 					});
 				}
 			}
 		});
 		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
 	}
 	
 	@MediumTest
 	public void testSubscribeToNode() throws Exception {
+		this.testCompleted = false;
 		final PubsubHelper helper = new PubsubHelper(getContext());
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -99,6 +118,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 												@Override
 												public void returnAction(boolean result) {
 													assertTrue(result);
+													TestAndroidPubsubHelper.this.testCompleted = true;
 												}
 											});
 										}
@@ -137,7 +157,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 			}
 		});
 		Thread.sleep(DELAY);
-
+		assertTrue(this.testCompleted);
 	}
 	
 	private class TestSubscriber implements ISubscriber {

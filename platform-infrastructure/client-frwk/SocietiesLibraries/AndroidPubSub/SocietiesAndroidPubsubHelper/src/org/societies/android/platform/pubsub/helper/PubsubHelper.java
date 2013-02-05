@@ -74,7 +74,6 @@ public class PubsubHelper implements IPubsubClient {
 		this.subscriberCallbackMap = Collections.synchronizedMap(new HashMap<String, ISubscriber>());
 		this.elementToClass = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 		
-		this.setupBroadcastReceiver();
 	}
 	
 	/**
@@ -84,6 +83,7 @@ public class PubsubHelper implements IPubsubClient {
 	public boolean bindPubsubService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Pubsub Service");
+		this.setupBroadcastReceiver();
 
 		this.bindCallback = bindCallback;
 		this.bindToPubsubService();

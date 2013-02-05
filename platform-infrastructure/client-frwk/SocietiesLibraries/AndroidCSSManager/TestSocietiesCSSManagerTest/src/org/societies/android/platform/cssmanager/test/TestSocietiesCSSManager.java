@@ -29,6 +29,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 	private static final String CLIENT = "org.societies.android.platform.cssmanager.test";
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
+	private static final int MULTIPLE_LOGIN_COUNT = 2;
 	
 	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
 	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
@@ -57,7 +58,9 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
     private IAndroidCSSManager cssService;
     private long testStartTime, testEndTime;
-    
+    private int loginCount;
+    private boolean testCompleted;
+
 	
     public TestSocietiesCSSManager() {
         super(TestServiceCSSManagerLocal.class);
@@ -90,29 +93,27 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 	@MediumTest
 	public void testConnectToService() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
 		
-		CssRecord cssRecord = new CssRecord();
-		cssRecord.setCssIdentity(TEST_IDENTITY_1);
-		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
-		cssRecord.setPassword(TEST_PASSWORD_1);
-
 		
 		Log.d(LOG_TAG, "testConnectToService start time: " + this.testStartTime);
         try {
-        	this.cssService.loginXMPPServer(CLIENT, cssRecord);
+        	this.cssService.loginXMPPServer(CLIENT, getCssRecord());
         } catch (Exception e) {
         	Log.d(LOG_TAG, "");
         }
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
-
+		assertTrue(this.testCompleted);
 	}
+	
 	@MediumTest
 	public void testCreateNewIdentity() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -132,29 +133,53 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+		assertTrue(this.testCompleted);
+
 	}
 	
 	@MediumTest
 	public void testLoginCSS() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupLoginCSSBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
 		
-		CssRecord cssRecord = new CssRecord();
-		cssRecord.setCssIdentity(TEST_IDENTITY_1);
-		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
-		cssRecord.setPassword(TEST_PASSWORD_1);
-
-		
 		Log.d(LOG_TAG, "testLoginCSS start time: " + this.testStartTime);
         try {
-        	this.cssService.loginXMPPServer(CLIENT, cssRecord);
+        	this.cssService.loginXMPPServer(CLIENT, getCssRecord());
         } catch (Exception e) {
         	Log.d(LOG_TAG, "");
         }
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+		assertTrue(this.testCompleted);
+
+	}
+
+	@MediumTest
+	/**
+	 * Tests for multiple logins/logout sequences
+	 * @throws Exception
+	 */
+	public void testMultipleLoginCSS() throws Exception {
+		this.testCompleted = false;
+		this.loginCount = 1;
+		BroadcastReceiver receiver = this.setupMultipleLoginCSSBroadcastReceiver();
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+		
+		Log.d(LOG_TAG, "testLoginCSS start time: " + this.testStartTime);
+        try {
+        	this.cssService.loginXMPPServer(CLIENT, getCssRecord());
+        } catch (Exception e) {
+        	Log.d(LOG_TAG, "");
+        }
+        Thread.sleep(DELAY);
+		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
+        unregisterReceiver(receiver);
+		assertTrue(this.testCompleted);
+
 	}
 
     /**
@@ -187,6 +212,23 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         receiver = new LoginCSSReceiver();
         getContext().registerReceiver(receiver, createTestIntentFilter());
         Log.d(LOG_TAG, "Register LoginCSSReceiver broadcast receiver");
+
+        return receiver;
+    }
+    
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupMultipleLoginCSSBroadcastReceiver() {
+        BroadcastReceiver receiver = null;
+
+        Log.d(LOG_TAG, "Set up Multiple LoginCSSReceiver broadcast receiver");
+
+        receiver = new MultipleLoginCSSReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());
+        Log.d(LOG_TAG, "Register Multiple LoginCSSReceiver broadcast receiver");
 
         return receiver;
     }
@@ -235,6 +277,57 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+				TestSocietiesCSSManager.this.testCompleted = true;
+	        }
+		}
+    }
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class MultipleLoginCSSReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+
+                
+                CssRecord cssRecord = new CssRecord();
+        		cssRecord.setCssIdentity(TEST_IDENTITY_1 + "@" + TEST_DOMAIN_AUTHORITY);
+
+                TestSocietiesCSSManager.this.cssService.loginCSS(CLIENT, cssRecord);
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Login CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+	        	
+                CssRecord cssRecord = new CssRecord();
+        		cssRecord.setCssIdentity(TEST_IDENTITY_1 + "@" + TEST_DOMAIN_AUTHORITY);
+
+        		TestSocietiesCSSManager.this.cssService.logoutCSS(CLIENT, cssRecord);
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Logout CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                TestSocietiesCSSManager.this.cssService.logoutXMPPServer(CLIENT);
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                if (TestSocietiesCSSManager.this.loginCount < MULTIPLE_LOGIN_COUNT) {
+                    TestSocietiesCSSManager.this.loginCount++;
+                    try {
+                    	TestSocietiesCSSManager.this.cssService.loginXMPPServer(CLIENT, getCssRecord());
+                    } catch (Exception e) {
+                    	Log.d(LOG_TAG, "");
+                    	fail();
+                    }
+                } else {
+    				TestSocietiesCSSManager.this.testCompleted = true;
+                }
+                
 	        }
 		}
     }
@@ -258,6 +351,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+				TestSocietiesCSSManager.this.testCompleted = true;
 	        } else if (intent.getAction().equals(IAndroidCSSManager.REGISTER_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
@@ -299,4 +393,12 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         return intentFilter;
     }
 
+    private static CssRecord getCssRecord() {
+		CssRecord cssRecord = new CssRecord();
+		cssRecord.setCssIdentity(TEST_IDENTITY_1);
+		cssRecord.setDomainServer(TEST_DOMAIN_AUTHORITY);
+		cssRecord.setPassword(TEST_PASSWORD_1);
+		return cssRecord;
+
+    }
 }
