@@ -60,6 +60,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -153,7 +154,8 @@ public class PrivacyNegotiationTest {
 		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
-			TestCase1264.privacyPolicyNegotiationManager.negotiateCISPolicy(requestorCis);
+			TestCase1264.privacyPolicyNegotiationManager.negotiateCISPolicy(new NegotiationDetails(requestorCis, 0));
+			
 			LOG.info("[#"+testCaseNumber+"] "+testTitle+": CIS Privacy Policy Negotiation finished");
 			retrievedPrivacyAgreement = TestCase1264.privacyAgreementManager.getAgreement(requestorCis);
 		} catch (PrivacyException e) {
@@ -175,7 +177,7 @@ public class PrivacyNegotiationTest {
 		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
-			TestCase1264.privacyPolicyNegotiationManager.negotiateServicePolicy(requestorService);
+			TestCase1264.privacyPolicyNegotiationManager.negotiateServicePolicy(new NegotiationDetails(requestorService, 1));
 			LOG.info("[#"+testCaseNumber+"] "+testTitle+": CIS Privacy Policy Negotiation finished");
 			retrievedPrivacyAgreement = TestCase1264.privacyAgreementManager.getAgreement(requestorService);
 		} catch (PrivacyException e) {

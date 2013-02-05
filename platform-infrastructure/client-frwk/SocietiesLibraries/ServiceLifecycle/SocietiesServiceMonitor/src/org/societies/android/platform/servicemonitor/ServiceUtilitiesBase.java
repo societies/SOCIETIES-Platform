@@ -27,26 +27,12 @@ package org.societies.android.platform.servicemonitor;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
-import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.android.api.servicelifecycle.AService;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.servicelifecycle.IServiceUtilities;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.identity.IIdentity;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
-import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
-import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
-import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
@@ -78,7 +64,7 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
     	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			this.commMgr = new ClientCommunicationMgr(androidContext);
+			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }
@@ -89,7 +75,7 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
      */
     
 	/* @see org.societies.android.api.servicelifecycle.IServiceUtilities#getMyServiceId(java.lang.String) */
-	public AServiceResourceIdentifier getMyServiceId(String client) {
+	public ServiceResourceIdentifier getMyServiceId(String client) {
 		Log.d(LOG_TAG, "Calling getMyServiceId from client: " + client);
 		
 		AsynGetMyServiceId methodAsync = new AsynGetMyServiceId();
@@ -143,13 +129,16 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 			String results [] = new String[1];
 			results[0] = params[0];
 			
-			AServiceResourceIdentifier sri = new AServiceResourceIdentifier();
+			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
 			String appName = getCallingAppName(params[0]);
-			String uri = "http://" + commMgr.getIdManager().getThisNetworkNode().getJid() + "/" + appName;
 			try {
+				String uri = "http://" + commMgr.getIdManager().getThisNetworkNode().getJid() + "/" + appName;
+			
 				sri.setIdentifier(new URI(uri));
 			} catch (URISyntaxException e) {
-				Log.d(LOG_TAG, "Exception parsing URI: " + uri);
+				Log.d(LOG_TAG, "Exception parsing URI");
+			} catch (InvalidFormatException e) {
+				Log.d(LOG_TAG, "Exception getting Network node id");
 			}
 			sri.setServiceInstanceIdentifier(params[0]);
 

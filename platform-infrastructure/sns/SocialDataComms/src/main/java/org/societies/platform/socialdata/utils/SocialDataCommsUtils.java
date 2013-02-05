@@ -82,10 +82,11 @@ public class SocialDataCommsUtils {
 		return paramsMap;
 	}
 	
-	public static SocialdataMessageBean createAddConnectorMessageBean(ISocialConnector.SocialNetwork socialNetwork, String token, long validity) {
+	public static SocialdataMessageBean createAddConnectorMessageBean(Socialnetwork socialNetwork, String token, long validity) {
 		SocialdataMessageBean messageBean = new SocialdataMessageBean();
 		messageBean.setMethod(SocialDataMethod.ADD_CONNECTOR);
-		messageBean.setSnName(SocialDataCommsUtils.socialNetwork(socialNetwork));
+		//messageBean.setSnName(SocialDataCommsUtils.socialNetwork(socialNetwork));
+		messageBean.setSnName(socialNetwork);
 		messageBean.setToken(token);
 		messageBean.setValidity(validity);
 		return messageBean;

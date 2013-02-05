@@ -126,6 +126,12 @@
                 	    	<artifactId>emma</artifactId>
                     		<version>2.1.5320</version>
                 	</dependency>
+			<dependency>
+				<artifactId>xpp3</artifactId>
+				<groupId>xpp3</groupId>
+				<version>1.1.4c</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -139,8 +145,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -246,6 +252,11 @@
                             		<version>1.7</version>
                         	</plugin>
   
+	     			<plugin>
+	        			<groupId>org.codehaus.mojo</groupId>
+	        			<artifactId>findbugs-maven-plugin</artifactId>
+	        			<version>2.5.2</version>
+	      			</plugin>
 				<!-- Being used to allow the Android Communication gateway to build <plugin> 
 					<groupId>com.jayway.maven.plugins.android.generation2</groupId> <artifactId>maven-android-plugin</artifactId> 
 					<version>2.9.0-issue170</version> <configuration> <sdk> <platform>8</platform> 

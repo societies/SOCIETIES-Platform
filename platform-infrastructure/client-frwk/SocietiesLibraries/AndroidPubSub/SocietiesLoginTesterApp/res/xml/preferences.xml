@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceScreen
+	    android:key="appBehaviour"
+        android:title="Behaviour">
+     		<CheckBoxPreference 
+     		    android:summary="Display passwords on entry" 
+     		    android:key="displayPasswords" 
+     		    android:defaultValue="false" 
+     		    android:title="Credential Passwords"/>
+	</PreferenceScreen>
+	
+ 	<PreferenceScreen
+	    android:key="cssConnectionProperties"
+        android:title="CSS Configuration">
+		    <EditTextPreference 
+   		    	android:title="Domain Authority Server URI" 
+   		    	android:key="daServerURI" 
+   		    	android:defaultValue="societies.local" 
+   		    	android:summary="URI of Domain Authority Server"/>
+    		<EditTextPreference 
+   		    	android:title="Domain Authority Node" 
+   		    	android:key="daNode" 
+   		    	android:defaultValue="danode" 
+   		    	android:summary="Domain Authority Node"/>
+    			<EditTextPreference 
+   		    	android:title="CSS Identity" 
+   		    	android:key="cssIdentity" 
+   		    	android:defaultValue="" 
+   		    	android:summary="CSS XMPP identity"/>
+           	<EditTextPreference 
+   		    	android:title="Identity Password" 
+   		    	android:key="cssPassword" 
+   		    	android:defaultValue="" 
+   		    	android:summary="CSS XMPP password"/>
+           	<EditTextPreference 
+   		    	android:title="Android CSS Node JID Resource" 
+   		    	android:key="cssNodeResource" 
+   		    	android:defaultValue="Android" 
+   		    	android:summary="CSS Node JID resource"/>
+           	<EditTextPreference 
+   		    	android:title="Domain Authority Server Port" 
+   		    	android:numeric="integer"
+   		    	android:key="daServerPort" 
+   		    	android:defaultValue="5222" 
+   		    	android:summary="Domain Authority Server Port"/>
+            <EditTextPreference 
+            	android:key="nodeType" 
+            	android:title="Node Type" 
+            	android:summary="CSS Node Type - Android" 
+            	android:defaultValue="0" 
+            	android:enabled="false"/>
+            <ListPreference 
+	           android:title="Identity Domain Servers"
+	           android:summary="Select an Identity server"
+	           android:key="listIdentityDomain"
+	           android:defaultValue="societies.local"
+               android:entries="@array/xmppNames"
+           	   android:entryValues="@array/xmppValues" />       
+	</PreferenceScreen>
+</PreferenceScreen>

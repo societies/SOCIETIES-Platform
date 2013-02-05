@@ -62,11 +62,11 @@ public class ResponseItem implements Serializable{
 	}
 
 	public String toXMLString(){
-		String str = "\n<Response>";
-		str = str.concat(this.item.toXMLString());
-		str = str.concat(this.decisionAsXML());
-		str = str.concat("\n</Response>");
-		return str;
+		StringBuilder str = new StringBuilder("\n<Response>");
+		str.append(getRequestItem().toXMLString());
+		str.append(decisionAsXML());
+		str.append("\n</Response>");
+		return str.toString();
 	}
 
 	public String decisionAsXML(){

@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.societies.android.api.external</groupId>
+	<artifactId>societies-android-api</artifactId>
+	<name>SOCIETIES API Android External</name>
+	<version>${release.version}</version>
+	<packaging>apklib</packaging>
+
+	<description>
+    		This APKLIB file provides the external interfaces and related classes of the 
+    		SOCIETIES Android platform    
+    	</description>
+
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -29,24 +29,22 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.cis.directory.ICisDirectory;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.directory.CisDirectoryBean;
 import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 import org.societies.api.schema.cis.directory.MethodType;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -77,7 +75,7 @@ public class CisDirectoryBase implements ICisDirectory {
     	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			this.commMgr = new ClientCommunicationMgr(androidContext);
+			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }
@@ -85,7 +83,7 @@ public class CisDirectoryBase implements ICisDirectory {
     
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
-	public ACisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
+	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
         Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -96,7 +94,7 @@ public class CisDirectoryBase implements ICisDirectory {
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
-	public ACisAdvertisementRecord[] findForAllCis(String client, String filter) {       
+	public CisAdvertisementRecord[] findForAllCis(String client, String filter) {       
         Log.d(LOG_TAG, "findForAllCis called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -107,7 +105,7 @@ public class CisDirectoryBase implements ICisDirectory {
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
-	public ACisAdvertisementRecord searchByID(String client, String cis_id) {
+	public CisAdvertisementRecord searchByID(String client, String cis_id) {
 		Log.d(LOG_TAG, "searchByID called by client: " + client);
 		
         AsyncDirFunctions methodAsync = new AsyncDirFunctions();
@@ -162,10 +160,11 @@ public class CisDirectoryBase implements ICisDirectory {
 				messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
 			}
 			//COMMS CONFIG
-			IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-			ICommCallback cisCallback = new CisDirectoryCallback(client, method);
-			Stanza stanza = new Stanza(toID);
-	        try {
+			try {
+				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
+				ICommCallback cisCallback = new CisDirectoryCallback(client, method);
+				Stanza stanza = new Stanza(toID);
+	        
 	        	commMgr.register(ELEMENT_NAMES, cisCallback);
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			} catch (Exception e) {
@@ -235,18 +234,20 @@ public class CisDirectoryBase implements ICisDirectory {
 					CisDirectoryBeanResult dirResult = (CisDirectoryBeanResult) msgBean;
 					List<CisAdvertisementRecord> listReturned = dirResult.getResultCis();
 					//CONVERT TO PARCEL BEANS
-					Parcelable returnArray[] = new Parcelable[listReturned.size()];
-					for (int i=0; i<listReturned.size(); i++) {
-						ACisAdvertisementRecord record = ACisAdvertisementRecord.convertCisAdvertRecord(listReturned.get(i)); 
-						returnArray[i] = record;
-						Log.d(LOG_TAG, "Added record: " + record.getId());
-					}
+					//Parcelable returnArray[] = new Parcelable[listReturned.size()];
+					//for (int i=0; i<listReturned.size(); i++) {
+					//	ACisAdvertisementRecord record = ACisAdvertisementRecord.convertCisAdvertRecord(listReturned.get(i)); 
+					//	returnArray[i] = record;
+					//	Log.d(LOG_TAG, "Added record: " + record.getId());
+					//}
+					 CisAdvertisementRecord returnArray[] = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
+					
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
 						
 					intent.setPackage(client);
 					CisDirectoryBase.this.androidContext.sendBroadcast(intent);
-					CisDirectoryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
+					//CisDirectoryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 				}
 			}
 		}

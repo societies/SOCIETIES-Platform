@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}Societies Project {% endblock %}</title>
+    
+    {% block stylesheets %}
+      <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}" type="text/css" />
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container">
+      <div id="header" class="hero-unit">
+        <h2>Societies Project </h2>
+        <p></p>
+      </div>
+ 
+      <div class="row">
+        <div id="menu" class="span3">
+          <h3><a href="{{ path('home') }}">Home</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="{{ path('admin') }}">Management</a></li>
+            <li><a href="{{ path('test_engine') }}">Test Engine</a></li>
+            <li><a href="{{ path('test_results', {'page':1}) }}">Test Results</a></li>
+          </ul>
+        </div>
+        <div id="content" class="span9">
+          {% block body %}
+          {% endblock %}
+        </div>
+      </div>
+ 
+      <hr>
+ 
+      <footer>
+        <p></p>
+      </footer>
+    </div>
+ 
+  {% block javascripts %}
+    {# Add this javascripts if you entend to use the bootstrap Twitter functions #}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ asset('js/bootstrap.js') }}"></script>
+  {% endblock %}
+  </body>
+</html>

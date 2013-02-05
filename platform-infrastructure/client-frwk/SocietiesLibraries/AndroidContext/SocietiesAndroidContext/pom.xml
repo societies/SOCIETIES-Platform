@@ -9,20 +9,25 @@
    </parent>
 
    <groupId>org.societies.android.platform.context</groupId>
-   <artifactId>SocietiesPlatformContext</artifactId>
-   <name>PlatformContext</name>
+   <artifactId>SocietiesAndroidContext</artifactId>
+   <name>AndroidContext</name>
    <version>${release.version}</version>
    <packaging>apklib</packaging>
 
-   <developers>
-      <developer>
-		 <name>WP5 Client Framework Team</name>
-		<!-- Name of component author-->
-		 <email>http://www.ict-societies.eu</email>
-		<!-- Component author e-mail-->
-	  </developer>
-   </developers>
-
+	<developers>
+		<developer>
+			<id>pkosmides</id>
+			<name>Pavlos Kosmides</name>
+			<email>pkosmidi@central.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
 
     <dependencies>
         <dependency>
@@ -33,40 +38,32 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-		</dependency>
- 		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-		</dependency>
-		        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-        
-        <dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
+		<groupId>org.societies.android.platform.content</groupId>
+   			<artifactId>SocietiesContent</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
 		</dependency>
- 		<dependency>
+        <dependency>
    			<groupId>org.societies.android.platform.androidutils</groupId>
 		    <artifactId>SocietiesAndroidUtilities</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
+        <dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <version>${version.comm}</version>
+		    <type>apklib</type>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>   
 		
         
     </dependencies>

@@ -57,6 +57,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	INegotiationCallback finalCallback;
 	String slaKey;
 	List<URI> fileUris;
+	int id;
 	
 	String[] eventTypes;
 	IEventMgr eventMgr;
@@ -72,11 +73,12 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * {@link ISecureStorage#getDocument(String)}
 	 */
 	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey,
-			List<URI> fileUris, IEventMgr eventMgr, String[] eventTypes) {
+			List<URI> fileUris, IEventMgr eventMgr, String[] eventTypes, int id) {
 		
 		this.finalCallback = finalCallback;
 		this.slaKey = slaKey;
 		this.fileUris = fileUris;
+		this.id = id;
 		
 		this.eventTypes = eventTypes;
 		this.eventMgr = eventMgr;
@@ -96,38 +98,62 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 		if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
 			
 			PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
-			NegotiationStatus status = payload.getNegotiationStatus();
-			LOG.debug("negotiation status : " + status);
+			
+			if (isEventForThisNegotiation(payload)) {
+				
+				NegotiationStatus status = payload.getNegotiationStatus();
+				LOG.debug("negotiation status : " + status);
 
-			if (status == NegotiationStatus.SUCCESSFUL) {
-				logPerformance(true);
-				notifySuccess();
-			}
-			else if (status == NegotiationStatus.FAILED) {
-				logPerformance(false);
-				notifyFailure();
+				if (status == NegotiationStatus.SUCCESSFUL) {
+					logPerformance(true);
+					notifySuccess();
+				}
+				else if (status == NegotiationStatus.FAILED) {
+					logPerformance(false);
+					notifyFailure();
+				}
 			}
 		}
 		else if (type.equals(EventTypes.FAILED_NEGOTIATION_EVENT)) {
 			
 			FailedNegotiationEvent payload = (FailedNegotiationEvent) event.geteventInfo();
-			Requestor requestor = payload.getRequestor();
 			
-			LOG.debug("negotiation requestor : " + requestor);
-			
-			if (requestor.equals(requestor)) {  // FIXME
+			if (isEventForThisNegotiation(payload)) {
+
+				Requestor requestor = payload.getDetails().getRequestor();
+				LOG.debug("negotiation requestor : " + requestor);
 				notifyFailure();
 			}
 		}
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
-	 */
 	@Override
 	public void handleExternalEvent(CSSEvent event) {
 		LOG.warn("External event received unexpectedly: {}", event.geteventType());    
+	}
+	
+	private boolean isEventForThisNegotiation(Object payload) {
+
+		int id;
+		
+		if (payload instanceof PPNegotiationEvent) {
+			PPNegotiationEvent p = (PPNegotiationEvent) payload;
+			id = p.getDetails().getNegotiationID();
+		}
+		else if (payload instanceof FailedNegotiationEvent) {
+			FailedNegotiationEvent p = (FailedNegotiationEvent) payload;
+			id = p.getDetails().getNegotiationID();
+		}
+		else {
+			LOG.warn("PPN event payload is of unexpected type: {}", payload.getClass().getName());
+			return false;
+		}
+		
+		LOG.debug("Event is for negotiation {}. This listener is waiting " +
+				"for negotiation {}", id, this.id);
+		
+		return id == this.id;
 	}
 	
 	private void notifySuccess() {

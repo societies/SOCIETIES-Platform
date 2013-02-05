@@ -13,8 +13,8 @@
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService" > <!-- android:process=":remoteService" -->
-        </service>
+        <!-- <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService" > android:process=":remoteService"
+        </service> -->
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" >
         </service>
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" >

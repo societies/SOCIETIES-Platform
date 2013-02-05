@@ -43,6 +43,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceConditionExtractor;
@@ -117,18 +118,18 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 				action = e.nextElement();
 				action.setServiceID(serviceID);
 				action.setServiceType(serviceType);
-				logging.debug("evaluated preference "+preferenceName+" of "+serviceType+":"+serviceID+"\nand returning value: "+action.getvalue());
+				logging.debug("evaluated preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"\nand returning value: "+action.getvalue());
 				return action;
 			}else{
-				logging.debug("evaluated preference "+preferenceName+" of "+serviceType+":"+serviceID+"\n did not yield any actions, returning empty action");
+				logging.debug("evaluated preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"\n did not yield any actions, returning empty action");
 			}
 		}
-		logging.debug("No preference available for: "+preferenceName+" of "+serviceType+":"+serviceID.toString());
+		logging.debug("No preference available for: "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
 		return null;
 	}
 
 	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID) {
-		logging.debug("extracting conditions for all preferences of : "+serviceType+":"+serviceID.toString());
+		logging.debug("extracting conditions for all preferences of : "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
 		List<IPreferenceConditionIOutcomeName> list = new ArrayList<IPreferenceConditionIOutcomeName>();
 		List<String> prefnames = this.preferenceCache.getPreferenceNamesofService(serviceType, serviceID);
 		PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
@@ -159,7 +160,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 
 	public IPreferenceOutcome reEvaluatePreferences(IIdentity ownerID, CtxAttribute attribute, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		logging.debug("New context event received, requested re-evaluation of preference: ");
-		logging.debug(preferenceName+""+serviceType+":"+serviceID.toString());
+		logging.debug(preferenceName+""+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
 		this.contextCache.updateCache(attribute);
 		IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
 		if (model!=null){
@@ -341,7 +342,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 		PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
 		IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
 		if (model==null){
-			this.logging.debug("Preference for "+new Tools(this.ctxBroker).convertToKey(serviceType, serviceID.toString(), preferenceName)+" doesn't exist");
+			this.logging.debug("Preference for "+new Tools(this.ctxBroker).convertToKey(serviceType, ServiceModelUtils.serviceResourceIdentifierToString(serviceID), preferenceName)+" doesn't exist");
 			return new ArrayList<CtxIdentifier>();
 		}
 		List<IPreferenceConditionIOutcomeName> list = pce.extractConditions(model);

@@ -1,0 +1,204 @@
+{
+	"CISDesktopManagerService" : {
+		"exceptionThreshold" : 0,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"createdCIS" : {
+						"communityName": "barcelona fc",
+	                    "communityType": "soccer",
+	                    "ownerJid": "thomas@soc.com",
+	                    "membershipCrit": {
+			                    "criteria": [
+		                    	{
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Atheist",
+		                        "rank": "1"},
+		                        {
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru",
+		                        "rank": "2"}
+		                        ]
+		                	},
+	                    "description": "soh barca",
+	                    "communityJid" : "barca.soc.com"
+	     			},
+	     "getMembers" : [{"jid": "alec@societies.local", 
+	     				  "role": "owner"
+	     				 },
+	     				 {"jid": "thomas@societies.local", 
+	     				  "role": "participant" 
+	     				 },
+	     				 {"jid": "alan@societies.local", 
+	     				  "role": "participant"
+	     			}],
+	     "listOfCISs": [{
+	     				"communityName": "flamengo",
+	                    "communityType": "soccer",
+	                    "ownerJid": "zico.soc.com",
+	                    "membershipCrit": {
+		                    "criteria": [
+		                    	{
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Atheist",
+		                        "rank": "1"},
+		                        {
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru",
+		                        "rank": "2"}
+		                        ]
+		                	},
+	                    "description": "cis do flamengo",
+	                    "communityJid" : "fla.soc.com"
+					     },
+	     				{
+						"communityName": "vasco",
+	                    "communityType": "soccer",
+	                    "ownerJid": "dinamite@soc.com",
+	                    "membershipCrit": {
+		                    "criteria": [
+		                    	{
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Protestant",
+		                        "rank": "1"},
+		                        {
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru",
+		                        "rank": "2"}
+		                        ]
+		                	},
+	                    "description": "cis do Vasco",
+	                    "communityJid" : "vasco.soc.com"
+					     },
+					     {
+						"communityName": "fluminense fc",
+	                    "communityType": "soccer",
+	                    "ownerJid": "fred@soc.com",
+	                    "membershipCrit": {
+		                    "criteria": [
+		                    	{
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Protestant",
+		                        "rank": "1"},
+		                        {
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru",
+		                        "rank": "2"}
+		                        ]
+		                	},
+	                    "description": "cis do flu",
+	                    "communityJid" : "flu.soc.com"
+	     				}
+	     		],
+		"CISDirResults": [
+     				{
+     				"id" : "student.hw.local",
+     				"cssownerid": "sarah.hw.local",
+     				"name": "Students Union",
+                    "type": "university",
+                    "membershipCrit": {
+	                    "criteria": [
+	                    	{
+	                        "attrib": "age",
+	                        "operator": "<",
+	                        "value1": "25",
+	                        "value2": "25",
+		                    "rank": "1"},
+	                        {
+	                        "attrib": "location",
+	                        "operator": "equals",
+	                        "value1": "Edinburgh",
+	                        "value2": "Edinburgh",
+		                    "rank": "2"}
+	                        ]
+	                	}
+				    },
+     				{
+					"id" : "developers.societies.local",
+     				"cssownerid": "john.societies.local",
+     				"name": "Societies Developers Helpdesk",
+                    "type": "Development",
+                    "membershipCrit": {
+	                    "criteria": [
+	                    	{
+	                        "attrib": "age",
+	                        "operator": ">",
+	                        "value1": "25",
+	                        "value2": "25",
+		                    "rank": "1"},
+	                        {
+	                        "attrib": "location",
+	                        "operator": "equals",
+	                        "value1": "Edinburgh",
+	                        "value2": "Edinburgh",
+		                    "rank": "2"}
+	                        ]
+	                	}
+				    }
+     			],
+     			
+		"JoinResponse": {
+     				"result": "true",
+     				"community": {
+	     				"communityName": "Societies Developers Helpdesk",
+	                    "communityType": "Development",
+	                    "ownerJid": "john.societies.local",
+	                    "membershipCrit": {
+		                    "criteria": [
+		                    	{
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Atheist",
+		                        "rank": "1"},
+		                        {
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru",
+		                        "rank": "2"}
+		                        ]
+		                	},
+	                    "description": "Where to go if you want help developing Societies services",
+	                    "communityJid" : "developers.societies.local"
+					     }
+					},
+					
+		"ActivityFeed": [{
+     				"actor": "john.societies.local",
+     				"verb": "created",
+	                "object": "cis-1234",
+	                "target" : "n/a",
+	                "published": "1332403882588"
+					},
+					{
+     				"actor": "jane.societies.local",
+     				"verb": "joined",
+	                "object": "cis-1234",
+	                "target" : "n/a",
+	                "published": "1332413890000"
+					},
+					{
+     				"actor": "john.societies.local",
+     				"verb": "shared",
+	                "object": "service-1234",
+	                "target" : "n/a",
+	                "published": "1332504090000"
+					}]
+	}
+}

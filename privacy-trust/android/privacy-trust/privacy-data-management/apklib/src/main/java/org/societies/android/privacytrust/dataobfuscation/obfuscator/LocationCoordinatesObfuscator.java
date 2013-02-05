@@ -28,13 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapper;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.RandomBetween;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
 
 import android.util.Log;
 
@@ -44,7 +43,7 @@ import android.util.Log;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<LocationCoordinates>> {
+public class LocationCoordinatesObfuscator extends DataObfuscator<DataWrapper> {
 	private final static String TAG = LocationCoordinatesObfuscator.class.getSimpleName();
 
 	/**
@@ -89,19 +88,19 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 	/**
 	 * @param data
 	 */
-	public LocationCoordinatesObfuscator(IDataWrapper<LocationCoordinates> data) {
+	public LocationCoordinatesObfuscator(DataWrapper data) {
 		super(data);
 		available = true;
 		obfuscationLevelType = ObfuscationLevelType.CONTINUOUS;
 		dataType = LocationCoordinates.class;
-		geolocation = data.getData();
+		geolocation = (LocationCoordinates) data.getData();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	public IDataWrapper<LocationCoordinates> obfuscateData(double obfuscationLevel)
+	public DataWrapper obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		// -- Init
 		rand = new RandomBetween();
@@ -112,7 +111,8 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(geolocation, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
 
 		// -- Return
-		IDataWrapper<LocationCoordinates> dataWrapper = new DataWrapper<LocationCoordinates>(obfuscatedLocationCoordinates);
+		DataWrapper dataWrapper = new DataWrapper();
+		dataWrapper.setData(obfuscatedLocationCoordinates);
 		return dataWrapper;
 	}
 

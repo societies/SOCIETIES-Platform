@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	
 	
 	private final Timer timer = new Timer();
+	private AtomicInteger updateTaskFailures = new AtomicInteger(0);
 	
 	private LocationManagementContextAccessor locationInference;
 	private ICtxSourceMgr contextSourceManagement;
@@ -79,6 +81,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	HashSet<String> registeredDevices = new HashSet<String>();
 	
 	private int contextUpdateInterval;
+	private int updateTaskMaxFailures;
 	
 	@SuppressWarnings("unused")
 	private void init(){
@@ -91,6 +94,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 			lmConfiguratorImpl.init(pubSubManager, commManager,commMngrController, this);
 			
 			contextUpdateInterval = PzPropertiesReader.instance().getUpdateCycle();
+			updateTaskMaxFailures = PzPropertiesReader.instance().getPzUpdateTaskMaxFailures();
 			
 			timer.scheduleAtFixedRate(new UpdateTask(),contextUpdateInterval, contextUpdateInterval);
 			
@@ -175,7 +179,6 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		
 	}
 	
-	
 	private class UpdateTask extends TimerTask{
 		@Override
 		public void run() {
@@ -198,8 +201,19 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 					if (userLocation != null){
 						log.debug("update CSM node - "+networkNode.getJid()+" \t location: "+userLocation.toString());
 						locationInference.updateCSM(userLocation, networkNode,contextUpdateInterval);
+						
+						//reset failures counters
+						updateTaskFailures.set(0);
 					}else{
-						log.debug("update CSM node - entity '"+networkNode.getJid()+"' wasn't identified by the LM system - can't perform update");
+						//increment failures counters
+						updateTaskFailures.incrementAndGet();
+						log.error("update CSM failed! - This is the '"+updateTaskFailures.get() +"'th attempt ;  entity '"+networkNode.getJid());
+						
+						//cancel the timer task if too many failures
+						if (updateTaskFailures.get() > updateTaskMaxFailures){
+							log.error("Location Management - Update CSM failed in the '"+updateTaskFailures.get() +"' attempt ; stopping task !");
+							timer.cancel();
+						}
 					}
 				}
 			}catch (IllegalStateException e) {

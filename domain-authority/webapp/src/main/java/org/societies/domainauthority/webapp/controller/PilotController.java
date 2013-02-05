@@ -233,7 +233,7 @@ public class PilotController {
 			
 			// GET SERVER/PORT NUMBER FROM REGISTRY
 			String redirectUrl = new String();
-			redirectUrl = String.format("http://%s:%s/societies/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
+			redirectUrl = String.format("http://%s:%s/societies-test/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
 			model.put("webappurl", redirectUrl);
 			model.put("name", userName);	
 			return new ModelAndView("loginsuccess", model);

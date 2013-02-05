@@ -146,36 +146,36 @@
 
   <xs:simpleType name="ctxModelTypeBean">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="ENTITY"/>
-      <xs:enumeration value="ATTRIBUTE"/>
-      <xs:enumeration value="ASSOCIATION"/>
+      <xs:enumeration value="entity"/>
+      <xs:enumeration value="attribute"/>
+      <xs:enumeration value="association"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="ctxBondOriginTypeBean">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="MANUALLY_SET"/>
-      <xs:enumeration value="DISCOVERED"/>
-      <xs:enumeration value="INHERITED"/>
+      <xs:enumeration value="manuallySet"/>
+      <xs:enumeration value="discovered"/>
+      <xs:enumeration value="inherited"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="ctxAttributeValueTypeBean">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="EMPTY"/>
-      <xs:enumeration value="STRING"/>
-      <xs:enumeration value="INTEGER"/>
-      <xs:enumeration value="DOUBLE"/>
-      <xs:enumeration value="BINARY"/>
+      <xs:enumeration value="empty"/>
+      <xs:enumeration value="string"/>
+      <xs:enumeration value="integer"/>
+      <xs:enumeration value="double"/>
+      <xs:enumeration value="binary"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="ctxOriginTypeBean">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="MANUALLY_SET"/>
-      <xs:enumeration value="SENSED"/>
-      <xs:enumeration value="INFERRED"/>
-      <xs:enumeration value="INHERITED"/>
+      <xs:enumeration value="manuallySet"/>
+      <xs:enumeration value="sensed"/>
+      <xs:enumeration value="inferred"/>
+      <xs:enumeration value="inherited"/>
     </xs:restriction>
   </xs:simpleType>
   

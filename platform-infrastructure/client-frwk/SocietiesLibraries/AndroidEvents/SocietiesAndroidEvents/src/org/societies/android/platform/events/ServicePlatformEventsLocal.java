@@ -25,8 +25,8 @@
 package org.societies.android.platform.events;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.platform.pubsub.helper.PubsubHelper;
 
 import android.app.Service;
 import android.content.Intent;
@@ -59,7 +59,7 @@ public class ServicePlatformEventsLocal extends Service {
 	public class LocalPlatformEventsBinder extends Binder {
 		
 		public IAndroidSocietiesEvents getService() {
-			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
+			PubsubHelper pubsubClient = createPubSubClientAndroid();
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
 			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this.getApplicationContext(), pubsubClient, ccm, false);
@@ -77,8 +77,8 @@ public class ServicePlatformEventsLocal extends Service {
 	 * Factory method to get instance of {@link PubsubClientAndroid}
 	 * @return PubsubClientAndroid
 	 */
-	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new PubsubClientAndroid(this);
+	protected PubsubHelper createPubSubClientAndroid() {
+		return new PubsubHelper(this);
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(this);
+		return new ClientCommunicationMgr(this, true);
 	}
 
 }

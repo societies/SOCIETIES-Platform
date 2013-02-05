@@ -27,48 +27,42 @@ package org.societies.android.platform.cis;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
-import org.societies.android.api.cis.management.AActivity;
-import org.societies.android.api.cis.management.ACommunity;
-import org.societies.android.api.cis.management.ACriteria;
-import org.societies.android.api.cis.management.AJoinResponse;
-import org.societies.android.api.cis.management.AParticipant;
-import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.activity.MarshaledActivity;
-import org.societies.api.schema.activityfeed.*;
+import org.societies.api.schema.activityfeed.AddActivity;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeed;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.DeleteActivity;
+import org.societies.api.schema.activityfeed.GetActivities;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
-import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMember;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.AskCisManagerForJoin;
 import org.societies.api.schema.cis.manager.AskCisManagerForLeave;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -103,7 +97,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
     	
 		try {
 			//INSTANTIATE COMMS MANAGER
-			this.commMgr = new ClientCommunicationMgr(androidContext);
+			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
@@ -112,7 +106,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
-	public ACommunity createCis(String client, String cisName, String cisType, String description, AMembershipCrit aMemberShipCrit, String privacyPolicy) {
+	public Community createCis(String client, String cisName, String cisType, String description, MembershipCrit rules, String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 		
 		//COMMUNITY INFO
@@ -121,7 +115,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		cisinfo.setDescription(description);
 		cisinfo.setCommunityType(cisType);
 		//MEMBERSHIP CRITERIA - CONVERT FROM PARCELABLE VERSION
-		MembershipCrit rules = AMembershipCrit.convertAMembershipCrit(aMemberShipCrit) ;
+		//MembershipCrit rules = AMembershipCrit.convertAMembershipCrit(aMemberShipCrit) ;
 		/*List<Criteria> listCriteria = new ArrayList<Criteria>();
 		for(ACriteria acrit: criteria) {
 			listCriteria.add( ACriteria.convertACriteria(acrit));
@@ -137,11 +131,12 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		messageBean.setCreate(create);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, CREATE_CIS); 
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
+		try {
+			ICommCallback cisCallback = new CommunityCallback(client, CREATE_CIS); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+			Stanza stanza = new Stanza(toID);
+        
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -163,11 +158,12 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		messageBean.setDelete(cisDel);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, DELETE_CIS); 
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
+			try {
+			ICommCallback cisCallback = new CommunityCallback(client, DELETE_CIS); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+			Stanza stanza = new Stanza(toID);
+        
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -178,7 +174,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisManager#getCisList(java.lang.String, org.societies.api.schema.cis.manager.ListCrit)*/
-	public ACommunity[] getCisList(String client, String query) {
+	public Community[] getCisList(String client, String query) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 		
 		//COMMUNITY INFO
@@ -189,11 +185,12 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		messageBean.setList(list);
 
 		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_LIST); 
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-		Stanza stanza = new Stanza(toID);
-        try {
+		try {
+			ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_LIST); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+			Stanza stanza = new Stanza(toID);
+        
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -222,11 +219,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		IIdentity toID = null;
 		try { //DELETE MEMBER IS PROVIDED BY THE CIS (NOT CIS MANAGER)
 			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
+			Stanza stanza = new Stanza(toID);
+			
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -237,20 +231,22 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
-	public String Join(String client, ACisAdvertisementRecord targetCis) {
+	public String Join(String client, CisAdvertisementRecord targetCis) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
 		//CREATE JOIN INFO
 		AskCisManagerForJoin join = new AskCisManagerForJoin();
-		join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
+		//join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
+		join.setCisAdv(targetCis);
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setAskCisManagerForJoin(join);
 		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, JOIN_CIS); 
-		IIdentity toID = commMgr.getIdManager().getCloudNode();	
-		Stanza stanza = new Stanza(toID);
-        try {
+		try {
+			ICommCallback cisCallback = new CommunityCallback(client, JOIN_CIS); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();	
+			Stanza stanza = new Stanza(toID);
+        
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -271,10 +267,11 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setAskCisManagerForLeave(leave);
 		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, LEAVE_CIS); 
-		IIdentity toID = commMgr.getIdManager().getCloudNode();
-		Stanza stanza = new Stanza(toID);
-        try {
+		try {
+			ICommCallback cisCallback = new CommunityCallback(client, LEAVE_CIS); 
+			IIdentity toID = commMgr.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(toID);
+	        
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -285,13 +282,19 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#addActivity(java.lang.String, org.societies.api.schema.activityfeed.AddActivity)*/
-	public Boolean addActivity(String client, String cisId, AActivity activity) {
+	public Boolean addActivity(String client, String cisId, MarshaledActivity activity) {
 		Log.d(LOG_TAG, "addActivity called by client: " + client);
 
 		//GETFEED OBJECT
-		activity.setActor(commMgr.getIdManager().getCloudNode().getJid());
+		String sActor = "unknown";
+		try {
+			sActor = commMgr.getIdManager().getCloudNode().getJid();
+		} catch (InvalidFormatException e1) {
+			Log.e(LOG_TAG, "ERROR querying cloud node");
+		}
+		activity.setActor(sActor);
 		AddActivity addAct = new AddActivity();
-		addAct.setMarshaledActivity(AActivity.convertAActivity(activity));
+		addAct.setMarshaledActivity(activity);
 		//CREATE MESSAGE BEAN
 		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
 		messageBean.setAddActivity(addAct);
@@ -301,11 +304,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		IIdentity toID = null;
 		try { 
 			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
+			Stanza stanza = new Stanza(toID);
+			
         	commMgr.register(ELEMENT_NAMES, cisCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -345,7 +345,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/*@see org.societies.android.api.cis.management.ICisSubscribed#deleteActivity(java.lang.String, org.societies.api.schema.activityfeed.DeleteActivity)*/
-	public Boolean deleteActivity(String client, String cisId, AActivity activity) {
+	public Boolean deleteActivity(String client, String cisId, MarshaledActivity activity) {
 		Log.d(LOG_TAG, "deleteActivity called by client: " + client);
 
 		//GETFEED OBJECT
@@ -420,7 +420,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#getCisInformation(java.lang.String, java.lang.String)*/
-	public ACommunity getCisInformation(String client, String cisId) {
+	public Community getCisInformation(String client, String cisId) {
 		Log.d(LOG_TAG, "getCisInformation called by client: " + client);
 
 		//GETINFO OBJECT
@@ -531,7 +531,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						boolean bJoined = communityMessage.getJoinResponse().isResult();
 						if (bJoined) {
 							//CONVERT TO PARCEL BEAN
-							Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
+							//Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
+							Parcelable joined = communityMessage.getJoinResponse();
 							//NOTIFY CALLING CLIENT
 							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
 						}
@@ -540,7 +541,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 				}
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
-				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
+				//CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 
@@ -563,9 +564,10 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						if(communityResult.getCreate().isResult() == true){
 							Community cis = communityResult.getCreate().getCommunity();
 							//CONVERT TO PARCEL BEAN
-							Parcelable pCis  = ACommunity.convertCommunity(cis);
+							//Parcelable pCis  = ACommunity.convertCommunity(cis);
+							Parcelable pCis  = cis;
 							//NOTIFY CALLING CLIENT
-							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, pCis); 
+							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, pCis);
 						}
 						intent.putExtra(ICisManager.INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}
@@ -584,12 +586,13 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					ListResponse response = (ListResponse) msgBean;
 					List<Community> listReturned = response.getCommunity();
 					//CONVERT TO PARCEL BEANS
-					Parcelable returnArray[] = new Parcelable[listReturned.size()];
-					for (int i=0; i<listReturned.size(); i++) {
-						ACommunity cis = ACommunity.convertCommunity(listReturned.get(i)); 
-						returnArray[i] = cis;
-						Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
-					}
+					//Parcelable returnArray[] = new Parcelable[listReturned.size()];
+					//for (int i=0; i<listReturned.size(); i++) {
+					//	ACommunity cis = ACommunity.convertCommunity(listReturned.get(i)); 
+					//	returnArray[i] = cis;
+					//	Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
+					//}
+					Community returnArray[] = listReturned.toArray(new Community[listReturned.size()]);
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(ICisManager.INTENT_RETURN_VALUE, returnArray);
 				}
@@ -602,12 +605,13 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					if (communityResponse.getWhoResponse() != null) {
 						List<Participant> listReturned = communityResponse.getWhoResponse().getParticipant();
 						//CONVERT TO PARCEL BEANS
-						Parcelable returnArray[] = new Parcelable[listReturned.size()];
-						for (int i=0; i<listReturned.size(); i++) {
-							AParticipant member = AParticipant.convertParticipant(listReturned.get(i)); 
-							returnArray[i] = member;
-							Log.d(LOG_TAG, "member: " + member.getJid());
-						}
+						//Parcelable returnArray[] = new Parcelable[listReturned.size()];
+						//for (int i=0; i<listReturned.size(); i++) {
+						//	AParticipant member = AParticipant.convertParticipant(listReturned.get(i)); 
+						//	returnArray[i] = member;
+						//	Log.d(LOG_TAG, "member: " + member.getJid());
+						//}
+						Participant returnArray[] = listReturned.toArray(new Participant[listReturned.size()]);
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}
@@ -628,12 +632,13 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					if (response.getGetActivitiesResponse() != null) {
 						List<MarshaledActivity> listReturned = response.getGetActivitiesResponse().getMarshaledActivity();
 						//CONVERT TO PARCEL BEANS
-						Parcelable returnArray[] = new Parcelable[listReturned.size()];
-						for (int i=0; i<listReturned.size(); i++) {
-							AActivity activity = AActivity.convertActivity(listReturned.get(i)); 
-							returnArray[i] = activity;
-							Log.d(LOG_TAG, "publish: " + activity.getPublished());
-						}
+						//Parcelable returnArray[] = new Parcelable[listReturned.size()];
+						//for (int i=0; i<listReturned.size(); i++) {
+						//	AActivity activity = AActivity.convertActivity(listReturned.get(i)); 
+						//	returnArray[i] = activity;
+						//	Log.d(LOG_TAG, "publish: " + activity.getPublished());
+						//}
+						MarshaledActivity returnArray[] = listReturned.toArray(new MarshaledActivity[listReturned.size()]);
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
 					}
@@ -654,7 +659,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 				
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
-				CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
+				//CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
