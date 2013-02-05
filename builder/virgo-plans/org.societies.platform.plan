@@ -34,6 +34,6 @@
 	
 	<artifact type="plan" name="org.societies.personalisation"/>
 	
-	<artifact type="plan" name="org.societies.webapp"/>
-
+	<!--	<artifact type="plan" name="org.societies.webapp"/>
+-->
 </plan>

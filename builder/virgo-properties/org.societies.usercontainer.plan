@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.usercontainer" version="0.4.0" scoped="true" atomic="false"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+			http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- Combined Container Node -->	
+	<artifact type="configuration" name="societiesplatform">
+		<property name="subDomain" value="john.societies.local" />
+		<property name="jdbc.url" value="jdbc\:mysql\://127.0.0.1\:3306/societies10" />
+	</artifact>
+	<artifact type="plan" name="org.societies.platform"/>
+</plan>

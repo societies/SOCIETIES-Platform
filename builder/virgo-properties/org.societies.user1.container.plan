@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.user1.container" version="0.4.0" scoped="true" atomic="false"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+			http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- Combined Container Node -->	
+	<!--	<artifact uri="file:${CONFIG_DIR}/societiesplatform1.properties"/> -->
+	<artifact type="plan" name="org.societies.platform"/>
+</plan>
