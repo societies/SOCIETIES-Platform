@@ -35,7 +35,7 @@ $(document).on('pageinit', '#index', function(event) {
 
     $("#connectXMPP").off('click').on('click', function(){
         console.log("Login button clicked ");
-        window.plugins.SocietiesFeedback.vibrateFeedback("success","failure",500);
+        window.plugins.SocietiesFeedback.vibrateFeedback(window.plugins.SocietiesFeedback.onSuccess,window.plugins.SocietiesFeedback.onSuccess,500);
     });    
 });
 

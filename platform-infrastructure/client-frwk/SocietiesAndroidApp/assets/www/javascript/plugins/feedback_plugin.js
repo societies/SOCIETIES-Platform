@@ -32,4 +32,26 @@ var SocietiesFeedback = {
             console.log("Vibrating");
             return cordova.exec (success, fail, "PluginFeedback", "vibrateFeedback", [time]);
         }
+        
+        /**
+         * @methodOf SocietiesFeedback#
+         * @description Success action 
+         * @param {Object} data
+         * @returns null
+         */
+
+        onSuccess: function(data) {
+            console.log("Feedback Success");
+        },
+        
+        /**
+         * @methodOf SocietiesFeedback#
+         * @description Failure action 
+         * @param {Object} error
+         * @returns null
+         */
+        onFailure: function(e) {
+            console.log("Feedback Error");
+            console.log(e);
+        }
 };
