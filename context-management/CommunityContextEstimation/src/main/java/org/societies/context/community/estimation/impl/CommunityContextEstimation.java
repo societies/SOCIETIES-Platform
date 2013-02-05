@@ -26,7 +26,6 @@ package org.societies.context.community.estimation.impl;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -260,7 +259,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		
 		
 		//***************************************************************************************
-		if (retrievedType.getType().toString().equals("location")){
+		if (retrievedType.getType().toString().equals("location_coordinates")){
 			
 			ArrayList<String> stringLocationValues = new ArrayList<String>();
 			CommunityCtxEntity retrievedCommunity;
@@ -273,7 +272,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("SYMBOLIC_LOCATION");
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
 
 					for (CtxAttribute ca:setAttributesSymbolicLocations){
 						stringLocationValues.add(ca.getStringValue());			
@@ -281,9 +280,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 							
 				}
 				
-				String symbolicLocationsAsString = stringLocationValues.toString();
+				String LocationsAsString = stringLocationValues.toString();
 				CommunityContextEstimation cce = new CommunityContextEstimation();
-				ArrayList<Point2D> points = CommunityContextEstimation.splitString(symbolicLocationsAsString);
+				ArrayList<Point2D> points = CommunityContextEstimation.splitString(LocationsAsString);
 				ArrayList<Point2D> conHull = cce.cceGeomConvexHull(points);
 				
 				CtxAttribute comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_COORDINATES).get();
@@ -387,10 +386,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 //
 //	}
 //		
-		
-
-		
-		
 		
 		//the if statement ends here
 		return result;

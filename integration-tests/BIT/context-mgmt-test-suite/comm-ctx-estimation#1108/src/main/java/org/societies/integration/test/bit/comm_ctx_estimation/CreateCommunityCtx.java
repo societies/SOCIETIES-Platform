@@ -85,7 +85,8 @@ public class CreateCommunityCtx {
 			LOG.info("Cis id "+cisID);
 
 			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
-
+			
+			
 			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("boo@societies.local ");
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 
@@ -165,7 +166,7 @@ public class CreateCommunityCtx {
 	}
 
 
-	
+	@Test
 	public void retrieveCommunityEntities() {
 
 		LOG.info("TestRetrieveCommunityEntities");
