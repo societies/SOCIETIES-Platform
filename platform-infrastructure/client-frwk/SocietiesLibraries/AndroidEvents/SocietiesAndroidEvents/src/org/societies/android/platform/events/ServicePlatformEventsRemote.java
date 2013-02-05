@@ -1,10 +1,11 @@
 package org.societies.android.platform.events;
 
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.RemoteServiceHandler;
 import org.societies.android.platform.androidutils.AppPreferences;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.platform.pubsub.helper.PubsubHelper;
 
 import android.app.Service;
 import android.content.Intent;
@@ -46,8 +47,8 @@ public class ServicePlatformEventsRemote extends Service {
 	 * Factory method to get instance of {@link PubsubClientAndroid}
 	 * @return PubsubClientAndroid
 	 */
-	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new PubsubClientAndroid(this);
+	protected PubsubHelper createPubSubClientAndroid() {
+		return new PubsubHelper(this);
 	}
 	
 	/**
@@ -55,7 +56,7 @@ public class ServicePlatformEventsRemote extends Service {
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this); 
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true); 
 		
 		AppPreferences appPreferences = new AppPreferences(this);
 
@@ -63,10 +64,25 @@ public class ServicePlatformEventsRemote extends Service {
 		String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
 		String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
 		
-		ccm.setDomainAuthorityNode(domainAuthorityName);
-		ccm.setPortNumber(xmppServerPort);
-		ccm.setResource(nodeJIDResource);
+		//ccm.setDomainAuthorityNode(domainAuthorityName);
+		//ccm.setPortNumber(xmppServerPort);
+		//ccm.setResource(nodeJIDResource);
 
+		ccm.configureAgent(domainAuthorityName, xmppServerPort, nodeJIDResource, false, new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		return ccm;
 
 	}

@@ -223,6 +223,7 @@
 							org.simpleframework.xml;resolution:=optional,
 							org.simpleframework.xml.convert;resolution:=optional,
 							org.societies.maven.converters;resolution:=optional,
+							org.societies.simple.basic;resolution:=optional,
 							org.societies.api.identity;resolution:=optional,
 
 							<!-- Form validation -->

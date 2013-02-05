@@ -26,6 +26,7 @@ package org.societies.context.dataInit.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
@@ -60,7 +62,6 @@ import org.springframework.stereotype.Service;
  * @since 0.4
  */
 @Service
-@Lazy(false)
 public class CtxDataInitiator {
 
 	/** The logging facility. */
@@ -105,6 +106,8 @@ public class CtxDataInitiator {
 				addContext(jane);
 			}
 
+			printCtxAttributes(ownerCtxId);
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,7 +117,10 @@ public class CtxDataInitiator {
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 
 
@@ -197,7 +203,12 @@ public class CtxDataInitiator {
 			if (value != null && !value.isEmpty())
 				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.STATUS, value);
 
+			// SKILLS	
+			value = user.getSkills();
+			if (value != null && !value.isEmpty())
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SKILLS, value);
 
+			
 		} catch (Exception e) {
 			LOG.info("error when initializing context data: "+ e.getLocalizedMessage());
 		}
@@ -234,4 +245,19 @@ public class CtxDataInitiator {
 
 		return cssOwnerId;	
 	}
+
+	private void printCtxAttributes(CtxEntityIdentifier ownerCtxId) throws Exception {
+		
+		final IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(ownerCtxId).get();
+		Set<CtxAttribute> attributes = entity.getAttributes();
+		
+		LOG.info("CtxEntity :"+entity.getId() );
+		for(CtxAttribute attr : attributes){
+			LOG.info("CtxAttribute :"+ attr +" value "+ attr.getStringValue());	
+		}
+		
+		
+		
+	}
+
 }

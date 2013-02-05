@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
@@ -44,11 +45,21 @@ public interface IPrivacyDataManagerInternal {
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param dataId ID of the requested data.
-	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param actions Actions requested over this data.
 	 * @return The ResponseItem of this permission
 	 * @throws PrivacyException
 	 */
-	public ResponseItem getPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	public PrivacyPermission getPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	
+	/**
+	 * Find the relevant obfuscation
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data, only the data type, or the complete id.
+	 * @return The obfuscation level. -1 means no obfuscation level available. 1 means no obfuscation, 0 means fully anonymous.
+	 * @throws PrivacyException
+	 */
+	public double getObfuscationLevel(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data
@@ -62,6 +73,19 @@ public interface IPrivacyDataManagerInternal {
 	 * @throws PrivacyException
 	 */
 	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
+	/**
+	 * Update access control permissions over a data
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param actions List of actions to request over this data.
+	 * @param permission Permission (permit / deny).
+	 * @param obfuscationLevel Level of obfuscation to use on this data.
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 */
+	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission, double obfuscationLevel) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data

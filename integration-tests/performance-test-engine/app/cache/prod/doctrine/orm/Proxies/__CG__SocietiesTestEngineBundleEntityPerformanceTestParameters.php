@@ -99,6 +99,18 @@ class PerformanceTestParameters extends \Societies\TestEngineBundle\Entity\Perfo
         return parent::getParameterUnit();
     }
 
+    public function setParameterValue($parameterValue)
+    {
+        $this->__load();
+        return parent::setParameterValue($parameterValue);
+    }
+
+    public function getParameterValue()
+    {
+        $this->__load();
+        return parent::getParameterValue();
+    }
+
     public function setPerformanceTest(\Societies\TestEngineBundle\Entity\PerformanceTest $performanceTest = NULL)
     {
         $this->__load();
@@ -114,7 +126,7 @@ class PerformanceTestParameters extends \Societies\TestEngineBundle\Entity\Perfo
 
     public function __sleep()
     {
-        return array('__isInitialized__', 'id', 'parameter_name', 'parameter_type', 'parameter_description', 'parameter_unit', 'performanceTest');
+        return array('__isInitialized__', 'id', 'parameter_name', 'parameter_type', 'parameter_description', 'parameter_unit', 'parameter_value', 'performanceTest');
     }
 
     public function __clone()

@@ -28,15 +28,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -61,131 +67,110 @@ public class PrivacyPolicyManagerRemote {
 
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
+	private PrivacyPolicyIntentSender intentSender;
 
 
 	public PrivacyPolicyManagerRemote(Context context)  {
 		this.context = context;
+		clientCommManager = new ClientCommunicationMgr(context, true);
+		intentSender = new PrivacyPolicyIntentSender(context);
 	}
 
 
-	public void getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
-		// Send remote call
-		GetRemotePrivacyPolicyTask task = new GetRemotePrivacyPolicyTask(context, clientPackage); 
-		task.execute(owner);
-	}
-	public class GetRemotePrivacyPolicyTask extends AsyncTask<Object, Void, RequestPolicy> {
-		private Context context;
-		private String clientPackage;
-
-		public GetRemotePrivacyPolicyTask(Context context, String clientPackage) {
-			this.context = context;
-			this.clientPackage = clientPackage;
-		}
-
-		protected RequestPolicy doInBackground(Object... args) {
-			clientCommManager = new ClientCommunicationMgr(context);
-
+	public boolean getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
+		String action = MethodType.GET_PRIVACY_POLICY.name();
+		try {
 			// -- Destination
-			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+			IIdentity cloudNode = getOwnerJid(owner);
 			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+MethodType.GET_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
 
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.GET_PRIVACY_POLICY);
-			messageBean.setRequestor((RequestorBean) args[0]);
+			messageBean.setRequestor(owner);
 
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			try {
-				clientCommManager.register(ELEMENT_NAMES, callback);
-				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.GET_PRIVACY_POLICY.name());
-				callback.wait();
-			} catch (Exception e) {
-				Log.e(TAG, e.getMessage());
-			}
-			return callback.getPrivacyPolicy();
+			clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
+		} catch (InvalidFormatException e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, action, "Error: don't know who to contact");
+			return false;
 		}
+		catch (CommunicationException e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
+			return false;
+		}
+		catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, action, "Unknown remote remote");
+			return false;
+		} 
+		return true;
 	}
 
-	public void updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
-		// Send remote call
-		UpdateRemotePrivacyPolicyTask task = new UpdateRemotePrivacyPolicyTask(clientPackage, context); 
-		task.execute(privacyPolicy);
-	}
-	public class UpdateRemotePrivacyPolicyTask extends AsyncTask<Object, Void, RequestPolicy> {
-		private Context context;
-		private String clientPackage;
-
-		public UpdateRemotePrivacyPolicyTask(String clientPackage, Context context) {
-			this.context = context;
-			this.clientPackage = clientPackage;
+	private IIdentity getOwnerJid(RequestorBean owner) throws InvalidFormatException {
+		// CIS: contact the CIS owner
+		if (owner instanceof RequestorCisBean) {
+			return clientCommManager.getIdManager().fromJid(owner.getRequestorId());
 		}
+		// 3P service: our cloud node know the privacy Policy
+		return clientCommManager.getIdManager().getCloudNode();
+	}
 
-		protected RequestPolicy doInBackground(Object... args) {
-			clientCommManager = new ClientCommunicationMgr(context);
 
+	public boolean updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
+		try {
 			// -- Destination
 			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
 			Stanza stanza = new Stanza(cloudNode);
-
+			Log.d(TAG, "Send "+MethodType.UPDATE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+	
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-			messageBean.setPrivacyPolicy((RequestPolicy) args[0]);
-
+			messageBean.setPrivacyPolicy(privacyPolicy);
+	
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			try {
-				clientCommManager.register(ELEMENT_NAMES, callback);
-				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
-				callback.wait();
-			} catch (Exception e) {
-				Log.e(TAG, e.getMessage());
-			}
-			return callback.getPrivacyPolicy();
+			clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, MethodType.UPDATE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
+			return false;
 		}
+		return true;
 	}
 
-	public void deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
-		// Send remote call
-		DeleteRemotePrivacyPolicyTask task = new DeleteRemotePrivacyPolicyTask(clientPackage, context); 
-		task.execute(owner);
-	}
-	public class DeleteRemotePrivacyPolicyTask extends AsyncTask<Object, Void, Boolean> {
-		private Context context;
-		private String clientPackage;
-
-		public DeleteRemotePrivacyPolicyTask(String clientPackage, Context context) {
-			this.context = context;
-			this.clientPackage = clientPackage;
-		}
-
-		protected Boolean doInBackground(Object... args) {
-			clientCommManager = new ClientCommunicationMgr(context);
-
+	public boolean deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
+		try {
 			// -- Destination
 			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
 			Stanza stanza = new Stanza(cloudNode);
-
+			Log.d(TAG, "Send "+MethodType.DELETE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+	
 			// -- Message
 			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
 			messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-			messageBean.setRequestor((RequestorBean) args[0]);
-
+			messageBean.setRequestor(owner);
+	
 			// -- Send
 			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			try {
-				clientCommManager.register(ELEMENT_NAMES, callback);
-				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
-				callback.wait();
-			} catch (Exception e) {
-				Log.e(TAG, e.getMessage());
-			}
-			return callback.isAck();
+		
+			clientCommManager.register(ELEMENT_NAMES, callback);
+			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+			intentSender.sendIntentError(clientPackage, MethodType.DELETE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
+			return false;
 		}
+		return true;
 	}
 }

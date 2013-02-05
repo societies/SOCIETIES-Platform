@@ -3,7 +3,8 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator.util;
 
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+
 
 
 /**

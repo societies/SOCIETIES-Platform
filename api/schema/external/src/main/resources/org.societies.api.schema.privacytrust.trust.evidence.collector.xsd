@@ -56,12 +56,12 @@
 	
 	<xs:simpleType name="trustEvidenceTypeBean">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="RATED"/>
-			<xs:enumeration value="FRIENDED_USER"/>
-			<xs:enumeration value="UNFRIENDED_USER"/>
-			<xs:enumeration value="JOINED_COMMUNITY"/>
-			<xs:enumeration value="LEFT_COMMUNITY"/>
-			<xs:enumeration value="USED_SERVICE"/>
+			<xs:enumeration value="rated"/>
+			<xs:enumeration value="friendedUser"/>
+			<xs:enumeration value="unfriendedUser"/>
+			<xs:enumeration value="joinedCommunity"/>
+			<xs:enumeration value="leftCommunity"/>
+			<xs:enumeration value="usedService"/>
 		</xs:restriction>
 	</xs:simpleType>
   

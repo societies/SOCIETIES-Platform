@@ -13,10 +13,10 @@
 
   <xs:simpleType name="trustedEntityTypeBean">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="CSS"/>
-      <xs:enumeration value="CIS"/>
-      <xs:enumeration value="SVC"/>
-      <xs:enumeration value="LGC"/>
+      <xs:enumeration value="css"/>
+      <xs:enumeration value="cis"/>
+      <xs:enumeration value="svc"/>
+      <xs:enumeration value="lgc"/>
     </xs:restriction>
   </xs:simpleType>
   

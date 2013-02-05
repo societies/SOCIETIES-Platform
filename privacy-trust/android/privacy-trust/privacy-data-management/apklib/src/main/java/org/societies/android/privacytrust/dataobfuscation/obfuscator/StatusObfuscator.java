@@ -25,9 +25,9 @@
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Status;
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
 
 /**
  * Obfuscator for name
@@ -35,11 +35,11 @@ import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wra
  * @author Olivier Maridat (Trialog)
  *
  */
-public class StatusObfuscator extends DataObfuscator<IDataWrapper<Status>> {
+public class StatusObfuscator extends DataObfuscator<DataWrapper> {
 	/**
 	 * @param data
 	 */
-	public StatusObfuscator(IDataWrapper<Status> data) {
+	public StatusObfuscator(DataWrapper data) {
 		super(data);
 		available = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
@@ -52,7 +52,7 @@ public class StatusObfuscator extends DataObfuscator<IDataWrapper<Status>> {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	public IDataWrapper<Status> obfuscateData(double obfuscationLevel)
+	public DataWrapper obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		return dataWrapper;
 	}

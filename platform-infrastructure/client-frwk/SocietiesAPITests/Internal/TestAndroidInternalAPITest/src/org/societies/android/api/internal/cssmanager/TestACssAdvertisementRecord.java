@@ -4,7 +4,7 @@ package org.societies.android.api.internal.cssmanager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
-import org.societies.android.api.css.directory.ACssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 import com.google.gson.Gson;
 
@@ -36,7 +36,7 @@ public class TestACssAdvertisementRecord extends TestCase {
 
 	@MediumTest
 	public void testParcelable() throws Exception {
-		ACssAdvertisementRecord aCssAdvert = new ACssAdvertisementRecord();
+		CssAdvertisementRecord aCssAdvert = new CssAdvertisementRecord();
 		aCssAdvert.setId(ADVERT_ID_1);
 		aCssAdvert.setName(ADVERT_NAME_1);
 		aCssAdvert.setUri(ADVERT_URI_1);
@@ -48,7 +48,7 @@ public class TestACssAdvertisementRecord extends TestCase {
         //done writing, now reset parcel for reading
         parcel.setDataPosition(0);
         //finish round trip
-        ACssAdvertisementRecord createFromParcel = ACssAdvertisementRecord.CREATOR.createFromParcel(parcel);
+        CssAdvertisementRecord createFromParcel = CssAdvertisementRecord.CREATOR.createFromParcel(parcel);
        
         assertEquals(aCssAdvert.getName(), createFromParcel.getName());
         assertEquals(aCssAdvert.getId(), createFromParcel.getId());
@@ -57,17 +57,17 @@ public class TestACssAdvertisementRecord extends TestCase {
 
 	@MediumTest
 	public void testJSONConversion() throws Exception {
-		ACssAdvertisementRecord aCssAdvert_1 = new ACssAdvertisementRecord();
+		CssAdvertisementRecord aCssAdvert_1 = new CssAdvertisementRecord();
 		aCssAdvert_1.setId(ADVERT_ID_1);
 		aCssAdvert_1.setName(ADVERT_NAME_1);
 		aCssAdvert_1.setUri(ADVERT_URI_1);
 		
-		ACssAdvertisementRecord aCssAdvert_2 = new ACssAdvertisementRecord();
+		CssAdvertisementRecord aCssAdvert_2 = new CssAdvertisementRecord();
 		aCssAdvert_2.setId(ADVERT_ID_2);
 		aCssAdvert_2.setName(ADVERT_NAME_2);
 		aCssAdvert_2.setUri(ADVERT_URI_2);
 		
-		ACssAdvertisementRecord array [] = {aCssAdvert_1, aCssAdvert_2};
+		CssAdvertisementRecord array [] = {aCssAdvert_1, aCssAdvert_2};
 		
 		assertEquals(2, array.length);
 		
@@ -89,8 +89,5 @@ public class TestACssAdvertisementRecord extends TestCase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
-
 	}
 }

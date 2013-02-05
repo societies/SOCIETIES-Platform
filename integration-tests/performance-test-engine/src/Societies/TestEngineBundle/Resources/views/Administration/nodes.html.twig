@@ -1,0 +1,25 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }} - Nodes{% endblock %}
+ 
+{% block body %}
+	{{ parent() }}
+	
+	
+	<h3>Test Nodes List</h3>
+	<ul>
+  		{% for node in nodes_list %}
+   			 <li><a href="{{path('admin_get_test_node', {'node_id': node.nodeId})}}">{{node.nodeId}}</a></li>
+ 		{% endfor %}
+	</ul>
+	
+	<br/>
+	
+	<h3>Add a New Test Node</h3>
+	
+		{% if result is defined %}
+			<p>{{ result }}</p>
+		{% endif %}
+ 		{% include "SocietiesTestEngineBundle:Administration:test_node_form.html.twig" %}
+	
+{% endblock %}

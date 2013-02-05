@@ -1,0 +1,11 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }}{% endblock %}
+ 
+{% block body %}
+	{{ parent() }}
+	<h3>Management Information</h3>
+	
+	{% include "SocietiesTestEngineBundle:Administration:test_node_form.html.twig" %}
+	
+{% endblock %}

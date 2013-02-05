@@ -12,7 +12,6 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.personalisation.mgmt.PersonalisationManagerBean;
 import org.societies.api.schema.personalisation.model.ActionBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;

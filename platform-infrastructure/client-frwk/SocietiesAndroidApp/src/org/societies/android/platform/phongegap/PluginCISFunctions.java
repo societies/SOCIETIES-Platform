@@ -35,20 +35,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.api.cis.directory.ICisDirectory;
-import org.societies.android.api.cis.management.AActivity;
-import org.societies.android.api.cis.management.ACommunity;
-import org.societies.android.api.cis.management.ACriteria;
-import org.societies.android.api.cis.management.AJoinResponse;
-import org.societies.android.api.cis.management.AMembershipCrit;
-import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
-import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.cis.CisDirectoryLocal;
 import org.societies.android.platform.cis.CommunityManagementLocal;
 import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
+import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.JoinResponse;
+import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import android.app.Notification;
 import android.content.BroadcastReceiver;
@@ -247,10 +247,10 @@ public class PluginCISFunctions extends Plugin {
 			if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 0))) {
 				try { //CREATE CIS
 					JSONArray jArray = data.getJSONArray(4); //ListCriteria
-					List<ACriteria> criteriaList = CreateCriteriaList(jArray);
-					AMembershipCrit aMembCrit = new AMembershipCrit();
-					aMembCrit.setACriteria(criteriaList);
-					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), aMembCrit, data.getString(5));
+					List<Criteria> criteriaList = CreateCriteriaList(jArray);
+					MembershipCrit membCrit = new MembershipCrit();
+					membCrit.setCriteria(criteriaList);
+					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), membCrit, data.getString(5));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -274,7 +274,7 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 4))) {
 				try { //JOIN A CIS
-					this.serviceCISManager.Join(data.getString(0), ACisAdvertisementRecord.createFromJSON(data.getJSONObject(1)));
+					this.serviceCISManager.Join(data.getString(0), createCisAdvertFromJSON(data.getJSONObject(1)));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -301,7 +301,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3))) {
 				try { //ADD AN ACTIVITY TO THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					AActivity activity = AActivity.CreateFromJSON(jObj); 
+					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
 					this.serviceCISsubscribe.addActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -309,7 +309,7 @@ public class PluginCISFunctions extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4))) {
 				try { //DELETE AN ACTIVITY FROM THE FEED
 					JSONObject jObj = data.getJSONObject(2);
-					AActivity activity = AActivity.CreateFromJSON(jObj); 
+					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
 					this.serviceCISsubscribe.deleteActivity(data.getString(0), data.getString(1), activity);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -357,11 +357,11 @@ public class PluginCISFunctions extends Plugin {
 	 * @return
 	 * @throws JSONException 
 	 */
-	private List<ACriteria> CreateCriteriaList(JSONArray jArray) {
-		List<ACriteria> criteriaList = new ArrayList<ACriteria>();
+	private List<Criteria> CreateCriteriaList(JSONArray jArray) {
+		List<Criteria> criteriaList = new ArrayList<Criteria>();
 		for(int i=0; i< jArray.length(); i++) {
 			try {
-				ACriteria crit = ACriteria.createFromJSON(jArray.getJSONObject(i));
+				Criteria crit = createCriteriaFromJSON(jArray.getJSONObject(i));
 				criteriaList.add(crit);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -394,8 +394,9 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
-					ACommunity cis = (ACommunity) parcel;
+					//Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
+					//ACommunity cis = (ACommunity) parcel;
+					Community cis =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
 					result.setKeepCallback(false);
@@ -428,12 +429,13 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
-					ACommunity communities[] = new ACommunity[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						communities[i] = (ACommunity) parcels[i];
-					}
+					Community communities[] = (Community[]) parcels;
+					//ACommunity communities[] = new ACommunity[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	communities[i] = (ACommunity) parcels[i];
+					//}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACommunitiesToJSONArray(communities));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCommunitiesToJSONArray(communities));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -462,8 +464,9 @@ public class PluginCISFunctions extends Plugin {
 					//UNMARSHALL THE RESPONSE FROM Parcel
 					boolean bJoined = intent.getBooleanExtra(ICisManager.INTENT_RETURN_BOOLEAN, false);
 					if (bJoined) {
-						Parcelable parcel = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
-						AJoinResponse response = (AJoinResponse) parcel;
+						//Parcelable parcel = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
+						//AJoinResponse response = (AJoinResponse) parcel;
+						JoinResponse response = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);;
 						//RETURN A JSON OBJECT
 						PluginResult result = new PluginResult(PluginResult.Status.OK, createJoinResponseJSON(response));
 						result.setKeepCallback(false);
@@ -492,12 +495,13 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					AParticipant members[] = new AParticipant[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						members[i] = (AParticipant) parcels[i];
-					}
+					Participant members[] = (Participant[]) parcels;  
+					//AParticipant members[] = new AParticipant[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	members[i] = (AParticipant) parcels[i];
+					//}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAPartipantToJSONArray(members));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertPartipantToJSONArray(members));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -510,8 +514,9 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITY FROM Parcel
-					Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					ACommunity cis = (ACommunity) parcel;
+					//Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
+					//ACommunity cis = (ACommunity) parcel;
+					Community cis =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					//RETURN JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
 					result.setKeepCallback(false);
@@ -527,12 +532,13 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE ACTIVITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					AActivity activities[] = new AActivity[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						activities[i] = (AActivity) parcels[i];
-					}
+					MarshaledActivity activities[] = (MarshaledActivity[]) parcels;
+					//AActivity activities[] = new AActivity[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	activities[i] = (AActivity) parcels[i];
+					//}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAActiviesToJSONArray(activities));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertActiviesToJSONArray(activities));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -576,12 +582,13 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						adverts[i] = (ACisAdvertisementRecord) parcels[i];
-					}
+					CisAdvertisementRecord adverts[] = (CisAdvertisementRecord[]) parcels;
+					//ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	adverts[i] = (ACisAdvertisementRecord) parcels[i];
+					//}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACisAdvertisementRecordToJSONArray(adverts));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -595,12 +602,13 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						adverts[i] = (ACisAdvertisementRecord) parcels[i];
-					}
+					CisAdvertisementRecord adverts[] = (CisAdvertisementRecord[]) parcels;
+					//ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
+					//for (int i = 0; i < parcels.length; i++) {
+					//	adverts[i] = (ACisAdvertisementRecord) parcels[i];
+					//}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACisAdvertisementRecordToJSONArray(adverts));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -615,7 +623,7 @@ public class PluginCISFunctions extends Plugin {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
 					if (parcels.length > 0) {
-						ACommunity foundCIS = (ACommunity) parcels[0];
+						Community foundCIS = (Community) parcels[0];
 						//RETURN JSON OBJECT - ASSUMED RESULT WAS IN POSTITION 0
 						PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(foundCIS));
 						result.setKeepCallback(false);
@@ -637,7 +645,7 @@ public class PluginCISFunctions extends Plugin {
 	 * @param members
 	 * @return
 	 */
-	public JSONArray convertAPartipantToJSONArray(AParticipant[] members) {
+	public JSONArray convertPartipantToJSONArray(Participant[] members) {
 		JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
@@ -652,7 +660,7 @@ public class PluginCISFunctions extends Plugin {
 	 * @param communities
 	 * @return
 	 */
-	private JSONArray convertACisAdvertisementRecordToJSONArray(ACisAdvertisementRecord[] adverts) {
+	private JSONArray convertCisAdvertisementRecordToJSONArray(CisAdvertisementRecord[] adverts) {
 		JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
@@ -668,7 +676,7 @@ public class PluginCISFunctions extends Plugin {
 	 * @param communities
 	 * @return
 	 */
-	private JSONArray convertACommunitiesToJSONArray(ACommunity[] communities) {
+	private JSONArray convertCommunitiesToJSONArray(Community[] communities) {
 		JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
@@ -683,7 +691,7 @@ public class PluginCISFunctions extends Plugin {
 	 * @param communities
 	 * @return
 	 */
-	private JSONArray convertAActiviesToJSONArray(AActivity[] array) {
+	private JSONArray convertActiviesToJSONArray(MarshaledActivity[] array) {
 		JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
@@ -695,12 +703,12 @@ public class PluginCISFunctions extends Plugin {
 	}
 	
 	/**
-     * Creates a JSONObject for a given AJoinResponse object
+     * Creates a JSONObject for a given JoinResponse object
      * 
      * @param resp AJoinResponse object to convert
      * @return JSONObject 
      */
-    private JSONObject createJoinResponseJSON(AJoinResponse resp) {
+    private JSONObject createJoinResponseJSON(JoinResponse resp) {
     	JSONObject jObj = new JSONObject();
 		Gson gson = new Gson();
 		try {
@@ -712,12 +720,12 @@ public class PluginCISFunctions extends Plugin {
     }
     
 	/**
-     * Creates a JSONObject for a given ACommunity object
+     * Creates a JSONObject for a given Community object
      * 
      * @param cis ACommunity object to convert
      * @return JSONObject 
      */
-    private JSONObject createCommunityJSON(ACommunity cis) {
+    private JSONObject createCommunityJSON(Community cis) {
     	JSONObject jObj = new JSONObject();
 		Gson gson = new Gson();
 		try {
@@ -729,6 +737,58 @@ public class PluginCISFunctions extends Plugin {
         return jObj;
     }
 
+    /**
+	 * Creates an CisAdvertisementRecord from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	private CisAdvertisementRecord createCisAdvertFromJSON(JSONObject jObj) throws JSONException {
+		CisAdvertisementRecord advert = new CisAdvertisementRecord();
+		advert.setId(jObj.getString("id"));
+		advert.setCssownerid(jObj.getString("cssownerid"));
+		advert.setName(jObj.getString("name"));
+		advert.setType(jObj.getString("type"));
+		//advert.setPassword(jObj.getString("password"));
+		//crit.setACriteria(CreateCriteriaList(jObj.getJSONArray("criteria")));
+		//advert.setMembershipCrit(crit);
+		
+		return advert;
+	}
+	
+	/**
+	 * Creates an MarshaledActivity from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	private MarshaledActivity CreateActivityFromJSON(JSONObject jObj) throws JSONException {
+		MarshaledActivity act = new MarshaledActivity();
+		act.setActor(jObj.getString("actor"));
+		act.setObject(jObj.getString("object"));
+		act.setPublished(jObj.getString("published"));
+		act.setTarget(jObj.getString("target"));
+		act.setVerb(jObj.getString("verb"));
+		
+		return act;
+	}
+
+	/**Creates an Criteria from a JSON object
+	 * @param jCriteria
+	 * @return
+	 * @throws JSONException
+	 */
+	private Criteria createCriteriaFromJSON(JSONObject jCriteria) throws JSONException {
+		Criteria aCrit = new Criteria();
+		aCrit.setAttrib(jCriteria.getString("attrib"));
+		aCrit.setOperator(jCriteria.getString("operator"));
+		aCrit.setRank(jCriteria.getInt("rank"));
+		aCrit.setValue1(jCriteria.getString("value1"));
+		aCrit.setValue2(jCriteria.getString("value2"));
+		
+		return aCrit;
+	}
+	
     /**
      * Determine if the Javascript action is a valid.
      * 

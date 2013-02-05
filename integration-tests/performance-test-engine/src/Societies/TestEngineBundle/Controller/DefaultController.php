@@ -12,57 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
-    public function indexAction($name)
+    public function indexAction()
     {
-        return $this->render('SocietiesTestEngineBundle:Default:index.html.twig', array('name' => $name));
-    }
-    
-    public function joinCisResultAction($test_id, $css_owner_jid, $cis_jid)
-    {
-    	//echo" joinCisResultAction";
-    	
-    	$client = new \SoapClient("http://localhost:29092/rafik-performance-test?wsdl");
-    	
-    	
-    	
-    	var_dump($client->__getFunctions());
-    	
-    	
-    	var_dump($client->__getTypes());
-    	
-    	//$client->joinCisTest(array("arg0"=>array("testCaseId"=>$test_id), "arg1"=>$css_owner_jid, "arg2"=>$cis_jid));
-    
-    	$session = $this->get('session');
-    	
-    	
-    	$session->set("nom", "Olivier");
-    	
-//     	//create JoinCisTestResult Entity
-//     	$joinCisTestResult = new JoinCisTestResult();
-    	
-//     	$joinCisTestResult->setNodeId("emma.societies.local");
-//     	$joinCisTestResult->setCisId("cis-67c5aaf1-a57a-45f4-9a66-08258745273b.societies.local");
-//     	$joinCisTestResult->setCssOwnerId("university.societies.local");
-//     	$joinCisTestResult->setState("success");
-//     	$joinCisTestResult->setComment("Join CIS has been done successfully");
-//     	$joinCisTestResult->setTestStartDate("1355926376565");
-//     	$joinCisTestResult->setTestEndDate("1355926380269");
-    	
-//     	//Get the entity manager to be able to persiste entity into the database
-//     	$em = $this->getDoctrine()->getEntityManager();
-    	
-//     	//Get the JoinCisTestResultRepository to be able to get JoinCisTestResult entities from the database
-//     	//$join_cis_test_repository = $em->getRepository('SocietiesTestEngineBundle:JoinCisTestResult');
-    	
-//     	//1st step: we persiste the entity
-//     	$em->persist($joinCisTestResult);
-    	
-//     	//2nd step: we flush 
-//     	$em->flush();
-    	
-//     	$response = "id: ".$joinCisTestResult->getId();
-    
-    	
-    	return $this->render('SocietiesTestEngineBundle:Default:index.html.twig', array('nom' => $session->get("nom")));
+        return $this->render('SocietiesTestEngineBundle:Default:index.html.twig');
     }
 }

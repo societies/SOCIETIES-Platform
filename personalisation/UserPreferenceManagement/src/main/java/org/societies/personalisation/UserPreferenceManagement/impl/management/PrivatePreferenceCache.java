@@ -33,6 +33,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.Tools;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -158,7 +159,7 @@ public class PrivatePreferenceCache {
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it
-			logging.debug("Preference "+preferenceName+" of "+serviceType+":"+serviceID.toString()+"doesn't exist. Aborting deletion");
+			logging.debug("Preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"doesn't exist. Aborting deletion");
 		}else{
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
 			storer.deletePreference(dpi, id);

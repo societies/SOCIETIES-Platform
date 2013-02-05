@@ -54,11 +54,12 @@
 
 	<dependencies>
 		<!-- Societies -->
-		<!--dependency>
+		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
-		</dependency-->
+			<type>apklib</type>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
@@ -67,10 +68,15 @@
 		</dependency>
 		<!-- Comm -->
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
+		<!-- Tools -->
+		<!-- <dependency> <groupId>org.societies.android.platform.androidutils</groupId> 
+			<artifactId>SocietiesAndroidUtilities</artifactId> <version>${release.version}</version> 
+			<type>apklib</type> </dependency> -->
 		<!-- Android -->
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -112,6 +118,12 @@
 			<artifactId>gson</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<version>1.1.4c</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -123,4 +135,13 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

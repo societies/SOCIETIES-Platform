@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+</head>
+<body>
+<div id="slidemenu">
+
+<h3>MENU</h3>
+	<ul>
+		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
+		<li><input id="slide-chat"  type="button" value="Chat"/></li>
+		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
+		<li><input id="slide-help"  type="button" value="Help"/></li>
+		<li><input id="slide-logout" type="button" value="Log Out"/></li>
+	</ul>
+</div>
+
+<!-- ///////////////////////////// APPLICATION DETAIL PAGE ////////////////////////////-->
+<div data-role="page" id="my_apps_details">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+		<!-- /header -->
+	</div>
+	<div data-role="content">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b" id="app_details">
+			<li data-role="list-divider">General Information</li>
+			<li>
+				<div class="profile_pic">
+					<img src="images/printer_icon.png" alt="printer-icon" />
+				</div>
+				<div class="profile_txt" id="app_detail">
+					<!-- DETAILED SERVICE CONTENT PLACEHOLDER -->
+				</div>
+			</li>
+			<li data-role="list-divider">Server Status</li>
+			<li>
+				<br />
+				<p id="service_status">STARTED!</p>
+				<p align="right"><input id="start_stop" type="button" value="Stop Service" data-inline="true" data-theme="h" /> </p>
+			</li>
+			<!--
+			<li data-role="list-divider">Similar Apps you might like</li>
+			<li>
+				<h3>HP Colour Printer</h3>
+				<p>HP SmartPrint Z200a</p>
+				<p class="ui-li-aside">
+					<a href="installed.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a>
+				</p>
+				<br/>
+			</li>
+			<li data-role="list-divider">My shared Apps</li>
+			<li>
+				<h3>HP Colour Printer</h3>
+				<p>
+					HP SmartPrint Z200a
+				</p>
+				<p class="ui-li-aside">
+				</p>
+				<br/>
+			</li>
+			 
+			<li data-role="list-divider">Share this App</li>
+			<li>
+				<h3></h3>
+				<p class="ui-li-middle">
+					<a href="#" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Share</a>
+				</p>
+			</li>
+			-->
+		</ul>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+    <!-- footer -->
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="images/icons/home_logo.png"  data-role="none"/>
+			</li>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="images/icons/my_profile.png"  data-role="none"/>	
+			</li>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="images/icons/settings.png"  data-role="none"/>	
+			</li>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="images/icons/about.png"  data-role="none"/>	
+			</li>
+		</ul><!-- /global navbar -->
+	</div>
+	<!-- end footer -->
+</div>
+
+</body>
+</html>

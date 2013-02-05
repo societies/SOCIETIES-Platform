@@ -120,7 +120,7 @@ public class SA_AI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			LOG.error("No History found this user");
+			LOG.debug("No History found this user");
 		}
 		//}
 		//send DPI based output to requestor
@@ -128,7 +128,7 @@ public class SA_AI extends Thread{
 		try{
 			requestor.handleC45Output(output);
 		}catch(Exception e){
-			LOG.error("The C45 requestor service is not available to handle response");
+			LOG.debug("The C45 requestor service is not available to handle response");
 		}
 	}
 
@@ -148,7 +148,8 @@ public class SA_AI extends Thread{
 		try{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
-			System.out.println("No rules could be learned from the current history set");
+			
+			System.out.println("No rules could be learned from the current history set\nException: "+e.toString());
 			e.printStackTrace();
 			return null;
 		}
