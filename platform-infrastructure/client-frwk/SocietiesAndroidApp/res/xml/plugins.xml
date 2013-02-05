@@ -43,5 +43,6 @@
     <!-- <plugin name="PluginCISManager" value="org.societies.android.platform.phongegap.PluginCISManager"/> -->
     <plugin name="PluginCISFunctions" value="org.societies.android.platform.phongegap.PluginCISFunctions"/>
     <plugin name="PluginSNConnector" value="org.societies.android.platform.phongegap.PluginSNConnector"/>
+    <plugin name="PluginFeedback" value="org.societies.android.platform.phongegap.PluginFeedback"/>
 
 </plugins>

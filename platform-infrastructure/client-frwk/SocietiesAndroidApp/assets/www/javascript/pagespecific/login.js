@@ -30,6 +30,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesLogin
  */
 
+$(document).on('pageinit', '#index', function(event) {
+    console.log("pageinit: Login init calls");
+
+    $("#connectXMPP").off('click').on('click', function(){
+        console.log("Login button clicked ");
+        window.plugins.SocietiesFeedback.vibrateFeedback("success","failure",500);
+    });    
+});
+
 
 var SocietiesLogin = {
 	/**
@@ -117,8 +126,6 @@ var SocietiesLogin = {
 			alert("getCSSIdentity - failure: " + data);
 		}
 		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "cssIdentity");
-
-
 	},
 	/**
 	 * @methodOf SocietiesLogin#
@@ -239,9 +246,7 @@ var SocietiesLogin = {
 			//alert("successfulCSSCloudLogin - failure: " + data);
 			success(data);
 		}
-		
 		window.plugins.SocietiesLocalCSSManager.loginCSS(success, failure);
-
 	}
 }
 

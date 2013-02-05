@@ -89,6 +89,9 @@ var SocietiesUtility = {
 			
 			console.log("Register SNS plugin ");
 			cordova.addPlugin("SocialConnectorsService", SocialConnectorsService);
+			
+			console.log("Register Feedback plugin ");
+            cordova.addPlugin("SocietiesFeedback", SocietiesFeedback);
 		});
 		
 		//handle the Android Back button 
