@@ -74,7 +74,7 @@
 </div>
 
 <!-- Form -->
-<section id="form_style_main">
+<section class="form_style_main">
 <form:form method="POST" action="create_community.html" commandName="createCISform" name="CreateCISForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 	

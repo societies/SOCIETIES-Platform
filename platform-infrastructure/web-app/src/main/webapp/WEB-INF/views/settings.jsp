@@ -22,38 +22,38 @@
 <section class="grid_12">
 <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
 <!-- Form -->
-<section id="form_style_main">
+<section class="form_style_main">
 <form action="" method="" id="">	
 <h4 class="form_title">Security Settings</h4>
 <div class="hr dotted clearfix">&nbsp;</div>
 <ul>						
 <li class="clearfix">
 <label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<input type="text" name="" class="smalltext" />
 <div class="clear"></div>
 <p class="error">Please, insert ...</p>
 </li> 
 <li class="clearfix">
 <label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<input type="text" name="" class="smalltext" />
 <div class="clear"></div>
 <p class="error">Please, insert...</p>
 </li> 
 <li class="clearfix">
 <label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<input type="text" name="" class="smalltext" />
 <div class="clear"></div>
 <p class="error">Please, insert ...</p>
 </li> 
 <li class="clearfix"> 
 <label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<input type="text" name="" class="smalltext" />
 <div class="clear"></div>
 <p  class="error">Please, enter ...</p>
 </li> 
 <li class="clearfix"> 
 <label for="">Text</label>
-<input type="text" name="" id="smalltext" />
+<input type="text" name="" class="smalltext" />
 <div class="clear"></div>
 <p class="error">Please, enter ...</p>
 </li> 
