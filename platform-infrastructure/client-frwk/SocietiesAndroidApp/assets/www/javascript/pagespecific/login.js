@@ -30,16 +30,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesLogin
  */
 
-$(document).on('pageinit', '#index', function(event) {
-    console.log("pageinit: Login init calls");
-
-    $("#connectXMPP").off('click').on('click', function(){
-        console.log("Login button clicked ");
-        window.plugins.SocietiesFeedback.vibrateFeedback(window.plugins.SocietiesFeedback.onSuccess,window.plugins.SocietiesFeedback.onSuccess,500);
-    });    
-});
-
-
 var SocietiesLogin = {
 	/**
 	 * @methodOf SocietiesLogin#
