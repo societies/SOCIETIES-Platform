@@ -7,6 +7,8 @@
                       http://www.springframework.org/schema/osgi-compendium 
                       http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.2.xsd">
 
+<osgi-compendium:cm-properties id="societiesProperties" persistent-id="societiesplatform"/>	
+	
 	<!-- definitions using elements of the osgi namespace can be included in 
 		this file. There is no requirement to keep these definitions in a separate 
 		file if you do not want to. The rationale for keeping these definitions separate 

@@ -2,7 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:osgi="http://www.springframework.org/schema/osgi"
+  	 xmlns:osgi-compendium="http://www.springframework.org/schema/osgi-compendium"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+  	http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.2.xsd
+               
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
   <!-- definitions using elements of the osgi namespace can be included
@@ -10,6 +13,8 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
+	
+	<osgi-compendium:cm-properties id="societiesProperties" persistent-id="societiesplatform"/>
 	
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	<osgi:service ref="cisDir" interface="org.societies.api.cis.directory.ICisDirectory" />

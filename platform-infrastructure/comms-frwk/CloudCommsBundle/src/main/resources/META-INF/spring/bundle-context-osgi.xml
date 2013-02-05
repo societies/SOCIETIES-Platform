@@ -19,6 +19,9 @@
 	<!-- Get DataSource reference -->
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	
+	<osgi-compendium:cm-properties id="societiesProperties" persistent-id="societiesplatform"/>
+	
+	
 	<!-- Load xc.properties with default values -->
 	<!-- 
 	<osgi-compendium:cm-properties id="componentConfig" persistent-id="xc">

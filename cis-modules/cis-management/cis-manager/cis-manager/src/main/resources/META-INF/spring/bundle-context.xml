@@ -20,20 +20,23 @@
    <context:annotation-config />
 
     <tx:annotation-driven />
-	<bean id="ServiceRegPropConfig"
+<!-- 	<bean id="ServiceRegPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true"></property>
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="locations">
 			<list>
-			<!-- 	<value>classpath:META-INF/spring/derby_database.properties</value> -->
+	
 			    <value>classpath:META-INF/spring/org.societies.local.properties</value>
 				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
 	</bean>
+-->
 
-
+<context:property-placeholder properties-ref="societiesProperties"/> 
+	
+	
     <bean
         id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >

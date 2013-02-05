@@ -28,17 +28,7 @@
 	<!-- Required for Async processing -->
 	<tx:annotation-driven />
 
-	<bean id="policyNegotiationProperties"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreResourceNotFound" value="true"></property>
-		<property name="locations">
-			<list>
-				<value>classpath:META-INF/spring/org.societies.local.properties</value>
-				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
-			</list>
-		</property>
-	</bean>
+	<context:property-placeholder properties-ref="societiesProperties"/>
 
 	<bean id="ProviderServiceMgr"
 		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
