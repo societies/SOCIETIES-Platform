@@ -22,31 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.api.internal.privacytrust.privacyprotection.negotiation;
 
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
-
+import org.societies.api.identity.Requestor;
 
 /**
  * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 18:57:17
+ *
  */
-public interface IPrivacyPolicyNegotiationManager {
+public class NegotiationDetails {
 
-	/**
-	 * 
-	 * @param details	requestor and negotiation id
-	 */
-	public void negotiateCISPolicy(NegotiationDetails details) throws PrivacyException;
 
-	/**
-	 * 
-	 * @param details	requestor and negotiation id
-	 */
-	public void negotiateServicePolicy(NegotiationDetails details) throws PrivacyException;
+	private final Requestor requestor;
+	private final int negotiationID;
 
+
+	public NegotiationDetails(Requestor requestor, int negotiationID) {
+		this.requestor = requestor;
+		this.negotiationID = negotiationID;
+	}
+
+
+	public Requestor getRequestor() {
+		return requestor;
+	}
+
+
+	public int getNegotiationID() {
+		return negotiationID;
+	}
 }

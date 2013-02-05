@@ -22,31 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.security.policynegotiator.util;
 
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
-
+import java.util.Random;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 18:57:17
+ * Helper class to generate unique numbers etc.
+ *
+ * @author Mitja Vardjan
+ *
  */
-public interface IPrivacyPolicyNegotiationManager {
+public class ValueGenerator {
 
+	private static Random r = new Random(); 
+	
 	/**
-	 * 
-	 * @param details	requestor and negotiation id
+	 * @return Pseudo random int value
 	 */
-	public void negotiateCISPolicy(NegotiationDetails details) throws PrivacyException;
-
-	/**
-	 * 
-	 * @param details	requestor and negotiation id
-	 */
-	public void negotiateServicePolicy(NegotiationDetails details) throws PrivacyException;
-
+	public static int generateUniqueInt() {
+		return r.nextInt();
+	}
 }

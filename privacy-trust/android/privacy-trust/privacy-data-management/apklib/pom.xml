@@ -74,12 +74,9 @@
 			<type>apklib</type>
 		</dependency>
 		<!-- Tools -->
-		<!-- <dependency>
-			<groupId>org.societies.android.platform.androidutils</groupId>
-			<artifactId>SocietiesAndroidUtilities</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.societies.android.platform.androidutils</groupId> 
+			<artifactId>SocietiesAndroidUtilities</artifactId> <version>${release.version}</version> 
+			<type>apklib</type> </dependency> -->
 		<!-- Android -->
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -138,4 +135,13 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
