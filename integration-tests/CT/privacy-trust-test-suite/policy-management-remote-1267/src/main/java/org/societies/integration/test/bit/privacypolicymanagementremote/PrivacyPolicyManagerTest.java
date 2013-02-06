@@ -107,10 +107,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
@@ -146,10 +146,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			}
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertTrue(true);
 	}
@@ -168,10 +168,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
@@ -193,10 +193,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
@@ -221,10 +221,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
 		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
@@ -254,10 +254,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
 		assertEquals("Privacy policy not updated", cisPolicy2, privacyPolicy2);
@@ -281,10 +281,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertNull("This privacy policy exists!", privacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
@@ -305,10 +305,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertNull("This privacy policy exists!", privacyPolicy);
 		if (null != privacyPolicy) {
@@ -336,10 +336,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
@@ -367,10 +367,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			TestCase1267.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error");
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error");
+			fail("Error: "+e.getMessage());
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
@@ -397,10 +397,10 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 		actions.add(new Action(ActionConstants.READ));
 		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
 		items.add(rItem);
-		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
+		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_COORDINATES);
 		List<Condition> extendedConditions = new ArrayList<Condition>();
-		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
-		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
+		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"0"));
+		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "1"));
 		List<Action> extendedActions = new ArrayList<Action>();
 		extendedActions.add(new Action(ActionConstants.READ));
 		extendedActions.add(new Action(ActionConstants.CREATE));
@@ -412,7 +412,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	}
 
 	private RequestorService getRequestorService() throws InvalidFormatException{
-		IIdentity requestorId = TestCase1267.commManager.getIdManager().fromJid("olivier@societies.local");
+		IIdentity requestorId = TestCase1267.commManager.getIdManager().fromJid("olivier.societies.local");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setServiceInstanceIdentifier("css://olivier@societies.local/HelloEarth");
 		try {
@@ -424,7 +424,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	}
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
-		IIdentity otherCssId = TestCase1267.commManager.getIdManager().fromJid("olivier@societies.local");
+		IIdentity otherCssId = TestCase1267.commManager.getIdManager().fromJid("olivier.societies.local");
 		IIdentity cisId = TestCase1267.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
@@ -440,7 +440,6 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 			LOG.info(privacyPolicy.toXMLString());
 		}
 		else {
-			LOG.info("*** Privacy Policy retrieved is null!");
 			LOG.error("*** Privacy Policy retrieved is null!");
 		}
 	}
