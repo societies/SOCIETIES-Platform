@@ -27,7 +27,7 @@ package org.societies.android.api.internal.privacytrust;
 import java.util.Map;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.RequestorBean;

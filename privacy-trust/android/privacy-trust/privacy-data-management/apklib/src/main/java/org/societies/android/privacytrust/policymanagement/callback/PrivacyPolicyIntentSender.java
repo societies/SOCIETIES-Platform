@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.privacytrust.callback.PrivacyIntentSender;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 
