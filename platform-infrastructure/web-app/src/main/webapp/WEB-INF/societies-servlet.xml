@@ -28,57 +28,55 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:ctx="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
-       xmlns:osgi="http://www.springframework.org/schema/osgi"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="
-           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-           http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
-           http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<!-- Configures the annotation-driven Spring MVC Controller programming model -->
-	<mvc:annotation-driven />	
+    <!-- Configures the annotation-driven Spring MVC Controller programming model -->
+    <mvc:annotation-driven/>
 
-	<!-- a HTTP Session-scoped bean exposed as a proxy -->
-	<bean id="userService" class="org.societies.webapp.service.UserService" scope="session"> 
-           <aop:scoped-proxy/>
-	</bean> 
-	
-	<bean id="openfireLoginService" class="org.societies.webapp.service.OpenfireLoginService" > 
-	</bean> 
-	
-	<!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
-	<ctx:component-scan base-package="org.societies.webapp.controller" />
+    <!-- a HTTP Session-scoped bean exposed as a proxy -->
+    <bean id="userService" class="org.societies.webapp.service.UserService" scope="session">
+        <aop:scoped-proxy/>
+    </bean>
+
+    <bean id="openfireLoginService" class="org.societies.webapp.service.OpenfireLoginService">
+
+    </bean>
+
+    <bean id="userPreferenceManagementService" class="org.societies.webapp.service.UserPreferenceManagementService">
+
+    </bean>
+
+    <!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
+    <ctx:component-scan base-package="org.societies.webapp.controller"/>
 
 
-	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-  		<property name="mediaTypes">
-    		<map>
-      			<entry key="atom" value="application/atom+xml"/>
-      			<entry key="html" value="text/html"/>
-      			<entry key="json" value="application/json"/>
-    		</map>
-  		</property>
-  		<property name="viewResolvers">
-    		<list>
-      			<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
-      			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        			<property name="prefix" value="/WEB-INF/views/"/>
-        			<property name="suffix" value=".jsp"/>
-      			</bean>
-    		</list>
-  		</property>
-  		<property name="defaultViews">
-    		<list>
-      			<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
-    		</list>
-  		</property>
-	</bean>
-		
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="mediaTypes">
+            <map>
+                <entry key="atom" value="application/atom+xml"/>
+                <entry key="html" value="text/html"/>
+                <entry key="json" value="application/json"/>
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/views/"/>
+                    <property name="suffix" value=".jsp"/>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>

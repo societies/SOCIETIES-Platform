@@ -1,126 +1,66 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+         pageEncoding="ISO-8859-1" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Societies</title>
-	<!-- JAVASCRIPT INCLUDES -->
-	<jsp:include page="js_includes.jsp" />
-	<!-- END JAVASCRIPT INCLUDES  -->
+    <title>Societies</title>
+    <!-- JAVASCRIPT INCLUDES -->
+    <jsp:include page="js_includes.jsp"/>
+    <!-- END JAVASCRIPT INCLUDES  -->
 </head>
 <body>
-  <div id="wrapper" class="clearfix">
-  <div id="container" class="container_12 clearfix">
-  <!-- HEADER -->
-  <jsp:include page="header.jsp" />
-  <!-- END HEADER -->
-<!-- .................PLACE YOUR CONTENT HERE ................ -->  
+<div id="wrapper" class="clearfix">
+    <div id="container" class="container_12 clearfix">
+        <!-- HEADER -->
+        <jsp:include page="header.jsp"/>
+        <!-- END HEADER -->
+        <!-- .................PLACE YOUR CONTENT HERE ................ -->
+        <jsp:useBean id="form" scope="request" type="org.societies.webapp.models.ProfileSettingsForm"/>
+        <%--@elvariable id="identity" type="org.societies.api.identity.IIdentity"--%>
 
+        <div class="hr grid_12 clearfix">&nbsp;</div>
+        <!-- Left Column -->
+        <section id="left_col" class="grid_12">
+            <div class="breadcrumbs"><a href="index.html">Home</a> / <a href="profilesettings.html">Profile Settings</a>
+            </div>
+            <!-- Form -->
+            <section class="form_style_main">
+                <form:form action="" method="" id="" commandName="profilesettingsform">
+                    <h4 class="form_title">Profile Settings for <c:out value="${form.fullName}"/></h4>
 
-<div class="hr grid_12 clearfix">&nbsp;</div>
-<!-- Left Column -->
-<section id="left_col" class="grid_12">
-<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
-<!-- Form -->
-<section id="form_style_main">
-<form action="" method="" id="">	
-<h4 class="form_title">Profile Settings</h4>
-<div class="hr dotted clearfix">&nbsp;</div>
-<ul>						
-<li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, insert ...</p>
-</li> 
-<li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, insert...</p>
-</li> 
-<li class="clearfix">
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, insert ...</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p  class="error">Please, enter ...</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Text</label>
-<input type="text" name="" id="smalltext" />
-<div class="clear"></div>
-<p class="error">Please, enter ...</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Lrge Text Area</label>
-<textarea name="" id="largetextarea" rows="30" cols="30"></textarea>
-<div class="clear"></div>
-<p class="error">Please, enter ...</p>
-</li>
-<li class="clearfix"> 
-<label for="">Choose an option</label>
-<div class="select-wrapper">
-<select name="select" required>
-<option value="1">Value 1</option>
-<option value="2">Value 2</option>
-<option value="3">Value 3</option>
-<option value="4">Value 4</option>
-</select>
-</div>
-<div class="clear"></div>
-<p id="option" class="error">Please, select an option</p>
-</li> 
-<li class="clearfix"> 
-<label for="">Choose opt</label>
-<div class="option-group radio">
-<input type="radio" name="" id="radio1" />
-<label for="radio1">Option 1</label>
-<input type="radio" name="" id="radio2" />
-<label for="radio2">Option 2</label>			
-<input type="radio" name="" id="radio3" />
-<label for="radio3">Option 3</label>
-</div>
-<div class="clear"></div>
-<p id="option" class="error">Please, select an option</p>
-</li> 
-<li class="clearfix"> 
-<label for="option">Choose check </label>
-<div class="option-group check">
-<input type="checkbox" name="" id="check1" />
-<label for="check1">Check 1</label>			
-<input type="checkbox" name="" id="check2" />
-<label for="check2">Check 2</label>
-<input type="checkbox" name="" id="check3" />
-<label for="check3">Check 3</label>
-</div>
-<div class="clear"></div>
-<p id="option" class="error">Please, select an option</p>
-</li> 
-<li class="clearfix"> 
-<p class="success">Thank you! Success Message here.</p>
-<p class="error">Sorry, an error has occured. Please try again later.</p>	
-<div id="button">
-<input type="submit" id="send_message" class="sendButton" value="Send" />
-</div>				
-</li> 
-</ul> 
-</form>
-</section>
-</section>
-<div class="hr grid_12 clearfix">&nbsp;</div>
-</div>
+                    <ul>
+                        <li>Identifier:
+                            <c:out value="${identity.identifier}"/></li>
+                        <li>Domain: <c:out value="${identity.domain}"/></li>
+                        <li>Type: <c:out value="${identity.type}"/></li>
+                        <li>JID: <c:out value="${identity.jid}"/></li>
+                        <li>Bare JID: <c:out value="${identity.bareJid}"/></li>
 
-<!-- .................END PLACE YOUR CONTENT HERE ................ -->
-	<!-- FOOTER -->
-	<jsp:include page="footer.jsp" />
-	<!-- END FOOTER -->
+                        <c:forEach var="pref" items="${form.preferenceDetailsList}">
+                            <li>
+                                <c:out value="${pref.preferenceName}"/>
+                                <c:out value="${pref.serviceType}"/>
+                                <c:out value="${pref.serviceID.serviceInstanceIdentifier}"/>
+                                <br/>
+                                <c:out value="${form.preferenceDetailTreeModelMap[pref].preferenceName}"/>
+                            </li>
+                        </c:forEach>
+                    </ul>
 
-</div> 	
+                    <div class="hr dotted clearfix">&nbsp;</div>
+                </form:form>
+            </section>
+        </section>
+        <div class="hr grid_12 clearfix">&nbsp;</div>
+    </div>
+
+    <!-- .................END PLACE YOUR CONTENT HERE ................ -->
+    <!-- FOOTER -->
+    <jsp:include page="footer.jsp"/>
+    <!-- END FOOTER -->
+
+</div>
 </body>
 </html>

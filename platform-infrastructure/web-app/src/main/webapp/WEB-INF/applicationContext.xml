@@ -26,21 +26,24 @@
 	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:osgi="http://www.springframework.org/schema/osgi"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-<osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-<osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager" />
-<osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote" />
+    <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+    <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
+    <osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
+    <osgi:reference id="userPreferenceConditionMonitor" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
 
-<!--TODO : Should not be using cardinality 0..1, this needs to be updated but since privacy api changed and IPrivacyPolicyManagerRemote
-no longer available, not just cardinality that needs to be changed, code does too. So leaving this for now, as that bundle deploys -->
-<osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1"/>
-<osgi:reference id="privacyPolicyManagerRemote" interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote" cardinality="0..1"/>
+    <!--TODO : Should not be using cardinality 0..1, this needs to be updated but since privacy api changed and IPrivacyPolicyManagerRemote
+    no longer available, not just cardinality that needs to be changed, code does too. So leaving this for now, as that bundle deploys -->
+    <osgi:reference id="privacyPolicyManager"
+                    interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"
+                    cardinality="0..1"/>
+    <osgi:reference id="privacyPolicyManagerRemote"
+                    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote"
+                    cardinality="0..1"/>
 
 
 </beans>
