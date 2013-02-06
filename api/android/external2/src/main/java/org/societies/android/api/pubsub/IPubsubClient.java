@@ -58,7 +58,7 @@ public interface IPubsubClient {
 	 * @param classList
 	 * @throws ClassNotFoundException
 	 */
-	public void addSimpleClasses(List<String> classList, IMethodCallback callback) throws ClassNotFoundException;
+	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException;
 	
 	/**
 	 * Disco items.
