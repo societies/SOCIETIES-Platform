@@ -164,7 +164,7 @@
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="shareWithCisMembersOnly" />
-			<xs:enumeration value="shareWithCisOnwerOnly" />
+			<xs:enumeration value="shareWithCisOwnerOnly" />
 			<xs:enumeration value="mayBeInferred" />
 			<xs:enumeration value="dataRetentionInSeconds" />
 			<xs:enumeration value="dataRetentionInMinutes" />

@@ -44,8 +44,10 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -64,7 +66,7 @@ import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGen
 
 
 public class PrivacyPolicyNegotiationManager extends EventListener implements IPrivacyPolicyNegotiationManager {
-	
+
 	//private NegotiationClient negClient;
 	//private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -76,22 +78,22 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private IUserPreferenceManagement prefMgr;
 
 	private ICtxBroker ctxBroker;
-	
+
 	private IEventMgr eventMgr;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
 	//ICommManager!
 	private IIdentityManager idm;
-	
+
 	private IPrivacyAgreementManagerInternal privacyAgreementManagerInternal;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
-	
+
 	private INegotiationAgentRemote negotiationAgentRemote;
-	
+
 	private IIdentitySelection identitySelection;
-	
+
 	private ICommManager commsMgr;
-	
-	
+
+
 	private IPrivacyPolicyManager privacyPolicyManager;
 	/**
 	 * @return the prefMgr
@@ -105,27 +107,27 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setPrefMgr(IUserPreferenceManagement prefMgr) {
 		this.prefMgr = prefMgr;
 	}
-	
-	
 
-/*	public PrivacyPolicyRegistryManager getPrivacyPolicyRegMgr(){
+
+
+	/*	public PrivacyPolicyRegistryManager getPrivacyPolicyRegMgr(){
 		return this.privacyPolicyRegMgr;
 	}
-	
 
-	*//**
+
+	 *//**
 	 * @param privacyPolicyRegMgr the privacyPolicyRegMgr to set
 	 *//*
 	public void setPrivacyPolicyRegMgr(PrivacyPolicyRegistryManager privacyPolicyRegMgr) {
 		this.privacyPolicyRegMgr = privacyPolicyRegMgr;
 	}
-	*/
-	
+	  */
+
 	public IPrivacyPreferenceManager getPrivacyPreferenceManager() {
 		// TODO Auto-generated method stub
 		return privacyPreferenceManager;
 	}
-    /**
+	/**
 	 * @param privacyPreferenceManager the privacyPreferenceManager to set
 	 */
 	public void setPrivacyPreferenceManager(IPrivacyPreferenceManager privacyPreferenceManager) {
@@ -194,7 +196,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	 */
 	public void setNegotiationAgentRemote(INegotiationAgentRemote negotiationAgentRemote) {
 		this.negotiationAgentRemote = negotiationAgentRemote;
-		
+
 		this.logging.debug("Set Remote Negotiation Agent : "+this.negotiationAgentRemote.getClass().getName());
 	}
 	/**
@@ -213,18 +215,18 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 	}
 
-    public void initialisePrivacyPolicyNegotiationManager(){
+	public void initialisePrivacyPolicyNegotiationManager(){
 		/*
 		this.myPublicDPI = this.IDM.getPublicDigitalPersonalIdentifier();
 		String localServiceID = (String) cc.getProperties().get(PssConstants._FW_SERVICE_ID);
 		this.policyMgrServiceID = new PssServiceIdentifier(localServiceID, this.myPublicDPI);
-		*/
+		 */
 		//Register Negotiation Agent and Client with OSGi so that the ONM-SM can find them
-		
+
 		//this.privacyPolicyRegMgr = new PrivacyPolicyRegistryManager(this.getCtxBroker());
 		//this.privacyPolicyRegMgr.setPublicDPI(this.myPublicDPI);
-		
-		
+
+
 		this.servicePolicyRetriever = new PolicyRetriever(this, this.getEventMgr());
 		this.negClients = new Hashtable<Requestor, NegotiationClient>();
 		/*
@@ -233,15 +235,15 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		 * this.myContext.registerService(INegotiationAgent.class.getName(), this.negAgent, new Hashtable<String,Object>());
 		 */
 		//this.localServiceStartedListener = new LocalServiceStartedListener(getEventMgr(), getIdm(), this.getPrivacyPolicyRegMgr()); 
-		
+
 		//JOptionPane.showMessageDiathis.logging.debug(null, "PolicyManager initialised");
 		this.registerForFailedNegotiationEvent();
 		this.logging.debug("Started PrivacyPolicyNegotiationManager");
-    }
-  
-	
-	
-/*	public PrivacyOutcomeConstants checkPermission(Permission permission, IIdentity requestorDPI) {
+	}
+
+
+
+	/*	public PrivacyOutcomeConstants checkPermission(Permission permission, IIdentity requestorDPI) {
 		if (permission instanceof CtxPermission){
 			CtxPermission ctxPermission = (CtxPermission) permission;
 			return this.checkPermission(ctxPermission, requestorDPI);
@@ -257,8 +259,8 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			e.printStackTrace();
 			return PrivacyOutcomeConstants.BLOCK;
 		}
-		
-		
+
+
 	}
 
 	private Action createActionObject(CtxPermission permission) throws PrivacyPreferenceException{
@@ -268,16 +270,16 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		}catch (IllegalArgumentException e){
 			this.logging.debug("Action: "+strAction+"  is not recognised as valid ActionConstants value");
 		}
-	
+
 		throw new PrivacyPreferenceException("Permission action "+permission.getActions()+"not recognisable");
 	}
 
-	
+
 	public IIdentity selectExactIdentity(List<IIdentity> dpis, IAgreement agreement) {
 		return this.privPrefMgr.evaluateIDSPreferences(agreement, dpis);
 	}*/
 
-	
+
 
 
 	/*
@@ -285,30 +287,36 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager#negotiateCISPolicy(org.societies.api.identity.RequestorCis)
 	 */
 	@Override
-	public void negotiateCISPolicy(RequestorCis requestor){
-		
-		if (this.negClients.containsKey(requestor)){
-			this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
-			if (!askUserNegotiationStarted(requestor)){
-				this.logging.debug("User has aborted the new negotiation request.");
-				return;
-			}
-			
-			/*int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with CIS : \n"
+	public void negotiateCISPolicy(NegotiationDetails details) throws PrivacyException{
+
+		if (details.getRequestor() instanceof RequestorCis){
+			RequestorCis requestor = (RequestorCis) details.getRequestor();
+
+			if (this.negClients.containsKey(requestor)){
+				this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
+				if (!askUserNegotiationStarted(requestor)){
+					this.logging.debug("User has aborted the new negotiation request.");
+					return;
+				}
+
+				/*int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with CIS : \n"
 				    +requestor.toString()+". Do you want to abort current negotiation and start a new one?", "Privacy Policy Negotiation Manager message", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.NO_OPTION){	
 				return;
 			}*/
-			
-			this.negClients.remove(requestor);
-			this.logging.debug("User has aborted the previous negotiation request");
+
+				this.negClients.remove(requestor);
+				this.logging.debug("User has aborted the previous negotiation request");
+			}
+			this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
+			NegotiationClient negClient = new NegotiationClient(this.negotiationAgentRemote, this);
+			negClient.startPrivacyPolicyNegotiation(details, null);
+			this.negClients.put(requestor, negClient);
+		}else{
+			throw new PrivacyException("Supplied Requestor not a CisRequestor");
 		}
-		this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
-		NegotiationClient negClient = new NegotiationClient(this.negotiationAgentRemote, this);
-		negClient.startNegotiation(requestor);
-		this.negClients.put(requestor, negClient);
 	}
-	
+
 	/**
 	 * 
 	 * @param requestor
@@ -320,12 +328,12 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		ExpProposalContent content;
 		if (requestor instanceof RequestorCis){
 			content = new ExpProposalContent("A Privacy Policy Negotiation process has already started with CIS : \n"
-				    +requestor.toString()+". A new Privacy Policy Negotiation process was requested to be performed. Do you want to abort the previous negotiation and start a new one?", new String[]{abort, ignore});
+					+requestor.toString()+". A new Privacy Policy Negotiation process was requested to be performed. Do you want to abort the previous negotiation and start a new one?", new String[]{abort, ignore});
 		}else{
 			content = new ExpProposalContent("A Privacy Policy Negotiation process has already started with service : \n"
-				    +requestor.toString()+". A new Privacy Policy Negotiation process was requested to be performed. Do you want to abort the previous negotiation and start a new one?", new String[]{abort, ignore});
+					+requestor.toString()+". A new Privacy Policy Negotiation process was requested to be performed. Do you want to abort the previous negotiation and start a new one?", new String[]{abort, ignore});
 		}
-		
+
 		try {
 			List<String> response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, content).get();
 			for (String str : response){
@@ -340,7 +348,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return true;
 	}
 
@@ -349,35 +357,38 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager#negotiateServicePolicy(org.societies.api.identity.RequestorService)
 	 */
 	@Override
-	public void negotiateServicePolicy(RequestorService requestor){
-		if (this.negClients.containsKey(requestor)){
-			this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
-			if (!askUserNegotiationStarted(requestor)){
-				this.logging.debug("User has aborted the new negotiation request.");
-				return;
-			}
-/*			int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with service: \n"
+	public void negotiateServicePolicy(NegotiationDetails details) throws PrivacyException{
+		if (details.getRequestor() instanceof RequestorService){
+			RequestorService requestor = (RequestorService) details.getRequestor();
+			if (this.negClients.containsKey(requestor)){
+				this.logging.debug("Another negotiation has been requested while a previous one is ongoing with the same requestor");
+				if (!askUserNegotiationStarted(requestor)){
+					this.logging.debug("User has aborted the new negotiation request.");
+					return;
+				}
+				/*			int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with service: \n"
 				    +requestor.toString()+". Do you want to abort current negotiation and start a new one?", "Privacy Policy Negotiation Manager message", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.NO_OPTION){	
 				return;
 			}*/
-			this.logging.debug("User has aborted the previous negotiation request");
-			this.negClients.remove(requestor);
+				this.logging.debug("User has aborted the previous negotiation request");
+				this.negClients.remove(requestor);
+			}
+			this.logging.debug("Starting new negotiation with service: "+requestor.toString());
+			NegotiationClient negClient = new NegotiationClient(this.getNegotiationAgentRemote(), this);
+			negClient.startPrivacyPolicyNegotiation(details, null);
+			this.negClients.put(requestor, negClient);		
 		}
-		this.logging.debug("Starting new negotiation with service: "+requestor.toString());
-		NegotiationClient negClient = new NegotiationClient(this.getNegotiationAgentRemote(), this);
-		negClient.startNegotiation(requestor);
-		this.negClients.put(requestor, negClient);		
 	}
-	
-/*	public void addPrivacyPolicyForService(Requestor serviceID,
+
+	/*	public void addPrivacyPolicyForService(Requestor serviceID,
 			RequestPolicy policy) {
 		if (serviceID !=null){
 			try {
 				Subject sub = new Subject(this.getIdm().parseDigitalPersonalIdentifier(serviceID.getOperatorId()), serviceID);
 				policy.setRequestor(sub);
 				this.getPrivacyPolicyRegMgr().addPolicy(serviceID, policy);
-				
+
 			} catch (MalformedDigitialPersonalIdentifierException e) {
 				this.logging.debug("Could not parse DPI from Requestor. Privacy Policy not added for serviceID "+serviceID.toUriString());
 				e.printStackTrace();
@@ -385,19 +396,19 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		}else{
 			this.logging.debug("Attempted to add a new service privacy policy with a null service ID. Service Privacy Policy NOT added");
 		}
-		
+
 	}
-	
-	
+
+
 	public void addPrivacyPolicyForService(Requestor serviceID, File xmlFile) {
 		XMLPolicyReader reader = new XMLPolicyReader(this.myContext);
 		RequestPolicy policy = reader.readPolicyFromFile(xmlFile);
 		this.getPrivacyPolicyRegMgr().addPolicy(serviceID, policy);
-		
+
 	}
-	
-	
-	
+
+
+
 	public void setFinalIdentity(IIdentity serviceDPI,
 			IIdentity userDPI, Requestor serviceID) {
 		this.privPrefMgr.addIDSDecision(userDPI, serviceDPI, serviceID);
@@ -411,23 +422,23 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			NegotiationClient client = this.negClients.get(serviceID);
 			this.negClients.remove(serviceID);
 			client.setFinalIdentity(serviceDPI, userDPI, serviceID);
-			
+
 			//JOptionPane.showMessageDialog(null, "Negotiation process complete. Removing negClient");
 		}else{
 			JOptionPane.showMessageDialog(null, "NegClients doesn't contain serviceID: "+serviceID.toUriString());
 		}
-		
-		
+
+
 	}*/
-	
+
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
 		this.logging.debug("Received an event: "+event.geteventType());
 		if (event.geteventType().equals(EventTypes.FAILED_NEGOTIATION_EVENT)){
 			FailedNegotiationEvent negEvent = (FailedNegotiationEvent) event.geteventInfo();
-			Requestor id = negEvent.getRequestor();
-			this.logging.debug("Received Failed Negotiation event for : "+negEvent.getRequestor().toString());
+			Requestor id = negEvent.getDetails().getRequestor();
+			this.logging.debug("Received Failed Negotiation event for : "+id.toString());
 			if(this.negClients.containsKey(id)){
 				//INegotiationClient client = this.negClients.get(id);
 				this.negClients.remove(id);
@@ -436,23 +447,23 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			}
 		}else if (event.geteventType().equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)){
 			PPNegotiationEvent ppnEvent = (PPNegotiationEvent) event.geteventInfo();
-			
+
 			Requestor requestor = ppnEvent.getAgreement().getRequestor();
 			this.logging.debug("Received successfull Negotiation event for : "+requestor.toString());
 			if (this.negClients.containsKey(requestor)){
 				this.negClients.remove(requestor);
 				this.logging.debug("Destroying NegotiationClient instance");
 			}
-			
+
 		}
-		
+
 		this.logging.debug("Finished executing handleInternalEvent");
 	}
-	
+
 
 	private void registerForFailedNegotiationEvent(){
 		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.FAILED_NEGOTIATION_EVENT, EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, null);
-		
+
 		this.logging.debug("Registered for events: "+EventTypes.FAILED_NEGOTIATION_EVENT);
 
 	}
@@ -460,7 +471,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	@Override
 	public void handleExternalEvent(CSSEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 	/**
 	 * @return the commsMgr
@@ -517,8 +528,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		this.logging.debug("NegotiationComms bound");
 		this.negotiationAgentRemote = negAgent;
 	}
-	
-	
-	
+
+
+
 }
-	

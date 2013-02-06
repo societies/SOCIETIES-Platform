@@ -34,24 +34,19 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public class FailedNegotiationEvent implements Serializable{
 
 
-	private Requestor requestor;
+
 	
-	public FailedNegotiationEvent(Requestor requestor){
-		this.setRequestor(requestor);
+	private final NegotiationDetails details;
+
+	public FailedNegotiationEvent(NegotiationDetails details){
+		this.details = details;
+		
 	}
 
-	/**
-	 * @return the requestor
-	 */
-	public Requestor getRequestor() {
-		return requestor;
+	public NegotiationDetails getDetails() {
+		return details;
 	}
 
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(Requestor requestor) {
-		this.requestor = requestor;
-	}
+
 
 }
