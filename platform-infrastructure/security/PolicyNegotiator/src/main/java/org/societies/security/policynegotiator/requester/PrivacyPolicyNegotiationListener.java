@@ -33,7 +33,6 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -43,6 +42,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 
 /**
  * 

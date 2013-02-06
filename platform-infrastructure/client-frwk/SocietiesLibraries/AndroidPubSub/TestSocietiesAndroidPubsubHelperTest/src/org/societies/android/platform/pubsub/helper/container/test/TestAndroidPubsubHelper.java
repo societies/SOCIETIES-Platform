@@ -1,5 +1,8 @@
 package org.societies.android.platform.pubsub.helper.container.test;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -10,6 +13,7 @@ import org.societies.api.identity.IdentityType;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.util.Log;
 
 /**
  * The test suite tests the Pubsub helper class and its interaction with the remote Android Societies Pubsub service.
@@ -27,6 +31,8 @@ import android.test.suitebuilder.annotation.MediumTest;
 
 public class TestAndroidPubsubHelper extends AndroidTestCase {
 	private static final int DELAY = 10000;
+	private static final String LOG_TAG = TestAndroidPubsubHelper.class.getName();
+	
     private static final String XMPP_DOMAIN = "societies.bespoke";
     private static final String XMPP_IDENTIFIER = "alan";
     private static final String XMPP_SUCCESSFUL_CLOUD_NODE = XMPP_IDENTIFIER + "." + XMPP_DOMAIN;
@@ -35,6 +41,13 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 
     public static final String DEPART_CSS_NODE = "departCSSNode";
     public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
+    //Test Nodes
+    public static final String TEST_PUBSUB_NODE_1 = "testSocietiesNode_11";
+    public static final String TEST_PUBSUB_NODE_2 = "testSocietiesNode_21";
+
+    private static final String PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+    private static final List<String> classList = Collections.singletonList(PUBSUB_CLASS);
+
     private boolean testCompleted;
 
 	protected void setUp() throws Exception {
@@ -48,7 +61,8 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 	@MediumTest
 	public void testBindToPubsubService() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext());
+		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			
 			@Override
@@ -79,11 +93,87 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 		Thread.sleep(DELAY);
 		assertTrue(this.testCompleted);
 	}
-	
+	@MediumTest
+	public void testOwnerCreateDelete() throws Exception {
+		this.testCompleted = false;
+		Thread.sleep(DELAY);
+		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		helper.addSimpleClasses(classList);
+		helper.bindPubsubService(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+				fail();
+			}
+			
+			@Override
+			public void returnAction(boolean flag) {
+				assertTrue(flag);
+				try {
+					helper.ownerCreate(new TestIdentity(), TEST_PUBSUB_NODE_1, new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+							assertNotNull(result);
+							try {
+								helper.ownerDelete(new TestIdentity(), TEST_PUBSUB_NODE_1, new IMethodCallback() {
+									
+									@Override
+									public void returnAction(String result) {
+										assertNotNull(result);
+										helper.unbindCommsService(new IMethodCallback() {
+											
+											@Override
+											public void returnAction(String arg0) {
+											}
+											
+											@Override
+											public void returnAction(boolean result) {
+												assertTrue(result);
+												TestAndroidPubsubHelper.this.testCompleted = true;
+											}
+										});
+									}
+									
+									@Override
+									public void returnAction(boolean arg0) {
+										fail();
+									}
+								});
+							} catch (XMPPError e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								fail();
+							} catch (CommunicationException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								fail();
+							}
+						}
+						
+						@Override
+						public void returnAction(boolean result) {
+							fail();
+						}
+					});
+				} catch (XMPPError e) {
+					e.printStackTrace();
+					fail();
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+					fail();
+				}
+			}
+		});
+
+		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
+	}
 	@MediumTest
 	public void testSubscribeToNode() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext());
+		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			
 			@Override
@@ -159,7 +249,50 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 		Thread.sleep(DELAY);
 		assertTrue(this.testCompleted);
 	}
-	
+	@MediumTest
+	public void testSendCatchEvent() throws Exception {
+		this.testCompleted = false;
+		Thread.sleep(DELAY);
+		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		helper.addSimpleClasses(classList);
+		helper.bindPubsubService(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+				fail();
+			}
+			
+			@Override
+			public void returnAction(boolean flag) {
+				assertTrue(flag);
+				try {
+					helper.ownerCreate(new TestIdentity(), TEST_PUBSUB_NODE_2, new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+							assertNotNull(result);
+						}
+						
+						@Override
+						public void returnAction(boolean arg0) {
+							fail();
+						}
+					});
+				} catch (XMPPError e) {
+					e.printStackTrace();
+					fail();
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+					fail();
+				}
+				
+			}
+		});
+
+		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
+	}
+
 	private class TestSubscriber implements ISubscriber {
 
 		@Override
@@ -197,6 +330,15 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 		public IdentityType getType() {
 			// TODO Auto-generated method stub
 			return null;
+		}
+	}
+	
+	private class EventSubscriber implements ISubscriber {
+		@Override
+		public void pubsubEvent(IIdentity pubsubServiceID, String node, String itemId, Object item) {
+			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event Node: " + node);
+			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event ID: " + itemId);
+			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event Payload: " + Object.class.getName());
 		}
 		
 	}

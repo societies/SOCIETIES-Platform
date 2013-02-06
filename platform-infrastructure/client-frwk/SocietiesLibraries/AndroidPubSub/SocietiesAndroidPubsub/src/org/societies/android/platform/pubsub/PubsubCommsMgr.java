@@ -77,8 +77,6 @@ public class PubsubCommsMgr {
 		this.idManager = null;
 		this.receiver = null;
 		this.bindCallback = null;
-		
-		this.setupBroadcastReceiver();
 	}
 	
 
@@ -90,6 +88,8 @@ public class PubsubCommsMgr {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Comms Service");
 		
+		this.setupBroadcastReceiver();
+
 		this.bindCallback = bindCallback;
 		this.bindToServiceAfterLogin();
 
@@ -425,7 +425,7 @@ public class PubsubCommsMgr {
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
-			}
+			} 
 		}
     }
 
@@ -448,6 +448,7 @@ public class PubsubCommsMgr {
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
         intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.PUBSUB_EVENT);
         return intentFilter;
     }
     

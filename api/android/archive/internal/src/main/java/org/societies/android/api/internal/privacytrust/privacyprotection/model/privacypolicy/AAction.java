@@ -24,8 +24,8 @@
  */
 package org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
 import android.os.Parcel;
 import android.os.Parcelable;

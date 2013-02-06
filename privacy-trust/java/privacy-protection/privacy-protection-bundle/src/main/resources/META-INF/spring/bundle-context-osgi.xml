@@ -9,21 +9,30 @@
 	<osgi:service ref="privacyDataManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
 
+	<osgi:service ref="privacyDataManagerRemote"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" />
+
 
 	<!-- Privacy Policy Manager Configuration -->
 
 	<osgi:service ref="privacyPolicyManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
 
+	<osgi:service ref="privacyPolicyManagerRemote"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote" />
+
 	<osgi:service ref="privacyAgreementManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager" />
+
+	<osgi:service ref="privacyAgreementManagerRemote"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyAgreementManagerRemote" />
 
 
 	<!-- Privacy Policy Negotiation Manager Configuration -->
 
 	<osgi:service ref="privacyPolicyNegotiationManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager" />
-		
+
 
 	<!-- Privacy Preference Manager Configuration -->
 
@@ -51,15 +60,16 @@
 		cardinality="0..1" />
 
 	<osgi:reference id="cisManager"
-		interface="org.societies.api.cis.management.ICisManager"
-		cardinality="0..1" />
-	
+		interface="org.societies.api.cis.management.ICisManager" cardinality="0..1" />
+
 	<osgi:reference id="negotiationAgentRemote"
-	    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote" cardinality="0..1">
-	    <osgi:listener bind-method="bindNegotiationAgentRemote" ref="privacyPolicyNegotiationManager"></osgi:listener>
-	   </osgi:reference>
-	
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote"
+		cardinality="0..1">
+		<osgi:listener bind-method="bindNegotiationAgentRemote"
+			ref="privacyPolicyNegotiationManager"></osgi:listener>
+	</osgi:reference>
+
 	<osgi:reference id="UserFeedbackGUI"
-	    interface="org.societies.api.internal.useragent.feedback.IUserFeedback"
-	    cardinality="0..1"/>
+		interface="org.societies.api.internal.useragent.feedback.IUserFeedback"
+		cardinality="0..1" />
 </beans>

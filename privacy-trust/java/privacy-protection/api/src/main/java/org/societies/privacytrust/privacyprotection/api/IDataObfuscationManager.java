@@ -27,8 +27,8 @@ package org.societies.privacytrust.privacyprotection.api;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 /**
  * Internal interface to protect a data by obfuscating it

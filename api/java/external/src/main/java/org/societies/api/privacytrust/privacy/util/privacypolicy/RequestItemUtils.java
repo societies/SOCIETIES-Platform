@@ -22,53 +22,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class DecisionUtils {
-	public static Decision toDecision(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision decisionBean)
+public class RequestItemUtils {
+	public static RequestItem toRequestItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItemBean)
 	{
-		if (null == decisionBean) {
+		if (null == requestItemBean) {
 			return null;
 		}
-		return Decision.valueOf(decisionBean.name());
+		return new RequestItem(ResourceUtils.toResource(requestItemBean.getResource()), ActionUtils.toActions(requestItemBean.getActions()), ConditionUtils.toConditions(requestItemBean.getConditions()));
 	}
-	public static List<Decision> toDecisions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> decisionBeans)
+	public static List<RequestItem> toRequestItems(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItemBeans)
 	{
-		if (null == decisionBeans) {
+		if (null == requestItemBeans) {
 			return null;
 		}
-		List<Decision> decisions = new ArrayList<Decision>();
-		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision decisionBean : decisionBeans) {
-			decisions.add(DecisionUtils.toDecision(decisionBean));
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItemBean : requestItemBeans) {
+			requestItems.add(RequestItemUtils.toRequestItem(requestItemBean));
 		}
-		return decisions;
+		return requestItems;
 	}
 	
-	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision toDecisionBean(Decision decision)
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem toRequestItemBean(RequestItem requestItem)
 	{
-		if (null == decision) {
+		if (null == requestItem) {
 			return null;
 		}
-		return org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision.valueOf(decision.name());
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItemBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem();
+		requestItemBean.setResource(ResourceUtils.toResourceBean(requestItem.getResource()));
+		requestItemBean.setOptional(requestItem.isOptional());
+		requestItemBean.setActions(ActionUtils.toActionBeans(requestItem.getActions()));
+		requestItemBean.setConditions(ConditionUtils.toConditionBeans(requestItem.getConditions()));
+		return requestItemBean;
 	}
-	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> toDecisionBeans(List<Decision> decisions)
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> toRequestItemBeans(List<RequestItem> requestItems)
 	{
-		if (null == decisions) {
+		if (null == requestItems) {
 			return null;
 		}
-		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> decisionBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision>();
-		for(Decision decision : decisions) {
-			decisionBeans.add(DecisionUtils.toDecisionBean(decision));
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItemBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem>();
+		for(RequestItem requestItem : requestItems) {
+			requestItemBeans.add(RequestItemUtils.toRequestItemBean(requestItem));
 		}
-		return decisionBeans;
+		return requestItemBeans;
 	}
 }

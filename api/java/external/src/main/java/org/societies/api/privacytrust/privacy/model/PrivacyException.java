@@ -22,16 +22,62 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
+package org.societies.api.privacytrust.privacy.model;
 
 /**
  * @author Elizabeth
  *
  */
-public enum ActionConstants {
+public class PrivacyException extends Exception{
+    /**
+     * Constructs a <code>PrivacyPreferenceException</code> with no detail
+     * message.
+     */
+    public PrivacyException() {
+        super();
+    }
 
-	READ, WRITE, CREATE, DELETE;
-	
-	
-	
+    /**
+     * Constructs a <code>PrivacyPreferenceException</code> with the specified
+     * detail message.
+     * 
+     * @param s
+     *            the detail message.
+     */
+    public PrivacyException(String s) {
+        super(s);
+    }
+
+    /**
+     * Creates a <code>PrivacyPreferenceException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public PrivacyException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>PrivacyPreferenceException</code> with the specified cause
+     * and a detail message of <tt>(cause==null ? null : cause.toString())</tt>
+     * (which typically contains the class and detail message of <tt>cause</tt>
+     * ).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public PrivacyException(Throwable cause) {
+        super(cause);
+    }
 }

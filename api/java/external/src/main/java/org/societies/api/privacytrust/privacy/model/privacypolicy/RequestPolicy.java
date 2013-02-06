@@ -22,85 +22,101 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.model.privacypolicy;
 
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.Requestor;
 
 /**
- * The ResponsePolicy class represents the response of the user to a requestPolicy of a service provider. 
- * The ResponsePolicy class contains ResponseItem objects for each of the RequestItem objects contained in 
- * the RequestPolicy of the service provider and a NegotiationStatus flag to denote the state of the negotiation.
+ * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
+ * to these items and its own terms and conditions that define what happens to the data after disclosure
+ * . 
  * @author Elizabeth
  *
  */
-public class ResponsePolicy implements Serializable{
+public class RequestPolicy implements Serializable{
 
-	private NegotiationStatus status;
-	private List<ResponseItem> responses;
-	private Requestor Requestor;
-	
-	private ResponsePolicy(){
-		this.responses = new ArrayList<ResponseItem>();
+	private Requestor requestor;
+	private List<RequestItem> requests;
+
+	private RequestPolicy(){
+		this.requests = new ArrayList<RequestItem>();
 	}
-	/**
-	 * @param results
-	 */
-	public ResponsePolicy(Requestor Requestor, List<ResponseItem> responses, NegotiationStatus status) {
-		this.Requestor = Requestor;
-		this.responses = responses;
-		this.status = status;
-		
+
+	public RequestPolicy(List<RequestItem> requests){
+		this.requests = requests;
+	}
+	public RequestPolicy(Requestor sub, List<RequestItem> requests) {
+		this.requestor = sub;
+		this.requests = requests;
+	}
+
+	public List<RequestItem> getRequests(){
+		return this.requests;
 	}
 
 	public Requestor getRequestor(){
-		return this.Requestor;
+		return this.requestor;
 	}
-	public NegotiationStatus getStatus(){
-		return this.status;
-	}
-	
-	public List<ResponseItem> getResponseItems(){
-		return this.responses;
+
+	public void setRequestor(Requestor subject){
+		this.requestor = subject;
 	}
 	
-	public void addResponseItem(ResponseItem item){
-		this.responses.add(item);
-	}
-	
-	public void setStatus(NegotiationStatus status){
-		this.status = status;
-	}
 	public String toXMLString(){
-		String str = "\n<ResponsePolicy>";
-		str = str.concat(this.Requestor.toXMLString());
-		str = str.concat(this.statusToXML());
-		str = str.concat("\n<Responses>");
-		for (ResponseItem item : responses){
-			str = str.concat(item.toXMLString());
+		StringBuilder str = new StringBuilder("<RequestPolicy>");
+		if (this.hasRequestor()){
+			str.append("<Subject>"+this.requestor.toXMLString()+"</Subject>");
 		}
-		str = str.concat("\n</Responses>");
-		str = str.concat("\n</ResponsePolicy>");
-		return str;
+		for (RequestItem item : requests){
+			str.append(item.toXMLString());
+		}
+		str.append("</RequestPolicy>");
+		return str.toString();
 	}
-	
-	private String statusToXML(){
-		String str = "\n<NegotiationStatus>";
-		str = str.concat("\n\t<Attribute AttributeId=\"Decision\" " +
-		"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus\">");
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.status.toString());
-		str = str.concat("</AttributeValue>");
-		str = str.concat("\n\t</Attribute>");
-		str = str.concat("\n</NegotiationStatus>");
-		return str;		
+
+	public boolean hasRequestor(){
+		return (this.requestor!=null);
 	}
-	
-	@Override
 	public String toString(){
 		return this.toXMLString();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result
+				+ ((requests == null) ? 0 : requests.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		RequestPolicy rhs = (RequestPolicy) obj;
+		return new EqualsBuilder()
+			.append(this.getRequestor(), rhs.getRequestor())
+			.append(this.getRequests(), rhs.getRequests())
+			.isEquals();
+	}
+
+
 }
