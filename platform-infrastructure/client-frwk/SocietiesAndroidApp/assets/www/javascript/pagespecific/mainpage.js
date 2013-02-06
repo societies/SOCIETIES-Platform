@@ -92,6 +92,9 @@ var SocietiesUtility = {
 			
 			console.log("Register PrivacyPolicyManager plugin ");
 			cordova.addPlugin("PrivacyPolicyManager", PrivacyPolicyManagerService);
+
+			console.log("Register Feedback plugin ");
+            cordova.addPlugin("SocietiesFeedback", SocietiesFeedback);
 		});
 		
 		//handle the Android Back button 
@@ -155,6 +158,10 @@ $(document).on('pageinit', '#index', function(event) {
 	console.log("jQuery pageinit action(s) for mainpage");
 	
 	$('#connectXMPP').off('click').on('click', function(){
+        //Vibrate when login button is clicked
+        console.log("Login button clicked ");
+        window.plugins.SocietiesFeedback.vibrateFeedback(window.plugins.SocietiesFeedback.onSuccess,window.plugins.SocietiesFeedback.onSuccess,500);
+
 		//DISPLAY PROGRESS AND DISABLE LOGIN BUTTON
 		$('#connectXMPP').val("logging in...");
 		$('#connectXMPP').button('disable');
