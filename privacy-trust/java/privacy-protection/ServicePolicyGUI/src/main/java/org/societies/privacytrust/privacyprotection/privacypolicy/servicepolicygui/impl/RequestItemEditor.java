@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -50,12 +50,12 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 public class RequestItemEditor extends JFrame implements ItemListener

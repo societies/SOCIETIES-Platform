@@ -22,62 +22,53 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 
 /**
- * @author Elizabeth
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public class PrivacyException extends Exception{
-    /**
-     * Constructs a <code>PrivacyPreferenceException</code> with no detail
-     * message.
-     */
-    public PrivacyException() {
-        super();
-    }
-
-    /**
-     * Constructs a <code>PrivacyPreferenceException</code> with the specified
-     * detail message.
-     * 
-     * @param s
-     *            the detail message.
-     */
-    public PrivacyException(String s) {
-        super(s);
-    }
-
-    /**
-     * Creates a <code>PrivacyPreferenceException</code> with the specified detail
-     * message and cause.
-     * 
-     * @param message
-     *            the detail message (which is saved for later retrieval by the
-     *            {@link #getMessage()} method).
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public PrivacyException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Creates a <code>PrivacyPreferenceException</code> with the specified cause
-     * and a detail message of <tt>(cause==null ? null : cause.toString())</tt>
-     * (which typically contains the class and detail message of <tt>cause</tt>
-     * ).
-     * 
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public PrivacyException(Throwable cause) {
-        super(cause);
-    }
+public class DecisionUtils {
+	public static Decision toDecision(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decisionBean)
+	{
+		if (null == decisionBean) {
+			return null;
+		}
+		return Decision.valueOf(decisionBean.name());
+	}
+	public static List<Decision> toDecisions(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision> decisionBeans)
+	{
+		if (null == decisionBeans) {
+			return null;
+		}
+		List<Decision> decisions = new ArrayList<Decision>();
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decisionBean : decisionBeans) {
+			decisions.add(DecisionUtils.toDecision(decisionBean));
+		}
+		return decisions;
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision toDecisionBean(Decision decision)
+	{
+		if (null == decision) {
+			return null;
+		}
+		return org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision.valueOf(decision.name());
+	}
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision> toDecisionBeans(List<Decision> decisions)
+	{
+		if (null == decisions) {
+			return null;
+		}
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision> decisionBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision>();
+		for(Decision decision : decisions) {
+			decisionBeans.add(DecisionUtils.toDecisionBean(decision));
+		}
+		return decisionBeans;
+	}
 }

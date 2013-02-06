@@ -29,7 +29,7 @@ import java.util.List;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 

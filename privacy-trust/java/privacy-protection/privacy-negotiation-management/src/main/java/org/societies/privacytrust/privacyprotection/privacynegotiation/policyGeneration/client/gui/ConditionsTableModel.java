@@ -29,7 +29,7 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 
 
 /**

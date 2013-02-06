@@ -29,11 +29,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.RandomBetween;

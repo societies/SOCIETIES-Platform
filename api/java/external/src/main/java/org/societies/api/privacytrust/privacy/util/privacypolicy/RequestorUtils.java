@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,6 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -104,26 +103,26 @@ public class RequestorUtils {
 		}
 		return requestorBeans;
 	}
-	public static String getRequestorId(RequestorBean requestor) {
-		StringBuilder sb = new StringBuilder();
-		if (requestor instanceof RequestorCisBean) {
-			sb.append("CIS:");
-			sb.append(requestor.getRequestorId());
-			sb.append("|");
-			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
-		}
-		else if (requestor instanceof RequestorServiceBean) {
-			String serviceOwnerJid = ServiceModelUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
-			String serviceId = ServiceModelUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
-			sb.append("Service:");
-			sb.append(serviceOwnerJid);
-			sb.append("|");
-			sb.append(serviceId);
-		}
-		else {
-			sb.append("CSS:");
-			sb.append(requestor.getRequestorId());
-		}
-		return sb.toString();
-	}
+	//	public static String getRequestorId(RequestorBean requestor) {
+	//		StringBuilder sb = new StringBuilder();
+	//		if (requestor instanceof RequestorCisBean) {
+	//			sb.append("CIS:");
+	//			sb.append(requestor.getRequestorId());
+	//			sb.append("|");
+	//			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
+	//		}
+	//		else if (requestor instanceof RequestorServiceBean) {
+	//			String serviceOwnerJid = ServiceModelUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
+	//			String serviceId = ServiceModelUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
+	//			sb.append("Service:");
+	//			sb.append(serviceOwnerJid);
+	//			sb.append("|");
+	//			sb.append(serviceId);
+	//		}
+	//		else {
+	//			sb.append("CSS:");
+	//			sb.append(requestor.getRequestorId());
+	//		}
+	//		return sb.toString();
+	//	}
 }

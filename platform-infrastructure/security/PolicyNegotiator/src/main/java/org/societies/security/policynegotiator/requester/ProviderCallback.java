@@ -35,7 +35,6 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
@@ -43,6 +42,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationCallback
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.util.ValueGenerator;

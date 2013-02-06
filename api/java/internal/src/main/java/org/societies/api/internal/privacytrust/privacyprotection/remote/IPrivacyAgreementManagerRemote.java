@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.remote;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 /**
  * Interface exposed to Societies components to read remotely the stored privacy policy agreements

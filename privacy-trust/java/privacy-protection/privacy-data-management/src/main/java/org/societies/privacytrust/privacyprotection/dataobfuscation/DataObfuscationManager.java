@@ -24,9 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.*;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.*;

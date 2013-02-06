@@ -22,21 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ConditionUtils {
-	public static Condition toCondition(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition conditionBean)
+	public static Condition toCondition(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionBean)
 	{
 		if (null == conditionBean) {
 			return null;
@@ -44,36 +44,36 @@ public class ConditionUtils {
 		ConditionConstants conditionConstant = ConditionConstants.valueOf(conditionBean.getConditionConstant().name());
 		return new Condition(conditionConstant, conditionBean.getValue(), conditionBean.isOptional());
 	}
-	public static List<Condition> toConditions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition> conditionBeans)
+	public static List<Condition> toConditions(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditionBeans)
 	{
 		if (null == conditionBeans) {
 			return null;
 		}
 		List<Condition> conditions = new ArrayList<Condition>();
-		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition conditionBean : conditionBeans) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionBean : conditionBeans) {
 			conditions.add(ConditionUtils.toCondition(conditionBean));
 		}
 		return conditions;
 	}
 	
-	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition toConditionBean(Condition condition)
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition toConditionBean(Condition condition)
 	{
 		if (null == condition) {
 			return null;
 		}
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition conditionBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition();
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants conditionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants.valueOf(condition.getConditionName().name());
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant = org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.valueOf(condition.getConditionName().name());
 		conditionBean.setConditionConstant(conditionConstant);
 		conditionBean.setValue(condition.getValueAsString());
 		conditionBean.setOptional(condition.isOptional());
 		return conditionBean;
 	}
-	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition> toConditionBeans(List<Condition> conditions)
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> toConditionBeans(List<Condition> conditions)
 	{
 		if (null == conditions) {
 			return null;
 		}
-		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition> conditionBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition>();
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditionBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition>();
 		for(Condition condition : conditions) {
 			conditionBeans.add(ConditionUtils.toConditionBean(condition));
 		}

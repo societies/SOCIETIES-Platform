@@ -30,10 +30,10 @@ import java.util.concurrent.Future;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
 
 /**

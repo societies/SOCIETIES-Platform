@@ -47,15 +47,15 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -205,7 +205,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)}.
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
 	 */
 	@Test
 	@Ignore
@@ -233,7 +233,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)}.
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
 	 */
 	@Test
 	@Ignore

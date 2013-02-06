@@ -22,20 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ActionUtils {
-	public static Action toAction(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action actionBean)
+	public static Action toAction(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionBean)
 	{
 		if (null == actionBean) {
 			return null;
@@ -43,35 +43,35 @@ public class ActionUtils {
 		ActionConstants actionConstant = ActionConstants.valueOf(actionBean.getActionConstant().name());
 		return new Action(actionConstant, actionBean.isOptional());
 	}
-	public static List<Action> toActions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action> actionBeans)
+	public static List<Action> toActions(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans)
 	{
 		if (null == actionBeans) {
 			return null;
 		}
 		List<Action> actions = new ArrayList<Action>();
-		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action actionBean : actionBeans) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionBean : actionBeans) {
 			actions.add(ActionUtils.toAction(actionBean));
 		}
 		return actions;
 	}
 	
-	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action toActionBean(Action action)
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action toActionBean(Action action)
 	{
 		if (null == action) {
 			return null;
 		}
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action actionBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action();
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants actionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants.valueOf(action.getActionType().name());
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant = org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.valueOf(action.getActionType().name());
 		actionBean.setActionConstant(actionConstant);
 		actionBean.setOptional(action.isOptional());
 		return actionBean;
 	}
-	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action> toActionBeans(List<Action> actions)
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> toActionBeans(List<Action> actions)
 	{
 		if (null == actions) {
 			return null;
 		}
-		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action> actionBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action>();
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action>();
 		for(Action action : actions) {
 			actionBeans.add(ActionUtils.toActionBean(action));
 		}

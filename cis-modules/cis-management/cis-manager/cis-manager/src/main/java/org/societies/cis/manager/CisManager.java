@@ -85,7 +85,6 @@ import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 
 import org.societies.api.internal.security.policynegotiator.INegotiation;
@@ -103,6 +102,7 @@ import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.cis.community.Community;
 
 

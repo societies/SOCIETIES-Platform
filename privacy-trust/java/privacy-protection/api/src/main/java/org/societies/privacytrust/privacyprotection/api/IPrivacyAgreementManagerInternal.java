@@ -26,8 +26,8 @@ package org.societies.privacytrust.privacyprotection.api;
 
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 /**
  * Interface internal to privacy components to manage privacy agreements

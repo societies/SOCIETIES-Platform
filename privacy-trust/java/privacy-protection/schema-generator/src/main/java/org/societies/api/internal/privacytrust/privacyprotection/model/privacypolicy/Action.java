@@ -26,7 +26,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 
 
 /**
