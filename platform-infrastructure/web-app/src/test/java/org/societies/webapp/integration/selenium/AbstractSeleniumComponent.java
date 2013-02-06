@@ -28,6 +28,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +42,7 @@ public abstract class AbstractSeleniumComponent {
 
     private static final long WAIT_UNTIL_THREAD_SLEEP = 100;
     public static final long DEFAULT_FIND_TIMEOUT_MILLIS = 5000;
-    public static final long DEFAULT_SENDKEYS_DELAY_MILLIS = 250;
+    public static final long DEFAULT_SENDKEYS_DELAY_MILLIS = 100;
 
     private long findTimeoutMillis = DEFAULT_FIND_TIMEOUT_MILLIS;
     private long sendKeysDelayMillis = DEFAULT_SENDKEYS_DELAY_MILLIS;
@@ -85,6 +88,21 @@ public abstract class AbstractSeleniumComponent {
         threadSleep(sendKeysDelayMillis);
     }
 
+    protected void moveMouseTo(WebElement element) {
+        RemoteWebElement ele = (RemoteWebElement) element;
+
+        if (driver instanceof RemoteWebDriver)
+            ((RemoteWebDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        ((ChromeDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof FirefoxDriver)
+//            ((FirefoxDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof InternetExplorerDriver)
+//            ((InternetExplorerDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof RemoteWebDriver)
+        else {
+            log.error("Cannot move mouse for driver of type " + getDriver().getClass().getName());
+        }
+    }
 
     protected WebElement waitUntilEnabled(By by) {
         // Sleep until the element we want is visible or timeout is over

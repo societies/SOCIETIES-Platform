@@ -25,29 +25,33 @@
 package org.societies.webapp.integration.tests;
 
 
-import org.junit.After;
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
 import org.societies.webapp.integration.selenium.pages.IndexPage;
+import org.societies.webapp.integration.selenium.pages.ProfileSettingsPage;
 
 public class TestProfileSettings extends SeleniumTest {
+    private static final String USERNAME = "paddy";
+    private static final String PASSWORD = "paddy";
 
-    private IndexPage indexPage;
+    private ProfileSettingsPage profileSettingsPage;
 
     @Before
     public void setupTest() {
-        indexPage = new IndexPage(getDriver());
-    }
+        IndexPage indexPage = new IndexPage(getDriver());
 
-    @After
-    public void tearDownTest() {
+        indexPage.doLogin(USERNAME,  PASSWORD);
 
+        profileSettingsPage = indexPage.navigateToProfileSettings();
     }
 
     @Test
-    public void loginSuccessfully_andNavigateToPage() {
+    public void userDetailsCorrect() {
+        profileSettingsPage.verifyUsernameInTitle(USERNAME);
 
+        Assert.fail();
     }
 
 }

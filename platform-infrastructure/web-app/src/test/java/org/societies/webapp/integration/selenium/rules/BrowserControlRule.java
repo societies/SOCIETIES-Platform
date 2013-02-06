@@ -31,15 +31,15 @@ import org.openqa.selenium.WebDriver;
 
 public class BrowserControlRule implements MethodRule {
 
-    public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
-//    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
 
     private WebDriver driver;
     private String url;
+    private boolean closeBrowserOnFailure;
 
-    public BrowserControlRule(WebDriver driver, String url) {
+    public BrowserControlRule(WebDriver driver, String url, boolean closeBrowserOnFailure) {
         this.driver = driver;
         this.url = url;
+        this.closeBrowserOnFailure = closeBrowserOnFailure;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BrowserControlRule implements MethodRule {
 
                 } catch (Throwable t) {
 
-                    if (CLOSE_BROWSER_ON_FAILURE)
+                    if (closeBrowserOnFailure)
                         driver.close(); // close on failure
 
                     throw t;

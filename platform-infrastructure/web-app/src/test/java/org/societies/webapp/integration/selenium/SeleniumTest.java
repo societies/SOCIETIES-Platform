@@ -33,9 +33,11 @@ import org.societies.webapp.integration.selenium.rules.BrowserControlRule;
 
 public abstract class SeleniumTest {
     public static final String BASE_URL = "http://localhost:8080/societies/";
+        public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
+//    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
+
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
-
     private WebDriver driver;
 
     @Rule
@@ -43,7 +45,7 @@ public abstract class SeleniumTest {
 
     protected SeleniumTest() {
         this.driver = new ChromeDriver();
-        this.browserControlRule = new BrowserControlRule(driver, BASE_URL);
+        this.browserControlRule = new BrowserControlRule(driver, BASE_URL, CLOSE_BROWSER_ON_FAILURE);
     }
 
     protected WebDriver getDriver() {

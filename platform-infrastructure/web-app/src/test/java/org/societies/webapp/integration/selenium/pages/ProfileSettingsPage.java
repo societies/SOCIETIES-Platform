@@ -24,16 +24,23 @@
  */
 package org.societies.webapp.integration.selenium.pages;
 
+import junit.framework.Assert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.societies.webapp.integration.selenium.AbstractSeleniumComponent;
-import org.societies.webapp.integration.selenium.components.LoginDialog;
+import org.openqa.selenium.WebElement;
 
-public class BaseSocietiesPage extends AbstractSeleniumComponent {
+public class ProfileSettingsPage extends BaseSocietiesPage {
+    private static final String TITLE = "//h4[@class='form_title']";
 
-    protected BaseSocietiesPage(WebDriver driver) {
+    public ProfileSettingsPage(WebDriver driver) {
         super(driver);
     }
 
 
+    public void verifyUsernameInTitle(String username) {
+        WebElement title = waitUntilVisible(By.xpath(TITLE));
 
+        Assert.assertTrue("Username not found in title: \n" + title.getText(),
+                title.getText().contains(username));
+    }
 }
