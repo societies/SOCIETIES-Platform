@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.io.Serializable;
 
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 
 /**
  * Describe your class here...

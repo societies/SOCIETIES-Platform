@@ -22,22 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
+package org.societies.api.privacytrust.privacy.model.privacypolicy.constants;
 
 /**
- * @author Elizabeth
+ * @author Olivier Maridat (Trialog)
  *
  */
-public enum ConditionConstants {
-	SHARE_WITH_3RD_PARTIES,
-	SHARE_WITH_CIS_MEMBERS_ONLY,
-	SHARE_WITH_CIS_OWNER_ONLY,
-	MAY_BE_INFERRED,
-	DATA_RETENTION_IN_SECONDS,
-	DATA_RETENTION_IN_MINUTES,
-	DATA_RETENTION_IN_HOURS,
-	RIGHT_TO_OPTOUT,
-	STORE_IN_SECURE_STORAGE,
-	RIGHT_TO_ACCESS_HELD_DATA,
-	RIGHT_TO_CORRECT_INCORRECT_DATA,
+public enum PrivacyPolicyTypeConstants {
+	SERVICE, CIS;
 }

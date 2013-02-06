@@ -25,8 +25,10 @@
 package org.societies.android.platform.events;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.pubsub.helper.PubsubHelper;
+import org.societies.api.identity.IIdentity;
 
 import android.app.Service;
 import android.content.Intent;
@@ -78,7 +80,15 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return PubsubClientAndroid
 	 */
 	protected PubsubHelper createPubSubClientAndroid() {
-		return new PubsubHelper(this);
+		return new PubsubHelper(this, new ISubscriber() {
+			
+			@Override
+			public void pubsubEvent(IIdentity pubsubService, String node,
+					String itemId, Object item) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	/**

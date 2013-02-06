@@ -22,12 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
+package org.societies.api.privacytrust.privacy.model.privacypolicy.constants;
 
 /**
- * @author Olivier Maridat (Trialog)
+ * @author Elizabeth
  *
  */
-public enum PrivacyPolicyTypeConstants {
-	SERVICE, CIS;
+public enum TargetMatchConstants {
+
+	SUBJECT(0),RESOURCE(1),ACTION(2);
+	
+	int i = -1;
+	TargetMatchConstants(int i){
+		this.i=i;
+	}
+	
+	public int getInt(){
+		return this.i;
+	}
 }

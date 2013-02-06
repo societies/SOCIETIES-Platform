@@ -220,7 +220,7 @@ public class LocationManagementContextAccessor {
 			List<CtxIdentifier> attributeIds = futureAttributeIds.get();
 			
 			if (attributeIds.size() > 0){
-				log.info("no need to create LOCATION_TYPE_FUSED attribute as it already exists");
+				log.debug("no need to create LOCATION_TYPE_FUSED attribute as it already exists");
 				return;
 			}
 			

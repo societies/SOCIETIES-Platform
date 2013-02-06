@@ -24,7 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 
 /**

@@ -27,8 +27,8 @@ package org.societies.android.api.internal.privacytrust.util.model.privacypolicy
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type

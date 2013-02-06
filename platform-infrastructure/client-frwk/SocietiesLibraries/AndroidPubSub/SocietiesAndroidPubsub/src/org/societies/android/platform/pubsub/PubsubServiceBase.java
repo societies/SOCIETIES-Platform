@@ -243,20 +243,6 @@ public class PubsubServiceBase implements IPubsubService {
 			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object payload) {
-//					if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
-//						org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
-//						String node = items.getNode();
-//						Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
-//						org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-//						try {
-//							List<ISubscriber> subscriberList = subscribers.get(sub);
-//							for (ISubscriber subscriber : subscriberList)
-//								subscriber.pubsubEvent(stanza.getFrom().getJid(), node, i.getId(), MarshallUtils.nodeToString((Element)i.getAny()));
-//
-//						} catch (TransformerException e) {
-//							Log.e(LOG_TAG, "Error while unmarshalling pubsub event payload", e);
-//						}
-//					}
 
 					//Send intent
 					Intent intent = new Intent();

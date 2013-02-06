@@ -11,7 +11,7 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
-	<!-- Privacy Data Management Configuration -->
+	<!-- ## Privacy Data Management Configuration ## -->
 
 	<bean name="privacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
@@ -27,14 +27,30 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<!-- Persistence Configuration -->
+	<!-- Communication -->
+	<bean name="privacyDataManagerRemote"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClient"
+		depends-on="commManager, PrivacyDataManagerCommClientCallback, PrivacyCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyCommClientCallback" ref="PrivacyCommClientCallback" />
+	</bean>
+	<bean name="PrivacyDataManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback">
+	</bean>
+	<bean name="PrivacyDataManagerCommServer"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer"
+		depends-on="commManager, privacyDataManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManager" ref="privacyDataManager" />
+	</bean>
+
+	<!-- Persistence -->
 	<context:annotation-config />
-
 	<tx:annotation-driven />
-
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
@@ -42,7 +58,6 @@
 			</list>
 		</property>
 	</bean>
-
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -62,14 +77,12 @@
 				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
 				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.show_sql">${show_sql}</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.format_sql">${format_sql}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
 			</props>
 		</property>
 	</bean>
-
 	<tx:annotation-driven transaction-manager="transactionManager" />
-
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -77,7 +90,7 @@
 
 
 
-	<!-- Privacy Policy Manager Configuration -->
+	<!-- ## Privacy Policy Manager Configuration ## -->
 
 	<bean name="privacyPolicyManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager"
@@ -85,6 +98,29 @@
 		<property name="commManager" ref="commManager" />
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
+
+	<!-- Communication -->
+	<bean name="privacyPolicyManagerRemote"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClient"
+		depends-on="commManager, PrivacyPolicyManagerCommClientCallback, PrivacyCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyPolicyManagerCommClientCallback" />
+		<property name="privacyCommClientCallback" ref="PrivacyCommClientCallback" />
+	</bean>
+	<bean name="PrivacyPolicyManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback"
+		depends-on="commManager">
+		<property name="commManager" ref="commManager" />
+	</bean>
+	<bean name="PrivacyPolicyManagerCommServer"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer"
+		depends-on="commManager, privacyPolicyManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+	</bean>
+
+
+	<!-- ## Privacy Agreement Manager Configuration ## -->
 
 	<bean name="privacyAgreementManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManager"
@@ -100,13 +136,32 @@
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
 
+	<!-- Communication -->
+	<bean name="privacyAgreementManagerRemote"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClient"
+		depends-on="commManager, PrivacyAgreementManagerCommClientCallback, PrivacyCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyAgreementManagerCommClientCallback" />
+		<property name="privacyCommClientCallback" ref="PrivacyCommClientCallback" />
+	</bean>
+	<bean name="PrivacyAgreementManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback"
+		depends-on="commManager">
+		<property name="commManager" ref="commManager" />
+	</bean>
+	<bean name="PrivacyAgreementManagerCommServer"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer"
+		depends-on="commManager, privacyAgreementManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyAgreementManager" ref="privacyAgreementManager" />
+	</bean>
 
 
-	<!-- Privacy Policy Negotiation Manager Configuration -->
+	<!-- ## Privacy Policy Negotiation Manager Configuration ## -->
 
 	<bean name="privacyPolicyNegotiationManager"
 		class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
-		init-method="initialisePrivacyPolicyNegotiationManager" 
+		init-method="initialisePrivacyPolicyNegotiationManager"
 		depends-on="ctxBroker,eventManager,commManager,,privacyDataManagerInternal,privacyAgreementManagerInternal,negotiationAgentRemote,privacyPreferenceManager,identitySelection,privacyPolicyManager,UserFeedbackGUI">
 		<property name="ctxBroker" ref="ctxBroker" />
 		<property name="eventMgr" ref="eventManager" />
@@ -116,7 +171,7 @@
 		<property name="negotiationAgentRemote" ref="PrivacyNegotiationManagerCommClient" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
-		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
 		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
@@ -129,15 +184,13 @@
 		<property name="commsMgr" ref="commManager" />
 	</bean>
 
-	<!-- Privacy Policy Negotiation Comms Configuration -->
-	
+	<!-- Communication -->
+
 	<bean name="PrivacyNegotiationManagerCommClient"
 		class="org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommClient"
-		depends-on="commManager"
-		init-method="initBean">
+		depends-on="commManager" init-method="initBean">
 		<property name="commManager" ref="commManager" />
 	</bean>
-
 	<bean name="PrivacyNegotiationManagerCommServer"
 		class="org.societies.privacytrust.privacyprotection.privacynegotiation.comms.PrivacyNegotiationManagerCommServer"
 		depends-on="commManager, negotiationAgent" init-method="initBean">
@@ -145,7 +198,8 @@
 		<property name="negAgent" ref="negotiationAgent" />
 	</bean>
 
-	<!-- Privacy Preference Manager Configuration -->
+
+	<!-- ## Privacy Preference Manager Configuration ## -->
 
 	<bean name="privacyPreferenceManager"
 		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager"
@@ -159,10 +213,33 @@
 
 
 
-	<!-- Identity Selection Configuration -->
+	<!-- ## Identity Selection Configuration ## -->
 
 	<bean name="identitySelection"
 		class="org.societies.privacytrust.privacyprotection.identity.IdentitySelection">
+	</bean>
+
+
+	<!-- ## Global privacy Communication ## -->
+
+	<bean name="PrivacyCommClientCallback"
+		class="org.societies.privacytrust.remote.PrivacyCommClientCallback"
+		depends-on="commManager, PrivacyDataManagerCommClientCallback"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommClientCallback" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyPolicyManagerCommClientCallback" ref="PrivacyPolicyManagerCommClientCallback" />
+		<property name="privacyAgreementManagerCommClientCallback"
+			ref="PrivacyAgreementManagerCommClientCallback" />
+	</bean>
+
+	<bean name="PrivacyCommServer"
+		class="org.societies.privacytrust.remote.PrivacyCommServer"
+		depends-on="commManager" init-method="initBean" destroy-method="destroyBean">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
+		<property name="privacyPolicyManagerCommServer" ref="PrivacyPolicyManagerCommServer" />
+		<property name="privacyAgreementManagerCommServer" ref="PrivacyAgreementManagerCommServer" />
 	</bean>
 
 </beans>

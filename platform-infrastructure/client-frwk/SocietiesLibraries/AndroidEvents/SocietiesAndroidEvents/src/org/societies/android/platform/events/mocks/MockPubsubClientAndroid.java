@@ -15,8 +15,8 @@ import android.content.Context;
  */
 public class MockPubsubClientAndroid extends PubsubHelper {
 
-	public MockPubsubClientAndroid(Context androidContext) {
-		super(androidContext);
+	public MockPubsubClientAndroid(Context androidContext, ISubscriber subscriberCallback) {
+		super(androidContext, subscriberCallback);
 	}
 	
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
