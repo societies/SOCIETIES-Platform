@@ -267,8 +267,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (!IdentityType.CIS.equals(cisId.getType()))
 			throw new IllegalArgumentException("Inserted id is not of type CIS");
 
-		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId);
-		LOG.info("Community Context CREATE ENTITY performed for context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
+		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId.toString());
+		LOG.info("Community Context CREATE ENTITY performed with context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
@@ -1436,9 +1436,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return new AsyncResult<CtxEntity>(entityResult);
 	}
-
-
-
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createAttribute(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<CtxAttribute> createAttribute(Requestor requestor,
@@ -1462,7 +1463,6 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ e1.getLocalizedMessage(), e1);
 		} 
 
-
 		if (IdentityType.CSS.equals(scopeID.getType()) 
 				|| IdentityType.CSS_RICH.equals(scopeID.getType())
 				|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
@@ -1479,7 +1479,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					ctxAttributeResult.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
 				}			
 
-			}else {
+			} else {
 
 				// remote call
 				final CreateAttributeCallback callback = new CreateAttributeCallback();
@@ -1501,8 +1501,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			//community context 
 		} else if (IdentityType.CIS.equals(scopeID.getType())){
 
-			ctxAttributeResult =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
-			LOG.info("Community Context CREATE ATTRIBUTE performed for context ID:"+ctxAttributeResult.getId()+" of type:"+ctxAttributeResult.getType());
+			ctxAttributeResult = this.communityCtxDBMgr.createAttribute(scope, type);
+			LOG.info("Community Context CREATE ATTRIBUTE performed with context ID:"+ctxAttributeResult.getId()+" of type:"+ctxAttributeResult.getType());
 		} 
 
 		return new AsyncResult<CtxAttribute>(ctxAttributeResult);

@@ -28,14 +28,15 @@ import java.util.List;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.identity.IIdentity;
 
 /**
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
@@ -46,32 +47,70 @@ import org.societies.api.identity.IIdentity;
 public interface ICommunityCtxDBMgr {
 	
 	/**
-	 * Creates a {@link CtxAttribute} of the specified type which is associated
-	 * to the identified community context entity (scope). 
+	 * Creates a {@link CtxAttribute} with the specified type which is
+	 * associated to the identified context entity (scope). 
 	 * 
 	 * @param scope
-	 *            the identifier of the community context entity to associate
-	 *            with the new attribute
+	 *            the identifier of the context entity to associate with the
+	 *            new attribute
 	 * @param type
-	 *            the type of the community context attribute to create
-	 * @return the newly created community context attribute
+	 *            the type of the context attribute to create
+	 * @return the newly created context attribute
 	 * @throws CtxException
-	 *             if the community context attribute cannot be persisted in
+	 *             if the context attribute cannot be persisted in
 	 *             the Community Context DB
 	 * @throws NullPointerException
 	 *             if any of the specified parameters is <code>null</code>
-	 * @since 0.3
+	 * @since 1.0
 	 */
-	public CtxAttribute createCommunityAttribute(final CtxEntityIdentifier scope,
+	public CtxAttribute createAttribute(final CtxEntityIdentifier scope,
 			final String type) throws CtxException;
 
 	/**
-	  * Creates a community Context Entity. 
+	  * Creates a {@link CommunityCtxEntity} with the specified id.
+	  *  
 	  * @param cisId
-	  * @throws CtxException 
-	  * @since 0.2
+	  *            the id of the community
+	  * @throws CtxException
+	  * @throws NullPointerException
+	  *             if the specified community id is <code>null</code>
+	  * @since 1.0
 	  */
-	public CommunityCtxEntity createCommunityEntity(IIdentity cisId) throws CtxException;
+	public CommunityCtxEntity createCommunityEntity(final String cisId)
+			throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxEntity} with the specified type on the identified
+	 * CIS.
+	 * 
+	 * @param cisId
+	 *            the id of the CIS where the context entity will be created
+	 * @param type
+	 *            the type of the context entity to create
+	 * @throws CtxException
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 1.0 
+	 */
+	public CtxEntity createEntity(final String cisId, final String type)
+			throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxAssociation} with the specified type on the
+	 * identified CIS.
+	 * 
+	 * @param cisId
+	 *            the id of the CIS where the context association will be
+	 *            created
+	 * @param type
+	 *            the type of the context association to create
+	 * @throws CtxException
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 1.0 
+	 */
+	public CtxAssociation createAssociation(final String cisId,
+			final String type) throws CtxException;
 
 	/**
 	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
@@ -108,15 +147,15 @@ public interface ICommunityCtxDBMgr {
 	  * in the Community Context DB.
 	  *  
 	  * @param cisId
-	  *            the {@IIdentity} of the CIS whose CommunityCtxEntity to retrieve
+	  *            the id of the CIS whose CommunityCtxEntity to retrieve
 	  * @return the {@link CommunityCtxEntity} which represents the specified
 	  *         CIS.
 	  * @throws CtxException
 	  * @throws NullPointerException
 	  *             if the specified cisId is <code>null</code>
-	  * @since 0.3
+	  * @since 1.0
 	  */
-	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
+	public CommunityCtxEntity retrieveCommunityEntity(final String cisId)
 			throws CtxException;
 
 	/**

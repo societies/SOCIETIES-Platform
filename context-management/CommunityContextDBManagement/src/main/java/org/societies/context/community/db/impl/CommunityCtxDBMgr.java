@@ -47,12 +47,12 @@ import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
@@ -97,10 +97,10 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
-	public CtxAttribute createCommunityAttribute(final CtxEntityIdentifier scope,
+	public CtxAttribute createAttribute(final CtxEntityIdentifier scope,
 			final String type) throws CtxException {
 	
 		if (scope == null)
@@ -157,10 +157,70 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 	
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityEntity(org.societies.api.identity.IIdentity)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createAssociation(java.lang.String, java.lang.String)
+	 */
+	public CtxAssociation createAssociation(final String cisId,
+			final String type) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("ownerId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
+				cisId, type, modelObjectNumber);
+		final CommunityCtxAssociationDAO associationDAO = new CommunityCtxAssociationDAO(id);
+
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try{
+			tx = session.beginTransaction();
+			session.save(associationDAO);
+			tx.commit();
+		}
+		catch (Exception e) {
+			if (tx != null)
+				tx.rollback();
+			throw new CommunityCtxDBMgrException("Could not create association of type '"
+					+ type + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+		
+		return (CtxAssociation) this.retrieve(id);
+	}
+	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createEntity(java.lang.String, java.lang.String)
+	 */
+	public CtxEntity createEntity(final String cisId,
+			final String type) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		
+		// TODO
+	}
+	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityEntity(java.lang.String)
 	 */
 	@Override
-	public CommunityCtxEntity createCommunityEntity(final IIdentity cisId)
+	public CommunityCtxEntity createCommunityEntity(final String cisId)
 			throws CtxException {
 		
 		if (cisId == null)
@@ -318,10 +378,10 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 	
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieveCommunityEntity(org.societies.api.identity.IIdentity)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieveCommunityEntity(java.lang.String)
 	 */
 	@Override
-	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
+	public CommunityCtxEntity retrieveCommunityEntity(final String cisId)
 			throws CtxException {
 
 		if (cisId == null)
@@ -332,7 +392,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		final Session session = sessionFactory.openSession();
 		try {
 			final Query query = session.getNamedQuery("getCommunityCtxEntityIdByOwnerId");
-			query.setParameter("ownerId", cisId.toString(), Hibernate.STRING);
+			query.setParameter("ownerId", cisId, Hibernate.STRING);
 			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
 			if (entityId != null)
 				entity = (CommunityCtxEntity) this.retrieve(entityId);
@@ -509,49 +569,6 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		}
 			
 		return result;
-	}
-	
-	private CtxAssociation createAssociation(final String ownerId,
-			final String type) throws CtxException {
-		
-		if (ownerId == null)
-			throw new NullPointerException("ownerId can't be null");
-		if (type == null)
-			throw new NullPointerException("type can't be null");
-
-		final Long modelObjectNumber = this.generateNextObjectNumber();
-		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
-				ownerId, type, modelObjectNumber);
-		final CommunityCtxAssociationDAO associationDAO = new CommunityCtxAssociationDAO(id);
-
-		final Session session = sessionFactory.openSession();
-		Transaction tx = null;
-		try{
-			tx = session.beginTransaction();
-			session.save(associationDAO);
-			tx.commit();
-		}
-		catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
-			throw new CommunityCtxDBMgrException("Could not create association of type '"
-					+ type + "': " + e.getLocalizedMessage(), e);
-		} finally {
-			if (session != null)
-				session.close();
-		}
-
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-		
-		return (CtxAssociation) this.retrieve(id);
 	}
 	
 	private Long generateNextObjectNumber() throws CommunityCtxDBMgrException {

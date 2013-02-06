@@ -110,6 +110,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	 * Used for JUnit testing only.
 	 */
 	public CtxBroker(InternalCtxBroker internalCtxBroker) {
+		
 		this.internalCtxBroker  = internalCtxBroker;
 		LOG.info(this.getClass() + " instantiated " +internalCtxBroker);
 	}
@@ -119,32 +120,42 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	// Basic CRUD methods
 	//******************************************
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createEntity(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
+	 */
 	@Override
 	@Async
-	public Future<CtxEntity> createEntity(Requestor requestor, 
-			final IIdentity targetCss, final String type) throws CtxException {
+	public Future<CtxEntity> createEntity(final Requestor requestor, 
+			final IIdentity targetId, final String type) throws CtxException {
 
-		return internalCtxBroker.createEntity(requestor, targetCss, type);
+		return internalCtxBroker.createEntity(requestor, targetId, type);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createAttribute(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	@Async
-	public Future<CtxAttribute> createAttribute( Requestor requestor,
+	public Future<CtxAttribute> createAttribute(final Requestor requestor,
 			final CtxEntityIdentifier scope, final String type) throws CtxException {
 
 		return this.internalCtxBroker.createAttribute(requestor, scope,  type);
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createAssociation(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<CtxAssociation> createAssociation(final Requestor requestor,
-			final IIdentity targetCss, final String type) throws CtxException {
+			final IIdentity targetId, final String type) throws CtxException {
 
-		return this.internalCtxBroker.createAssociation(requestor, targetCss, type);
+		return this.internalCtxBroker.createAssociation(requestor, targetId, type);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#remove(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> remove(final Requestor requestor,
@@ -153,26 +164,31 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return this.internalCtxBroker.remove(requestor, identifier);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	@Async
-	public Future<CtxModelObject> retrieve( Requestor requestor,
+	public Future<CtxModelObject> retrieve(final Requestor requestor,
 			final CtxIdentifier identifier) throws CtxException {
 
 		return this.internalCtxBroker.retrieve(requestor, identifier);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntityId(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
-			Requestor requestor, final IIdentity cssId) throws CtxException {
-
+			final Requestor requestor, final IIdentity cssId) throws CtxException {
 
 		return this.internalCtxBroker.retrieveIndividualEntityId(requestor, cssId);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveCommunityEntityId(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
@@ -181,6 +197,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return this.internalCtxBroker.retrieveCommunityEntityId(requestor, cisId);
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#update(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxModelObject)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> update( Requestor requestor,
@@ -189,7 +208,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return this.internalCtxBroker.update(requestor, object);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookup(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor, 
@@ -199,17 +220,21 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return this.internalCtxBroker.lookup(requestor, entityId, modelType, type);
 	}
 
-
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookup(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<List<CtxIdentifier>> lookup( Requestor requestor,
 			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException {
 
-
 		return this.internalCtxBroker.lookup(requestor, target, modelType, type);
 	}
-
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookupEntities(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String, java.lang.String, java.io.Serializable, java.io.Serializable)
+	 */
 	@Override
 	@Async
 	public Future<List<CtxEntityIdentifier>> lookupEntities(
