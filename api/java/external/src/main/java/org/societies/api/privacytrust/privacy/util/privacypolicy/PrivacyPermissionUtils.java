@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,16 +32,16 @@ import java.util.List;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.PrivacyPermission;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyPermissionUtils {
-	public static PrivacyPermission toPrivacyPermission(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission privacyPermissionBean)
+	public static PrivacyPermission toPrivacyPermission(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission privacyPermissionBean)
 	{
 		if (null == privacyPermissionBean) {
 			return null;
@@ -50,24 +50,24 @@ public class PrivacyPermissionUtils {
 		Decision decision = DecisionUtils.toDecision(privacyPermissionBean.getDecision());
 		return new PrivacyPermission(requestItem, decision, privacyPermissionBean.getObfuscationLevel(), privacyPermissionBean.getCreationDate(), privacyPermissionBean.getValidityDuration());
 	}
-	public static List<PrivacyPermission> toPrivacyPermissions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission> privacyPermissionBeans)
+	public static List<PrivacyPermission> toPrivacyPermissions(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission> privacyPermissionBeans)
 	{
 		if (null == privacyPermissionBeans) {
 			return null;
 		}
 		List<PrivacyPermission> privacyPermissions = new ArrayList<PrivacyPermission>();
-		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission privacyPermissionBean : privacyPermissionBeans) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission privacyPermissionBean : privacyPermissionBeans) {
 			privacyPermissions.add(PrivacyPermissionUtils.toPrivacyPermission(privacyPermissionBean));
 		}
 		return privacyPermissions;
 	}
 	
-	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission toPrivacyPermissionBean(PrivacyPermission privacyPermission) throws DatatypeConfigurationException
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission toPrivacyPermissionBean(PrivacyPermission privacyPermission) throws DatatypeConfigurationException
 	{
 		if (null == privacyPermission) {
 			return null;
 		}
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission privacyPermissionBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission privacyPermissionBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission();
 		privacyPermissionBean.setDecision(DecisionUtils.toDecisionBean(privacyPermission.getDecision()));
 		privacyPermissionBean.setRequestItem(RequestItemUtils.toRequestItemBean(privacyPermission.getRequestItem()));
 		privacyPermissionBean.setObfuscationLevel(privacyPermission.getObfuscationLevel());
@@ -79,12 +79,12 @@ public class PrivacyPermissionUtils {
 		privacyPermissionBean.setValidityDuration(privacyPermission.getValidityDuration());
 		return privacyPermissionBean;
 	}
-	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission> toPrivacyPermissionBeans(List<PrivacyPermission> privacyPermissions) throws DatatypeConfigurationException
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission> toPrivacyPermissionBeans(List<PrivacyPermission> privacyPermissions) throws DatatypeConfigurationException
 	{
 		if (null == privacyPermissions) {
 			return null;
 		}
-		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission> privacyPermissionBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission>();
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission> privacyPermissionBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission>();
 		for(PrivacyPermission privacyPermission : privacyPermissions) {
 			privacyPermissionBeans.add(PrivacyPermissionUtils.toPrivacyPermissionBean(privacyPermission));
 		}
@@ -95,7 +95,7 @@ public class PrivacyPermissionUtils {
 	 * To know if this privacy permission is still valid or not
 	 * @return True if the privacy permission is still valid
 	 */
-	public boolean isStillValid(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission privacyPermissionBean) {
+	public boolean isStillValid(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission privacyPermissionBean) {
 		Date now = new Date();
 		//return (now.getTime() > (privacyPermissionBean.getCreationDate().toGregorianCalendar().getTimeInMillis()+privacyPermissionBean.getValidityDuration()));
 		return (now.getTime() > (privacyPermissionBean.getCreationDate().getTime() + privacyPermissionBean.getValidityDuration()));

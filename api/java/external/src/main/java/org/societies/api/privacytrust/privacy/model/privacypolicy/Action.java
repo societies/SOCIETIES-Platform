@@ -22,68 +22,92 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.model.privacypolicy;
 
 
+
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.TargetMatchConstants;
+
 
 /**
- * The ResponseItem class represents the response to a RequestItem contained in the RequestPolicy of a service provider. 
- * It is constructed after the privacy preference evaluation has been performed and the system can decide to permit or deny the request. 
- * The ResponseItem contains the requestItem object and a Decision flag. The Decision flag can be any of the types listed in the Decision enumeration. 
- * INDETERMINATE suggests that the RequestItem has be altered per the user's wishes (such as adding extra conditions or removing an action) 
- * and needs to be accepted by the service provider. NOT_APPLICABLE suggests that the piece of data the RequestItem refers to does not exist 
- * as a type in the CSS (for example a service may request access to room temperature but the CSS does not have such a type in the system 
- * because the CSS has no temperature sensor )
+ * The Action class represents an operation that can be performed on a Resource. 
+ * The Action can be "READ", "WRITE", "CREATE", "DELETE" as listed in the ActionConstants enumeration. 
  * @author Elizabeth
  *
  */
-public class ResponseItem implements Serializable{
+public class Action implements Serializable{
 
-	RequestItem item;
-	Decision decision;
-
-	private ResponseItem(){
-
+	protected ActionConstants action;
+	private boolean optional;
+	
+	private Action(){
 	}
-	public ResponseItem(RequestItem item, Decision decision){
-		this.item = item;
-		this.decision = decision;
+	public Action(ActionConstants action){
+		this.action = action;
+		this.optional = false;
 	}
-
-	public Decision getDecision(){
-		return this.decision;
+	
+	public Action(ActionConstants action, boolean isOptional){
+		this.action = action;
+		this.optional = isOptional;
 	}
-
-	public RequestItem getRequestItem(){
-		return this.item;
+	
+	public Action(Action action){
+		this.action = action.getActionType();
+		this.optional = action.isOptional();
 	}
-
+	
+	public void setOptional(boolean isOptional){
+		this.optional = isOptional;
+	}
+	public boolean isOptional(){
+		return this.optional;
+	}
+	public ActionConstants getActionType(){
+		return this.action;
+	}
+	public ActionConstants getActionConstants(){
+		return this.action;
+	}
+	public TargetMatchConstants getType(){
+		return TargetMatchConstants.ACTION;
+	}
+	
 	public String toXMLString(){
-		StringBuilder str = new StringBuilder("\n<Response>");
-		str.append(getRequestItem().toXMLString());
-		str.append(decisionAsXML());
-		str.append("\n</Response>");
-		return str.toString();
-	}
-
-	public String decisionAsXML(){
-		String str = "\n<Decision>";
-		str = str.concat("\n\t<Attribute AttributeId=\"Decision\" " +
-		"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision\">");
+		String str = "\n<Action>";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" " +
+				"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">");
 		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.decision.toString());
+		str = str.concat(this.action.toString());
 		str = str.concat("</AttributeValue>");
 		str = str.concat("\n\t</Attribute>");
-		str = str.concat("\n</Decision>");
+		str = str.concat(this.printOptional());
+		str = str.concat("\n</Action>");
 		return str;
+	}
+	private String printOptional(){
+		return "\n<optional>"+this.optional+"</optional>";
 	}
 	public String toString(){
 		return this.toXMLString();
 	}
-	
+	public static void main(String[] args) throws IOException{
+		Action action = new Action(ActionConstants.READ);
+		System.out.println(action.toXMLString());
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((action == null) ? 0 : action.hashCode());
+		result = prime * result + (optional ? 1231 : 1237);
+		return result;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -97,10 +121,11 @@ public class ResponseItem implements Serializable{
 			return false;
 		}
 		// -- Verify obj type
-		ResponseItem rhs = (ResponseItem) obj;
+		Action rhs = (Action) obj;
 		return new EqualsBuilder()
-			.append(this.getDecision().name(), rhs.getDecision().name())
-			.append(this.getRequestItem(), rhs.getRequestItem())
+			.append(this.getActionType().name(), rhs.getActionType().name())
+			.append(this.isOptional(), rhs.isOptional())
 			.isEquals();
 	}
+
 }

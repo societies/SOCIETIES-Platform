@@ -56,8 +56,8 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestPolicyUtils;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
@@ -123,7 +123,7 @@ public class PrivacyPolicyRegistryManager {
 		CtxAttribute ctxAttr;
 		try {
 			ctxAttr = (CtxAttribute) ctxBroker.retrieve(id).get();
-			RequestPolicy policy = RequestPolicyUtils.toRequestPolicy((org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader()), idm);
+			RequestPolicy policy = RequestPolicyUtils.toRequestPolicy((org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader()), idm);
 			return policy;
 		} catch (CtxException e) {
 			e.printStackTrace();

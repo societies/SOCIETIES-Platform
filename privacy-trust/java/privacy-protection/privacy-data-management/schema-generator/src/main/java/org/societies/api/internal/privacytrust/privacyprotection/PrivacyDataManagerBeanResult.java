@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.societies.api.internal.privacytrust.privacyprotection.PrivacyDataManagerBean.methodType;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
 /**
  * @author Olivier Maridat (Trialog)

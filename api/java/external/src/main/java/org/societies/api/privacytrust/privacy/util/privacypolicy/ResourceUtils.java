@@ -22,22 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ResourceUtils {
-	public static Resource toResource(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean)
+	public static Resource toResource(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resourceBean)
 	{
 		if (null == resourceBean) {
 			return null;
@@ -63,26 +63,26 @@ public class ResourceUtils {
 		}
 		return resource;
 	}
-	public static List<Resource> toResources(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource> resourceBeans)
+	public static List<Resource> toResources(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> resourceBeans)
 	{
 		if (null == resourceBeans) {
 			return null;
 		}
 		List<Resource> resources = new ArrayList<Resource>();
-		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean : resourceBeans) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resourceBean : resourceBeans) {
 			resources.add(ResourceUtils.toResource(resourceBean));
 		}
 		return resources;
 	}
 
-	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource toResourceBean(Resource resource)
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource toResourceBean(Resource resource)
 	{
 		try
 		{
 			if (null == resource) {
 				return null;
 			}
-			org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource();
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resourceBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
 			resourceBean.setDataIdUri((null != resource.getDataId() ? resource.getDataId().getUri() : null));
 			resourceBean.setDataType(resource.getDataType());
 			if (resource.getScheme()==null){
@@ -95,12 +95,12 @@ public class ResourceUtils {
 			return null;
 		}
 	}
-	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource> toResourceBeans(List<Resource> resources)
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> toResourceBeans(List<Resource> resources)
 	{
 		if (null == resources) {
 			return null;
 		}
-		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource> resourceBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource>();
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> resourceBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource>();
 		for(Resource resource : resources) {
 			resourceBeans.add(ResourceUtils.toResourceBean(resource));
 		}
@@ -108,7 +108,7 @@ public class ResourceUtils {
 	}
 	
 	public static String getDataIdUri(
-			org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resource) {
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
 		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
 	}
 }
