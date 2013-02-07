@@ -31,7 +31,7 @@
 	<artifactId>DomainAuthorityRest</artifactId>
 	<packaging>war</packaging>
 	<version>${release.version}</version>
-	<name>Domain authority REST Jersey Webapp</name>
+	<name>Domain authority REST Webapp</name>
 	<description>REST server for sharing any files related to SOCIETIES 3rd party services, for example jar file for service client, any service specific resources like videos, etc. The server has access control and allows download only to clients that present a valid proof of authorization from the service provider (given by the service provider after a successful policy negotiation).</description>
 
 	<developers>
@@ -81,12 +81,19 @@
 			<version>1.2.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.web.servlet</artifactId>
 			<version>3.0.5.RELEASE</version>
 			<scope>provided</scope>
-		</dependency-->
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>com.springsource.javax.ws.rs</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+<!--
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
@@ -143,16 +150,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${jersey-version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -231,8 +233,8 @@
 							org.springframework.context.config;resolution:=optional,
 							org.osgi.framework;resolution:=optional,
 
-							com.sun.jersey.spi.container.servlet;resolution:=optional,
 							javax.ws.rs;resolution:=optional,
+							org.springframework.web.servlet;resolution:=optional,
 							org.objectweb.asm;resolution:=optional,
 							javax.annotation;resolution:=optional,
 							
