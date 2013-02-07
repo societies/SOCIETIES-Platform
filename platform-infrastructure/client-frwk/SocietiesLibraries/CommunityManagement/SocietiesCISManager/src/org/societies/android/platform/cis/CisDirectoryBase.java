@@ -30,6 +30,8 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.cis.directory.ICisDirectory;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -64,6 +66,8 @@ public class CisDirectoryBase implements ICisDirectory {
     
 	private ClientCommunicationMgr commMgr;
     private Context androidContext;
+    private boolean connectedToComms = false;
+    private boolean registeredNamespaces = false;
     
     /**
      * Default constructor
@@ -71,8 +75,7 @@ public class CisDirectoryBase implements ICisDirectory {
     public CisDirectoryBase(Context androidContext) {
     	Log.d(LOG_TAG, "Object created");
     	
-    	this.androidContext = androidContext;
-    	
+    	this.androidContext = androidContext;    	
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -81,36 +84,120 @@ public class CisDirectoryBase implements ICisDirectory {
         }
     }
     
+    /**
+	 * @param client
+	 */
+	private void broadcastNotLoggedIn(final String client) {
+		if (client != null) {
+			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			intent.setPackage(client);
+			CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+		}
+	}
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
-	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
+	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(final String client) {
         Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
-		methodAsync.execute(params);
+        if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findAllCisAdvertisementRecords connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
+						methodAsync.execute(params);		
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+			String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
+			methodAsync.execute(params);
+        }
 		
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
-	public CisAdvertisementRecord[] findForAllCis(String client, String filter) {       
+	public CisAdvertisementRecord[] findForAllCis(final String client, final String filter) {       
         Log.d(LOG_TAG, "findForAllCis called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FILTER_CIS, filter};
-		methodAsync.execute(params);
+        if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FILTER_CIS, filter};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+				
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+			String params[] = {client, ICisDirectory.FILTER_CIS, filter};
+			methodAsync.execute(params);
+		}
 		
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
-	public CisAdvertisementRecord searchByID(String client, String cis_id) {
+	public CisAdvertisementRecord searchByID(final String client, final String cis_id) {
 		Log.d(LOG_TAG, "searchByID called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
-		methodAsync.execute(params);
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+				
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+    		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
+    		methodAsync.execute(params);
+		}
 		
 		return null;
 	}
@@ -145,7 +232,7 @@ public class CisDirectoryBase implements ICisDirectory {
 			String results[] = new String[1];
 			results[0] = client;
 			//MESSAGE BEAN
-			CisDirectoryBean messageBean = new CisDirectoryBean();
+			final CisDirectoryBean messageBean = new CisDirectoryBean();
 			if (method.equals(ICisDirectory.FIND_CIS_ID)) {
 				messageBean.setMethod(MethodType.SEARCH_BY_ID);
 				messageBean.setFilter(filterCis);
@@ -162,12 +249,75 @@ public class CisDirectoryBase implements ICisDirectory {
 			//COMMS CONFIG
 			try {
 				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-				ICommCallback cisCallback = new CisDirectoryCallback(client, method);
-				Stanza stanza = new Stanza(toID);
+				final ICommCallback cisCallback = new CisDirectoryCallback(client, method);
+				final Stanza stanza = new Stanza(toID);
 	        
-	        	commMgr.register(ELEMENT_NAMES, cisCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				//only need to register once
+				if (!CisDirectoryBase.this.registeredNamespaces) {
+					CisDirectoryBase.this.registeredNamespaces = true;
+					
+		        	commMgr.register(ELEMENT_NAMES, new ICommCallback() {
+						
+						@Override
+						public void receiveResult(Stanza arg1, Object result) {
+							boolean status = (Boolean) result;
+							if (status) {
+					        	try {
+									commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+								} catch (CommunicationException e) {
+									// TODO Auto-generated catch block
+									Log.e(LOG_TAG, "Error sending XMPP message", e);
+								}
+							}
+						}
+						
+						@Override
+						public void receiveMessage(Stanza stanza, Object payload) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveItems(Stanza stanza, String node, List<String> items) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveError(Stanza stanza, XMPPError error) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public List<String> getXMLNamespaces() {
+							// TODO Auto-generated method stub
+							return NAME_SPACES;
+						}
+						
+						@Override
+						public List<String> getJavaPackages() {
+							// TODO Auto-generated method stub
+							return PACKAGES;
+						}
+					});
+				} else {
+		        	try {
+						commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						Log.e(LOG_TAG, "Error sending XMPP message", e);
+					}
+				}
+					
 			} catch (Exception e) {
+				e.printStackTrace();
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
 	        }
 			return results;
@@ -226,7 +376,9 @@ public class CisDirectoryBase implements ICisDirectory {
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				
-				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
+				//TODO: Investigate why stanza is not returning
+				
+//				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
 				if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
 				// --------- cisDirectoryBeanResult Bean ---------
 				if (msgBean instanceof CisDirectoryBeanResult) {
@@ -243,9 +395,10 @@ public class CisDirectoryBase implements ICisDirectory {
 					 CisAdvertisementRecord returnArray[] = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
 					
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
-						
-					intent.setPackage(client);
+						intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
+					
+					//TODO: investigate why wrong client is being used
+//					intent.setPackage(client);
 					CisDirectoryBase.this.androidContext.sendBroadcast(intent);
 					//CisDirectoryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 				}

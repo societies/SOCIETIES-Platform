@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.cis.management.ICisManager;
-import org.societies.android.api.cis.management.ICisSubscribed;
-import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal;
 import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal.LocalCISManagerBinder;
 import org.societies.api.schema.cis.community.Community;
@@ -34,14 +32,14 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
 	
-	//PREF NAMES
-	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
-	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
-	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
-	//PREF VALUES
-	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
-	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
-	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
+//	//PREF NAMES
+//	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+//	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+//	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+//	//PREF VALUES
+//	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
+//	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
+//	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
 	//TEST VALUES
 	private static final String TEST_COMMUNITY_NAME = "Test NameXYZ";
 	private static final String TEST_COMMUNITY_DESC = "Test description for community XYZ";
@@ -58,14 +56,14 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		//Create shared preferences for later use
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
-		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
-		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
-		
-		editor.commit();
+//		//Create shared preferences for later use
+//		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+//		SharedPreferences.Editor editor = settings.edit();
+//		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
+//		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
+//		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
+//		
+//		editor.commit();
 
         Intent commsIntent = new Intent(getContext(), TestServiceCISManagerLocal.class);
         LocalCISManagerBinder binder = (LocalCISManagerBinder) bindService(commsIntent);
@@ -80,7 +78,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 		super.tearDown();
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testCreateCIS() throws Exception {
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
@@ -108,7 +106,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         unregisterReceiver(receiver);
 	}
 	
-	@MediumTest
+//	@MediumTest
 	public void testCreateCISMembershipNull() throws Exception {
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
@@ -125,7 +123,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         unregisterReceiver(receiver);
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testCreateCISCriteriaNull() throws Exception {
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
@@ -145,7 +143,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	}
 
 	
-	@MediumTest
+//	@MediumTest
 	public void testListCommunities() throws Exception {
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
@@ -204,6 +202,10 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	        } else if (intent.getAction().equals(ICisManager.GET_CIS_LIST)) {
 	        	Community[] listing = (Community[]) intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
 	        	assertNotNull(listing);
+	        	for(Community cis: listing) {
+	        		Log.i(LOG_TAG, cis.getCommunityJid());
+	        		Log.i(LOG_TAG, cis.getCommunityName());
+	        	}
 	        	assertTrue(listing.length > 0);
 	        } 
 	        

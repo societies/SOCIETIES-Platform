@@ -34,6 +34,7 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -86,6 +87,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
+    private boolean connectedToComms = false;
     
     /**
      * CONSTRUCTOR
@@ -104,11 +106,49 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 
     }
 
+    /**
+	 * @param client
+	 */
+	private void broadcastNotLoggedIn(final String client) {
+		if (client != null) {
+			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			intent.setPackage(client);
+			CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+		}
+	}
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
-	public Community createCis(String client, String cisName, String cisType, String description, MembershipCrit rules, String privacyPolicy) {
+	public Community createCis(final String client, final String cisName, final String cisType, final String description, final MembershipCrit rules, final String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "createCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						createCisConnected(client, cisName, cisType, description, rules, privacyPolicy);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	createCisConnected(client, cisName, cisType, description, rules, privacyPolicy);
+        }
 		
+        return null;
+	}
+	
+	private void createCisConnected(String client, String cisName, String cisType, String description, MembershipCrit rules, String privacyPolicy) {
 		//COMMUNITY INFO
 		Community cisinfo = new Community();
 		cisinfo.setCommunityName(cisName);
@@ -143,13 +183,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
-        return null;
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisManager#deleteCis(java.lang.String, java.lang.String)*/
-	public Boolean deleteCis(String client, String cisId) {
+	public Boolean deleteCis(final String client, final String cisId) {
 		Log.d(LOG_TAG, "deleteCis called by client: " + client);
 		
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "deleteCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						deleteCisConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	deleteCisConnected(client, cisId);
+        }
+		
+        return null;
+	}
+
+	private void deleteCisConnected(String client, String cisId) {
 		//COMMUNITY INFO
 		org.societies.api.schema.cis.manager.Delete cisDel = new org.societies.api.schema.cis.manager.Delete();
 		cisDel.setCommunityJid(cisId);
@@ -170,13 +236,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
-        return null;
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisManager#getCisList(java.lang.String, org.societies.api.schema.cis.manager.ListCrit)*/
+	public Community[] getCisList(final String client, final String query) {
+		Log.d(LOG_TAG, "createCis called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getCisList connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						getCisListConnected(client, query);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	getCisListConnected(client, query);
+        }
+		
+		return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisManager#getCisList(java.lang.String, org.societies.api.schema.cis.manager.ListCrit)*/
-	public Community[] getCisList(String client, String query) {
-		Log.d(LOG_TAG, "createCis called by client: " + client);
-		
+	private void getCisListConnected(String client, String query) {
 		//COMMUNITY INFO
 		org.societies.api.schema.cis.manager.List list = new org.societies.api.schema.cis.manager.List();
 		list.setListCriteria(ListCrit.fromValue(query));
@@ -197,13 +289,37 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
-        return null;
 	}
-
+	
 	/* @see org.societies.android.api.cis.management.ICisManager#removeMember(java.lang.String, java.lang.String, java.lang.String)*/
-	public void removeMember(String client, String cisId, String memberJid) {
+	public void removeMember(final String client, final String cisId, final String memberJid) {
 		Log.d(LOG_TAG, "removeMember called by client: " + client);
 		
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "removeMember connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						removeMemberConnected(client, cisId, memberJid);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	removeMemberConnected(client, cisId, memberJid);
+        }
+	}
+	
+	private void removeMemberConnected(String client, String cisId, String memberJid) {
 		//MEMBER INFO
 		Participant member = new Participant();
 		member.setJid(memberJid);
@@ -226,17 +342,42 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }		
+        }
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
-	public String Join(String client, CisAdvertisementRecord targetCis) {
+	public String Join(final String client, final CisAdvertisementRecord targetCis) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "Join connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						JoinConnected(client, targetCis);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	JoinConnected(client, targetCis);
+        }
+        return null;
+	}
+
+	private void JoinConnected(String client, CisAdvertisementRecord targetCis) {
 		//CREATE JOIN INFO
 		AskCisManagerForJoin join = new AskCisManagerForJoin();
-		//join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
 		join.setCisAdv(targetCis);
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
@@ -253,13 +394,38 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#Leave(java.lang.String, java.lang.String)*/
+	public String Leave(final String client, final String cisId) {
+		Log.d(LOG_TAG, "Leave CIS called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "Leave connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						LeaveConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	LeaveConnected(client, cisId);
+        }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#Leave(java.lang.String, java.lang.String)*/
-	public String Leave(String client, String cisId) {
-		Log.d(LOG_TAG, "Leave CIS called by client: " + client);
-
+	private void LeaveConnected(String client, String cisId) {
 		//CREATE Leave INFO
 		AskCisManagerForLeave leave = new AskCisManagerForLeave(); 
 		leave.setTargetCisJid(cisId);
@@ -278,13 +444,38 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#addActivity(java.lang.String, org.societies.api.schema.activityfeed.AddActivity)*/
+	public Boolean addActivity(final String client, final String cisId, final MarshaledActivity activity) {
+		Log.d(LOG_TAG, "addActivity called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "addActivity connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						addActivityConnected(client, cisId, activity);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	addActivityConnected(client, cisId, activity);
+        }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#addActivity(java.lang.String, org.societies.api.schema.activityfeed.AddActivity)*/
-	public Boolean addActivity(String client, String cisId, MarshaledActivity activity) {
-		Log.d(LOG_TAG, "addActivity called by client: " + client);
-
+	private void addActivityConnected(String client, String cisId, MarshaledActivity activity) {
 		//GETFEED OBJECT
 		String sActor = "unknown";
 		try {
@@ -312,13 +503,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
+		
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#cleanActivityFeed(java.lang.String)*/
+	public CleanUpActivityFeedResponse cleanActivityFeed(final String client, final String cisId) {
+		Log.d(LOG_TAG, "cleanActivityFeed called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "cleanActivityFeed connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						cleanActivityFeedConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	cleanActivityFeedConnected(client, cisId);
+        }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#cleanActivityFeed(java.lang.String)*/
-	public CleanUpActivityFeedResponse cleanActivityFeed(String client, String cisId) {
-		Log.d(LOG_TAG, "addActivity called by client: " + client);
-
+	private void cleanActivityFeedConnected(String client, String cisId) {
 		//GETFEED OBJECT
 		CleanUpActivityFeed feed = new CleanUpActivityFeed();
 		//CREATE MESSAGE BEAN
@@ -341,13 +558,38 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
+	}
+	
+	/*@see org.societies.android.api.cis.management.ICisSubscribed#deleteActivity(java.lang.String, org.societies.api.schema.activityfeed.DeleteActivity)*/
+	public Boolean deleteActivity(final String client, final String cisId, final MarshaledActivity activity) {
+		Log.d(LOG_TAG, "deleteActivity called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "deleteActivity connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						deleteActivityConnected(client, cisId, activity);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	deleteActivityConnected(client, cisId, activity);
+        }
         return null;
 	}
 
-	/*@see org.societies.android.api.cis.management.ICisSubscribed#deleteActivity(java.lang.String, org.societies.api.schema.activityfeed.DeleteActivity)*/
-	public Boolean deleteActivity(String client, String cisId, MarshaledActivity activity) {
-		Log.d(LOG_TAG, "deleteActivity called by client: " + client);
-
+	private void deleteActivityConnected(String client, String cisId, MarshaledActivity activity) {		
 		//GETFEED OBJECT
 		DeleteActivity getFeed = new DeleteActivity();
 		getFeed.setMarshaledActivity(activity);
@@ -370,14 +612,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+        }		
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#getActivityFeed(java.lang.String, java.lang.String)*/
+	public MarshaledActivity[] getActivityFeed(final String client, final String cisId) {
+		Log.d(LOG_TAG, "getActivityFeed called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getActivityFeed connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						getActivityFeedConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	getActivityFeedConnected(client, cisId);
         }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#getActivityFeed(java.lang.String, java.lang.String)*/
-	public MarshaledActivity[] getActivityFeed(String client, String cisId) {
-		Log.d(LOG_TAG, "getActivityFeed called by client: " + client);
-
+	private void getActivityFeedConnected(String client, String cisId) {
 		//GETFEED OBJECT
 		GetActivities getFeed = new GetActivities();
 		
@@ -415,14 +682,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+        }		
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#getCisInformation(java.lang.String, java.lang.String)*/
+	public Community getCisInformation(final String client, final String cisId) {
+		Log.d(LOG_TAG, "getCisInformation called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getCisInformation connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						getCisInformationConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	getCisInformationConnected(client, cisId);
         }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#getCisInformation(java.lang.String, java.lang.String)*/
-	public Community getCisInformation(String client, String cisId) {
-		Log.d(LOG_TAG, "getCisInformation called by client: " + client);
-
+	private void getCisInformationConnected(String client, String cisId) {
 		//GETINFO OBJECT
 		org.societies.api.schema.cis.community.GetInfo info = new org.societies.api.schema.cis.community.GetInfo();
 		//CREATE MESSAGE BEAN
@@ -444,14 +736,39 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+        }		
+	}
+	
+	/* @see org.societies.android.api.cis.management.ICisSubscribed#getMembers(java.lang.String, java.lang.String)*/
+	public String[] getMembers(final String client, final String cisId) {
+		Log.d(LOG_TAG, "getMembers called by client: " + client);
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getMembers connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						getMembersConnected(client, cisId);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) { }
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	getMembersConnected(client, cisId);
         }
         return null;
 	}
 
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#getMembers(java.lang.String, java.lang.String)*/
-	public String[] getMembers(String client, String cisId) {
-		Log.d(LOG_TAG, "getMembers called by client: " + client);
-
+	private void getMembersConnected(String client, String cisId) {
 		//CREATE LIST INFO
 		org.societies.api.schema.cis.community.WhoRequest listing = new org.societies.api.schema.cis.community.WhoRequest();
 		//CREATE MESSAGE BEAN
@@ -473,10 +790,9 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-        return null;
+        }		
 	}
-
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/**
 	 * Callback required for Android Comms Manager

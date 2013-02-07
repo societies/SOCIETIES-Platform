@@ -28,6 +28,7 @@ package org.societies.android.platform.comms;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ import android.util.Log;
 public class AndroidCommsBase implements XMPPAgent {
 	private static final String LOG_TAG = AndroidCommsBase.class.getName();
 	private static final long PUBSUB_EVENT_CALBACK_ID = -9999999999999L;
+	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
 	
 	private XMPPConnection connection;
 	private String username, password, resource;
@@ -77,13 +79,18 @@ public class AndroidCommsBase implements XMPPAgent {
 	int port;
 	boolean debug;
 	boolean restrictBroadcast;
+	boolean pubsubRegistered;
+	PacketListener pubsubListener;
 	Context serviceContext;
+
 	
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
 		Log.d(LOG_TAG, "Service Base Object created");
 		this.restrictBroadcast = restrictBroadcast;
 		Log.d(LOG_TAG, "Restrict broadcasted intents: " + this.restrictBroadcast);
 		this.serviceContext = serviceContext;
+		this.pubsubRegistered = false;
+		this.pubsubListener = null;
 	}
 	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
@@ -115,11 +122,18 @@ public class AndroidCommsBase implements XMPPAgent {
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 
 		try {
-			connect();
-			
-			// TODO remove packet listener on unregister
-			connection.addPacketListener( new RegisterPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(Message.class), 
-											new NamespaceFilter(namespaces)));
+			//only need to register Pubsub listener once, otherwise multiple events instances 
+			//are generated for a single event
+			if (!this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
+				connect();
+				
+				this.pubsubListener = new RegisterPacketListener(client, remoteCallId);
+				
+				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), 
+												new NamespaceFilter(namespaces)));
+				this.pubsubRegistered = true;
+				Log.d(LOG_TAG, "Pubsub event listener registered");
+			}
 			intent.setAction(XMPPAgent.REGISTER_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 		} catch (XMPPException e) {
@@ -148,6 +162,14 @@ public class AndroidCommsBase implements XMPPAgent {
 //			Log.d(LOG_TAG, "unregister namespace: " + namespace);
 //		}
 		
+		
+		//remove Pubsub listener
+		if (this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
+			connection.removePacketListener(this.pubsubListener);
+			Log.d(LOG_TAG, "Pubsub event listener unregistered");
+			this.pubsubRegistered = false;
+		}
+
 		//Send intent
 		Intent intent = new Intent();
 		if (AndroidCommsBase.this.restrictBroadcast) {
@@ -794,12 +816,15 @@ public class AndroidCommsBase implements XMPPAgent {
 		public void processPacket(Packet packet) {
 			//Send intent
 			Intent intent = new Intent(PUBSUB_EVENT);
-			if (AndroidCommsBase.this.restrictBroadcast) {
-				intent.setPackage(this.client);
-			}
+			//TODO: Extra parameter required for eventual client component that 
+			//wants to receive this intent
+//			if (AndroidCommsBase.this.restrictBroadcast) {
+//				intent.setPackage(this.client);
+//			}
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALBACK_ID);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			Log.d(LOG_TAG, "Pubsub node intent sent: " + packet.toXML());
 
 		}			
 	}
@@ -911,4 +936,22 @@ public class AndroidCommsBase implements XMPPAgent {
 		  return stackTracelines;
 		}
 
+	/**
+	 * Determine if an array of namespace elements relate to XMPP Pubsub
+	 * 
+	 * @param namespaces
+	 * @return
+	 */
+	private static boolean isNameSpacePubsub(String [] namespaces) {
+		boolean retValue = false;
+		
+		for (String element : namespaces) {
+			if (element.contains(PUBSUB_NAMESPACE_KEY)) {
+				retValue = true;
+				break;
+			}
+		}
+		
+		return retValue;
+	}
 }

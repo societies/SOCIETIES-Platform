@@ -22,15 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.cis;
+package org.societies.android.platform.cismanager.container;
 
-import org.societies.android.api.cis.directory.ICisDirectory;
-import org.societies.android.api.utilities.RemoteServiceHandler;
-
+import java.lang.ref.WeakReference;
+import org.societies.android.platform.cis.CisDirectoryBase;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
-import android.os.Messenger;
 import android.util.Log;
 
 /**
@@ -39,27 +38,51 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CisDirectoryRemote extends Service {
-	private static final String LOG_TAG = CisDirectoryRemote.class.getName();
-	private Messenger inMessenger;
-
-	@Override
+public class TestServiceCisDirectoryLocal extends Service {
+	
+    private static final String LOG_TAG = TestServiceCisDirectoryLocal.class.getName();
+    private LocalCisDirectoryBinder binder = null;
+    
+    @Override
 	public void onCreate () {
-		CisDirectoryBase cisDirBase = new CisDirectoryBase(this.getApplicationContext());
-		
-		this.inMessenger = new Messenger(new RemoteServiceHandler(cisDirBase.getClass(), cisDirBase, ICisDirectory.methodsArray));
-		Log.i(LOG_TAG, "CisDirectoryRemote creation");
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		Log.d(LOG_TAG, "CisDirectoryRemote onBind");
-		return inMessenger.getBinder();
+		this.binder = new LocalCisDirectoryBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(new CisDirectoryBase(this));
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.i(LOG_TAG, "CisDirectoryRemote terminating");
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service terminating");
 	}
+
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+
+	/**
+	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
+	 */
+	 public static class LocalCisDirectoryBinder extends Binder {
+		 private WeakReference<CisDirectoryBase> outerClassReference = null;
+		 
+		 public void addouterClassreference(CisDirectoryBase instance) {
+			 this.outerClassReference = new WeakReference<CisDirectoryBase>(instance);
+		 }
+		 
+		 public CisDirectoryBase getService() {
+	            return outerClassReference.get();
+	            }
+		 }
 
 }
