@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -64,42 +66,55 @@ import org.societies.domainauthority.rest.util.UrlParamName;
  * @author Mitja Vardjan
  */
 @Path(UrlPath.PATH_FILES)
-public class ServiceClientJar {
-    
+public class ServiceClientJar extends HttpServlet {
+
+	private static final long serialVersionUID = 4625772782444356957L;
+
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
-	
+
 	public ServiceClientJar() {
 		LOG.info("Constructor");
 	}
-	
+
 	/**
-     * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
-     * 
-     * @return Service client in form of jar file.
-     * Error 401 if file or key not valid.
-     * Error 500 on server error.
-     */
-	//@Path("{name}.jar")
-	@Path("{name}")
-    @GET
-    @Produces("application/java-archive")
-    public byte[] getFile(@PathParam("name") String name,
-    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
+	 * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
+	 * 
+	 * @return Service client in form of jar file.
+	 * Error 401 if file or key not valid.
+	 * Error 500 on server error.
+	 */
+//	@Path("{name}")
+//	@GET
+//	@Produces("application/java-archive")
+//	public byte[] doGet(@PathParam("name") String name,
+//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+//			@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		//String path = name + ".jar";
-
+		if (request.getPathInfo() == null) {
+			LOG.warn("HTTP GET: request.getPathInfo() is null");
+			return;
+		}
+		String[] name = request.getPathInfo().split("/");
+		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
+		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
+		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
+		
 		LOG.info("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
-		
+
 		byte[] file;
-		
+
 		if (!ServiceClientJarAccess.isAuthorized(path, signature)) {
 			LOG.warn("Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
-			throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+			//throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
 		}
-		
+
 		try {
 			file = Files.getBytesFromFile(get3PServicePath(serviceId) + path);
 		} catch (FileNotFoundException e) {
@@ -108,53 +123,82 @@ public class ServiceClientJar {
 			} catch (IOException e2) {
 				LOG.warn("Could not open file {}", path, e2);
 				// Return HTTP status code 500 - Internal Server Error
-				throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+//				throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
 			// Return HTTP status code 500 - Internal Server Error
-			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
-		
+
 		LOG.info("Serving {}", path);
-		return file;
-    }
+		
+		response.setContentLength(file.length);
+		//response.setContentType("application/java-archive");
+		try {
+			ServletOutputStream stream = response.getOutputStream();
+			stream.write(file);
+			stream.flush();
+		} catch (IOException e) {
+			LOG.warn("Could not write response", e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	/**
-     * Method processing HTTP POST requests.
-     */
-	@Path("{name}")
-    @POST
-    public void postIt(@PathParam("name") String name,
-    		InputStream is,
-    		@Context HttpServletRequest request,
-    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
+	 * Method processing HTTP POST requests.
+	 */
+//	@Path("{name}")
+//	@POST
+//	public void postIt(@PathParam("name") String name,
+//			InputStream is,
+//			@Context HttpServletRequest request,
+//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+//			@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
+		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
+		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
+		String pubKey = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+	
+		
 		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
 				request.getRemoteHost(), path);
 		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
-    }
+	}
 
 	/**
-     * Method processing HTTP PUT requests.
-     */
-	@Path("{name}")
-    @PUT
-    public void puIt(@PathParam("name") String name,
-    		InputStream is,
-    		@Context HttpServletRequest request,
-    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String cert) {
+	 * Method processing HTTP PUT requests.
+	 */
+//	@Path("{name}")
+//	@PUT
+//	public void puIt(@PathParam("name") String name,
+//			InputStream is,
+//			@Context HttpServletRequest request,
+//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
+//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+//			@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String cert) {
+	@Override
+	public void doPut(HttpServletRequest request, HttpServletResponse response) {
+		
+		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
+		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
+		String cert = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
 
 		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);
 
 		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
-		
+
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
 
@@ -166,41 +210,47 @@ public class ServiceClientJar {
 		try {
 			items = upload.parseRequest(request);
 		} catch (FileUploadException e) {
-			throw new WebApplicationException(HttpServletResponse.SC_BAD_REQUEST);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+//			throw new WebApplicationException(HttpServletResponse.SC_BAD_REQUEST);
 		}
-		
+
 		// Process the uploaded items
 		Iterator iter = items.iterator();
 		while (iter.hasNext()) {
-		    FileItem item = (FileItem) iter.next();
+			FileItem item = (FileItem) iter.next();
 
-		    if (item.isFormField()) {
-		        // Process FormField;
-		    } else {
-		        // Process Uploaded File
-		    	//path = path.replaceAll("[/\\\\]", File.separator);
-		    	path = get3PServicePath(serviceId) + path;
-		    	LOG.debug("Saving to file {}", path);
+			if (item.isFormField()) {
+				// Process FormField;
+			} else {
+				// Process Uploaded File
+				//path = path.replaceAll("[/\\\\]", File.separator);
+				path = get3PServicePath(serviceId) + path;
+				LOG.debug("Saving to file {}", path);
 				try {
 					Files.writeFile(item.getInputStream(), path);
 					ServiceClientJarAccess.addResource(path, cert);
 				} catch (IOException e) {
 					LOG.warn("Could not write to file {}", path, e);
 					// Return HTTP status code 500 - Internal Server Error
-					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					return;
+//					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				} catch (DigsigException e) {
 					LOG.warn("Could not store public key", e);
 					// Return HTTP status code 500 - Internal Server Error
-					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					return;
+//					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
-		    }
+			}
 		}
-    }
-	
+	}
+
 	private String get3PServicePath(String serviceId) {
-		
+
 		serviceId = FileName.removeUnsupportedChars(serviceId);
-		
+
 		return LocalPath.PATH_3P_SERVICES + File.separator + serviceId + File.separator;
 	}
 }
