@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 
 public interface IIdentitySelection {
 	

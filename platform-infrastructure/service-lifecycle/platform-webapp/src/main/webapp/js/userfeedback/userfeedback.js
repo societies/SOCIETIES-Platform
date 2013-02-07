@@ -31,7 +31,7 @@ var userFeedback = (function () {
 
 
 	var loader = $('<img>').addClass('ufeedbackLoader')
-	.attr('src', '/societies/images/loading.gif')
+	.attr('src', '/societies-test/images/loading.gif')
 	.attr('alt', 'Loading')
 	.hide();
 	var result = $('<span>').addClass('ufeedbackResult')

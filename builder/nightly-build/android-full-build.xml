@@ -61,6 +61,7 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsub</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsubHelper</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/SocietiesLoginTesterApp</module>
 		<!-- 
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>

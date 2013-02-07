@@ -66,6 +66,7 @@ import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
 	private static final String LOG_TAG = AndroidCommsBase.class.getName();
+	private static final long PUBSUB_EVENT_CALBACK_ID = -9999999999999L;
 	
 	private XMPPConnection connection;
 	private String username, password, resource;
@@ -792,12 +793,12 @@ public class AndroidCommsBase implements XMPPAgent {
 		}
 		public void processPacket(Packet packet) {
 			//Send intent
-			Intent intent = new Intent(REGISTER_RESULT);
+			Intent intent = new Intent(PUBSUB_EVENT);
 			if (AndroidCommsBase.this.restrictBroadcast) {
 				intent.setPackage(this.client);
 			}
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALBACK_ID);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 
 		}			
