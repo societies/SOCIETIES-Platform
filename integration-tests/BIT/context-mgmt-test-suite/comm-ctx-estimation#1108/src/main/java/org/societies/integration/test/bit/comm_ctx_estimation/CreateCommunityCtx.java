@@ -82,91 +82,101 @@ public class CreateCommunityCtx {
 
 		try {
 			IIdentity cisID = createCISid();
-			LOG.info("Cis id "+cisID);
+			LOG.info("#@#@# Cis id "+cisID);
 
 			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
-			
-			
+		LOG.info("gCommunity Entity Created");
+		LOG.info("g00");		
 			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("boo@societies.local ");
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 
-			CtxAttribute individualAttr1 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
-			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
-			individualAttr1.setValueType(CtxAttributeValueType.STRING);
+LOG.info("g01");
+LOG.info("xssID "+this.cssID1); //boo@societies.local 
+LOG.info("indiEnt1 "+this.indiEnt1); //org.societies.api.context.model.IndividualCtxEntity@230d4771
+LOG.info("this.indiEnt1.getId() "+this.indiEnt1.getId()+"CtxAttributeTypes.INTERESTS "+CtxAttributeTypes.INTERESTS); //(context://boo@societies.local /ENTITY/person/426015,interests)
 
+			CtxAttribute individualAttr1 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
+			LOG.info("g011");
+			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
+			LOG.info("g012");
+			individualAttr1.setValueType(CtxAttributeValueType.STRING);
+LOG.info("g02");
 			CtxAttribute individualAttr2 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr2.setValueType(CtxAttributeValueType.INTEGER);
 			individualAttr2.setIntegerValue(25);
-
+LOG.info("g03");
 			Test1108.getCtxBroker().update(individualAttr1);
 			Test1108.getCtxBroker().update(individualAttr2);
-
+LOG.info("g04");
 			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("coo@societies.local ");
 			this.indiEnt2 = Test1108.getCtxBroker().createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
-
+LOG.info("g05");
 			CtxAttribute individualAttr3 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr3.setStringValue("cooking,horseRiding,restaurants,cinema");
 			individualAttr3.setValueType(CtxAttributeValueType.STRING);
-
+LOG.info("g06");
 			CtxAttribute individualAttr4 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr4.setIntegerValue(27);
 			individualAttr4.setValueType(CtxAttributeValueType.INTEGER);
-
+LOG.info("g07");
 			Test1108.getCtxBroker().update(individualAttr3);
 			Test1108.getCtxBroker().update(individualAttr4);
-
+LOG.info("g08");
 			this.cssID3 =  Test1108.getCommManager().getIdManager().fromJid("doo@societies.local ");
 			this.indiEnt3 = Test1108.getCtxBroker().createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
-
+			LOG.info("g09");
 			CtxAttribute individualAttr5 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr5.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
 			individualAttr5.setValueType(CtxAttributeValueType.STRING);
-
+			LOG.info("g10");
 			CtxAttribute individualAttr6 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr6.setIntegerValue(27);
 			individualAttr6.setValueType(CtxAttributeValueType.INTEGER);
-
+			LOG.info("g11");
 			Test1108.getCtxBroker().update(individualAttr5);
 			Test1108.getCtxBroker().update(individualAttr6);
-
+			LOG.info("g12");
 			communityEntity.addMember(this.indiEnt1.getId());
 			communityEntity.addMember(this.indiEnt2.getId());
 			communityEntity.addMember(this.indiEnt3.getId());
-
+			LOG.info("g13");
 			Test1108.getCtxBroker().update(communityEntity);
-
+			LOG.info("g14");
 			CtxAttribute ctxAttr = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE).get();
 			CtxAttribute ctxAttr1 = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS).get();
-
+			LOG.info("g15");
 			this.communityAttrTemperatureId = ctxAttr.getId();
 			this.communityCtxEntityID = communityEntity.getId();
 			this.communityAttrInterestsId = ctxAttr1.getId();
-
+			LOG.info("g16");
 			//this.communityAttrTemperatureId = ctxAttr1.getId();
 
 			// LOG.info("TestRetrieveCommunityEntities "+ctxAttr.getId() );
 			LOG.info("TestRetrieveCommunityEntities   this.communityAttrTemperatureId "+ this.communityAttrTemperatureId );
 			LOG.info("TestRetrieveCommunityEntities   this.communityInterestsId "+ this.communityAttrInterestsId);
-
-
+			LOG.info("g17");
+LOG.info("we5uy34y5 before retrieveCommunityEntities");
 			retrieveCommunityEntities();
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.info("interrupted exception");
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.info("execution exception");
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.info("invalid format exception");
 		}
 	}
 
 
-	@Test
 	public void retrieveCommunityEntities() {
 
 		LOG.info("TestRetrieveCommunityEntities");
