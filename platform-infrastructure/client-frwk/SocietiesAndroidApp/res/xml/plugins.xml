@@ -44,5 +44,6 @@
     <plugin name="PluginCISFunctions" value="org.societies.android.platform.phongegap.PluginCISFunctions"/>
     <plugin name="PluginSNConnector" value="org.societies.android.platform.phongegap.PluginSNConnector"/>
     <plugin name="PrivacyPolicyManager" value="org.societies.android.platform.phongegap.PrivacyPolicyManagerPlugin"/>
-
+    <plugin name="PluginFeedback" value="org.societies.android.platform.phongegap.PluginFeedback"/>
+    
 </plugins>

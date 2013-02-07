@@ -12,14 +12,6 @@
 	<osgi:reference id="SignatureMgr" interface="org.societies.api.security.digsig.ISignatureMgr" />
 	<osgi:reference id="SlaSignatureMgr" interface="org.societies.api.internal.security.digsig.ISlaSignatureMgr" />
 	<osgi:reference id="SecureStorage" interface="org.societies.api.internal.security.storage.ISecureStorage" />
-	<osgi:reference id="NegotiationProviderRemote"
-		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote"
-		cardinality="0..1"
-		/>
-	<osgi:reference id="ClientJarServerRemote"
-		interface="org.societies.api.internal.domainauthority.IClientJarServerRemote"
-		cardinality="0..1"
-		/>
 	<osgi:reference id="PersonalizationMgr"
 		interface="org.societies.api.personalisation.mgmt.IPersonalisationManager"
 		cardinality="0..1"
@@ -33,5 +25,14 @@
 	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
 	<osgi:service ref="ProviderServiceMgr"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" />
 	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
+
+
+	<!-- Communications -->
 	
+ 	<osgi:reference id="CommManager"
+ 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />	
+
+	<osgi:service ref="NegotiationProviderRemote"
+		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote" />
+
 </beans>

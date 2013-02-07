@@ -26,11 +26,11 @@ package org.societies.android.privacytrust.api;
 
 import java.util.List;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPermission;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 

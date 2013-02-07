@@ -49,16 +49,16 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ActionUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ConditionUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResourceUtils;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.*;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 
 /**
  * @author Eliza

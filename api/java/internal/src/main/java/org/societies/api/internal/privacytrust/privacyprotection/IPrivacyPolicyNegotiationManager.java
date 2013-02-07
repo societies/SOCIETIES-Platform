@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 
 /**
