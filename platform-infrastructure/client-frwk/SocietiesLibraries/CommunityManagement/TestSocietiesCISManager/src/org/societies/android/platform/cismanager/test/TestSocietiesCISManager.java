@@ -204,6 +204,10 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	        } else if (intent.getAction().equals(ICisManager.GET_CIS_LIST)) {
 	        	Community[] listing = (Community[]) intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
 	        	assertNotNull(listing);
+	        	for(Community cis: listing) {
+	        		Log.i(LOG_TAG, cis.getCommunityJid());
+	        		Log.i(LOG_TAG, cis.getCommunityName());
+	        	}
 	        	assertTrue(listing.length > 0);
 	        } 
 	        
