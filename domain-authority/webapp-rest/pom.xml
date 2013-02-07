@@ -92,7 +92,7 @@
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>
 			<scope>compile</scope>
-			<!--exclusions>
+			<exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
 					<artifactId>cglib</artifactId>
@@ -113,14 +113,14 @@
 					<groupId>commons-collections</groupId>
 					<artifactId>commons-collections</artifactId>
 				</exclusion>
-			</exclusions-->
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey-version}</version>
 			<scope>compile</scope>
-			<!--exclusions>
+			<exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
 					<artifactId>cglib</artifactId>
@@ -141,7 +141,7 @@
 					<groupId>commons-collections</groupId>
 					<artifactId>commons-collections</artifactId>
 				</exclusion>
-			</exclusions-->
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -153,18 +153,6 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${jersey-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.distributions</groupId>
-			<artifactId>web-all</artifactId>
-			<version>10.0-build-20080430</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.embedded</groupId>
-			<artifactId>gf-embedded-api</artifactId>
-			<version>1.0-alpha-4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -243,7 +231,7 @@
 							org.springframework.context.config;resolution:=optional,
 							org.osgi.framework;resolution:=optional,
 
-							com.sun.jersey.spi.container.servlet,
+							com.sun.jersey.spi.container.servlet;resolution:=optional,
 							javax.ws.rs;resolution:=optional,
 							org.objectweb.asm;resolution:=optional,
 							javax.annotation;resolution:=optional,
@@ -268,18 +256,18 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-<!--
 					<attachClasses>true</attachClasses>
--->
+<!--
 					<packagingExcludes>WEB-INF/lib/a*.jar,WEB-INF/lib/c*.jar</packagingExcludes>
+-->
 					<archive>
 						<manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
-<!--
 						<manifest>
 							<addClasspath>true</addClasspath>
+<!--
 							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
 -->
+						</manifest>
 					</archive>
 				</configuration>
 			</plugin>
@@ -318,6 +306,7 @@
 									<type>jar</type>
 								</artifactItem> -->
 
+<!--
 								<artifactItem>
 									<groupId>com.sun.jersey</groupId>
 									<artifactId>jersey-core</artifactId>
@@ -330,6 +319,7 @@
 									<version>${jersey-version}</version>
 									<type>jar</type>
 								</artifactItem>
+-->
 
 								<artifactItem>
 									<groupId>org.objectweb.asm</groupId>
@@ -379,11 +369,6 @@
 				</configuration>
 			</plugin>
 			
-			<plugin>
-				<groupId>org.glassfish</groupId>
-				<artifactId>maven-glassfish-plugin</artifactId>
-			</plugin>
-			
 		</plugins>
 		
 	</build>
@@ -391,29 +376,5 @@
 	<properties>
 		<jersey-version>1.8</jersey-version>
 	</properties>
-	
-	<!--repositories>
-		<repository>
-			<id>glassfish.java.net</id>
-			<name>GlassFish Maven Repository</name>
-			<url>http://download.java.net/maven/glassfish</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>m2.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://download.java.net/maven/2</url>
-			<layout>default</layout>
-		</repository>        
-	</repositories-->
-	
-	<!--pluginRepositories>
-		<pluginRepository>
-			<id>m2.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://download.java.net/maven/2</url>
-			<layout>default</layout>
-		</pluginRepository>  
-	</pluginRepositories-->
 	
 </project>
