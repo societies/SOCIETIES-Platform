@@ -27,6 +27,8 @@ package org.societies.android.platform.cismanager.test;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal;
 import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal.LocalCISManagerBinder;
+import org.societies.android.platform.cismanager.container.TestServiceCisDirectoryLocal;
+import org.societies.android.platform.cismanager.container.TestServiceCisDirectoryLocal.LocalCisDirectoryBinder;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import android.content.BroadcastReceiver;
@@ -34,6 +36,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -45,45 +48,49 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCISManagerLocal> {
+public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDirectoryLocal> {
 
 	private static final String LOG_TAG = TestSocietiesCisDirectory.class.getName();
 	private static final String CLIENT = "org.societies.android.platform.cismanager.test";
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
 
-	//PREF NAMES
-	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
-	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
-	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
-	//PREF VALUES
-	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
-	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
-	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
+
+	
+//	//PREF NAMES
+//	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
+//	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+//	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+//	//PREF VALUES
+//	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
+//	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
+//	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
 	
 	private ICisDirectory cisDirectory;
 	private long testStartTime, testEndTime;
+    private boolean testCompleted;
+
 	/**
 	 * @param serviceClass
 	 */
 	public TestSocietiesCisDirectory() {
-		super(TestServiceCISManagerLocal.class);
+		super(TestServiceCisDirectoryLocal.class);
 	}
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		//Create shared preferences for later use
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
-		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
-		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
-		
-		editor.commit();
+//		//Create shared preferences for later use
+//		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+//		SharedPreferences.Editor editor = settings.edit();
+//		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
+//		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
+//		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
+//		
+//		editor.commit();
 
-        Intent commsIntent = new Intent(getContext(), TestServiceCISManagerLocal.class);
-        LocalCISManagerBinder binder = (LocalCISManagerBinder) bindService(commsIntent);
+        Intent commsIntent = new Intent(getContext(), TestServiceCisDirectoryLocal.class);
+        LocalCisDirectoryBinder binder = (LocalCisDirectoryBinder) bindService(commsIntent);
         assertNotNull(binder);
         this.cisDirectory = (ICisDirectory) binder.getService();
 	}
@@ -97,6 +104,8 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCISMa
 
 	@MediumTest
 	public void testGetAllCisAdverts() throws Exception {
+		this.testCompleted = false;
+		
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -110,6 +119,7 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCISMa
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+        assertTrue(this.testCompleted);
 	}
 	
 	/**
@@ -148,18 +158,25 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCISMa
 	        Log.d(LOG_TAG, "Received action: " + intent.getAction());
 	
 	        if (intent.getAction().equals(ICisDirectory.FIND_ALL_CIS)) {
-	        	CisAdvertisementRecord[] adverts = (CisAdvertisementRecord[])intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-	        	assertNotNull(adverts);
-	        	for(CisAdvertisementRecord advert: adverts) {
+	        	Parcelable[] objects = (Parcelable[])intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
+	        	assertNotNull(objects);
+	        	
+	        	for(Parcelable object: objects) {
+	        		CisAdvertisementRecord advert = (CisAdvertisementRecord) object;
 	        		Log.i(LOG_TAG, advert.getId());
 	        		Log.i(LOG_TAG, advert.getName());
 	        	}
+	        	//signal that test has completed
+        		TestSocietiesCisDirectory.this.testCompleted = true;
                 
 	        } else if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID)) {
-	        	CisAdvertisementRecord advert = intent.getParcelableExtra(ICisDirectory.INTENT_RETURN_VALUE);
+	        	CisAdvertisementRecord advert = (CisAdvertisementRecord) intent.getParcelableExtra(ICisDirectory.INTENT_RETURN_VALUE);
 	        	assertNotNull(advert);
 	        	Log.i(LOG_TAG, advert.getId());
         		Log.i(LOG_TAG, advert.getName());
+
+        		//signal that test has completed
+        		TestSocietiesCisDirectory.this.testCompleted = true;
 	        } 
 	        
 	        TestSocietiesCisDirectory.this.testEndTime = System.currentTimeMillis();
@@ -176,6 +193,7 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCISMa
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ICisDirectory.FIND_ALL_CIS);
         intentFilter.addAction(ICisDirectory.FIND_CIS_ID);
+        intentFilter.addAction(ICisDirectory.FILTER_CIS);
         
         return intentFilter;
     }

@@ -31,6 +31,7 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -66,6 +67,7 @@ public class CisDirectoryBase implements ICisDirectory {
 	private ClientCommunicationMgr commMgr;
     private Context androidContext;
     private boolean connectedToComms = false;
+    private boolean registeredNamespaces = false;
     
     /**
      * Default constructor
@@ -230,7 +232,7 @@ public class CisDirectoryBase implements ICisDirectory {
 			String results[] = new String[1];
 			results[0] = client;
 			//MESSAGE BEAN
-			CisDirectoryBean messageBean = new CisDirectoryBean();
+			final CisDirectoryBean messageBean = new CisDirectoryBean();
 			if (method.equals(ICisDirectory.FIND_CIS_ID)) {
 				messageBean.setMethod(MethodType.SEARCH_BY_ID);
 				messageBean.setFilter(filterCis);
@@ -247,12 +249,75 @@ public class CisDirectoryBase implements ICisDirectory {
 			//COMMS CONFIG
 			try {
 				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-				ICommCallback cisCallback = new CisDirectoryCallback(client, method);
-				Stanza stanza = new Stanza(toID);
+				final ICommCallback cisCallback = new CisDirectoryCallback(client, method);
+				final Stanza stanza = new Stanza(toID);
 	        
-	        	commMgr.register(ELEMENT_NAMES, cisCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				//only need to register once
+				if (!CisDirectoryBase.this.registeredNamespaces) {
+					CisDirectoryBase.this.registeredNamespaces = true;
+					
+		        	commMgr.register(ELEMENT_NAMES, new ICommCallback() {
+						
+						@Override
+						public void receiveResult(Stanza arg1, Object result) {
+							boolean status = (Boolean) result;
+							if (status) {
+					        	try {
+									commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+								} catch (CommunicationException e) {
+									// TODO Auto-generated catch block
+									Log.e(LOG_TAG, "Error sending XMPP message", e);
+								}
+							}
+						}
+						
+						@Override
+						public void receiveMessage(Stanza stanza, Object payload) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveItems(Stanza stanza, String node, List<String> items) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void receiveError(Stanza stanza, XMPPError error) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public List<String> getXMLNamespaces() {
+							// TODO Auto-generated method stub
+							return NAME_SPACES;
+						}
+						
+						@Override
+						public List<String> getJavaPackages() {
+							// TODO Auto-generated method stub
+							return PACKAGES;
+						}
+					});
+				} else {
+		        	try {
+						commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						Log.e(LOG_TAG, "Error sending XMPP message", e);
+					}
+				}
+					
 			} catch (Exception e) {
+				e.printStackTrace();
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
 	        }
 			return results;
@@ -311,7 +376,9 @@ public class CisDirectoryBase implements ICisDirectory {
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				
-				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
+				//TODO: Investigate why stanza is not returning
+				
+//				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
 				if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
 				// --------- cisDirectoryBeanResult Bean ---------
 				if (msgBean instanceof CisDirectoryBeanResult) {
@@ -328,9 +395,10 @@ public class CisDirectoryBase implements ICisDirectory {
 					 CisAdvertisementRecord returnArray[] = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
 					
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
-						
-					intent.setPackage(client);
+						intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
+					
+					//TODO: investigate why wrong client is being used
+//					intent.setPackage(client);
 					CisDirectoryBase.this.androidContext.sendBroadcast(intent);
 					//CisDirectoryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 				}
