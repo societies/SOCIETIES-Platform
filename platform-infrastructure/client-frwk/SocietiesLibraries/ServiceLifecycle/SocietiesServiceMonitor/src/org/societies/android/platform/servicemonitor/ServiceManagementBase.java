@@ -32,13 +32,13 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
@@ -75,7 +75,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 															   "org.societies.api.schema.servicelifecycle.model");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
-    
+    private boolean connectedToComms = false;
 
     /**
      * Default constructor
@@ -93,26 +93,85 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
         }
     }
 
+    /**
+	 * @param client
+	 */
+	private void broadcastNotLoggedIn(final String client) {
+		if (client != null) {
+			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			intent.setPackage(client);
+			ServiceManagementBase.this.androidContext.sendBroadcast(intent);
+		}
+	}
+	
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery methods >>>>>>>>>>>>>>>>>>>>>>>
     /* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public Service[] getMyServices(String client) {
+	public Service[] getMyServices(final String client) {
 		Log.d(LOG_TAG, "getMyServices called by client: " + client);
-		
-		AsyncGetMyServices methodAsync = new AsyncGetMyServices();
-		String params [] = {client};
-		methodAsync.execute(params);
-		
+
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getMyServices connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncGetMyServices methodAsync = new AsyncGetMyServices();
+						String params [] = {client};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncGetMyServices methodAsync = new AsyncGetMyServices();
+    		String params [] = {client};
+    		methodAsync.execute(params);
+        }
         return null;
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public Service[] getServices(String client, String identity) {
+	public Service[] getServices(final String client, final String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
-		AsynGetServices methodAsync = new AsynGetServices();
-		String params [] = {client, identity};
-		methodAsync.execute(params);
-
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "getServices connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsynGetServices methodAsync = new AsynGetServices();
+						String params [] = {client, identity};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsynGetServices methodAsync = new AsynGetServices();
+    		String params [] = {client, identity};
+    		methodAsync.execute(params);
+        }
         return null;
 	}
 
@@ -138,46 +197,143 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#shareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String shareService(String client, Service service, String identity) {
+	public String shareService(final String client, final Service service, final String identity) {
 		Log.d(LOG_TAG, "shareService called by client: " + client);
 		
-		AsyncShareService methodAsync = new AsyncShareService();
-		Object params[] = {client, service, identity, IServiceControl.SHARE_SERVICE};
-		methodAsync.execute(params);
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "shareService connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncShareService methodAsync = new AsyncShareService();
+						Object params[] = {client, service, identity, IServiceControl.SHARE_SERVICE};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncShareService methodAsync = new AsyncShareService();
+    		Object params[] = {client, service, identity, IServiceControl.SHARE_SERVICE};
+    		methodAsync.execute(params);
+        }
 		
 		return null;
 	}
 	
 	/*@see org.societies.android.api.internal.servicelifecycle.IServiceControl#unshareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String unshareService(String client, Service service, String identity) {
+	public String unshareService(final String client, final Service service, final String identity) {
 		Log.d(LOG_TAG, "unshareService called by client: " + client);
 		
-		AsyncShareService methodAsync = new AsyncShareService();
-		Object params[] = {client, service, identity, IServiceControl.UNSHARE_SERVICE};
-		methodAsync.execute(params);
-		
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "unshareService connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncShareService methodAsync = new AsyncShareService();
+						Object params[] = {client, service, identity, IServiceControl.UNSHARE_SERVICE};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncShareService methodAsync = new AsyncShareService();
+    		Object params[] = {client, service, identity, IServiceControl.UNSHARE_SERVICE};
+    		methodAsync.execute(params);
+        }
 		return null;
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#startService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String) */
-	public String startService(String client, ServiceResourceIdentifier serviceId) {
+	public String startService(final String client, final ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "startService called by client: " + client);
 		
-		AsyncControlService methodAsync = new AsyncControlService();
-		Object params[] = {client, serviceId, IServiceControl.START_SERVICE};
-		methodAsync.execute(params);
-		
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "startService connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncControlService methodAsync = new AsyncControlService();
+						Object params[] = {client, serviceId, IServiceControl.START_SERVICE};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+    		AsyncControlService methodAsync = new AsyncControlService();
+    		Object params[] = {client, serviceId, IServiceControl.START_SERVICE};
+    		methodAsync.execute(params);
+        }
 		return null;
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#stopService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
-	public String stopService(String client, ServiceResourceIdentifier serviceId) {
+	public String stopService(final String client, final ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "stopService called by client: " + client);
 		
-		AsyncControlService methodAsync = new AsyncControlService();
-		Object params[] = {client, serviceId, IServiceControl.STOP_SERVICE};
-		methodAsync.execute(params);
-		
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "stopService connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncControlService methodAsync = new AsyncControlService();
+						Object params[] = {client, serviceId, IServiceControl.STOP_SERVICE};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncControlService methodAsync = new AsyncControlService();
+    		Object params[] = {client, serviceId, IServiceControl.STOP_SERVICE};
+    		methodAsync.execute(params);
+        }
 		return null;
 	}
 
@@ -235,13 +391,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
 					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
-					//CONVERT TO PARCEL BEANS
-					//int i=0;
-					//Parcelable serviceArray[] = new Parcelable[serviceList.size()];
-					//for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
-					//	serviceArray[i] = AService.convertService(tmpService);
-					//	i++;
-					//}
 					org.societies.api.schema.servicelifecycle.model.Service serviceArray[] = serviceList.toArray(new org.societies.api.schema.servicelifecycle.model.Service[serviceList.size()]);
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray); 
@@ -312,7 +461,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	 
 			return results;
 		}
-
 		
 		@Override
 		/**
@@ -393,7 +541,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			results[0] = client;
 			//MESSAGE BEAN
 			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			//messageBean.setService(AService.convertAService(service));
 			messageBean.setService(service);
 			messageBean.setShareJid(identity);
 			if (method.equals(IServiceControl.SHARE_SERVICE)) 
@@ -443,7 +590,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 			results[0] = client;
 			//MESSAGE BEAN
 			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			//messageBean.setServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(serviceId));
 			messageBean.setServiceId(serviceId);
 			if (method.equals(IServiceControl.START_SERVICE)) 
 				messageBean.setMethod(MethodType.START_SERVICE);
