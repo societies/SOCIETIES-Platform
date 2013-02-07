@@ -22,62 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
+
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
- * @author Elizabeth
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public class PrivacyException extends Exception{
-    /**
-     * Constructs a <code>PrivacyPreferenceException</code> with no detail
-     * message.
-     */
-    public PrivacyException() {
-        super();
-    }
-
-    /**
-     * Constructs a <code>PrivacyPreferenceException</code> with the specified
-     * detail message.
-     * 
-     * @param s
-     *            the detail message.
-     */
-    public PrivacyException(String s) {
-        super(s);
-    }
-
-    /**
-     * Creates a <code>PrivacyPreferenceException</code> with the specified detail
-     * message and cause.
-     * 
-     * @param message
-     *            the detail message (which is saved for later retrieval by the
-     *            {@link #getMessage()} method).
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public PrivacyException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Creates a <code>PrivacyPreferenceException</code> with the specified cause
-     * and a detail message of <tt>(cause==null ? null : cause.toString())</tt>
-     * (which typically contains the class and detail message of <tt>cause</tt>
-     * ).
-     * 
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public PrivacyException(Throwable cause) {
-        super(cause);
-    }
+public class ResourceUtils {
+	public static String getDataIdUri(Resource resource) {
+		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+	}
 }

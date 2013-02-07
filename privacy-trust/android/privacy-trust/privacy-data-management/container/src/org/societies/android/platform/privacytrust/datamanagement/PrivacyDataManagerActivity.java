@@ -30,7 +30,7 @@ import java.util.List;
 import org.societies.android.api.identity.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.platform.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
 import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;

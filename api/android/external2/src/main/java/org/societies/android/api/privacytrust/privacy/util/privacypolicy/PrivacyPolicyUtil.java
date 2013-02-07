@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -36,9 +36,6 @@ import java.util.Map;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
-import org.societies.api.schema.cis.community.MembershipCrit;
-import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
@@ -48,13 +45,15 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Privacy
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 import android.util.Log;
 
 
 /**
- * Interface exposed to Societies components in order to do actions relative
- * to a privacy policy
+ * Interface exposed to Societies components and 3P services in order to do actions relative to a privacy policy
+ * creation and manipulation
  * 
  * @author Olivier Maridat (Trialog)
  * @created 18-dec.-2012 19:41:29
@@ -63,8 +62,8 @@ public class PrivacyPolicyUtil {
 	private final static String TAG = PrivacyPolicyUtil.class.getSimpleName();
 
 	/**
-	 * General function to help a developer or a user to create a privacy policy by inferring a default
-	 * one using information about the CIS or the service. The privacy policy in
+	 * Generic function to help a developer or a user to create a privacy policy by inferring a default
+	 * one using information about the CIS or the 3P service. The privacy policy in
 	 * result will be slightly completed but still need to be filled.
 	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
 	 * the inference engine will add geolocation data line to the privacy policy.
