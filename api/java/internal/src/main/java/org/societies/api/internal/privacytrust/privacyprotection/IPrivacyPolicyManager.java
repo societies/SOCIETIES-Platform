@@ -27,9 +27,9 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 import java.util.Map;
 
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 
 /**
  * Interface exposed to Societies components in order to do actions relative

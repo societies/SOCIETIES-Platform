@@ -27,7 +27,7 @@ package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.RandomBetween;

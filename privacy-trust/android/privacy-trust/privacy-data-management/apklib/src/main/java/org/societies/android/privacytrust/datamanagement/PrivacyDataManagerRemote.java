@@ -29,13 +29,13 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.comms.xmpp.Stanza;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.schema.identity.DataIdentifier;

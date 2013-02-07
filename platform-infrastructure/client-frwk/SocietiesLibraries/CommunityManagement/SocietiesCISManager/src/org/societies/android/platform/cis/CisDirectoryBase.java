@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.cis.directory.ICisDirectory;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -64,6 +65,7 @@ public class CisDirectoryBase implements ICisDirectory {
     
 	private ClientCommunicationMgr commMgr;
     private Context androidContext;
+    private boolean connectedToComms = false;
     
     /**
      * Default constructor
@@ -71,8 +73,7 @@ public class CisDirectoryBase implements ICisDirectory {
     public CisDirectoryBase(Context androidContext) {
     	Log.d(LOG_TAG, "Object created");
     	
-    	this.androidContext = androidContext;
-    	
+    	this.androidContext = androidContext;    	
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -81,36 +82,120 @@ public class CisDirectoryBase implements ICisDirectory {
         }
     }
     
+    /**
+	 * @param client
+	 */
+	private void broadcastNotLoggedIn(final String client) {
+		if (client != null) {
+			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			intent.setPackage(client);
+			CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+		}
+	}
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
-	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(String client) {
+	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(final String client) {
         Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
-		methodAsync.execute(params);
+        if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findAllCisAdvertisementRecords connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
+						methodAsync.execute(params);		
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+	
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+			String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
+			methodAsync.execute(params);
+        }
 		
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
-	public CisAdvertisementRecord[] findForAllCis(String client, String filter) {       
+	public CisAdvertisementRecord[] findForAllCis(final String client, final String filter) {       
         Log.d(LOG_TAG, "findForAllCis called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FILTER_CIS, filter};
-		methodAsync.execute(params);
+        if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FILTER_CIS, filter};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+				
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+			String params[] = {client, ICisDirectory.FILTER_CIS, filter};
+			methodAsync.execute(params);
+		}
 		
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
-	public CisAdvertisementRecord searchByID(String client, String cis_id) {
+	public CisAdvertisementRecord searchByID(final String client, final String cis_id) {
 		Log.d(LOG_TAG, "searchByID called by client: " + client);
 		
-        AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
-		methodAsync.execute(params);
+		if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) { 
+						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+						String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
+						methodAsync.execute(params);
+						connectedToComms = true;
+					}
+					else // NOT LOGGED IN
+						broadcastNotLoggedIn(client);
+				}
+				
+				@Override
+				public void returnAction(String result) {
+				}
+			});
+        } else {
+        	//ALREADY CONNECTED TO COMMS SERVICE
+        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
+    		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
+    		methodAsync.execute(params);
+		}
 		
 		return null;
 	}

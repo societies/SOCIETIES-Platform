@@ -364,7 +364,8 @@ public class CtxEventMgr implements ICtxEventMgr {
 				this.pubsubClient.publisherPublish(pubsubId, topics[i], 
 						itemId, eventBean);
 			} catch (Exception e) {
-				throw new CtxEventMgrException("Could not post remote context change event to topic '" 
+				//throw new CtxEventMgrException("Could not post remote context change event to topic '" 
+				LOG.error("Could not post remote context change event to topic '" 
 						+ topics[i] + "'" + " with itemId '" + itemId + "': "
 						+ e.getLocalizedMessage(), e);
 			}
