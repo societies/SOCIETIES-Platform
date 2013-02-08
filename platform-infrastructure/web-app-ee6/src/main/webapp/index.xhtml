@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+    <title>Simple JSF Facelets page</title>
+</h:head>
+
+<h:body>
+    <h:form>
+
+
+        <h:commandButton id="meep" value="Click Me!" action="${index.buttonAction}"/>
+
+        <h:inputText id="textArea" value="${index.whateverValue}" />
+
+        <h:outputText id="outputText1" value="${index.intValue}"/>
+    </h:form>
+</h:body>
+
+</ui:composition>
