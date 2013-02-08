@@ -52,7 +52,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -176,21 +176,23 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTFILTER @@@@@@@");
 		actFeed.startUp(sessionFactory, Integer.toString(3));
 		String actor="testFilterUser";
-		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
+		long now = System.currentTimeMillis();
+		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(now-100));
 		actFeed.addActivity(act1);
-		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
+		String timeSeries = Long.toString(now-1000)+" "+Long.toString(now+1000);
 		JSONObject searchQuery = new JSONObject();
 		try {
 			searchQuery.append("filterBy", "actor");
 			searchQuery.append("filterOp", "equals");
 			searchQuery.append("filterValue", actor);
 		} catch (JSONException e) {
-			e.printStackTrace();
+			LOG.info("JSON error: "+e.getMessage(), e);
+			fail("JSON error: "+e.getMessage());
 		}
 		LOG.info("sending timeSeries: "+timeSeries+ " act published: "+act1.getPublished());
 		List<IActivity> results = actFeed.getActivities(searchQuery.toString(), timeSeries);
 		LOG.info("testing filtering filter result: "+results.size());
-		assert(results.size() > 0);
+		assertTrue("Results is empty", results.size() > 0);
 	}
 
 //	@Test
@@ -254,10 +256,11 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTREBOOT @@@@@@@");
 		String actor="testRebootActor";
 		String verb="published";
+		long now = System.currentTimeMillis();
 		actFeed.startUp(sessionFactory, Integer.toString(5));
 		IActivity iact = new Activity();
 		iact.setActor(actor);
-		iact.setPublished(Long.toString(System.currentTimeMillis()));
+		iact.setPublished(Long.toString(now));
 		iact.setVerb(verb);
 		iact.setObject("message");
 		iact.setTarget("testTarget");
@@ -272,13 +275,14 @@ AbstractTransactionalJUnit4SpringContextTests {
 		List<IActivity> results = null;
 		try {
 			JSONObject searchQuery = new JSONObject();
-			String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
+			String timeSeries = "0 "+Long.toString(now+1000);
 			try {
 				searchQuery.append("filterBy", "actor");
 				searchQuery.append("filterOp", "equals");
 				searchQuery.append("filterValue", actor);
 			} catch (JSONException e) {
-				e.printStackTrace();
+				LOG.info("JSON error: "+e.getMessage(), e);
+				fail("JSON error: "+e.getMessage());
 			}
 			LOG.info("sending timeSeries: "+timeSeries+ " act published: "+iact.getPublished());
 			results = actFeed.getActivities(searchQuery.toString(), timeSeries);
@@ -289,8 +293,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 			e.printStackTrace();
 		}
 		//assert(results!=null);
-		assert(results.size()>0);
-		assert(results.get(0).getActor().equals(actor));
+		assertTrue("Result list is empty", results.size()>0);
+		assertTrue("Actor of the first result doesn't match", results.get(0).getActor().equals(actor));
 	}
 	private static String readFileAsString(String filePath)
 			throws java.io.IOException{

@@ -27,8 +27,8 @@ package org.societies.android.platform.privacytrust.policymanagement;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.util.model.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;

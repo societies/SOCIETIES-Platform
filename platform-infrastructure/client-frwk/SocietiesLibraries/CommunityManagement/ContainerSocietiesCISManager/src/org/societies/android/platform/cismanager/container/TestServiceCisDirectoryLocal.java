@@ -22,39 +22,67 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.platform.cismanager.container;
 
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
+import java.lang.ref.WeakReference;
+import org.societies.android.platform.cis.CisDirectoryBase;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Obfuscator for name
+ * Describe your class here...
  *
- * @author Olivier Maridat (Trialog)
+ * @author aleckey
  *
  */
-public class TemperatureObfuscator extends DataObfuscator<DataWrapper> {
+public class TestServiceCisDirectoryLocal extends Service {
+	
+    private static final String LOG_TAG = TestServiceCisDirectoryLocal.class.getName();
+    private LocalCisDirectoryBinder binder = null;
+    
+    @Override
+	public void onCreate () {
+		this.binder = new LocalCisDirectoryBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(new CisDirectoryBase(this));
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service terminating");
+	}
+
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+
 	/**
-	 * @param data
+	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
 	 */
-	public TemperatureObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Temperature.class;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
-	}
+	 public static class LocalCisDirectoryBinder extends Binder {
+		 private WeakReference<CisDirectoryBase> outerClassReference = null;
+		 
+		 public void addouterClassreference(CisDirectoryBase instance) {
+			 this.outerClassReference = new WeakReference<CisDirectoryBase>(instance);
+		 }
+		 
+		 public CisDirectoryBase getService() {
+	            return outerClassReference.get();
+	            }
+		 }
 
 }

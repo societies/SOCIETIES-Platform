@@ -31,7 +31,7 @@
 	<artifactId>DomainAuthorityRest</artifactId>
 	<packaging>war</packaging>
 	<version>${release.version}</version>
-	<name>Domain authority REST Jersey Webapp</name>
+	<name>Domain authority REST Webapp</name>
 	<description>REST server for sharing any files related to SOCIETIES 3rd party services, for example jar file for service client, any service specific resources like videos, etc. The server has access control and allows download only to clients that present a valid proof of authorization from the service provider (given by the service provider after a successful policy negotiation).</description>
 
 	<developers>
@@ -81,18 +81,25 @@
 			<version>1.2.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.web.servlet</artifactId>
 			<version>3.0.5.RELEASE</version>
 			<scope>provided</scope>
-		</dependency-->
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>com.springsource.javax.ws.rs</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+<!--
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>
 			<scope>compile</scope>
-			<!--exclusions>
+			<exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
 					<artifactId>cglib</artifactId>
@@ -113,14 +120,14 @@
 					<groupId>commons-collections</groupId>
 					<artifactId>commons-collections</artifactId>
 				</exclusion>
-			</exclusions-->
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey-version}</version>
 			<scope>compile</scope>
-			<!--exclusions>
+			<exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
 					<artifactId>cglib</artifactId>
@@ -141,30 +148,13 @@
 					<groupId>commons-collections</groupId>
 					<artifactId>commons-collections</artifactId>
 				</exclusion>
-			</exclusions-->
+			</exclusions>
 		</dependency>
+-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${jersey-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.distributions</groupId>
-			<artifactId>web-all</artifactId>
-			<version>10.0-build-20080430</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.embedded</groupId>
-			<artifactId>gf-embedded-api</artifactId>
-			<version>1.0-alpha-4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -223,6 +213,7 @@
 				<configuration>
 					<manifestLocation>${project.build.directory}/META-INF</manifestLocation>
 					<supportedProjectTypes>
+						<supportedProjectType>jar</supportedProjectType>
 						<supportedProjectType>bundle</supportedProjectType>
 						<supportedProjectType>war</supportedProjectType>
 					</supportedProjectTypes>
@@ -242,15 +233,20 @@
 							org.springframework.context.config;resolution:=optional,
 							org.osgi.framework;resolution:=optional,
 
-							com.sun.jersey.spi.container.servlet;resolution:=optional,
 							javax.ws.rs;resolution:=optional,
+							org.springframework.web.servlet;resolution:=optional,
 							org.objectweb.asm;resolution:=optional,
-							javax.annotation;resolution:=optional, 
+							javax.annotation;resolution:=optional,
+							
+							org.societies.api.identity;resolution:=optional,
+							
 							*;resolution:=optional
 						</Import-Package>
 						<Export-Package>!*</Export-Package>
 						<_nouses>true</_nouses>
-						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
+						<Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+						<Embed-Directory>WEB-INF/lib</Embed-Directory>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Webapp-Context>rest</Webapp-Context>
 						<Web-ContextPath>rest</Web-ContextPath>
 					</instructions>
@@ -263,13 +259,18 @@
 				<version>2.2</version>
 				<configuration>
 					<attachClasses>true</attachClasses>
+<!--
+					<packagingExcludes>WEB-INF/lib/a*.jar,WEB-INF/lib/c*.jar</packagingExcludes>
+-->
 					<archive>
 						<manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-					<!-- Make a skinny WAR -->
+						<manifest>
+							<addClasspath>true</addClasspath>
 <!--
-					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+							<classpathPrefix>lib/</classpathPrefix>
 -->
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 			
@@ -306,6 +307,7 @@
 									<version>1.2.1</version>
 									<type>jar</type>
 								</artifactItem> -->
+
 <!--
 								<artifactItem>
 									<groupId>com.sun.jersey</groupId>
@@ -320,6 +322,7 @@
 									<type>jar</type>
 								</artifactItem>
 -->
+
 								<artifactItem>
 									<groupId>org.objectweb.asm</groupId>
 									<artifactId>com.springsource.org.objectweb.asm</artifactId>
@@ -368,11 +371,6 @@
 				</configuration>
 			</plugin>
 			
-			<plugin>
-				<groupId>org.glassfish</groupId>
-				<artifactId>maven-glassfish-plugin</artifactId>
-			</plugin>
-			
 		</plugins>
 		
 	</build>
@@ -380,29 +378,5 @@
 	<properties>
 		<jersey-version>1.8</jersey-version>
 	</properties>
-	
-	<!--repositories>
-		<repository>
-			<id>glassfish.java.net</id>
-			<name>GlassFish Maven Repository</name>
-			<url>http://download.java.net/maven/glassfish</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>m2.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://download.java.net/maven/2</url>
-			<layout>default</layout>
-		</repository>        
-	</repositories-->
-	
-	<!--pluginRepositories>
-		<pluginRepository>
-			<id>m2.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://download.java.net/maven/2</url>
-			<layout>default</layout>
-		</pluginRepository>  
-	</pluginRepositories-->
 	
 </project>
