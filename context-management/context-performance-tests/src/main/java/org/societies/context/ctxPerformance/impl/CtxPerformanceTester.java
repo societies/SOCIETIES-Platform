@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +41,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -112,7 +114,7 @@ public class CtxPerformanceTester{
 	public void startMonitoring() {
 
 		Timer timer1 = new Timer();             // Get timer 1
-		long delay1 = 15*1000;                   // 15 seconds delay
+		long delay1 = 60*1000;                   // 60 seconds delay
 
 		System.out.println("startMonitoring");
 		timer1.schedule(new GetVolume(this.ctxBroker, this.cssOwnerId), 0, delay1);	
@@ -183,6 +185,8 @@ public class CtxPerformanceTester{
 			try {
 				indiEntity = this.internalCtxBroker.retrieveIndividualEntity(this.internalOwnerId).get();
 
+				//current context data
+				
 				byte entBytes [] = toByteArray(indiEntity);
 				entSize = entBytes.length;
 				System.out.println("entity volume "+ entSize);
@@ -203,19 +207,47 @@ public class CtxPerformanceTester{
 				}
 
 
-				IPerformanceMessage m = new PerformanceMessage();
-				m.setTestContext("ContextBroker_Volume_UserContextData");
-				m.setSourceComponent(this.getClass()+"");
-				m.setPerformanceType(IPerformanceMessage.Memory);
-				m.setOperationType("CSS_ContextData");
-				m.setD82TestTableName("S11");
+				IPerformanceMessage m1 = new PerformanceMessage();
+				m1.setTestContext("ContextBroker_Volume_UserContextData");
+				m1.setSourceComponent(this.getClass()+"");
+				m1.setPerformanceType(IPerformanceMessage.Memory);
+				m1.setOperationType("CSS_ContextData");
+				m1.setD82TestTableName("S56");
 				long volumeCtxDB = attrSize + assocSize + entSize;
-				m.setPerformanceNameValue("User Ctx Volume="+(volumeCtxDB));
+				m1.setPerformanceNameValue("User Ctx Volume="+(volumeCtxDB));
 
-				PERF_LOG.trace(m.toString());
+				PERF_LOG.trace(m1.toString());
 
-
-
+				//history context data
+				
+				long  attrHocSize = 0;
+				
+				if(indiEntity.getAttributes() != null){
+					Set<CtxAttribute> attrSet = indiEntity.getAttributes();
+					
+					for(CtxAttribute attr : attrSet){
+					
+						if(attr.isHistoryRecorded()){
+							List<CtxHistoryAttribute> attrList = this.internalCtxBroker.retrieveHistory(attr.getId(), null, null).get();
+							byte attrHistoryBytes [] = toByteArray(attrList);
+							long attrTempHocSize = attrHistoryBytes.length;
+							attrHocSize = attrHocSize + attrTempHocSize; 
+						}
+					}
+					System.out.println("individual hoc attribute volume length "+ attrSize);
+						
+				}
+								
+				IPerformanceMessage m2 = new PerformanceMessage();
+				m2.setTestContext("ContextBroker_Volume_UserContextHistoryData");
+				m2.setSourceComponent(this.getClass()+"");
+				m2.setPerformanceType(IPerformanceMessage.Memory);
+				m2.setOperationType("CSS_HistoryContextData");
+				m2.setD82TestTableName("S56");
+				long volumeHoCCtxDB = attrHocSize; 
+				m2.setPerformanceNameValue("User Ctx History Volume="+(volumeHoCCtxDB));
+									
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
