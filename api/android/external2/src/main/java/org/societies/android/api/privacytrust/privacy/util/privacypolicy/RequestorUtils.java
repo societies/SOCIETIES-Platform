@@ -22,16 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.android.api.servicelifecycle.ServiceUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class ResourceUtils {
-	public static String getDataIdUri(Resource resource) {
-		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+public class RequestorUtils {
+	public static String toFormattedString(RequestorBean requestor) {
+		StringBuilder sb = new StringBuilder();
+		if (requestor instanceof RequestorCisBean) {
+			sb.append("CIS:");
+			sb.append(requestor.getRequestorId());
+			sb.append("|");
+			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
+		}
+		else if (requestor instanceof RequestorServiceBean) {
+			String serviceOwnerJid = ServiceUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
+			String serviceId = ServiceUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
+			sb.append("Service:");
+			sb.append(serviceOwnerJid);
+			sb.append("|");
+			sb.append(serviceId);
+		}
+		else {
+			sb.append("CSS:");
+			sb.append(requestor.getRequestorId());
+		}
+		return sb.toString();
+	}
+	
+	public static RequestorBean fromFormattedString(String requestorString) {
+		String[] requestorInfo = requestorString.split(":");
+		// CIS
+		if (requestorString.startsWith("CIS:")) {
+			requestorInfo = requestorInfo[1].split("|");
+			RequestorCisBean requestor = new RequestorCisBean();
+			requestor.setRequestorId(requestorInfo[0]);
+			requestor.setCisRequestorId(requestorInfo[1]);
+			return requestor;
+		}
+		// Service
+		else if (requestorString.startsWith("Service:")) {
+			requestorInfo = requestorInfo[1].split("|");
+			RequestorServiceBean requestor = new RequestorServiceBean();
+			requestor.setRequestorId(requestorInfo[0]);
+			requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorInfo[1]));
+			return requestor;
+		}
+		// CSS
+		else {
+			RequestorBean requestor = new RequestorBean();
+			requestor.setRequestorId(requestorInfo[1]);
+			return requestor;
+		}
 	}
 }

@@ -5,6 +5,9 @@ package org.societies.android.api.comms;
  *
  */
 public interface IMethodCallback {
+
+	public static final String INTENT_NOTLOGGEDIN_EXCEPTION = "org.societies.android.platform.comms.NotLoggedInException";
+	
 	/**
 	 * A generic method to receive the callback action
 	 * @param resultFlag

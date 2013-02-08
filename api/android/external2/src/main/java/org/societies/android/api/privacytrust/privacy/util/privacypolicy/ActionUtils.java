@@ -22,64 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import org.societies.android.api.internal.servicelifecycle.ServiceModelUtils;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class RequestorUtils {
-	public static String toFormattedString(RequestorBean requestor) {
+public class ActionUtils {
+	public static List<Action> fromFormattedString(String actionsString) {
+		List<Action> actions = new ArrayList<Action>();
+		if (null != actionsString && !"".equals(actionsString)) {
+			int pos = 0, end;
+			// Loop over actions
+			while ((end = actionsString.indexOf('/', pos)) >= 0) {
+				String actionString = actionsString.substring(pos, end);
+				int positionOptional = actionString.indexOf(':');
+				Action action = new Action();
+				action.setActionConstant(ActionConstants.fromValue(actionString.substring(0, positionOptional)));
+				action.setOptional("false".equals(actionString.substring(positionOptional+1, actionString.length())) ? false : true);
+				actions.add(action);
+				pos = end + 1;
+			}
+		}
+		return actions;
+	}
+	public static String toFormattedString(List<Action> actions) {
 		StringBuilder sb = new StringBuilder();
-		if (requestor instanceof RequestorCisBean) {
-			sb.append("CIS:");
-			sb.append(requestor.getRequestorId());
-			sb.append("|");
-			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
-		}
-		else if (requestor instanceof RequestorServiceBean) {
-			String serviceOwnerJid = ServiceModelUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
-			String serviceId = ServiceModelUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
-			sb.append("Service:");
-			sb.append(serviceOwnerJid);
-			sb.append("|");
-			sb.append(serviceId);
-		}
-		else {
-			sb.append("CSS:");
-			sb.append(requestor.getRequestorId());
+		if (null != actions) {
+			for(int i=0; i<actions.size(); i++) {
+				sb.append(actions.get(i).getActionConstant().name()+":"+(actions.get(i).isOptional() ? "true" : "false")+"/");
+			}
 		}
 		return sb.toString();
-	}
-	
-	public static RequestorBean fromFormattedString(String requestorString) {
-		String[] requestorInfo = requestorString.split(":");
-		// CIS
-		if (requestorString.startsWith("CIS:")) {
-			requestorInfo = requestorInfo[1].split("|");
-			RequestorCisBean requestor = new RequestorCisBean();
-			requestor.setRequestorId(requestorInfo[0]);
-			requestor.setCisRequestorId(requestorInfo[1]);
-			return requestor;
-		}
-		// Service
-		else if (requestorString.startsWith("Service:")) {
-			requestorInfo = requestorInfo[1].split("|");
-			RequestorServiceBean requestor = new RequestorServiceBean();
-			requestor.setRequestorId(requestorInfo[0]);
-			requestor.setRequestorServiceId(ServiceModelUtils.generateServiceResourceIdentifierFromString(requestorInfo[1]));
-			return requestor;
-		}
-		// CSS
-		else {
-			RequestorBean requestor = new RequestorBean();
-			requestor.setRequestorId(requestorInfo[1]);
-			return requestor;
-		}
 	}
 }

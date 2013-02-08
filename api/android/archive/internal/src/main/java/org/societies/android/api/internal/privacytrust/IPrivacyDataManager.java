@@ -26,10 +26,10 @@ package org.societies.android.api.internal.privacytrust;
 
 import java.util.List;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapper;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
