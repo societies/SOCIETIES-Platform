@@ -226,52 +226,26 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		
 		final ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.LOGIN_CSS);
 
-		try {
-    		ccm.register(ELEMENT_NAMES, new ICommCallback() {
+		this.ccm.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				if (resultFlag) {
 				
-				@Override
-				public void receiveResult(Stanza arg0, Object result) {
-					boolean status = (Boolean) result;
-					if (status) {
-						try {
-							ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-						} catch (CommunicationException e) {
-							// TODO Auto-generated catch block
-							Log.e(LOG_TAG, e.getMessage(), e);
-						}
+					try {
+						ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 						Log.d(LOG_TAG, "Send stanza");
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						Log.e(LOG_TAG, e.getMessage(), e);
 					}
 				}
-				
-				@Override
-				public void receiveMessage(Stanza arg0, Object arg1) {
-				}
-				
-				@Override
-				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-				}
-				
-				@Override
-				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-				}
-				
-				@Override
-				public void receiveError(Stanza arg0, XMPPError arg1) {
-				}
-				
-				@Override
-				public List<String> getXMLNamespaces() {
-					return NAME_SPACES;
-				}
-				
-				@Override
-				public List<String> getJavaPackages() {
-					return PACKAGES;
-				}
-			});
-		} catch (Exception e) {
-			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
-        } 
+			}
+		});
 
 		return null;
 	}
