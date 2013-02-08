@@ -87,7 +87,7 @@ public class CreateCommunityCtx {
 			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
 		LOG.info("gCommunity Entity Created");
 		LOG.info("g00");		
-			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("boo@societies.local ");
+			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("john@societies.local ");
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 
 LOG.info("g01");
@@ -108,7 +108,7 @@ LOG.info("g03");
 			Test1108.getCtxBroker().update(individualAttr1);
 			Test1108.getCtxBroker().update(individualAttr2);
 LOG.info("g04");
-			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("coo@societies.local ");
+			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("XCManager@societies.local ");
 			this.indiEnt2 = Test1108.getCtxBroker().createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
 LOG.info("g05");
 			CtxAttribute individualAttr3 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
