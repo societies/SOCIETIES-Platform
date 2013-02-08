@@ -29,8 +29,13 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -102,6 +107,9 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 		uniqueConstraints = { @UniqueConstraint(columnNames = {
 				"owner_id", "type" }) }
 )
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "entity_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("CommunityCtxEntity")
 public class CommunityCtxEntityDAO extends CtxModelObjectDAO {
 	
 	private static final long serialVersionUID = 4804830819205311983L;

@@ -64,6 +64,7 @@ import org.societies.context.community.db.impl.model.CommunityCtxModelDAOTransla
 import org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO;
+import org.societies.context.community.db.impl.model.CtxEntityDAO;
 import org.societies.context.community.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxQualityDAO;
 import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
@@ -212,8 +213,40 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			throw new NullPointerException("cisId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
+
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxEntityIdentifier id = 
+				new CtxEntityIdentifier(cisId, type, modelObjectNumber);
+		final CtxEntityDAO entityDAO = new CtxEntityDAO(id);
+
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try{
+			tx = session.beginTransaction();
+			session.save(entityDAO);
+			tx.commit();
+		}
+		catch (Exception e) {
+			if (tx != null)
+				tx.rollback();
+			throw new CommunityCtxDBMgrException("Could not create entity of type '" 
+					+ type + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
+					new String[] {CtxChangeEventTopic.CREATED}, CtxEventScope.BROADCAST);
+		} else {
+			LOG.warn("Could not send context change event to topics '"
+					+ CtxChangeEventTopic.CREATED
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
+					+ "ICtxEventMgr service is not available");
+		}
 		
-		// TODO
+		return (CtxEntity) this.retrieve(id);
 	}
 	
 	/*
