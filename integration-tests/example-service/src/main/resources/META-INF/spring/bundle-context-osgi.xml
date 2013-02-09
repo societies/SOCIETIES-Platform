@@ -23,7 +23,7 @@
 		<property name="authorSignature" value="integrator" />
 		<property name="serviceDescription" value="Example Service to test Integration" />
 		<property name="serviceName" value="IntegrationExample" />
-		<property name="serviceType" value="THIRD_PARTY_SERVER" />
+		<property name="serviceType" value="THIRD_PARTY_CLIENT" />
 	</bean>
 
 </beans>

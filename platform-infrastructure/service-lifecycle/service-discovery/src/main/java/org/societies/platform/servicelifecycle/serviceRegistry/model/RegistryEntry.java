@@ -159,7 +159,7 @@ public class RegistryEntry implements Serializable {
 		this.serviceName = serviceName;
 	}
 
-	@Column(name = "ServiceDescription")
+	@Column(name = "ServiceDescription", length = 1024)
 	public String getServiceDescription() {
 		return serviceDescription;
 	}
@@ -339,7 +339,7 @@ public class RegistryEntry implements Serializable {
 		this.serviceType = serviceType;
 	}
 
-	@Column(name = "ServiceLocation")
+	@Column(name = "ServiceLocation", length = 512)
 	public String getServiceLocation() {
 		return serviceLocation;
 	}
