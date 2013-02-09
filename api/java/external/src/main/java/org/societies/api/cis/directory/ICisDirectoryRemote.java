@@ -25,6 +25,8 @@
 
 package org.societies.api.cis.directory;
 
+import java.util.List;
+
 import org.societies.api.cis.directory.ICisDirectoryCallback;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -85,6 +87,13 @@ public interface ICisDirectoryRemote {
 	 * @param cis_id ID of cis advertisment to return
 	 */
 	public void searchByID(String cisID, ICisDirectoryCallback callback);
+	
+	/**
+	 * Search for a list of advertisement records based on list of CisID  in the CisDirectory
+	 *
+	 * @param cisIds List of ID of cis advertisments to return
+	 */
+	public void searchByIDS(List<String> cisIDs, ICisDirectoryCallback callback);
 	
 	
 }
