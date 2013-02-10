@@ -25,9 +25,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.content;
 
+import org.societies.android.api.contentproviders.CSSContentProvider;
+import org.societies.android.api.contentproviders.CSSContentProvider.CssNodes;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -37,6 +43,25 @@ import android.net.Uri;
  */
 public class ProviderImplemenation extends ContentProvider {
 	private DBHelper dbHelper;
+	
+	private final static int CSS_NODES_MATCHER = 1;
+	private final static int CSS_ARCHIVED_NODES_MATCHER = 2;
+	private final static int CSS_RECORD_MATCHER = 3;
+	private final static int CSS_PREFERENCES_MATCHER = 4;
+	
+	private final static String USER = "user";
+	private final static String XMPP_SERVER = "xmppServer";
+	private final static String DOMAIN_AUTHORITY = "domainAuthority";
+	private final static String CURRENT_NODE_JID = "currentNodeJid";
+	
+	private String [] CSS_PREFERENCES_COLUMNS = {USER, XMPP_SERVER, DOMAIN_AUTHORITY, CURRENT_NODE_JID};
+	
+    private UriMatcher uriMatcher;
+
+    public ProviderImplemenation() {
+    	super();
+    	uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    }
 	
 	@Override
 	public int delete(Uri arg0, String arg1, String[] arg2) {
@@ -63,10 +88,38 @@ public class ProviderImplemenation extends ContentProvider {
 	}
 
 	@Override
-	public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
-			String arg4) {
-		// TODO Auto-generated method stub
-		return null;
+	public Cursor query(Uri uri, String[] columns, String selectionCriteria, String[] selectionArgs, String sortOrder) {
+		Cursor cursor = null;
+		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+	    // TODO: required API level 14
+//	    queryBuilder.setStrict(true);
+	    
+	    switch(this.uriMatcher.match(uri)) {
+		    case CSS_ARCHIVED_NODES_MATCHER: 
+		    	queryBuilder.setTables(DBHelper.ARCHIVED_NODE_TABLE);
+		    	break;
+		    case CSS_NODES_MATCHER: 
+		    	queryBuilder.setTables(DBHelper.CURRENT_NODE_TABLE);
+		    	break;
+		    case CSS_PREFERENCES_MATCHER:
+		    	break;
+		    case CSS_RECORD_MATCHER:
+		    	queryBuilder.setTables(DBHelper.CSS_RECORD_TABLE);
+		    	break;
+	    	default:
+	    		throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	    
+	    if (CSS_PREFERENCES_MATCHER != this.uriMatcher.match(uri)) {
+	    	cursor = queryBuilder.query(this.dbHelper.getReadableDatabase(), columns, selectionCriteria, selectionArgs, null, null, sortOrder);
+	    } else {
+	    	cursor  = new MatrixCursor(CSS_PREFERENCES_COLUMNS);
+	    }
+	    
+	    // Make sure that potential listeners are notified
+	    cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+		return cursor;
 	}
 
 	@Override
@@ -75,4 +128,13 @@ public class ProviderImplemenation extends ContentProvider {
 		return 0;
 	}
 
+	/**
+	 * Build the URI matcher with
+	 */
+	private void buildUriMatcher() {
+		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssNodes.PATH, CSS_NODES_MATCHER);
+		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssArchivedNodes.PATH, CSS_ARCHIVED_NODES_MATCHER);		
+		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssRecord.PATH, CSS_RECORD_MATCHER);
+		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssPreferences.PATH, CSS_PREFERENCES_MATCHER);
+	}
 }

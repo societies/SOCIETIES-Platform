@@ -39,9 +39,15 @@ public class CSSContentProvider {
 	
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
+	public static final class CssPreferences implements BaseColumns {
+		public static final String PATH = "CssPreferences";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
+	}
+
 	public static final class CssNodes implements BaseColumns {
 
-		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/CssNode");
+		public static final String PATH = "CssNode";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
 		
 		public final static String CSS_NODE_IDENTITY = "identity";
 		public final static String CSS_NODE_TYPE = "type";
@@ -52,7 +58,8 @@ public class CSSContentProvider {
 	
 	public static final class CssArchivedNodes implements BaseColumns {
 
-		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/ArchivedCssNode");
+		public static final String PATH = "ArchivedCssNode";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
 		
 		public final static String CSS_NODE_IDENTITY = "identity";
 		public final static String CSS_NODE_TYPE = "type";
@@ -62,8 +69,9 @@ public class CSSContentProvider {
 	}
 
 	public static final class CssRecord implements BaseColumns {
-		
-		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/cssRecord");
+
+		public static final String PATH = "cssRecord";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
 		
 		public final static String CSS_RECORD_DOMAIN_SERVER = "domainServer";
 		public final static String CSS_RECORD_CSS_HOSTING_LOCATION = "cssHostingLocation";
