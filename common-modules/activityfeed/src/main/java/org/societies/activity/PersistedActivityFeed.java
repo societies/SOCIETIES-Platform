@@ -44,7 +44,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed{//, Subscriber {
+public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed {//, Subscriber {
 	
 	
 	private PubsubClient pubSubcli;
