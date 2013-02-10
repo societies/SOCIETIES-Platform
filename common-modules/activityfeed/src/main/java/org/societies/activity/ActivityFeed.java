@@ -69,7 +69,6 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		this.id = id;
 		list = new HashSet<Activity>();// from Thomas
 	}
-	@Autowired 
 	protected SessionFactory sessionFactory;
     protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
     //protected Session session;
@@ -233,6 +232,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	
 	public void setSessionFactory(SessionFactory sessionFactory) {
+        LOG.info("sessionFactory injected");
 		this.sessionFactory = sessionFactory;
 	}
 	
