@@ -57,7 +57,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	 * 
 	 */
 
-
+    protected String owner;
     protected String id;// represents the CIS which owns the activity feed
     protected
 	Set<Activity> list;

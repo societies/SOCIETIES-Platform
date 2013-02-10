@@ -25,6 +25,11 @@
 
 package org.societies.activity;
 
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedManager;
+
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: bjornmagnus
@@ -32,6 +37,18 @@ package org.societies.activity;
  * Time: 16:06
  * To change this template use File | Settings | File Templates.
  */
-public class ActivityFeedManager {
+public class ActivityFeedManager implements IActivityFeedManager {
+    List<IActivityFeed> feeds;
+    @Override
+    public IActivityFeed getOrCreateFeed(String id) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
+    @Override
+    public boolean deleteFeed(String id) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+    public void init(){
+
+    }
 }
