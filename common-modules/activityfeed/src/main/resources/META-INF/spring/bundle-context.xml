@@ -97,13 +97,9 @@
          for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-    <bean id="cpa" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="cisDataCollector"
+    <bean id="activityFeedManager" class="org.societies.activity.ActivityFeedManager" depends-on=""
           init-method="init">
-        <property name="collector" ref="cisDataCollector" />
-        <property name="eventMgr" ref="eventMgr"/>
+        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
-    <bean id="activityFeed" class="org.societies.activity.PersistedActivityFeed"
-          depends-on="" init-method="init">
-    </bean>
 </beans>

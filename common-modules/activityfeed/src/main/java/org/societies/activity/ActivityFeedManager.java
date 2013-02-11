@@ -25,9 +25,15 @@
 
 package org.societies.activity;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,17 +44,67 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ActivityFeedManager implements IActivityFeedManager {
-    List<IActivityFeed> feeds;
+    private List<IActivityFeed> feeds;
+    private SessionFactory sessionFactory;
+    private static Logger LOG = LoggerFactory
+            .getLogger(ActivityFeedManager.class);
     @Override
-    public IActivityFeed getOrCreateFeed(String id) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public IActivityFeed getOrCreateFeed(String ownerId, String feedId) {
+        for(IActivityFeed feed : feeds){
+            if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
+                if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
+                    return null;
+                ((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
+                return feed;
+            }
+        }
+
+        //not existing, making a new one..
+        IActivityFeed ret = new ActivityFeed(ownerId,feedId);
+        feeds.add(ret);
+        return ret;
     }
 
     @Override
-    public boolean deleteFeed(String id) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public boolean deleteFeed(String ownerId, String feedId) {
+        Iterator<IActivityFeed> it = feeds.iterator(); IActivityFeed cur=null;
+        while(it.hasNext())    {
+            cur = it.next();
+            if(((ActivityFeed)cur).getId().contentEquals(feedId)) {
+                if(!((ActivityFeed)cur).getOwner().contentEquals(ownerId))
+                    return false;
+
+                return feeds.remove(it);
+            }
+        }
+/*        for(IActivityFeed feed : feeds){
+            if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
+                if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
+                    return false;
+
+                return feeds.remove(feed);
+            }
+        }*/
+        return false;
     }
     public void init(){
+        Session session = getSessionFactory().openSession();
+        try{
+        feeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+        		}catch(Exception e){
+        LOG.error("CISManager startup queries failed..");
+        e.printStackTrace();
+    }finally{
+        if(session!=null)
+            session.close();
+    }
+    }
 
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 }
