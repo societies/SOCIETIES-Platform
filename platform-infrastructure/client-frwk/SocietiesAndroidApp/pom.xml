@@ -122,18 +122,18 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.android.platform</groupId>
 			<artifactId>SocietiesAndroidSocialData</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency>
-		<dependency>
+		</dependency-->
+		<!--dependency>
 			<groupId>org.societies.android</groupId>
 			<artifactId>privacytrust</artifactId>
 			<version>${version.pt}</version>
 			<type>apklib</type>
-		</dependency>
+		</dependency-->
 		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
