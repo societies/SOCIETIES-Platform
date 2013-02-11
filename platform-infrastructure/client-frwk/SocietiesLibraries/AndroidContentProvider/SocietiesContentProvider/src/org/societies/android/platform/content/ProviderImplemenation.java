@@ -27,6 +27,7 @@ package org.societies.android.platform.content;
 
 import org.societies.android.api.contentproviders.CSSContentProvider;
 import org.societies.android.api.contentproviders.CSSContentProvider.CssNodes;
+import org.societies.android.platform.androidutils.AppPreferences;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -35,6 +36,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Implements the Content Provider API to allow other external and internal components to access 
@@ -42,25 +44,26 @@ import android.net.Uri;
  *
  */
 public class ProviderImplemenation extends ContentProvider {
-	private DBHelper dbHelper;
+	private final static String LOG_TAG = ProviderImplemenation.class.getName();
 	
 	private final static int CSS_NODES_MATCHER = 1;
 	private final static int CSS_ARCHIVED_NODES_MATCHER = 2;
 	private final static int CSS_RECORD_MATCHER = 3;
 	private final static int CSS_PREFERENCES_MATCHER = 4;
 	
-	private final static String USER = "user";
-	private final static String XMPP_SERVER = "xmppServer";
-	private final static String DOMAIN_AUTHORITY = "domainAuthority";
-	private final static String CURRENT_NODE_JID = "currentNodeJid";
-	
-	private String [] CSS_PREFERENCES_COLUMNS = {USER, XMPP_SERVER, DOMAIN_AUTHORITY, CURRENT_NODE_JID};
 	
     private UriMatcher uriMatcher;
+	private DBHelper dbHelper;
+	private final String preferenceColumnNames [] = {CSSContentProvider.CssPreferences.CSS_USER_PREFERENCE,
+											CSSContentProvider.CssPreferences.CSS_XMPP_SERVER,
+											CSSContentProvider.CssPreferences.CSS_DOMAIN_AUTHORITY,
+											CSSContentProvider.CssPreferences.CSS_CURRENT_NODE_JID};
 
+	
     public ProviderImplemenation() {
     	super();
-    	uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    	this.uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    	this.buildUriMatcher(this.uriMatcher);
     }
 	
 	@Override
@@ -83,12 +86,21 @@ public class ProviderImplemenation extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
+		Log.d(LOG_TAG, "CSS Content Provider created");
 		this.dbHelper = new DBHelper(this.getContext(), CssRecordDAO.SOCIETIES_DATABASE_NAME, null, CssRecordDAO.SOCIETIES_DATABASE_VERSION);
 		return true;
 	}
 
 	@Override
 	public Cursor query(Uri uri, String[] columns, String selectionCriteria, String[] selectionArgs, String sortOrder) {
+		Log.d(LOG_TAG, "Content provider query");
+		Log.d(LOG_TAG,"Selection criteria: " + selectionCriteria);
+		if (null != columns) {
+			for (String column: columns) {
+				Log.d(LOG_TAG, "Query column: " + column);
+			}
+		}
+		
 		Cursor cursor = null;
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 	    // TODO: required API level 14
@@ -96,24 +108,41 @@ public class ProviderImplemenation extends ContentProvider {
 	    
 	    switch(this.uriMatcher.match(uri)) {
 		    case CSS_ARCHIVED_NODES_MATCHER: 
+		    	Log.d(LOG_TAG, "Archived CSS Nodes query matched" );
 		    	queryBuilder.setTables(DBHelper.ARCHIVED_NODE_TABLE);
 		    	break;
 		    case CSS_NODES_MATCHER: 
+		    	Log.d(LOG_TAG, "Current CSS Nodes query matched" );
 		    	queryBuilder.setTables(DBHelper.CURRENT_NODE_TABLE);
 		    	break;
 		    case CSS_PREFERENCES_MATCHER:
+		    	Log.d(LOG_TAG, "CSS Preferences query matched" );
 		    	break;
 		    case CSS_RECORD_MATCHER:
+		    	Log.d(LOG_TAG, "CSS record query matched" );
 		    	queryBuilder.setTables(DBHelper.CSS_RECORD_TABLE);
 		    	break;
 	    	default:
+		    	Log.d(LOG_TAG, "Unknown URI" );
 	    		throw new IllegalArgumentException("Unknown URI: " + uri);
 	    }
 	    
 	    if (CSS_PREFERENCES_MATCHER != this.uriMatcher.match(uri)) {
+	    	Log.d(LOG_TAG, "Executing database query");
 	    	cursor = queryBuilder.query(this.dbHelper.getReadableDatabase(), columns, selectionCriteria, selectionArgs, null, null, sortOrder);
+
 	    } else {
-	    	cursor  = new MatrixCursor(CSS_PREFERENCES_COLUMNS);
+	    	Log.d(LOG_TAG, "Getting app preferences for query");
+	    	AppPreferences preferences = new AppPreferences(getContext());
+	    	
+	    	String columnValues [] = new String[this.preferenceColumnNames.length];
+	    	for (int i = 0; i < this.preferenceColumnNames.length; i++) {
+	    		columnValues[i] = preferences.getStringPrefValue(this.preferenceColumnNames[i]);
+	    	}
+	    	
+	    	MatrixCursor mCursor  = new MatrixCursor(this.preferenceColumnNames);
+	    	mCursor.addRow(columnValues);
+	    	cursor = mCursor;
 	    }
 	    
 	    // Make sure that potential listeners are notified
@@ -131,10 +160,10 @@ public class ProviderImplemenation extends ContentProvider {
 	/**
 	 * Build the URI matcher with
 	 */
-	private void buildUriMatcher() {
-		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssNodes.PATH, CSS_NODES_MATCHER);
-		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssArchivedNodes.PATH, CSS_ARCHIVED_NODES_MATCHER);		
-		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssRecord.PATH, CSS_RECORD_MATCHER);
-		this.uriMatcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssPreferences.PATH, CSS_PREFERENCES_MATCHER);
+	private void buildUriMatcher(UriMatcher matcher) {
+		matcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssNodes.PATH, CSS_NODES_MATCHER);
+		matcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssArchivedNodes.PATH, CSS_ARCHIVED_NODES_MATCHER);		
+		matcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssRecord.PATH, CSS_RECORD_MATCHER);
+		matcher.addURI(CSSContentProvider.AUTHORITY, CSSContentProvider.CssPreferences.PATH, CSS_PREFERENCES_MATCHER);
 	}
 }

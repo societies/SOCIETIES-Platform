@@ -49,10 +49,8 @@
 
 		<!-- API -->
 		<module>../../api/android-pom.xml</module>
-		<!--
-		<module>../../api/android/external2</module>
-		<module>../../api/android/internal2</module>
-		 -->
+		<!--module>../../api/android/external2</module>
+		<module>../../api/android/internal2</module-->
 		 				
 		<!-- Android Communication components -->
 		<module>../../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons/android-pom.xml</module>
