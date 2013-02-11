@@ -36,6 +36,7 @@ import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -46,7 +47,6 @@ import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 
 /**
@@ -55,7 +55,7 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CisDirectoryBase implements ICisDirectory {
+public class CisDirectoryBase implements ICisDirectory, IServiceManager {
 	//LOGGING TAG
 	private static final String LOG_TAG = CisDirectoryBase.class.getName();
 	
@@ -67,7 +67,6 @@ public class CisDirectoryBase implements ICisDirectory {
 	private ClientCommunicationMgr commMgr;
     private Context androidContext;
     private boolean connectedToComms = false;
-    private boolean registeredNamespaces = false;
     
     /**
      * Default constructor
@@ -83,250 +82,175 @@ public class CisDirectoryBase implements ICisDirectory {
 			Log.e(LOG_TAG, e.getMessage());
         }
     }
+
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+			        	commMgr.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "CisDirectoryBase stopService unregistering namespaces");
+        	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					commMgr.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+    	return true;
+    }
     
     /**
 	 * @param client
 	 */
-	private void broadcastNotLoggedIn(final String client) {
+	private void broadcastServiceNotStarted(String client, String method) {
 		if (client != null) {
-			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
 			intent.setPackage(client);
-			CisDirectoryBase.this.androidContext.sendBroadcast(intent);
+			androidContext.sendBroadcast(intent);
 		}
 	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords(java.lang.String) */
 	public CisAdvertisementRecord[] findAllCisAdvertisementRecords(final String client) {
-        Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
+		Log.d(LOG_TAG, "findAllCisAdvertisementRecords called by client: " + client);
+		Dbc.require("Client must be supplied", client != null);
 		
-        if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "findAllCisAdvertisementRecords connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-	
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-						String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
-						methodAsync.execute(params);		
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-	
-				@Override
-				public void returnAction(String result) {
-				}
-			});
+        if (connectedToComms) {
+			//MESSAGE BEAN
+			final CisDirectoryBean messageBean = new CisDirectoryBean();
+			messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
+			//SEND COMMS
+			try {
+				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
+				final ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_ALL_CIS);
+				final Stanza stanza = new Stanza(toID);
+				commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback); 
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
         } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-			String params[] = {client, ICisDirectory.FIND_ALL_CIS, ""};
-			methodAsync.execute(params);
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ICisDirectory.FIND_ALL_CIS);
         }
-		
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#findForAllCis(java.lang.String, java.lang.String) */
 	public CisAdvertisementRecord[] findForAllCis(final String client, final String filter) {       
         Log.d(LOG_TAG, "findForAllCis called by client: " + client);
+		Dbc.require("Client must be supplied", client != null);
 		
-        if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-						String params[] = {client, ICisDirectory.FILTER_CIS, filter};
-						methodAsync.execute(params);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-				
-				@Override
-				public void returnAction(String result) {
-				}
-			});
+        if (connectedToComms) {
+			//MESSAGE BEAN
+			final CisDirectoryBean messageBean = new CisDirectoryBean();
+			messageBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
+			CisAdvertisementRecord advert = new CisAdvertisementRecord();
+			advert.setName(filter);
+			messageBean.setCisA(advert);
+			//SEND COMMS
+			try {
+				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
+				final ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FILTER_CIS);
+				final Stanza stanza = new Stanza(toID);
+				commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback); 
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
         } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-			String params[] = {client, ICisDirectory.FILTER_CIS, filter};
-			methodAsync.execute(params);
-		}
-		
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ICisDirectory.FILTER_CIS);
+        }
 		return null;
 	}
 
 	/* @see org.societies.android.api.cis.directory.ICisDirectory#searchByID(java.lang.String, java.lang.String) */
 	public CisAdvertisementRecord searchByID(final String client, final String cis_id) {
 		Log.d(LOG_TAG, "searchByID called by client: " + client);
+		Dbc.require("Client must be supplied", client != null);
 		
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "findForAllCis connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-						String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
-						methodAsync.execute(params);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-				
-				@Override
-				public void returnAction(String result) {
-				}
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	AsyncDirFunctions methodAsync = new AsyncDirFunctions();
-    		String params[] = {client, ICisDirectory.FIND_CIS_ID, cis_id};
-    		methodAsync.execute(params);
-		}
-		
-		return null;
-	}
-
-	/**
-	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
-	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
-	 * method invocation is an explicitly asynchronous operation, other usage is not and the use of these types of classes
-	 * is encouraged. Remember, Android Not Responding (ANR) exceptions will be invoked if the main app thread is abused
-	 * and the app will be closed down by Android very soon after.
-	 * 
-	 * Although the result of an AsyncTask can be obtained by using <AsyncTask Object>.get() it's not a good idea as 
-	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
-	 * class ineffective. Use Intents as an asynchronous callback mechanism.
-	 */
-
-	/**
-	 * This class carries out the GetFriendRequests method call asynchronously
-	 */
-	private class AsyncDirFunctions extends AsyncTask<String, Void, String[]> {
-		
-		@Override
-		protected String[] doInBackground(String... params) {
-			Dbc.require("At least one parameter must be supplied", params.length >= 1);
-			Log.d(LOG_TAG, "AsyncFriendRequests - doInBackground");
-			
-			//PARAMETERS
-			String client = params[0];
-			String method = params[1];
-			String filterCis = params[2];
-			//RETURN OBJECT
-			String results[] = new String[1];
-			results[0] = client;
+        if (connectedToComms) {
 			//MESSAGE BEAN
 			final CisDirectoryBean messageBean = new CisDirectoryBean();
-			if (method.equals(ICisDirectory.FIND_CIS_ID)) {
-				messageBean.setMethod(MethodType.SEARCH_BY_ID);
-				messageBean.setFilter(filterCis);
-			} 
-			else if (method.equals(ICisDirectory.FILTER_CIS)) {
-				messageBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
-				CisAdvertisementRecord advert = new CisAdvertisementRecord();
-				advert.setName(filterCis);
-				messageBean.setCisA(advert);
-			} 
-			else {
-				messageBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
-			}
-			//COMMS CONFIG
+			messageBean.setMethod(MethodType.SEARCH_BY_ID);
+			messageBean.setFilter(cis_id);
+			//SEND COMMS
 			try {
 				IIdentity toID = commMgr.getIdManager().getDomainAuthorityNode();
-				final ICommCallback cisCallback = new CisDirectoryCallback(client, method);
+				final ICommCallback cisCallback = new CisDirectoryCallback(client, ICisDirectory.FIND_CIS_ID);
 				final Stanza stanza = new Stanza(toID);
-	        
-				//only need to register once
-				if (!CisDirectoryBase.this.registeredNamespaces) {
-					CisDirectoryBase.this.registeredNamespaces = true;
-					
-		        	commMgr.register(ELEMENT_NAMES, new ICommCallback() {
-						
-						@Override
-						public void receiveResult(Stanza arg1, Object result) {
-							boolean status = (Boolean) result;
-							if (status) {
-					        	try {
-									commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-								} catch (CommunicationException e) {
-									// TODO Auto-generated catch block
-									Log.e(LOG_TAG, "Error sending XMPP message", e);
-								}
-							}
-						}
-						
-						@Override
-						public void receiveMessage(Stanza stanza, Object payload) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						@Override
-						public void receiveItems(Stanza stanza, String node, List<String> items) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						@Override
-						public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						@Override
-						public void receiveError(Stanza stanza, XMPPError error) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						@Override
-						public List<String> getXMLNamespaces() {
-							// TODO Auto-generated method stub
-							return NAME_SPACES;
-						}
-						
-						@Override
-						public List<String> getJavaPackages() {
-							// TODO Auto-generated method stub
-							return PACKAGES;
-						}
-					});
-				} else {
-		        	try {
-						commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-					} catch (CommunicationException e) {
-						// TODO Auto-generated catch block
-						Log.e(LOG_TAG, "Error sending XMPP message", e);
-					}
-				}
-					
+				commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback); 
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
 	        }
-			return results;
-		}
-
-		@Override
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ICisDirectory.FIND_CIS_ID);
+        }
+		return null;
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
