@@ -25,10 +25,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.content;
 
+import org.societies.android.api.contentproviders.CSSContentProvider;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 /**
  * Helper class to create Societies Client Database
@@ -42,30 +45,30 @@ public class DBHelper extends SQLiteOpenHelper {
 	public final static String ARCHIVED_NODE_TABLE = "ArchivedCssNode";
 	
 	//Create constants for table columns to maintain a single reference fir each column
-	public final static String ROW_ID = "_id";
+	public final static String ROW_ID = BaseColumns._ID;
 	
-	public final static String CSS_NODE_IDENTITY = "identity";
-	public final static String CSS_NODE_TYPE = "type";
-	public final static String CSS_NODE_STATUS = "status";
-	public final static String CSS_NODE_RECORD = "record";
+	public final static String CSS_NODE_IDENTITY = CSSContentProvider.CssNodes.CSS_NODE_IDENTITY;
+	public final static String CSS_NODE_TYPE = CSSContentProvider.CssNodes.CSS_NODE_TYPE;
+	public final static String CSS_NODE_STATUS = CSSContentProvider.CssNodes.CSS_NODE_STATUS;
+	public final static String CSS_NODE_RECORD = CSSContentProvider.CssNodes.CSS_NODE_RECORD;
 
-	public final static String CSS_RECORD_DOMAIN_SERVER = "domainServer";
-	public final static String CSS_RECORD_CSS_HOSTING_LOCATION = "cssHostingLocation";
-	public final static String CSS_RECORD_ENTITY = "entity";
-	public final static String CSS_RECORD_FORENAME = "foreName";
-	public final static String CSS_RECORD_NAME = "name";
-	public final static String CSS_RECORD_IDENTITY_NAME = "identityName";
+	public final static String CSS_RECORD_DOMAIN_SERVER = CSSContentProvider.CssRecord.CSS_RECORD_DOMAIN_SERVER;
+	public final static String CSS_RECORD_CSS_HOSTING_LOCATION = CSSContentProvider.CssRecord.CSS_RECORD_CSS_HOSTING_LOCATION;
+	public final static String CSS_RECORD_ENTITY = CSSContentProvider.CssRecord.CSS_RECORD_ENTITY;
+	public final static String CSS_RECORD_FORENAME = CSSContentProvider.CssRecord.CSS_RECORD_FORENAME;
+	public final static String CSS_RECORD_NAME = CSSContentProvider.CssRecord.CSS_RECORD_NAME;
+	public final static String CSS_RECORD_IDENTITY_NAME = CSSContentProvider.CssRecord.CSS_RECORD_IDENTITY_NAME;
 	public final static String CSS_RECORD_PASSWORD = "password";
-	public final static String CSS_RECORD_EMAILID = "emailID";
-	public final static String CSS_RECORD_IMID = "imID";
-	public final static String CSS_RECORD_SOCIALURI = "socialURI";
-	public final static String CSS_RECORD_SEX = "sex";
-	public final static String CSS_RECORD_HOME_LOCATION = "homeLocation";
-	public final static String CSS_RECORD_CSS_IDENTITY = "cssIdentity";
-	public final static String CSS_RECORD_STATUS = "status";
-	public final static String CSS_RECORD_REGISTRATION = "cssRegistration";
-	public final static String CSS_RECORD_INACTIVATION = "cssInactivation";
-	public final static String CSS_RECORD_UPTIME = "cssUpTime";
+	public final static String CSS_RECORD_EMAILID = CSSContentProvider.CssRecord.CSS_RECORD_EMAILID;
+	public final static String CSS_RECORD_IMID = CSSContentProvider.CssRecord.CSS_RECORD_IMID;
+	public final static String CSS_RECORD_SOCIALURI = CSSContentProvider.CssRecord.CSS_RECORD_SOCIALURI;
+	public final static String CSS_RECORD_SEX = CSSContentProvider.CssRecord.CSS_RECORD_SEX;
+	public final static String CSS_RECORD_HOME_LOCATION = CSSContentProvider.CssRecord.CSS_RECORD_HOME_LOCATION;
+	public final static String CSS_RECORD_CSS_IDENTITY = CSSContentProvider.CssRecord.CSS_RECORD_CSS_IDENTITY;
+	public final static String CSS_RECORD_STATUS = CSSContentProvider.CssRecord.CSS_RECORD_STATUS;
+	public final static String CSS_RECORD_REGISTRATION = CSSContentProvider.CssRecord.CSS_RECORD_REGISTRATION;
+	public final static String CSS_RECORD_INACTIVATION = CSSContentProvider.CssRecord.CSS_RECORD_INACTIVATION;
+	public final static String CSS_RECORD_UPTIME = CSSContentProvider.CssRecord.CSS_RECORD_UPTIME;
 	
 	//Create an "all columns" array. Useful for retrieving all data from a table
 	public final static String [] ALL_CSSRECORD_COLUMNS = {ROW_ID, CSS_RECORD_DOMAIN_SERVER, CSS_RECORD_CSS_HOSTING_LOCATION,
@@ -75,8 +78,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	
 	public final static String [] ALL_CSSNODE_COLUMNS = {ROW_ID, CSS_NODE_IDENTITY, CSS_NODE_TYPE, CSS_NODE_STATUS, CSS_NODE_RECORD};
 	
-	public DBHelper(Context context, String name, CursorFactory factory,
-			int version) {
+	public DBHelper(Context context, String name, CursorFactory factory, int version) {
 		super(context, name, factory, version);
 	}
 

@@ -153,7 +153,20 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 				stanza = new Stanza(ccm.getIdManager().getDomainAuthorityNode());
 				ICommCallback callback = new CSSDirectoryCallback(client, method);
 				try {
-		    		ccm.register(ELEMENT_NAMES, callback);
+		    		ccm.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void returnAction(boolean resultFlag) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
 					ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
 					Log.d(LOG_TAG, "Send stanza");
 				} catch (Exception e) {
