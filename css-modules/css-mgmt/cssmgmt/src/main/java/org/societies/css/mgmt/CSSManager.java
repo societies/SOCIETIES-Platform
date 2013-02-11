@@ -30,6 +30,7 @@ import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.CSSNode;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.css.ICSSManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
@@ -62,7 +63,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 
-public class CSSManager implements ICSSInternalManager {
+public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
 	
 	public static final String TEST_IDENTITY_1 = "node11";

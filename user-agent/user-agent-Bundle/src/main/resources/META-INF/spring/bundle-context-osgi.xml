@@ -61,7 +61,7 @@
 	</osgi:reference>
 	
 	<!-- CSS Manager is needed by uam -->
-	<osgi:reference id="cssMgr" interface="org.societies.api.internal.css.management.ICSSLocalManager">
+	<osgi:reference id="cssMgr" interface="org.societies.api.internal.css.ICSSInternalManager">
 	</osgi:reference>
 
 </beans>
