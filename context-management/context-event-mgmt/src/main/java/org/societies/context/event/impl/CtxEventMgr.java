@@ -44,7 +44,6 @@ import org.societies.api.context.event.CtxEvent;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
-import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -55,7 +54,6 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.context.contextmanagement.CtxChangeEventBean;
-import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
@@ -401,16 +399,13 @@ public class CtxEventMgr implements ICtxEventMgr {
 					+ "' to topics '" + Arrays.toString(topics) + "'");
 		final IIdentity pubsubId;
 		final String itemId;
-		final CtxIdentifierBean idBean;
 		final CtxChangeEventBean eventBean;
 		try {
 			pubsubId = this.commMgr.getIdManager().fromJid(
 					event.getId().getOwnerId());
 			itemId = event.getId().toString();
-			idBean = CtxModelBeanTranslator.getInstance().fromCtxIdentifier(
-					event.getId());
 			eventBean = new CtxChangeEventBean();
-			eventBean.setId(idBean);
+			eventBean.setId(itemId);
 		} catch (Exception e) {
 			throw new CtxEventMgrException("Could not post remote context change event '" 
 					+ event	+ "' to topics '" + Arrays.toString(topics) + "': "
