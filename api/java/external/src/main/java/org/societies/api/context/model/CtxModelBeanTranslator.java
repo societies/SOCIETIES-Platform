@@ -131,7 +131,7 @@ public final class CtxModelBeanTranslator {
 
 		CtxEntity entity = new CtxEntity(
 				(CtxEntityIdentifier) fromCtxIdentifierBean(entityBean.getId()));
-		
+
 		//entity.setLastModified(XMLGregorianCalendarToDate(entityBean.getLastModified()));
 		entity.setLastModified(entityBean.getLastModified());
 		// Handle entity attributes
@@ -289,7 +289,7 @@ public final class CtxModelBeanTranslator {
 	}
 
 	public CtxModelObjectBean fromCtxModelObject(CtxModelObject object) {
-	
+
 		if (LOG.isDebugEnabled())
 			LOG.debug("Creating CtxModelObject bean from instance " + object);
 
@@ -365,8 +365,21 @@ public final class CtxModelBeanTranslator {
 			CtxOriginType originType) {
 
 		CtxOriginTypeBean result = null;
+		//result = CtxOriginTypeBean.valueOf(originType.toString());
 
-		if(originType != null ) result = CtxOriginTypeBean.valueOf(originType.toString());	
+		if(originType == null ) return null; 	
+
+		switch (originType) {
+		case MANUALLY_SET:  result = CtxOriginTypeBean.MANUALLY_SET;
+		break;
+		case INFERRED:  result = CtxOriginTypeBean.INFERRED;
+		break;
+		case INHERITED: result = CtxOriginTypeBean.INHERITED;
+		break;
+		case SENSED: result = CtxOriginTypeBean.SENSED;
+
+		break;
+		}
 
 		return result;	
 	}
@@ -374,34 +387,127 @@ public final class CtxModelBeanTranslator {
 	public CtxOriginType fromCtxOriginTypeBean(
 			CtxOriginTypeBean originTypeBean) {
 
+		if (originTypeBean == null)	return null; 
+				
+		//if (originTypeBean != null)	result = CtxOriginType.valueOf(originTypeBean.toString());
 		CtxOriginType result = null;
-		if (originTypeBean != null)	result = CtxOriginType.valueOf(originTypeBean.toString());
-
+		
+		switch (originTypeBean) {
+		case MANUALLY_SET: result = CtxOriginType.MANUALLY_SET;
+		break;
+		
+		case INFERRED: result = CtxOriginType.INFERRED;
+		break;
+		
+		case INHERITED: result = CtxOriginType.INHERITED;
+		break;
+		
+		case SENSED: result = CtxOriginType.SENSED;
+		break;
+		}
+		
 		return result; 	
 	}
 
 	public CtxModelTypeBean CtxModelTypeBeanFromCtxModelType(
 			CtxModelType modelType) {
 
-		return CtxModelTypeBean.valueOf(modelType.toString());	
+		if (modelType == null)	return null;
+		
+		CtxModelTypeBean result = null;
+		
+		switch (modelType) {
+		
+		case ASSOCIATION : result = CtxModelTypeBean.ASSOCIATION;
+		break;
+		
+		case ATTRIBUTE : result = CtxModelTypeBean.ATTRIBUTE;
+		break;
+		
+		case ENTITY : result = CtxModelTypeBean.ENTITY;
+		break;
+		}
+	
+		return result;	
 	}
 
 	public CtxModelType CtxModelTypeFromCtxModelTypeBean(
 			CtxModelTypeBean modelTypeBean) {
 
-		return CtxModelType.valueOf(modelTypeBean.toString());	
+		if (modelTypeBean == null)	return null;
+		
+		CtxModelType result = null;
+		
+		switch (modelTypeBean) {
+		
+		case ASSOCIATION : result = CtxModelType.ASSOCIATION;
+		break;
+		
+		case ATTRIBUTE : result = CtxModelType.ATTRIBUTE;
+		break;
+		
+		case ENTITY : result = CtxModelType.ENTITY;
+		break;
+		}
+	
+		return result;	
 	}
 
 	public CtxAttributeValueTypeBean fromCtxAttributeValueType(CtxAttributeValueType valueType) {
 
-		return CtxAttributeValueTypeBean.valueOf(valueType.toString());	
+		
+		if (valueType == null)	return null; 
+		
+		CtxAttributeValueTypeBean result = null;
+		
+		switch (valueType) {
+		case BINARY : result = CtxAttributeValueTypeBean.BINARY;
+		break;
+		
+		case DOUBLE: result = CtxAttributeValueTypeBean.DOUBLE;
+		break;
+		
+		case EMPTY : result = CtxAttributeValueTypeBean.EMPTY;
+		break;
+		
+		case INTEGER: result = CtxAttributeValueTypeBean.INTEGER;
+		break;
+		
+		case STRING : result = CtxAttributeValueTypeBean.STRING;
+		break;
+		}
+		
+		return result; 	
+	
 	}
 
 	public CtxAttributeValueType fromCtxAttributeValueTypeBean(CtxAttributeValueTypeBean valueTypeBean) {
 
-		return CtxAttributeValueType.valueOf(valueTypeBean.toString());	
+	if (valueTypeBean == null)	return null; 
+				
+	CtxAttributeValueType result = null;
+		
+		switch (valueTypeBean) {
+		case BINARY : result = CtxAttributeValueType.BINARY;
+		break;
+		
+		case DOUBLE : result = CtxAttributeValueType.DOUBLE;
+		break;
+		
+		case EMPTY : result = CtxAttributeValueType.EMPTY;
+		break;
+		
+		case INTEGER: result = CtxAttributeValueType.INTEGER;
+		break;
+		
+		case STRING : result = CtxAttributeValueType.STRING;
+		break;
+		}
+	
+		return result;
 	}
 
+	
 	public XMLGregorianCalendar DateToXMLGregorianCalendar(Date myDate) throws DatatypeConfigurationException {
 
 		GregorianCalendar c = new GregorianCalendar();
