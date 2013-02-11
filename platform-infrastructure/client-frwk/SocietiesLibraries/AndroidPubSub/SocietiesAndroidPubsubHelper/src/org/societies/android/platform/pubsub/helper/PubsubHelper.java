@@ -88,12 +88,11 @@ public class PubsubHelper implements IPubsubClient {
 	private PacketMarshaller marshaller;
 	private ISubscriber subscriberCallback;
 	
-	public PubsubHelper(Context androidContext, ISubscriber subscriberCallback) {
+	public PubsubHelper(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
 		Log.d(LOG_TAG, "Instantiate PubsubHelper");
 		this.androidContext = androidContext;
-		this.subscriberCallback = subscriberCallback;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
 		this.randomGenerator = new Random(System.currentTimeMillis());
@@ -109,6 +108,14 @@ public class PubsubHelper implements IPubsubClient {
 		marshaller.register(ELEMENTS, NAMESPACES, PACKAGES);
 	}
 	
+	/**
+	 * set the event subscriber for Pubsub node events
+	 * @param subscriberCallback
+	 */
+	public void setSubscriberCallback(ISubscriber subscriberCallback) {
+		this.subscriberCallback = subscriberCallback;
+	}
+
 	/**
 	 * Binds to Android Pubsub Service
 	 * @param bindCallback callback 

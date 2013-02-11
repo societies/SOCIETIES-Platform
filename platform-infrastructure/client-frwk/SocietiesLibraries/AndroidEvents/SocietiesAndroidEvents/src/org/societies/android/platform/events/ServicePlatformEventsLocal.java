@@ -61,10 +61,8 @@ public class ServicePlatformEventsLocal extends Service {
 	public class LocalPlatformEventsBinder extends Binder {
 		
 		public IAndroidSocietiesEvents getService() {
-			PubsubHelper pubsubClient = createPubSubClientAndroid();
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
-			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this.getApplicationContext(), pubsubClient, ccm, false);
+			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this, createPubSubClientAndroid(), createClientCommunicationMgr(), false);
 
 			return serviceBase;
 		}
@@ -80,15 +78,7 @@ public class ServicePlatformEventsLocal extends Service {
 	 * @return PubsubClientAndroid
 	 */
 	protected PubsubHelper createPubSubClientAndroid() {
-		return new PubsubHelper(this, new ISubscriber() {
-			
-			@Override
-			public void pubsubEvent(IIdentity pubsubService, String node,
-					String itemId, Object item) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		return new PubsubHelper(this);
 	}
 	
 	/**

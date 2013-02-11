@@ -1,7 +1,6 @@
 package org.societies.android.platform.events;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +8,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.pubsub.helper.PubsubHelper;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
@@ -24,7 +22,7 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.util.Log;
 
-public class PlatformEventsBase implements IAndroidSocietiesEvents {
+public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceManager {
 	
 	//Logging tag
     private static final String LOG_TAG = PlatformEventsBase.class.getName();
@@ -45,14 +43,15 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	private Map<String, ISubscriber> pubsubSubscribes = null;
 	private ArrayList <String> allPlatformEvents = null; 
 
-	private String cloudCommsDestination = null;
 	private String domainCommsDestination = null;
 
     private IIdentity cloudNodeIdentity = null;
-    private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
     private List<String> classList;
+    private boolean connectedToComms;
+    private boolean connectedToPubsub;
+
 
     /**
      * Default constructor
@@ -65,6 +64,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	this.androidContext = androidContext;
     	this.restrictBroadcast = restrictBroadcast;
     	
+    	this.connectedToComms = false;
+    	this.connectedToPubsub = false;
+    	
     	this.subscribedClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
     	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, ISubscriber>());
     	
@@ -76,6 +78,71 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		
 		this.configureForPubsub();
     }
+
+	@Override
+	public boolean startService() {
+		if (!this.connectedToComms && !this.connectedToPubsub) {
+			this.ccm.bindCommsService(new IMethodCallback() {
+				
+				@Override
+				public void returnAction(String result) {
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+					if (resultFlag) {
+						PlatformEventsBase.this.connectedToComms = true;
+						PlatformEventsBase.this.pubsubClient.bindPubsubService(new IMethodCallback() {
+							
+							@Override
+							public void returnAction(String result) {
+							}
+							
+							@Override
+							public void returnAction(boolean resultFlag) {
+								if (resultFlag) {
+									PlatformEventsBase.this.connectedToPubsub = true;
+								}
+								//Send intent
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+							}
+						});
+					}
+				}
+			});
+		}
+		return false;
+	}
+
+	@Override
+	public boolean stopService() {
+		if (this.connectedToComms && this.connectedToPubsub) {
+			this.pubsubClient.unbindCommsService(new IMethodCallback() {
+				
+				@Override
+				public void returnAction(String result) {
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+					if (resultFlag) {
+						PlatformEventsBase.this.connectedToPubsub = false;
+						boolean result = PlatformEventsBase.this.ccm.unbindCommsService();
+						if (result) {
+							PlatformEventsBase.this.connectedToComms = false;
+						}
+						//Send intent
+			    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, result);
+			    		PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+					}
+				}
+			});
+		}
+		return false;
+	}
 
 	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
@@ -110,9 +177,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			
 	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client); 
 	    	subPubSub.execute(events);
-
 		}
-		
 
     	return 0;
 	}
@@ -414,7 +479,6 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		this.client = client;
     		
     		PlatformEventsBase.this.assignConnectionParameters();
-
 		}
     	
 		private boolean resultStatus = true;
@@ -510,29 +574,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     private void assignConnectionParameters() {
     	Log.d(LOG_TAG, "assignConnectionParameters invoked");
     	try {
-        	if (null == this.cloudCommsDestination) {
+        	if (null == this.domainCommsDestination) {
             	Log.d(LOG_TAG, "determine destinations");
-            	
-            	//Log.d(LOG_TAG, "Is CCM connected ? " + this.ccm.isConnected());
-
-        		//Get the Cloud destination
-            	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
-        		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
 
             	this.domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
             	Log.d(LOG_TAG, "Domain Authority Node: " + this.domainCommsDestination);
-            			
-            	try {
-        			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
-        			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
-        			
-        			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainCommsDestination);
-        			Log.d(LOG_TAG, "Domain node identity: " + this.cloudNodeIdentity);
-        			
-        		} catch (InvalidFormatException e) {
-        			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
-        			throw new RuntimeException(e);
-        		}     
         	}
     		
     	} catch (Exception e ) {
@@ -645,4 +691,5 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	}
     	return retValue;
     }
+
 }
