@@ -23,24 +23,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.activity;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
+package org.societies.platform.activityfeed;
 
 /**
  * Created with IntelliJ IDEA.
- * User: bjornmagnus
- * Date: 2/8/13
- * Time: 16:06
+ * User: epic
+ * Date: 2/11/13
+ * Time: 20:25
  * To change this template use File | Settings | File Templates.
  */
-@SocietiesExternalInterface(type = SocietiesExternalInterface.SocietiesInterfaceType.PROVIDED)
-public interface IActivityFeedManager {
-    /**
-     *
-     * @param id The id of the existing or new ActivityFeed
-     * @return {@link IActivityFeed}
-     */
-    public IActivityFeed getOrCreateFeed(String ownerId, String feedId);
-    public boolean deleteFeed(String ownerId, String id);
+public class ActivityFeedManagerTest {
 }

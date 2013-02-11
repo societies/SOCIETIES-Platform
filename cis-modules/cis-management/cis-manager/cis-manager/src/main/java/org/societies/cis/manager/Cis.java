@@ -130,7 +130,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	//@OneToOne(cascade=CascadeType.ALL)
 	@Transient
-	public PersistedActivityFeed activityFeed = new PersistedActivityFeed();
+	public IActivityFeed activityFeed = null;//new PersistedActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
