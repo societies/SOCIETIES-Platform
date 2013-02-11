@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.comms.IMethodCallback;
