@@ -42,6 +42,12 @@ public class CSSContentProvider {
 	public static final class CssPreferences implements BaseColumns {
 		public static final String PATH = "CssPreferences";
 		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
+		
+		public static final String CSS_USER_PREFERENCE = "user";
+		public final static String CSS_XMPP_SERVER = "xmppServer";
+		public final static String CSS_DOMAIN_AUTHORITY = "domainAuthority";
+		public final static String CSS_CURRENT_NODE_JID = "currentNodeJid";
+
 	}
 
 	public static final class CssNodes implements BaseColumns {
