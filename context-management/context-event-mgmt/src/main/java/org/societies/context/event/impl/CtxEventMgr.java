@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -93,6 +92,9 @@ public class CtxEventMgr implements ICtxEventMgr {
 	private ICommManager commMgr;
 	
 	private final Set<IIdentity> pubsubOwners = new CopyOnWriteArraySet<IIdentity>();
+	
+	private final Set<LocalChangeEventHandler> localHandlers =
+			new CopyOnWriteArraySet<LocalChangeEventHandler>();
 	
 	@Autowired(required=true)
 	CtxEventMgr(PubsubClient pubsubClient) throws Exception {
@@ -173,10 +175,15 @@ public class CtxEventMgr implements ICtxEventMgr {
 		if (ownerId == null)
 			throw new NullPointerException("ownerId can't be null");
 		
-		if (this.commMgr.getIdManager().isMine(ownerId))
-			this.registerLocalChangeListener(listener, topics, ownerId);
-		else
-			; // TODO ? this.registerRemoteChangeListener(ownerId, listener, topics);
+		if (this.commMgr.getIdManager().isMine(ownerId)) {
+			// local
+			final String filter = "(" + CSSEventConstants.EVENT_NAME + "=*" 
+					+ ownerId.toString() + "*)";
+			this.registerLocalChangeListener(listener, topics, filter);
+		} else {
+			// remote
+			// TODO ? this.registerRemoteChangeListener(ownerId, listener, topics);
+		}
 	}
 
 	/*
@@ -193,7 +200,15 @@ public class CtxEventMgr implements ICtxEventMgr {
 		if (ownerId == null)
 			throw new NullPointerException("ownerId can't be null");
 		
-		// TODO Auto-generated method stub
+		if (this.commMgr.getIdManager().isMine(ownerId)) {
+			// local
+			final String filter = "(" + CSSEventConstants.EVENT_NAME + "=*" 
+					+ ownerId.toString() + "*)";
+			this.unregisterLocalChangeListener(listener, topics, filter);
+		} else {
+			// remote
+			// TODO ?
+		}
 	}
 	
 	/*
@@ -212,10 +227,16 @@ public class CtxEventMgr implements ICtxEventMgr {
 		
 		try {
 			final IIdentity pubsubId = this.commMgr.getIdManager().fromJid(ctxId.getOwnerId());
-			if (this.commMgr.getIdManager().isMine(pubsubId))
-				this.registerLocalChangeListener(listener, topics, ctxId);
-			else
-				this.registerRemoteChangeListener(pubsubId, listener, topics, ctxId);
+			if (this.commMgr.getIdManager().isMine(pubsubId)) {
+				// local
+				final String filter =  "(" + CSSEventConstants.EVENT_NAME + "=" 
+						+ ctxId + ")";
+				this.registerLocalChangeListener(listener, topics, filter);
+			} else {
+				// remote
+				final String filter = ctxId.toString();
+				this.registerRemoteChangeListener(pubsubId, listener, topics, filter);
+			}
 		} catch (InvalidFormatException ife) {
 			
 			throw new CtxEventMgrException("Could not register context change event listener: "
@@ -236,8 +257,24 @@ public class CtxEventMgr implements ICtxEventMgr {
 			throw new NullPointerException("topics can't be null");
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
-		
-		// TODO Auto-generated method stub
+	
+		try {
+			final IIdentity pubsubId = this.commMgr.getIdManager().fromJid(ctxId.getOwnerId());
+			if (this.commMgr.getIdManager().isMine(pubsubId)) {
+				// local
+				final String filter =  "(" + CSSEventConstants.EVENT_NAME + "=" 
+						+ ctxId + ")";
+				this.unregisterLocalChangeListener(listener, topics, filter);
+			} else {
+				// remote
+				// TODO
+				//this.unregisterRemoteChangeListener(pubsubId, listener, topics, ctxId);
+			}
+		} catch (InvalidFormatException ife) {
+			
+			throw new CtxEventMgrException("Could not unregister context change event listener: "
+					+ "ctxId is not a valid IIdentity: " + ife.getLocalizedMessage(), ife);
+		}
 	}
 
 	/*
@@ -257,10 +294,26 @@ public class CtxEventMgr implements ICtxEventMgr {
 		
 		try {
 			final IIdentity pubsubId = this.commMgr.getIdManager().fromJid(scope.getOwnerId());
-			if (this.commMgr.getIdManager().isMine(pubsubId))
-				this.registerLocalChangeListener(listener, topics, scope, attrType);
-			else
-				this.registerRemoteChangeListener(pubsubId, listener, topics, scope, attrType);
+			if (this.commMgr.getIdManager().isMine(pubsubId)) {
+				// local
+				final StringBuilder eventFilterSB = new StringBuilder();
+				eventFilterSB.append("(");
+				eventFilterSB.append(CSSEventConstants.EVENT_NAME + "=" + scope + "/ATTRIBUTE/");
+				if (attrType != null)
+					eventFilterSB.append(attrType + "/*");
+				else
+					eventFilterSB.append("*");
+				eventFilterSB.append(")");
+				this.registerLocalChangeListener(listener, topics, eventFilterSB.toString());
+			} else {
+				// remote
+				final StringBuilder eventFilterSB = new StringBuilder();
+				eventFilterSB.append(scope.toString() + "/ATTRIBUTE");
+				if (attrType != null)
+					eventFilterSB.append("/" + attrType);
+				eventFilterSB.append("/\\S+");
+				this.registerRemoteChangeListener(pubsubId, listener, topics, eventFilterSB.toString());
+			}
 		} catch (InvalidFormatException ife) {
 			
 			throw new CtxEventMgrException("Could not register context change event listener: "
@@ -283,7 +336,28 @@ public class CtxEventMgr implements ICtxEventMgr {
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
 		
-		// TODO Auto-generated method stub
+		try {
+			final IIdentity pubsubId = this.commMgr.getIdManager().fromJid(scope.getOwnerId());
+			if (this.commMgr.getIdManager().isMine(pubsubId)) {
+				// local
+				final StringBuilder eventFilterSB = new StringBuilder();
+				eventFilterSB.append("(");
+				eventFilterSB.append(CSSEventConstants.EVENT_NAME + "=" + scope + "/ATTRIBUTE/");
+				if (attrType != null)
+					eventFilterSB.append(attrType + "/*");
+				else
+					eventFilterSB.append("*");
+				eventFilterSB.append(")");
+				this.unregisterLocalChangeListener(listener, topics, eventFilterSB.toString());
+			} else {
+				// remote
+				// TODO
+			}
+		} catch (InvalidFormatException ife) {
+			
+			throw new CtxEventMgrException("Could not register context change event listener: "
+					+ "ctxId is not a valid IIdentity: " + ife.getLocalizedMessage(), ife);
+		}
 	}
 	
 	private void postLocalChangeEvent(CtxChangeEvent event, String[] topics) 
@@ -373,39 +447,54 @@ public class CtxEventMgr implements ICtxEventMgr {
 	}
 	
 	private void registerLocalChangeListener(final CtxChangeEventListener listener,
-			final String[] topics, final IIdentity ownerId) throws CtxException {
+			final String[] topics, final String filter) throws CtxException {
 		
-		final String filter = "(" + CSSEventConstants.EVENT_NAME + "=*" 
-				+ ownerId.toString() + "*)";
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering local context change event listener to topics "
 					+ Arrays.toString(topics)
 					+ " with filter '" + filter + "'");
-		this.eventMgr.subscribeInternalEvent(
-				new LocalChangeEventHandler(listener), topics, filter);
+		final LocalChangeEventHandler localHandler =
+				new LocalChangeEventHandler(listener, filter);
+		if (LOG.isDebugEnabled())
+			LOG.debug("localHandlers size before register: " + this.localHandlers.size());
+		if (!this.localHandlers.add(localHandler))
+			throw new CtxEventMgrException(
+					"Could not register local context change event listener to topics "
+					+ Arrays.toString(topics)
+					+ " with filter '" + filter + "': Listener already registered");
+		if (LOG.isDebugEnabled())
+			LOG.debug("localHandlers size after register: " + this.localHandlers.size());
+		this.eventMgr.subscribeInternalEvent(localHandler, topics, filter);
 	}
 	
-	private void registerLocalChangeListener(final CtxChangeEventListener listener,
-			final String[] topics, final CtxIdentifier ctxId) throws CtxException {
+	private void unregisterLocalChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final String filter) throws CtxException {
 		
-		final String filter =  "(" + CSSEventConstants.EVENT_NAME + "=" 
-				+ ctxId + ")";
 		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering local context change event listener to topics "
+			LOG.info("Unregistering local context change event listener from topics "
 					+ Arrays.toString(topics)
 					+ " with filter '" + filter + "'");
-		this.eventMgr.subscribeInternalEvent(
-				new LocalChangeEventHandler(listener), topics, filter);
+		final LocalChangeEventHandler localHandler =
+				new LocalChangeEventHandler(listener, filter);
+		if (LOG.isDebugEnabled())
+			LOG.debug("localHandlers size before unregister: " + this.localHandlers.size());
+		if (!this.localHandlers.remove(localHandler))
+			throw new CtxEventMgrException(
+					"Could not unregister local context change event listener from topics "
+					+ Arrays.toString(topics)
+					+ " with filter '" + filter + "': Listener was not registered");
+		if (LOG.isDebugEnabled())
+			LOG.debug("localHandlers size after unregister: " + this.localHandlers.size());
+		this.eventMgr.unSubscribeInternalEvent(localHandler, topics, filter);
 	}
 	
 	private void registerRemoteChangeListener(final IIdentity pubsubId,
 			final CtxChangeEventListener listener, final String[] topics,
-			final CtxIdentifier ctxId) throws CtxException {
+			final String filter) throws CtxException {
 		
-		final String filter = ctxId.toString();
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering remote context change event listener to pubsubId "
-					+ pubsubId + " for topics "	+ Arrays.toString(topics)
+					+ pubsubId + " and topics " + Arrays.toString(topics)
 					+ " with filter '" + filter + "'");
 		try {
 			for (int i = 0; i < topics.length; ++i)
@@ -415,59 +504,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 			
 			throw new CtxEventMgrException(
 					"Could not register remote context change event listener to pubsubId "
-					+ pubsubId + " for topics "	+ Arrays.toString(topics)
-					+ " with filter '" + filter + "': " + e.getLocalizedMessage(), e);
-		}
-	}
-	
-	private void registerLocalChangeListener(final CtxChangeEventListener listener,
-			final String[] topics, final CtxEntityIdentifier scope,
-			final String attrType) throws CtxException {
-		
-		final StringBuilder eventFilterSB = new StringBuilder();
-		eventFilterSB.append("(");
-		eventFilterSB.append(CSSEventConstants.EVENT_NAME + "=" + scope + "/ATTRIBUTE/");
-		if (attrType != null)
-			eventFilterSB.append(attrType + "/*");
-		else
-			eventFilterSB.append("*");
-		eventFilterSB.append(")");
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering local context change event listener to topics "
-					+ Arrays.toString(topics)
-					+ " with filter '" + eventFilterSB.toString() + "'");
-		this.eventMgr.subscribeInternalEvent(
-				new LocalChangeEventHandler(listener), topics, eventFilterSB.toString());
-	}
-	
-	private void registerRemoteChangeListener(final IIdentity pubsubId,
-			final CtxChangeEventListener listener, final String[] topics,
-			final CtxEntityIdentifier scope, final String attrType)
-					throws CtxException {
-		
-		final StringBuilder eventFilterSB = new StringBuilder();
-		eventFilterSB.append(scope.toString() + "/ATTRIBUTE");
-		if (attrType != null)
-			eventFilterSB.append("/" + attrType);
-		eventFilterSB.append("/\\S+");
-		final String filter = eventFilterSB.toString();
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering remote context change event listener to pubsubId "
-					+ pubsubId + " for topics "	+ Arrays.toString(topics)
-					+ " with filter '" + filter + "'");
-		try {
-			for (int i = 0; i < topics.length; ++i) {
-				
-				final Subscription subscription = this.pubsubClient.subscriberSubscribe(pubsubId, topics[i], 
-						new RemoteChangeEventHandler(listener, filter));
-				if (LOG.isDebugEnabled())
-					LOG.debug("subscription=" + subscription);
-			}
-		} catch (Exception e) {
-			
-			throw new CtxEventMgrException(
-					"Could not register remote context change event listener to pubsubId "
-					+ pubsubId + " for topics "	+ Arrays.toString(topics)
+					+ pubsubId + " and topics "	+ Arrays.toString(topics)
 					+ " with filter '" + filter + "': " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -477,9 +514,19 @@ public class CtxEventMgr implements ICtxEventMgr {
 		/** The listener to forward CtxChangeEvents. */
 		private final CtxChangeEventListener listener;
 		
-		private LocalChangeEventHandler(CtxChangeEventListener listener) {
+		/** 
+		 * The filter used for the EventListener registration.
+		 *  
+		 * @see #hashCode()
+		 * @see #equals(Object) 
+		 */
+		private final String filter;
+		
+		private LocalChangeEventHandler(final CtxChangeEventListener listener,
+				final String filter) {
 			
 			this.listener = listener;
+			this.filter = filter;
 		}
 		
 		/*
@@ -528,6 +575,50 @@ public class CtxEventMgr implements ICtxEventMgr {
 			
 			if (!(internalEvent.geteventInfo() instanceof CtxIdentifier))
 				throw new CtxEventMgrException("internal event info is missing or incorrect");
+		}
+		
+		/*
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((this.listener == null) ? 0 : this.listener.hashCode());
+			result = prime * result
+					+ ((this.filter == null) ? 0 : this.filter.hashCode());
+			
+			return result;
+		}
+
+		/*
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object that) {
+			
+			if (this == that)
+				return true;
+			if (that == null)
+				return false;
+			if (this.getClass() != that.getClass())
+				return false;
+			
+			LocalChangeEventHandler other = (LocalChangeEventHandler) that;
+			if (this.listener == null) {
+				if (other.listener != null)
+					return false;
+			} else if (!this.listener.equals(other.listener))
+				return false;
+			if (this.filter == null) {
+				if (other.filter != null)
+					return false;
+			} else if (!this.filter.equals(other.filter))
+				return false;
+			
+			return true;
 		}
 	}
 	
