@@ -39,5 +39,13 @@ testing of the bundle outside of an OSGi container -->
 
     <!--         <osgi:service ref="CPA"> -->
     <!--         <osgi:interfaces> -->
-    <osgi:service ref="activityFeedManager" interface="org.societies.api.activity.IActivityFeedManager"/>
+    <osgi:service ref="activityFeedManager">
+        <osgi:interfaces>
+            <value>org.societies.api.activity.IActivityFeedManager</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <osgi:reference id="pubSubClient"
+                    interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" />
+
 </beans>

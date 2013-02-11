@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,8 +50,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     private SessionFactory sessionFactory;
     private static Logger LOG = LoggerFactory
             .getLogger(ActivityFeedManager.class);
+    private PubsubClient pubSubClient;
+
     @Override
-    public IActivityFeed getOrCreateFeed(String ownerId, String feedId) {
+    public IActivityFeed getOrCreateFeed(IIdentity owner, String feedId) {
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
                 if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
@@ -66,7 +70,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
     }
 
     @Override
-    public boolean deleteFeed(String ownerId, String feedId) {
+    public boolean deleteFeed(IIdentity owner, String feedId) {
         Iterator<IActivityFeed> it = feeds.iterator(); IActivityFeed cur=null;
         while(it.hasNext())    {
             cur = it.next();
@@ -106,5 +110,13 @@ public class ActivityFeedManager implements IActivityFeedManager {
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    public void setPubSubClient(PubsubClient pubSubClient) {
+        this.pubSubClient = pubSubClient;
+    }
+
+    public PubsubClient getPubSubClient() {
+        return pubSubClient;
     }
 }
