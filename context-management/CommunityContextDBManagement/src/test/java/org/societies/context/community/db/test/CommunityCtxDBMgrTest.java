@@ -74,6 +74,8 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING7 = "myCIS7.societies.local";
 	private static final String CIS_IIDENTITY_STRING8 = "myCIS8.societies.local";
 	private static final String CIS_IIDENTITY_STRING9 = "myCIS9.societies.local";
+	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
+	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
 	@Autowired
 	private ICommunityCtxDBMgr communityDB;
@@ -223,6 +225,54 @@ public class CommunityCtxDBMgrTest {
 		assertEquals(lastModified1, lastModified2);
 		//problem with Mysql when testing
 		//assertTrue(lastUpdated2.compareTo(lastUpdated1) > 0);
+	}
+	
+	@Test
+	public void testAssociations() throws CtxException {
+		
+		CtxAssociation association = this.communityDB.createAssociation(CIS_IIDENTITY_COMMUNITY_PARENT, CtxAssociationTypes.HAS_PARAMETERS);
+		
+		CommunityCtxEntity communityEntity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_COMMUNITY_PARENT);
+		CtxEntity entity = this.communityDB.createEntity(CIS_IIDENTITY_ENTITY_CHILD, CtxEntityTypes.PERSON);
+	
+		//set parent entity
+		final CtxEntityIdentifier parentEntityId = communityEntity.getId();
+		association.setParentEntity(parentEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertNotNull(association.getParentEntity());
+		assertEquals(parentEntityId, association.getParentEntity());
+		
+		//check association from the entity's side
+		communityEntity = (CommunityCtxEntity) this.communityDB.retrieve(parentEntityId);
+		assertTrue(communityEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, communityEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
+		
+		//add child entity
+		final CtxEntityIdentifier childEntityId = entity.getId();
+		association.addChildEntity(childEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertEquals(communityEntity.getId(), association.getParentEntity());
+		assertEquals(1, association.getChildEntities().size());
+		assertTrue(association.getChildEntities().contains(childEntityId));
+		
+		//check association from the entity's side
+		entity = (CtxEntity) this.communityDB.retrieve(childEntityId);
+		assertTrue(entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
+
+		//add second child entity
+		final CtxEntityIdentifier childEntityId2 = this.communityDB.createEntity(CIS_IIDENTITY_COMMUNITY_PARENT, CtxEntityTypes.PERSON).getId();
+		association.addChildEntity(childEntityId2);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertEquals(communityEntity.getId(), association.getParentEntity());
+		assertEquals(2, association.getChildEntities().size());
+		assertTrue(association.getChildEntities().contains(childEntityId));
+		assertTrue(association.getChildEntities().contains(childEntityId2));
+		
+		//check association from the entity's side
+		entity = (CtxEntity) this.communityDB.retrieve(childEntityId2);
+		assertTrue(entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
 	}
 	
 	@Test

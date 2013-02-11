@@ -475,29 +475,49 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
         	
         	case ENTITY:            	
             	dao = this.retrieve(CommunityCtxEntityDAO.class, id);
+            	if (dao == null)
+            		break;
             	final Session session = this.sessionFactory.openSession();
+            	Query query;
+            	//CtxAssociations where this entity is member of
+            	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
+
             	try { 
-            		// Retrieve all associations whose parent entity is this entity
-            		final Query query = session.getNamedQuery("getCommunityCtxAssociationsByParentEntityId");
-                	query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(),
-                			Hibernate.custom(CtxEntityIdentifierType.class));
-                	final List<CommunityCtxAssociationDAO> associations = query.list();
-                	
-                	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
-                	// IS_MEMBER_OF association --> communities
-                	final Set<CtxEntityIdentifier> communityIds = new HashSet<CtxEntityIdentifier>();
-                	// HAS_MEMBERS association --> members
-                	final Set<CtxEntityIdentifier> memberIds = new HashSet<CtxEntityIdentifier>();
-                	
-            		for (final CommunityCtxAssociationDAO association : associations) {
-            			associationIds.add(association.getId());
-            			if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
-            				communityIds.addAll(association.getChildEntities());
-            			else if (CtxAssociationTypes.HAS_MEMBERS.equals(association.getId().getType()))
-            				memberIds.addAll(association.getChildEntities());
+            		if (dao instanceof CtxEntityDAO) {
+            			// Retrieve CtxAssociationIds where this entity is parent
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
+            			query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CommunityCtxEntityDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+
+            		} else if (dao instanceof CommunityCtxEntityDAO) {
+                		// Retrieve all associations whose parent entity is this entity
+                		query = session.getNamedQuery("getCommunityCtxAssociationsByParentEntityId");
+                    	query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(),
+                    			Hibernate.custom(CtxEntityIdentifierType.class));
+                    	final List<CommunityCtxAssociationDAO> associations = query.list();
+
+                    	// IS_MEMBER_OF association --> communities
+                    	final Set<CtxEntityIdentifier> communityIds = new HashSet<CtxEntityIdentifier>();
+                    	// HAS_MEMBERS association --> members
+                    	final Set<CtxEntityIdentifier> memberIds = new HashSet<CtxEntityIdentifier>();
+
+                    	
+                		for (final CommunityCtxAssociationDAO association : associations) {
+                			associationIds.add(association.getId());
+                			if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
+                				communityIds.addAll(association.getChildEntities());
+                			else if (CtxAssociationTypes.HAS_MEMBERS.equals(association.getId().getType()))
+                				memberIds.addAll(association.getChildEntities());
+                		}	            			
+                		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
+                		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
             		}
-            		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
-            		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
             		((CommunityCtxEntityDAO) dao).setAssociations(associationIds);
             					
             	} finally {
