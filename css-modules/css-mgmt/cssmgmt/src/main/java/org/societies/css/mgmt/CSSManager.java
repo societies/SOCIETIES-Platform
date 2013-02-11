@@ -21,13 +21,16 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.css.FriendFilter;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.internal.css.management.CSSNode;
-import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.css.CSSManagerEnums;
+import org.societies.api.internal.css.CSSNode;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.css.ICSSManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -59,7 +62,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 
-public class CSSManager implements ICSSLocalManager {
+public class CSSManager implements ICSSInternalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
 	
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -255,7 +258,6 @@ public class CSSManager implements ICSSLocalManager {
 			e1.printStackTrace();
 		}
 	}
-	@Override
 	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile) {
 		// TODO Auto-generated method stub
 		return null;
@@ -338,7 +340,6 @@ public class CSSManager implements ICSSLocalManager {
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
-	@Override
 	public Future<CssInterfaceResult> loginXMPPServer(CssRecord profile) {
 		// TODO Auto-generated method stub
 		return null;
@@ -411,7 +412,6 @@ public class CSSManager implements ICSSLocalManager {
 	}
 
 
-	@Override
 	public Future<CssInterfaceResult> logoutXMPPServer(CssRecord profile) {
 		// TODO Auto-generated method stub
 		return null;
@@ -557,13 +557,11 @@ public class CSSManager implements ICSSLocalManager {
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
-	@Override
 	public Future<CssInterfaceResult> setPresenceStatus(CssRecord profile) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Future<CssInterfaceResult> synchProfile(CssRecord profile) {
 		// TODO Auto-generated method stub
 		return null;
@@ -1561,5 +1559,39 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					cssManagerRemote.updateCssFriendRequest(request); 
 			}
 		}
+
+	@Override
+	public Future<HashMap<IIdentity, Integer>> getSuggestedFriends(
+			FriendFilter arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetails(
+			FriendFilter arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void sendCSSFriendRequest(IIdentity arg0, RequestorService arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleExternalFriendRequest(IIdentity arg0,
+			CssRequestStatusType arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleInternalFriendRequest(IIdentity arg0,
+			CssRequestStatusType arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
