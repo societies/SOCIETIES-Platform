@@ -35,10 +35,12 @@ import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -73,14 +75,14 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CommunityManagementBase implements ICisManager, ICisSubscribed {
+public class CommunityManagementBase implements ICisManager, ICisSubscribed, IServiceManager {
 	//LOGGING TAG
 	private static final String LOG_TAG = CommunityManagementBase.class.getName();
 	
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
-														    	  "http://societies.org/api/schema/activityfeed",	  		
+														    	  "http://societies.org/api/schema/activityfeed",
 																  "http://societies.org/api/schema/cis/community");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.cis.manager",
 													    	   "org.societies.api.schema.marshaledactivityfeed",
@@ -102,246 +104,226 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
-        }    
-
+        }
     }
 
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "CommunityManagementBase startService binding to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+			        	commMgr.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "CommunityManagementBase stopService unregistering namespaces");
+        	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					commMgr.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+    	return true;
+    }
+    
     /**
 	 * @param client
 	 */
-	private void broadcastNotLoggedIn(final String client) {
+	private void broadcastServiceNotStarted(String client, String method) {
 		if (client != null) {
-			Intent intent = new Intent(IMethodCallback.INTENT_NOTLOGGEDIN_EXCEPTION);
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
 			intent.setPackage(client);
-			CommunityManagementBase.this.androidContext.sendBroadcast(intent);
+			androidContext.sendBroadcast(intent);
 		}
 	}
-	
+
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisManager >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
 	public Community createCis(final String client, final String cisName, final String cisType, final String description, final MembershipCrit rules, final String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "createCis connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						createCisConnected(client, cisName, cisType, description, rules, privacyPolicy);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+	        //COMMUNITY INFO
+			Community cisinfo = new Community();
+			cisinfo.setCommunityName(cisName);
+			cisinfo.setDescription(description);
+			cisinfo.setCommunityType(cisType);
+			cisinfo.setMembershipCrit(rules);
+			//ADD TO BEAN
+			Create create = new Create();
+			create.setCommunity(cisinfo);
+			create.setPrivacyPolicy(privacyPolicy);
+			//CREATE MESSAGE BEAN
+			CommunityManager messageBean = new CommunityManager();
+			messageBean.setCreate(create);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	createCisConnected(client, cisName, cisType, description, rules, privacyPolicy);
+			//COMMS STUFF
+			try {
+				ICommCallback cisCallback = new CommunityCallback(client, CREATE_CIS); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+	        }
+		} else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, CREATE_CIS);
         }
+		return null;
+	}
 		
-        return null;
-	}
-	
-	private void createCisConnected(String client, String cisName, String cisType, String description, MembershipCrit rules, String privacyPolicy) {
-		//COMMUNITY INFO
-		Community cisinfo = new Community();
-		cisinfo.setCommunityName(cisName);
-		cisinfo.setDescription(description);
-		cisinfo.setCommunityType(cisType);
-		//MEMBERSHIP CRITERIA - CONVERT FROM PARCELABLE VERSION
-		//MembershipCrit rules = AMembershipCrit.convertAMembershipCrit(aMemberShipCrit) ;
-		/*List<Criteria> listCriteria = new ArrayList<Criteria>();
-		for(ACriteria acrit: criteria) {
-			listCriteria.add( ACriteria.convertACriteria(acrit));
-		}	
-		rules.setCriteria(listCriteria);*/
-		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX
-		//ADD TO BEAN
-		Create create = new Create();
-		create.setCommunity(cisinfo);
-		create.setPrivacyPolicy(privacyPolicy);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setCreate(create);
-
-		//COMMS STUFF
-		try {
-			ICommCallback cisCallback = new CommunityCallback(client, CREATE_CIS); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-			Stanza stanza = new Stanza(toID);
-        
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-	}
-
 	/* @see org.societies.android.api.cis.management.ICisManager#deleteCis(java.lang.String, java.lang.String)*/
 	public Boolean deleteCis(final String client, final String cisId) {
 		Log.d(LOG_TAG, "deleteCis called by client: " + client);
 		
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "deleteCis connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						deleteCisConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	deleteCisConnected(client, cisId);
-        }
-		
-        return null;
-	}
-
-	private void deleteCisConnected(String client, String cisId) {
-		//COMMUNITY INFO
-		org.societies.api.schema.cis.manager.Delete cisDel = new org.societies.api.schema.cis.manager.Delete();
-		cisDel.setCommunityJid(cisId);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setDelete(cisDel);
-
-		//COMMS STUFF
+		if (connectedToComms) {
+			//COMMUNITY INFO
+			org.societies.api.schema.cis.manager.Delete cisDel = new org.societies.api.schema.cis.manager.Delete();
+			cisDel.setCommunityJid(cisId);
+			//CREATE MESSAGE BEAN
+			CommunityManager messageBean = new CommunityManager();
+			messageBean.setDelete(cisDel);
+			
+			//COMMS STUFF
 			try {
-			ICommCallback cisCallback = new CommunityCallback(client, DELETE_CIS); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-			Stanza stanza = new Stanza(toID);
-        
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+				ICommCallback cisCallback = new CommunityCallback(client, DELETE_CIS); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+		} else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, DELETE_CIS);
         }
+		return null;
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisManager#getCisList(java.lang.String, org.societies.api.schema.cis.manager.ListCrit)*/
 	public Community[] getCisList(final String client, final String query) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "getCisList connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						getCisListConnected(client, query);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+        	//COMMUNITY INFO
+			org.societies.api.schema.cis.manager.List list = new org.societies.api.schema.cis.manager.List();
+			list.setListCriteria(ListCrit.fromValue(query));
+			//CREATE MESSAGE BEAN
+			CommunityManager messageBean = new CommunityManager();
+			messageBean.setList(list);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	getCisListConnected(client, query);
+			//COMMS STUFF
+			try {
+				ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_LIST); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+		} else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, GET_CIS_LIST);
         }
-		
 		return null;
-	}
-
-	private void getCisListConnected(String client, String query) {
-		//COMMUNITY INFO
-		org.societies.api.schema.cis.manager.List list = new org.societies.api.schema.cis.manager.List();
-		list.setListCriteria(ListCrit.fromValue(query));
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setList(list);
-
-		//COMMS STUFF
-		try {
-			ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_LIST); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
-			Stanza stanza = new Stanza(toID);
-        
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisManager#removeMember(java.lang.String, java.lang.String, java.lang.String)*/
 	public void removeMember(final String client, final String cisId, final String memberJid) {
 		Log.d(LOG_TAG, "removeMember called by client: " + client);
 		
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "removeMember connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						removeMemberConnected(client, cisId, memberJid);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//MEMBER INFO
+			Participant member = new Participant();
+			member.setJid(memberJid);
+			//DELETE INFO
+			DeleteMember delMember = new DeleteMember();
+			delMember.setParticipant(member);
+			//CREATE MESSAGE BEAN
+			CommunityMethods messageBean = new CommunityMethods();
+			messageBean.setDeleteMember(delMember);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	removeMemberConnected(client, cisId, memberJid);
-        }
-	}
-	
-	private void removeMemberConnected(String client, String cisId, String memberJid) {
-		//MEMBER INFO
-		Participant member = new Participant();
-		member.setJid(memberJid);
-		//DELETE INFO
-		DeleteMember delMember = new DeleteMember();
-		delMember.setParticipant(member);
-		//CREATE MESSAGE BEAN
-		CommunityMethods messageBean = new CommunityMethods();
-		messageBean.setDeleteMember(delMember);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, REMOVE_MEMBER); 
-		IIdentity toID = null;
-		try { //DELETE MEMBER IS PROVIDED BY THE CIS (NOT CIS MANAGER)
-			toID = commMgr.getIdManager().fromJid(cisId);
-			Stanza stanza = new Stanza(toID);
-			
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, REMOVE_MEMBER); 
+			IIdentity toID = null;
+			try { //DELETE MEMBER IS PROVIDED BY THE CIS (NOT CIS MANAGER)
+				toID = commMgr.getIdManager().fromJid(cisId);
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+		} else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, REMOVE_MEMBER);
         }
 	}
 
@@ -350,447 +332,293 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	public String Join(final String client, final CisAdvertisementRecord targetCis) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "Join connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						JoinConnected(client, targetCis);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	JoinConnected(client, targetCis);
-        }
-        return null;
-	}
-
-	private void JoinConnected(String client, CisAdvertisementRecord targetCis) {
-		//CREATE JOIN INFO
-		AskCisManagerForJoin join = new AskCisManagerForJoin();
-		join.setCisAdv(targetCis);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setAskCisManagerForJoin(join);
-		//COMMS STUFF
-		try {
-			ICommCallback cisCallback = new CommunityCallback(client, JOIN_CIS); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();	
-			Stanza stanza = new Stanza(toID);
-        
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
+		if (connectedToComms) {
+        	//CREATE JOIN INFO
+			AskCisManagerForJoin join = new AskCisManagerForJoin();
+			join.setCisAdv(targetCis);
+			//CREATE MESSAGE BEAN
+			CommunityManager messageBean = new CommunityManager();
+			messageBean.setAskCisManagerForJoin(join);
+			//COMMS STUFF
+			try {
+				ICommCallback cisCallback = new CommunityCallback(client, JOIN_CIS); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();	
+				Stanza stanza = new Stanza(toID);
+				commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, JOIN_CIS);
+	    }
+		return null;
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Leave(java.lang.String, java.lang.String)*/
 	public String Leave(final String client, final String cisId) {
 		Log.d(LOG_TAG, "Leave CIS called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "Leave connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						LeaveConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
-	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	LeaveConnected(client, cisId);
-        }
-        return null;
-	}
-
-	private void LeaveConnected(String client, String cisId) {
-		//CREATE Leave INFO
-		AskCisManagerForLeave leave = new AskCisManagerForLeave(); 
-		leave.setTargetCisJid(cisId);
-		//CREATE MESSAGE BEAN
-		CommunityManager messageBean = new CommunityManager();
-		messageBean.setAskCisManagerForLeave(leave);
-		//COMMS STUFF
-		try {
-			ICommCallback cisCallback = new CommunityCallback(client, LEAVE_CIS); 
-			IIdentity toID = commMgr.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(toID);
-	        
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
+		if (connectedToComms) {
+			//CREATE Leave INFO
+			AskCisManagerForLeave leave = new AskCisManagerForLeave(); 
+			leave.setTargetCisJid(cisId);
+			//CREATE MESSAGE BEAN
+			CommunityManager messageBean = new CommunityManager();
+			messageBean.setAskCisManagerForLeave(leave);
+			//COMMS STUFF
+			try {
+				ICommCallback cisCallback = new CommunityCallback(client, LEAVE_CIS); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(toID);
+		        
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, LEAVE_CIS);
+	    }
+		return null;
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#addActivity(java.lang.String, org.societies.api.schema.activityfeed.AddActivity)*/
 	public Boolean addActivity(final String client, final String cisId, final MarshaledActivity activity) {
 		Log.d(LOG_TAG, "addActivity called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "addActivity connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						addActivityConnected(client, cisId, activity);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//GETFEED OBJECT
+			String sActor = "unknown";
+			try {
+				sActor = commMgr.getIdManager().getCloudNode().getJid();
+			} catch (InvalidFormatException e1) {
+				Log.e(LOG_TAG, "ERROR querying cloud node");
+			}
+			activity.setActor(sActor);
+			AddActivity addAct = new AddActivity();
+			addAct.setMarshaledActivity(activity);
+			//CREATE MESSAGE BEAN
+			MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
+			messageBean.setAddActivity(addAct);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, ADD_ACTIVITY); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
         } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	addActivityConnected(client, cisId, activity);
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ADD_ACTIVITY);
         }
-        return null;
-	}
-
-	private void addActivityConnected(String client, String cisId, MarshaledActivity activity) {
-		//GETFEED OBJECT
-		String sActor = "unknown";
-		try {
-			sActor = commMgr.getIdManager().getCloudNode().getJid();
-		} catch (InvalidFormatException e1) {
-			Log.e(LOG_TAG, "ERROR querying cloud node");
-		}
-		activity.setActor(sActor);
-		AddActivity addAct = new AddActivity();
-		addAct.setMarshaledActivity(activity);
-		//CREATE MESSAGE BEAN
-		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
-		messageBean.setAddActivity(addAct);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, ADD_ACTIVITY); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-			Stanza stanza = new Stanza(toID);
-			
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
-		
+		return null;		
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#cleanActivityFeed(java.lang.String)*/
 	public CleanUpActivityFeedResponse cleanActivityFeed(final String client, final String cisId) {
 		Log.d(LOG_TAG, "cleanActivityFeed called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "cleanActivityFeed connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						cleanActivityFeedConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//GETFEED OBJECT
+			CleanUpActivityFeed feed = new CleanUpActivityFeed();
+			//CREATE MESSAGE BEAN
+			MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
+			messageBean.setCleanUpActivityFeed(feed);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	cleanActivityFeedConnected(client, cisId);
-        }
-        return null;
-	}
-
-	private void cleanActivityFeedConnected(String client, String cisId) {
-		//GETFEED OBJECT
-		CleanUpActivityFeed feed = new CleanUpActivityFeed();
-		//CREATE MESSAGE BEAN
-		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
-		messageBean.setCleanUpActivityFeed(feed);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, CLEAN_ACTIVITIES); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, CLEAN_ACTIVITIES); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, CLEAN_ACTIVITIES);
+	    }
+		return null;
 	}
 	
 	/*@see org.societies.android.api.cis.management.ICisSubscribed#deleteActivity(java.lang.String, org.societies.api.schema.activityfeed.DeleteActivity)*/
 	public Boolean deleteActivity(final String client, final String cisId, final MarshaledActivity activity) {
 		Log.d(LOG_TAG, "deleteActivity called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "deleteActivity connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						deleteActivityConnected(client, cisId, activity);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//GETFEED OBJECT
+			DeleteActivity getFeed = new DeleteActivity();
+			getFeed.setMarshaledActivity(activity);
+			//CREATE MESSAGE BEAN
+			MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
+			messageBean.setDeleteActivity(getFeed);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	deleteActivityConnected(client, cisId, activity);
-        }
-        return null;
-	}
-
-	private void deleteActivityConnected(String client, String cisId, MarshaledActivity activity) {		
-		//GETFEED OBJECT
-		DeleteActivity getFeed = new DeleteActivity();
-		getFeed.setMarshaledActivity(activity);
-		//CREATE MESSAGE BEAN
-		MarshaledActivityFeed messageBean = new MarshaledActivityFeed();
-		messageBean.setDeleteActivity(getFeed);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, DELETE_ACTIVITY); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }		
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, DELETE_ACTIVITY); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);
+			} catch (InvalidFormatException e1) {
+				e1.printStackTrace();
+			}		
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, DELETE_ACTIVITY);
+	    }
+		return null;
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#getActivityFeed(java.lang.String, java.lang.String)*/
 	public MarshaledActivity[] getActivityFeed(final String client, final String cisId) {
 		Log.d(LOG_TAG, "getActivityFeed called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "getActivityFeed connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						getActivityFeedConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//GETFEED OBJECT
+			GetActivities getFeed = new GetActivities();
+			
+			//TODO: HARDCODED RANGE DATE
+			String str_date="20100101";
+			DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+			Date date = null;
+			try {
+				date = (Date)formatter.parse(str_date);
+			} catch (ParseException e2) {
+				e2.printStackTrace();
+			} 
+			long longFrom=date.getTime();
 	
-				@Override
-				public void returnAction(String result) { }
-			});
+			Date now = new Date();
+			long longNow = now.getTime();
+			getFeed.setTimePeriod(longFrom + " " + longNow);
+			
+			//CREATE MESSAGE BEAN
+			MarshaledActivityFeed messageBean = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+			messageBean.setGetActivities(getFeed);
+	
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, GET_ACTIVITY_FEED); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);
+			} catch (InvalidFormatException e1) {
+				e1.printStackTrace();
+			}		
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+	        } catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
         } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	getActivityFeedConnected(client, cisId);
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, GET_ACTIVITY_FEED);
         }
-        return null;
-	}
-
-	private void getActivityFeedConnected(String client, String cisId) {
-		//GETFEED OBJECT
-		GetActivities getFeed = new GetActivities();
-		
-		//TODO: HARDCODED RANGE DATE
-		String str_date="20100101";
-		DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-		Date date = null;
-		try {
-			date = (Date)formatter.parse(str_date);
-		} catch (ParseException e2) {
-			e2.printStackTrace();
-		} 
-		long longFrom=date.getTime();
-
-		Date now = new Date();
-		long longNow = now.getTime();
-		getFeed.setTimePeriod(longFrom + " " + longNow);
-		
-		//CREATE MESSAGE BEAN
-		MarshaledActivityFeed messageBean = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-		messageBean.setGetActivities(getFeed);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, GET_ACTIVITY_FEED); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }		
+		return null;	
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#getCisInformation(java.lang.String, java.lang.String)*/
 	public Community getCisInformation(final String client, final String cisId) {
 		Log.d(LOG_TAG, "getCisInformation called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "getCisInformation connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						getCisInformationConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//GETINFO OBJECT
+			org.societies.api.schema.cis.community.GetInfo info = new org.societies.api.schema.cis.community.GetInfo();
+			//CREATE MESSAGE BEAN
+			CommunityMethods messageBean = new CommunityMethods();
+			messageBean.setGetInfo(info);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
-        } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	getCisInformationConnected(client, cisId);
-        }
-        return null;
-	}
-
-	private void getCisInformationConnected(String client, String cisId) {
-		//GETINFO OBJECT
-		org.societies.api.schema.cis.community.GetInfo info = new org.societies.api.schema.cis.community.GetInfo();
-		//CREATE MESSAGE BEAN
-		CommunityMethods messageBean = new CommunityMethods();
-		messageBean.setGetInfo(info);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_INFO); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }		
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, GET_CIS_INFO); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);	
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+	        } catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, GET_CIS_INFO);
+	    }
+		return null;		
 	}
 	
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#getMembers(java.lang.String, java.lang.String)*/
 	public String[] getMembers(final String client, final String cisId) {
 		Log.d(LOG_TAG, "getMembers called by client: " + client);
 
-		if (!connectedToComms) {
-        	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "getMembers connecting to comms");
-	        this.commMgr.bindCommsService(new IMethodCallback() {
-				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
-					if (resultFlag) { 
-						getMembersConnected(client, cisId);
-						connectedToComms = true;
-					}
-					else // NOT LOGGED IN
-						broadcastNotLoggedIn(client);
-				}
+		if (connectedToComms) {
+			//CREATE LIST INFO
+			org.societies.api.schema.cis.community.WhoRequest listing = new org.societies.api.schema.cis.community.WhoRequest();
+			//CREATE MESSAGE BEAN
+			CommunityMethods messageBean = new CommunityMethods();
+			messageBean.setWhoRequest(listing);
 	
-				@Override
-				public void returnAction(String result) { }
-			});
+			//COMMS STUFF
+			ICommCallback cisCallback = new CommunityCallback(client, GET_MEMBERS); 
+			IIdentity toID = null;
+			try { 
+				toID = commMgr.getIdManager().fromJid(cisId);
+			} catch (InvalidFormatException e1) {
+				e1.printStackTrace();
+			}		
+			Stanza stanza = new Stanza(toID);
+	        try {
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+	        } catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
         } else {
-        	//ALREADY CONNECTED TO COMMS SERVICE
-        	getMembersConnected(client, cisId);
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, GET_MEMBERS);
         }
-        return null;
-	}
-
-	private void getMembersConnected(String client, String cisId) {
-		//CREATE LIST INFO
-		org.societies.api.schema.cis.community.WhoRequest listing = new org.societies.api.schema.cis.community.WhoRequest();
-		//CREATE MESSAGE BEAN
-		CommunityMethods messageBean = new CommunityMethods();
-		messageBean.setWhoRequest(listing);
-
-		//COMMS STUFF
-		ICommCallback cisCallback = new CommunityCallback(client, GET_MEMBERS); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
-		Stanza stanza = new Stanza(toID);
-        try {
-        	commMgr.register(ELEMENT_NAMES, cisCallback);
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-        }		
+		return null;		
 	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

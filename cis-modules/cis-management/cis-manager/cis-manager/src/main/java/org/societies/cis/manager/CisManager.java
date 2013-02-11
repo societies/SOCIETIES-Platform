@@ -752,6 +752,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						Community comm = new Community();
 						icis.fillCommmunityXMPPobj(comm);
 						cr.setCommunity(comm);
+						cr.setPrivacyPolicy(pPolicy);
 						cr.setResult(true);
 						return response;
 					}else{

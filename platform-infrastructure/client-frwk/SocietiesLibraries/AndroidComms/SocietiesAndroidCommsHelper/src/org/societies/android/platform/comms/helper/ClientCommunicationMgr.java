@@ -689,8 +689,8 @@ public class ClientCommunicationMgr {
 						Packet packet;
 						try {
 							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Object payload = marshaller.unmarshallPayload(packet);
-							callback.receiveResult(stanzaFromPacket(packet), payload);
+							XMPPError payload = marshaller.unmarshallError(packet);
+							callback.receiveError(stanzaFromPacket(packet), payload);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
