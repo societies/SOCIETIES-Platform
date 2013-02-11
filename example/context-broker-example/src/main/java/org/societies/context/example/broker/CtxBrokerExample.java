@@ -204,8 +204,17 @@ public class CtxBrokerExample implements Subscriber{
 			System.out.println(" CtxAssociation refering to CIS created: "+assoc.getId());
 			
 			assoc.addChildEntity(entity.getId());
+
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+			assoc.setParentEntity(ctxCommunityEntityIdentifier);
+			
 			CtxAssociation assocUpdated = (CtxAssociation) this.internalCtxBroker.update(assoc).get();
 			System.out.println(" CtxAssociation refering to CIS child entities: "+assocUpdated.getChildEntities());
+			LOG.info(" CtxAssociation refering to CIS child entities: "+assocUpdated.getChildEntities());
+			//final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
+
+			
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
