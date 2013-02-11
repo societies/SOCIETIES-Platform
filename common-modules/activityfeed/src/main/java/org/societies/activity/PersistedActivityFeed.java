@@ -38,13 +38,14 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.activity.ILocalActivityFeed;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed {//, Subscriber {
+public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed, ILocalActivityFeed {//, Subscriber {
 	
 	
 	private PubsubClient pubSubcli;
@@ -76,7 +77,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
     synchronized public void startUp(SessionFactory sessionFactory, String id, PubsubClient pubSubcli, IIdentity ownerCSS){
         this.sessionFactory = sessionFactory;
         this.id = id;
-        this.pubSubcli = pubSubcli;
+        this.setPubSubcli(pubSubcli);
         this.ownerCSS = ownerCSS;
         
         // pubsub code
@@ -232,10 +233,10 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		
 		// Publishing TO PUBSUB
-		if(false == err && pubSubcli !=null){
+		if(false == err && getPubSubcli() !=null){
 			try {
 				LOG.info("going to call pubsub");
-				pubSubcli.publisherPublish(this.ownerCSS, this.id, Long.toString(actv_id), iactivToMarshActiv(newAct));
+				getPubSubcli().publisherPublish(this.ownerCSS, this.id, Long.toString(actv_id), iactivToMarshActiv(newAct));
 			} catch (XMPPError e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

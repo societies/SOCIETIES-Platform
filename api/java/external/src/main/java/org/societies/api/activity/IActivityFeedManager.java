@@ -25,6 +25,7 @@
 
 package org.societies.api.activity;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 
 /**
@@ -41,6 +42,6 @@ public interface IActivityFeedManager {
      * @param id The id of the existing or new ActivityFeed
      * @return {@link IActivityFeed}
      */
-    public IActivityFeed getOrCreateFeed(String ownerId, String feedId);
-    public boolean deleteFeed(String ownerId, String id);
+    public IActivityFeed getOrCreateFeed(IIdentity owner, String feedId);
+    public boolean deleteFeed(IIdentity owner, String id);
 }
