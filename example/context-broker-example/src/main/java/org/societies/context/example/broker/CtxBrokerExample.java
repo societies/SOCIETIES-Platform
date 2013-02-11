@@ -170,13 +170,15 @@ public class CtxBrokerExample implements Subscriber{
 		//this.registerForContextChanges();
 		//this.retrieveContext();
 		//this.lookupContext();
-		this.simpleCtxHistoryTest();
-		this.tuplesCtxHistoryTest();
+		//this.simpleCtxHistoryTest();
+		//this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
 	
 		// community context tests
 		LOG.info("*** Starting community context examples...");
-	
+		createCommunityEntAssociation();
+		// create entity and association refering to community
+		
 		//this.createIndividualEntities();
 		// includes context bond tests
 	//	this.populateCommunityEntity();
@@ -188,6 +190,39 @@ public class CtxBrokerExample implements Subscriber{
 	}
 
 
+	
+	private void createCommunityEntAssociation(){
+		
+		System.out.println(" createCommunityEntAssociation ");
+		
+		try {
+	
+			CtxEntity entity = this.internalCtxBroker.createEntity(cisID, CtxEntityTypes.DEVICE).get();
+			System.out.println(" CtxEntity refering to CIS created: "+entity.getId());
+			
+			CtxAssociation assoc = this.internalCtxBroker.createAssociation(cisID, CtxAssociationTypes.HAS_PARAMETERS).get();
+			System.out.println(" CtxAssociation refering to CIS created: "+assoc.getId());
+			
+			assoc.addChildEntity(entity.getId());
+			CtxAssociation assocUpdated = (CtxAssociation) this.internalCtxBroker.update(assoc).get();
+			System.out.println(" CtxAssociation refering to CIS child entities: "+assocUpdated.getChildEntities());
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+				
+	}
+	
+	
+	
+	
 	private void lookupCommunityEntAttributes(){
 
 		CtxEntityIdentifier ctxCommunityEntityIdentifier;
