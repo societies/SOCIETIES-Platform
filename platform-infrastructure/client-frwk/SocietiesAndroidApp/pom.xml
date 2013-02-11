@@ -40,14 +40,6 @@
 			<groupId>com.phonegap</groupId>
 			<artifactId>cordova</artifactId>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.societies.android.api.external</groupId>
-			<artifactId>societies-android-api</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
@@ -122,18 +114,18 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>org.societies.android.platform</groupId>
 			<artifactId>SocietiesAndroidSocialData</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency-->
-		<!--dependency>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.android</groupId>
 			<artifactId>privacytrust</artifactId>
 			<version>${version.pt}</version>
 			<type>apklib</type>
-		</dependency-->
+		</dependency>
 		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
