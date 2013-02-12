@@ -23,35 +23,85 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.management;
-
-import org.societies.api.schema.cssmanagement.CssRecord;
-
+package org.societies.api.internal.css;
 
 /**
- * Result class that is supplied by implementations of {@link ICSSRemoteManager}
- *
+ * Defines a CSS node or device
+ * 
+ * In order to allow for Android compatibility, the natural Enum types 
+ * are int types. 
+
  */
-public class CSSInterfaceResult {
-	private boolean resultStatus;
+
+public class CSSNode {
+
+	/**
+	 * unique within context of CSS
+	 */
+	String identity = null;
 	
-	private CssRecord profile;
-
-	public boolean isResultStatus() {
-		return resultStatus;
-	}
-
-	public void setResultStatus(boolean resultStatus) {
-		this.resultStatus = resultStatus;
-	}
-
-	public CssRecord getProfile() {
-		return profile;
-	}
-
-	public void setProfile(CssRecord profile) {
-		this.profile = profile;
+	/**
+	 * status of device
+	 */
+	int status = 0;
+	/**
+	 * node type of device
+	 */
+	int type = 0;
+	
+	/**
+	 * MAC address of the Node
+	 */
+	String cssnodeMAC = null;
+	
+	/**
+	 * is the node interactable
+	 */
+	boolean interactable = true;
+	
+	/**
+	 * Default Constructor
+	 */
+	public CSSNode() {
 	}
 	
+	public String getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
 	
+	public String getcssNodeMAC() {
+		return cssnodeMAC;
+	}
+
+	public void setcssNodeMAC(String cssnodeMAC) {
+		this.cssnodeMAC = cssnodeMAC;
+	}
+
+	public boolean getInteractable() {
+		return interactable;
+	}
+
+	public void setInteractable(boolean interactable) {
+		this.interactable = interactable;
+	}
 }

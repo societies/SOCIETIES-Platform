@@ -23,6 +23,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -40,7 +41,7 @@ public class CssNodeController {
 	 */
 	
 	@Autowired
-	private ICSSLocalManager cssLocalManager;
+	private ICSSInternalManager cssLocalManager;
 	@Autowired
 	private ICommManager commManager;
 	@Autowired
@@ -54,11 +55,11 @@ public class CssNodeController {
 		this.sdService = sdService;
 	}
 	
-	public ICSSLocalManager getCssLocalManager() {
+	public ICSSInternalManager getCssLocalManager() {
 		return cssLocalManager;
 	}
 
-	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
+	public void setCssLocalManager(ICSSInternalManager cssLocalManager) {
 		this.cssLocalManager = cssLocalManager;
 	}
 

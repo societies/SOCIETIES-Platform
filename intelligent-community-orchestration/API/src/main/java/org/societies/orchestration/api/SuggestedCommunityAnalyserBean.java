@@ -27,7 +27,7 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 import org.societies.api.activity.IActivity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.css.management.ICssActivity;
+//import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentity;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class SuggestedCommunityAnalyserBean {
 	private ArrayList<IIdentity> cssList;
 	private ArrayList<CtxAttribute> sharedContextAttributes;
 	private ArrayList<CtxAssociation> sharedContextAssociations;
-	private ArrayList<ICssActivity> sharedCssActivities;
+//	private ArrayList<ICssActivity> sharedCssActivities;
 	private ArrayList<IActivity> sharedCisActivities;
 	
 	public SuggestedCommunityAnalyserBean() {
@@ -107,13 +107,13 @@ public class SuggestedCommunityAnalyserBean {
 		this.sharedContextAssociations = sharedContextAssociations;
 	}
 	
-	public ArrayList<ICssActivity> getSharedCssActivities(){
-		return this.sharedCssActivities;
-	}
+//	public ArrayList<ICssActivity> getSharedCssActivities(){
+//		return this.sharedCssActivities;
+//	}
 	
-	public void setSharedCssActivities(ArrayList<ICssActivity> sharedCssActivities){
-		this.sharedCssActivities = sharedCssActivities;
-	}
+//	public void setSharedCssActivities(ArrayList<ICssActivity> sharedCssActivities){
+//		this.sharedCssActivities = sharedCssActivities;
+//	}
 	
 	public ArrayList<IActivity> getSharedCisActivities(){
 		return this.sharedCisActivities;
