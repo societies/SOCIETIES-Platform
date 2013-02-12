@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.faces.bean.ManagedBean;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -52,9 +53,10 @@ import java.util.Map;
  * @author Paddy S
  */
 @Controller
+@ManagedBean(name = "profileSettings")
 @Scope("request")
-public class ProfileSettingsController {
-    private static Logger log = LoggerFactory.getLogger(ProfileSettingsController.class);
+public class ProfileSettingsController extends BasePageController {
+//    private static Logger log = LoggerFactory.getLogger(ProfileSettingsController.class);
     @Autowired
     private UserService userService;
     @Autowired
@@ -85,7 +87,11 @@ public class ProfileSettingsController {
 
         IIdentity ident = (IIdentity) model.get("identity");
         populateUserDetails(form, ident);
-        populateProfileForm(form, ident);
+        StringBuilder sb = new StringBuilder();
+
+        populateProfileForm(form, ident, sb);
+
+        form.setPreferenceHtml(sb.toString());
 
         return new ModelAndView("profilesettings", model);
     }
@@ -95,67 +101,95 @@ public class ProfileSettingsController {
 
     }
 
-    private void populateProfileForm(ProfileSettingsForm form, IIdentity ident) {
+    private void populateProfileForm(ProfileSettingsForm form, IIdentity ident, StringBuilder sb) {
 
         List<PreferenceDetails> detailsList = userPreferenceManagementService.getPreferenceDetailsForAllPreferences();
         form.setPreferenceDetailsList(detailsList);
 
         if (detailsList == null) return;
 
+
         for (PreferenceDetails preferenceDetails : detailsList) {
             IPreferenceTreeModel preferenceTreeModel = userPreferenceManagementService.getModel(ident, preferenceDetails);
             form.getPreferenceDetailTreeModelMap().put(preferenceDetails, preferenceTreeModel);
 
-            log.debug("----------------------");
-            log.debug(preferenceDetails.getPreferenceName() + "/" + preferenceTreeModel.getPreferenceName());
-            log.debug(preferenceTreeModel.getServiceType());
-            log.debug(preferenceTreeModel.getLastModifiedDate().toString());
-            log.debug(preferenceTreeModel.getServiceID().getServiceInstanceIdentifier() + " / " + preferenceTreeModel.getServiceID().getIdentifier().toString());
+//            log.debug("----------------------");
+//            log.debug(preferenceDetails.getPreferenceName() + " / " + preferenceTreeModel.getPreferenceName());
+//            log.debug(preferenceTreeModel.getServiceType());
+//            log.debug(preferenceTreeModel.getLastModifiedDate().toString());
+//            log.debug(preferenceTreeModel.getServiceID().getServiceInstanceIdentifier() + " / " + preferenceTreeModel.getServiceID().getIdentifier().toString());
+
+            sb.append("<div style=\"border: 1px solid #000; padding: 0 3px 3px 3px; \">");
+            sb.append("<div style=\"border: 1px solid #000; margin: 0px; padding 2px; width: 100%; background-color: #009; color: #fff; font-weight: bold; text-align: center; font-variant: small-caps; font-size: large;\">");
+            sb.append(preferenceDetails.getPreferenceName());
+            sb.append("</div>");
+            sb.append("<br>");
+            sb.append("Last modified: ");
+            sb.append(preferenceTreeModel.getLastModifiedDate().toString());
+            sb.append("\n");
 
             IPreference preference = preferenceTreeModel.getRootPreference();
-            blah(preference);
+            blah(preference, 0, sb);
+
+            sb.append("</div>\n");
 
         }
 
     }
 
-    private void blah(IPreference preference) {
-        log.debug("+++");
+    private void blah(IPreference preference, int indent, StringBuilder sb) {
+
+        if (preference.getLevel() != indent) return;
+
+
+        String s_indent = "";
+        for (int i = 0; i < indent; i++) s_indent += "\t";
+
+        sb.append("\n");
+        sb.append(s_indent);
+        sb.append("<ul>\n");
+        sb.append(s_indent);
+        sb.append("<li>");
+
+//        log.debug("+++" + Integer.toHexString(preference.hashCode()) + " d=" + preference.getDepth() + " l=" + preference.getLevel());
+
         IPreferenceCondition condition = preference.getCondition();
+        if (condition != null) {
+            sb.append("[CONDITION] " + condition.getType() + ": " + condition.getname() + " " + condition.getoperator() + " " + condition.getvalue() + "<br/>");
+//            log.debug(s_indent + "[CONDITION] " + condition.getType() + ": " + condition.getname() + " " + condition.getoperator() + " " + condition.getvalue());
+        }
+
         IPreferenceOutcome outcome = preference.getOutcome();
+        if (outcome != null) {
+            sb.append("[OUTCOME] " + outcome.getparameterName() + "/" + outcome.getServiceType() + "/" + outcome.getvalue() + "/" + outcome.getQualityofPreference() + "/" + outcome.getConfidenceLevel() + "<br/>");
+//            log.debug(s_indent + "[OUTCOME] " + outcome.getparameterName() + "/" + outcome.getServiceType() + "/" + outcome.getvalue() + "/" + outcome.getQualityofPreference() + "/" + outcome.getConfidenceLevel());
+        }
 
         IPreference root = preference.getRoot();
-        Object userObject = preference.getUserObject();
+        if (root != null && condition == null && outcome == null) {
+            sb.append(s_indent + "[ROOT] " + root.toString() + "<br/>");
+//            log.debug(s_indent + "[ROOT] " + root.toString());
+        }
 
-        log.debug(preference.toTreeString());
+//        Object userObject = preference.getUserObject();
+//        if (userObject != null) {
+//            sb.append(s_indent + "[USER_OBJECT] " + userObject.getClass() + ": " + userObject.toString() + "<br/>");
+////            log.debug(s_indent + "[USER_OBJECT] " + userObject.getClass() + ": " + userObject.toString());
+//        }
 
-        if (condition == null)
-            log.debug("no condition");
-        else
-            log.debug(condition.getname() + "/" + condition.getType() + "/" + condition.getvalue() + "/" + condition.getoperator());
-
-        if (outcome == null)
-            log.debug("no outcome");
-        else
-            log.debug(outcome.getparameterName() + "/" + outcome.getServiceType() + "/" + outcome.getvalue() + "/" + outcome.getQualityofPreference() + "/" + outcome.getConfidenceLevel());
-
-        if (root == null)
-            log.debug("no root");
-        else
-            log.debug(root.toString());
-
-        if (userObject == null)
-            log.debug("no userObject");
-        else
-            log.debug(userObject.getClass() + ": " + userObject.toString());
-
-        Enumeration<IPreference> e = preference.breadthFirstEnumeration();
+        Enumeration<IPreference> e = preference.postorderEnumeration();
         while (e.hasMoreElements()) {
             IPreference ele = e.nextElement();
             if (ele == preference) continue;
 
-            blah(ele);
+            blah(ele, indent + 1, sb);
         }
+
+        sb.append(s_indent);
+        sb.append("</li>\n");
+        sb.append(s_indent);
+        sb.append("</ul>\n");
+
     }
 
 }

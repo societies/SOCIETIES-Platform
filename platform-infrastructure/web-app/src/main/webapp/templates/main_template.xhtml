@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputStylesheet library="css" name="dialog.css"/>
+    <h:outputScript library="js" name="jquery-v1.8.1.js"/>
+
+    <!-- Menu -->
+    <h:outputScript library="js" name="webmenu_nav.js"/>
+    <h:outputScript library="js" name="webpopup.js"/>
+    <!-- ToDo , move -->
+    <h:outputScript library="js" name="cisajax.js"/>
+
+    <ui:insert name="html_head">
+        <!-- Template: HTML HEAD CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+        <title>Societies</title>
+    </ui:insert>
+</h:head>
+
+<h:body>
+    <h:form>
+        <div id="wrapper" class="clearfix">
+            <div id="container" class="container_12 clearfix">
+                <!-- Header -->
+                <header id="header" class="grid_12">
+                    <!-- LOGIN POPUP -->
+                    <ui:include src="../includes/loginbox.xhtml"/>
+                    <!-- END LOGIN POPUP -->
+
+                    <!-- MENU -->
+                    <ui:include src="../includes/menu.xhtml"/>
+                    <!-- END MENU -->
+                    <div class="clear"></div>
+
+                    <h:messages globalOnly="true"/>
+                </header>
+
+                <ui:insert name="body">
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+                </ui:insert>
+
+                <footer class="container_12 clearfix">
+                    <section class="footer">
+                        <p class="footer-links">
+                            <span><a href="termsofuse.xhtml">Terms of Use</a>
+                                | <a href="disclaimer.xhtml">Disclaimer</a>
+                                | <a href="privacy.xhtml">Privacy</a>
+                                | <a href="help.xhtml">Help</a>
+                                | <a href="about.xhtml">About</a>
+                            </span>
+                            <a class="float right toplink" href="#">top</a>
+                        </p>
+                    </section>
+                </footer>
+
+            </div>
+
+        </div>
+
+    </h:form>
+</h:body>
+
+</html>

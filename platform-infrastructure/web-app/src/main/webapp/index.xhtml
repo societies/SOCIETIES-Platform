@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+        <!--Main Content START -->
+        <section id="featured" class="clearfix grid_12">
+            <div>
+                <article><img src="images/societies-v1.png" alt="Where Pervasive Meets Social" width="960"
+                              height="400"
+                              class="landing_img"/>
+                </article>
+            </div>
+        </section>
+        <div class="hr grid_12 clearfix boxhr"></div>
+        <section class="homebox_entries grid_12">
+            <!-- FIRST ROW -->
+            <header>
+                <h4 class="box_title">DISCOVER, CONNECT &amp; ORGANISE WITH SOCIETIES </h4></header>
+            <div class="hr grid_12 clearfix"></div>
+            <article>
+                <a class="homeboxgrid box " href="your_societies_friends_list.xhtml" title="Friends">
+                    <img src="images/home_friends.png" width="270" height="150" alt="Friends"/></a>
+            </article>
+            <article>
+                <a class="homeboxgrid box " href="your_installed_apps.xhtml" title="Apps">
+                    <img src="images/home_apps.png" width="270" height="150" alt="Apps"/> </a>
+            </article>
+            <article>
+                <a class="homeboxgrid box " href="your_communities_list.xhtml" title="Communities">
+                    <img src="images/home_communities.png" width="270" height="150" alt="Communities"/> </a>
+            </article>
+        </section>
+        <div class="hr grid_12 clearfix"></div>
+
+    </ui:define>
+</ui:composition>
+</html>

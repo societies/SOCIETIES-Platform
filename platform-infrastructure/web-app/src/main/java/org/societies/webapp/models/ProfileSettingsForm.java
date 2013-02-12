@@ -39,6 +39,7 @@ public class ProfileSettingsForm {
     private String fullName;
     private List<PreferenceDetails> preferenceDetailsList;
     private final Map<PreferenceDetails, IPreferenceTreeModel> preferenceDetailTreeModelMap = new HashMap<PreferenceDetails, IPreferenceTreeModel>();
+    private String preferenceHtml;
 
     public String getFullName() {
         return fullName;
@@ -60,4 +61,11 @@ public class ProfileSettingsForm {
         return preferenceDetailTreeModelMap;
     }
 
+    public void setPreferenceHtml(String preferenceHtml) {
+        this.preferenceHtml = preferenceHtml;
+    }
+
+    public String getPreferenceHtml() {
+        return preferenceHtml;
+    }
 }

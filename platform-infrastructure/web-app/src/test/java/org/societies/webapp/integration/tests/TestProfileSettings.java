@@ -51,7 +51,7 @@ public class TestProfileSettings extends SeleniumTest {
     public void userDetailsCorrect() {
         profileSettingsPage.verifyUsernameInTitle(USERNAME);
 
-        Assert.fail();
+        Assert.fail("Haven't quite finished this test yet");
     }
 
 }

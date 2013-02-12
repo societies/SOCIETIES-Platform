@@ -38,16 +38,10 @@
                         <li>JID: <c:out value="${identity.jid}"/></li>
                         <li>Bare JID: <c:out value="${identity.bareJid}"/></li>
 
-                        <c:forEach var="pref" items="${form.preferenceDetailsList}">
-                            <li>
-                                <c:out value="${pref.preferenceName}"/>
-                                <c:out value="${pref.serviceType}"/>
-                                <c:out value="${pref.serviceID.serviceInstanceIdentifier}"/>
-                                <br/>
-                                <c:out value="${form.preferenceDetailTreeModelMap[pref].preferenceName}"/>
-                            </li>
-                        </c:forEach>
                     </ul>
+
+                    <c:out value="${form.preferenceHtml}" escapeXml="false"/>
+
 
                     <div class="hr dotted clearfix">&nbsp;</div>
                 </form:form>

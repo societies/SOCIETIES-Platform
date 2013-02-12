@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>Profile Settings :: SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+        <div class="hr grid_12 clearfix"></div>
+        <!-- Left Column -->
+        <section id="left_col" class="grid_12">
+            <div class="breadcrumbs"><a href="index.xhtml">Home</a>
+                / <a href="profilesettings.xhtml">Profile Settings</a>
+            </div>
+
+            <section class="form_style_main">
+                <h4 class="form_title">Profile Settings for <h:outputText value="#{loginController.username}"/></h4>
+
+                <ul>
+                    <li>Identifier: <h:outputText value="#{loginController.identity.identifier}"/></li>
+                    <li>Domain: <h:outputText value="#{loginController.identity.domain}"/></li>
+                    <li>Type: <h:outputText value="#{loginController.identity.type}"/></li>
+                    <li>JID: <h:outputText value="#{loginController.identity.jid}"/></li>
+                    <li>Bare JID: <h:outputText value="#{loginController.identity.bareJid}"/></li>
+                </ul>
+
+                <!--<h:outputText value="${form.preferenceHtml}" escapeXml="false"/>-->
+
+
+                <div class="hr dotted clearfix"></div>
+            </section>
+        </section>
+        <div class="hr grid_12 clearfix"></div>
+    </ui:define>
+</ui:composition>
+</html>
