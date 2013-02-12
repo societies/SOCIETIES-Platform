@@ -31,6 +31,7 @@
 	    <module>data-management-1266</module>
 	    <module>policy-management-1244</module>
 	    <module>negotiation-management-1264</module>
+	    <module>trust-based-pref-mgmt-1678</module>
 	</modules>
 
 </project>
