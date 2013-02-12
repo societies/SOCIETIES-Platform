@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:p="http://primefaces.org/ui">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -29,6 +29,25 @@
 
                 <!--<h:outputText value="${form.preferenceHtml}" escapeXml="false"/>-->
 
+                <p:tree id="tree" value="#{profileSettings.preferencesRootNode}" var="node" orientation="horizontal">
+
+                    <p:treeNode id="defaultNode">
+                        <h:outputText value="#{node}" id="lblNode_default"/>
+                    </p:treeNode>
+
+                    <p:treeNode id="preferenceNode" type="preference">
+                        <h:outputText value="#{node}" id="lblNode_preference"/>
+                    </p:treeNode>
+
+                    <p:treeNode id="conditionNode" type="condition">
+                        <h:outputText value="#{node}" id="lblNode_condition"/>
+                    </p:treeNode>
+
+                    <p:treeNode id="outcomeNode" type="outcome">
+                        <h:outputText value="#{node}" id="lblNode_outcome"/>
+                    </p:treeNode>
+
+                </p:tree>
 
                 <div class="hr dotted clearfix"></div>
             </section>

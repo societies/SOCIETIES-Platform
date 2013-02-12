@@ -53,6 +53,16 @@
         <version>RELEASE</version>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>prime-repo</id>
+            <name>PrimeFaces Maven Repository</name>
+            <url>http://repository.primefaces.org</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -216,6 +226,13 @@
             </exclusions>
         </dependency>
 
+        <!-- PrimeFaces dependencies -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>3.5</version>
+        </dependency>
+
         <!-- Java EE6 dependencies -->
         <dependency>
             <groupId>com.sun.faces</groupId>
@@ -245,6 +262,13 @@
             <artifactId>jsp-api</artifactId>
             <version>2.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.webflow</groupId>
+            <artifactId>spring-faces</artifactId>
+            <version>2.3.2.RELEASE</version>
+        </dependency>
+
         <!-- Virgo/Tomcat needs this -->
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -332,6 +356,167 @@
                             javax.faces.webapp,
                             javax.faces.component,
                             javax.faces.component.html,
+                            <!-- PrimeFaces -->
+                            org.primefaces,
+                            org.primefaces.application,
+                            org.primefaces.component.accordionpanel,
+                            org.primefaces.component.ajaxstatus,
+                            org.primefaces.component.api,
+                            org.primefaces.component.autocomplete,
+                            org.primefaces.component.behavior.ajax,
+                            org.primefaces.component.behavior.printer,
+                            org.primefaces.component.blockui,
+                            org.primefaces.component.breadcrumb,
+                            org.primefaces.component.button,
+                            org.primefaces.component.calendar,
+                            org.primefaces.component.captcha,
+                            org.primefaces.component.carousel,
+                            org.primefaces.component.celleditor,
+                            org.primefaces.component.chart,
+                            org.primefaces.component.chart.bar,
+                            org.primefaces.component.chart.bubble,
+                            org.primefaces.component.chart.donut,
+                            org.primefaces.component.chart.line,
+                            org.primefaces.component.chart.metergauge,
+                            org.primefaces.component.chart.ohlc,
+                            org.primefaces.component.chart.pie,
+                            org.primefaces.component.clock,
+                            org.primefaces.component.collector,
+                            org.primefaces.component.colorpicker,
+                            org.primefaces.component.column,
+                            org.primefaces.component.columngroup,
+                            org.primefaces.component.columns,
+                            org.primefaces.component.commandbutton,
+                            org.primefaces.component.commandlink,
+                            org.primefaces.component.confirmdialog,
+                            org.primefaces.component.contextmenu,
+                            org.primefaces.component.dashboard,
+                            org.primefaces.component.datagrid,
+                            org.primefaces.component.datalist,
+                            org.primefaces.component.datatable,
+                            org.primefaces.component.datatable.feature,
+                            org.primefaces.component.defaultcommand,
+                            org.primefaces.component.dialog,
+                            org.primefaces.component.dnd,
+                            org.primefaces.component.dock,
+                            org.primefaces.component.editor,
+                            org.primefaces.component.effect,
+                            org.primefaces.component.export,
+                            org.primefaces.component.feedreader,
+                            org.primefaces.component.fieldset,
+                            org.primefaces.component.filedownload,
+                            org.primefaces.component.fileupload,
+                            org.primefaces.component.focus,
+                            org.primefaces.component.galleria,
+                            org.primefaces.component.gmap,
+                            org.primefaces.component.graphicimage,
+                            org.primefaces.component.growl,
+                            org.primefaces.component.hotkey,
+                            org.primefaces.component.idlemonitor,
+                            org.primefaces.component.imagecompare,
+                            org.primefaces.component.imagecropper,
+                            org.primefaces.component.imageswitch,
+                            org.primefaces.component.inplace,
+                            org.primefaces.component.inputmask,
+                            org.primefaces.component.inputtext,
+                            org.primefaces.component.inputtextarea,
+                            org.primefaces.component.keyboard,
+                            org.primefaces.component.layout,
+                            org.primefaces.component.lightbox,
+                            org.primefaces.component.log,
+                            org.primefaces.component.media,
+                            org.primefaces.component.media.player,
+                            org.primefaces.component.megamenu,
+                            org.primefaces.component.menu,
+                            org.primefaces.component.menubar,
+                            org.primefaces.component.menubutton,
+                            org.primefaces.component.menuitem,
+                            org.primefaces.component.message,
+                            org.primefaces.component.messages,
+                            org.primefaces.component.mindmap,
+                            org.primefaces.component.notificationbar,
+                            org.primefaces.component.orderlist,
+                            org.primefaces.component.outputlabel,
+                            org.primefaces.component.outputpanel,
+                            org.primefaces.component.overlaypanel,
+                            org.primefaces.component.paginator,
+                            org.primefaces.component.panel,
+                            org.primefaces.component.panelgrid,
+                            org.primefaces.component.panelmenu,
+                            org.primefaces.component.password,
+                            org.primefaces.component.photocam,
+                            org.primefaces.component.picklist,
+                            org.primefaces.component.poll,
+                            org.primefaces.component.progressbar,
+                            org.primefaces.component.radiobutton,
+                            org.primefaces.component.rating,
+                            org.primefaces.component.remotecommand,
+                            org.primefaces.component.resetinput,
+                            org.primefaces.component.resizable,
+                            org.primefaces.component.resources,
+                            org.primefaces.component.ring,
+                            org.primefaces.component.row,
+                            org.primefaces.component.roweditor,
+                            org.primefaces.component.rowexpansion,
+                            org.primefaces.component.rowtoggler,
+                            org.primefaces.component.schedule,
+                            org.primefaces.component.scrollpanel,
+                            org.primefaces.component.selectbooleanbutton,
+                            org.primefaces.component.selectbooleancheckbox,
+                            org.primefaces.component.selectcheckboxmenu,
+                            org.primefaces.component.selectmanybutton,
+                            org.primefaces.component.selectmanycheckbox,
+                            org.primefaces.component.selectmanymenu,
+                            org.primefaces.component.selectonebutton,
+                            org.primefaces.component.selectonelistbox,
+                            org.primefaces.component.selectonemenu,
+                            org.primefaces.component.selectoneradio,
+                            org.primefaces.component.separator,
+                            org.primefaces.component.slidemenu,
+                            org.primefaces.component.slider,
+                            org.primefaces.component.socket,
+                            org.primefaces.component.spacer,
+                            org.primefaces.component.spinner,
+                            org.primefaces.component.splitbutton,
+                            org.primefaces.component.stack,
+                            org.primefaces.component.submenu,
+                            org.primefaces.component.subtable,
+                            org.primefaces.component.summaryrow,
+                            org.primefaces.component.tabmenu,
+                            org.primefaces.component.tabview,
+                            org.primefaces.component.tagcloud,
+                            org.primefaces.component.terminal,
+                            org.primefaces.component.themeswitcher,
+                            org.primefaces.component.tieredmenu,
+                            org.primefaces.component.toolbar,
+                            org.primefaces.component.tooltip,
+                            org.primefaces.component.tree,
+                            org.primefaces.component.treetable,
+                            org.primefaces.component.watermark,
+                            org.primefaces.component.wizard,
+                            org.primefaces.context,
+                            org.primefaces.event,
+                            org.primefaces.event.data,
+                            org.primefaces.event.map,
+                            org.primefaces.facelets,
+                            org.primefaces.json,
+                            org.primefaces.lifecycle,
+                            org.primefaces.model,
+                            org.primefaces.model.chart,
+                            org.primefaces.model.filter,
+                            org.primefaces.model.map,
+                            org.primefaces.model.mindmap,
+                            org.primefaces.model.tagcloud,
+                            org.primefaces.push,
+                            org.primefaces.renderkit,
+                            org.primefaces.util,
+                            org.primefaces.visit,
+                            org.primefaces.webapp,
+                            org.primefaces.webapp.filter,
+                            javax.faces.event,
+                            org.springframework.web.jsf.el,
+                            org.springframework.osgi.config,
+                            com.sun.faces.vendor,
                             <!-- spring DM -->
                             org.springframework.beans.factory.config,
                             org.springframework.osgi.web.context.support,
@@ -479,14 +664,21 @@
                                 <artifactItem>
                                     <groupId>com.sun.faces</groupId>
                                     <artifactId>jsf-impl</artifactId>
-                            <version>2.1.17</version>
+                                    <version>2.1.17</version>
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.faces</groupId>
                                     <artifactId>jsf-api</artifactId>
-                            <version>2.1.17</version>
+                                    <version>2.1.17</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.primefaces</groupId>
+                                    <artifactId>primefaces</artifactId>
+                                    <version>3.5</version>
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                                 </artifactItem>

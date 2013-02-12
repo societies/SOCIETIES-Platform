@@ -1,24 +1,49 @@
 package org.societies.webapp.controller;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
+import org.societies.webapp.service.OpenfireLoginService;
+import org.societies.webapp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 
+@Controller
 @ManagedBean(name = "loginController") //required to access data from XHTML files
 @SessionScoped // indicates the lifetime of this object
 public class LoginController extends BasePageController {
 
-//    @Autowired
-//    private UserService userService;
-//    @Autowired
-//    private OpenfireLoginService openfireLoginService;
+    @Autowired
+    @ManagedProperty(value = "#{userService}")
+    private UserService userService;
+    @Autowired
+    @ManagedProperty(value = "#{openfireLoginService}")
+    private OpenfireLoginService openfireLoginService;
 
-    private boolean loggedIn = false;
-    private String username = "";
-    private String userID = "";
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        log.trace("setUserService() has been called with " + userService);
+        this.userService = userService;
+    }
+
+    public OpenfireLoginService getOpenfireLoginService() {
+        return openfireLoginService;
+    }
+
+    public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
+        log.trace("setOpenfireLoginService() has been called with " + openfireLoginService);
+        this.openfireLoginService = openfireLoginService;
+    }
+
+    //    private boolean loggedIn = false;
+//    private String username = "";
+//    private String userID = "";
     private String loginDialogUsername;
     private String loginDialogPassword;
 
@@ -37,18 +62,20 @@ public class LoginController extends BasePageController {
             logoutAction();
         }
 
-//        String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
-//        if (result == null) {
-//            return "false";
-//        }
-//        userService.setUserLoggedIn(true);
-//        userService.loadUserDetailsFromCommMgr();
+        String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
+        if (result == null) {
+            return "false";
+        }
 
-        setLoggedIn(true);
+        userService.setUserLoggedIn(true);
+        userService.loadUserDetailsFromCommMgr();
+
+//        setLoggedIn(true);
 //        username = userService.getUsername();
 //        userID = userService.getUserID();
-        setUsername("paddy");
-        setUserID("ermahgerd");
+
+//        setUsername("paddy");
+//        setUserID("ermahgerd");
 
         String summary = "User " + getUsername() + " logged in";
         String detail = "User successfully logged in";
@@ -69,10 +96,10 @@ public class LoginController extends BasePageController {
         String detail = "User logged out";
 
 
-        setLoggedIn(false);
-        setUsername("");
-        setUserID("");
-//        userService.setUserLoggedIn(false);
+//        setLoggedIn(false);
+//        setUsername("");
+//        setUserID("");
+        userService.setUserLoggedIn(false);
 
         addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
 
@@ -81,59 +108,60 @@ public class LoginController extends BasePageController {
 
     public boolean isLoggedIn() {
 //        log.trace("isLoggedIn()=" + loggedIn);
-        return loggedIn;
+//        return loggedIn;
+        return userService.isUserLoggedIn();
     }
 
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
+//    public void setLoggedIn(boolean loggedIn) {
+//        this.loggedIn = loggedIn;
+//    }
 
     public String getUsername() {
-        return username;
-//        return userService.getUsername();
+//        return username;
+        return userService.getUsername();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     public String getUserID() {
-        return userID;
-//        return userService.getUserID();
+//        return userID;
+        return userService.getUserID();
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
+//    public void setUserID(String userID) {
+//        this.userID = userID;
+//    }
 
     public IIdentity getIdentity() {
-        return new IIdentity() {
-            @Override
-            public String getIdentifier() {
-                return "id";
-            }
-
-            @Override
-            public String getDomain() {
-                return "domain";
-            }
-
-            @Override
-            public IdentityType getType() {
-                return IdentityType.CIS;
-            }
-
-            @Override
-            public String getJid() {
-                return "jid";
-            }
-
-            @Override
-            public String getBareJid() {
-                return "bare jid";
-            }
-        };
-//        return userService.getIdentity();
+//        return new IIdentity() {
+//            @Override
+//            public String getIdentifier() {
+//                return "id";
+//            }
+//
+//            @Override
+//            public String getDomain() {
+//                return "domain";
+//            }
+//
+//            @Override
+//            public IdentityType getType() {
+//                return IdentityType.CIS;
+//            }
+//
+//            @Override
+//            public String getJid() {
+//                return "jid";
+//            }
+//
+//            @Override
+//            public String getBareJid() {
+//                return "bare jid";
+//            }
+//        };
+        return userService.getIdentity();
     }
 
     public void setLoginDialogUsername(String username) {

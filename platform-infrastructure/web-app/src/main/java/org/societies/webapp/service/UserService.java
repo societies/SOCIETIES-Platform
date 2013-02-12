@@ -20,7 +20,7 @@ public class UserService {
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    ICommManager commManager;
+    private ICommManager commMngrRef;
 
     private boolean userLoggedIn;
     private String username;
@@ -30,6 +30,14 @@ public class UserService {
     public UserService() {
         log.info("UserService constructor");
         userLoggedIn = false;
+    }
+
+    public ICommManager getCommMngrRef() {
+        return commMngrRef;
+    }
+
+    public void setCommMngrRef(ICommManager commMngrRef) {
+        this.commMngrRef = commMngrRef;
     }
 
     public String getUsername() {
@@ -74,7 +82,7 @@ public class UserService {
             return;
         }
 
-        IIdentity identity = commManager.getIdManager().getThisNetworkNode();
+        IIdentity identity = commMngrRef.getIdManager().getThisNetworkNode();
 
         if (identity == null) {
             clearCurrentUser();
