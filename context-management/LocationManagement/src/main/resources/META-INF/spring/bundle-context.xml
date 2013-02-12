@@ -36,7 +36,7 @@
 			<!-- <property name="deviceRegistry" ref="DeviceRegistry" /> -->
 			<property name="pubSubManager" ref="PubsubClient"/>
 			<property name="commMngrController" ref="CommMngrController"/>
-			<property name="cssLocalManager" ref="CSSLocalManager"/>
+			<property name="cssInternalManager" ref="CSSInternalManager"/>
    </bean>
    
    

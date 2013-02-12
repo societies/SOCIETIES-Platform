@@ -1,4 +1,5 @@
-package org.societies.api.internal.css.management;
+package org.societies.api.internal.css;
+
 
 /**
  * Defines a CSS profile

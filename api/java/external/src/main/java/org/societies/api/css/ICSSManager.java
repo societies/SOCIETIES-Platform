@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011-2013, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -22,27 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.management;
+package org.societies.api.css;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import java.util.HashMap;
+import java.util.concurrent.Future;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 /**
- * @author Babak.Farshchian@sintef.no
+ * This Interface defines the methods exposed to a 3rd party service to manage and retrieve CSS related data on behalf of the user.
  *
+ * @author David McKitterick
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICssActivity {
-	public String getVerb();
-	public void setVerb(String verb);
-	public String getActor();
-	public void setActor(String actor);
-	public String getObject();
-	public void setObject(String object);
-	public String getTarget();
-	public void setTarget(String target);
+public interface ICSSManager {
+	
+	/**
+	 * The method is called to request a set of filtered friends suggestions.
+	 * 
+	 * @return a HashMap of the result set including the CSS JID of users and associated tags for ranking inspection
+	 */
+	public Future<HashMap<IIdentity, Integer>> getSuggestedFriends(FriendFilter filter);
+	
+	/**
+	 * The method is called to request a set of filtered friends suggestions.
+	 * 
+	 * @return a HashMap of the result set including the CSS JID of users and associated tags for ranking inspection
+	 */
+	public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetails(FriendFilter filter);
+	
+	/**
+	 * send a friend request to remote css to join
+	 */
+	public void sendCSSFriendRequest(IIdentity friendId, RequestorService service);
+	
 }
