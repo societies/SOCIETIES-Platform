@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 
@@ -51,6 +52,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
     private static Logger LOG = LoggerFactory
             .getLogger(ActivityFeedManager.class);
     private PubsubClient pubSubClient;
+    private ICommManager commManager;
 
     @Override
     public IActivityFeed getOrCreateFeed(IIdentity owner, String feedId) {
@@ -118,5 +120,13 @@ public class ActivityFeedManager implements IActivityFeedManager {
 
     public PubsubClient getPubSubClient() {
         return pubSubClient;
+    }
+
+    public ICommManager getCommManager() {
+        return commManager;
+    }
+
+    public void setCommManager(ICommManager commManager) {
+        this.commManager = commManager;
     }
 }

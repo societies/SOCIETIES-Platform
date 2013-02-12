@@ -101,6 +101,7 @@
           init-method="init">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="pubSubClient" ref="pubSubClient" />
+        <property name="commManager" ref="iCommManager" />
     </bean>
 
 </beans>

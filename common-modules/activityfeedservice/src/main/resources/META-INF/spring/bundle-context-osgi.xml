@@ -47,5 +47,7 @@ testing of the bundle outside of an OSGi container -->
 
     <osgi:reference id="pubSubClient"
                     interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" />
+    <osgi:reference id="iCommManager"
+                    interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
 
 </beans>
