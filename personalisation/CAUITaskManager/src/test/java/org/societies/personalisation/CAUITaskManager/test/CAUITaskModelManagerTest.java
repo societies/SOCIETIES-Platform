@@ -242,6 +242,18 @@ public class CAUITaskModelManagerTest {
 		//System.out.println("output 3 "+ results3);
 		assertEquals(1,results3.size());
 
+	
+		Map<String, Serializable> situationConext4 = new HashMap<String, Serializable>();
+		situationConext4.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
+		situationConext4.put(CtxAttributeTypes.STATUS, "free");
+		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		List<IUserIntentAction> results4 =  modelManager.retrieveActionsByContext(situationConext3);
+		System.out.println("output 4 "+ results4);
+		//assertEquals(1,results3.size());
+
+		
+		
+	
 	}
 
 	@Ignore
