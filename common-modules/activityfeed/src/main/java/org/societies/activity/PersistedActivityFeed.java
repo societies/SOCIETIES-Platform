@@ -38,14 +38,13 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.activity.ILocalActivityFeed;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed, ILocalActivityFeed {//, Subscriber {
+public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed{//, Subscriber {
 	
 	
 	private PubsubClient pubSubcli;
@@ -77,10 +76,9 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
     synchronized public void startUp(SessionFactory sessionFactory, String id, PubsubClient pubSubcli, IIdentity ownerCSS){
         this.sessionFactory = sessionFactory;
         this.id = id;
-        this.setPubSubcli(pubSubcli);
+        this.pubSubcli = pubSubcli;
         this.ownerCSS = ownerCSS;
-    }
-    public void connectPubSub(){
+        
         // pubsub code
         LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
@@ -89,49 +87,48 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 //			} catch (ClassNotFoundException e1) {
 //				LOG.warn("error adding classes at pubsub at activityfeed pubsub");
 //				e1.printStackTrace();
-//
+//				
 //			}
-            List<String> l = null;
-            try {
-                l = pubSubcli.discoItems(ownerCSS, null);
-            } catch (XMPPError e) {
-                LOG.warn("XMPPError at activityfeed pubsub");
-                e.printStackTrace();
-                return;
-            } catch (CommunicationException e) {
-                LOG.warn("Com at activityfeed pubsub");
-                e.printStackTrace();
-                return;
-            }
-            boolean nodeExists = false;
-            if(l.size() == 0)
-                LOG.warn("empty disco item list");
-
-            if(l != null && l.size()>0){
-                for(String temp : l){
-                    LOG.warn("Existing node is " + temp);
-                    if (temp.equals(this.id))
-                        nodeExists=true;
-                }
-
-            }
-            if(false == nodeExists){
-                try {
-                    LOG.warn("going to create a pubsub node");
-                    pubSubcli.ownerCreate(ownerCSS, this.id);
-                } catch (XMPPError e) {
-                    LOG.warn("XMPPError at activityfeed pubsub");
-                    e.printStackTrace();
-                } catch (CommunicationException e) {
-                    LOG.warn("Com at activityfeed pubsub");
-                    e.printStackTrace();
-                }
-            }else{
-                LOG.warn("node exists");
-            }
+			List<String> l = null;
+			try {
+				l = pubSubcli.discoItems(ownerCSS, null);
+			} catch (XMPPError e) {
+				LOG.warn("XMPPError at activityfeed pubsub");
+				e.printStackTrace();
+				return;
+			} catch (CommunicationException e) {
+				LOG.warn("Com at activityfeed pubsub");
+				e.printStackTrace();
+				return;
+			}
+			boolean nodeExists = false;
+			if(l.size() == 0)
+				LOG.warn("empty disco item list");
+			
+			if(l != null && l.size()>0){
+				for(String temp : l){
+					LOG.warn("Existing node is " + temp);
+					if (temp.equals(this.id))
+						nodeExists=true;
+				}
+				
+			}
+			if(false == nodeExists){
+				try {
+					LOG.warn("going to create a pubsub node");
+					pubSubcli.ownerCreate(ownerCSS, this.id);
+				} catch (XMPPError e) {
+					LOG.warn("XMPPError at activityfeed pubsub");
+					e.printStackTrace();
+				} catch (CommunicationException e) {
+					LOG.warn("Com at activityfeed pubsub");
+					e.printStackTrace();
+				}
+			}else{
+				LOG.warn("node exists");
+			}
         }
     }
-
 
     /**
 	 * 
@@ -235,10 +232,10 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		
 		// Publishing TO PUBSUB
-		if(false == err && getPubSubcli() !=null){
+		if(false == err && pubSubcli !=null){
 			try {
 				LOG.info("going to call pubsub");
-				getPubSubcli().publisherPublish(this.ownerCSS, this.id, Long.toString(actv_id), iactivToMarshActiv(newAct));
+				pubSubcli.publisherPublish(this.ownerCSS, this.id, Long.toString(actv_id), iactivToMarshActiv(newAct));
 			} catch (XMPPError e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
