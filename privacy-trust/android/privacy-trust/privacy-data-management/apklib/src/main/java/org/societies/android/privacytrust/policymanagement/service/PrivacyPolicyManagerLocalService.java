@@ -25,12 +25,15 @@
 package org.societies.android.privacytrust.policymanagement.service;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
+import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
 import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManager;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 
 /**
@@ -42,8 +45,19 @@ public class PrivacyPolicyManagerLocalService extends Service {
 	private IBinder binder;
 
 
+	@Override
 	public void onCreate() {
 		this.binder = new LocalBinder();
+		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).startService()) {
+			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
+		}
+	}
+	
+	@Override
+	public void onDestroy() {
+		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).stopService()) {
+			Log.e(TAG, "Ouch, can't stop this service (i.e. can't unbind it to the SocietiesCommsApp)");
+		}
 	}
 	
 

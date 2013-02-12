@@ -72,17 +72,9 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 		privacyDataManagerRemote = new PrivacyDataManagerRemote(context);
 		intentSender = new PrivacyDataIntentSender(context);
+		startService(); // stub until I find a solution
 	}
 
-	public boolean startService() {
-		privacyDataManagerRemote.bindToComms();
-		return true;
-	}
-	
-	public boolean stopService() {
-		privacyDataManagerRemote.unbindFromComms();
-		return true;
-	}
 
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
@@ -350,5 +342,15 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");
 		}
 		return obfuscator;
+	}
+	
+	public boolean startService() {
+		privacyDataManagerRemote.bindToComms();
+		return true;
+	}
+	
+	public boolean stopService() {
+		privacyDataManagerRemote.unbindFromComms();
+		return true;
 	}
 }
