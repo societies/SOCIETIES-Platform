@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.internal.privacytrust.util.model.privacypolicy;
 
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type

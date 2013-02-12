@@ -26,11 +26,13 @@ package org.societies.android.platform.eventscontainer;
 
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.pubsub.ISubscriber;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.events.PlatformEventsBase;
 import org.societies.android.platform.events.mocks.MockClientCommunicationMgr;
 import org.societies.android.platform.events.mocks.MockPubsubClientAndroid;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.pubsub.helper.PubsubHelper;
+import org.societies.api.identity.IIdentity;
 
 import android.app.Service;
 import android.content.Intent;
@@ -64,10 +66,7 @@ public class ServicePlatformEventsTest extends Service {
 	public class TestPlatformEventsBinder extends Binder {
 		
 		public IAndroidSocietiesEvents getService() {
-			PubsubClientAndroid pubsubClient = createPubSubClientAndroid();
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			
-			PlatformEventsBase serviceBase = new PlatformEventsBase(getApplicationContext(), pubsubClient, ccm, true);
+			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsTest.this, createPubSubClientAndroid(), createCCM(), false);
 
 			return serviceBase;
 		}
@@ -82,15 +81,11 @@ public class ServicePlatformEventsTest extends Service {
 	 * Factory method to get instance of {@link PubsubClientAndroid}
 	 * @return PubsubClientAndroid
 	 */
-	protected PubsubClientAndroid createPubSubClientAndroid() {
-		return new MockPubsubClientAndroid(getApplicationContext());
+	protected PubsubHelper createPubSubClientAndroid() {
+		return new MockPubsubClientAndroid(this);
 	}
 	
-	/**
-	 * Factory method to get instance of {@link ClientCommunicationMgr}
-	 * @return ClientCommunicationMgr
-	 */
-	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new MockClientCommunicationMgr(getApplicationContext());
+	protected ClientCommunicationMgr createCCM() {
+		return new MockClientCommunicationMgr(this);
 	}
 }

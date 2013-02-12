@@ -26,8 +26,9 @@ package org.societies.android.privacytrust.datamanagement;
 
 import java.util.List;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
@@ -43,22 +44,21 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.util.Log;
 
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManager implements IPrivacyDataManager {
+public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager {
 	private final static String TAG = PrivacyDataManager.class.getSimpleName();
 
 	private Context context;
@@ -74,6 +74,15 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		intentSender = new PrivacyDataIntentSender(context);
 	}
 
+	public boolean startService() {
+		privacyDataManagerRemote.bindToComms();
+		return true;
+	}
+	
+	public boolean stopService() {
+		privacyDataManagerRemote.unbindFromComms();
+		return true;
+	}
 
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters

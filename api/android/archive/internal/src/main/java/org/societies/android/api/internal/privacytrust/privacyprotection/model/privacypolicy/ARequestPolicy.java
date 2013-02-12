@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 /**
  * @author Olivier Maridat (Trialog)

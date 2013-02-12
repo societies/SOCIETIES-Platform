@@ -25,8 +25,10 @@
 package org.societies.android.platform.events;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.pubsub.helper.PubsubHelper;
+import org.societies.api.identity.IIdentity;
 
 import android.app.Service;
 import android.content.Intent;
@@ -59,10 +61,8 @@ public class ServicePlatformEventsLocal extends Service {
 	public class LocalPlatformEventsBinder extends Binder {
 		
 		public IAndroidSocietiesEvents getService() {
-			PubsubHelper pubsubClient = createPubSubClientAndroid();
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
-			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this.getApplicationContext(), pubsubClient, ccm, false);
+			PlatformEventsBase serviceBase = new PlatformEventsBase(ServicePlatformEventsLocal.this, createPubSubClientAndroid(), createClientCommunicationMgr(), false);
 
 			return serviceBase;
 		}

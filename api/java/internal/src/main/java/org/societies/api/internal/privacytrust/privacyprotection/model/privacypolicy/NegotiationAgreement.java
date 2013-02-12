@@ -32,6 +32,8 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 

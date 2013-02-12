@@ -144,19 +144,63 @@ public class PubsubServiceBase implements IPubsubService {
 	}
 
 	@Override
-	public boolean unBindFromAndroidComms(String client, long remoteCallID) {
-		if (this.pubsubClientMgr.unbindCommsService()) {
-			//Send intent
-			Intent intent = new Intent();
-			if (PubsubServiceBase.this.restrictBroadcast) {
-				intent.setPackage(client);
-			}
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-			intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
-			intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
-			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+	public boolean unBindFromAndroidComms(final String client, final long remoteCallID) {
+		this.pubsubClientMgr.unregister(ELEMENTS, new ICommCallback() {
+			
+			@Override
+			public void receiveResult(Stanza stanza, Object payload) {
+				boolean result = (Boolean) payload;
+				if (result) {
+					if (PubsubServiceBase.this.pubsubClientMgr.unbindCommsService()) {
+						//Send intent
+						Intent intent = new Intent();
+						if (PubsubServiceBase.this.restrictBroadcast) {
+							intent.setPackage(client);
+						}
+						intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+						intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
+						intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
+						PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 
-		}
+					}
+				}
+			}
+			
+			@Override
+			public void receiveMessage(Stanza stanza, Object payload) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void receiveItems(Stanza stanza, String node, List<String> items) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void receiveError(Stanza stanza, XMPPError error) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public List<String> getXMLNamespaces() {
+				return NAMESPACES;
+			}
+			
+			@Override
+			public List<String> getJavaPackages() {
+				return PACKAGES;
+			}
+		});
+		
 		return false;
 	}
 
@@ -243,20 +287,6 @@ public class PubsubServiceBase implements IPubsubService {
 			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
 				
 				public void receiveResult(Stanza stanza, Object payload) {
-//					if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
-//						org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
-//						String node = items.getNode();
-//						Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
-//						org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-//						try {
-//							List<ISubscriber> subscriberList = subscribers.get(sub);
-//							for (ISubscriber subscriber : subscriberList)
-//								subscriber.pubsubEvent(stanza.getFrom().getJid(), node, i.getId(), MarshallUtils.nodeToString((Element)i.getAny()));
-//
-//						} catch (TransformerException e) {
-//							Log.e(LOG_TAG, "Error while unmarshalling pubsub event payload", e);
-//						}
-//					}
 
 					//Send intent
 					Intent intent = new Intent();
@@ -447,6 +477,8 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
+		Dbc.require("Pubsub item ID", null != itemId && itemId.length() > 0);
+		Dbc.require("Pubsub event payload", null != item && item.length() > 0);
 		
 		Log.d(LOG_TAG, "publisherPublish called with domain authority: " + pubsubService + " and node: " + node);
 
@@ -697,7 +729,7 @@ public class PubsubServiceBase implements IPubsubService {
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
 
 			synchronized (this.subscribedNodes) {
-				if (1 == this.subscribedNodes.get(node)) {
+				if (this.subscribedNodes.containsKey(node) && 1 == this.subscribedNodes.get(node)) {
 					Stanza stanza = new Stanza(pubsubServiceIdentity);
 					Pubsub payload = new Pubsub();
 					Unsubscribe unsub = new Unsubscribe();

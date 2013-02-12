@@ -57,6 +57,7 @@ public interface XMPPAgent {
 	public static final String SEND_IQ_ERROR = "org.societies.android.platform.comms.SEND_IQ_ERROR";
 	public static final String SEND_MESSAGE_RESULT = "org.societies.android.platform.comms.SEND_MESSAGE_RESULT";
 	public static final String SEND_MESSAGE_EXCEPTION = "org.societies.android.platform.comms.SEND_MESSAGE_EXCEPTION";
+	public static final String PUBSUB_EVENT = "org.societies.android.platform.comms.PUBSUB_EVENT";
 
 
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId);

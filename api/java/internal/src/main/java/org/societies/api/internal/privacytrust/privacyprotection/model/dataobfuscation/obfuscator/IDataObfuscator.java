@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfu
 
 import java.lang.reflect.Type;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 
 /**

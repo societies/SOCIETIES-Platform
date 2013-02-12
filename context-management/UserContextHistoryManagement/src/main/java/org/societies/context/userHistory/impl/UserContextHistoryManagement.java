@@ -452,6 +452,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 					if(attr != null){
 						attr.setHistoryRecorded(true);
 						this.userCtxDBMgr.update(attr);	
+						this.storeHoCAttribute(attr);
 					}	
 				}
 				

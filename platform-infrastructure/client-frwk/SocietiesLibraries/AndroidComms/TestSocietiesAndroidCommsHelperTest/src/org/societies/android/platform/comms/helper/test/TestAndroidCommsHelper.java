@@ -463,11 +463,18 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 									public void returnAction(String loginResult) {
 										assertEquals(XMPP_SUCCESSFUL_JID, loginResult);
 										
-										ccm.register(ELEMENT_NAMES, new ICommCallback() {
+										ccm.register(ELEMENT_NAMES, NAME_SPACES, CSS_PACKAGES, new IMethodCallback() {
 											
-											public void receiveResult(Stanza stanza, Object object) {
-												assertTrue((Boolean) object);
-												ccm.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+											@Override
+											public void returnAction(String arg0) {
+												fail("Incorrect return object");
+											}
+											
+											@Override
+											public void returnAction(boolean result) {
+												assertTrue(result);
+												if (result) {
+													ccm.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
 													
 													@Override
 													public void returnAction(String arg0) {
@@ -488,6 +495,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																ccm.UnRegisterCommManager(new IMethodCallback() {
 																	
 																	public void returnAction(String arg0) {
+																		fail("Incorrect return object");
 																	}
 																	
 																	public void returnAction(boolean result) {
@@ -500,34 +508,10 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 														});
 													}
 												});
-													
 
-											}
-											public void receiveMessage(Stanza arg0, Object arg1) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-												fail("Incorrect callback method called");
-											}
-											
-											public void receiveError(Stanza arg0, XMPPError arg1) {
-												fail("Incorrect callback method called");
-											}
-											
-											public List<String> getXMLNamespaces() {
-												return NAME_SPACES;
-											}
-											
-											public List<String> getJavaPackages() {
-												return CSS_PACKAGES;
+												}
 											}
 										});
-
 									}
 									
 									public void returnAction(boolean arg0) {

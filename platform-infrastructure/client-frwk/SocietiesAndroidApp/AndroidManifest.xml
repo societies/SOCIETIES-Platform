@@ -62,7 +62,7 @@
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
 		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
-        <service android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService" />
+          <service android:name="org.societies.android.platform.cssmanager.ServiceCSSManagerLocal" />
         <service android:name="org.societies.android.platform.cssmanager.LocalCssDirectoryService" />
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
@@ -88,6 +88,13 @@
                 <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
    			</intent-filter>
         </service>
+        <provider 
+            android:authorities="org.societies.android.platform.content.androidcssmanager"
+            android:name="org.societies.android.platform.content.ProviderImplementation"
+            android:exported="true"
+            android:label="SocietiesCSSContentProvider">
+        </provider>
+        
           <!-- this needs to be copied manually  -->
     <!--provider
         android:name="org.societies.android.platform.SocialProvider"

@@ -44,15 +44,15 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataMan
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 
 /**
  * @author Olivier Maridat (Trialog)

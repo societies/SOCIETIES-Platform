@@ -42,8 +42,8 @@
 			<version>${version.comm}</version>
 		</dependency-->
         <dependency>
-   			<groupId>org.societies.android.platform.content</groupId>
-   			<artifactId>SocietiesContent</artifactId>
+		    <groupId>org.societies.android.platform.content</groupId>
+		    <artifactId>SocietiesCSSContentProvider</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>

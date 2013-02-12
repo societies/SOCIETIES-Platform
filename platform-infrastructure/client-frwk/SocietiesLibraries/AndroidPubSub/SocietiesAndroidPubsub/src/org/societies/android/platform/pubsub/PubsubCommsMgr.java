@@ -77,8 +77,6 @@ public class PubsubCommsMgr {
 		this.idManager = null;
 		this.receiver = null;
 		this.bindCallback = null;
-		
-		this.setupBroadcastReceiver();
 	}
 	
 
@@ -90,6 +88,8 @@ public class PubsubCommsMgr {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
 		Log.d(LOG_TAG, "Bind to Android Comms Service");
 		
+		this.setupBroadcastReceiver();
+
 		this.bindCallback = bindCallback;
 		this.bindToServiceAfterLogin();
 
@@ -139,6 +139,30 @@ public class PubsubCommsMgr {
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
 		
 		InvokeRegister invoker = new InvokeRegister(this.clientPackageName, elementNames, namespaces, callbackID);
+		invoker.execute();
+	}
+
+	public void unregister(final List<String> elementNames, final ICommCallback callback) {
+		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
+		Dbc.require("Callback object must be supplied", null != callback);
+
+		long callbackID = this.randomGenerator.nextLong();
+
+		synchronized(this.xmppCallbackMap) {
+			//store callback in order to activate required methods
+			this.xmppCallbackMap.put(callbackID, callback);
+		}
+		
+		Log.d(LOG_TAG, "unregister element names");
+		
+//		for (String element : elementNames) {
+//			Log.d(LOG_TAG, "register element: " + element);
+//		}
+
+		final List<String> namespaces = callback.getXMLNamespaces();
+		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
+		
+		InvokeUnRegister invoker = new InvokeUnRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoker.execute();
 	}
 
@@ -425,7 +449,16 @@ public class PubsubCommsMgr {
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
-			}
+			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
+				synchronized (PubsubCommsMgr.this.xmppCallbackMap) {
+					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
+						Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
+			} 
 		}
     }
 
@@ -448,6 +481,7 @@ public class PubsubCommsMgr {
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
         intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.PUBSUB_EVENT);
         return intentFilter;
     }
     
@@ -561,6 +595,68 @@ public class PubsubCommsMgr {
      * Async task to invoke remote service method unregister
      *
      */
+    private class InvokeUnRegister extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeUnRegister.class.getName();
+    	private String client;
+    	private List<String> elementNames; 
+    	private List<String> nameSpaces;
+    	private long remoteID;
+
+   	 /**
+   	 * Default Constructor
+   	  * @param client
+   	  * @param elementNames
+   	  * @param nameSpaces
+   	  * @param remoteID
+   	  */
+    	public InvokeUnRegister(String client, List<String> elementNames, List<String> nameSpaces, long remoteID) {
+    		this.client = client;
+    		this.elementNames = elementNames;
+    		this.nameSpaces = nameSpaces;
+    		this.remoteID = remoteID;
+   	}
+
+    	protected Void doInBackground(Void... args) {
+
+    		String targetMethod = XMPPAgent.methodsArray[1];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+    		/*
+    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+    		 * only the client can receive it.
+    		 */
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+
+    		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
+    		
+    		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
+    		
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
+    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+
+	/**
+     * 
+     * Async task to invoke remote service method send an IQ stanza
+     *
+     */
     private class InvokeSendIQ extends AsyncTask<Void, Void, Void> {
 
     	private final String LOCAL_LOG_TAG = InvokeSendIQ.class.getName();
@@ -616,7 +712,7 @@ public class PubsubCommsMgr {
 
 	/**
      * 
-     * Async task to invoke remote service method unregister
+     * Async task to invoke remote service method get items
      *
      */
     private class InvokeGetItems extends AsyncTask<Void, Void, Void> {
@@ -679,7 +775,7 @@ public class PubsubCommsMgr {
 
 	/**
      * 
-     * Async task to invoke remote service method unregister
+     * Async task to invoke remote service method get Identity
      *
      */
     private class InvokeGetIdentityJid extends AsyncTask<Void, Void, Void> {
@@ -733,7 +829,7 @@ public class PubsubCommsMgr {
 
 	/**
      * 
-     * Async task to invoke remote service method unregister
+     * Async task to invoke remote service method domain
      *
      */
     private class InvokeGetDomainAuthorityNode extends AsyncTask<Void, Void, Void> {
@@ -787,7 +883,7 @@ public class PubsubCommsMgr {
 
 	/**
      * 
-     * Async task to invoke remote service method unregister
+     * Async task to invoke remote service method isConnected
      *
      */
     private class InvokeIsConnected extends AsyncTask<Void, Void, Void> {

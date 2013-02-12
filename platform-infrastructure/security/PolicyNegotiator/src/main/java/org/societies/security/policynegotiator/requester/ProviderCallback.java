@@ -35,14 +35,17 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.policynegotiator.sla.SLA;
+import org.societies.security.policynegotiator.util.ValueGenerator;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
 
@@ -178,25 +181,35 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				EventTypes.FAILED_NEGOTIATION_EVENT,
 				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}; 
 
+		int id = ValueGenerator.generateUniqueInt();
+		NegotiationDetails ppnDetails = new NegotiationDetails(provider, id);
+
 		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey, fileUris,
-				requester.getEventMgr(), eventTypes);
+				requester.getEventMgr(), eventTypes, id);
 		
 		requester.getEventMgr().subscribeInternalEvent(listener, eventTypes, null);
 		
-		if (provider instanceof RequestorService) {
-			RequestorService providerService = (RequestorService) provider;
-			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerService.getRequestorId(),
-					providerService.getRequestorServiceId());
-			ppn.negotiateServicePolicy(providerService);
-		}
-		else if (provider instanceof RequestorCis) {
-			RequestorCis providerCis = (RequestorCis) provider;
-			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerCis.getRequestorId(),
-					providerCis.getCisRequestorId());
-			ppn.negotiateCISPolicy(providerCis);
-		}
-		else {
-			LOG.warn("startPrivacyPolicyNegotiation(): unrecognized provider type: {}", provider.getClass().getName());
+		
+		try {
+			if (provider instanceof RequestorService) {
+				RequestorService providerService = (RequestorService) provider;
+				LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerService.getRequestorId(),
+						providerService.getRequestorServiceId());
+				ppn.negotiateServicePolicy(ppnDetails);
+			}
+			else if (provider instanceof RequestorCis) {
+				RequestorCis providerCis = (RequestorCis) provider;
+				LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerCis.getRequestorId(),
+						providerCis.getCisRequestorId());
+				ppn.negotiateCISPolicy(ppnDetails);
+			}
+			else {
+				LOG.warn("startPrivacyPolicyNegotiation(): unrecognized provider type: {}", provider.getClass().getName());
+				return;
+			}
+		} catch (PrivacyException e) {
+			LOG.warn("startPrivacyPolicyNegotiation()", e);
+			return;
 		}
 	}
 	
