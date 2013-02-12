@@ -35,6 +35,7 @@ import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +45,6 @@ import java.util.List;
  * User: bjornmagnus
  * Date: 2/8/13
  * Time: 16:06
- * To change this template use File | Settings | File Templates.
  */
 public class ActivityFeedManager implements IActivityFeedManager {
     private List<IActivityFeed> feeds;
@@ -55,29 +55,38 @@ public class ActivityFeedManager implements IActivityFeedManager {
     private ICommManager commManager;
 
     @Override
-    public IActivityFeed getOrCreateFeed(IIdentity owner, String feedId) {
+    public IActivityFeed getOrCreateFeed(String owner, String feedId) {
+
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
+                if(!((ActivityFeed)feed).getOwner().contentEquals(owner))
                     return null;
                 ((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
                 return feed;
             }
         }
-
+        IIdentity identity = null;
+        try {
+            identity = commManager.getIdManager().fromJid(owner);
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         //not existing, making a new one..
-        IActivityFeed ret = new ActivityFeed(ownerId,feedId);
+        PersistedActivityFeed ret = new PersistedActivityFeed();
+        ret.setPubSubcli(this.pubSubClient);
+        ret.startUp(this.sessionFactory,owner);
+        ret.connectPubSub(identity);
         feeds.add(ret);
         return ret;
     }
 
     @Override
-    public boolean deleteFeed(IIdentity owner, String feedId) {
-        Iterator<IActivityFeed> it = feeds.iterator(); IActivityFeed cur=null;
+    public boolean deleteFeed(String owner, String feedId) {
+        Iterator<IActivityFeed> it = feeds.iterator(); IActivityFeed cur;
         while(it.hasNext())    {
             cur = it.next();
             if(((ActivityFeed)cur).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)cur).getOwner().contentEquals(ownerId))
+                if(!((ActivityFeed)cur).getOwner().contentEquals(owner))
                     return false;
 
                 return feeds.remove(it);

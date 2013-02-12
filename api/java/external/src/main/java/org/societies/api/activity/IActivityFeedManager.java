@@ -25,7 +25,6 @@
 
 package org.societies.api.activity;
 
-import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 
 /**
@@ -33,15 +32,14 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
  * User: bjornmagnus
  * Date: 2/8/13
  * Time: 16:06
- * To change this template use File | Settings | File Templates.
  */
 @SocietiesExternalInterface(type = SocietiesExternalInterface.SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeedManager {
     /**
      *
-     * @param id The id of the existing or new ActivityFeed
+     * @param owner The id of the existing or new ActivityFeed
      * @return {@link IActivityFeed}
      */
-    public IActivityFeed getOrCreateFeed(IIdentity owner, String feedId);
-    public boolean deleteFeed(IIdentity owner, String id);
+    public IActivityFeed getOrCreateFeed(String owner, String feedId);
+    public boolean deleteFeed(String owner, String id);
 }
