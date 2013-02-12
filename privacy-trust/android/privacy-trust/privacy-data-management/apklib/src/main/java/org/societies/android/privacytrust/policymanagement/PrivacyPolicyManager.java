@@ -24,34 +24,14 @@
  */
 package org.societies.android.privacytrust.policymanagement;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.api.internal.privacytrust.util.model.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.api.utilities.MissingClientPackageException;
-import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
-import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
@@ -63,7 +43,7 @@ import android.util.Log;
  * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
-public class PrivacyPolicyManager implements IPrivacyPolicyManager {
+public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceManager {
 	private final static String TAG = PrivacyPolicyManager.class.getSimpleName();
 
 	private Context context;
@@ -77,6 +57,16 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		intentSender = new PrivacyPolicyIntentSender(context);
 	}
 
+	public boolean startService() {
+		privacyPolicyManagerRemote.bindToComms();
+		return true;
+	}
+	
+	public boolean stopService() {
+		privacyPolicyManagerRemote.unbindFromComms();
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)

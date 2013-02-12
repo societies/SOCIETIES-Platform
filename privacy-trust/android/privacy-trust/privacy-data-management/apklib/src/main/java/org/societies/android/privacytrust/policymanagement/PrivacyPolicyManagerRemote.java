@@ -28,10 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.Stanza;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.privacytrust.datamanagement.PrivacyDataManagerRemote;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
 import org.societies.api.identity.IIdentity;
@@ -45,6 +48,7 @@ import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -68,7 +72,7 @@ public class PrivacyPolicyManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyPolicyIntentSender intentSender;
-
+	private boolean connectedToComms = false;
 
 	public PrivacyPolicyManagerRemote(Context context)  {
 		this.context = context;
@@ -76,40 +80,122 @@ public class PrivacyPolicyManagerRemote {
 		intentSender = new PrivacyPolicyIntentSender(context);
 	}
 
-
+	public void bindToComms() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(TAG, "PrivacyPolicyManagerRemote startService binding to comms");
+	        this.clientCommManager.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+						clientCommManager.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		PrivacyPolicyManagerRemote.this.context.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		PrivacyPolicyManagerRemote.this.context.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		this.context.sendBroadcast(intent);
+    	}
+    }
+    
+    public void unbindFromComms() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(TAG, "PrivacyPolicyManagerRemote stopService unregistering namespaces");
+        	clientCommManager.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					clientCommManager.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		PrivacyPolicyManagerRemote.this.context.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		this.context.sendBroadcast(intent);
+    	}
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			this.context.sendBroadcast(intent);
+		}
+	}
+	
 	public boolean getPrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
 		String action = MethodType.GET_PRIVACY_POLICY.name();
-		try {
-			// -- Destination
-			IIdentity cloudNode = getOwnerJid(owner);
-			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
-
-			// -- Message
-			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
-			messageBean.setMethod(MethodType.GET_PRIVACY_POLICY);
-			messageBean.setRequestor(owner);
-
-			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			clientCommManager.register(ELEMENT_NAMES, callback);
-			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
-		} catch (InvalidFormatException e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, action, "Error: don't know who to contact");
-			return false;
-		}
-		catch (CommunicationException e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
-			return false;
-		}
-		catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, action, "Unknown remote remote");
-			return false;
-		} 
+		if (connectedToComms) {
+			try {
+				// -- Destination
+				IIdentity cloudNode = getOwnerJid(owner);
+				Stanza stanza = new Stanza(cloudNode);
+				Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
+	
+				// -- Message
+				PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
+				messageBean.setMethod(MethodType.GET_PRIVACY_POLICY);
+				messageBean.setRequestor(owner);
+	
+				// -- Send
+				RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+				Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
+			} catch (InvalidFormatException e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, action, "Error: don't know who to contact");
+				return false;
+			}
+			catch (CommunicationException e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
+				return false;
+			}
+			catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, action, "Unknown remote remote");
+				return false;
+			} 
+		} else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(clientPackage, action);
+	    }
 		return true;
 	}
 
@@ -124,53 +210,62 @@ public class PrivacyPolicyManagerRemote {
 
 
 	public boolean updatePrivacyPolicy(String clientPackage, RequestPolicy privacyPolicy) throws PrivacyException {
-		try {
-			// -- Destination
-			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+MethodType.UPDATE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
-	
-			// -- Message
-			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
-			messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-			messageBean.setPrivacyPolicy(privacyPolicy);
-	
-			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
-			clientCommManager.register(ELEMENT_NAMES, callback);
-			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.UPDATE_PRIVACY_POLICY.name());
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, MethodType.UPDATE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
-			return false;
-		}
+		String action = MethodType.UPDATE_PRIVACY_POLICY.name();
+		if (connectedToComms) {
+			try {
+				// -- Destination
+				INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNode);
+				Log.d(TAG, "Send "+MethodType.UPDATE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
+		
+				// -- Message
+				PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
+				messageBean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
+				messageBean.setPrivacyPolicy(privacyPolicy);
+		
+				// -- Send
+				RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+				Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
+			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, MethodType.UPDATE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
+				return false;
+			}
+		} else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(clientPackage, action);
+	    }
 		return true;
 	}
 
 	public boolean deletePrivacyPolicy(String clientPackage, RequestorBean owner) throws PrivacyException {
-		try {
-			// -- Destination
-			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+MethodType.DELETE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
-	
-			// -- Message
-			PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
-			messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-			messageBean.setRequestor(owner);
-	
-			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		String action = MethodType.DELETE_PRIVACY_POLICY.name();
+		if (connectedToComms) {
+			try {
+				// -- Destination
+				INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNode);
+				Log.d(TAG, "Send "+MethodType.DELETE_PRIVACY_POLICY.name()+" to "+cloudNode.getJid());
 		
-			clientCommManager.register(ELEMENT_NAMES, callback);
-			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+MethodType.DELETE_PRIVACY_POLICY.name());
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, MethodType.DELETE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
-			return false;
-		}
+				// -- Message
+				PrivacyPolicyManagerBean messageBean = new PrivacyPolicyManagerBean();
+				messageBean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
+				messageBean.setRequestor(owner);
+		
+				// -- Send
+				RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+				Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
+			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, MethodType.DELETE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
+				return false;
+			}
+		} else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(clientPackage, action);
+	    }
 		return true;
 	}
 }

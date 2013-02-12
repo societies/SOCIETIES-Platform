@@ -26,7 +26,7 @@ package org.societies.android.privacytrust.api;
 
 import java.util.List;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission;

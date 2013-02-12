@@ -28,8 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.cis.directory.ICisDirectory;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.Stanza;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
@@ -42,6 +46,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 
@@ -63,11 +68,10 @@ public class PrivacyDataManagerRemote {
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.servicelifecycle.model");
 
-
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyDataIntentSender intentSender;
-
+	private boolean connectedToComms = false;
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
@@ -75,62 +79,148 @@ public class PrivacyDataManagerRemote {
 		intentSender = new PrivacyDataIntentSender(context);
 	}
 
-
+	public void bindToComms() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(TAG, "PrivacyDataManagerRemote startService binding to comms");
+	        this.clientCommManager.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+						clientCommManager.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		this.context.sendBroadcast(intent);
+    	}
+    }
+    
+    public void unbindFromComms() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(TAG, "PrivacyDataManagerRemote stopService unregistering namespaces");
+        	clientCommManager.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					clientCommManager.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		this.context.sendBroadcast(intent);
+    	}
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			this.context.sendBroadcast(intent);
+		}
+	}
+	
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
-		try {
-			// -- Destination
-			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
-	
-			// -- Message
-			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
-			messageBean.setMethod(MethodType.CHECK_PERMISSION);
-			messageBean.setRequestor(requestor);
-			messageBean.setDataIdUri(dataId.getUri());
-			messageBean.setActions(actions);
-	
-			// -- Send
-			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		if (connectedToComms) {
+			try {
+				// -- Destination
+				INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNode);
+				Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
 		
-			clientCommManager.register(ELEMENT_NAMES, callback);
-			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
-		}
+				// -- Message
+				PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
+				messageBean.setMethod(MethodType.CHECK_PERMISSION);
+				messageBean.setRequestor(requestor);
+				messageBean.setDataIdUri(dataId.getUri());
+				messageBean.setActions(actions);
+		
+				// -- Send
+				RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+				Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
+			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(clientPackage, action);
+	    }
 	}
 
 	// -- Obfuscation
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
-		try {
-			// -- Destination
-			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
-			Stanza stanza = new Stanza(cloudNode);
-			Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
-	
-			// -- Message
-			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
-			messageBean.setMethod(MethodType.OBFUSCATE_DATA);
-			messageBean.setRequestor(requestor);
-			messageBean.setDataWrapper(dataWrapper);
-	
-			// -- Send
-			RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+		if (connectedToComms) {
+			try {
+				// -- Destination
+				INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNode);
+				Log.d(TAG, "Send "+action+" to "+cloudNode.getJid());
 		
-			clientCommManager.register(ELEMENT_NAMES, callback);
-			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-			Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+action);
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
-		}
+				// -- Message
+				PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
+				messageBean.setMethod(MethodType.OBFUSCATE_DATA);
+				messageBean.setRequestor(requestor);
+				messageBean.setDataWrapper(dataWrapper);
+		
+				// -- Send
+				RemotePrivacyDataCallback callback = new RemotePrivacyDataCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+				Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
+			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+				intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(clientPackage, action);
+	    }
 	}
+	
 	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");
 		return dataWrapper.getDataId();
 	}
+	
 }

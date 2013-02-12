@@ -32,13 +32,15 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
@@ -48,11 +50,8 @@ import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
 
-import org.societies.utilities.DBC.Dbc;
-
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 
 
@@ -61,7 +60,7 @@ import android.util.Log;
  * 
  *
  */
-public class ServiceManagementBase implements IServiceDiscovery, IServiceControl {
+public class ServiceManagementBase implements IServiceDiscovery, IServiceControl, IServiceManager {
 	//Logging tag
     private static final String LOG_TAG = ServiceManagementBase.class.getName();
     
@@ -75,7 +74,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 															   "org.societies.api.schema.servicelifecycle.model");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
-    
+    private boolean connectedToComms = false;
 
     /**
      * Default constructor
@@ -84,7 +83,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
     	Log.d(LOG_TAG, "Object created");
     	
     	this.androidContext = androidContext;
-    	
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -93,27 +91,147 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
         }
     }
 
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+			        	commMgr.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		ServiceManagementBase.this.androidContext.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		ServiceManagementBase.this.androidContext.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "CisDirectoryBase stopService unregistering namespaces");
+        	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					commMgr.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		ServiceManagementBase.this.androidContext.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		androidContext.sendBroadcast(intent);
+    	}
+    	return true;
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			androidContext.sendBroadcast(intent);
+		}
+	}
+	
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery methods >>>>>>>>>>>>>>>>>>>>>>>
     /* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public Service[] getMyServices(String client) {
+	public Service[] getMyServices(final String client) {
 		Log.d(LOG_TAG, "getMyServices called by client: " + client);
-		
-		AsyncGetMyServices methodAsync = new AsyncGetMyServices();
-		String params [] = {client};
-		methodAsync.execute(params);
-		
-        return null;
+
+		if (connectedToComms) {
+			//Message Bean
+			ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
+			messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
+
+			//COMMS CONFIG
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(client, GET_MY_SERVICES);
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Log.e(LOG_TAG, "Cloud Node: " + toID.getJid());
+				Stanza stanza = new Stanza(toID);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, GET_MY_SERVICES);
+        }
+		return null;
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
-	public Service[] getServices(String client, String identity) {
+	public Service[] getServices(final String client, final String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
-		AsynGetServices methodAsync = new AsynGetServices();
-		String params [] = {client, identity};
-		methodAsync.execute(params);
+		if (!connectedToComms) {
+			//Message Bean
+			ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
+			messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
 
-        return null;
+			//Communications configuration
+			ICommCallback discoCallback = new ServiceLifecycleCallback(client, GET_SERVICES); 
+			IIdentity toID;
+			try {
+				toID = commMgr.getIdManager().fromJid(identity);
+				Stanza stanza = new Stanza(toID);
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, GET_SERVICES);
+        }
+		return null;
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
@@ -138,49 +256,94 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 	}
 	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#shareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String shareService(String client, Service service, String identity) {
+	public String shareService(final String client, final Service service, final String identity) {
 		Log.d(LOG_TAG, "shareService called by client: " + client);
-		
-		AsyncShareService methodAsync = new AsyncShareService();
-		Object params[] = {client, service, identity, IServiceControl.SHARE_SERVICE};
-		methodAsync.execute(params);
-		
+		serviceSharingHandler(client, service, identity, IServiceControl.SHARE_SERVICE);
 		return null;
 	}
 	
 	/*@see org.societies.android.api.internal.servicelifecycle.IServiceControl#unshareService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, java.lang.String)*/
-	public String unshareService(String client, Service service, String identity) {
+	public String unshareService(final String client, final Service service, final String identity) {
 		Log.d(LOG_TAG, "unshareService called by client: " + client);
-		
-		AsyncShareService methodAsync = new AsyncShareService();
-		Object params[] = {client, service, identity, IServiceControl.UNSHARE_SERVICE};
-		methodAsync.execute(params);
-		
+		serviceSharingHandler(client, service, identity, IServiceControl.UNSHARE_SERVICE);
 		return null;
 	}
 
+	private void serviceSharingHandler(final String client, final Service service, final String identity, final String method) {
+		if (connectedToComms) {
+			//MESSAGE BEAN
+			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+			messageBean.setService(service);
+			messageBean.setShareJid(identity);
+			if (method.equals(IServiceControl.SHARE_SERVICE)) 
+				messageBean.setMethod(MethodType.SHARE_SERVICE);
+			else
+				messageBean.setMethod(MethodType.UNSHARE_SERVICE);
+			
+			//COMMS CONFIG
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(toID);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, method);
+        }
+	}
+	
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#startService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String) */
-	public String startService(String client, ServiceResourceIdentifier serviceId) {
+	public String startService(final String client, final ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "startService called by client: " + client);
-		
-		AsyncControlService methodAsync = new AsyncControlService();
-		Object params[] = {client, serviceId, IServiceControl.START_SERVICE};
-		methodAsync.execute(params);
-		
+		serviceControlHandler(client, serviceId, IServiceControl.START_SERVICE);
 		return null;
 	}
 
 	/* @see org.societies.android.api.internal.servicelifecycle.IServiceControl#stopService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)*/
-	public String stopService(String client, ServiceResourceIdentifier serviceId) {
+	public String stopService(final String client, final ServiceResourceIdentifier serviceId) {
 		Log.d(LOG_TAG, "stopService called by client: " + client);
-		
-		AsyncControlService methodAsync = new AsyncControlService();
-		Object params[] = {client, serviceId, IServiceControl.STOP_SERVICE};
-		methodAsync.execute(params);
-		
+		serviceControlHandler(client, serviceId, IServiceControl.STOP_SERVICE);
 		return null;
 	}
 
+	private void serviceControlHandler(final String client, final ServiceResourceIdentifier serviceId, String method) {
+		if (connectedToComms) {
+			//MESSAGE BEAN
+			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+			messageBean.setServiceId(serviceId);
+			if (method.equals(IServiceControl.START_SERVICE)) 
+				messageBean.setMethod(MethodType.START_SERVICE);
+			else
+				messageBean.setMethod(MethodType.STOP_SERVICE);
+			
+			//COMMS CONFIG
+			try {
+				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
+				IIdentity toID = commMgr.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(toID);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+			}
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, method);
+	    }
+	}
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICommCallback methods >>>>>>>>>>>>>>>>>>>>>>>
 	/**
 	 * Callback required for Android Comms Manager to enable remote invocations to callback with returned information
@@ -235,13 +398,6 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
 					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
-					//CONVERT TO PARCEL BEANS
-					//int i=0;
-					//Parcelable serviceArray[] = new Parcelable[serviceList.size()];
-					//for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
-					//	serviceArray[i] = AService.convertService(tmpService);
-					//	i++;
-					//}
 					org.societies.api.schema.servicelifecycle.model.Service serviceArray[] = serviceList.toArray(new org.societies.api.schema.servicelifecycle.model.Service[serviceList.size()]);
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray); 
@@ -259,217 +415,8 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					intent.setPackage(client);
 				}
 				ServiceManagementBase.this.androidContext.sendBroadcast(intent);
-				//ServiceManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}
 	
-	/**
-	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
-	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
-	 * method invocation is an explicitly asynchronous operation, other usage is not and in general the use of these types of classes
-	 * is encouraged. Remember, Android Not Responding (ANR) exceptions will be invoked if the main application thread is abused
-	 * and the application will be closed down by Android very soon after.
-	 * 
-	 * Although the result of an AsyncTask can be obtained by using <AsyncTask Object>.get() it's not a good idea as 
-	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
-	 * class ineffective. Use Intents as an asynchronous callback mechanism.
-	 */
-	
-	/**
-	 * This class carries out the getMyServices method call asynchronously
-	 */
-	private class AsyncGetMyServices extends AsyncTask<String, Void, String[]> {
-		
-		@Override
-		/**
-		 * Carry out compute task 
-		 */
-		protected String[] doInBackground(String... params) {
-			Dbc.require("At least one parameter must be supplied", params.length >= 1);
-			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
-			
-			String results [] = new String[1];
-			results[0] = params[0];
-			
-			//Message Bean
-			ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
-			messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
-
-			//Communications configuration
-			try {
-				ICommCallback discoCallback = new ServiceLifecycleCallback(params[0], GET_MY_SERVICES); 
-				IIdentity toID = commMgr.getIdManager().getCloudNode();
-				Log.e(LOG_TAG, "Cloud Node: " + toID.getJid());
-				Stanza stanza = new Stanza(toID);
-	        
-	        	commMgr.register(ELEMENT_NAMES, discoCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
-				Log.d(LOG_TAG, "Sending stanza");
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-	        }
-	 
-			return results;
-		}
-
-		
-		@Override
-		/**
-		 * Handle the communication of the result
-		 */
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
-	}
-	
-	/**
-	 * This class carries out the getServices method call asynchronously
-	 */
-	private class AsynGetServices extends AsyncTask<String, Void, String[]> {
-		
-		@Override
-		/**
-		 * Carry out compute task 
-		 */
-		protected String[] doInBackground(String... params) {
-			Dbc.require("At least two parameters must be supplied", params.length >= 2);
-			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
-			
-			String results [] = new String[1];
-			results[0] = params[0];
-			
-			//Message Bean
-			ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
-			messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
-
-			//Communications configuration
-			ICommCallback discoCallback = new ServiceLifecycleCallback(params[0], GET_SERVICES); 
-			IIdentity toID;
-			try {
-				toID = commMgr.getIdManager().fromJid(params[1]);
-
-				Stanza stanza = new Stanza(toID);
-	        	commMgr.register(ELEMENT_NAMES, discoCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
-				Log.d(LOG_TAG, "Sending stanza");
-			} catch (Exception e) {
-				Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
-	        }
-	 
-			return results;
-		}
-
-		
-		@Override
-		/**
-		 * Handle the communication of the result
-		 */
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
-	}
-	
-	/**
-	 * This class carries out the Share and unShare Services methods call asynchronously
-	 */
-	private class AsyncShareService extends AsyncTask<Object, Void, String[]> {
-		
-		@Override
-		/**
-		 * Carry out compute task 
-		 */
-		protected String[] doInBackground(Object... params) {
-			Dbc.require("At least two parameters must be supplied", params.length >= 2);
-			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
-			
-			//PARAMETERS
-			String client = (String)params[0];
-			Service service = (Service) params[1];
-			String identity = (String) params[2];
-			String method = (String) params[3];
-			//RETURN OBJECT
-			String results[] = new String[1];
-			results[0] = client;
-			//MESSAGE BEAN
-			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			//messageBean.setService(AService.convertAService(service));
-			messageBean.setService(service);
-			messageBean.setShareJid(identity);
-			if (method.equals(IServiceControl.SHARE_SERVICE)) 
-				messageBean.setMethod(MethodType.SHARE_SERVICE);
-			else
-				messageBean.setMethod(MethodType.UNSHARE_SERVICE);
-			
-			//Communications configuration
-			try {
-				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
-				IIdentity toID = commMgr.getIdManager().getCloudNode();
-				Stanza stanza = new Stanza(toID);
-	        
-	        	commMgr.register(ELEMENT_NAMES, discoCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
-				Log.d(LOG_TAG, "Sending stanza");
-			} catch (Exception e) {
-				Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
-	        }	 
-			return results;
-		}
-		
-		/**Handle the communication of the result*/
-		@Override
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
-	}
-
-	/**
-	 * This class carries out the Stop/Start Service method call asynchronously
-	 */
-	private class AsyncControlService extends AsyncTask<Object, Void, String[]> {
-		
-		@Override
-		/**Carry out compute task */
-		protected String[] doInBackground(Object... params) {
-			Dbc.require("At least two parameters must be supplied", params.length >= 2);
-			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
-			
-			//PARAMETERS
-			String client = (String)params[0];
-			ServiceResourceIdentifier serviceId = (ServiceResourceIdentifier) params[1];
-			String method = (String) params[2];
-			//RETURN OBJECT
-			String results[] = new String[1];
-			results[0] = client;
-			//MESSAGE BEAN
-			ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
-			//messageBean.setServiceId(AServiceResourceIdentifier.convertAServiceResourceIdentifier(serviceId));
-			messageBean.setServiceId(serviceId);
-			if (method.equals(IServiceControl.START_SERVICE)) 
-				messageBean.setMethod(MethodType.START_SERVICE);
-			else
-				messageBean.setMethod(MethodType.STOP_SERVICE);
-			
-			//Communications configuration
-			try {
-				ICommCallback discoCallback = new ServiceLifecycleCallback(client, method); 
-				IIdentity toID = commMgr.getIdManager().getCloudNode();
-				Stanza stanza = new Stanza(toID);
-	        
-	        	commMgr.register(ELEMENT_NAMES, discoCallback);
-	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
-				Log.d(LOG_TAG, "Sending stanza");
-			} catch (Exception e) {
-				Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
-	        }	 
-			return results;
-		}
-		
-		/**Handle the communication of the result*/
-		@Override
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
-	}
-
 }

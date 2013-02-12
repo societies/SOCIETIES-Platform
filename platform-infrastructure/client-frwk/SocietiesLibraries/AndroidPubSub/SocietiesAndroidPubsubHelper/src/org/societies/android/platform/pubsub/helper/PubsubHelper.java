@@ -88,12 +88,11 @@ public class PubsubHelper implements IPubsubClient {
 	private PacketMarshaller marshaller;
 	private ISubscriber subscriberCallback;
 	
-	public PubsubHelper(Context androidContext, ISubscriber subscriberCallback) {
+	public PubsubHelper(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
 		Log.d(LOG_TAG, "Instantiate PubsubHelper");
 		this.androidContext = androidContext;
-		this.subscriberCallback = subscriberCallback;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
 		this.randomGenerator = new Random(System.currentTimeMillis());
@@ -106,10 +105,17 @@ public class PubsubHelper implements IPubsubClient {
         this.serializer = new Persister(strategy);
         
         this.marshaller = new PacketMarshaller();
-        //TODO: wrong classes
 		marshaller.register(ELEMENTS, NAMESPACES, PACKAGES);
 	}
 	
+	/**
+	 * set the event subscriber for Pubsub node events
+	 * @param subscriberCallback
+	 */
+	public void setSubscriberCallback(ISubscriber subscriberCallback) {
+		this.subscriberCallback = subscriberCallback;
+	}
+
 	/**
 	 * Binds to Android Pubsub Service
 	 * @param bindCallback callback 
@@ -259,6 +265,7 @@ public class PubsubHelper implements IPubsubClient {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                     this.serializer.write(payload, os);
                     itemXml = os.toString();
+                    Log.d(LOG_TAG, "Serialised event payload: " + itemXml);
             } catch (TransformerException e) {
                     throw new CommunicationException(e.getMessage(), e);
             } catch (ParserConfigurationException e) {
@@ -495,6 +502,12 @@ public class PubsubHelper implements IPubsubClient {
 					callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 				}
 			} else if (intent.getAction().equals(IPubsubService.OWNER_DELETE)) {
+				synchronized(PubsubHelper.this.methodCallbackMap) {
+					IMethodCallback callback = PubsubHelper.this.methodCallbackMap.get(callbackId);
+					PubsubHelper.this.methodCallbackMap.remove(callbackId);
+					callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+				}
+			} else if (intent.getAction().equals(IPubsubService.PUBLISHER_PUBLISH)) {
 				synchronized(PubsubHelper.this.methodCallbackMap) {
 					IMethodCallback callback = PubsubHelper.this.methodCallbackMap.get(callbackId);
 					PubsubHelper.this.methodCallbackMap.remove(callbackId);
@@ -922,6 +935,8 @@ public class PubsubHelper implements IPubsubClient {
     		this.pubsubServiceJid = pubsubServiceJid;
     		this.node = node;
     		this.remoteID = remoteID;
+        	this.payload = payload;
+        	this.eventID = eventID;
     	}
 
     	protected Void doInBackground(Void... args) {
