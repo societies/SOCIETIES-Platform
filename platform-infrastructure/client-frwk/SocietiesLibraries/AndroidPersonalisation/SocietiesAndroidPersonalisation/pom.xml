@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
-        <groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
-        <version>RELEASE</version>
-        <!-- <version>0.1</version> -->
-        <!-- <relativePath>../../../parent/android.xml</relativePath> -->
-	<!-- modify if project root directory different to other projects-->
-   </parent>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+		<!-- <version>0.1</version> -->
+		<!-- <relativePath>../../../parent/android.xml</relativePath> -->
+		<!-- modify if project root directory different to other projects -->
+	</parent>
 
-   <groupId>org.societies.android.platform</groupId>
-   <artifactId>personalisation</artifactId>
-   <version>${version.pm}</version> 
-   <name>Android-personalisation</name>
-   <packaging>apklib</packaging>
-   
-   
-   
+	<groupId>org.societies.android.platform</groupId>
+	<artifactId>personalisation</artifactId>
+	<version>${version.pm}</version>
+	<name>Android-personalisation</name>
+	<packaging>apklib</packaging>
+
+
+
 	<developers>
 		<developer>
 			<name>Elizabeth Papadopoulou</name>
@@ -33,12 +34,12 @@
 	</developers>
 
 
-    <dependencies>
-        <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
 		</dependency>
-        <dependency>
+		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
@@ -50,42 +51,37 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-<!--         <dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		</dependency> -->
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
+			<type>apklib</type>
 		</dependency>
-        
-    </dependencies>
+		<!-- <dependency> <groupId>org.societies.comm.xmpp</groupId> <artifactId>CommunicationFrameworkCommons</artifactId> 
+			<version>${version.comm}</version> </dependency> <dependency> <groupId>org.societies</groupId> 
+			<artifactId>AndroidAgentApi</artifactId> <version>${version.comm}</version> 
+			exclusions> <exclusion> <groupId>org.societies.android.jaxb</groupId> <artifactId>jaxb-android-societies</artifactId> 
+			</exclusion> </exclusions> </dependency> -->
 
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 	<reporting>
-	    <plugins>
-	      <plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>findbugs-maven-plugin</artifactId>
-	      </plugin>
-	    </plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</reporting>
 
 </project>

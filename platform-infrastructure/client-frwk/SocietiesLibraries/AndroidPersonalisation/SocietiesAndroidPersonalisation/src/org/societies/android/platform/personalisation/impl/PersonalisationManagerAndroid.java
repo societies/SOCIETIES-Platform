@@ -28,26 +28,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.internal.personalisation.IPersonalisationManagerInternalAndroid;
-import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.personalisation.mgmt.PersonalisationManagerBean;
 import org.societies.api.schema.personalisation.mgmt.PersonalisationMethodType;
 import org.societies.api.schema.personalisation.model.ActionBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.content.Context;
 import android.content.Intent;
@@ -108,6 +104,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 				Stanza stanza = new Stanza(cloudNode);
 
 				commMgr.register(ELEMENT_NAMES, callback);
+			
 				commMgr.sendIQ(stanza, IQ.Type.GET, bean, callback);
 			}
 		
