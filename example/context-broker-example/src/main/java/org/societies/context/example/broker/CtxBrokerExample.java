@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -75,8 +75,8 @@ public class CtxBrokerExample implements Subscriber{
 	private IIdentity cisID;
 	private IIdentity cssOwnerId;
 	private IIdentity cssID1; 
-	private IIdentity cssID2;
-	private IIdentity cssID3;
+	//private IIdentity cssID2;
+	//private IIdentity cssID3;
 
 	private CommunityCtxEntity communityEntity;
 	private IndividualCtxEntity indiEnt1;
@@ -126,18 +126,18 @@ public class CtxBrokerExample implements Subscriber{
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId.toString());
 		LOG.info("  cssOwnerId id type: "+this.cssOwnerId.getType());
 
-		this.cssID1 =  commMgr.getIdManager().fromJid("boo@societies.local ");
+		this.cssID1 =  commMgr.getIdManager().fromJid("jane.societies.local");
 
 		LOG.info( "this.cssID1 "+ this.cssID1);
 		LOG.info( "this.cssID1.getType() "+ this.cssID1.getType());
 
-		this.cssID2 =  commMgr.getIdManager().fromJid("coo@societies.local");
-		LOG.info( "this.cssID2 "+ this.cssID2);
-		LOG.info( "this.cssID2.getType() "+ this.cssID2.getType());
+		//this.cssID2 =  commMgr.getIdManager().fromJid("coo@societies.local");
+		//LOG.info( "this.cssID2 "+ this.cssID2);
+		//LOG.info( "this.cssID2.getType() "+ this.cssID2.getType());
 
-		this.cssID3 =  commMgr.getIdManager().fromJid("zoo@societies.local");
-		LOG.info( "this.cssID3 "+ this.cssID3);
-		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
+		//this.cssID3 =  commMgr.getIdManager().fromJid("zoo@societies.local");
+		//LOG.info( "this.cssID3 "+ this.cssID3);
+		//LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
 
@@ -166,17 +166,20 @@ public class CtxBrokerExample implements Subscriber{
 		LOG.info("*** Starting  individual context examples...");
 		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
-		//this.createContext();
-		//this.registerForContextChanges();
-		//this.retrieveContext();
-		//this.lookupContext();
+		this.createContext();
+		this.registerForContextChanges();
+		this.retrieveContext();
+		this.lookupContext();
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
 	
 		// community context tests
 		LOG.info("*** Starting community context examples...");
-	
+		retrieveCommunityEntityBasedOnCisID();
+		createCommunityEntAssociation();
+		// create entity and association refering to community
+		
 		//this.createIndividualEntities();
 		// includes context bond tests
 	//	this.populateCommunityEntity();
@@ -188,6 +191,51 @@ public class CtxBrokerExample implements Subscriber{
 	}
 
 
+	
+	private void createCommunityEntAssociation(){
+		
+		System.out.println(" createCommunityEntAssociation ");
+		
+		try {
+			LOG.info("cisID "+cisID.getJid());
+			
+			this.retrieveCommunityEntityBasedOnCisID();
+			
+			CtxEntity entity = this.internalCtxBroker.createEntity(cisID, CtxEntityTypes.DEVICE).get();
+			System.out.println(" CtxEntity refering to CIS created: "+entity.getId());
+			
+			CtxAssociation assoc = this.internalCtxBroker.createAssociation(cisID, CtxAssociationTypes.HAS_PARAMETERS).get();
+			System.out.println(" CtxAssociation refering to CIS created: "+assoc.getId());
+			
+			assoc.addChildEntity(entity.getId());
+
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+			assoc.setParentEntity(ctxCommunityEntityIdentifier);
+			
+			CtxAssociation assocUpdated = (CtxAssociation) this.internalCtxBroker.update(assoc).get();
+			System.out.println(" CtxAssociation refering to CIS child entities: "+assocUpdated.getChildEntities());
+			LOG.info(" CtxAssociation refering to CIS child entities: "+assocUpdated.getChildEntities());
+			//final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
+
+			
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+				
+	}
+	
+	
+	
+	
 	private void lookupCommunityEntAttributes(){
 
 		CtxEntityIdentifier ctxCommunityEntityIdentifier;
@@ -334,8 +382,8 @@ public class CtxBrokerExample implements Subscriber{
 		LOG.info("*** createIndividualEntities ... to be added in a community");
 		try {
 			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
-			this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
-			this.indiEnt3 = this.internalCtxBroker.createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
+			//this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
+			//this.indiEnt3 = this.internalCtxBroker.createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
 
 			LOG.info("individual entity 1 "+this.indiEnt1);		
 			LOG.info("individual entity 2 "+this.indiEnt2);	
