@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.PersistedActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -50,7 +49,6 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.*;
-import org.societies.api.internal.activity.ILocalActivityFeed;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -132,7 +130,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	//@OneToOne(cascade=CascadeType.ALL)
 	@Transient
-	public IActivityFeed activityFeed = null;//new PersistedActivityFeed();
+	public PersistedActivityFeed activityFeed = new PersistedActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
@@ -363,7 +361,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
 			,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
 			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
-			PubsubClient pubsubClient, IActivityFeedManager activityFeedManager) {
+			PubsubClient pubsubClient) {
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		
@@ -444,15 +442,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 		//session = sessionFactory.openSession();
 		LOG.debug("activityFeed: "+activityFeed);
 		if(null != this.psc){
-//			try {
+			try {
 				LOG.debug("starting activ feed with pubsub");
-				//activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
-			    this.activityFeed = activityFeedManager.getOrCreateFeed(this.getCisId(),this.getCisId());
-//            } catch (InvalidFormatException e) {
-//				// TODO Auto-generated catch block
-//				LOG.debug("starting activ feed without pubsub");
-//				e.printStackTrace();
-//			} // this must be called just after the CisRecord has been set
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				LOG.debug("starting activ feed without pubsub");
+				e.printStackTrace();
+			} // this must be called just after the CisRecord has been set
 		}
 		else{
 			LOG.debug("pub sub is null");
@@ -469,7 +466,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		iActivity.setVerb("created");
 		
 		
-		((ILocalActivityFeed)activityFeed).addActivity(iActivity);
+		activityFeed.addActivity(iActivity);
 		
 		//activityFeed.getActivities("0 1339689547000");
 

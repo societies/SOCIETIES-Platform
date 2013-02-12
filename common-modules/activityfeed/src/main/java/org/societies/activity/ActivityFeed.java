@@ -53,8 +53,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ActivityFeed implements IActivityFeed{//, Subscriber {
+	/**
+	 * 
+	 */
 
-    private String owner;
+
     protected String id;// represents the CIS which owns the activity feed
     protected
 	Set<Activity> list;
@@ -62,10 +65,11 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	{
 		list = new HashSet<Activity>();
 	}
-	public ActivityFeed(String owner, String id){
+	public ActivityFeed(String id){
 		this.id = id;
 		list = new HashSet<Activity>();// from Thomas
 	}
+	@Autowired 
 	protected SessionFactory sessionFactory;
     protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
     //protected Session session;
@@ -229,7 +233,6 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 	}
 	
 	public void setSessionFactory(SessionFactory sessionFactory) {
-        LOG.info("sessionFactory injected");
 		this.sessionFactory = sessionFactory;
 	}
 	
@@ -527,11 +530,5 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		Activity a = new Activity();
 		return a;
 	}
-
-    /**
-     *
-     */
-    public String getOwner() {
-        return owner;
-    }
+	
 }

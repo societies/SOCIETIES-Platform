@@ -16,8 +16,7 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-
+
    <context:annotation-config />
 
     <tx:annotation-driven />
@@ -55,6 +54,7 @@
 
             <list>
                 <value>org.societies.cis.manager</value>
+                <value>org.societies.cis.activity</value>
             </list>
         </property>
 
@@ -81,6 +81,7 @@
     destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
+        <property name="iCommMgr" ref="xcCommunication"/>
         <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
         <property name="privacyDataManager" ref="PrivacyDataManager"/>
@@ -90,7 +91,7 @@
         <property name="pubsubClient" ref="PubsubClient"/>       
         <property name="iUsrFeedback" ref="userFeedback"/>
         <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />  
-        <property name="activityFeedManager" ref="activityFeedManager" />
+        
     </bean>
     
    <!-- <bean id="CisClientService" 

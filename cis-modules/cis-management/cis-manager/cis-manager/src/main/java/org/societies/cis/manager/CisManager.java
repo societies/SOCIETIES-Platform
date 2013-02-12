@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
-import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
@@ -167,7 +166,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IPrivacyPolicyManager privacyPolicyManager = null;
 	private IEventMgr eventMgr = null;
 	private ICtxBroker internalCtxBroker = null;
-    private IActivityFeedManager activityFeedManager;
+
 	private INegotiation negotiator;
 	private IPrivacyDataManager privacyDataManager;
 
@@ -895,16 +894,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 
-    public IActivityFeedManager getActivityFeedManager() {
-        return activityFeedManager;
-    }
 
-    public void setActivityFeedManager(IActivityFeedManager activityFeedManager) {
-        this.activityFeedManager = activityFeedManager;
-    }
-
-
-    public class JoinCallBack implements ICisManagerCallback{
+public class JoinCallBack implements ICisManagerCallback{
 		
 	JoinResponse resp;
 	
