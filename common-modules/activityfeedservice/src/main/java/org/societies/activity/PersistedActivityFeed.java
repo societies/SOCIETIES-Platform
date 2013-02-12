@@ -51,12 +51,6 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	private PubsubClient pubSubcli;
 	private IIdentity ownerCSS;
 
-	public IIdentity getOwnerCSS() {
-		return ownerCSS;
-	}
-	public void setOwnerCSS(IIdentity ownerCSS) {
-		this.ownerCSS = ownerCSS;
-	}
 	public PubsubClient getPubSubcli() {
 		return pubSubcli;
 	}
@@ -66,21 +60,16 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	
 	private final static List<String> classList = Collections 
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.MarshaledActivity"));
-	
-	@Override
+
+
+	// version with PubSub
     synchronized public void startUp(SessionFactory sessionFactory, String id){
         this.sessionFactory = sessionFactory;
         this.id = id;
-    }
-
-	// version with PubSub
-    synchronized public void startUp(SessionFactory sessionFactory, String id, PubsubClient pubSubcli, IIdentity ownerCSS){
-        this.sessionFactory = sessionFactory;
-        this.id = id;
         this.setPubSubcli(pubSubcli);
-        this.ownerCSS = ownerCSS;
     }
-    public void connectPubSub(){
+    public void connectPubSub(IIdentity ownerCSS){
+        this.ownerCSS = ownerCSS;
         // pubsub code
         LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
