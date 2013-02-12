@@ -25,7 +25,8 @@
 package org.societies.integration.test.bit.privacytrust;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
@@ -35,7 +36,8 @@ import org.societies.integration.test.IntegrationTestCase;
  */
 public class TestCase1678 extends IntegrationTestCase {
 
-	public static ICtxBroker ctxBroker;
+	public static ITrustEvidenceCollector internalTrustEvidenceCollector;
+	public static ITrustBroker internalTrustBroker;
 	public static ICommManager commManager;
 	
 	public TestCase1678() {
@@ -44,19 +46,35 @@ public class TestCase1678 extends IntegrationTestCase {
 	}
 
 	/**
-	 * @return the ctxBroker
+	 * @return the Trust Evidence Collector
 	 */
-	public static ICtxBroker getCtxBroker() {
+	public static ITrustEvidenceCollector getInternalTrustEvidenceCollector() {
 
-		return TestCase1678.ctxBroker;
+		return TestCase1678.internalTrustEvidenceCollector;
 	}
 
 	/**
-	 * @param ctxBroker the ctxBroker to set
+	 * @param trustEvidenceCollector the Trust Evidence Collector to set
 	 */
-	public void setCtxBroker(ICtxBroker ctxBroker) {
+	public void setInternalTrustBroker(ITrustEvidenceCollector internalTrustEvidenceCollector) {
 
-		TestCase1678.ctxBroker = ctxBroker;
+		TestCase1678.internalTrustEvidenceCollector = internalTrustEvidenceCollector;
+	}
+	
+	/**
+	 * @return the Trust Broker
+	 */
+	public static ITrustBroker getInternalTrustBroker() {
+
+		return TestCase1678.internalTrustBroker;
+	}
+
+	/**
+	 * @param trustBroker the Trust Broker to set
+	 */
+	public void setTrustBroker(ITrustBroker internalTrustBroker) {
+
+		TestCase1678.internalTrustBroker = internalTrustBroker;
 	}
 	
 	/**
