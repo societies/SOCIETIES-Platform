@@ -88,12 +88,13 @@ public class CreateCommunityCtx {
 		LOG.info("gCommunity Entity Created");
 		LOG.info("g00");		
 			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("XCManager@societies.local ");
+			LOG.info("trying to create attribute witth: "+this.cssID1 + "and "+ CtxEntityTypes.PERSON);
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 
 LOG.info("g01");
-LOG.info("xssID "+this.cssID1); //boo@societies.local 
-LOG.info("indiEnt1 "+this.indiEnt1); //org.societies.api.context.model.IndividualCtxEntity@230d4771
-LOG.info("this.indiEnt1.getId() "+this.indiEnt1.getId()+"CtxAttributeTypes.INTERESTS "+CtxAttributeTypes.INTERESTS); //(context://boo@societies.local /ENTITY/person/426015,interests)
+LOG.info("xssID "+this.cssID1); //XCManager@societies.local 
+LOG.info("indiEnt1 "+this.indiEnt1); //org.societies.api.context.model.IndividualCtxEntity@a1e977de
+LOG.info("this.indiEnt1.getId() "+this.indiEnt1.getId()+"CtxAttributeTypes.INTERESTS "+CtxAttributeTypes.INTERESTS); //(context://XCManager@societies.local /ENTITY/person/950308,interests)
 
 			CtxAttribute individualAttr1 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
 			LOG.info("g011");
