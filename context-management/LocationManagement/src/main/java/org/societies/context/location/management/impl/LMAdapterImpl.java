@@ -44,6 +44,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
@@ -73,7 +74,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	private ICommManagerController commMngrController;
 	private PubsubClient pubSubManager; 
 	//private IDeviceRegistry deviceRegistry;
-	private ICSSLocalManager cssLocalManager;
+	private ICSSInternalManager cssInternalManager;
 	
 	@Autowired
 	private PZWrapper pzWrapper; 
@@ -130,7 +131,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	}
 	
 	private Collection<INetworkNode> getCSSnodesFromCssManager(){
-		Future<CssInterfaceResult> futureCssRecord = cssLocalManager.getCssRecord();
+		Future<CssInterfaceResult> futureCssRecord = cssInternalManager.getCssRecord();
 		CssInterfaceResult cssInterfaceResult= null;
 		List<CssNode> cssNodes;
 		
@@ -286,12 +287,12 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		this.commMngrController = commMngrController;
 	}
 
-	public ICSSLocalManager getCssLocalManager() {
-		return cssLocalManager;
+	public ICSSInternalManager getCssInternalManager() {
+		return cssInternalManager;
 	}
 
-	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
-		this.cssLocalManager = cssLocalManager;
+	public void setCssInternalManager(ICSSInternalManager cssLocalManager) {
+		this.cssInternalManager = cssInternalManager;
 	}
 
 	@Autowired

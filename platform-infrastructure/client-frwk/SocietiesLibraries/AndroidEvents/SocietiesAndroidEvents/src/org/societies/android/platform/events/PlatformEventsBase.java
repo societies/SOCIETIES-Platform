@@ -39,8 +39,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 	private PubsubHelper pubsubClient = null;
 
 	//Synchronised Maps - require manual synchronisation 
-	private Map<String, String> subscribedClientEvents = null;
-	private Map<String, ISubscriber> pubsubSubscribes = null;
+	private Map<String, String> subscribedToClientEvents = null;
+	private Map<String, Integer> subscribedToEvents = null;
+	
 	private ArrayList <String> allPlatformEvents = null; 
 
 	private String domainCommsDestination = null;
@@ -66,9 +67,10 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	
     	this.connectedToComms = false;
     	this.connectedToPubsub = false;
-    	
-    	this.subscribedClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
-    	this.pubsubSubscribes = Collections.synchronizedMap(new HashMap<String, ISubscriber>());
+    	//tracks the events subscribed to by clients
+    	this.subscribedToClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
+    	//tracks the events subscribed to Android Pubsub
+    	this.subscribedToEvents = Collections.synchronizedMap(new HashMap<String, Integer>());
     	
     	//create list of event classes for Pubsub registration 
         this.classList = new ArrayList<String>();
@@ -76,7 +78,6 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		this.classList.add(CONTEXT_CLASS);
 		this.classList.add(CSS_MANAGER_CLASS);
 		
-		this.configureForPubsub();
     }
 
 	@Override
@@ -101,12 +102,21 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 							@Override
 							public void returnAction(boolean resultFlag) {
 								if (resultFlag) {
-									PlatformEventsBase.this.connectedToPubsub = true;
+									
+									try {
+										PlatformEventsBase.this.configureForPubsub();
+										PlatformEventsBase.this.connectedToPubsub = true;
+
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+										resultFlag = false;
+									} finally {
+										//Send intent
+						        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+						        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+						        		PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+									}
 								}
-								//Send intent
-				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
-				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
-				        		PlatformEventsBase.this.androidContext.sendBroadcast(intent);
 							}
 						});
 					}
@@ -165,12 +175,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		Log.d(LOG_TAG, "Invocation of subscribeToEvent for client: " + client + " and intent: " + intent);
 
 		//store client/event
-		synchronized (this.subscribedClientEvents) {
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+		synchronized (this.subscribedToClientEvents) {
+			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
-			this.subscribedClientEvents.put(this.generateClientEventKey(client, intent), intent);
+			this.subscribedToClientEvents.put(this.generateClientEventKey(client, intent), intent);
 
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
@@ -190,6 +200,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		ArrayList<String> targetEvents = null;
 		String returnIntent;
 		
+		//Generate a list of all possible events or a filtered subset
 		if (ALL_EVENT_FILTER.equals(intentFilter)) {
 			targetEvents = this.getAllPlatformEvents();
 			returnIntent = IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS;
@@ -199,18 +210,20 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		}
 		
 		
-		synchronized (this.subscribedClientEvents) {
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+		synchronized (this.subscribedToClientEvents) {
+			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			ArrayList<String> unSubscribedEvents = new ArrayList<String>();
    
+			//add the client/intent pair if they do not already exist
 			for (String filteredEvent: targetEvents) {
 				//store client/event
-				this.subscribedClientEvents.put(this.generateClientEventKey(client, filteredEvent), filteredEvent);
-
-				unSubscribedEvents.add(filteredEvent);
+				if (!this.subscribedToClientEvents.containsKey(this.generateClientEventKey(client, filteredEvent))) {
+					this.subscribedToClientEvents.put(this.generateClientEventKey(client, filteredEvent), filteredEvent);
+					unSubscribedEvents.add(filteredEvent);
+				}
 			}
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (unSubscribedEvents.size() > 0) {
 			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client); 
@@ -231,14 +244,14 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		Dbc.require("Intent must be specified", null != intent && intent.length() > 0);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvent for client: " + client + " and intent: " + intent);
 
-		synchronized (this.subscribedClientEvents) {
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+		synchronized (this.subscribedToClientEvents) {
+			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			//remove client/event
 			
-			Log.d(LOG_TAG, "Removed value: " + this.subscribedClientEvents.remove(this.generateClientEventKey(client, intent))
+			Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(this.generateClientEventKey(client, intent))
 					+ " for key: " + this.generateClientEventKey(client, intent));
 			
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
@@ -266,20 +279,22 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		}
 		
 		
-		synchronized (this.subscribedClientEvents) {
+		synchronized (this.subscribedToClientEvents) {
 			ArrayList<String> subscribedEvents = new ArrayList<String>();
 
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
   
+			//remove the client/intent pair if they do already exist
 			for (String filteredEvent: targetEvents) {
-				//remove client/event
-				Log.d(LOG_TAG, "Removed value: " + this.subscribedClientEvents.remove(this.generateClientEventKey(client, filteredEvent))
-						+ " for key: " + this.generateClientEventKey(client, filteredEvent));
-				
-				subscribedEvents.add(filteredEvent);
+				if (this.subscribedToClientEvents.containsKey(this.generateClientEventKey(client, filteredEvent))) {
+					//remove client/event
+					Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(this.generateClientEventKey(client, filteredEvent))
+							+ " for key: " + this.generateClientEventKey(client, filteredEvent));
+					subscribedEvents.add(filteredEvent);
+				}
 			}
 
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedClientEvents.size());
+			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (subscribedEvents.size() > 0) {
 				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client); 
@@ -291,26 +306,15 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 	}
 
 	/**
-	 * Unregister from already subscribed to pubsub events
-	 */
-	private void  unregisterFromPubsub() {
-		Log.d(LOG_TAG, "Starting Pubsub un-registration: " + System.currentTimeMillis());
-		//TODO: unbind from Pubsub
-	}
-
-	/**
 	 * Configure for Pubsub events
+	 * @throws ClassNotFoundException 
 	 */
-	private void configureForPubsub() {
+	private void configureForPubsub() throws ClassNotFoundException {
 		
-		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
+		Log.d(LOG_TAG, "Configuring Pubsub");
 		
-        //try {
-        //    this.pubsubClient.addSimpleClasses(classList);
-        //    Log.d(LOG_TAG, "Subscribing to pubsub");
-        //} catch (ClassNotFoundException e) {
-        //        Log.e(LOG_TAG, "ClassNotFoundException loading " + Arrays.toString(classList.toArray()), e);
-        //}
+		this.pubsubClient.addSimpleClasses(classList);
+		this.pubsubClient.setSubscriberCallback(createSubscriber());
 	}
 	
 	/**
@@ -323,25 +327,24 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			public void pubsubEvent(IIdentity identity, String node, String itemId, Object payload) {
 				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 				
-				String intentTarget = PlatformEventsBase.this.translatePlatformEvent(node);
+				String intentTarget = translatePlatformEventToIntent(node);
 				//TODO: put in asynctask
-				synchronized (PlatformEventsBase.this.subscribedClientEvents) {
-					for (String key : PlatformEventsBase.this.subscribedClientEvents.keySet()) {
+				synchronized (PlatformEventsBase.this.subscribedToClientEvents) {
+					for (String key : PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
 						if (key.contains(intentTarget)) {
 							Intent intent = new Intent(intentTarget);
 							intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (Parcelable) payload);
-//							intent.setPackage(PlatformEventsBase.this.getClient(key));
+							intent.setPackage(getClient(key));
 							
 							PlatformEventsBase.this.androidContext.sendBroadcast(intent);
 
-							Log.d(LOG_TAG, "Android Intent " + intentTarget + " sent for client: " + PlatformEventsBase.this.getClient(key));
+							Log.d(LOG_TAG, "Android Intent " + intentTarget + " sent for client: " + getClient(key));
 						}
 					}
 				}
 			}
 		};
 		return subscriber;
-
 	}
 
 	/**
@@ -375,20 +378,22 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be un-subscribed: " + events.size());
 
-    		PubsubHelper pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
-
-    		IIdentity pubsubService = null;
-    		
-    		pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
+    		IIdentity pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
 
     		try {
-    			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
-    				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
+    			synchronized (PlatformEventsBase.this.subscribedToEvents) {
+    				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
 
     				for (final String event: events) {
-        				if (isValueEquals(PlatformEventsBase.this.pubsubSubscribes.keySet(), event) && !PlatformEventsBase.this.otherClientsSubscribed(client, event)) {
 
-	        				pubsubAndClient.subscriberUnsubscribe(pubsubService, event, PlatformEventsBase.this.pubsubSubscribes.get(event), new IMethodCallback() {
+    		    		Integer numSubscriptions = PlatformEventsBase.this.subscribedToEvents.get(translateAndroidIntentToEvent(event));
+    		    		
+    		    		if ((null != numSubscriptions) && (1 == numSubscriptions)) {
+           		    		Log.d(LOG_TAG, "Un-subscribe from Pubsub with event : " + translateAndroidIntentToEvent(event));
+           		    	 
+    		    			PlatformEventsBase.this.pubsubClient.subscriberUnsubscribe(pubsubService, 
+    		    									translateAndroidIntentToEvent(event), 
+    		    									new IMethodCallback() {
 								
 								@Override
 								public void returnAction(String result) {
@@ -397,22 +402,23 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 								@Override
 								public void returnAction(boolean resultFlag) {
 									if (resultFlag) {
-				            			PlatformEventsBase.this.pubsubSubscribes.remove(event);
+				            			PlatformEventsBase.this.subscribedToEvents.remove(translateAndroidIntentToEvent(event));
 				            			
-				               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + event);
-
+				               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + translateAndroidIntentToEvent(event));
 									}
 								}
 							});
+        				} else {
+        					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(event), numSubscriptions - 1);
         				}
         			}
-    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
+    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
     			}
     			
 				Intent returnIntent = new Intent(intentValue);
     			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, this.numEventListeners(this.client));
 
-    			if (!PlatformEventsBase.this.restrictBroadcast) {
+    			if (PlatformEventsBase.this.restrictBroadcast) {
         			returnIntent.setPackage(this.client);
     			}
     			
@@ -439,14 +445,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
         	
     		Log.d(LOG_TAG, "Invocation of numEventListeners for client: " + client);
     		
-			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
-				for (String key: PlatformEventsBase.this.subscribedClientEvents.keySet()) {
-					if (key.startsWith(client + KEY_DIVIDER)) {
-						numListeners++;
-					}
+			for (String key: PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
+				if (key.startsWith(client + KEY_DIVIDER)) {
+					numListeners++;
 				}
-				Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
 			}
+			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
  
         	return numListeners;
         }
@@ -487,48 +491,48 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     		
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be subscribed: " + events.size());
-    		
-    		PubsubHelper pubsubAndClient = PlatformEventsBase.this.pubsubClient;    	
 
-    		IIdentity pubsubService = null;
-    		
-			pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
+    		IIdentity pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
 
     		try {
     			
-       			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
-    				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
+       			synchronized (PlatformEventsBase.this.subscribedToEvents) {
+    				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
     				
         			for (final String eventName: events) {
-    		    		Log.d(LOG_TAG, "Does event exist: " + eventName);
-         				if (!isValueEquals(PlatformEventsBase.this.pubsubSubscribes.keySet(), eventName)) {
-        		    		Log.d(LOG_TAG, "Store event : " + eventName);
-        		    		PlatformEventsBase.this.pubsubSubscribes.put(eventName, PlatformEventsBase.this.createSubscriber());
-        		    		Log.d(LOG_TAG, "Subscribe to Pubsub with event : " + eventName);
-                			pubsubAndClient.subscriberSubscribe(pubsubService, eventName, PlatformEventsBase.this.pubsubSubscribes.get(eventName), new IMethodCallback() {
+    		    		Log.d(LOG_TAG, "Does event exist: " + translateAndroidIntentToEvent(eventName));
+    		    		
+    		    		Integer numSubscriptions = PlatformEventsBase.this.subscribedToEvents.get(translateAndroidIntentToEvent(eventName));
+    		    		if (null == numSubscriptions) {
+        		    		Log.d(LOG_TAG, "Store event : " + translateAndroidIntentToEvent(eventName));
+        		    		PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), 1);
+        		    		Log.d(LOG_TAG, "Subscribe to Pubsub with event : " + translateAndroidIntentToEvent(eventName));
+                			PlatformEventsBase.this.pubsubClient.subscriberSubscribe(pubsubService, 
+                										translateAndroidIntentToEvent(eventName),
+                										new IMethodCallback() {
 								
 								@Override
 								public void returnAction(String result) {
-									// TODO Auto-generated method stub
-									
 								}
 								
 								@Override
 								public void returnAction(boolean resultFlag) {
 									if (resultFlag) {
-			                			Log.d(LOG_TAG, "Pubsub subscription created for: " + eventName);
+			                			Log.d(LOG_TAG, "Pubsub subscription created for: " + translateAndroidIntentToEvent(eventName));
 									}
 								}
 							});
+        				} else {
+        					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), numSubscriptions + 1);
         				}
          			}
-    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.pubsubSubscribes.size());
+    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
        			}
 
     			Intent returnIntent = new Intent(intentValue);
     			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, this.numEventListeners(this.client));
 
-    			if (!PlatformEventsBase.this.restrictBroadcast) {
+    			if (PlatformEventsBase.this.restrictBroadcast) {
         			returnIntent.setPackage(this.client);
     			}
     			
@@ -555,14 +559,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
         	
     		Log.d(LOG_TAG, "Invocation of numEventListeners for client: " + client);
     		
-   			synchronized (PlatformEventsBase.this.pubsubSubscribes) {
-   				for (String key: PlatformEventsBase.this.subscribedClientEvents.keySet()) {
-   					if (key.startsWith(client + KEY_DIVIDER)) {
-   						numListeners++;
-   					}
-   				}
-   				Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
-   			}
+			for (String key: PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
+				if (key.startsWith(client + KEY_DIVIDER)) {
+					numListeners++;
+				}
+			}
+			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
  
         	return numListeners;
         }
@@ -592,10 +594,10 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
      * @param filter
      * @return ArrayList<String> of filtered events 
      */
-    private ArrayList<String> getFilteredEvents(String filter) {
+    private static ArrayList<String> getFilteredEvents(String filter) {
     	ArrayList<String> filteredEvents = new ArrayList<String>();
     	
-    	for (String event : IAndroidSocietiesEvents.societiesEvents) {
+    	for (String event : IAndroidSocietiesEvents.societiesAndroidIntents) {
     		if (event.startsWith(filter)) {
     			filteredEvents.add(event);
     		}
@@ -610,29 +612,29 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
      */
     private ArrayList<String> getAllPlatformEvents() {
     	if (null == this.allPlatformEvents) {
-    		this.allPlatformEvents = this.getFilteredEvents(ALL_EVENT_FILTER);
+    		this.allPlatformEvents = getFilteredEvents(ALL_EVENT_FILTER);
     	}
     	return this.allPlatformEvents;
     }
     
-    /**
-     * Is an event still subscribed to by other clients ?
-     * 
-     * @param client
-     * @param event
-     * @return boolean true if event subscribed to by another client
-     */
-    private boolean otherClientsSubscribed(String client, String event) {
-    	boolean retValue = false;
-    	
-		for (String value : this.subscribedClientEvents.values()) {
-			if (value.equals(event)) {
-				retValue = true;
-				break;
-			}
-		}
-    	return retValue;
-    }
+//    /**
+//     * Is an event still subscribed to by other clients ?
+//     * 
+//     * @param client
+//     * @param event
+//     * @return boolean true if event subscribed to by another client
+//     */
+//    private boolean otherClientsSubscribed(String client, String event) {
+//    	boolean retValue = false;
+//    	
+//		for (String value : this.subscribedClientEvents.values()) {
+//			if (value.equals(event)) {
+//				retValue = true;
+//				break;
+//			}
+//		}
+//    	return retValue;
+//    }
     
     /**
      * Generate the Map key for client/event pair
@@ -641,26 +643,45 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
      * @param event
      * @return
      */
-    private String generateClientEventKey(String client, String event) {
+    private static String generateClientEventKey(String client, String event) {
     	return client + KEY_DIVIDER + event;
     }
     
     /**
-     * Translate Societies platform inter-node Pubsub event to an internal Android Societies internal intent
+     * Translate Societies platform inter-node Pubsub event to an internal Android Societies internal intent.
+     * Uses the two Events/Intents arrays to maps inter-node events to Android equivalent intents
      * 
      * @param platformEvent
      * @return String Android Societies internal intent
      */
-    private String translatePlatformEvent(String platformEvent) {
+    private static String translatePlatformEventToIntent(String platformEvent) {
     	String retValue = null;
     	
-    	for (String event : this.getAllPlatformEvents()) {
-    		if (event.contains(platformEvent)) {
-    			retValue = event;
+    	for (int i = 0; i < IAndroidSocietiesEvents.societiesAndroidEvents.length; i++) {
+    		if (platformEvent.equals(IAndroidSocietiesEvents.societiesAndroidEvents[i])) {
+    			retValue = IAndroidSocietiesEvents.societiesAndroidIntents[i];
     			break;
     		}
     	}
-    	return retValue;
+     	return retValue;
+    }
+    /**
+     * Translate Societies Android Pubsub intent to an inter-node Societies platform Pubsub event.
+     * Uses the two Events/Intents arrays to maps Android intents to Societies equivalent Pubsub events
+     * 
+     * @param androidIntent
+     * @return String Pubsub inter-node event
+     */
+    private static String translateAndroidIntentToEvent(String androidIntent) {
+    	String retValue = null;
+    	
+    	for (int i = 0; i < IAndroidSocietiesEvents.societiesAndroidIntents.length; i++) {
+    		if (androidIntent.equals(IAndroidSocietiesEvents.societiesAndroidIntents[i])) {
+    			retValue = IAndroidSocietiesEvents.societiesAndroidEvents[i];
+    			break;
+    		}
+    	}
+     	return retValue;
     }
     /**
      * Retrieve client part of key
@@ -668,7 +689,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
      * @param key
      * @return client part of key
      */
-    private String getClient(String key) {
+    private static String getClient(String key) {
     	return key.substring(0, key.indexOf(KEY_DIVIDER));
     }
     
@@ -680,7 +701,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
      * @param event
      * @return boolean true if event is contained
      */
-    private boolean isValueEquals(Set<String> keys, String event) {
+    private static boolean isValueEquals(Set<String> keys, String event) {
     	boolean retValue = false;
 
     	for (String key : keys) {

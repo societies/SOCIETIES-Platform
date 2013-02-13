@@ -22,25 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.community.db.impl.model;
 
-package org.societies.api.internal.css.management;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
-
-import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
- * This is the base client interface for T4.5/SOCIETIES. This interface is implemented
- * for Android and Virgo in the respective client libraries.
- *  
- * @author Babak.Farshchian@sintef.no
+ * Describe your class here...
+ *
+ * @author pkosmides
  *
  */
+@NamedQueries({
+	@NamedQuery(
+			name = "getCtxEntityIdByOwnerId",
+			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.owner_id = :ownerId"
+	)
+})
+@Entity
+@org.hibernate.annotations.Entity(
+		dynamicUpdate=true
+)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("CtxEntity")
+public class CommunityCtxEntityBaseDAO extends CommunityCtxEntityDAO {
+	
+	private static final long serialVersionUID = -4415679433140566711L;
 
-// TODO: This class needs to be higher up in the package hierarchy and be a global 
-// class/interface.
-@Deprecated
-public interface ISocietiesApp {
-    Object getCssManager();
-    ICssDirectory getCssDirectory();
+	CommunityCtxEntityBaseDAO() {
+		
+		super();
+	}
+	
+	public CommunityCtxEntityBaseDAO(CtxEntityIdentifier ctxId) {
+		
+		super(ctxId);
+	}	
 
 }

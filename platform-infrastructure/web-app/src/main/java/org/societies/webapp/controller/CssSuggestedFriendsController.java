@@ -76,83 +76,6 @@ public class CssSuggestedFriendsController {
 		this.cisDirectoryRemote = cisDirectoryRemote;
 	}
 
-	@RequestMapping(value = "/suggestedfriends.html", method = RequestMethod.GET)
-	public ModelAndView SuggestedFriends() {
-
-		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please input values and submit");
-
-		// ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
-		SuggestedFriendsForm sfForm = new SuggestedFriendsForm();
-		model.put("sfForm", sfForm);
-
-		// ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-		Map<String, String> methods = new LinkedHashMap<String, String>();
-
-		methods.put("findFriends", "Find Friends");
-		methods.put("pendingfriendreq", "Find Pending Friend Request");
-		model.put("methods", methods);
-
-		model.put("suggestedfriendsresult", "CSS Suggested Friends Result :");
-		return new ModelAndView("suggestedfriends", model);
-	}
-
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/suggestedfriends.html", method = RequestMethod.POST)
-	public ModelAndView SuggestedFriends(@Valid SuggestedFriendsForm sfForm,
-			BindingResult result, Map model) {
-
-		if (result.hasErrors()) {
-			model.put("result", "CSS Suggested Friends form error");
-			return new ModelAndView("suggestedfriends", model);
-		}
-
-		if (getCssLocalManager() == null) {
-			model.put("errormsg",
-					"CSS Suggested Friends reference not avaiable");
-			return new ModelAndView("error", model);
-		}
-
-		String method = sfForm.getMethod();
-
-		String res = null;
-
-		try {
-
-			if (method.equalsIgnoreCase("findFriends")) {
-				res = "CSS Suggested Friends Result ";
-
-				Future<HashMap<IIdentity, Integer>> asynchcssfriends = getCssLocalManager()
-						.getSuggestedFriends(null); //suggestedFriends();
-
-				model.put("result", res);
-				model.put("cssfriends", asynchcssfriends.get());
-
-			} else if (method.equalsIgnoreCase("pendingfriendreq")) {
-
-				res = "All Pending Friend Requests";
-
-				Future<List<CssAdvertisementRecord>> asynchfriendrequests = cssLocalManager
-						.getFriendRequests();
-
-				model.put("result", res);
-				model.put("cssfriends", asynchfriendrequests.get());
-
-			} else {
-				res = "error unknown metod";
-			}
-
-			model.put("result", res);
-
-		} catch (Exception e) {
-			res = "Oops!!!!<br/>";
-		}
-		;
-
-		return new ModelAndView("suggestedfriendsresult", model);
-	}
-
 	@RequestMapping(value = "/suggestedfriendspilot.html", method = RequestMethod.GET)
 	public ModelAndView SuggestedFriendsPilot() {
 
@@ -163,8 +86,8 @@ public class CssSuggestedFriendsController {
 
 		try {
 
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
-			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); 
+			HashMap<IIdentity,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
@@ -205,13 +128,13 @@ public class CssSuggestedFriendsController {
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
 						boolean bAlreadySuggested = false;
-/*						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
-							if (snsSuggestedFriends.get(snsIndex).getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
+						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
+							if (snsSuggestedFriends.get(snsIndex).valueOf(snsIndex).toString().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
 							{
 								bAlreadySuggested = true;
 								snsFriends.add(allcssDetails.get(index));
 							}
-						}*/
+						}
 
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));
@@ -296,7 +219,7 @@ public class CssSuggestedFriendsController {
 
 		try {
 
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null);
 			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
 
@@ -338,13 +261,13 @@ public class CssSuggestedFriendsController {
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
 						boolean bAlreadySuggested = false;
-/*						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
-							if (snsSuggestedFriends.get(snsIndex).getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
+						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
+							if (snsSuggestedFriends.get(snsIndex).valueOf(snsIndex).toString().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
 							{
 								bAlreadySuggested = true;
 								snsFriends.add(allcssDetails.get(index));
 							}
-						}*/
+						}
 
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));
@@ -391,3 +314,4 @@ public class CssSuggestedFriendsController {
 	}
 
 }
+

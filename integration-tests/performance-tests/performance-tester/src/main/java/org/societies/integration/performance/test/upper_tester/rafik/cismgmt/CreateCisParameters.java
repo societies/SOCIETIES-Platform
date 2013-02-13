@@ -22,12 +22,95 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.management;
+package org.societies.integration.performance.test.upper_tester.rafik.cismgmt;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ *
+ * @author Rafik
  *
  */
-public interface ICssActivityFeed {
+public class CreateCisParameters {
+	
+	private String cisName;
+	private String cisType;
+	private String cisDescription;
+	private String privacyPolicyWithoutRequestor;
 
+	/**
+	 * 
+	 */
+	public CreateCisParameters() {
+
+	}
+
+	/**
+	 * @param cisName
+	 * @param cisType
+	 * @param cisDescription
+	 * @param privacyPolicyWithoutRequestor
+	 */
+	public CreateCisParameters(String cisName, String cisType,
+			String cisDescription, String privacyPolicyWithoutRequestor) {
+		this.cisName = cisName;
+		this.cisType = cisType;
+		this.cisDescription = cisDescription;
+		this.privacyPolicyWithoutRequestor = privacyPolicyWithoutRequestor;
+	}
+
+	/**
+	 * @return the cisName
+	 */
+	public String getCisName() {
+		return cisName;
+	}
+
+	/**
+	 * @param cisName the cisName to set
+	 */
+	public void setCisName(String cisName) {
+		this.cisName = cisName;
+	}
+
+	/**
+	 * @return the cisType
+	 */
+	public String getCisType() {
+		return cisType;
+	}
+
+	/**
+	 * @param cisType the cisType to set
+	 */
+	public void setCisType(String cisType) {
+		this.cisType = cisType;
+	}
+
+	/**
+	 * @return the cisDescription
+	 */
+	public String getCisDescription() {
+		return cisDescription;
+	}
+
+	/**
+	 * @param cisDescription the cisDescription to set
+	 */
+	public void setCisDescription(String cisDescription) {
+		this.cisDescription = cisDescription;
+	}
+
+	/**
+	 * @return the privacyPolicyWithoutRequestor
+	 */
+	public String getPrivacyPolicyWithoutRequestor() {
+		return privacyPolicyWithoutRequestor;
+	}
+
+	/**
+	 * @param privacyPolicyWithoutRequestor the privacyPolicyWithoutRequestor to set
+	 */
+	public void setPrivacyPolicyWithoutRequestor(
+			String privacyPolicyWithoutRequestor) {
+		this.privacyPolicyWithoutRequestor = privacyPolicyWithoutRequestor;
+	}
 }

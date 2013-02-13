@@ -34,6 +34,7 @@ import org.societies.integration.performance.test.lower_tester.PerformanceLowerT
 import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
 import org.societies.integration.performance.test.lower_tester.PerformanceTestResult;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CisManagerClientCallback;
+import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CreateCisParameters;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.JoinCisParameters;
 
@@ -145,5 +146,16 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 																	PerformanceTestResult.ERROR_STATUS);
 			performanceLowerTester.testFinish(performanceTestResult);
 		}
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest#createCisTest(org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo, org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CreateCisParameters)
+	 */
+	@Override
+	public void createCisTest(PerformanceTestMgmtInfo performanceTestInfo,
+			CreateCisParameters createCisParameters) {
+		// TODO Auto-generated method stub
+		
 	}
 }

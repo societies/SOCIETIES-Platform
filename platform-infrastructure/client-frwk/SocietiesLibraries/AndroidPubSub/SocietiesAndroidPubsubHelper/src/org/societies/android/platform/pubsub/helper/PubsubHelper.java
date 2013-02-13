@@ -296,10 +296,9 @@ public class PubsubHelper implements IPubsubClient {
 	}
 
 	@Override
-	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
-		Dbc.require("Subscriber callback cannot be null", null != callback);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
 		Log.d(LOG_TAG, "subscriberSubscribe called for node: " + node);
 		
@@ -314,10 +313,9 @@ public class PubsubHelper implements IPubsubClient {
 	}
 
 	@Override
-	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
-		Dbc.require("Subscriber callback cannot be null", null != callback);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
 		Log.d(LOG_TAG, "subscriberUnsubscribe called for node: " + node);
 		
