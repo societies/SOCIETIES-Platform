@@ -40,6 +40,7 @@
 				<value>org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO</value>
 				<value>org.societies.context.community.db.impl.model.CtxModelObjectDAO</value>
 				<value>org.societies.context.community.db.impl.model.CommunityCtxEntityDAO</value>
+				<value>org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO</value>
 				<value>org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO</value>
 				<value>org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO</value>
 				<value>org.societies.context.community.db.impl.model.CommunityCtxQualityDAO</value>

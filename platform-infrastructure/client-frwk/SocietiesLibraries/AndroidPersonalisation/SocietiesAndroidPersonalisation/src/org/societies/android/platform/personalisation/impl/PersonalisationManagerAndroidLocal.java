@@ -25,7 +25,7 @@
 package org.societies.android.platform.personalisation.impl;
 
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;
@@ -56,7 +56,7 @@ public class PersonalisationManagerAndroidLocal extends Service{
 
 			ClientCommunicationMgr ccm = createClientCommunicationMgr();
 			
-			IPersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), ccm, false);
+			IPersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidLocal.this.getApplicationContext(), false);
 
 			return serviceBase;
 		}
@@ -77,7 +77,8 @@ public class PersonalisationManagerAndroidLocal extends Service{
 	 * @return ClientCommunicationMgr
 	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
+		//TODO: check if login has been completed, that's what the boolean in the clientCommunicationMgr is for
+		return new ClientCommunicationMgr(getApplicationContext(), false);
 	}
 
 }

@@ -22,25 +22,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.integration.test.bit.context.event;
 
-package org.societies.api.internal.css.management;
-
-
-import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * This is the base client interface for T4.5/SOCIETIES. This interface is implemented
- * for Android and Virgo in the respective client libraries.
- *  
- * @author Babak.Farshchian@sintef.no
- *
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 1.0
+ * @see TestLocalUserCtxEventing
  */
+public class TestCase extends IntegrationTestCase {
 
-// TODO: This class needs to be higher up in the package hierarchy and be a global 
-// class/interface.
-@Deprecated
-public interface ISocietiesApp {
-    Object getCssManager();
-    ICssDirectory getCssDirectory();
+	public static ICtxBroker ctxBroker;
+	public static ICommManager commManager;
+	
+	public TestCase() {
 
+		super(0001, new Class[] { TestLocalUserCtxEventing.class, 
+				TestRemoteUserCtxEventing.class });
+	}
+
+	/**
+	 * @return the ctxBroker
+	 */
+	public static ICtxBroker getCtxBroker() {
+
+		return TestCase.ctxBroker;
+	}
+
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+
+		TestCase.ctxBroker = ctxBroker;
+	}
+	
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager getCommManager() {
+
+		return TestCase.commManager ;
+	}
+
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public void setCommManager(ICommManager commMgr) {
+
+		TestCase.commManager = commMgr;
+	}		
 }

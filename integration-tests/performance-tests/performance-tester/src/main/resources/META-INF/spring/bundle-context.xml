@@ -48,6 +48,7 @@
 	<bean name="PerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.PerformanceTestImpl">
   		<property name="cisManager" ref="CisManager"/>
   		<property name="commManager" ref="commManager"/>
+  		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
   	</bean>
 	
 	<!-- Rafik's Declarations end -->

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011-2013, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -22,12 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.management;
+package org.societies.api.css;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
-public interface ICssActivityFeed {
+import org.societies.api.identity.IIdentity;
 
+public class FriendFilter {
+
+	private int filterFlag;
+	private IIdentity[] cis;
+
+	public int getFilterFlag() {
+		return filterFlag;
+	}
+
+	public void setFilterFlag(int filterFlag) {
+		this.filterFlag = filterFlag;
+	}
+
+	public IIdentity[] getCis_Jids() {
+		return cis;
+	}
+
+	public void setCis_Jids(IIdentity[] cis) {
+		this.cis = cis;
+	}
+	
 }

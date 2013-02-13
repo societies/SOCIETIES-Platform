@@ -23,8 +23,9 @@
        for integration testing outside of an OSGi environment -->
 	
 	<bean id="testCase1678" class="org.societies.integration.test.bit.privacytrust.TestCase1678" init-method="run">
-		<property name="ctxBroker" ref ="ctxBroker" />
-		<property name="commManager" ref="commManager" />	 
+		<property name="internalTrustEvidenceCollector" ref ="internalTrustEvidenceCollector" />
+		<property name="internalTrustBroker" ref ="internalTrustBroker" />
+		<property name="commManager" ref="commManager" />
   	</bean>
   	
 </beans>
