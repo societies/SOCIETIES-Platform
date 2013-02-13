@@ -582,4 +582,10 @@ public class MockPZWrapperImpl implements PZWrapper {
 		mockEntitiesLocations.put(entityId, location);
 	}
 
+
+	@Override
+	public boolean isLocationSystemActive() {
+		return true;
+	}
+
 }

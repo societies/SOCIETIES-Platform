@@ -18,7 +18,7 @@
 	<!-- <osgi:reference id="DeviceRegistry" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" />-->
 	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 	<!-- <osgi:reference id="DmCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/> -->
-	<osgi:reference id="CSSInternalManager" interface="org.societies.api.internal.css.ICSSInternalManager" />
+	<!--  <osgi:reference id="CSSInternalManager" interface="org.societies.api.internal.css.ICSSInternalManager" /> -->
 	
 	<osgi:service ref="LMAdapterBean" interface="org.societies.context.location.management.api.ILocationManagementAdapter"/>
 	
