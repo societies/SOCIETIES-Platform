@@ -234,7 +234,7 @@ public class CommunityCtxDBMgrTest {
 		
 		CommunityCtxEntity communityEntity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_COMMUNITY_PARENT);
 		CtxEntity entity = this.communityDB.createEntity(CIS_IIDENTITY_ENTITY_CHILD, CtxEntityTypes.PERSON);
-	
+		
 		//set parent entity
 		final CtxEntityIdentifier parentEntityId = communityEntity.getId();
 		association.setParentEntity(parentEntityId);
@@ -272,7 +272,7 @@ public class CommunityCtxDBMgrTest {
 		//check association from the entity's side
 		entity = (CtxEntity) this.communityDB.retrieve(childEntityId2);
 		assertTrue(entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
-		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());		
 	}
 	
 	@Test
