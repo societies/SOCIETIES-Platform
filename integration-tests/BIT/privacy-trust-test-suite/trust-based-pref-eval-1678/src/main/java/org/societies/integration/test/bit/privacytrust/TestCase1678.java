@@ -36,9 +36,9 @@ import org.societies.integration.test.IntegrationTestCase;
  */
 public class TestCase1678 extends IntegrationTestCase {
 
-	public static ITrustEvidenceCollector internalTrustEvidenceCollector;
-	public static ITrustBroker internalTrustBroker;
-	public static ICommManager commManager;
+	private static ITrustEvidenceCollector internalTrustEvidenceCollector;
+	private static ITrustBroker internalTrustBroker;
+	private static ICommManager commManager;
 	
 	public TestCase1678() {
 
@@ -56,7 +56,7 @@ public class TestCase1678 extends IntegrationTestCase {
 	/**
 	 * @param trustEvidenceCollector the Trust Evidence Collector to set
 	 */
-	public void setInternalTrustBroker(ITrustEvidenceCollector internalTrustEvidenceCollector) {
+	public void setInternalTrustEvidenceCollector(ITrustEvidenceCollector internalTrustEvidenceCollector) {
 
 		TestCase1678.internalTrustEvidenceCollector = internalTrustEvidenceCollector;
 	}
@@ -72,7 +72,7 @@ public class TestCase1678 extends IntegrationTestCase {
 	/**
 	 * @param trustBroker the Trust Broker to set
 	 */
-	public void setTrustBroker(ITrustBroker internalTrustBroker) {
+	public void setInternalTrustBroker(ITrustBroker internalTrustBroker) {
 
 		TestCase1678.internalTrustBroker = internalTrustBroker;
 	}

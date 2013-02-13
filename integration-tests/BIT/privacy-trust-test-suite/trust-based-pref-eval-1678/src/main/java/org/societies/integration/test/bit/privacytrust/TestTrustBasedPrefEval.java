@@ -24,8 +24,7 @@
  */
 package org.societies.integration.test.bit.privacytrust;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
@@ -53,6 +52,16 @@ public class TestTrustBasedPrefEval {
 	
 	private static final String USER_ID1 = "bob.societies.local";
 	private static final String USER_ID2 = "alice.societies.local";
+	
+	/**
+	 * The {@link #setUp()} method assigns trust values to {@link #USER_ID1}
+	 * and {@link #USER_ID2}, such that:
+	 * <ul>
+	 * <li>{@link #USER_ID1} is assigned a value <b>above</b> this threshold</li>
+	 * <li>{@link #USER_ID2} is assigned a value <b>below</b> this threshold</li>
+	 * </ul>
+	 */
+	private static final double TRUST_VALUE_THRESHOLD = 0.5d;
 	
 	private static final long WAIT_TRUST_EVAL = 1000l;
 	
@@ -116,12 +125,16 @@ public class TestTrustBasedPrefEval {
 		Thread.sleep(WAIT_TRUST_EVAL);
 		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
 		LOG.info("*** trust2 = " + trust2);
+		
+		// TODO privacy pref setup
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 		
 		// TODO
+		// 1. remove test trust data db? currently not supported
+		// 2. remove test privacy prefs 
 	}
 
 	@Test
@@ -129,6 +142,14 @@ public class TestTrustBasedPrefEval {
 
 		LOG.info("*** Start TestPrefEval ...");
 		
+		// 1. Verify that trust values have been properly setup
+		// User 1
+		final Double trust1 = this.internalTrustBroker.retrieveTrust(myTeid, teid1).get();
+		assertTrue(trust1 > TRUST_VALUE_THRESHOLD);
+		// User 2
+		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
+		assertTrue(trust2 < TRUST_VALUE_THRESHOLD);
 		
+		// TODO 2. privacy pref
 	}
 }
