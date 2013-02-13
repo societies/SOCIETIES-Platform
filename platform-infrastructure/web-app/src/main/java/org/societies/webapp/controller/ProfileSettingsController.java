@@ -39,8 +39,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import javax.inject.Inject;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -51,15 +51,14 @@ import java.util.List;
 public class ProfileSettingsController extends BasePageController {
 
     @Autowired
+    @ManagedProperty(value = "#{userService}")
     private UserService userService; // Spring dependency
 
     @Autowired
+    @ManagedProperty(value = "#{userPreferenceConditionMonitor}")
     private IUserPreferenceConditionMonitor userPreferenceConditionMonitor; // Spring dependency
 
     private IUserPreferenceManagement userPreferenceManagement;
-
-    @Inject
-    private LoginController loginController; // Java EE CDI dependency
 
     private TreeNode preferencesRootNode;
 
@@ -90,140 +89,6 @@ public class ProfileSettingsController extends BasePageController {
     public void setUserPreferenceManagement(IUserPreferenceManagement userPreferenceManagement) {
         this.userPreferenceManagement = userPreferenceManagement;
     }
-
-    public LoginController getLoginController() {
-        return loginController;
-    }
-
-    public void setLoginController(LoginController loginController) {
-        this.loginController = loginController;
-    }
-
-    //    @RequestMapping(value = "/profilesettings.html", method = RequestMethod.GET)
-//    public ModelAndView initProfileSettings() {
-//
-//        if (!userService.isUserLoggedIn()) {
-//            // redirect to login page
-//            // TODO: popup login box
-//            log.warn("User not logged in - redirecting to home");
-//            return new ModelAndView(new RedirectView("index.html", true));
-//        }
-//
-//        Map<String, Object> model = new HashMap<String, Object>();
-//        ProfileSettingsForm form = new ProfileSettingsForm();
-//
-//        userService.loadUserDetailsFromCommMgr();
-//        userService.loadUserDetailsIntoModel(model);
-//
-//        model.put("loggedIn", true); // can only be true by this point
-//        model.put("form", form);
-//
-//        IIdentity ident = (IIdentity) model.get("identity");
-//        populateUserDetails(form, ident);
-//        StringBuilder sb = new StringBuilder();
-//
-//        populateProfileForm(form, ident, sb);
-//
-//        form.setPreferenceHtml(sb.toString());
-//
-//        return new ModelAndView("profilesettings", model);
-//    }
-//
-//    private void populateUserDetails(ProfileSettingsForm form, IIdentity ident) {
-//        form.setFullName(userService.getUsername());
-//
-//    }
-//
-//    private void populateProfileForm(ProfileSettingsForm form, IIdentity ident, StringBuilder sb) {
-//
-//        List<PreferenceDetails> detailsList = userPreferenceManagementService.getPreferenceDetailsForAllPreferences();
-//        form.setPreferenceDetailsList(detailsList);
-//
-//        if (detailsList == null) return;
-//
-//
-//        for (PreferenceDetails preferenceDetails : detailsList) {
-//            IPreferenceTreeModel preferenceTreeModel = userPreferenceManagementService.getModel(ident, preferenceDetails);
-//            form.getPreferenceDetailTreeModelMap().put(preferenceDetails, preferenceTreeModel);
-//
-////            log.debug("----------------------");
-////            log.debug(preferenceDetails.getPreferenceName() + " / " + preferenceTreeModel.getPreferenceName());
-////            log.debug(preferenceTreeModel.getServiceType());
-////            log.debug(preferenceTreeModel.getLastModifiedDate().toString());
-////            log.debug(preferenceTreeModel.getServiceID().getServiceInstanceIdentifier() + " / " + preferenceTreeModel.getServiceID().getIdentifier().toString());
-//
-//            sb.append("<div style=\"border: 1px solid #000; padding: 0 3px 3px 3px; \">");
-//            sb.append("<div style=\"border: 1px solid #000; margin: 0px; padding 2px; width: 100%; background-color: #009; color: #fff; font-weight: bold; text-align: center; font-variant: small-caps; font-size: large;\">");
-//            sb.append(preferenceDetails.getPreferenceName());
-//            sb.append("</div>");
-//            sb.append("<br>");
-//            sb.append("Last modified: ");
-//            sb.append(preferenceTreeModel.getLastModifiedDate().toString());
-//            sb.append("\n");
-//
-//            IPreference preference = preferenceTreeModel.getRootPreference();
-//            blah(preference, 0, sb);
-//
-//            sb.append("</div>\n");
-//
-//        }
-//
-//    }
-//
-//    private void blah(IPreference preference, int indent, StringBuilder sb) {
-//
-//        if (preference.getLevel() != indent) return;
-//
-//
-//        String s_indent = "";
-//        for (int i = 0; i < indent; i++) s_indent += "\t";
-//
-//        sb.append("\n");
-//        sb.append(s_indent);
-//        sb.append("<ul>\n");
-//        sb.append(s_indent);
-//        sb.append("<li>");
-//
-////        log.debug("+++" + Integer.toHexString(preference.hashCode()) + " d=" + preference.getDepth() + " l=" + preference.getLevel());
-//
-//        IPreferenceCondition condition = preference.getCondition();
-//        if (condition != null) {
-//            sb.append("[CONDITION] " + condition.getType() + ": " + condition.getname() + " " + condition.getoperator() + " " + condition.getvalue() + "<br/>");
-////            log.debug(s_indent + "[CONDITION] " + condition.getType() + ": " + condition.getname() + " " + condition.getoperator() + " " + condition.getvalue());
-//        }
-//
-//        IPreferenceOutcome outcome = preference.getOutcome();
-//        if (outcome != null) {
-//            sb.append("[OUTCOME] " + outcome.getparameterName() + "/" + outcome.getServiceType() + "/" + outcome.getvalue() + "/" + outcome.getQualityofPreference() + "/" + outcome.getConfidenceLevel() + "<br/>");
-////            log.debug(s_indent + "[OUTCOME] " + outcome.getparameterName() + "/" + outcome.getServiceType() + "/" + outcome.getvalue() + "/" + outcome.getQualityofPreference() + "/" + outcome.getConfidenceLevel());
-//        }
-//
-//        IPreference root = preference.getRoot();
-//        if (root != null && condition == null && outcome == null) {
-//            sb.append(s_indent + "[ROOT] " + root.toString() + "<br/>");
-////            log.debug(s_indent + "[ROOT] " + root.toString());
-//        }
-//
-////        Object userObject = preference.getUserObject();
-////        if (userObject != null) {
-////            sb.append(s_indent + "[USER_OBJECT] " + userObject.getClass() + ": " + userObject.toString() + "<br/>");
-//////            log.debug(s_indent + "[USER_OBJECT] " + userObject.getClass() + ": " + userObject.toString());
-////        }
-//
-//        Enumeration<IPreference> e = preference.postorderEnumeration();
-//        while (e.hasMoreElements()) {
-//            IPreference ele = e.nextElement();
-//            if (ele == preference) continue;
-//
-//            blah(ele, indent + 1, sb);
-//        }
-//
-//        sb.append(s_indent);
-//        sb.append("</li>\n");
-//        sb.append(s_indent);
-//        sb.append("</ul>\n");
-//
-//    }
 
     public TreeNode getPreferencesRootNode() {
         if (preferencesRootNode == null)
@@ -259,53 +124,86 @@ public class ProfileSettingsController extends BasePageController {
 
         for (PreferenceDetails preferenceDetails : detailsList) {
             IPreferenceTreeModel preferenceTreeModel =
-                    userPreferenceManagement.getModel(loginController.getIdentity(), preferenceDetails);
+                    userPreferenceManagement.getModel(userService.getIdentity(), preferenceDetails);
 
-            IPreference preference = preferenceTreeModel.getRootPreference();
-
-            populatePreferenceNode(preferenceDetails, preference);
+            populatePreferenceNode(preferenceTreeModel);
         }
     }
 
-    private void populatePreferenceNode(PreferenceDetails preferenceDetails, IPreference preference) {
-        TreeNode preferenceNode = new DefaultTreeNode(preferenceDetails.getPreferenceName(), preferencesRootNode);
+    private void populatePreferenceNode(IPreferenceTreeModel preferenceTreeModel) {
+
+        TreeNode preferenceNode = new DefaultTreeNode(preferenceTreeModel.getPreferenceName(), preferencesRootNode);
         preferenceNode.setExpanded(true);
 
-        if (preference.isBranch()) {
-            // this is a CONDITION
-            populateConditionNode(preference, preferenceNode);
-        } else if (preference.isLeaf()) {
-            // this is an OUTCOME
-            populateOutcomeNode(preference, preferenceNode);
-        }
+        IPreference preference = preferenceTreeModel.getRootPreference();
+
+        processSubnodes(preference, preferenceNode);
 
     }
 
     private void populateConditionNode(IPreference preference, TreeNode preferenceNode) {
         IPreferenceCondition condition = preference.getCondition();
 
+        if (condition == null) {
+            log.error("branch node " + preference.toString() + " contains null condition");
+            return;
+        }
         TreeNode conditionNode = new DefaultTreeNode(condition.getname() + " " + condition.getoperator() + " " + condition.getvalue(), preferenceNode);
         conditionNode.setExpanded(true);
 
-        Enumeration<IPreference> e = preference.postorderEnumeration();
-        while (e.hasMoreElements()) {
-            IPreference ele = e.nextElement();
-            if (ele == preference) continue;
-
-            populateConditionNode(ele, conditionNode);
-        }
+        processSubnodes(preference, conditionNode);
 
     }
 
     private void populateOutcomeNode(IPreference preference, TreeNode conditionNode) {
         IPreferenceOutcome outcome = preference.getOutcome();
 
-        String fmt = "$s = $s (q=$s, p=$s)";
+        if (outcome == null) {
+            log.error("leaf node " + preference.toString() + " contains null outcome");
+            return;
+        }
+
+        String fmt = "%s = %s (q=%s, p=%s)";
         TreeNode outcomeNode = new DefaultTreeNode(
                 String.format(fmt,
                         outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
                 conditionNode);
         outcomeNode.setExpanded(true);
 
+    }
+
+    private void processSubnodes(IPreference preference, TreeNode node) {
+        Enumeration<IPreference> e = preference.postorderEnumeration();
+        boolean conditionsFound = false;
+        // process conditions ONLY
+        while (e.hasMoreElements()) {
+            IPreference ele = e.nextElement();
+            if (ele == preference) continue;
+
+            if (ele.getCondition() != null) {
+                // this is a CONDITION
+                populateConditionNode(ele, node);
+                conditionsFound = true;
+            } else if (ele.getOutcome() != null) {
+                // this is an OUTCOME
+//                populateOutcomeNode(ele, node);
+            }
+        }
+        // process outcomes ONLY
+        if (!conditionsFound) {
+            e = preference.postorderEnumeration();
+            while (e.hasMoreElements()) {
+                IPreference ele = e.nextElement();
+                if (ele == preference) continue;
+
+                if (ele.getCondition() != null) {
+                    // this is a CONDITION
+                    populateConditionNode(ele, node);
+                } else if (ele.getOutcome() != null) {
+                    // this is an OUTCOME
+                    populateOutcomeNode(ele, node);
+                }
+            }
+        }
     }
 }
