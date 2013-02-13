@@ -41,13 +41,13 @@ public interface ICisMgmtPerformanceTest {
 	 * @param joinCisParameters an object containing parameters needed for this test  
 	 * 
 	 */
-	public void joinCisTest(PerformanceTestMgmtInfo performanceTestInfo, JoinCisParameters joinCisParameters);
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, JoinCisParameters joinCisParameters);
 	
 	/**
 	 * 
 	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
 	 * @param createCisParameters an object containing parameters needed for this test
 	 */
-	public void createCisTest(PerformanceTestMgmtInfo performanceTestInfo, CreateCisParameters createCisParameters);
+	public void createCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, CreateCisParameters createCisParameters);
 }
 
