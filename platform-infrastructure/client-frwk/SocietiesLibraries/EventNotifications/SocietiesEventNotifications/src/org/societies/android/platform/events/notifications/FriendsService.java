@@ -27,6 +27,7 @@ package org.societies.android.platform.events.notifications;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 import android.app.Notification;
 import android.app.Service;
@@ -53,16 +54,17 @@ import android.util.Log;
  *
  */
 public class FriendsService extends Service {
-
 	private static final String LOG_TAG = FriendsService.class.getName();
+	
 	//THIS LOCAL SERVICE
 	private IBinder binder = null;
 	
 	//TRACKING CONNECTION TO EVENTS MANAGER
 	private boolean boundToEventMgrService = false;
 	private Messenger eventMgrService = null;
-	private static final String SERVICE_ACTION = "org.societies.android.platform.events.ServicePlatformEventsRemote";
-	private static final String CLIENT_NAME    = "org.societies.android.platform.events.notifications.FriendsService";
+	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsService";
+	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	@Override
@@ -131,7 +133,7 @@ public class FriendsService extends Service {
         return receiver;
     }
     
-    /**Broadcast receiver to receive intent return values from service method calls only*/
+    /**Broadcast receiver to receive intent return values from EventManager service*/
     private class MainReceiver extends BroadcastReceiver {
 		
 		@Override
@@ -149,13 +151,16 @@ public class FriendsService extends Service {
 			//PUBSUB EVENTS
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request received: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				Parcelable payload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = advert.getName() + " sent a friend request";
+				addNotification(description, "Friend Request", advert);
 			}
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_ACCEPTED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request accepted: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				Parcelable payload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-			}
-			
+				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = advert.getName() + " accepted your friend request";
+				addNotification(description, "Friend Request Accepted", advert);
+			}			
 		}
     }
     
@@ -205,19 +210,21 @@ public class FriendsService extends Service {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-    		
     		return null;
     	}
     }
 
-    private void addNotification(Context context, String description, String eventType) {
+    private void addNotification(String description, String eventType, CssAdvertisementRecord advert) {
     	//CREATE ANDROID NOTIFICATION
 		int notifierflags [] = new int [1];
 		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
 		AndroidNotifier notifier = new AndroidNotifier(FriendsService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent();
-		notifier.notifyMessage(description, eventType, FriendsActivity.class);
+		Intent intent = new Intent(this.getApplicationContext(), FriendsService.class);
+		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		notifier.notifyMessage(description, eventType, FriendsActivity.class, intent);
 	}
 }
