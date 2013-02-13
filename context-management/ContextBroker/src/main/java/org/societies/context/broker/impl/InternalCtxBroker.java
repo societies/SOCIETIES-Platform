@@ -2436,7 +2436,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			throws CtxException {
 
 		Requestor req = null;
-		LOG.info("aaa createEntity  identity " + identity +" type "+type);
+		//LOG.info("aaa createEntity  identity " + identity +" type "+type);
 		return this.createEntity(req, identity, type);
 	}
 

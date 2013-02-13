@@ -44,12 +44,10 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
@@ -88,7 +86,7 @@ public class CtxBrokerExample implements Subscriber{
 	private INetworkNode cssNodeId;
 	
 	
-	private ICSSLocalManager cssManager;
+	//private ICSSLocalManager cssManager;
 	
 	String cssPassword = "password.societies.local";
 
@@ -98,7 +96,7 @@ public class CtxBrokerExample implements Subscriber{
 	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
 	@Autowired(required=true)
-	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager,PubsubClient pubsubClient, ICSSLocalManager cssManager) throws InvalidFormatException {
+	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager,PubsubClient pubsubClient) throws InvalidFormatException {
 
 		LOG.info("*** CtxBrokerExample instantiated "+this.internalCtxBroker);
 
@@ -114,8 +112,8 @@ public class CtxBrokerExample implements Subscriber{
 		this.pubsubClient = pubsubClient;
 		LOG.info("*** pubsubClient instantiated "+this.cisManager);
 
-		this.cssManager = cssManager;
-		LOG.info("*** cssManager instantiated "+this.cssManager);
+		//this.cssManager = cssManager;
+		//LOG.info("*** cssManager instantiated "+this.cssManager);
 		
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
@@ -130,14 +128,6 @@ public class CtxBrokerExample implements Subscriber{
 
 		LOG.info( "this.cssID1 "+ this.cssID1);
 		LOG.info( "this.cssID1.getType() "+ this.cssID1.getType());
-
-		//this.cssID2 =  commMgr.getIdManager().fromJid("coo@societies.local");
-		//LOG.info( "this.cssID2 "+ this.cssID2);
-		//LOG.info( "this.cssID2.getType() "+ this.cssID2.getType());
-
-		//this.cssID3 =  commMgr.getIdManager().fromJid("zoo@societies.local");
-		//LOG.info( "this.cssID3 "+ this.cssID3);
-		//LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
 
@@ -483,12 +473,6 @@ public class CtxBrokerExample implements Subscriber{
 				}	
 			}
 
-			//CssRecord cssRecord = this.cssManager..getCssRecord().get();
-			//cssRecord
-			
-			
-			LOG.info("*** cssManager instantiated "+this.cssManager);
-			
 			
 		} catch (Exception e) {
 
