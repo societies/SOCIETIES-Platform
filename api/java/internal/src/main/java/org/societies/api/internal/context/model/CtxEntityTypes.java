@@ -49,4 +49,10 @@ public class CtxEntityTypes extends
      * @since 0.0.8 
      */
     public static final String DIANNE = "dianne";
+    
+    /**
+     * A {@link CtxEntity} representing a user or community preference. 
+     * @since 1.0
+     */
+    public static final String PREFERENCE = "preference";
 }
