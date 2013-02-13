@@ -9,6 +9,17 @@
        for integration testing outside of an OSGi environment -->
 
 
+	<bean id="daRestProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+
   <!--  Mock PZ Wrapper -->
  <!--
   <bean id="PZWrapperBean" 
@@ -20,7 +31,11 @@
    
    <!--  PZ Wrapper will be connected using REST to the location server   -->
       <bean id="PZWrapperBean" 
-       		 class="org.societies.context.location.management.impl.PZWrapperImpl" >
+       		 class="org.societies.context.location.management.impl.PZWrapperImpl" 
+       		 init-method="init">
+          	<property name="productionQueryURL" value="${pz.prd.url}" />
+			<property name="productionAdminURL" value="${pz.prd.server.admin.url}" />
+			<property name="locationSystemActive" value="${location.system.active}" />
    </bean>
    
    
@@ -36,7 +51,7 @@
 			<!-- <property name="deviceRegistry" ref="DeviceRegistry" /> -->
 			<property name="pubSubManager" ref="PubsubClient"/>
 			<property name="commMngrController" ref="CommMngrController"/>
-			<property name="cssInternalManager" ref="CSSInternalManager"/>
+			<!-- <property name="cssInternalManager" ref="CSSInternalManager"/> -->
    </bean>
    
    
