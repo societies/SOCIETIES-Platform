@@ -84,16 +84,16 @@ public class NominalTestCaseUpperTester {
 		// -- Consume the service
 		int expected = 3;
 		int actual = 0;
-		try {
-			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
+		//try {
+			actual = NominalTestCaseLowerTester.calculatorService.addNumbers(1, 2);
 			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
 			assertEquals("[#759] Consume Calculator Service", expected, actual);
-		} catch (InterruptedException e) {
+	/*	} catch (InterruptedException e) {
 			LOG.info("[#759] InterruptedException", e);
 			fail("[#759] InterruptedException: "+e.getMessage());
 		} catch (ExecutionException e) {
 			LOG.info("[#759] ExecutionException", e);
 			fail("[#759] ExecutionException: "+e.getMessage());
-		}
+		}*/
 	}
 }

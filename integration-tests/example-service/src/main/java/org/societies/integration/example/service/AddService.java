@@ -10,7 +10,7 @@ import org.societies.integration.example.service.api.IAddService;
 public class AddService implements IAddService {
 
 	public int addNumbers(int a, int b) {		
-		return a=b;
+		return a+b;
 	}
 
 }

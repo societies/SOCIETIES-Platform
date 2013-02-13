@@ -1,4 +1,6 @@
 package org.societies.integration.example.service.api;
+
+
 /**
  * 
  * @author pkuppuud
@@ -7,5 +9,11 @@ package org.societies.integration.example.service.api;
 public interface IAddService {
 	
 	public int addNumbers(int a, int b);
+
+	/**
+	 * @param i
+	 * @param j
+	 * @return
+	 */
 
 }

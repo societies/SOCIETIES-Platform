@@ -21,6 +21,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.example.calculator.ICalc;
+import org.societies.integration.example.service.api.IAddService;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -41,7 +42,7 @@ public class NominalTestCaseLowerTester {
 	/**
 	 * Injection of ICalc interface
 	 */
-	public static ICalc calculatorService;
+	public static IAddService calculatorService;
 	/**
 	 * Tools for integration test
 	 */
@@ -51,6 +52,10 @@ public class NominalTestCaseLowerTester {
 	 */
 	public static int testCaseNumber;
 
+	/**
+	 * Relative path to the jar file in resources folder
+	 */
+	private static final String SERVICE_PATH = "IntegrationTestService-0.1.jar";
 
 	public NominalTestCaseLowerTester() {
 		integrationTestUtils = new IntegrationTestUtils();
@@ -68,7 +73,7 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#759] Prerequisite: The CSS is created");
 		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
-		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getSystemResource("Calculator-0.3.jar");//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
+		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getSystemResource(SERVICE_PATH);//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
 		calculatorServiceId = null;
 		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
 		LOG.info("[#759] Service location: "+serviceBundleUrl);
@@ -154,7 +159,7 @@ public class NominalTestCaseLowerTester {
 		}
 	}
 
-	public void setCalculatorService(ICalc calculatorService) {
+	public void setCalculatorService(IAddService calculatorService) {
 		LOG.info("[#759] Calculator Service injected");
 		this.calculatorService = calculatorService;
 		// -- Launch the UpperTester to continue the test case by consuming a service
