@@ -25,12 +25,106 @@
 
 package org.societies.platform.activityfeed;
 
+import org.hibernate.SessionFactory;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.activity.ActivityFeed;
+import org.societies.activity.ActivityFeedManager;
+import org.societies.api.activity.IActivityFeedManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.mockito.Mockito.*;
+
 /**
  * Created with IntelliJ IDEA.
- * User: epic
+ * User: bjornmagnus
  * Date: 2/11/13
  * Time: 20:25
- * To change this template use File | Settings | File Templates.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedManagerTest-context.xml"})
 public class ActivityFeedManagerTest {
+    private static Logger LOG = LoggerFactory
+            .getLogger(ActivityFeedManagerTest.class);
+    //@Autowired
+    private ActivityFeedManager activityFeedManagerUnderTest;
+    private IActivityFeedManager iActivityFeedManagerUnderTest;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+    private ICISCommunicationMgrFactory mockCcmFactory;
+    private ICommManager mockCSSendpoint = mock(ICommManager.class);
+    private IIdentityManager mockIdentityManager;
+    private IIdentity mockIdentity;
+    private String mockJid = "mockJid";
+
+    @BeforeClass
+    public void setupBeforeClass() throws InvalidFormatException {
+
+        when(mockCSSendpoint.getIdManager()).thenReturn(mockIdentityManager);
+        when(mockIdentityManager.fromJid(mockJid)).thenReturn(mockIdentity);
+        activityFeedManagerUnderTest.setCommManager(mockIdentity);
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+
+    }
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    @Test
+    public void testConstructor(){
+        activityFeedManagerUnderTest = new ActivityFeedManager();
+        this.setMockingOn();
+    }
+    @Test
+    public void testGetNewActivityFeed(){
+
+    }
+    @Test
+    public void testGetOldActivityFeed(){
+
+    }
+    @Test
+    public void testGetNotMyOwnActivityFeed(){
+
+    }
+    @Test
+    public void testDeleteOwnActivityFeed(){
+
+    }
+    @Test
+    public void testDeleteNotMyOwnActivityFeed(){
+
+    }
+    @Test
+    public void testDeleteNonExistentActivityFeed(){
+
+    }
+    public ICommManager getMockCSSendpoint() {
+        return mockCSSendpoint;
+    }
+
+    public void setMockCSSendpoint(ICommManager mockCSSendpoint) {
+        this.mockCSSendpoint = mockCSSendpoint;
+    }
 }
