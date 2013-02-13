@@ -30,7 +30,7 @@ import javax.persistence.*;
 import java.util.HashMap;
 
 @Entity
-@Table(name = "org_societies_cis_activity_model_Activity")
+@Table(name = "org_societies_activity_model_Activity")
 public class Activity implements IActivity {
 	/**
 	 * Serializable .. 

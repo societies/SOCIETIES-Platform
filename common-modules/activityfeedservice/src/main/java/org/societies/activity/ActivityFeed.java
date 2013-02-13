@@ -44,7 +44,6 @@ import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,8 +53,8 @@ import java.util.*;
 
 public class ActivityFeed implements IActivityFeed{//, Subscriber {
 
-    private String owner;
-    protected String id;// represents the CIS which owns the activity feed
+    protected String owner;
+    protected String id;// represents the owner of the activity feed
     protected
 	Set<Activity> list;
 	public ActivityFeed()
@@ -233,18 +232,18 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
 		this.sessionFactory = sessionFactory;
 	}
 	
-	synchronized public void startUp(SessionFactory sessionFactory, String id){
-        this.id = id;
+	synchronized public void startUp(SessionFactory sessionFactory, String owner){
+        this.owner = owner;
         list = new HashSet<Activity>();
-        LOG.info("starting loading activities from db with ownerId: "+ id );
+        LOG.info("starting loading activities from db with ownerId: "+ owner);
         Session session = null;
         try{
         	session = sessionFactory.openSession();
-            list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
+            list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(owner)).list());
             if(list.size() == 0){
-                LOG.error("did not find actitivties with ownerId: "+ id ) ;
+                LOG.error("did not find actitivties with ownerId: "+ owner) ;
             }else if(list.size() > 1){
-                LOG.error("activityfeed startup with ownerId: "+id+" gave more than one activityfeed!! ");
+                LOG.error("activityfeed startup with ownerId: "+ owner +" gave more than one activityfeed!! ");
             }
         }catch(Exception e){
         	e.printStackTrace();
@@ -254,7 +253,7 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
                 session.close();
         }
         
-        LOG.info("loaded activityfeed with ownerId: " + id + " with "+list.size()+" activities.");
+        LOG.info("loaded activityfeed with ownerId: " + owner + " with "+list.size()+" activities.");
         for(Activity act : list){
             act.repopHash();
             LOG.info("act actor: " + act.getActor());
@@ -533,5 +532,9 @@ public class ActivityFeed implements IActivityFeed{//, Subscriber {
      */
     public String getOwner() {
         return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

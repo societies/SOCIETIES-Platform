@@ -41,15 +41,22 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.activity.ILocalActivityFeed;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed, ILocalActivityFeed {//, Subscriber {
+@Entity
+@Table(name = "org_societies_activity_ActivityFeed")
+public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 	
-	
+	@Transient
 	private PubsubClient pubSubcli;
-	private IIdentity ownerCSS;
+	@Transient
+    private IIdentity ownerCSS;
+
 
 	public PubsubClient getPubSubcli() {
 		return pubSubcli;
@@ -63,12 +70,11 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 
 
 	// version with PubSub
-    synchronized public void startUp(SessionFactory sessionFactory, String id){
+    synchronized public void startUp(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
-        this.id = id;
         this.setPubSubcli(pubSubcli);
     }
-    public void connectPubSub(IIdentity ownerCSS){
+    public void connectPubSub(IIdentity ownerCSS){ //ASSUME PUBSUB NODE PERSISTING (CONFIGURATION), CHECK IF IT EXISTS
         this.ownerCSS = ownerCSS;
         // pubsub code
         LOG.debug("starting pubsub at activityfeed pubsub");
@@ -169,8 +175,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 				if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
                     act.repopHash();
 					ret.add(act);
-                    System.out.println("adding: actor: "+act
-                            .getActor()+" time: "+act.getPublished());
+/*                    System.out.println("adding: actor: "+act
+                            .getActor()+" time: "+act.getPublished());*/
 				}
 			}
 				
@@ -454,4 +460,12 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
                 session.close();
         }
 	}
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 }
