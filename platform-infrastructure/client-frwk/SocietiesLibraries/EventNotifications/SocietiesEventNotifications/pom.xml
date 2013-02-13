@@ -42,13 +42,25 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-        <dependency>
-			<groupId>org.societies.android.platform.cssmanager</groupId>
-			<artifactId>SocietiesCSSManager</artifactId>
+		<dependency>
+			<groupId>org.societies.android.platform.events</groupId>
+   			<artifactId>SocietiesPlatformEvents</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-    </dependencies>
+		<dependency>
+   			<groupId>org.societies.android.platform.androidutils</groupId>
+		    <artifactId>SocietiesAndroidUtilities</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<version>1.1.4c</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -60,4 +72,13 @@
             </plugin>
         </plugins>
     </build>
+    <reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>findbugs-maven-plugin</artifactId>
+	      </plugin>
+	    </plugins>
+	</reporting>
+	
 </project>
