@@ -58,6 +58,15 @@ public class CtxAssociationTypes extends
 	public static final String HAS_ECA = "hasEca";
 	
 	/**
+	 * Directed context association between a {@link CommunityMemberCtxEntity},
+	 * i.e. {@link IndividualCtxEntity} or {@link CommunityCtxEntity}, and one
+	 * or more {@link CtxEntity CtxEntities} of type {@link CtxEntityTypes#PREFERENCE}.
+	 *  
+	 * @since 1.0
+	 */
+	public static final String HAS_PREFERENCES = "hasPreferences";
+	
+	/**
 	 * Directed context association
 	 *  
 	 * @since 0.0.8

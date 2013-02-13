@@ -166,7 +166,7 @@
 	<xs:element name="ctxChangeEventBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="id" type="tns:ctxIdentifierBean" minOccurs="1" nillable="false"/>
+				<xs:element name="id" type="xs:string" minOccurs="1" nillable="false"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

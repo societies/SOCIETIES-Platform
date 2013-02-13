@@ -615,6 +615,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			final Criteria criteria = session.createCriteria(modelObjectClass)
 					.add(Restrictions.eq("ctxId", ctxId));
 			result = (T) criteria.uniqueResult();
+			if (result!= null) {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Refreshing cached context model object " + result.getId());
+				session.refresh(result);
+			}
 		} finally {
 			if (session != null)
 				session.close();

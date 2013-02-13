@@ -38,7 +38,8 @@ import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -71,13 +72,14 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
 	private ClientCommunicationMgr clientCommManager;
 	private RequestPolicy retrievedPrivacyPolicy;
+	private RequestPolicy defaultPrivacyPolicy;
 
 
 	//Enter local user credentials and domain name
 	private static final String USER_NAME = "university";
 	private static final String USER_PASS = "university";
 	private static final String XMPP_DOMAIN = "societies.local";
-	
+
 	/* **************
 	 * Business
 	 * ************** */
@@ -107,8 +109,12 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
 				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
-					if (retrievedPrivacyPolicy == null) {
-						txtLocation.setText("Hum, for testing purpose, retrieve the Privacy Policy before please!");
+					if (null == retrievedPrivacyPolicy) {
+						txtLocation.setText("Hum, for testing purpose, we will use a default privacy policy");
+						retrievedPrivacyPolicy = defaultPrivacyPolicy;
+					}
+					if (null == retrievedPrivacyPolicy) {
+						txtLocation.setText("Hum, but there is no default privacy policy");
 					}
 					else {
 						RequestItem requestItem = new RequestItem();
@@ -147,7 +153,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
 	}
-	
+
 	// Receiver
 	private class bReceiver extends BroadcastReceiver  {
 		@Override
@@ -176,6 +182,10 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
 			onLaunchTest(v);
 		}
+		else if (R.id.btnConnect == v.getId()) {
+			Log.d(TAG, "Not implemented yet.");
+//			clientCommManager.login();
+		}
 		else if (R.id.btnReset == v.getId()) {
 			onButtonResetClick(v);
 		}
@@ -183,7 +193,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			Toast.makeText(this, "What button did you clicked on?", Toast.LENGTH_SHORT);
 		}
 	};
-	
+
 	/**
 	 * Utilities button to reset all values of this activity
 	 * @param view
@@ -191,7 +201,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	public void onButtonResetClick(View view) {
 		txtLocation.setText(R.string.txt_nothing);
 	}
-	
+
 	/* **************
 	 * Activity Lifecycle
 	 * ************** */
@@ -204,6 +214,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		// -- Create a link with editable area
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
 		// -- Create a link with buttons
+		((Button) findViewById(R.id.btnConnect)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest1)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest1bis)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest2)).setOnClickListener(this);
@@ -211,7 +222,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		((Button) findViewById(R.id.btnLaunchTest4)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
 
-		clientCommManager = new ClientCommunicationMgr(this);
+		clientCommManager = new ClientCommunicationMgr(this.getApplicationContext(), true);
 		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 
 
@@ -228,6 +239,14 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		intentFilter.addAction(MethodType.INFER_PRIVACY_POLICY.name());
 
 		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
+
+		// Mock data
+		try {
+			defaultPrivacyPolicy = PrivacyPolicyUtil.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
+		}
+		catch(PrivacyException e) {
+			Log.e(TAG, "Cannot generate default privacy policy: "+e.getMessage());
+		}
 	}
 
 	protected void onStop() {
@@ -237,7 +256,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			getApplicationContext().unbindService(inProcessServiceConnection);
 		}
 		// -- Logout
-		clientCommManager.logout();
+//		clientCommManager.logout();
 	}
 
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
