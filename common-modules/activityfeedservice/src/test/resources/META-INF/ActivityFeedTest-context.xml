@@ -82,7 +82,7 @@
     <qualifier value="test"/>
     <property name="sessionFactory" ref="sessionFactory" />
 </bean>
-    <bean id="pFeed" class="org.societies.activity.PersistedActivityFeed" >
+    <bean id="pFeed" class="org.societies.activity.ActivityFeed" >
         <qualifier value="test"/>
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>

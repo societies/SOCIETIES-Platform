@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
-import org.societies.activity.PersistedActivityFeed;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -42,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
-@ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml" })
+@ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedTest-context.xml" })
 public class SpeedTests extends
 AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 	
@@ -50,9 +49,9 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 	
 	int messages = 1000;
 	@Autowired
-	private ActivityFeed actFeed;
+	private ActivityFeed mFeed;
     @Autowired
-	private PersistedActivityFeed pFeed;
+	private ActivityFeed pFeed;
 	
 	private SessionFactory sessionFactory=null;
 	private Session session=null;
@@ -64,11 +63,11 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 	@Before
 	public void setupBefore() throws Exception {
 		if(sessionFactory==null){
-			sessionFactory = actFeed.getSessionFactory();
+			sessionFactory = mFeed.getSessionFactory();
 		}
 //		if(session==null){
 //			session = sessionFactory.openSession();
-//			actFeed.setSession(session);
+//			mFeed.setSession(session);
 //		}
 //		if(!session.isOpen())
 //			session = sessionFactory.openSession();
@@ -78,9 +77,9 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 	@After
 	public void tearDownAfter() throws Exception {
 		
-		actFeed.clear();
+		mFeed.clear();
 //		session.close();
-		actFeed = null;
+		mFeed = null;
 	}
 	@Test
     public void SerialTest(){//this is to avoid any parrallelisation of the tests, which would ruin the point.
@@ -90,14 +89,16 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
         testPersisted();
     }
 	public void testOrig(){
-		actFeed.startUp(sessionFactory, "1");
+        mFeed.setId("1");
+		mFeed.startUp(sessionFactory);
 		long start = System.currentTimeMillis();
-        addRandomActs(actFeed,this.messages);
+        addRandomActs(mFeed,this.messages);
         long spent = System.currentTimeMillis() - start;
         LOG.info("Added "+this.messages+" messages in "+spent +" ms: "+((double)this.messages)/((double)spent/1000L)+" msgs/sec");
 	}
 	public void testPersisted(){
-		pFeed.startUp(sessionFactory, "2");
+        mFeed.setId("2");
+		pFeed.startUp(sessionFactory);
 		long start = System.currentTimeMillis();
         addRandomActs(pFeed,this.messages);
         long spent = System.currentTimeMillis() - start;

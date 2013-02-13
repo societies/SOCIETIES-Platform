@@ -75,7 +75,7 @@
             <list>
                 <!--                 <value>org.societies.activity.ActivityFeed</value> -->
                 <value>org.societies.activity.model.Activity</value>
-                <value>org.societies.activity.PersistedActivityFeed</value>
+                <value>org.societies.activity.ActivityFeed</value>
             </list>
         </property>
 

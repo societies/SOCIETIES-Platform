@@ -31,12 +31,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.activity.ActivityFeedManager;
-import org.societies.activity.PersistedActivityFeed;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -49,7 +47,6 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
@@ -116,14 +113,14 @@ public class ActivityFeedManagerTest {
     @Test
     public void testGetNewActivityFeed(){
         IActivityFeed feed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
-        assert (((PersistedActivityFeed)feed).getOwner().contentEquals(this.mockJid));
+        assert (((ActivityFeed)feed).getOwner().contentEquals(this.mockJid));
     }
     @Test
     public void testGetOldActivityFeed(){
         IActivityFeed oldFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
         IActivityFeed checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
-        String oldOwner = ((PersistedActivityFeed)oldFeed).getOwner();
-        String checkOwner = ((PersistedActivityFeed)checkFeed).getOwner();
+        String oldOwner = ((ActivityFeed)oldFeed).getOwner();
+        String checkOwner = ((ActivityFeed)checkFeed).getOwner();
         assert (oldOwner.contentEquals(checkOwner));
     }
     @Test
