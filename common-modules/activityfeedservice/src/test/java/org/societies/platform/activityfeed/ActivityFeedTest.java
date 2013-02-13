@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
-import org.societies.activity.PersistedActivityFeed;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.internal.sns.ISocialConnector;
@@ -62,7 +61,7 @@ import static org.mockito.Mockito.stub;
  * @author bjornmagnus adopted from solutanet
  * 
  */
-@ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml"})
+@ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedTest-context.xml"})
 public class ActivityFeedTest extends
 AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
@@ -71,8 +70,8 @@ AbstractTransactionalJUnit4SpringContextTests {
     @Qualifier(value = "test")
 	@Autowired
 	private ActivityFeed actFeed;
-    @Autowired
-    private PersistedActivityFeed pFeed;
+    //@Autowired
+    //private ActivityFeed pFeed;
 	private SessionFactory sessionFactory=null;
 	private Session session=null;
 	static {
@@ -82,15 +81,16 @@ AbstractTransactionalJUnit4SpringContextTests {
 
     public ActivityFeedTest() {
         LOG.info("in actfeedtest constructor");
-        actFeed = pFeed;
+/*        actFeed = pFeed;*/
     }
 
     @Before
 	public void setupBefore() throws Exception {
-        actFeed = pFeed;
+        actFeed = new ActivityFeed();
 		if(sessionFactory==null){
 			sessionFactory = actFeed.getSessionFactory();
 		}
+
 //		if(session==null){
 //			session = sessionFactory.openSession();
 //			actFeed.setSession(session);
@@ -111,7 +111,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testAddCisActivity() {
 		LOG.info("@@@@@@@ IN TESTADDACTIVITY @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(1));
+        actFeed.setId("1");
+		actFeed.startUp(sessionFactory);
 		String actor="testUsertestAddCisActivity";
 		String verb="published";
 		IActivity iact = new Activity();
@@ -151,7 +152,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testCleanupFeed() {
 		LOG.info("@@@@@@@ IN TESTCLEANUPFEED @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(2));
+        actFeed.setId("2");
+		actFeed.startUp(sessionFactory);
 		JSONObject searchQuery = new JSONObject();
 		String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
 		try {
@@ -174,7 +176,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testFilter(){
 		LOG.info("@@@@@@@ IN TESTFILTER @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(3));
+        actFeed.setId("2");
+		actFeed.startUp(sessionFactory);
 		String actor="testFilterUser";
 		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
 		actFeed.addActivity(act1);
@@ -215,7 +218,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testSNImporter(){
 		LOG.info("@@@@@@@ IN TESTSNIMPORTER @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(4));
+        actFeed.setId("4");
+		actFeed.startUp(sessionFactory);
 		LOG.info("actFeedcontent: "+ actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
 		ISocialConnector mockedSocialConnector; 
 		mockedSocialConnector = mock(ISocialConnector.class);
@@ -254,7 +258,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTREBOOT @@@@@@@");
 		String actor="testRebootActor";
 		String verb="published";
-		actFeed.startUp(sessionFactory, Integer.toString(5));
+        actFeed.setId("5");
+		actFeed.startUp(sessionFactory);
 		IActivity iact = new Activity();
 		iact.setActor(actor);
 		iact.setPublished(Long.toString(System.currentTimeMillis()));

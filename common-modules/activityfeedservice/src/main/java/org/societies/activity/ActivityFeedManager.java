@@ -72,8 +72,8 @@ public class ActivityFeedManager implements IActivityFeedManager {
                     LOG.info("right feedid but wrong owner");
                     return null;
                 }
-                LOG.info("right feedid and owner");
-                ((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
+                //LOG.info("right feedid and owner");
+                //((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
                 return feed;
             }
         }
@@ -85,11 +85,9 @@ public class ActivityFeedManager implements IActivityFeedManager {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         //not existing, making a new one..
-        PersistedActivityFeed ret = new PersistedActivityFeed();
-        ret.setId(feedId);
-        ret.setOwner(owner);
+        ActivityFeed ret = new ActivityFeed(feedId,owner);
         ret.setPubSubcli(this.pubSubClient);
-        ret.startUp(this.sessionFactory, owner);
+        ret.startUp(this.sessionFactory);
         ret.connectPubSub(identity);
 
         feeds.add(ret);
@@ -119,7 +117,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
         return false;
     }
     private boolean removeRecord(IActivityFeed feed){
-        PersistedActivityFeed deleted = (PersistedActivityFeed)feed;
+        ActivityFeed deleted = (ActivityFeed)feed;
         Session session = null;
         Transaction t = null;
         try{
@@ -142,7 +140,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public void init(){
         Session session = getSessionFactory().openSession();
         try{
-            feeds = session.createCriteria(PersistedActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+            feeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
         }catch(Exception e){
             LOG.error("CISManager startup queries failed..");
             e.printStackTrace();
