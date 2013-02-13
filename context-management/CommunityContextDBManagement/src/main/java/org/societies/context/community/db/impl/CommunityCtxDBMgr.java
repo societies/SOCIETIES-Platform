@@ -213,20 +213,18 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			throw new NullPointerException("cisId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
-		//LOG.info("skata  1 community entity cisId " +cisId.toString() +" type "+type); 
-		
+
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
 				new CtxEntityIdentifier(cisId, type, modelObjectNumber);
 		final CommunityCtxEntityBaseDAO entityDAO = new CommunityCtxEntityBaseDAO(id);
-	//	LOG.info("skata  2");
+
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try{
 			tx = session.beginTransaction();
 			session.save(entityDAO);
 			tx.commit();
-		//	LOG.info("skata  3");
 		}
 		catch (Exception e) {
 			if (tx != null)
@@ -237,7 +235,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
-		//LOG.info("skata  4");
+
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] {CtxChangeEventTopic.CREATED}, CtxEventScope.BROADCAST);
@@ -247,7 +245,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
-		//LOG.info("skata  5");
+		
 		return (CtxEntity) this.retrieve(id);
 	}
 	

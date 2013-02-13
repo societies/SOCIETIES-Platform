@@ -114,14 +114,22 @@ public class PrivacyPolicyManagerTest {
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
+		if (null == TestCase1244.privacyPolicyManager) {
+			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : privacyPolicyManager is null");
+			fail("Error: privacyPolicyManager is null");
+		}
+		if (null == requestorCis) {
+			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : requestorCis is null");
+			fail("Error: requestorCis is null");
+		}
 		try {
 			privacyPolicy = TestCase1244.privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
+			fail("Privacy error: "+e.getLocalizedMessage()+" "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
+			fail("Error: "+e.getLocalizedMessage()+" "+e.getMessage());
 		}
 		
 		//Modified by rafik
