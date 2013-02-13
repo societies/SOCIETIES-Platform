@@ -42,7 +42,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 @NamedQueries({
 	@NamedQuery(
 			name = "getCtxEntityIdByOwnerId",
-			query = "select entity.ctxId from CtxEntityDAO as entity where entity.ctxId.owner_id = :ownerId"
+			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.owner_id = :ownerId"
 	)
 })
 @Entity
@@ -51,16 +51,16 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 )
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("CtxEntity")
-public class CtxEntityDAO extends CommunityCtxEntityDAO {
+public class CommunityCtxEntityBaseDAO extends CommunityCtxEntityDAO {
 	
 	private static final long serialVersionUID = -4415679433140566711L;
 
-	CtxEntityDAO() {
+	CommunityCtxEntityBaseDAO() {
 		
 		super();
 	}
 	
-	public CtxEntityDAO(CtxEntityIdentifier ctxId) {
+	public CommunityCtxEntityBaseDAO(CtxEntityIdentifier ctxId) {
 		
 		super(ctxId);
 	}	

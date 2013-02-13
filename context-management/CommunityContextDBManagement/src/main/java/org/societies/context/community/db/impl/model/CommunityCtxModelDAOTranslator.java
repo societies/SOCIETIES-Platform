@@ -77,8 +77,8 @@ public final class CommunityCtxModelDAOTranslator {
 		return mo;
 	}
 	
-	public CtxEntityDAO fromCtxEntity(CtxEntity mo) {
-		final CtxEntityDAO dao = new CtxEntityDAO(mo.getId());
+	public CommunityCtxEntityBaseDAO fromCtxEntity(CtxEntity mo) {
+		final CommunityCtxEntityBaseDAO dao = new CommunityCtxEntityBaseDAO(mo.getId());
 		dao.setLastModified(mo.getLastModified());
 		
 		for (final CtxAttribute attribute : mo.getAttributes()) {
@@ -88,7 +88,7 @@ public final class CommunityCtxModelDAOTranslator {
 		return dao;
 	}
 	
-	public CtxEntity fromCtxEntityDAO(CtxEntityDAO dao) {
+	public CtxEntity fromCtxEntityDAO(CommunityCtxEntityBaseDAO dao) {
 		final Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
 		for (final CommunityCtxAttributeDAO attributeDAO : dao.getAttributes())
 			attributes.add(this.fromCtxAttributeDAO(attributeDAO));
@@ -192,8 +192,8 @@ public final class CommunityCtxModelDAOTranslator {
 		
 		if (dao instanceof CommunityCtxEntityDAO)
 			mo = this.fromCommunityCtxEntityDAO((CommunityCtxEntityDAO) dao);
-		else if (dao instanceof CtxEntityDAO)
-			mo = this.fromCtxEntityDAO((CtxEntityDAO) dao);
+		else if (dao instanceof CommunityCtxEntityBaseDAO)
+			mo = this.fromCtxEntityDAO((CommunityCtxEntityBaseDAO) dao);
 		else if (dao instanceof CommunityCtxAttributeDAO)
 			mo = this.fromCtxAttributeDAO((CommunityCtxAttributeDAO) dao);
 		else if (dao instanceof CommunityCtxAssociationDAO)

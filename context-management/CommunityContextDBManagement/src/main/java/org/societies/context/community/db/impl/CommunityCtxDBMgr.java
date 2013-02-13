@@ -64,7 +64,7 @@ import org.societies.context.community.db.impl.model.CommunityCtxModelDAOTransla
 import org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO;
-import org.societies.context.community.db.impl.model.CtxEntityDAO;
+import org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO;
 import org.societies.context.community.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxQualityDAO;
 import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
@@ -218,7 +218,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
 				new CtxEntityIdentifier(cisId, type, modelObjectNumber);
-		final CtxEntityDAO entityDAO = new CtxEntityDAO(id);
+		final CommunityCtxEntityBaseDAO entityDAO = new CommunityCtxEntityBaseDAO(id);
 	//	LOG.info("skata  2");
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
@@ -485,7 +485,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
             	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
 
             	try { 
-            		if (dao instanceof CtxEntityDAO) {
+            		if (dao instanceof CommunityCtxEntityBaseDAO) {
             			// Retrieve CtxAssociationIds where this entity is parent
             			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
             			query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(), 
