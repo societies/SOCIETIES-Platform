@@ -21,7 +21,7 @@ import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 
 public class NominalTestCaseLowerTester {

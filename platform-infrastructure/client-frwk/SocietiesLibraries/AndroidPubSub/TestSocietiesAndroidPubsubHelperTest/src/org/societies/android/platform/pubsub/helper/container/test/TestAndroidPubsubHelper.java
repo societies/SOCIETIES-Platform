@@ -64,7 +64,8 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 	@MediumTest
 	public void testBindToPubsubService() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		final PubsubHelper helper = new PubsubHelper(getContext());
+		helper.setSubscriberCallback(new EventSubscriber());
 		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -99,7 +100,8 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 	@MediumTest
 	public void testOwnerCreateDelete() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		final PubsubHelper helper = new PubsubHelper(getContext());
+		helper.setSubscriberCallback(new EventSubscriber());
 		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -174,7 +176,8 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 	@MediumTest
 	public void testSubscribeToNode() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext(), new EventSubscriber());
+		final PubsubHelper helper = new PubsubHelper(getContext());
+		helper.setSubscriberCallback(new EventSubscriber());
 		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			
@@ -254,7 +257,8 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 	@MediumTest
 	public void testSendCatchEvent() throws Exception {
 		this.testCompleted = false;
-		final PubsubHelper helper = new PubsubHelper(getContext(), new SendEventSubscriber());
+		final PubsubHelper helper = new PubsubHelper(getContext());
+		helper.setSubscriberCallback(new EventSubscriber());
 		helper.addSimpleClasses(classList);
 		helper.bindPubsubService(new IMethodCallback() {
 			

@@ -88,12 +88,11 @@ public class PubsubHelper implements IPubsubClient {
 	private PacketMarshaller marshaller;
 	private ISubscriber subscriberCallback;
 	
-	public PubsubHelper(Context androidContext, ISubscriber subscriberCallback) {
+	public PubsubHelper(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
 		Log.d(LOG_TAG, "Instantiate PubsubHelper");
 		this.androidContext = androidContext;
-		this.subscriberCallback = subscriberCallback;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
 		this.randomGenerator = new Random(System.currentTimeMillis());
@@ -109,6 +108,14 @@ public class PubsubHelper implements IPubsubClient {
 		marshaller.register(ELEMENTS, NAMESPACES, PACKAGES);
 	}
 	
+	/**
+	 * set the event subscriber for Pubsub node events
+	 * @param subscriberCallback
+	 */
+	public void setSubscriberCallback(ISubscriber subscriberCallback) {
+		this.subscriberCallback = subscriberCallback;
+	}
+
 	/**
 	 * Binds to Android Pubsub Service
 	 * @param bindCallback callback 
@@ -289,10 +296,9 @@ public class PubsubHelper implements IPubsubClient {
 	}
 
 	@Override
-	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
-		Dbc.require("Subscriber callback cannot be null", null != callback);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
 		Log.d(LOG_TAG, "subscriberSubscribe called for node: " + node);
 		
@@ -307,10 +313,9 @@ public class PubsubHelper implements IPubsubClient {
 	}
 
 	@Override
-	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, ISubscriber callback, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
-		Dbc.require("Subscriber callback cannot be null", null != callback);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
 		Log.d(LOG_TAG, "subscriberUnsubscribe called for node: " + node);
 		

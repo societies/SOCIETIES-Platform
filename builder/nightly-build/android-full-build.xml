@@ -49,10 +49,8 @@
 
 		<!-- API -->
 		<module>../../api/android-pom.xml</module>
-		<!--
-		<module>../../api/android/external2</module>
-		<module>../../api/android/internal2</module>
-		 -->
+		<!--module>../../api/android/external2</module>
+		<module>../../api/android/internal2</module-->
 		 				
 		<!-- Android Communication components -->
 		<module>../../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons/android-pom.xml</module>
@@ -76,7 +74,7 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/CommunityManagement/SocietiesCISManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidCSSManager/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidContentProvider/SocietiesContentProvider</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>

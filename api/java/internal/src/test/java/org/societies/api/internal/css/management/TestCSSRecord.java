@@ -1,10 +1,13 @@
 package org.societies.api.internal.css.management;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.css.CSSManagerEnums;
+import org.societies.api.internal.css.CSSNode;
+import org.societies.api.internal.css.CSSRecord;
 
 public class TestCSSRecord {
 
@@ -96,7 +99,7 @@ public class TestCSSRecord {
 		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
 		assertEquals(TEST_IM_ID, cssProfile.getImID());
 		assertEquals(TEST_NAME, cssProfile.getName());
-		assertEquals(TEST_PASSWORD, cssProfile.password);
+		assertEquals(TEST_PASSWORD, cssProfile.getPassword());
 		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
 		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());

@@ -28,23 +28,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssDirectoryBean;
 import org.societies.api.schema.css.directory.MethodType;
 import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
-import org.societies.utilities.DBC.Dbc;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -58,7 +58,7 @@ import android.util.Log;
  * to and from the Android Comms service, otherwise this service is not going to work.
  *
  */
-public class LocalCssDirectoryService extends Service implements IAndroidCssDirectory {
+public class LocalCssDirectoryService extends Service implements IAndroidCssDirectory, IServiceManager {
 	private static final String LOG_TAG = LocalCssDirectoryService.class.getName();
 	
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssDirectoryBean", "cssDirectoryBeanResult");
@@ -67,16 +67,13 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 
     private ClientCommunicationMgr ccm;
     private IBinder binder = null;
-    private boolean boundToAndroidComms;
+    private boolean connectedToComms = false;
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalCssDirectoryBinder();
-	
+    	Log.d(LOG_TAG, "CssDirectory service starting");
+    	this.binder = new LocalCssDirectoryBinder();
 		this.ccm = new ClientCommunicationMgr(this, true);
-		this.boundToAndroidComms = false;
-		
-		Log.d(LOG_TAG, "CssDirectory service starting");
 	}
     
 	@Override
@@ -98,78 +95,139 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		return this.binder;
 	}
 
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>IServiceManager>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "LocalCssDirectoryService startService binding to comms");
+	        this.ccm.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+						ccm.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "LocalCssDirectoryService stopService unregistering namespaces");
+        	ccm.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					ccm.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+    	}
+    	return true;
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			LocalCssDirectoryService.this.getApplicationContext().sendBroadcast(intent);
+		}
+	}
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ICssDirectory>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	public CssAdvertisementRecord[] findAllCssAdvertisementRecords(String client) {
 		Log.d(LOG_TAG, "findAllCssAdvertisementRecords called by client: " + client);
-		
-		AsyncSearchDirectory methodAsync = new AsyncSearchDirectory();
-		String params[] = {client, IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS};
-		methodAsync.execute(params);
-		
+		if(connectedToComms) {
+			//MESSAGE BEAN
+			CssDirectoryBean directoryBean = new CssDirectoryBean();
+			directoryBean.setMethod(MethodType.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+			try {
+				Stanza stanza = new Stanza(ccm.getIdManager().getDomainAuthorityNode());
+				ICommCallback callback = new CSSDirectoryCallback(client, IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+				ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
+				Log.d(LOG_TAG, "Sent stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ICisDirectory.FIND_ALL_CIS);
+		}
 		return null;
 	}
 
 	public CssAdvertisementRecord[] findForAllCss(String client, String searchTerm) {
 		Log.d(LOG_TAG, "getFriendRequests called by client: " + client);
 		
-		AsyncSearchDirectory methodAsync = new AsyncSearchDirectory();
-		String params[] = {client, IAndroidCssDirectory.FIND_FOR_ALL_CSS, searchTerm};
-		methodAsync.execute(params);
-		
-		return null;
-	}
-
-	/**
-	 * This class carries out the AcceptFriendRequests method call asynchronously
-	 */
-	private class AsyncSearchDirectory extends AsyncTask<String, Void, String[]> {
-		
-		@Override
-		protected String[] doInBackground(String... params) {
-			Dbc.require("At least one parameter must be supplied", params.length >= 1);
-			Log.d(LOG_TAG, "GetFriendRequests - doInBackground");
-			String results [] = new String[1];
-			results[0] = params[0];
-			//PARAMETERS
-			String client = (String)params[0];
-			String method = (String) params[1];
-			String searchTerm = "";
-			if (params.length == 3) 
-				searchTerm = (String) params[2];
-
+		if(connectedToComms) {
 			//MESSAGE BEAN
+			CssAdvertisementRecord aAdvert = new CssAdvertisementRecord();
+			aAdvert.setName(searchTerm);
 			CssDirectoryBean directoryBean = new CssDirectoryBean();
-			if (params.length == 3) {
-				CssAdvertisementRecord aAdvert = new CssAdvertisementRecord();
-				aAdvert.setName(searchTerm);
-				directoryBean.setCssA(aAdvert);
-			}
-			if (method.equals(IAndroidCssDirectory.FIND_FOR_ALL_CSS)) 
-				directoryBean.setMethod(MethodType.FIND_FOR_ALL_CSS);
-			else
-				directoryBean.setMethod(MethodType.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
-			
-			Stanza stanza;
+			directoryBean.setCssA(aAdvert);
+			directoryBean.setMethod(MethodType.FIND_FOR_ALL_CSS);
 			try {
-				stanza = new Stanza(ccm.getIdManager().getDomainAuthorityNode());
-				ICommCallback callback = new CSSDirectoryCallback(client, method);
-				try {
-		    		ccm.register(ELEMENT_NAMES, callback);
-					ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
-					Log.d(LOG_TAG, "Send stanza");
-				} catch (Exception e) {
-					Log.e(this.getClass().getName(), "Error when sending message stanza", e);
-		        } 
-			} catch (InvalidFormatException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			return results;
+				Stanza stanza = new Stanza(ccm.getIdManager().getDomainAuthorityNode());
+				ICommCallback callback = new CSSDirectoryCallback(client, IAndroidCssDirectory.FIND_FOR_ALL_CSS);
+				ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
+				Log.d(LOG_TAG, "Send stanza"); 
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+        } else {
+        	//NOT CONNECTED TO COMMS SERVICE
+        	broadcastServiceNotStarted(client, ICisDirectory.FIND_ALL_CIS);
 		}
-
-		@Override
-		protected void onPostExecute(String results []) {
-			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
-	    }
+		return null;
 	}
 
 	/**
@@ -225,21 +283,8 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 
 				LocalCssDirectoryService.this.sendBroadcast(intent);
 				Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveResult sent return value: " + retValue);
-//				LocalCssDirectoryService.this.ccm.unregister(LocalCssDirectoryService.ELEMENT_NAMES, this);
 			}
 		}
 	}
 	
-	private void bindToAndroidComms() {
-		this.ccm.bindCommsService(new IMethodCallback() {
-			
-			@Override
-			public void returnAction(String result) {
-			}
-			
-			@Override
-			public void returnAction(boolean resultFlag) {
-			}
-		});
-	}
 }

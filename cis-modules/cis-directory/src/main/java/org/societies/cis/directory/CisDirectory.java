@@ -337,6 +337,9 @@ public class CisDirectory implements ICisDirectory {
 	
 	@Override
 	public Future<List<CisAdvertisementRecord>> searchByID(String cisID) {
+		//TODO: We really want to deprecate this call and always use the searchByIDs 
+		// but since andoid also using, leaving it for now ...
+		
 		//filter by id, search directory and return CISs that match the relevant cis id 
 		// should only be one, but easier to return a list of one as that is
 		// what all other searches will return a list
@@ -374,6 +377,62 @@ public class CisDirectory implements ICisDirectory {
 					record.setMembershipCrit(memberCrit); 
 
 					returnList.add(record);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return new AsyncResult<List<CisAdvertisementRecord>>(returnList);
+	}
+	
+	
+ 
+	@Override
+	public Future<List<CisAdvertisementRecord>> searchByIDS(List<String> cisIDs) {
+		//filter by id, search directory and return CISs that match the relevant cis id 
+		// should only be one, but easier to return a list of one as that is
+		// what all other searches will return a list
+		Session session = sessionFactory.openSession();
+		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
+		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
+		CisAdvertisementRecord record = null;
+
+		try {
+			
+			if (cisIDs.size() > 0) // not use searching if we have an empty list!
+			{
+				tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class).
+					add(Restrictions.in("id",cisIDs)).list();
+			
+				if ((tmpAdvertList != null) && (tmpAdvertList.size() > 0))
+				{
+					for (CisAdvertisementRecordEntry entry : tmpAdvertList) 
+					{
+						record = new CisAdvertisementRecord();
+						record.setName(entry.getName());
+						record.setId(entry.getId());
+						record.setCssownerid(entry.getCssOwnerId());
+						record.setPassword(entry.getpassword());
+						record.setType(entry.gettype()); 
+						//	MEMBERSHIP CRITERIA
+						MembershipCrit memberCrit = new MembershipCrit();
+						for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+							Criteria crit = new Criteria();
+							crit.setAttrib(critRecord.getAttrib());
+							crit.setOperator(critRecord.getOperator());
+							crit.setRank(critRecord.getRank());
+							crit.setValue1(critRecord.getValue1());
+							crit.setValue2(critRecord.getValue2());
+							memberCrit.getCriteria().add(crit);
+						}
+						record.setMembershipCrit(memberCrit); 
+
+						returnList.add(record);
+					}
 				}
 			}
 		} catch (Exception e) {
