@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
  * @date 5 déc. 2011
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getName());
 
 	ICommManager commManager;
 	ICtxBroker ctxBroker;
