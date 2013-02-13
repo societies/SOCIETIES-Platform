@@ -62,7 +62,7 @@ import static org.mockito.Mockito.stub;
  * @author bjornmagnus adopted from solutanet
  * 
  */
-@ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml" })
+@ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml"})
 public class ActivityFeedTest extends
 AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
