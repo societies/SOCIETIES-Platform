@@ -16,10 +16,10 @@ import javax.faces.bean.SessionScoped;
 @SessionScoped // indicates the lifetime of this object
 public class LoginController extends BasePageController {
 
-    @Autowired
+//    @Autowired
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
-    @Autowired
+//    @Autowired
     @ManagedProperty(value = "#{openfireLoginService}")
     private OpenfireLoginService openfireLoginService;
 
@@ -109,6 +109,11 @@ public class LoginController extends BasePageController {
     public boolean isLoggedIn() {
 //        log.trace("isLoggedIn()=" + loggedIn);
 //        return loggedIn;
+        if (userService == null) {
+            log.error("userService is null - cannot determine login state");
+            return false;
+        }
+
         return userService.isUserLoggedIn();
     }
 

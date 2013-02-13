@@ -39,6 +39,7 @@
     <mvc:annotation-driven/>
 
     <!-- a HTTP Session-scoped bean exposed as a proxy -->
+<!--
     <bean id="userService" class="org.societies.webapp.service.UserService" scope="session">
         <aop:scoped-proxy/>
     </bean>
@@ -46,9 +47,11 @@
     <bean id="openfireLoginService" class="org.societies.webapp.service.OpenfireLoginService">
 
     </bean>
+-->
 
     <!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
     <ctx:component-scan base-package="org.societies.webapp.controller"/>
+    <ctx:component-scan base-package="org.societies.webapp.service"/>
 
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

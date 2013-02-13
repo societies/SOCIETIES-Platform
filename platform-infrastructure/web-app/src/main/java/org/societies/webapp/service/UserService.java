@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -15,11 +19,14 @@ import java.util.Map;
  */
 @Service
 @Scope("Session")
-public class UserService {
+@SessionScoped // JSF
+@ManagedBean // JSF
+public class UserService implements Serializable {
 
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
+    @ManagedProperty(value = "#{commMngrRef}")
     private ICommManager commMngrRef;
 
     private boolean userLoggedIn;
