@@ -76,10 +76,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 	private final ClientCommunicationMgr commMgr;
 	private final boolean restrictBroadcast;
 
-	public PersonalisationManagerAndroid(Context applicationContext, ClientCommunicationMgr commMgr,
+	public PersonalisationManagerAndroid(Context applicationContext,
 			boolean restrictBroadcast) {
 		this.applicationContext = applicationContext;
-		this.commMgr = commMgr;
+		this.commMgr = new ClientCommunicationMgr(applicationContext, true);
 		this.restrictBroadcast = restrictBroadcast;
 	}
 
@@ -214,7 +214,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 		} catch (org.societies.api.identity.InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (org.societies.api.comm.xmpp.exceptions.CommunicationException e) {
+		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

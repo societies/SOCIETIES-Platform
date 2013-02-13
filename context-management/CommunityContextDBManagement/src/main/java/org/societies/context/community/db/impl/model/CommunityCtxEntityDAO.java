@@ -27,32 +27,21 @@ package org.societies.context.community.db.impl.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Columns;
-import org.hibernate.annotations.Type;
-import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
  * Describe your class here...
  *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
+ * @author pkosmides
+ *
  */
 @NamedQueries({
 	@NamedQuery(
@@ -102,106 +91,47 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 @org.hibernate.annotations.Entity(
 		dynamicUpdate=true
 )
-@Table(
-		name = "org_societies_context_community_entities", 
-		uniqueConstraints = { @UniqueConstraint(columnNames = {
-				"owner_id", "type" }) }
-)
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "entity_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("CommunityCtxEntity")
-public class CommunityCtxEntityDAO extends CtxModelObjectDAO {
+public class CommunityCtxEntityDAO extends CommunityCtxEntityBaseDAO {
 	
-	private static final long serialVersionUID = 4804830819205311983L;
+	private static final long serialVersionUID = -4415679433140566711L;
 
-	/** The identifier of this entity. */
-	@Columns(columns = {
-			@Column(name = "owner_id", nullable = false, updatable = false, length = 127),
-			@Column(name = "type", nullable = false, updatable = false, length = 63),
-			@Column(name = "object_number", nullable = false, updatable = false)
-	})
-	@Type(type="org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierCompositeType")
-	private CtxEntityIdentifier ctxId;
+	CommunityCtxEntityDAO() {
+		
+		super();
+	}
 	
-	@OneToMany(
-			cascade = { CascadeType.ALL },
-			fetch = FetchType.EAGER,
-			mappedBy="entity",
-			orphanRemoval = true,
-			targetEntity = CommunityCtxAttributeDAO.class
-	)
-	private Set<CommunityCtxAttributeDAO> attributes = new HashSet<CommunityCtxAttributeDAO>();
-	
-	@Transient
-	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
-	
+	public CommunityCtxEntityDAO(CtxEntityIdentifier ctxId) {
+		
+		super(ctxId);
+	}	
+
 	@Transient
 	private Set<CtxEntityIdentifier> communities = new HashSet<CtxEntityIdentifier>();
 	
 	@Transient
 	private Set<CtxEntityIdentifier> members = new HashSet<CtxEntityIdentifier>();
 
-	CommunityCtxEntityDAO() {
-		
-		super(null);
-	}
-	
-	public CommunityCtxEntityDAO(CtxEntityIdentifier ctxId) {
-		
-		super(ctxId.toString());
-		this.ctxId = ctxId;
-	}
-	
-	/*
-	 * @see org.societies.context.user.db.impl.model.CtxModelObjectDAO#getId()
-	 */
-	@Override
-	public CtxEntityIdentifier getId() {
-		
-		return this.ctxId;
-	}
-	
-	public Set<CommunityCtxAttributeDAO> getAttributes() {
-		
-		return this.attributes;
-	}
-	
-	public void addAttribute(CommunityCtxAttributeDAO attribute) {
-		
-		if (!this.attributes.contains(attribute))
-			this.attributes.add(attribute);
-		
-		if (!this.equals(attribute.getEntity()))
-			attribute.setEntity(this);
-	}
-	
-	public Set<CtxAssociationIdentifier> getAssociations() {
-		
-		return this.associations;
-	}
-	
-	public void setAssociations(Set<CtxAssociationIdentifier> associations) {
-		
-		this.associations = associations;
-	}
-	
+
 	public Set<CtxEntityIdentifier> getCommunities() {
-		
+	
 		return this.communities;
 	}
-	
+
 	public void setCommunities(Set<CtxEntityIdentifier> communities) {
-		
+	
 		this.communities = communities;
 	}
-	
+
 	public Set<CtxEntityIdentifier> getMembers() {
-		
+	
 		return this.members;
 	}
-	
+
 	public void setMembers(Set<CtxEntityIdentifier> members) {
-		
+	
 		this.members = members;
 	}
+
 }

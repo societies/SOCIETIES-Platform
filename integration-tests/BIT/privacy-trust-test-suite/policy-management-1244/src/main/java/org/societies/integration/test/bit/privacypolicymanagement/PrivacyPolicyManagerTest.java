@@ -81,7 +81,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyPolicyManagerTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getName());
 
 	public static Integer testCaseNumber = 0;
 
@@ -126,10 +126,10 @@ public class PrivacyPolicyManagerTest {
 			privacyPolicy = TestCase1244.privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getLocalizedMessage()+" "+e.getMessage());
+			fail("Privacy error: "+e.getMessage());
 		} catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getLocalizedMessage()+" "+e.getMessage());
+			fail("Error: "+e.getMessage());
 		}
 		
 		//Modified by rafik

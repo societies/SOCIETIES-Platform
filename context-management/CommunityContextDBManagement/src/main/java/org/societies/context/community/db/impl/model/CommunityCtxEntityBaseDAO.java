@@ -24,45 +24,159 @@
  */
 package org.societies.context.community.db.impl.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
  * Describe your class here...
  *
- * @author pkosmides
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.5
  */
 @NamedQueries({
 	@NamedQuery(
-			name = "getCtxEntityIdByOwnerId",
+			name = "getCommunityCtxEntityBaseIdByOwnerId",
 			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.owner_id = :ownerId"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByType",
+			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.type = :type"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByAttrType",
+			query = "select distinct entity.ctxId from CommunityCtxEntityBaseDAO as entity inner join entity.attributes as attribute " +
+					"where entity.ctxId.type = :entType " +
+					"and attribute.ctxId.type = :attrType"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByAttrStringValue",
+			query = "select distinct entity.ctxId from CommunityCtxEntityBaseDAO as entity inner join entity.attributes as attribute " +
+					"where entity.ctxId.type = :entType " +
+					"and attribute.ctxId.type = :attrType " +
+					"and attribute.stringValue between :minAttribValue and :maxAttribValue"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByAttrIntegerValue",
+			query = "select distinct entity.ctxId from CommunityCtxEntityBaseDAO as entity inner join entity.attributes as attribute " +
+					"where entity.ctxId.type = :entType " +
+					"and attribute.ctxId.type = :attrType " +
+					"and attribute.integerValue between :minAttribValue and :maxAttribValue"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByAttrDoubleValue",
+			query = "select distinct entity.ctxId from CommunityCtxEntityBaseDAO as entity inner join entity.attributes as attribute " +
+					"where entity.ctxId.type = :entType " +
+					"and attribute.ctxId.type = :attrType " +
+					"and attribute.doubleValue between :minAttribValue and :maxAttribValue"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdsByAttrBinaryValue",
+			query = "select distinct entity.ctxId from CommunityCtxEntityBaseDAO as entity inner join entity.attributes as attribute " +
+					"where entity.ctxId.type = :entType " +
+					"and attribute.ctxId.type = :attrType " +
+					"and attribute.binaryValue = :minAttribValue"
 	)
 })
 @Entity
 @org.hibernate.annotations.Entity(
 		dynamicUpdate=true
 )
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
+@Table(
+		name = "org_societies_context_community_entities", 
+		uniqueConstraints = { @UniqueConstraint(columnNames = {
+				"owner_id", "type" }) }
+)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "entity_type", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("CtxEntity")
-public class CommunityCtxEntityBaseDAO extends CommunityCtxEntityDAO {
+public class CommunityCtxEntityBaseDAO extends CtxModelObjectDAO {
 	
-	private static final long serialVersionUID = -4415679433140566711L;
+	private static final long serialVersionUID = 4804830819205311983L;
 
+	/** The identifier of this entity. */
+	@Columns(columns = {
+			@Column(name = "owner_id", nullable = false, updatable = false, length = 127),
+			@Column(name = "type", nullable = false, updatable = false, length = 63),
+			@Column(name = "object_number", nullable = false, updatable = false)
+	})
+	@Type(type="org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierCompositeType")
+	private CtxEntityIdentifier ctxId;
+	
+	@OneToMany(
+			cascade = { CascadeType.ALL },
+			fetch = FetchType.EAGER,
+			mappedBy="entity",
+			orphanRemoval = true,
+			targetEntity = CommunityCtxAttributeDAO.class
+	)
+	private Set<CommunityCtxAttributeDAO> attributes = new HashSet<CommunityCtxAttributeDAO>();
+	
+	@Transient
+	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
+	
 	CommunityCtxEntityBaseDAO() {
 		
-		super();
+		super(null);
 	}
 	
 	public CommunityCtxEntityBaseDAO(CtxEntityIdentifier ctxId) {
 		
-		super(ctxId);
-	}	
-
+		super(ctxId.toString());
+		this.ctxId = ctxId;
+	}
+	
+	/*
+	 * @see org.societies.context.user.db.impl.model.CtxModelObjectDAO#getId()
+	 */
+	@Override
+	public CtxEntityIdentifier getId() {
+		
+		return this.ctxId;
+	}
+	
+	public Set<CommunityCtxAttributeDAO> getAttributes() {
+		
+		return this.attributes;
+	}
+	
+	public void addAttribute(CommunityCtxAttributeDAO attribute) {
+		
+		if (!this.attributes.contains(attribute))
+			this.attributes.add(attribute);
+		
+		if (!this.equals(attribute.getEntity()))
+			attribute.setEntity(this);
+	}
+	
+	public Set<CtxAssociationIdentifier> getAssociations() {
+		
+		return this.associations;
+	}
+	
+	public void setAssociations(Set<CtxAssociationIdentifier> associations) {
+		
+		this.associations = associations;
+	}
+	
 }
