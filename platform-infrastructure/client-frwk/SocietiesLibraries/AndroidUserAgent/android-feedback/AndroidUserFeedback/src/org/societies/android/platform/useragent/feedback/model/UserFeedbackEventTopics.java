@@ -23,41 +23,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.useragent.feedback;
+package org.societies.android.platform.useragent.feedback.model;
 
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.api.utilities.RemoteServiceHandler;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+public final class UserFeedbackEventTopics {
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-import android.os.Messenger;
-import android.util.Log;
+	private static final String BASE_TOPIC = "org/societies/useragent/feedback/event/"; 
 
-public class AndroidUserFeedbackRemote extends Service{
+	/** UserFeedback request event */
+	public static final String REQUEST = BASE_TOPIC + "REQUEST";
 
-	private static final String LOG_TAG = AndroidUserFeedbackRemote.class.getName();
-	private Messenger inMessenger;
+	/** UserFeedback explicit response event */
+	public static final String EXPLICIT_RESPONSE = BASE_TOPIC + "EXPLICIT_RESPONSE";
 	
-	@Override
-	public void onCreate () {
-		Log.d(LOG_TAG, "AndroidUserFeedbackRemote service starting...");
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
-		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
-		AndroidUserFeedbackBase ufBase = new AndroidUserFeedbackBase(this.getApplicationContext(), ccm, pubsubClient, false);
-		this.inMessenger = new Messenger(new RemoteServiceHandler(ufBase.getClass(), ufBase, IAndroidUserFeedback.methodsArray));
-	}
-	
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "AndroidUserFeedbackRemote service terminating...");
-	}
-	
-	@Override
-	public IBinder onBind(Intent intent) {
-		Log.d(LOG_TAG, "AndroidUserFeedbackRemote onBind...");
-		return inMessenger.getBinder();
-	}
-
+	/** UserFeedback implicit response event */
+	public static final String IMPLICIT_RESPONSE = BASE_TOPIC + "IMPLICIT_RESPONSE";
 }
