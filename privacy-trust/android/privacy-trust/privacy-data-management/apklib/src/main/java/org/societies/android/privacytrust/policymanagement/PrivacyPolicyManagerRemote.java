@@ -74,12 +74,14 @@ public class PrivacyPolicyManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyPolicyIntentSender intentSender;
-	private boolean connectedToComms = false;
+	private boolean remoteReady;
 
+	
 	public PrivacyPolicyManagerRemote(Context context)  {
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyPolicyIntentSender(context);
+		remoteReady = false;
 	}
 
 
@@ -190,10 +192,11 @@ public class PrivacyPolicyManagerRemote {
 		return true;
 	}
 
-
+	
+	// -- Comms
 
 	public void bindToComms() {
-		if (!connectedToComms) {
+		if (!remoteReady) {
 			//NOT CONNECTED TO COMMS SERVICE YET
 			Log.d(TAG, "PrivacyPolicyManagerRemote startService binding to comms");
 			this.clientCommManager.bindCommsService(new IMethodCallback() {	
@@ -201,7 +204,7 @@ public class PrivacyPolicyManagerRemote {
 				public void returnAction(boolean resultFlag) {
 					Log.d(TAG, "Connected to comms: " + resultFlag);
 					if (resultFlag) {
-						connectedToComms = true;
+						remoteReady = true;
 						//REGISTER NAMESPACES
 						clientCommManager.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
 							@Override
@@ -235,14 +238,14 @@ public class PrivacyPolicyManagerRemote {
 	}
 
 	public void unbindFromComms() {
-		if (connectedToComms) {
+		if (remoteReady) {
 			//UNREGISTER AND DISCONNECT FROM COMMS
 			Log.d(TAG, "PrivacyPolicyManagerRemote stopService unregistering namespaces");
 			clientCommManager.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
 				@Override
 				public void returnAction(boolean resultFlag) {
 					Log.d(TAG, "Unregistered namespaces: " + resultFlag);
-					connectedToComms = false;
+					remoteReady = false;
 
 					clientCommManager.unbindCommsService();
 					//SEND INTENT WITH SERVICE STOPPED STATUS
@@ -261,17 +264,23 @@ public class PrivacyPolicyManagerRemote {
 		}
 	}
 
+	/**
+	 * To know if the remote access is ready or not
+	 * @return True when ready, false otherwize. In the latter case, @see{bindToComms} have to be called.
+	 */
 	public boolean isRemoteReady() {
-		return connectedToComms;
+		return remoteReady;
 	}
 
 	/**
-	 * Check that this component is bound to the Societies 
+	 * Check that this component is bound to the Societies
+	 * @param clientPackage Client package name
+	 * @param action Action requested
 	 * @return True if the process can continue, False otherwise
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			intentSender.sendIntentError(clientPackage, action, IServiceManager.INTENT_NOTSTARTED_EXCEPTION);
+			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
 			return false;
 		}
 		return true;

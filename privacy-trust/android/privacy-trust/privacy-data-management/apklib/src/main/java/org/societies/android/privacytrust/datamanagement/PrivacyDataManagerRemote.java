@@ -74,14 +74,19 @@ public class PrivacyDataManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyDataIntentSender intentSender;
-	private boolean connectedToComms = false;
+	private boolean remoteReady;
+	
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyDataIntentSender(context);
+		remoteReady = false;
 	}
 
+	
+	// -- Access control
+	
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
@@ -112,6 +117,7 @@ public class PrivacyDataManagerRemote {
 	}
 
 	// -- Obfuscation
+	
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		try {
@@ -145,10 +151,10 @@ public class PrivacyDataManagerRemote {
 		return dataWrapper.getDataId();
 	}
 
-
+	// -- Comms
 
 	public void bindToComms() {
-		if (!connectedToComms) {
+		if (!remoteReady) {
 			//NOT CONNECTED TO COMMS SERVICE YET
 			Log.d(TAG, "PrivacyDataManagerRemote startService binding to comms");
 			this.clientCommManager.bindCommsService(new IMethodCallback() {	
@@ -156,7 +162,7 @@ public class PrivacyDataManagerRemote {
 				public void returnAction(boolean resultFlag) {
 					Log.d(TAG, "Connected to comms: " + resultFlag);
 					if (resultFlag) {
-						connectedToComms = true;
+						remoteReady = true;
 						//REGISTER NAMESPACES
 						clientCommManager.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
 							@Override
@@ -188,14 +194,14 @@ public class PrivacyDataManagerRemote {
 	}
 
 	public void unbindFromComms() {
-		if (connectedToComms) {
+		if (remoteReady) {
 			//UNREGISTER AND DISCONNECT FROM COMMS
 			Log.d(TAG, "PrivacyDataManagerRemote stopService unregistering namespaces");
 			clientCommManager.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
 				@Override
 				public void returnAction(boolean resultFlag) {
 					Log.d(TAG, "Unregistered namespaces: " + resultFlag);
-					connectedToComms = false;
+					remoteReady = false;
 
 					clientCommManager.unbindCommsService();
 					//SEND INTENT WITH SERVICE STOPPED STATUS
@@ -214,20 +220,25 @@ public class PrivacyDataManagerRemote {
 		}
 	}
 
+	/**
+	 * To know if the remote access is ready or not
+	 * @return True when ready, false otherwize. In the latter case, @see{bindToComms} have to be called.
+	 */
 	public boolean isRemoteReady() {
-		return connectedToComms;
+		return remoteReady;
 	}
 
 	/**
-	 * Check that this component is bound to the Societies 
+	 * Check that this component is bound to the Societies
+	 * @param clientPackage Client package name
+	 * @param action Action requested
 	 * @return True if the process can continue, False otherwise
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			intentSender.sendIntentError(clientPackage, action, IServiceManager.INTENT_NOTSTARTED_EXCEPTION);
+			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
 			return false;
 		}
 		return true;
 	}
-
 }

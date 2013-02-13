@@ -47,19 +47,21 @@ public class PrivacyPolicyManagerLocalService extends Service {
 
 	@Override
 	public void onCreate() {
+		super.onCreate();
 		this.binder = new LocalBinder();
 		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).startService()) {
 			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
 		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).stopService()) {
 			Log.e(TAG, "Ouch, can't stop this service (i.e. can't unbind it to the SocietiesCommsApp)");
 		}
 	}
-	
+
 
 	/* ****************************
 	 * Android Service Management *

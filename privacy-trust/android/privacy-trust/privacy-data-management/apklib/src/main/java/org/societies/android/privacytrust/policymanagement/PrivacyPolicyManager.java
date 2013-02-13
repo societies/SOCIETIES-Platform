@@ -55,7 +55,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceMana
 		this.context = context;
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 		intentSender = new PrivacyPolicyIntentSender(context);
-		startService(); // stub until I find a solution
 	}
 	
 	
@@ -278,12 +277,13 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceMana
 		}
 	}
 	
-
+	@Override
 	public boolean startService() {
 		privacyPolicyManagerRemote.bindToComms();
 		return true;
 	}
 	
+	@Override
 	public boolean stopService() {
 		privacyPolicyManagerRemote.unbindFromComms();
 		return true;

@@ -69,13 +69,14 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 
 	public PrivacyDataManager(Context context)  {
 		this.context = context;
+		// Init tools
 		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 		privacyDataManagerRemote = new PrivacyDataManagerRemote(context);
 		intentSender = new PrivacyDataIntentSender(context);
-		startService(); // stub until I find a solution
 	}
 
 
+	@Override
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
@@ -161,6 +162,7 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 		}
 	}
 
+	@Override
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
@@ -289,6 +291,7 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 		}
 	}
 
+	@Override
 	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		//		if (null == requestor) {
@@ -305,6 +308,18 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 		//		}
 
 		//		return dataWrapper.getDataId();
+	}
+	
+	@Override
+	public boolean startService() {
+		privacyDataManagerRemote.bindToComms();
+		return true;
+	}
+	
+	@Override
+	public boolean stopService() {
+		privacyDataManagerRemote.unbindFromComms();
+		return true;
 	}
 
 
@@ -342,15 +357,5 @@ public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager 
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");
 		}
 		return obfuscator;
-	}
-	
-	public boolean startService() {
-		privacyDataManagerRemote.bindToComms();
-		return true;
-	}
-	
-	public boolean stopService() {
-		privacyDataManagerRemote.unbindFromComms();
-		return true;
 	}
 }

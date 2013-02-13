@@ -29,6 +29,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import org.societies.android.api.css.manager.IServiceManager;
+
 /**
  * @author Olivier Maridat (Trialog)
  *
@@ -58,5 +60,12 @@ public abstract class PrivacyIntentSender {
 			intent.putExtra(returnStatusMsgKey, ackMessage);
 		}
 		return intent;
+	}
+	
+	public boolean sendIntentErrorServiceNotStarted(String clientPackage, String action) {
+		Intent intent = prepareIntent(clientPackage, action, false, "Service not started yet.");
+		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+		context.sendBroadcast(intent);
+		return true;
 	}
 }
