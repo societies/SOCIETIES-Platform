@@ -65,23 +65,24 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ICtxBroker {
 
 	/**
-	 * Creates a {@link CtxEntity} with the specified type on the identified CSS.
+	 * Creates a {@link CtxEntity} with the specified type on the identified
+	 * CSS or CIS.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to create the context entity.
-	 * @param targetCss
-	 *            the {@link IIdentity} of the CSS where the context
-	 *            association will be created
+	 * @param targetId
+	 *            the {@link IIdentity} of the CSS or CIS where the context
+	 *            entity will be created
 	 * @param type
 	 *            the type of the context entity to create
 	 * @throws CtxException 
 	 */
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
-			final IIdentity targetCss, final String type) throws CtxException;
+			final IIdentity targetId, final String type) throws CtxException;
 	
 	/**
-	 * Creates a {@link CtxAttribute} with the specified type which is associated to
-	 * the identified context entity (scope).
+	 * Creates a {@link CtxAttribute} with the specified type which is
+	 * associated to the identified context entity (scope).
 	 * 
 	 * @param requestor
 	 *            the entity requesting to create the context attribute
@@ -92,23 +93,25 @@ public interface ICtxBroker {
 	 *            the type of the context attribute to create
 	 * @throws CtxException 
 	 */
-	public Future<CtxAttribute> createAttribute(final Requestor requestor, final CtxEntityIdentifier scope, final String type) throws CtxException;
+	public Future<CtxAttribute> createAttribute(final Requestor requestor,
+			final CtxEntityIdentifier scope, final String type)
+					throws CtxException;
 
 	/**
-	 * Creates a {@link CtxAssociation} with the specified type on the identified
-	 * CSS.
+	 * Creates a {@link CtxAssociation} with the specified type on the
+	 * identified CSS or CIS.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to create the context association
-	 * @param targetCss
-	 *            the {@link IIdentity} of the CSS where the context
+	 * @param targetId
+	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            association will be created
 	 * @param type
 	 *            the type of the context association to create
 	 * @throws CtxException 
 	 */
 	public Future<CtxAssociation> createAssociation(final Requestor requestor, 
-			final IIdentity targetCss, final String type) throws CtxException;
+			final IIdentity targetId, final String type) throws CtxException;
 	
 	/**
 	 * There are several methods missing that would express the similarity of context
