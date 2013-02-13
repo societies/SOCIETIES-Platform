@@ -27,6 +27,7 @@ package org.societies.platform.activityfeed;
 
 import org.hibernate.SessionFactory;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +36,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.activity.ActivityFeedManager;
+import org.societies.activity.PersistedActivityFeed;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -45,6 +51,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -57,6 +66,7 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedManagerTest-context.xml"})
 public class ActivityFeedManagerTest {
+    public static final String FEED_ID = "myTestGetNewActivityFeedFeed";
     private static Logger LOG = LoggerFactory
             .getLogger(ActivityFeedManagerTest.class);
     //@Autowired
@@ -66,23 +76,35 @@ public class ActivityFeedManagerTest {
     @Autowired
     private SessionFactory sessionFactory;
     private ICISCommunicationMgrFactory mockCcmFactory;
-    private ICommManager mockCSSendpoint = mock(ICommManager.class);
-    private IIdentityManager mockIdentityManager;
-    private IIdentity mockIdentity;
-    private String mockJid = "mockJid";
+    private static ICommManager mockCSSendpoint = mock(ICommManager.class);
+    private static IIdentityManager mockIdentityManager = mock(IIdentityManager.class);
+    private static IIdentity mockIdentity = mock(IIdentity.class);
+    private static String mockJid = "mockJid";
+    private static PubsubClient mockPubsubClient = mock(PubsubClient.class);
+    private static List<String> mockDicoItems = new ArrayList<String>();
 
     @BeforeClass
-    public void setupBeforeClass() throws InvalidFormatException {
-
+    public static void setupBeforeClass() throws InvalidFormatException, CommunicationException, XMPPError {
+        mockDicoItems.add(FEED_ID);
         when(mockCSSendpoint.getIdManager()).thenReturn(mockIdentityManager);
         when(mockIdentityManager.fromJid(mockJid)).thenReturn(mockIdentity);
-        activityFeedManagerUnderTest.setCommManager(mockIdentity);
+        when(mockPubsubClient.discoItems(mockIdentity,FEED_ID)).thenReturn(mockDicoItems);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
 
     }
+
+    @Before
+    public void beforeTest(){
+        activityFeedManagerUnderTest = new ActivityFeedManager();
+        activityFeedManagerUnderTest.setCommManager(mockCSSendpoint);
+        LOG.info("setting sessionManager: "+this.sessionFactory);
+        activityFeedManagerUnderTest.setSessionFactory(this.sessionFactory);
+        activityFeedManagerUnderTest.setPubSubClient(this.mockPubsubClient);
+    }
+
     public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
@@ -92,33 +114,44 @@ public class ActivityFeedManagerTest {
     }
 
     @Test
-    public void testConstructor(){
-        activityFeedManagerUnderTest = new ActivityFeedManager();
-        this.setMockingOn();
-    }
-    @Test
     public void testGetNewActivityFeed(){
-
+        IActivityFeed feed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
+        assert (((PersistedActivityFeed)feed).getOwner().contentEquals(this.mockJid));
     }
     @Test
     public void testGetOldActivityFeed(){
-
+        IActivityFeed oldFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
+        IActivityFeed checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
+        String oldOwner = ((PersistedActivityFeed)oldFeed).getOwner();
+        String checkOwner = ((PersistedActivityFeed)checkFeed).getOwner();
+        assert (oldOwner.contentEquals(checkOwner));
     }
     @Test
     public void testGetNotMyOwnActivityFeed(){
-
+        activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid+"something",FEED_ID);
+        IActivityFeed checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid, FEED_ID);
+        assert (checkFeed == null);
     }
     @Test
     public void testDeleteOwnActivityFeed(){
-
+        IActivityFeed checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
+        int checkHash = checkFeed.hashCode();
+        boolean ret = activityFeedManagerUnderTest.deleteFeed(this.mockJid,FEED_ID);
+        assert (ret);
+        checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID); //this should create a NEW object containing the same data..
+        assert (checkHash!=checkFeed.hashCode());
     }
     @Test
     public void testDeleteNotMyOwnActivityFeed(){
-
+        IActivityFeed checkFeed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID);
+        int checkHash = checkFeed.hashCode();
+        boolean ret = activityFeedManagerUnderTest.deleteFeed(this.mockJid+"something",FEED_ID);
+        assert (!ret);
     }
     @Test
     public void testDeleteNonExistentActivityFeed(){
-
+        boolean ret = activityFeedManagerUnderTest.deleteFeed(this.mockJid,FEED_ID);
+        assert (!ret);
     }
     public ICommManager getMockCSSendpoint() {
         return mockCSSendpoint;

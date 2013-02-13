@@ -27,6 +27,7 @@ package org.societies.activity;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,24 +49,35 @@ import java.util.List;
  * Time: 16:06
  */
 public class ActivityFeedManager implements IActivityFeedManager {
+    //read from DB or created in constructor.
     private List<IActivityFeed> feeds;
-    private SessionFactory sessionFactory;
+    //logger
     private static Logger LOG = LoggerFactory
             .getLogger(ActivityFeedManager.class);
+
+    //these are fetched from spring context..
+    private SessionFactory sessionFactory;
     private PubsubClient pubSubClient;
     private ICommManager commManager;
 
+    public ActivityFeedManager(){
+        feeds = new ArrayList<IActivityFeed>();
+    }
     @Override
     public IActivityFeed getOrCreateFeed(String owner, String feedId) {
-
+        LOG.info("In getOrCreateFeed .. ");
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)feed).getOwner().contentEquals(owner))
+                if(!((ActivityFeed)feed).getOwner().contentEquals(owner)) {
+                    LOG.info("right feedid but wrong owner");
                     return null;
+                }
+                LOG.info("right feedid and owner");
                 ((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
                 return feed;
             }
         }
+        LOG.info("did not find feedid creating new..");
         IIdentity identity = null;
         try {
             identity = commManager.getIdManager().fromJid(owner);
@@ -73,9 +86,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
         }
         //not existing, making a new one..
         PersistedActivityFeed ret = new PersistedActivityFeed();
+        ret.setId(feedId);
+        ret.setOwner(owner);
         ret.setPubSubcli(this.pubSubClient);
-        ret.startUp(this.sessionFactory,owner);
+        ret.startUp(this.sessionFactory, owner);
         ret.connectPubSub(identity);
+
         feeds.add(ret);
         return ret;
     }
@@ -88,8 +104,8 @@ public class ActivityFeedManager implements IActivityFeedManager {
             if(((ActivityFeed)cur).getId().contentEquals(feedId)) {
                 if(!((ActivityFeed)cur).getOwner().contentEquals(owner))
                     return false;
-
-                return feeds.remove(it);
+                removeRecord(cur);
+                return feeds.remove(cur);
             }
         }
 /*        for(IActivityFeed feed : feeds){
@@ -102,17 +118,38 @@ public class ActivityFeedManager implements IActivityFeedManager {
         }*/
         return false;
     }
+    private boolean removeRecord(IActivityFeed feed){
+        PersistedActivityFeed deleted = (PersistedActivityFeed)feed;
+        Session session = null;
+        Transaction t = null;
+        try{
+            session = sessionFactory.openSession();
+            t = session.beginTransaction();
+            session.delete(deleted);
+            t.commit();
+        }catch (Exception e){
+            if (t != null)
+                t.rollback();
+            e.printStackTrace();
+            LOG.error("Error when trying to delete activityfeed");
+            return false;
+        }finally {
+            if(session!=null)
+                session.close();
+        }
+        return true;
+    }
     public void init(){
         Session session = getSessionFactory().openSession();
         try{
-        feeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
-        		}catch(Exception e){
-        LOG.error("CISManager startup queries failed..");
-        e.printStackTrace();
-    }finally{
-        if(session!=null)
-            session.close();
-    }
+            feeds = session.createCriteria(PersistedActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+        }catch(Exception e){
+            LOG.error("CISManager startup queries failed..");
+            e.printStackTrace();
+        }finally{
+            if(session!=null)
+                session.close();
+        }
     }
 
     public SessionFactory getSessionFactory() {
