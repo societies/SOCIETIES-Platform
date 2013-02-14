@@ -23,47 +23,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.useragent.uam;
+package org.societies.android.platform.useragent.feedback.model;
 
-import org.societies.android.api.useragent.IAndroidUserActionMonitor;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+public final class UserFeedbackEventTopics {
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
+	private static final String BASE_TOPIC = "org/societies/useragent/feedback/event/"; 
 
-public class AndroidUserActionMonitorLocal extends Service{
+	/** UserFeedback request event */
+	public static final String REQUEST = BASE_TOPIC + "REQUEST";
 
-	private static final String LOG_TAG = AndroidUserActionMonitorLocal.class.getName();
-	private IBinder binder;
-
-	@Override
-	public void onCreate () {
-		this.binder = new LocalUAMBinder();
-		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service starting...");
-	}
-
-	@Override
-	public void onDestroy(){
-		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal service terminating...");
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		Log.d(LOG_TAG, "AndroidUserActionMonitorLocal onBind...");
-		return this.binder;
-	}
-
-	public class LocalUAMBinder extends Binder {
-		public IAndroidUserActionMonitor getService() {
-			ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext(), true);
-			AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(
-					AndroidUserActionMonitorLocal.this.getApplicationContext(),
-					false);
-			return uamBase;
-		}
-	}
+	/** UserFeedback explicit response event */
+	public static final String EXPLICIT_RESPONSE = BASE_TOPIC + "EXPLICIT_RESPONSE";
 	
+	/** UserFeedback implicit response event */
+	public static final String IMPLICIT_RESPONSE = BASE_TOPIC + "IMPLICIT_RESPONSE";
 }

@@ -51,6 +51,12 @@ public interface IAndroidSocietiesEvents {
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT = "org.societies.android.device.manager.DEVICE_DISCONNECTED";
 	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT = "org.societies.android.device.manager.EVENTING_NODE_NAME";
 	
+	
+	//UserFeedback intents
+	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT =  "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE"; 
+	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
+	final static String USER_FEEDBACK_REQUEST_INTENT = "org.societies.useragent.feedback.event.REQUEST"; 
+	final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
 	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
 	final static String societiesAndroidIntents [] = {CONTEXT_MANAGER_CREATED_INTENT,
@@ -63,7 +69,11 @@ public interface IAndroidSocietiesEvents {
 										 CSS_FRIEND_REQUEST_ACCEPTED_INTENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_INTENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT,
-										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT
+										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
+										 USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT,
+										 USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT,
+										 USER_FEEDBACK_REQUEST_INTENT,
+										 USER_FEEDBACK_SHOW_NOTIFICATION_INTENT
 										 };
 	
 	/**
@@ -86,6 +96,11 @@ public interface IAndroidSocietiesEvents {
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT = "DEVICE_DISCONNECTED";
 	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT  = "EVENTING_NODE_NAME";
 
+	//UserFeedback intents
+	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT =  "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
+	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
+	final static String USER_FEEDBACK_REQUEST_EVENT = "org/societies/useragent/feedback/event/REQUEST"; 
+	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 	
 	//N.B. Must be in same order as societiesAndroidIntents array to allow successful translation
 	final static String societiesAndroidEvents [] = {CONTEXT_MANAGER_CREATED_EVENT,
 										 CONTEXT_MANAGER_UPDATED_EVENT,
@@ -97,7 +112,11 @@ public interface IAndroidSocietiesEvents {
 										 CSS_FRIEND_REQUEST_ACCEPTED_EVENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_EVENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT,
-										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT
+										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
+										 USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT,
+										 USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT,
+										 USER_FEEDBACK_REQUEST_EVENT,
+										 USER_FEEDBACK_SHOW_NOTIFICATION_EVENT
 										 };
 
 	

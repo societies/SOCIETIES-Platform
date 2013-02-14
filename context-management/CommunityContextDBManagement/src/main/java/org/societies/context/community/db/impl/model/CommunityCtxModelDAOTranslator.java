@@ -172,10 +172,10 @@ public final class CommunityCtxModelDAOTranslator {
 
 		final CtxModelObjectDAO dao;
 		
-		if (mo instanceof CommunityCtxEntity)
-			dao = this.fromCommunityCtxEntity((CommunityCtxEntity) mo);
-		else if (mo instanceof CtxEntity)
+		if (mo instanceof CtxEntity)
 			dao = this.fromCtxEntity((CtxEntity) mo);
+		else if (mo instanceof CommunityCtxEntity)
+			dao = this.fromCommunityCtxEntity((CommunityCtxEntity) mo);
 		else if (mo instanceof CtxAttribute) 
 			dao = this.fromCtxAttribute((CtxAttribute) mo);
 		else if (mo instanceof CtxAssociation)

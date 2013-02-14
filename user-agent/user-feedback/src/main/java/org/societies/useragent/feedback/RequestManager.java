@@ -52,6 +52,12 @@ public class RequestManager {
 	}
 	
 	public void addRequest(FeedbackForm newRequest){
+		for (FeedbackForm nextRequest: requestQueue){
+			if (nextRequest.getID().equals(newRequest.getID())){
+				LOG.error("Request to add duplicate request to queue");
+				return;
+			}
+		}
 		requestQueue.add(newRequest);
 	}
 	
