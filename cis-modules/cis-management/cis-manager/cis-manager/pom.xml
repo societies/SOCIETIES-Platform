@@ -112,12 +112,12 @@
 		</dependency>
 		
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>activityfeedservice</artifactId>
 			<version>${version.cis}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>-->
 		
 		<dependency>
 			<groupId>javax.transaction</groupId>
