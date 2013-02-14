@@ -78,7 +78,6 @@ import org.societies.context.community.db.impl.CommunityCtxDBMgr;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
-
 /**
  * Describe your class here...
  *
@@ -86,7 +85,6 @@ import org.societies.context.userHistory.impl.UserContextHistoryManagement;
  *
  *
  */
-
 public class InternalCtxBrokerTest {
 
 	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
@@ -94,8 +92,7 @@ public class InternalCtxBrokerTest {
 	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
 	//myFooIIdentity@societies.local
 	private static final List<String> INF_TYPES_LIST = new ArrayList<String>(); 
-	
-	
+		
 	private InternalCtxBroker internalCtxBroker;
 
 	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
@@ -106,6 +103,7 @@ public class InternalCtxBrokerTest {
 	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
 
 	private static IUserCtxInferenceMgr mockUserCtxInferenceMgr = mock(IUserCtxInferenceMgr.class);
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -856,24 +854,6 @@ public class InternalCtxBrokerTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#registerForUpdates(org.societies.api.context.model.CtxEntityIdentifier)}.
-	 */
-	@Ignore
-	@Test
-	public void testRegisterForUpdatesCtxEntityIdentifierString() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#registerForUpdates(org.societies.api.context.model.CtxAttributeIdentifier)}.
-	 */
-	@Ignore
-	@Test
-	public void testRegisterForUpdatesCtxAttributeIdentifier() {
-		fail("Not yet implemented");
-	}
-
-	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#remove(org.societies.api.context.model.CtxIdentifier)}.
 	 * @throws CtxException 
 	 * @throws ExecutionException 
@@ -1091,25 +1071,6 @@ public class InternalCtxBrokerTest {
 			e.printStackTrace();
 		}
 
-	}
-
-
-	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#unregisterForUpdates(org.societies.api.context.model.CtxAttributeIdentifier)}.
-	 */
-	@Ignore
-	@Test
-	public void testUnregisterForUpdatesCtxAttributeIdentifier() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#unregisterForUpdates(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)}.
-	 */
-	@Ignore
-	@Test
-	public void testUnregisterForUpdatesCtxEntityIdentifierString() {
-		fail("Not yet implemented");
 	}
 
 	/**

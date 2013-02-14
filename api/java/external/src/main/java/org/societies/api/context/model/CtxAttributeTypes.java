@@ -33,82 +33,116 @@ package org.societies.api.context.model;
 public class CtxAttributeTypes {
 
 	/**
+     *  The string value of this attribute type contains information about the entity (e.g. desription of a user or community)
+     *  Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      *  @since 0.0.8
      */
     public static final String ABOUT = "aboutMe";
 	 
 	/**
+     *  This attribute type is used in order to model an action performed by an entity. 
+     *  For example, a user action can be related with the manipulation of a service or a device.
+     *  Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.BINARY}
+     *    
      *  @since 0.0.8
      */
     public static final String ACTION = "action";
     
     /**
-     *  @since 0.0.8
+     *  The value of this attribute type contains information about the age of an entity. 
+     *  Possible value types: {@link CtxAttributeValueType.STRING},{@link CtxAttributeValueType.INTEGER},{@link CtxAttributeValueType.DOUBLE}  
+     *  
+     *  @since 0.0.8  
      */
     public static final String AGE = "age";
     
 	/**
+     * The string value of this attribute type contains information about the address home city of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_HOME_CITY = "addressHomeCity";
     
     /**
+     * The string value of this attribute type contains information about the address home country of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_HOME_COUNTRY = "addressHomeCountry";
 	
 	/**
+     * The string value of this attribute type contains information about the address home street name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_HOME_STREET_NAME = "addressHomeStreetName";
     
     /**
+     * The integer value of this attribute type contains information about the address home number of an entity.
+     * Possible value types: {@link CtxAttributeValueType.INTEGER}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_HOME_STREET_NUMBER = "addressHomeStreetNumber";
     
     /**
+     * The string value of this attribute type contains information about the work place city name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_WORK_CITY = "addressWorkCity";
     
     /**
+     * The string value of this attribute type contains information about the work place country name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
 	
 	/**
+     * The string value of this attribute type contains information about the work place street name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String ADDRESS_WORK_STREET_NAME = "addressWorkStreetName";
     
     /**
-     * 
+     * The integer value of this attribute type contains information about the work place street number of the owner entity of the CSS.
+     * Possible value types: {@link CtxAttributeValueType.INTEGER}
+     *   
      * @since 0.0.8
      */
     public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
 	
     /**
+     * The comma separated string values of this attribute type contains information about the affiliation of the an entity with other members of 
+     * the organisation that may belong (e.g. "professor", "student", "employee").
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.4
      */
     public static final String AFFILIATION = "affiliation";
     
     /**
+     * The string value of this attribute type contains information about the birthday of a person entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String BIRTHDAY = "birthday";
    
     /**
-     * 
+     * The comma separated string values of this attribute type contains information about the favorite books of a person. 
+     * (e.g. "LeMisserables,MobyDick,Twenty Thousand Leagues Under the Sea")
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.0.8
      */
     public static final String BOOKS = "books";
@@ -126,151 +160,241 @@ public class CtxAttributeTypes {
     public static final String CRIST_MODEL = "crist_model";
         
     /**
+     * The string value of this attribute type contains information about the email address of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String EMAIL = "email";
     
     /**
+     * The comma separated string values of this attribute type contains information about the favorite quotes of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String FAVOURITE_QUOTES = "favoriteQuotes";
         
     /**
+     * The comma separated string values of this attribute type contains information about the friend ids of an entity. 
+     * Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.BINARY}
+     * 
      * @since 0.0.8
      */
     public static final String FRIENDS = "friends";
     
 	/**
+     * The value of this attribute type contains information about the id of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.BINARY}
+     * 
      * @since 0.0.8
      */
     public static final String ID = "id";
     
     /**
+     * The comma separated string values of this attribute type contains information about the interests of an entity. 
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.0.8
      */
     public static final String INTERESTS = "interests";
 
     /**
+     * The comma separated string values of this attribute type contains information about the languages used or spoken by an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String LANGUAGES = "languages";
 
     
     /**
+     * The value of this attribute type contains information about the last action performed by an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.BINARY}
+     * 
      * @since 0.0.8
      */
     public static final String LAST_ACTION = "lastAction";
     
     /**
+     * The coordinates of the current location of an entity (e.g. "123.45,124.39").
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String LOCATION_COORDINATES = "locationCoordinates";
     
     /**
+     * The string value of this attribute type contains information about the location id of an entity.
+     * This attribute type value is set by the Presence Zones location management system.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.4
      */
     public static final String LOCATION_ID = "locationId";
     
     /**
+     * The string value of this attribute type contains information about the location parent id of an entity.
+     * This attribute type value is set by the Presence Zones location management system.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.4
      */
     public static final String LOCATION_PARENT_ID = "locationParentId";
     
     /**
+     * The string values of this attribute type contains information about the tags describing the location of an entity.
+     * This attribute type value is set by the Presence Zones location management system.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.4
      */
     public static final String LOCATION_PERSONAL_TAGS = "locationPersonalTags";
     
     /**
+     * The string values of this attribute type contains information about the tags describing the location of an entity.
+     * This attribute type value is set by the Presence Zones location management system.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.4
      */
     public static final String LOCATION_PUBLIC_TAGS = "locationPublicTags";
     
     /**
+     * The string value of this attribute type contains information about the location, described by a symbolic name, of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String LOCATION_SYMBOLIC = "locationSymbolic";
     
     /**
+     * The string value of this attribute type contains information about the location type of an entity.
+     * This attribute type value is set by the Presence Zones location management system.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.4
      */
     public static final String LOCATION_TYPE = "locationType";
         
     /**
+     * The comma separated string values of this attribute type contains information about the favorite movies of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String MOVIES = "movies";
    
     /**
+     * The comma separated string values of this attribute type contains information about the favorite music (groups,songs) of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String MUSIC = "music";
     
     /**
+     * The string value of this attribute type describes the name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String NAME = "name";
     
     /**
+     * The string value of this attribute type describes the first name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String NAME_FIRST = "nameFirst";
     
     /**
+     * The string value of this attribute type describes the last name of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
      * 
      * @since 0.0.8
      */
     public static final String NAME_LAST = "nameLast";
     
     /**
+     * The comma separated string values of this attribute type contains information about the occupation of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.0.8
      */
     public static final String OCCUPATION = "occupation";
     
     
     /**
+     * The string value of this attribute type contains information about the parameters of a service modeled as an entity (entity type: service_parameter).
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *     
      * @since 0.0.8
      */
     public static final String PARAMETER_NAME = "parameterName";
     
     /**
+     * The comma separated string values of this attribute type contains information about the political views of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.0.8
      */
     public static final String POLITICAL_VIEWS = "politicalViews";
  
     /**
-     * @since 0.0.8
+     * The comma separated string values of this attribute type contains information about the religious views of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *      
+     * @since 0.0.8 
      */
     public static final String RELIGIOUS_VIEWS = "religiouslViews";
  
     /**
+     * The string value of this attribute type contains information about the sex of an entity (e.g. male, female).
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *      
      * @since 0.0.8
      */
     public static final String SEX = "sex";
   
     /**
+     * The string value of this attribute type contains information about the status of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.0.8
      */
     public static final String STATUS = "status";
     
     /**
+     * The comma separated string values of this attribute type contains information about the skills of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
      * @since 0.0.8
      */
     public static final String SKILLS = "skills";
     
     
     /**
+     * The string value of this attribute type contains information about the temperature of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING},{@link CtxAttributeValueType.INTEGER}, {@link CtxAttributeValueType.DOUBLE}
+     * 
      * @since 0.0.8
      */
     public static final String TEMPERATURE = "temperature";
     
     /**
+     * The string value of this attribute type contains information about the type of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     * 
      * @since 0.5
      */
     public static final String TYPE = "type";
    
     /**
+     * The double value of this attribute type contains information about the weight of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.DOUBLE}
+     * 
      * @since 0.0.8
      */
     public static final String WEIGHT = "weight";
