@@ -58,6 +58,7 @@ import org.hibernate.Transaction;
 import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.client.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
@@ -72,7 +73,6 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
@@ -477,6 +477,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cisIdentity.getJid());
 
+		
 		// TODO: broadcast its creation to other nodes?
 		
 		//session = sessionFactory.openSession();
@@ -494,7 +495,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 
 		
-		activityFeed.addActivity(iActivity, new   DummyActivitiesCall())  ;
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
 		
 
 		//activityFeed.getActivities("0 1339689547000");
@@ -659,7 +660,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			iActivity.setVerb("joined");
 			
 			// TODO: perhaps, treat dummy return
-			activityFeed.addActivity(iActivity,new   DummyActivitiesCall()) ;
+			activityFeed.addActivity(iActivity,new   ActivityFeedClient()) ;
 	
 			return true;
 		}else{
@@ -748,7 +749,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			iActivity.setVerb("left");
 			
 			
-			activityFeed.addActivity(iActivity,new DummyActivitiesCall());
+			activityFeed.addActivity(iActivity,new ActivityFeedClient());
 			
 			
 
@@ -1144,11 +1145,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setTarget(c.getDeleteActivity().getMarshaledActivity().getTarget());
 				iActivity.setVerb(c.getDeleteActivity().getMarshaledActivity().getVerb());
 
-				DummyActivitiesCall d = new DummyActivitiesCall();
+				ActivityFeedClient d = new ActivityFeedClient();
 				activityFeed.deleteActivity(iActivity,d);
 				
-				if(null != d.getFeedResponse()){
-					r.setResult(d.getFeedResponse().getDeleteActivityResponse().isResult());
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getDeleteActivityResponse()){
+					r.setResult(m.getDeleteActivityResponse().isResult());
 				}else{
 					LOG.warn("no callback object after immediate call of delecte activity feed");
 					r.setResult(false);
@@ -1168,36 +1171,31 @@ public class Cis implements IFeatureServer, ICisOwned {
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				List<IActivity> iActivityList;
-				List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
+				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 				
+				
+				ActivityFeedClient d = new ActivityFeedClient();
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
-						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
+						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
 					else
-						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
+						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);										
 				//}
 				
-					LOG.debug("loacl query worked activities called");
-					this.activityFeed.iactivToMarshActvList(iActivityList, marshalledActivList);
-
-				/*	
-				Iterator<IActivity> it = iActivityList.iterator();
-				
-				while(it.hasNext()){
-					IActivity element = it.next();
-					org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
-					a.setActor(element.getActor());
-					a.setObject(a.getObject());
-					a.setPublished(a.getPublished());
-					a.setVerb(a.getVerb());
-					marshalledActivList.add(a);
-			     }
-				*/
-					LOG.info("finished the marshling");
-				r.setMarshaledActivity(marshalledActivList);
+					MarshaledActivityFeed m = d.getActivityFeed();
+					
+					if(null != m && null != m.getGetActivitiesResponse()){
+						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
+					}else{
+						LOG.warn("no callback object after immediate call of get activities");
+						// ill set an empty list
+						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
+					}
+					
+					
 				result.setGetActivitiesResponse(r);		
 				return result;
 
@@ -1214,16 +1212,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
+				IActivity iActivity = activityFeed.getEmptyIActivity();
 				iActivity.setActor(c.getAddActivity().getMarshaledActivity().getActor());
 				iActivity.setObject(c.getAddActivity().getMarshaledActivity().getObject());
 				iActivity.setTarget(c.getAddActivity().getMarshaledActivity().getTarget());
-				iActivity.setPublished(c.getAddActivity().getMarshaledActivity().getPublished());
 				iActivity.setVerb(c.getAddActivity().getMarshaledActivity().getVerb());
 
-				activityFeed.addActivity(iActivity);
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.addActivity(iActivity,d);
 				
-				r.setResult(true); //TODO. add a return on the activity feed method
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getAddActivityResponse()){
+					r.setResult(m.getAddActivityResponse().isResult());
+				}else{
+					LOG.warn("no callback object after immediate call of add activity");
+					r.setResult(false);
+				}
 				
 				
 				result.setAddActivityResponse(r);		
@@ -1244,8 +1249,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria(),d);
 				
-				r.setResult(activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria())); //TODO. add a return on the activity feed method
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getCleanUpActivityFeedResponse()){
+					r.setResult(m.getCleanUpActivityFeedResponse().getResult());
+				}else{
+					LOG.warn("no callback object after immediate call of clean up activity feed");
+					r.setResult(0);
+				}
 				
 				
 				result.setCleanUpActivityFeedResponse(r);		
@@ -1386,7 +1400,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Iterator<CisParticipant> it = s.iterator();
 
 		// deleting from DB
-		activityFeed.clear();
+		// the remove of the activityFeed will be done by the CIS MANAGER!!
 		activityFeed = null;
 		this.deletePersisted(this);
 		
@@ -1448,8 +1462,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("could not unregister CIS");
 		//TODO: possibly do something in case we cant close it
 		
-		//cisIdentity =null;
-		PubsubClient psc = null; // TODO: replace with proper way of destroying it
 
 		membersCss = null; 
 		
@@ -1730,7 +1742,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	// callback class to be used for local activity methods only
-	class DummyActivitiesCall implements IActivityFeedCallback{
+/*	class DummyActivitiesCall implements IActivityFeedCallback{
 		MarshaledActivityFeed feedResponse = null;;
 		public DummyActivitiesCall(){//IUserFeedback userFeedback){
 			super();
@@ -1744,7 +1756,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		public MarshaledActivityFeed getFeedResponse(){
 			return feedResponse;
 		}
-	};
+	};*/
 	
 	
 	// subclass for local get list callbacks

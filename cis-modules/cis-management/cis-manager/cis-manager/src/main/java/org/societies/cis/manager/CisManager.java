@@ -399,6 +399,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			cis.fillCommmunityXMPPobj(c);
 						
 			ret = cis.deleteCIS();
+			ret = iActivityFeedManager.deleteFeed(this.cisManagerId.getJid(), cisJid);
 			ret = ret && getOwnedCISs().remove(cis);
 			
 			if(ret == true && this.getEventMgr() != null){ // if it works we also send an internal event
