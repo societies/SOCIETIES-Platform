@@ -639,12 +639,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	//     Context Change Events Methods  
 	//***********************************************
 
-	@Override
-	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO remove DEPRECATED
-
-	}
-
 	/*
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.identity.IIdentity)
 	 */
