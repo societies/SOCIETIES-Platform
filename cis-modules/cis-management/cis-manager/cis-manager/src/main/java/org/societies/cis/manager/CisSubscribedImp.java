@@ -28,7 +28,6 @@ package org.societies.cis.manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.RemoteActivityFeed;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -89,7 +88,8 @@ public class CisSubscribedImp implements ICis {
 		this.cisRecord = cisRecord;
 		this.cisManag =cisManag;
 		try {
-			this.iactivityFeed = new RemoteActivityFeed(cisManag.getiCommMgr(), cisManag.getiCommMgr().getIdManager().fromJid(cisRecord.cisJID));
+			this.iactivityFeed = cisManag.getiActivityFeedManager().getRemoteActivityFeedHandler(this.cisManag.getiCommMgr(), 
+					cisManag.getiCommMgr().getIdManager().fromJid(cisRecord.getCisJID())  );
 		} catch (InvalidFormatException e) {
 			LOG.debug("Wrong format of CIS jid in cisRecord");
 			e.printStackTrace();
@@ -129,7 +129,8 @@ public class CisSubscribedImp implements ICis {
 	public void startAfterDBretrieval(CisManager cisManag){
 		this.cisManag = cisManag;
 		try {
-			this.iactivityFeed = new RemoteActivityFeed(cisManag.getiCommMgr(), cisManag.getiCommMgr().getIdManager().fromJid(this.cisRecord.cisJID));
+			this.iactivityFeed = cisManag.getiActivityFeedManager().getRemoteActivityFeedHandler(this.cisManag.getiCommMgr(), 
+					cisManag.getiCommMgr().getIdManager().fromJid(cisRecord.getCisJID())  );
 		} catch (InvalidFormatException e) {
 			LOG.debug("Wrong format of CIS jid in cisRecord");
 			e.printStackTrace();
@@ -306,7 +307,7 @@ public class CisSubscribedImp implements ICis {
 	}
 	
 	
-	public Future<IActivityFeed> getCisActivityFeed(){
+/*	public Future<IActivityFeed> getCisActivityFeed(){
 		IIdentity remoteCISid;
 		IActivityFeed i = null;
 		try {
@@ -319,7 +320,7 @@ public class CisSubscribedImp implements ICis {
 		
 		
 		return new AsyncResult<IActivityFeed>(i);
-	}
+	}*/
 
 	@Override
 	public void getMembershipCriteria(ICisManagerCallback callback) {

@@ -25,6 +25,8 @@
 
 package org.societies.api.activity;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 
 /**
@@ -33,6 +35,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
  * Date: 2/8/13
  * Time: 16:06
  */
+
 @SocietiesExternalInterface(type = SocietiesExternalInterface.SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeedManager {
     /**
@@ -42,4 +45,16 @@ public interface IActivityFeedManager {
      */
     public IActivityFeed getOrCreateFeed(String owner, String feedId);
     public boolean deleteFeed(String owner, String id);
+    
+    
+    /**
+     * 
+     * This method returns a handler to a remote activity feed
+     * 
+     * @param {@link ICommManager} iCommMgr is the commManager responsible for dispatching the messages
+     * to the remote node
+     * @param {@link IIdentity} remoteCISid is the Identity of the remote node
+     * @return {@link IActivityFeed} is the handler to the remote activity feed 
+     */
+    public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid);
 }

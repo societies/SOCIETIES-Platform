@@ -177,4 +177,11 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public void setCommManager(ICommManager commManager) {
         this.commManager = commManager;
     }
+    
+    @Override
+    public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid){
+    	return new RemoteActivityFeed(iCommMgr,remoteCISid);
+    }
+    
+
 }

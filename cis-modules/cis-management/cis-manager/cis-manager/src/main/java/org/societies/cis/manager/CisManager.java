@@ -31,14 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
-
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -46,24 +42,20 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisRemote;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -71,11 +63,9 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
-
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
-
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -83,49 +73,37 @@ import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
-
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-
-import org.springframework.scheduling.annotation.AsyncResult;
-
-
-
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.cis.community.Community;
-
-
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Qualification;
 import org.societies.api.schema.cis.community.WhoRequest;
-//import org.societies.api.schema.cis.community.Leave;
-import org.societies.api.schema.cis.community.MembershipCrit;
-
-
-//import org.societies.api.schema.cis.community.Leave;
-
-
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-
 import org.societies.api.schema.cis.manager.AskCisManagerForJoinResponse;
 import org.societies.api.schema.cis.manager.AskCisManagerForLeaveResponse;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.cis.manager.ListCrit;
-import org.societies.api.schema.cis.manager.ListResponse;
-
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
+import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.api.schema.identity.RequestorBean;
+import org.springframework.scheduling.annotation.AsyncResult;
+//import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+//import org.societies.api.schema.cis.community.Leave;
+//import org.societies.api.schema.cis.community.Leave;
 
 
 // this is the class which manages all the CIS from a CSS
@@ -158,14 +136,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private INegotiation negotiator;
 	private IPrivacyDataManager privacyDataManager;
 
-	private PubsubClient pubsubClient;
+	//private PubsubClient pubsubClient;
 	
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
 	private boolean privacyPolicyNegotiationIncluded;
-    private String iActivityFeedManager;
+    private IActivityFeedManager iActivityFeedManager;
 
-    public IUserFeedback getiUsrFeedback() {
+    
+    public IActivityFeedManager getiActivityFeedManager() {
+		return iActivityFeedManager;
+	}
+
+	public void setiActivityFeedManager(IActivityFeedManager iActivityFeedManager) {
+		this.iActivityFeedManager = iActivityFeedManager;
+	}
+
+	public IUserFeedback getiUsrFeedback() {
 		return iUsrFeedback;
 	}
 
@@ -178,7 +165,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return negotiator;
 	}
 
-	public PubsubClient getPubsubClient() {
+	/*public PubsubClient getPubsubClient() {
 		return pubsubClient;
 	}
 
@@ -195,7 +182,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e1.printStackTrace();
 			
 		}
-	}
+	}*/
 
 	public IPrivacyDataManager getPrivacyDataManager() {
 		return privacyDataManager;
@@ -273,7 +260,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, 
-					 this.pubsubClient, this.privacyDataManager);
+					 this.privacyDataManager,this.iActivityFeedManager);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -460,7 +447,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
 		this.ccmFactory, this.privacyPolicyManager,this.sessionFactory
-		,description,cisCriteria,this.pubsubClient);
+		,description,cisCriteria,this.iActivityFeedManager);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
 			return cis;
@@ -889,14 +876,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
     public void setiCommMgr(ICommManager iCommMgr) {
         this.iCommMgr = iCommMgr;
-    }
-
-    public void setiActivityFeedManager(String iActivityFeedManager) {
-        this.iActivityFeedManager = iActivityFeedManager;
-    }
-
-    public String getiActivityFeedManager() {
-        return iActivityFeedManager;
     }
 
 
@@ -1605,8 +1584,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		
 		if (level >= 1) {
-			if (null == pubsubClient) {
-				LOG.info("[Dependency Injection] Missing ICisDirectoryRemote");
+			if (null == iActivityFeedManager) {
+				LOG.info("[Dependency Injection] Missing ActivityFeedManager");
 				return false;
 			}
 			if (null == iCisDirRemote) {
