@@ -5,7 +5,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
     <h:outputStylesheet library="css" name="style.css"/>
@@ -18,6 +19,11 @@
     <!-- ToDo , move -->
     <h:outputScript library="js" name="cisajax.js"/>
 
+    <ui:fragment rendered="#{!request.requestURI.endsWith('index.xhtml') and !loginController.loggedIn}">
+        <!-- redirect to index page if not logged in -->
+        <meta http-equiv="REFRESH" content="0;url=index.xhtml"/>
+    </ui:fragment>
+
     <ui:insert name="html_head">
         <!-- Template: HTML HEAD CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
         <title>Societies</title>
@@ -25,7 +31,10 @@
 </h:head>
 
 <h:body>
-    <h:form>
+    <h:form id="mainForm">
+
+        <p:growl id="messages" showDetail="true" sticky="true" autoUpdate="true"/>
+
         <div id="wrapper" class="clearfix">
             <div id="container" class="container_12 clearfix">
                 <!-- Header -->
@@ -38,8 +47,6 @@
                     <ui:include src="../includes/menu.xhtml"/>
                     <!-- END MENU -->
                     <div class="clear"></div>
-
-                    <h:messages globalOnly="true"/>
                 </header>
 
                 <ui:insert name="body">
@@ -71,7 +78,14 @@
 
         </div>
 
+        <ui:insert name="dialogs">
+        </ui:insert>
+
     </h:form>
+
+    <ui:insert name="outside_form">
+    </ui:insert>
+
 </h:body>
 
 </html>

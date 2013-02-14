@@ -22,7 +22,7 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <!--<navigation-case>
-            <from-action>#{login.loginButtonAction}</from-action>
+            <from-action>#{loginController.loginButtonAction}</from-action>
             <from-outcome>true</from-outcome>
             <to-view-id>/index.xhtml</to-view-id>
             <redirect/>

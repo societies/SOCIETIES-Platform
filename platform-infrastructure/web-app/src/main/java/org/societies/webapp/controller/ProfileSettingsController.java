@@ -35,20 +35,23 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.societies.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import java.util.Enumeration;
 import java.util.List;
 
-@Controller // Spring
+//@Controller // Spring
 @ManagedBean(name = "profileSettings") // JSF
-@RequestScoped // JSF
-@Scope("Request") // Spring
+@SessionScoped // JSF
+//@Scope("Request") // Spring
 public class ProfileSettingsController extends BasePageController {
+
+    public static final String OUTCOME_NODE = "outcome";
+    public static final String CONDITION_NODE = "condition";
+    public static final String PREFERENCE_NODE = "preference";
 
     @Autowired
     @ManagedProperty(value = "#{userService}")
@@ -61,11 +64,16 @@ public class ProfileSettingsController extends BasePageController {
     private IUserPreferenceManagement userPreferenceManagement;
 
     private TreeNode preferencesRootNode;
+    private TreeNode selectedTreeNode;
+    private IPreferenceCondition conditionToEdit;
+    private IPreferenceOutcome outcomeToEdit;
+    private PreferenceDetails preferenceToEdit;
 
     public ProfileSettingsController() {
         log.info("ProfileSettingsController ctor");
     }
 
+    /* Spring/JSF dependency Getters and Setters */
     public UserService getUserService() {
         return userService;
     }
@@ -90,13 +98,79 @@ public class ProfileSettingsController extends BasePageController {
         this.userPreferenceManagement = userPreferenceManagement;
     }
 
+    /* Web app Getters and Setters */
     public TreeNode getPreferencesRootNode() {
+//        log.trace("getPreferencesRootNode()");
         if (preferencesRootNode == null)
             populatePreferencesRootNode();
 
         return preferencesRootNode;
     }
 
+    public void setSelectedTreeNode(TreeNode selectedTreeNode) {
+        log.trace("setSelectedTreeNode() = " + selectedTreeNode);
+        this.selectedTreeNode = selectedTreeNode;
+    }
+
+    public TreeNode getSelectedTreeNode() {
+//        log.trace("getSelectedTreeNode() = " + selectedTreeNode);
+        return selectedTreeNode;
+    }
+
+    public PreferenceDetails getPreferenceToEdit() {
+//        log.trace("getPreferenceToEdit()");
+        return preferenceToEdit;
+    }
+
+    public IPreferenceCondition getConditionToEdit() {
+//        log.trace("getConditionToEdit() = " + conditionToEdit);
+        return conditionToEdit;
+    }
+
+    public IPreferenceOutcome getOutcomeToEdit() {
+//        log.trace("getOutcomeToEdit()");
+        return outcomeToEdit;
+    }
+
+    /* Public methods */
+    public void editSelectedNode() {
+        log.trace("editSelectedNode()");
+        this.preferenceToEdit = null;
+        this.conditionToEdit = null;
+        this.outcomeToEdit = null;
+
+        if (getSelectedTreeNode() == null) {
+            super.addGlobalMessage("No node selected", "No node selected", FacesMessage.SEVERITY_WARN);
+
+        } else if (PREFERENCE_NODE.equals(getSelectedTreeNode().getType())) {
+            PreferenceDetails preferenceDetails = (PreferenceDetails) getSelectedTreeNode().getData();
+            log.debug("setting preference to edit: " + preferenceDetails);
+            this.preferenceToEdit = preferenceDetails;
+
+//            super.addGlobalMessage(preferenceDetails.getPreferenceName(), "Selected edit on preference", FacesMessage.SEVERITY_INFO);
+        } else if (CONDITION_NODE.equals(getSelectedTreeNode().getType())) {
+            IPreferenceCondition condition = (IPreferenceCondition) getSelectedTreeNode().getData();
+            log.debug("setting condition to edit: " + condition);
+            this.conditionToEdit = condition;
+
+//            super.addGlobalMessage(condition.getname(), "Selected edit on condition", FacesMessage.SEVERITY_INFO);
+        } else if (OUTCOME_NODE.equals(getSelectedTreeNode().getType())) {
+            IPreferenceOutcome outcome = (IPreferenceOutcome) getSelectedTreeNode().getData();
+            log.debug("setting outcome   to edit: " + outcome);
+            this.outcomeToEdit = outcome;
+
+//            super.addGlobalMessage(outcome.getparameterName(), "Selected edit on outcome", FacesMessage.SEVERITY_INFO);
+        } else {
+            super.addGlobalMessage("No node selected", "You've probably tried to edit the root node. Well done. You win a gold star", FacesMessage.SEVERITY_WARN);
+        }
+
+    }
+
+    public void deleteSelectedNode() {
+        log.trace("deleteSelectedNode()");
+    }
+
+    /* Private helper methods */
     private void populatePreferencesRootNode() {
         preferencesRootNode = new DefaultTreeNode("Preferences", null);
         preferencesRootNode.setExpanded(true);
@@ -126,13 +200,16 @@ public class ProfileSettingsController extends BasePageController {
             IPreferenceTreeModel preferenceTreeModel =
                     userPreferenceManagement.getModel(userService.getIdentity(), preferenceDetails);
 
-            populatePreferenceNode(preferenceTreeModel);
+            populatePreferenceNode(preferenceDetails, preferenceTreeModel);
         }
     }
 
-    private void populatePreferenceNode(IPreferenceTreeModel preferenceTreeModel) {
+    private void populatePreferenceNode(PreferenceDetails preferenceDetails, IPreferenceTreeModel preferenceTreeModel) {
 
-        TreeNode preferenceNode = new DefaultTreeNode(preferenceTreeModel.getPreferenceName(), preferencesRootNode);
+        TreeNode preferenceNode = new DefaultTreeNode(PREFERENCE_NODE,
+                preferenceDetails,
+//                preferenceTreeModel.getPreferenceName(),
+                preferencesRootNode);
         preferenceNode.setExpanded(true);
 
         IPreference preference = preferenceTreeModel.getRootPreference();
@@ -148,11 +225,15 @@ public class ProfileSettingsController extends BasePageController {
             log.error("branch node " + preference.toString() + " contains null condition");
             return;
         }
-        TreeNode conditionNode = new DefaultTreeNode(condition.getname() + " " + condition.getoperator() + " " + condition.getvalue(), preferenceNode);
+
+//        String fmt = "%s %s %s";
+        TreeNode conditionNode = new DefaultTreeNode(CONDITION_NODE,
+                condition,
+//                String.format(fmt, condition.getname() + " " + condition.getoperator() + " " + condition.getvalue()),
+                preferenceNode);
         conditionNode.setExpanded(true);
 
         processSubnodes(preference, conditionNode);
-
     }
 
     private void populateOutcomeNode(IPreference preference, TreeNode conditionNode) {
@@ -163,10 +244,10 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        String fmt = "%s = %s (q=%s, p=%s)";
-        TreeNode outcomeNode = new DefaultTreeNode(
-                String.format(fmt,
-                        outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
+//        String fmt = "%s = %s (q=%s, p=%s)";
+        TreeNode outcomeNode = new DefaultTreeNode(OUTCOME_NODE,
+                outcome,
+//                String.format(fmt, outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
                 conditionNode);
         outcomeNode.setExpanded(true);
 
@@ -180,11 +261,11 @@ public class ProfileSettingsController extends BasePageController {
             IPreference ele = e.nextElement();
             if (ele == preference) continue;
 
-            if (ele.getCondition() != null) {
+            if (ele.isBranch()) {
                 // this is a CONDITION
                 populateConditionNode(ele, node);
                 conditionsFound = true;
-            } else if (ele.getOutcome() != null) {
+            } else if (ele.isLeaf()) {
                 // this is an OUTCOME
 //                populateOutcomeNode(ele, node);
             }
@@ -196,14 +277,16 @@ public class ProfileSettingsController extends BasePageController {
                 IPreference ele = e.nextElement();
                 if (ele == preference) continue;
 
-                if (ele.getCondition() != null) {
+                if (ele.isBranch()) {
                     // this is a CONDITION
-                    populateConditionNode(ele, node);
-                } else if (ele.getOutcome() != null) {
+//                    populateConditionNode(ele, node);
+                } else if (ele.isLeaf()) {
                     // this is an OUTCOME
                     populateOutcomeNode(ele, node);
                 }
             }
         }
     }
+
+
 }

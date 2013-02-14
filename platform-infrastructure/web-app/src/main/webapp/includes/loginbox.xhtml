@@ -27,7 +27,7 @@
                                value="#{loginController.loginDialogPassword}"/>
 
                 <h:commandButton class="submit button"
-                                 action="#{loginController.loginButtonAction}">Sign in</h:commandButton>
+                                 actionListener="#{loginController.loginButtonAction()}">Sign in</h:commandButton>
 
                 <p>Don't have a login?
                     <a class="" href="new_account.xhtml">Sign Up</a>

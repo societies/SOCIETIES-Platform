@@ -514,6 +514,7 @@
                             org.primefaces.webapp,
                             org.primefaces.webapp.filter,
                             javax.faces.event,
+                            javax.faces.convert,
                             org.springframework.web.jsf.el,
                             org.springframework.osgi.config,
                             com.sun.faces.vendor,
