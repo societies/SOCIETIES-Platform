@@ -23,67 +23,77 @@
 	        <role>senior developer</role>
 	      </roles>
 	    </developer>
+				<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
 	</developers>	
 	
-	<dependencies>
+
+    <dependencies>
+	<!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
 		<dependency>
 	    	<groupId>com.google.android</groupId>
-           	<artifactId>android</artifactId> 
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		<!-- <dependency>
-	    	<groupId>org.societies.api.external</groupId>
-	    	<artifactId>societies-api</artifactId>
-	    	<version>${release.version}</version>
-		</dependency> -->
-		<!-- <dependency>
-		   <groupId>org.societies.api.internal</groupId>
-		   <artifactId>societies-api-internal</artifactId>
-        </dependency> -->
-        <!-- <dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
-		</dependency> -->
-		<dependency>
-		        <groupId>org.societies.android.api.external</groupId>
-        		<artifactId>societies-android-api</artifactId>
-        		<version>${release.version}</version>
-       			<type>apklib</type>
-		</dependency> 
-		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
+			<type>apklib</type>
 		</dependency>
+		<!--dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api-external</artifactId>
+			<version>${release.version}</version>
+		</dependency-->
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
 			<exclusions>
-				<!-- StAX is not available on Android -->
-				<exclusion>
-					<artifactId>stax</artifactId>
-			       	<groupId>stax</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>stax-api</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-			   	<!-- Provided by Android -->
-				<exclusion>
-					<artifactId>xpp3</artifactId>
-			       	<groupId>xpp3</groupId>
-				</exclusion>
+			    <!-- StAX is not available on Android -->
+			    <exclusion>
+			        <artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <!-- Provided by Android -->
+			    <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			    </exclusion>
 			</exclusions>
-			<scope>provided</scope>	
 		</dependency>
-    </dependencies>
-    
-	<build>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+    <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
@@ -93,4 +103,13 @@
             </plugin>
         </plugins>
     </build>
+
+	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>findbugs-maven-plugin</artifactId>
+	      </plugin>
+	    </plugins>
+	</reporting>
 </project>

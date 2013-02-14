@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.IndividualCtxEntity;
 
 /**
  * This is a 3p service Ifc that needs to access context through the societies platform ...
@@ -46,20 +47,22 @@ public interface IContextAware3pService {
 	
 	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId, String type);
 	
-	public CtxEntity createRemoteCtxEntity(String type);
+	public CtxEntity createRemoteCtxEntity(String targetID, String type);
 	
-	public CtxAssociation createRemoteCtxAssociation(String type);
+	public CtxAssociation createRemoteCtxAssociation(String targetID, String type);
 	
-	public List<CtxIdentifier> lookupRemoteCtxAttribute(String type);
+	public List<CtxIdentifier> lookupRemoteCtxAttribute(String targetID, String type);
 	
 	public CtxAttribute retrieveCtxObject(CtxIdentifier ctxID);
 	
 	public CtxModelObject updateCtxModelObject(CtxModelObject obj);
 	
-	public List<CtxAttribute> lookupRemoteLocalCtxAttribute();
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute(String targetID, String attrType);
 	
 	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener);
 	
-	public void retrieveRemoteIndiEntity();
+	public IndividualCtxEntity retrieveRemoteIndiEntity(String targetID);
+	
+	public String estimateCommunityCtx();
 	
 }

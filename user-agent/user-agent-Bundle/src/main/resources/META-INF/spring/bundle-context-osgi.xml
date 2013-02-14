@@ -56,10 +56,8 @@
 	<osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient">
 	</osgi:reference>
 	
-	<!-- IServiceDiscovery is needed by dm (at least) -->
-	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
-	</osgi:reference>
-	
+	<!-- IServiceDiscovery is needed by dm (at least) <osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
+	</osgi:reference>-->
 	<!-- CSS Manager is needed by uam -->
 	<osgi:reference id="cssMgr" interface="org.societies.api.internal.css.ICSSInternalManager">
 	</osgi:reference>
