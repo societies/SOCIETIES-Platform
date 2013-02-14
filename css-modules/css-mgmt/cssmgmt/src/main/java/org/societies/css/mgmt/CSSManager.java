@@ -1,5 +1,31 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.societies.css.mgmt;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -21,11 +47,20 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.css.FriendFilter;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.CSSNode;
 import org.societies.api.internal.css.ICSSInternalManager;
@@ -68,22 +103,14 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
-	public static final String TEST_ARCHIVED_IDENTITY_1 = "archnode11";
-	public static final String TEST_ARCHIVED_IDENTITY_2 = "archnode22";
-
+	
 	public static final String TEST_IDENTITY = "android";
-	public static final String TEST_INACTIVE_DATE = "20121029";
-	public static final String TEST_REGISTERED_DATE = "20120229";
-	public static final int TEST_UPTIME = 7799;
+	
 	public static final String TEST_EMAIL = "somebody@tssg.org";
 	public static final String TEST_FORENAME = "4Name";
-	public static final String TEST_HOME_LOCATION = "The Hearth";
-	public static final String TEST_IDENTITY_NAME = "Id Name";
-	public static final String TEST_IM_ID = "somebody.tssg.org";
+	
 	public static final String TEST_NAME = "The CSS";
-	public static final String TEST_PASSWORD = "androidpass";
-	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
-
+	
 	private static final String THIS_NODE = "XCManager.societies.local";
 	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
     private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
@@ -102,6 +129,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private boolean pubsubInitialised = false;
 	
 	private IEventMgr eventMgr = null;
+	//private ICtxBroker ctxBroker;
 	
 	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
@@ -185,23 +213,16 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				CssRecord cssProfile = new CssRecord();
 				cssProfile.getCssNodes().add(cssNode);
 				cssProfile.setCssIdentity(identity);
-				cssProfile.setCssInactivation("0");
 				
-				cssProfile.setCssRegistration(this.getDate());
-
-				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-				cssProfile.setCssUpTime(0);
 				cssProfile.setEmailID("");
 				cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 				cssProfile.setForeName("");
-				cssProfile.setHomeLocation("");
-				cssProfile.setIdentityName("");
-				cssProfile.setImID("");
 				cssProfile.setName("");
-				cssProfile.setPassword("");
-				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+				
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-				cssProfile.setSocialURI("");
+				cssProfile.setWorkplace("");
+				cssProfile.setPosition("");
+				
 
 				try {
 					this.cssRegistry.registerCss(cssProfile);
@@ -210,19 +231,15 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				
 				// internal eventing
+				LOG.info("Generating CSS_Record to piush to context");
+
+				this.pushtoContext(cssProfile);
+				
 				LOG.info("Generating CSS_Record_Event to notify Record has been created");
-				if(this.getEventMgr() != null){
-					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record Created", this.idManager.getThisNetworkNode().toString(), cssProfile);
-					try {
-						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-						this.getEventMgr().publishInternalEvent(event);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						LOG.error("error trying to internally publish SUBS CIS event");
-					}
-				}
+				
 			} else {
 				// if CssRecord already persisted remove all nodes and add cloud node
 				
@@ -422,58 +439,30 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
 		LOG.debug("Calling modifyCssRecord");
 
+		LOG.info("Calling modifyCssRecord");
+
+		LOG.info("modifyCssRecord CSSIdentity : " +profile.getCssIdentity());
+
 		Dbc.require("CssRecord parameter cannot be null", profile != null);
 
         CssInterfaceResult result = new CssInterfaceResult();
 		result.setProfile(profile);
 		result.setResultStatus(false);
-		
-		CssRecord cssRecord = null;
-		
-		try{
-			if (this.cssRegistry.cssRecordExists()) {
-				cssRecord = this.cssRegistry.getCssRecord();
-				
-				// update profile information
-				cssRecord.setEntity(profile.getEntity());
-				cssRecord.setForeName(profile.getForeName());
-				cssRecord.setName(profile.getName());
-				cssRecord.setEmailID(profile.getEmailID());
-				cssRecord.setImID(profile.getImID());
-				cssRecord.setSocialURI(profile.getSocialURI());
-				cssRecord.setSex(profile.getSex());
-				cssRecord.setHomeLocation(profile.getHomeLocation());
-				cssRecord.setIdentityName(profile.getIdentityName());
+			
+			
 				
 				// internal eventing
-				LOG.info("Generating CSS_Record_Event to notify Record has changed");
-				if(this.getEventMgr() != null){
-					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
-					try {
-						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-						this.getEventMgr().publishInternalEvent(event);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						LOG.error("error trying to internally publish SUBS CIS event");
-					}
-				}
+				this.updateCssRegistry(profile);
+				LOG.info("Updating CSS with local database");
 
-				this.updateCssRegistry(cssRecord);
+				LOG.info("Pushing CSS_Record to Context from modifyCssRecord");		
+				this.pushtoContext(profile);
+
+				this.updateCssRegistry(profile);
 				LOG.debug("Updating CSS with local database");
 
-				result.setProfile(cssRecord);
+				result.setProfile(profile);
 				result.setResultStatus(true);
-
-			} else {
-				LOG.equals("Css record does not exist");
-			}
-			
-
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -530,7 +519,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			LOG.info("cssNodes Array Size is : " +cssNodes.size());
 			//}
 			
-			this.modifyCssRecord(profile);
+			// insert internal event here for modified cssNodes
+			//this.pushtoContext(profile);
+			
+			
+			
+			//this.modifyCssRecord(profile);
 		//try {
 	//		LOG.info("+++++++++++++ Calling cssRegistry Register CSSRecord ");
 		//	result = cssRegistry.registerCss(profile);
@@ -769,6 +763,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	}
 
 	@Autowired
+	private ICtxBroker ctxBroker;
+
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+	
 	private ISocialData socialdata;
 
 	//Spring injection
@@ -1215,8 +1215,10 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			//LOG.info(" cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
 		}
 		
-		
-		this.modifyCssRecord(cssrecord); 
+		// insert internal event here for modified cssNodes
+		LOG.info(" pushing new css node to context ");
+		this.pushtoContext(cssrecord);
+		//this.modifyCssRecord(cssrecord); 
 	
 	}
 	
@@ -1264,6 +1266,10 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		// insert internal event here for modified cssNodes (node removed)
+		LOG.info(" pushing css node removed to context ");
+		this.pushtoContext(cssrecord);
 		//this.modifyCssRecord(cssrecord); 
 	
 	}
@@ -1456,6 +1462,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 			try {
 				cssRegistry.updateCssFriendRequestRecord(request);
 				cssRegistry.updateCssRequestRecord(request);
+				
+				
 				// internal eventing for notifying of new Friend
 				LOG.info("Generating CSS_Friended_Event to notify CSS Friend Request has been accepted");
 				if(this.getEventMgr() != null){
@@ -1594,5 +1602,105 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void pushtoContext(CssRecord record) {
+
+		final String cssIdStr = "jane.societies.local"; //record.getCssIdentity();
+		LOG.info("pushtoContext cssIdStr: " +cssIdStr);
+
+
+
+		try {
+			IIdentity cssId = commManager.getIdManager().fromJid(cssIdStr);
+			LOG.info("pushtoContext cssId: " +cssId);
+			CtxEntityIdentifier ownerCtxId = this.getCtxBroker().retrieveIndividualEntity(cssId).get().getId();
+
+			LOG.info("pushtoContext ownerCtxId: " +ownerCtxId);
+
+			String value;
+
+			// NAME
+			value = record.getName();
+			LOG.info("pushtoContext NAME value: " +value);
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME, value);
+
+			// EMAIL
+			value = record.getEmailID();
+			LOG.info("pushtoContext EMAIL value: " +value);
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+/*			
+			// Entity
+			value = record.getName();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ENTITY, value);
+
+			// Forename
+			value = record.getEmailID();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FORENAME, value);
+			
+			// Sex
+			value = record.getName();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+
+			// CSS Identity
+			value = record.getEmailID();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSIDENTITY, value);
+			
+			// CSS Nodes
+			value = record.getName();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSNODES, value);
+
+			// Workplace
+			value = record.getEmailID();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORKPLACE, value);
+			
+			// Position
+			value = record.getEmailID();
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.POSITION, value);
+*/
+
+		} catch (InvalidFormatException ife) {
+
+			LOG.error("Invalid CSS IIdentity found in CSS record: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (Exception e) {
+
+			LOG.error("Failed to access context data: " 
+					+ e.getLocalizedMessage(), e);
+		}
+
+
+	}
+
+	private void updateCtxAttribute(CtxEntityIdentifier ownerCtxId, 
+			String type, String value) throws Exception {
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
+
+		final List<CtxIdentifier> ctxIds = 
+				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
+		final CtxAttribute attr;
+		if (!ctxIds.isEmpty())
+			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
+		else
+			attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
+
+		attr.setStringValue(value);
+		attr.setValueType(CtxAttributeValueType.STRING);
+		attr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		this.ctxBroker.update(attr);
+	}
+	
+	
+	
 }
 

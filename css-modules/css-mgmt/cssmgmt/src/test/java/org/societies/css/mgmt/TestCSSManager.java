@@ -19,17 +19,11 @@ public class TestCSSManager {
 	public static final String TEST_IDENTITY_2 = "node22";
 
 	public static final String TEST_IDENTITY = "CSSProfile1";
-	public static final String TEST_INACTIVE_DATE = "20121029";
-	public static final String TEST_REGISTERED_DATE = "2012-02-23";
-	public static final int TEST_UPTIME = 7799;
 	public static final String TEST_EMAIL = "somebody@tssg.org";
 	public static final String TEST_FORENAME = "4Name";
-	public static final String TEST_HOME_LOCATION = "The Hearth";
-	public static final String TEST_IDENTITY_NAME = "Id Name";
-	public static final String TEST_IM_ID = "somebody.tssg.org";
 	public static final String TEST_NAME = "TestCSS";
-	public static final String TEST_PASSWORD = "P455W0RD";
-	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+	public static final String TEST_POSITION = "Senior Software Engineer";
+	public static final String TEST_WORKPLACE = "Lake Communications";
 	private ICssRegistry cssRegistry;
 	
 
@@ -57,18 +51,15 @@ public class TestCSSManager {
 		profile.setCssIdentity(TEST_IDENTITY);
 		profile.setEmailID(TEST_EMAIL);
 		profile.setForeName(TEST_FORENAME);
-		profile.setHomeLocation(TEST_HOME_LOCATION);
-		profile.setIdentityName(TEST_IDENTITY_NAME);
-		profile.setImID(TEST_IM_ID);
-		profile.setSocialURI(TEST_SOCIAL_URI);
-		
+		profile.setPosition(TEST_POSITION);
+		profile.setWorkplace(TEST_WORKPLACE);
+
 		assertEquals(TEST_IDENTITY, profile.getCssIdentity());
 		assertEquals(TEST_EMAIL, profile.getEmailID());
 		assertEquals(TEST_FORENAME, profile.getForeName());
-		assertEquals(TEST_HOME_LOCATION, profile.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, profile.getIdentityName());
-		assertEquals(TEST_IM_ID, profile.getImID());
-		assertEquals(TEST_SOCIAL_URI, profile.getSocialURI());
+		assertEquals(TEST_POSITION, profile.getPosition());
+		assertEquals(TEST_WORKPLACE, profile.getWorkplace());
+		
 
 		
 		CSSManager manager = new CSSManager();

@@ -216,9 +216,9 @@ public class CssCtxMonitor extends EventListener {
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
 
 				// ADDRESS_HOME_CITY
-				value = cssRecord.getHomeLocation();
-				if (value != null && !value.isEmpty())
-					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
+//				value = cssRecord.getHomeLocation();
+//				if (value != null && !value.isEmpty())
+//					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
 
 			} catch (InvalidFormatException ife) {
 

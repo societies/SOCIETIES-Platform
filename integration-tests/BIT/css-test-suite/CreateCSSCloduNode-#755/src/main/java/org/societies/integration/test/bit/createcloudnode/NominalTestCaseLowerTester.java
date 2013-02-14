@@ -40,17 +40,11 @@ public class NominalTestCaseLowerTester {
 	public static final String TEST_IDENTITY_2 = "node22";
 
 	public static final String TEST_IDENTITY = "cloud";
-	public static final String TEST_INACTIVE_DATE = "20120202";
-	public static final String TEST_REGISTERED_DATE = "2012101";
-	public static final int TEST_UPTIME = 7799;
 	public static final String TEST_EMAIL = "Liam@tssg.org";
 	public static final String TEST_FORENAME = "Liam";
-	public static final String TEST_HOME_LOCATION = "The Hearth";
-	public static final String TEST_IDENTITY_NAME = "Id Name";
-	public static final String TEST_IM_ID = "Liam.tssg.org";
 	public static final String TEST_NAME = "Cloud CSS";
-	public static final String TEST_PASSWORD = "cloudpass";
-	public static final String TEST_SOCIAL_URI = "Liam@fb.com";
+	public static final String TEST_POSITION = "LOSER";
+	public static final String TEST_WORKPLACE = "Lake";
 	
 	
 
@@ -112,21 +106,13 @@ public class NominalTestCaseLowerTester {
 				//cssProfile.getArchiveCSSNodes().add(cssNode_2);
 				
 				cssProfile.setCssIdentity(TEST_IDENTITY);
-				cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-				cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-				cssProfile.setCssUpTime(TEST_UPTIME);
 				cssProfile.setEmailID(TEST_EMAIL);
 				cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 				cssProfile.setForeName(TEST_FORENAME);
-				cssProfile.setHomeLocation(TEST_HOME_LOCATION);
-				cssProfile.setIdentityName(TEST_IDENTITY_NAME);
-				cssProfile.setImID(TEST_IM_ID);
 				cssProfile.setName(TEST_NAME);
-				cssProfile.setPassword(TEST_PASSWORD);
-				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 				cssProfile.setSex(CSSManagerEnums.genderType.Male.ordinal());
-				cssProfile.setSocialURI(TEST_SOCIAL_URI);
+				cssProfile.setWorkplace(TEST_WORKPLACE);
+				cssProfile.setPosition(TEST_POSITION);
 
 				
 				return cssProfile;
