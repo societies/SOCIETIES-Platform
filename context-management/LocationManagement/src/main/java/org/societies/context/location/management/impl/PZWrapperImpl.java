@@ -59,35 +59,44 @@ public class PZWrapperImpl implements PZWrapper  {
 	/** The logging facility. */
 	private static final Logger log = LoggerFactory.getLogger(PZWrapperImpl.class);
 	
-	private final String PZ_URL;
-	private final String PZ_FULL_ENTITY;
-	private final String ENTITY_ID;
+	private String PZ_FULL_ENTITY;
+	private String ENTITY_ID;
 	
 	Pix2Geo pix2GeoConvertor = null;
 	private boolean convertToGeo= false;
 	
-	public PZWrapperImpl(){
+	private String productionQueryURL;
+	private String productionAdminURL;
+	private boolean locationSystemActive=false;
+	
+	
+	@SuppressWarnings("unused")
+	private void init(){
 		PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
-		PZ_URL =pzPropertiesReader.getPzURL();
-		PZ_FULL_ENTITY = PZ_URL + pzPropertiesReader.getEntityFullQuery();
+		PZ_FULL_ENTITY = productionAdminURL + pzPropertiesReader.getEntityFullQuery();
 		ENTITY_ID = pzPropertiesReader.getEntityId();
 		
+		/*
 		try{
 			initialPixel2GeoConvertor();
 			convertToGeo = true;
 		}catch (Exception e) {
 			log.error("can't initial pix2GeoConvertor ; coordinates will be given as in PZ server",e);
-		}
+		}*/
 	}
 	
-	
 	private void initialPixel2GeoConvertor() throws Exception{
-		
-		PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
-		String url = pzPropertiesReader.getPzAdminURL() + pzPropertiesReader.getMapQuery();
-		JSONObject jsonObject = restCallHelperMethod(url);
-		pix2GeoConvertor = new Pix2Geo(jsonObject);
-		
+		try{
+			if (pix2GeoConvertor == null){
+				PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
+				String url = productionAdminURL + pzPropertiesReader.getMapQuery();
+				JSONObject jsonObject = restCallHelperMethod(url);
+				pix2GeoConvertor = new Pix2Geo(jsonObject);
+				convertToGeo = true;
+			}
+		}catch (Exception e) {
+			log.error("can't initial pix2GeoConvertor ; coordinates will be given as in PZ server",e);
+		}	
 	}
 	
 	/**************************************************************/
@@ -118,6 +127,8 @@ public class PZWrapperImpl implements PZWrapper  {
 		
 		IUserLocation userLocation = null;
 		try{
+			initialPixel2GeoConvertor();
+			
 			String url = PZ_FULL_ENTITY.replaceFirst(ENTITY_ID, entityId);
 			
 			JSONObject jsonResponse = restCallHelperMethod(url);
@@ -277,6 +288,39 @@ public class PZWrapperImpl implements PZWrapper  {
 		}
     	return jsonObject;
 	}
+
+
+		public String getProductionQueryURL() {
+			return productionQueryURL;
+		}
+	
+	
+		public void setProductionQueryURL(String productionQueryURL) {
+			this.productionQueryURL = productionQueryURL;
+		}
+	
+	
+		public String getProductionAdminURL() {
+			return productionAdminURL;
+		}
+	
+	
+		public void setProductionAdminURL(String productionAdminURL) {
+			this.productionAdminURL = productionAdminURL;
+		}
+	
+	
+		public boolean isLocationSystemActive() {
+			return locationSystemActive;
+		}
+	
+	
+		public void setLocationSystemActive(boolean locationSystemActive) {
+			this.locationSystemActive = locationSystemActive;
+		}
+
+
+	
 	
 	
 }

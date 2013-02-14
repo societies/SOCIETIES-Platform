@@ -59,12 +59,12 @@ import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.community.db.impl.model.CommunityCtxEntityDAO;
+import org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxModelDAOTranslator;
 import org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO;
-import org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO;
+import org.societies.context.community.db.impl.model.CommunityCtxEntityDAO;
 import org.societies.context.community.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxQualityDAO;
 import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
@@ -109,9 +109,9 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final CommunityCtxEntityDAO entityDAO;
+		final CommunityCtxEntityBaseDAO entityDAO;
 		try {
-			entityDAO = this.retrieve(CommunityCtxEntityDAO.class, scope);
+			entityDAO = this.retrieve(CommunityCtxEntityBaseDAO.class, scope);
 		} catch (Exception e) {
 			throw new CommunityCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
@@ -213,20 +213,18 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			throw new NullPointerException("cisId can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
-		//LOG.info("skata  1 community entity cisId " +cisId.toString() +" type "+type); 
-		
+
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
 				new CtxEntityIdentifier(cisId, type, modelObjectNumber);
 		final CommunityCtxEntityBaseDAO entityDAO = new CommunityCtxEntityBaseDAO(id);
-	//	LOG.info("skata  2");
+
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try{
 			tx = session.beginTransaction();
 			session.save(entityDAO);
 			tx.commit();
-		//	LOG.info("skata  3");
 		}
 		catch (Exception e) {
 			if (tx != null)
@@ -237,7 +235,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
-		//LOG.info("skata  4");
+
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(id), 
 					new String[] {CtxChangeEventTopic.CREATED}, CtxEventScope.BROADCAST);
@@ -247,7 +245,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
-		//LOG.info("skata  5");
+		
 		return (CtxEntity) this.retrieve(id);
 	}
 	
@@ -476,7 +474,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
         	switch (id.getModelType()) {
         	
         	case ENTITY:            	
-            	dao = this.retrieve(CommunityCtxEntityDAO.class, id);
+            	dao = this.retrieve(CommunityCtxEntityBaseDAO.class, id);
             	if (dao == null)
             		break;
             	final Session session = this.sessionFactory.openSession();
@@ -485,22 +483,10 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
             	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
 
             	try { 
-            		if (dao instanceof CommunityCtxEntityBaseDAO) {
-            			// Retrieve CtxAssociationIds where this entity is parent
-            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
-            			query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(), 
-            					Hibernate.custom(CtxEntityIdentifierType.class));
-            			associationIds.addAll(query.list());
-            			// Retrieve CtxAssociationIds where this entity is child
-            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByChildEntityId");
-            			query.setParameter("childEntId", ((CommunityCtxEntityDAO) dao).getId(), 
-            					Hibernate.custom(CtxEntityIdentifierType.class));
-            			associationIds.addAll(query.list());
-
-            		} else if (dao instanceof CommunityCtxEntityDAO) {
+            		if (dao instanceof CommunityCtxEntityDAO) {
                 		// Retrieve all associations whose parent entity is this entity
                 		query = session.getNamedQuery("getCommunityCtxAssociationsByParentEntityId");
-                    	query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(),
+                    	query.setParameter("parentEntId", ((CommunityCtxEntityBaseDAO) dao).getId(),
                     			Hibernate.custom(CtxEntityIdentifierType.class));
                     	final List<CommunityCtxAssociationDAO> associations = query.list();
 
@@ -519,8 +505,20 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
                 		}	            			
                 		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
                 		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
-            		}
-            		((CommunityCtxEntityDAO) dao).setAssociations(associationIds);
+            		} else if (dao instanceof CommunityCtxEntityBaseDAO) {
+            			// Retrieve CtxAssociationIds where this entity is parent
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
+            			query.setParameter("parentEntId", ((CommunityCtxEntityBaseDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CommunityCtxEntityBaseDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+
+            		} 
+            		((CommunityCtxEntityBaseDAO) dao).setAssociations(associationIds);
             					
             	} finally {
             		if (session != null)
@@ -579,7 +577,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
             switch (modelType) {
             
             case ENTITY:
-            	query = session.getNamedQuery("getCommunityCtxEntityIdsByType");
+            	query = session.getNamedQuery("getCommunityCtxEntityBaseIdsByType");
             	break;
             case ATTRIBUTE:
             	query = session.getNamedQuery("getCommunityCtxAttributeIdsByType");

@@ -26,7 +26,7 @@
 package org.societies.android.platform.useragent.uam;
 
 import org.societies.android.api.useragent.IAndroidUserActionMonitor;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;
@@ -58,16 +58,12 @@ public class AndroidUserActionMonitorLocal extends Service{
 
 	public class LocalUAMBinder extends Binder {
 		public IAndroidUserActionMonitor getService() {
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+			ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext(), true);
 			AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(
-					AndroidUserActionMonitorLocal.this.getApplicationContext(),  
-					ccm, 
+					AndroidUserActionMonitorLocal.this.getApplicationContext(),
 					false);
 			return uamBase;
 		}
 	}
 	
-	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
-	}
 }

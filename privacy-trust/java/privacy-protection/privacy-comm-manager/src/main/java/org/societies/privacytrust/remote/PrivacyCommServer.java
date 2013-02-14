@@ -57,6 +57,7 @@ public class PrivacyCommServer implements IFeatureServer {
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement",
+					"http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
 			  		"http://societies.org/api/schema/servicelifecycle/model",
@@ -64,6 +65,7 @@ public class PrivacyCommServer implements IFeatureServer {
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
+					"org.societies.api.schema.privacytrust.privacy.model.privacypolicy",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
 			  		"org.societies.api.schema.servicelifecycle.model",

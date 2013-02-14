@@ -81,7 +81,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyPolicyManagerTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getName());
 
 	public static Integer testCaseNumber = 0;
 
@@ -114,6 +114,14 @@ public class PrivacyPolicyManagerTest {
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
+		if (null == TestCase1244.privacyPolicyManager) {
+			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : privacyPolicyManager is null");
+			fail("Error: privacyPolicyManager is null");
+		}
+		if (null == requestorCis) {
+			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : requestorCis is null");
+			fail("Error: requestorCis is null");
+		}
 		try {
 			privacyPolicy = TestCase1244.privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {

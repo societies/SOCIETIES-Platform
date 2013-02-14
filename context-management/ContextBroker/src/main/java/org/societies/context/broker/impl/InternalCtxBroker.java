@@ -688,7 +688,23 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (ownerId == null)
 			throw new NullPointerException("ownerId can't be null");
 
-		// TODO Auto-generated method stub
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Unregistering context change event listener for IIdentity '"
+						+ ownerId + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.unregisterChangeListener(listener, topics, ownerId);
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for IIdentity '"
+					+ ownerId + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	/*
@@ -708,12 +724,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void unregisterFromChanges(final CtxChangeEventListener listener,
 			final CtxIdentifier ctxId) throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (ctxId == null)
-			throw new NullPointerException("ctxId can't be null");
-
-		// TODO Auto-generated method stub
+		this.unregisterFromChanges(null, listener, ctxId);
 	}
 
 	/*
@@ -734,12 +745,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void unregisterFromChanges(final CtxChangeEventListener listener,
 			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
 
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (scope == null)
-			throw new NullPointerException("scope can't be null");
-
-		// TODO Auto-generated method stub
+		this.unregisterFromChanges(null, listener, scope, attrType);
 	}
 
 
@@ -2011,14 +2017,59 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.Requestor, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	public void unregisterFromChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxIdentifier ctxId)
 					throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Unregistering context change event listener for object '"
+						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
+			this.ctxEventMgr.unregisterChangeListener(listener, topics, ctxId);
+
+/* TODO
+			try {
+				if (ctxId instanceof CtxAttributeIdentifier 
+						&& this.userCtxInferenceMgr.getInferrableTypes().contains(ctxId.getType())) {
+					if (LOG.isInfoEnabled()) // TODO DEBUG
+						LOG.info("Triggering continuous inference of attribute '" + ctxId + "'");
+					this.userCtxInferenceMgr.refineContinuously(
+							(CtxAttributeIdentifier) ctxId, new Double(0)); // TODO handle updateFreq
+				}
+			} catch (ServiceUnavailableException sue) {
+
+				LOG.warn("Could not check if attribute requires inference: "
+						+ "User Context Inference Mgr is not available");
+			}
+*/
+		} else {
+			throw new CtxBrokerException(
+					"Could not unregister context change event listener for object '"
+					+ ctxId + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.Requestor, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	public void registerForChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxEntityIdentifier scope,
@@ -2051,12 +2102,40 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.Requestor, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	public void unregisterFromChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		
+		if (requestor == null)
+			requestor = this.getLocalRequestor();
 
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.CREATED,
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Unregistering context change event listener for attributes with scope '"
+						+ scope + "' and type '" + attrType + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.unregisterChangeListener(listener, topics, scope, attrType );
+		} else {
+			throw new CtxBrokerException(
+					"Could not unregister context change event listener for attributes with scope '"
+					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+					+ "': ICtxEventMgr service is not available");
+		}
 	}
 
 	@Override

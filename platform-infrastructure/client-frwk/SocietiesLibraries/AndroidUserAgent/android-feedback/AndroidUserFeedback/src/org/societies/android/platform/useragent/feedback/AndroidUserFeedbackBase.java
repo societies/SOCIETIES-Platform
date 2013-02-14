@@ -30,49 +30,92 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-//import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.api.internal.useragent.model.ExpProposalContent;
+import org.societies.android.api.internal.useragent.model.ImpProposalContent;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
 import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
 import org.societies.android.platform.useragent.feedback.guis.ExplicitPopup;
 import org.societies.android.platform.useragent.feedback.guis.ImplicitPopup;
 import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.android.platform.useragent.feedback.model.UserFeedbackEventTopics;
+import org.societies.android.api.pubsub.IeventMgrService;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.identity.IdentityManagerImpl;
-import org.societies.useragent.api.model.UserFeedbackEventTopics;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
-import android.view.View;
-import android.widget.PopupWindow;
 
-public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber{
+public class AndroidUserFeedbackBase extends Service implements IAndroidUserFeedback, Subscriber{
 
 	private static final String LOG_TAG = AndroidUserFeedbackBase.class.getName();
+	private static final String SERVICE_ACTION = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+	private static final String CLIENT_NAME = AndroidUserFeedbackBase.class.getCanonicalName();
 	private Context androidContext;
 	private ClientCommunicationMgr ccm;
-	private PubsubClientAndroid pubsubClient;
+	private Messenger eventMgrService = null;
 	private boolean restrictBroadcast;
 	private IIdentity myCloudID;
 	private HashMap<String, ExplicitPopup> expPopups;
 	private HashMap<String, ImplicitPopup> impPopups;
+	//TRACKING CONNECTION TO EVENTS MANAGER
+	private boolean boundToEventMgrService = false;
+	
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	@Override
+	public IBinder onBind(Intent intent) {
+		return this.binder;
+	}
+	
+	@Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		Log.d(LOG_TAG, "Friends service starting");
+		
+		setupBroadcastReceiver();
+		bindToEventsManagerService();
+	}
+	
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "Friends service terminating");
+	}
+	
+	/**Create Binder object for local service invocation */
+	public class LocalBinder extends Binder {
+		public FriendsService getService() {
+			return FriendsService.this;
+		}
+	}
 
-	public AndroidUserFeedbackBase(Context androidContext, ClientCommunicationMgr ccm, PubsubClientAndroid pubsubClient, boolean restrictBroadcast){
+	public AndroidUserFeedbackBase(Context androidContext, boolean restrictBroadcast){
 		this.androidContext = androidContext;
-		this.ccm = ccm;
-		this.pubsubClient = pubsubClient;
+		//check with Alec that login has been completed
+		this.ccm = new ClientCommunicationMgr(androidContext, true);
+		
 		this.restrictBroadcast = restrictBroadcast;
 		
 		expPopups = new HashMap<String, ExplicitPopup>();
@@ -83,9 +126,9 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		//register for events from user feedback pubsub node
 		try {
 			Log.d(LOG_TAG, "Registering for user feedback pubsub node");
-			pubsubClient.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.REQUEST, this);
-			pubsubClient.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
-			pubsubClient.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
+			eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.REQUEST, this);
+			eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
+			eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
 			Log.d(LOG_TAG, "Pubsub registration complete!");
 		} catch (XMPPError e) {
 			e.printStackTrace();
@@ -119,7 +162,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		//send pubsub event to all user agents
 		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
-			pubsubClient.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
+			eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -149,7 +192,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		//send pubsub event to all user agents
 		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
-			pubsubClient.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
+			eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -174,7 +217,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		//send pubsub event to all user agents
 		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
-			pubsubClient.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
+			eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 		} catch (XMPPError e) {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
@@ -266,6 +309,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 	 * Assign connection parameters (must happen after successful XMPP login)
 	 */
 	private void assignConnectionParameters() {
+		try {
 		//Get the Cloud destination
 		String cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
 		Log.d(LOG_TAG, "Cloud Node: " + cloudCommsDestination);
@@ -273,7 +317,7 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 		//String domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
 		//Log.d(LOG_TAG, "Domain Authority Node: " + domainCommsDestination);
 
-		try {
+
 			this.myCloudID = IdentityManagerImpl.staticfromJid(cloudCommsDestination);
 			Log.d(LOG_TAG, "Cloud node identity: " + this.myCloudID);
 
@@ -285,4 +329,65 @@ public class AndroidUserFeedbackBase implements IAndroidUserFeedback, Subscriber
 			throw new RuntimeException(e);
 		}     
 	}
+	
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/** Bind to the Events Manager Service */
+	private void bindToEventsManagerService() {
+    	Intent serviceIntent = new Intent(SERVICE_ACTION);
+    	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
+    	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			boundToEventMgrService = true;
+			eventMgrService = new Messenger(service);
+			Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
+			
+			//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
+			InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
+    		invoke.execute();
+		}
+		
+		public void onServiceDisconnected(ComponentName name) {
+			boundToEventMgrService = false;
+		}
+	};
+	
+	
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SUBSCRIBE TO PUBSUB EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/** Async task to invoke remote service method */
+    private class InvokeRemoteMethod extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeRemoteMethod.class.getName();
+    	private String client;
+
+    	public InvokeRemoteMethod(String client) {
+    		this.client = client;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+    		//METHOD: subscribeToEvents(String client, String intentFilter) - ARRAY POSITION: 1
+    		String targetMethod = IAndroidSocietiesEvents.methodsArray[1];
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+
+    		//PARAMETERS
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT);
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Sending event registration");
+    		try {
+    			eventMgrService.send(outMessage);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+
 }

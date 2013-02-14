@@ -56,16 +56,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceMana
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 		intentSender = new PrivacyPolicyIntentSender(context);
 	}
-
-	public boolean startService() {
-		privacyPolicyManagerRemote.bindToComms();
-		return true;
-	}
 	
-	public boolean stopService() {
-		privacyPolicyManagerRemote.unbindFromComms();
-		return true;
-	}
 	
 	/*
 	 * (non-Javadoc)
@@ -284,5 +275,17 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceMana
 			}
 			return result;
 		}
+	}
+	
+	@Override
+	public boolean startService() {
+		privacyPolicyManagerRemote.bindToComms();
+		return true;
+	}
+	
+	@Override
+	public boolean stopService() {
+		privacyPolicyManagerRemote.unbindFromComms();
+		return true;
 	}
 }
