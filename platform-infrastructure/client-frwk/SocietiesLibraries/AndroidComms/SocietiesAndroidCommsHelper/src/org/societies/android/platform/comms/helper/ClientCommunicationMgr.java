@@ -136,25 +136,26 @@ public class ClientCommunicationMgr {
 		
 		return retValue;
 	}
-	public void register(final List<String> elementNames, final ICommCallback callback) {
+	public void register(List<String> elementNames, List<String> namespaces, List<String> packages, IMethodCallback callback) {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
+		Dbc.require("Message Beans must be specified", null != namespaces && namespaces.size() > 0);
+		Dbc.require("Message Beans must be specified", null != packages && packages.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
+		Log.d(LOG_TAG, "Register XMPP data namespace attributes");
 
 		long callbackID = this.randomGenerator.nextLong();
 
-		synchronized(this.xmppCallbackMap) {
+		synchronized(this.methodCallbackMap) {
 			//store callback in order to activate required methods
-			this.xmppCallbackMap.put(callbackID, callback);
+			this.methodCallbackMap.put(callbackID, callback);
 		}
 		
-		Log.d(LOG_TAG, "register element names");
 		
 //		for (String element : elementNames) {
 //			Log.d(LOG_TAG, "register element: " + element);
 //		}
 
-		final List<String> namespaces = callback.getXMLNamespaces();
-		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
+		marshaller.register(elementNames, namespaces, packages);
 		
 		InvokeRegister invoke = new InvokeRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoke.execute();
@@ -645,11 +646,11 @@ public class ClientCommunicationMgr {
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
-				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
-					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
 					if (null != callback) {
-						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnAction(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
 
@@ -688,8 +689,8 @@ public class ClientCommunicationMgr {
 						Packet packet;
 						try {
 							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-							Object payload = marshaller.unmarshallPayload(packet);
-							callback.receiveResult(stanzaFromPacket(packet), payload);
+							XMPPError payload = marshaller.unmarshallError(packet);
+							callback.receiveError(stanzaFromPacket(packet), payload);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

@@ -41,7 +41,7 @@ import org.societies.integration.test.IntegrationTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestCase1244 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase1244.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1244.class.getName());
 
 	public static IPrivacyPolicyManager privacyPolicyManager;
 	public static IPrivacyAgreementManager privacyAgreementManager;

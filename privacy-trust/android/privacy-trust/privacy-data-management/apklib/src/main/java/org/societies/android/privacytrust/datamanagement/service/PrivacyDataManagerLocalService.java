@@ -31,6 +31,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 
 /**
@@ -42,8 +43,21 @@ public class PrivacyDataManagerLocalService extends Service {
 	private IBinder binder;
 
 
+	@Override
 	public void onCreate() {
+		super.onCreate();
 		this.binder = new LocalBinder();
+		if (!((PrivacyDataManager)((LocalBinder)binder).getService()).startService()) {
+			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
+		}
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (!((PrivacyDataManager)((LocalBinder)binder).getService()).stopService()) {
+			Log.e(TAG, "Ouch, can't stop this service (i.e. can't unbind it to the SocietiesCommsApp)");
+		}
 	}
 
 

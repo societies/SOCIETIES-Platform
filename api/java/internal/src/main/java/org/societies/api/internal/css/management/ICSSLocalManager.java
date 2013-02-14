@@ -13,6 +13,7 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 /**
+ * @deprecated see org.societies.api.internal.css.ICSSInternalManager
  * 
  * This interface forms the basis of the CSSManager, a component that will exist
  * on all nodes. Its main tasks are:

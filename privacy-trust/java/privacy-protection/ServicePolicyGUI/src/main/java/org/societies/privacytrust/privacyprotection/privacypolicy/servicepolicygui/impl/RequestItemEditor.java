@@ -112,7 +112,7 @@ public class RequestItemEditor extends JFrame implements ItemListener
 	public RequestItemEditor(ActionListener listener)
 	{
 		     super("Requested Items Editor");
-
+		     this.setupDataTypes();
 		     this.pnPanel0 = new JPanel();
 		     this.pnPanel0.setBorder(BorderFactory.createTitledBorder("Resource Editor"));
 		     GridBagLayout gbPanel0 = new GridBagLayout();
@@ -344,13 +344,31 @@ public class RequestItemEditor extends JFrame implements ItemListener
 	}
 
 
+	private void setupDataTypes() {
+		this.cisTypes = new ArrayList<String>();
+		this.cisTypes.add("cis-member-list");
+		this.cisTypes.add("cis-list");
+		
+		this.deviceTypes = new ArrayList<String>();
+		this.deviceTypes.add("meta-data");
+		
+		this.activityTypes = new ArrayList<String>();
+		this.activityTypes.add("activityfeed");
+		
+		
+	}
+
 	private String[] getSchemeList() {
 		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
-		String[] names = new String[fields.length];
-		for (int i=0; i<names.length; i++){
-			names[i] = fields[i].name();
-			
-			
+		
+		ArrayList<String> tempNames = new ArrayList<String>();
+		for (int i=0; i<fields.length; i++){
+			if (!fields[i].name().equalsIgnoreCase("CSS"))
+				tempNames.add(fields[i].name());
+		}
+		String[] names = new String[tempNames.size()];
+		for (int i=0; i<tempNames.size(); i++){
+			names[i] = tempNames.get(i);
 		}
 		
 		return names;

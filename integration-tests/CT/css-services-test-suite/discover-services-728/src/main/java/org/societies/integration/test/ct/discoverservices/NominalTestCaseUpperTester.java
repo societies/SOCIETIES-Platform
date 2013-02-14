@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 
 
 /**
@@ -107,7 +108,7 @@ public class NominalTestCaseUpperTester {
 			
 			//STEP 2: Check if we retrieved two services
 			if(LOG.isDebugEnabled()) LOG.debug("[#728] Retrieved " + resultList.size() + " services.");
-			Assert.assertEquals("[#728]  Checking if we retrieved exactly two services!", 2, resultList.size());
+			Assert.assertEquals("[#728]  Checking if we retrieved exactly three services!", 3, resultList.size());
 			
 			//STEP 3 & 4: Check if our current node isn't othercss.societies.local
 			String localJid = TestCase728.getCommManager().getIdManager().getThisNetworkNode().getJid();
@@ -119,8 +120,9 @@ public class NominalTestCaseUpperTester {
 			for(Service service: resultList){
 				String serviceJid = service.getServiceInstance().getXMPPNode();
 				if(LOG.isDebugEnabled()) LOG.debug("[#728] Service " + service.getServiceName() + " has jid " + serviceJid);
-				Assert.assertEquals("[#728] Service JID is not the correct one!", REMOTEJID, serviceJid);
-				Assert.assertTrue(service.getServiceName().equals("Calculator Service") || service.getServiceName().equals("FortuneCookie Service"));
+				if(!service.getServiceType().equals(ServiceType.DEVICE))
+					Assert.assertEquals("[#728] Service JID is not the correct one!", REMOTEJID, serviceJid);
+				Assert.assertTrue(service.getServiceName().equals("Calculator Service") || service.getServiceName().equals("FortuneCookie Service") || service.getServiceName().equals("RFiD System"));
 			}
 			
 			

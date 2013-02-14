@@ -95,7 +95,12 @@
    			<type>apklib</type>
    			<scope>provided</scope>
 		</dependency>
-                
+        <dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
+		
         <dependency>
             <groupId>emma</groupId>
             <artifactId>emma</artifactId>

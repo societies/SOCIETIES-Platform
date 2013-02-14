@@ -387,9 +387,18 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 		List<IUserIntentAction> bestActionList = new ArrayList<IUserIntentAction>();
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
-
-		String currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		String currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);
+		
+		String currentLocationValue = "null";
+		String currentStatusValue = "null";
+		
+		if( situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
+			currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
+		}
+		
+		if( situationConext.get(CtxAttributeTypes.STATUS) != null){
+			currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);	
+		}  
+		
 		//Integer currentTempValue = (Integer) situationConext.get(CtxAttributeTypes.TEMPERATURE);
 
 		for(IUserIntentAction action : actionList ){
@@ -400,7 +409,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 			for(String ctxType : actionCtx.keySet()){
 				int actionMatchScore = 0;	
-				Serializable ctxValue = actionCtx.get(ctxType);
+				Serializable ctxValue = "null";
+				if(actionCtx.get(ctxType) != null) 	ctxValue = actionCtx.get(ctxType);
 
 				if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC) && ctxValue instanceof String){
 					String actionLocation = (String) ctxValue;

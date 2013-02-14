@@ -11,7 +11,9 @@ import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -42,7 +44,7 @@ public class CssSuggestedFriendsController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private ICSSLocalManager cssLocalManager;
+	private ICSSInternalManager cssLocalManager;
 	@Autowired
 	private ICommManager commManager;
 	@Autowired
@@ -56,11 +58,11 @@ public class CssSuggestedFriendsController {
 		this.sdService = sdService;
 	}
 
-	public ICSSLocalManager getCssLocalManager() {
+	public ICSSInternalManager getCssLocalManager() {
 		return cssLocalManager;
 	}
 
-	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
+	public void setCssLocalManager(ICSSInternalManager cssLocalManager) {
 		this.cssLocalManager = cssLocalManager;
 	}
 
@@ -121,8 +123,8 @@ public class CssSuggestedFriendsController {
 			if (method.equalsIgnoreCase("findFriends")) {
 				res = "CSS Suggested Friends Result ";
 
-				Future<List<CssAdvertisementRecord>> asynchcssfriends = getCssLocalManager()
-						.suggestedFriends();
+				Future<HashMap<IIdentity, Integer>> asynchcssfriends = getCssLocalManager()
+						.getSuggestedFriends(null); //suggestedFriends();
 
 				model.put("result", res);
 				model.put("cssfriends", asynchcssfriends.get());
@@ -161,8 +163,8 @@ public class CssSuggestedFriendsController {
 
 		try {
 
-			Future<List<CssAdvertisementRecord>> asynchSnsSuggestedFriends = getCssLocalManager().suggestedFriends();
-			List<CssAdvertisementRecord> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
+			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
@@ -203,13 +205,13 @@ public class CssSuggestedFriendsController {
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
 						boolean bAlreadySuggested = false;
-						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
+/*						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
 							if (snsSuggestedFriends.get(snsIndex).getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
 							{
 								bAlreadySuggested = true;
 								snsFriends.add(allcssDetails.get(index));
 							}
-						}
+						}*/
 
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));
@@ -294,8 +296,8 @@ public class CssSuggestedFriendsController {
 
 		try {
 
-			Future<List<CssAdvertisementRecord>> asynchSnsSuggestedFriends = getCssLocalManager().suggestedFriends();
-			List<CssAdvertisementRecord> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
+			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
@@ -336,13 +338,13 @@ public class CssSuggestedFriendsController {
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
 						boolean bAlreadySuggested = false;
-						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
+/*						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
 							if (snsSuggestedFriends.get(snsIndex).getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
 							{
 								bAlreadySuggested = true;
 								snsFriends.add(allcssDetails.get(index));
 							}
-						}
+						}*/
 
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));

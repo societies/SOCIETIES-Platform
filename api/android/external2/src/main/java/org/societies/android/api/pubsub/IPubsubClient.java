@@ -79,23 +79,21 @@ public interface IPubsubClient {
 	 *
 	 * @param pubsubService Identity of the pubsub service
 	 * @param node Pubsub event node
-	 * @param subscriber the subscriber
 	 * @return the subscription
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public boolean subscriberSubscribe(IIdentity pubsubService, String node, ISubscriber subscriber, IMethodCallback callback) throws XMPPError, CommunicationException;
+	public boolean subscriberSubscribe(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 
 	/**
 	 * Unsubscribe from an pubsub node of this identity.
 	 *
 	 * @param pubsubService Identity of the pubsub service
 	 * @param node Pubsub event node
-	 * @param subscriber the subscriber
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public boolean subscriberUnsubscribe(IIdentity pubsubService, String node, ISubscriber subscriber, IMethodCallback callback) throws XMPPError, CommunicationException;
+	public boolean subscriberUnsubscribe(IIdentity pubsubService, String node, IMethodCallback callback) throws XMPPError, CommunicationException;
 
 	/**
 	 * Retrieve the last event that was published to this node.

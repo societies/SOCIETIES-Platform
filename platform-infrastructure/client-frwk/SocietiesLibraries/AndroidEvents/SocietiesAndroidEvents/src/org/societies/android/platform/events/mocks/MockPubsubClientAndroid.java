@@ -2,6 +2,7 @@ package org.societies.android.platform.events.mocks;
 
 import java.util.List;
 
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.pubsub.ISubscriber;
@@ -15,21 +16,17 @@ import android.content.Context;
  */
 public class MockPubsubClientAndroid extends PubsubHelper {
 
-	public MockPubsubClientAndroid(Context androidContext, ISubscriber subscriberCallback) {
-		super(androidContext, subscriberCallback);
+	public MockPubsubClientAndroid(Context androidContext) {
+		super(androidContext);
 	}
 	
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
-    }
-	
-    public boolean subscriberUnsubscribe(final IIdentity pubsubService, final String node,
-            ISubscriber subscriber) throws XMPPError, CommunicationException {
-    	return true;
-    }
-    
-    public boolean subscriberSubscribe(IIdentity pubsubService,
-            final String node, final ISubscriber subscriber) throws XMPPError,
-            CommunicationException {
-    	return true;
-    }
+	}
+	public boolean subscriberSubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+		return false;
+	}
+	public boolean subscriberUnsubscribe(IIdentity pubsubServiceID, String node, IMethodCallback methodCallback) throws XMPPError, CommunicationException {
+		return false;
+	}
+
 }

@@ -62,11 +62,6 @@ public class CtxEntityTypes {
     /**
      * 
      */
-    public static final String PREFERENCE = "preference";
-    
-    /**
-     * 
-     */
     public static final String PRIVACY_POLICY = "privacyPolicy";
     
     /**

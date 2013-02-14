@@ -46,7 +46,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Request
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -191,7 +191,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 		((Button) findViewById(R.id.btnLaunchTestCheckPermission)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
 
-		clientCommManager = new ClientCommunicationMgr(this);
+		clientCommManager = new ClientCommunicationMgr(this.getApplicationContext(), true);
 		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 
 
@@ -215,7 +215,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 			getApplicationContext().unbindService(inProcessServiceConnection);
 		}
 		// -- Logout
-		clientCommManager.logout();
+//		clientCommManager.logout();
 	}
 
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
