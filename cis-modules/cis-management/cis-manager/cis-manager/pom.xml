@@ -60,6 +60,13 @@
 		  <version>${version.cis}</version>
 		  <scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>activityfeed-client</artifactId>
+		    <version>${release.version}</version>
+		    <scope>provided</scope>
+	    </dependency>
 		  
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -112,12 +119,12 @@
 		</dependency>
 		
 
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>activityfeedservice</artifactId>
 			<version>${version.cis}</version>
-			<scope>provided</scope>
-		</dependency>-->
+			<scope>test</scope>
+		</dependency>
 		
 		<dependency>
 			<groupId>javax.transaction</groupId>

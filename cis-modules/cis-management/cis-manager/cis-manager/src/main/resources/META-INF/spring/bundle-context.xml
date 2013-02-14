@@ -85,8 +85,7 @@
         <property name="privacyDataManager" ref="PrivacyDataManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
-        <property name="negotiator" ref="NegotiationRequester"/>
-        <property name="pubsubClient" ref="PubsubClient"/>       
+        <property name="negotiator" ref="NegotiationRequester"/>    
         <property name="iUsrFeedback" ref="userFeedback"/>
         <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />
         <property name="iActivityFeedManager" value="activityFeedManager" />
