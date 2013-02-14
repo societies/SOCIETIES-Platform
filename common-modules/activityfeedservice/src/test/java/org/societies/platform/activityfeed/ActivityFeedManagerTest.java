@@ -73,6 +73,7 @@ public class ActivityFeedManagerTest {
     @Autowired
     private SessionFactory sessionFactory;
     private ICISCommunicationMgrFactory mockCcmFactory;
+    //mocks
     private static ICommManager mockCSSendpoint = mock(ICommManager.class);
     private static IIdentityManager mockIdentityManager = mock(IIdentityManager.class);
     private static IIdentity mockIdentity = mock(IIdentity.class);

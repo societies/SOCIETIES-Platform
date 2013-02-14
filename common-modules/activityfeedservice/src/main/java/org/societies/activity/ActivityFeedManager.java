@@ -63,6 +63,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public ActivityFeedManager(){
         feeds = new ArrayList<IActivityFeed>();
     }
+    public ActivityFeedManager(SessionFactory sessionFactory){
+        feeds = new ArrayList<IActivityFeed>();
+        this.sessionFactory = sessionFactory;
+    }
     @Override
     public IActivityFeed getOrCreateFeed(String owner, String feedId) {
         LOG.info("In getOrCreateFeed .. ");
