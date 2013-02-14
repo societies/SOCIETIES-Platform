@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
@@ -25,17 +25,12 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.context.broker.ICtxBroker;
-
-
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.cis.attributes.Rule;
 
 
 public class CreateCommunityCtx {
 
 	private static Logger LOG = LoggerFactory.getLogger(Test1108.class);
-	
+
 
 	//	private IIdentity cisID;
 	private IIdentity cssID1; 
@@ -44,7 +39,7 @@ public class CreateCommunityCtx {
 
 
 	//private CommunityCtxEntity communityEntity;
-	
+
 	private IndividualCtxEntity indiEnt1;
 	private IndividualCtxEntity indiEnt2;
 	private IndividualCtxEntity indiEnt3;
@@ -56,24 +51,22 @@ public class CreateCommunityCtx {
 
 	private INetworkNode cssNodeId;
 	private ICisManager cisManager;
-	
-		String cssPassword = "password.societies.local";
+
+	String cssPassword = "password.societies.local";
 
 	public void setUp(){
 
 		LOG.info("CreateCommunityCtx started");
-	//	LOG.info("Context broker service: "+ Test1108.getCtxBroker());
-	//	LOG.info("comm manager service"+ Test1108.getCommManager());
-	//	LOG.info("cisManager service"+ Test1108.getCisManager());
+		//	LOG.info("Context broker service: "+ Test1108.getCtxBroker());
+		//	LOG.info("comm manager service"+ Test1108.getCommManager());
+		//	LOG.info("cisManager service"+ Test1108.getCisManager());
 
 	}
-
 
 	@Test
 	public void TestCreateCommunityEntities() {
 
 		LOG.info("TestCreateCommunityEntities");
-
 		LOG.info("Context broker service: "+ Test1108.getCtxBroker());
 		LOG.info("comm manager service"+ Test1108.getCommManager());
 		LOG.info("cisManager service"+ Test1108.getCisManager());
@@ -81,52 +74,65 @@ public class CreateCommunityCtx {
 		CommunityCtxEntity communityEntity = null;
 
 		try {
-			IIdentity cisID = createCISid();
-			LOG.info("#@#@# Cis id "+cisID);
-
+			//IIdentity cisID = createCISid(); //cis-843d9742-f7ff-4ba9-ae53-60b4b4bcd30d.societies.local
+			IIdentity cisID = Test1108.getCommManager().getIdManager().fromJid("cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local");
+			//IIdentity cisID = ('cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local');
+			//LOG.info("#@#@# Cis id "+cisID);
+			LOG.info("#@#@# Test id "+cisID); //cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local
+			//communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
 			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
-		LOG.info("gCommunity Entity Created");
-		LOG.info("g00");		
-			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("XCManager@societies.local ");
+			LOG.info("gCommunity Entity Created");
+			LOG.info("g00");		
+			
+			
+			
+			//Creation of the 1st entity XCManager with attribute interests reading,socialnetworking,cinema,sports
+			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("XCManager.societies.local ");
 			LOG.info("trying to create attribute witth: "+this.cssID1 + "and "+ CtxEntityTypes.PERSON);
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
-
-LOG.info("g01");
-LOG.info("xssID "+this.cssID1); //XCManager@societies.local 
-LOG.info("indiEnt1 "+this.indiEnt1); //org.societies.api.context.model.IndividualCtxEntity@a1e977de
-LOG.info("this.indiEnt1.getId() "+this.indiEnt1.getId()+"CtxAttributeTypes.INTERESTS "+CtxAttributeTypes.INTERESTS); //(context://XCManager@societies.local /ENTITY/person/950308,interests)
-
+			LOG.info("g01");
+			LOG.info("xssID "+this.cssID1); //XCManager.societies.local 
+			LOG.info("indiEnt1 "+this.indiEnt1); //org.societies.api.context.model.IndividualCtxEntity@a1e977de
+			LOG.info("this.indiEnt1.getId() "+this.indiEnt1.getId()+"CtxAttributeTypes.INTERESTS "+CtxAttributeTypes.INTERESTS); //(context://XCManager@societies.local /ENTITY/person/950308,interests)
 			CtxAttribute individualAttr1 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
 			LOG.info("g011");
 			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
 			LOG.info("g012");
 			individualAttr1.setValueType(CtxAttributeValueType.STRING);
-LOG.info("g02");
+				
+			//Creation of attribute Temperature of the 1st entity XCManager with value 25
+			LOG.info("g02");
 			CtxAttribute individualAttr2 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr2.setValueType(CtxAttributeValueType.INTEGER);
 			individualAttr2.setIntegerValue(25);
-LOG.info("g03");
+			LOG.info("g03");
 			Test1108.getCtxBroker().update(individualAttr1);
 			Test1108.getCtxBroker().update(individualAttr2);
-LOG.info("g04");
-			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("XCManager@societies.local ");
+			LOG.info("g04");
+			
+			
+			// Creation of the 2nd entity XCManager with attribute interests cooking,horseRiding,restaurants,cinema and Temperature 27
+			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("XCManager.societies.local");
 			this.indiEnt2 = Test1108.getCtxBroker().createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
-LOG.info("g05");
+			LOG.info("g05");
 			CtxAttribute individualAttr3 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr3.setStringValue("cooking,horseRiding,restaurants,cinema");
 			individualAttr3.setValueType(CtxAttributeValueType.STRING);
-LOG.info("g06");
+			LOG.info("g06");
 			CtxAttribute individualAttr4 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr4.setIntegerValue(27);
 			individualAttr4.setValueType(CtxAttributeValueType.INTEGER);
-LOG.info("g07");
+			LOG.info("g07");
 			Test1108.getCtxBroker().update(individualAttr3);
 			Test1108.getCtxBroker().update(individualAttr4);
-LOG.info("g08");
-			this.cssID3 =  Test1108.getCommManager().getIdManager().fromJid("doo@societies.local ");
+			LOG.info("g08");
+			
+			
+			//Creation of the 3rd entity John with attributes Interests cooking,horseRiding,socialnetworking,restaurants,cinema and Temperature 27
+			this.cssID3 =  Test1108.getCommManager().getIdManager().fromJid("john.societies.local");
 			this.indiEnt3 = Test1108.getCtxBroker().createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
 			LOG.info("g09");
-			CtxAttribute individualAttr5 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
+			CtxAttribute individualAttr5 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId(), CtxAttributeTypes.INTERESTS).get();
 			individualAttr5.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
 			individualAttr5.setValueType(CtxAttributeValueType.STRING);
 			LOG.info("g10");
@@ -137,9 +143,9 @@ LOG.info("g08");
 			Test1108.getCtxBroker().update(individualAttr5);
 			Test1108.getCtxBroker().update(individualAttr6);
 			LOG.info("g12");
-			communityEntity.addMember(this.indiEnt1.getId());
-			communityEntity.addMember(this.indiEnt2.getId());
-			communityEntity.addMember(this.indiEnt3.getId());
+	//		communityEntity.addMember(this.indiEnt1.getId());
+	//		communityEntity.addMember(this.indiEnt2.getId());
+	//		communityEntity.addMember(this.indiEnt3.getId());
 			LOG.info("g13");
 			Test1108.getCtxBroker().update(communityEntity);
 			LOG.info("g14");
@@ -156,9 +162,9 @@ LOG.info("g08");
 			LOG.info("TestRetrieveCommunityEntities   this.communityAttrTemperatureId "+ this.communityAttrTemperatureId );
 			LOG.info("TestRetrieveCommunityEntities   this.communityInterestsId "+ this.communityAttrInterestsId);
 			LOG.info("g17");
-LOG.info("we5uy34y5 before retrieveCommunityEntities");
+			LOG.info("we5uy34y5 before retrieveCommunityEntities");
 			retrieveCommunityEntities();
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -182,7 +188,7 @@ LOG.info("we5uy34y5 before retrieveCommunityEntities");
 
 		LOG.info("TestRetrieveCommunityEntities");
 		CtxAttribute estimatedCommunityAttribute;
-		
+
 		try {
 			// at this point communityAttrInterests is created and assigned to communityEntity but has a null value 
 			LOG.info("communityAttrInterestsId " + this.communityAttrInterestsId);
@@ -191,26 +197,26 @@ LOG.info("we5uy34y5 before retrieveCommunityEntities");
 			CtxAttribute communityInter = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
 			LOG.info(" communityAttr  "+communityTempr.getId()); 
 			LOG.info(" communityAttr  value "+ communityInter.getStringValue()+ " should be null");
-	
+
 			LOG.info(" The estimation for the community Temperature begins, ");
 			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrTemperatureId);
 			LOG.info(" estimatedCommunityAttribute getString ID:  "+estimatedCommunityAttribute.getId()+" should not be null ");
 			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getDoubleValue() +" should not be null ");
-			
+
 			LOG.info(" The estimation for the community Interests begins, ");
 			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrInterestsId);
 			LOG.info(" estimatedCommunityAttribute getString ID:  "+estimatedCommunityAttribute.getId()+" should not be null ");
 			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getStringValue() +" should not be null ");
-			
+
 			// TODO second version of the test
 			//retrieving attribute with flag true should initiate the inference process.
 			//inference process will assign a community context value to community attribute
-					
+
 			//CtxAttribute communityAttr2 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, true).get();
 			//LOG.info(" trigger inference ");
 			//LOG.info(" communityAttr  "+communityAttr2.getId()); 
 			//LOG.info(" communityAttr  value "+ communityAttr2.getStringValue());
-		
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -222,24 +228,24 @@ LOG.info("we5uy34y5 before retrieveCommunityEntities");
 			e.printStackTrace();
 		}
 	}
-	
+
 	// helper classes
-	
+
 	protected  IIdentity createCISid() {
 
 		IIdentity cisID = null;
 		IIdentity cssOwnerId = null;
 		ICisOwned cisOwned ;
-	
+
 		try {
 			this.cssNodeId = Test1108.getCommManager().getIdManager().getThisNetworkNode();
 			LOG.info("*** cssNodeId = " + this.cssNodeId);
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			cssOwnerId = Test1108.getCommManager().getIdManager().fromJid(cssOwnerStr);
-		
+
 			//Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
-		
-			
+
+
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 			MembershipCriteria m = new MembershipCriteria();
 			try{
@@ -253,26 +259,26 @@ LOG.info("we5uy34y5 before retrieveCommunityEntities");
 				// TODO: treat expection
 				e.printStackTrace();
 			}
-			
+
 			LOG.info("*** trying to create cis : ");
 			cisOwned = Test1108.getCisManager().createCis("CIS_NAME", "password.societies.local" , cisCriteria,"stringArg3").get();
-			
+
 			LOG.info("*** cis created: "+cisOwned.getCisId());
-			
+
 			//LOG.info("*** cis list: "+cisManager.getCisList());
 			//			cisManager.createCis(arg0, arg1, arg2, arg3)
-			
-			 //CisOwned ciss =  (cisManager.createCis(cssOwnerStr, "password.societies.local","cisNAme", null , TEST_CIS_MODE)).get();
-			
-			
+
+			//CisOwned ciss =  (cisManager.createCis(cssOwnerStr, "password.societies.local","cisNAme", null , TEST_CIS_MODE)).get();
+
+
 			//.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
-			
+
 			//cisOwned = cisManager.getOwnedCis(arg0);
 			LOG.info("*** cisOwned " +cisOwned);
 			String cisIDString  = cisOwned.getCisId();
 			LOG.info("*** cisOwned.getCisId() " +cisIDString);
 			cisID = Test1108.getCommManager().getIdManager().fromJid(cisIDString);
-			
+
 		} catch (InterruptedException e) {
 
 		} catch (ExecutionException e) {
