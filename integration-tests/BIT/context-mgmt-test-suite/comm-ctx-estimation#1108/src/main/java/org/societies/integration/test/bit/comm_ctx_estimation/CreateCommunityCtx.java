@@ -74,8 +74,8 @@ public class CreateCommunityCtx {
 		CommunityCtxEntity communityEntity = null;
 
 		try {
-			//IIdentity cisID = createCISid(); //cis-843d9742-f7ff-4ba9-ae53-60b4b4bcd30d.societies.local
-			IIdentity cisID = Test1108.getCommManager().getIdManager().fromJid("cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local");
+			IIdentity cisID = createCISid(); //cis-843d9742-f7ff-4ba9-ae53-60b4b4bcd30d.societies.local
+			//IIdentity cisID = Test1108.getCommManager().getIdManager().fromJid("cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local");
 			//IIdentity cisID = ('cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local');
 			//LOG.info("#@#@# Cis id "+cisID);
 			LOG.info("#@#@# Test id "+cisID); //cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local
