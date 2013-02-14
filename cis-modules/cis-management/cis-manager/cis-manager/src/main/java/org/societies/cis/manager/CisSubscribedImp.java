@@ -89,7 +89,7 @@ public class CisSubscribedImp implements ICis {
 		this.cisRecord = cisRecord;
 		this.cisManag =cisManag;
 		try {
-			this.iactivityFeed = new RemoteActivityFeed(cisManag.iCommMgr, cisManag.iCommMgr.getIdManager().fromJid(cisRecord.cisJID));
+			this.iactivityFeed = new RemoteActivityFeed(cisManag.getiCommMgr(), cisManag.getiCommMgr().getIdManager().fromJid(cisRecord.cisJID));
 		} catch (InvalidFormatException e) {
 			LOG.debug("Wrong format of CIS jid in cisRecord");
 			e.printStackTrace();
@@ -129,7 +129,7 @@ public class CisSubscribedImp implements ICis {
 	public void startAfterDBretrieval(CisManager cisManag){
 		this.cisManag = cisManag;
 		try {
-			this.iactivityFeed = new RemoteActivityFeed(cisManag.iCommMgr, cisManag.iCommMgr.getIdManager().fromJid(this.cisRecord.cisJID));
+			this.iactivityFeed = new RemoteActivityFeed(cisManag.getiCommMgr(), cisManag.getiCommMgr().getIdManager().fromJid(this.cisRecord.cisJID));
 		} catch (InvalidFormatException e) {
 			LOG.debug("Wrong format of CIS jid in cisRecord");
 			e.printStackTrace();
@@ -145,7 +145,7 @@ public class CisSubscribedImp implements ICis {
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			toIdentity = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
@@ -157,7 +157,7 @@ public class CisSubscribedImp implements ICis {
 			
 			try {
 				LOG.info("Sending stanza with get info");
-				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
+				this.cisManag.getiCommMgr().sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -176,7 +176,7 @@ public class CisSubscribedImp implements ICis {
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			toIdentity = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
@@ -185,7 +185,7 @@ public class CisSubscribedImp implements ICis {
 			c.setGetInfo( new GetInfo());
 			try {
 				LOG.info("Sending stanza with get info");
-				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
+				this.cisManag.getiCommMgr().sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -204,7 +204,7 @@ public class CisSubscribedImp implements ICis {
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			toIdentity = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
@@ -216,7 +216,7 @@ public class CisSubscribedImp implements ICis {
 		
 			try {
 				LOG.info("Sending stanza with set info");
-				this.cisManag.iCommMgr.sendIQGet(stanza, com, commsCallback);
+				this.cisManag.getiCommMgr().sendIQGet(stanza, com, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -236,7 +236,7 @@ public class CisSubscribedImp implements ICis {
 		WhoRequest w = new WhoRequest();
 		c.setWhoRequest(w);
 		RequestorBean reqB = new RequestorBean();
-		reqB.setRequestorId(this.cisManag.iCommMgr.getIdManager().getThisNetworkNode().getBareJid());
+		reqB.setRequestorId(this.cisManag.getiCommMgr().getIdManager().getThisNetworkNode().getBareJid());
 		this.sendXmpp(c, callback);		
 	}
 	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
@@ -287,14 +287,14 @@ public class CisSubscribedImp implements ICis {
 	private void sendXmpp(CommunityMethods c,ICisManagerCallback callback){
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			toIdentity = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
 			try {
 				LOG.info("Sending stanza");
-				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
+				this.cisManag.getiCommMgr().sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -310,8 +310,8 @@ public class CisSubscribedImp implements ICis {
 		IIdentity remoteCISid;
 		IActivityFeed i = null;
 		try {
-			remoteCISid = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
-			i = new RemoteActivityFeed(this.cisManag.iCommMgr,remoteCISid);
+			remoteCISid = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
+			i = new RemoteActivityFeed(this.cisManag.getiCommMgr(),remoteCISid);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -40,4 +40,6 @@
 
 	<osgi:reference id="userFeedback"
 		interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
+    <osgi:service id="activityFeedManager"
+        interface="org.societies.api.activity.IActivityFeedManager" />
 </beans>

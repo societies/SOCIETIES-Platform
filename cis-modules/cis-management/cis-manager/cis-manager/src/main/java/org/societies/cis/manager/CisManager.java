@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Set;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +47,6 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
@@ -66,7 +64,6 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -89,10 +86,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Uti
 
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.cis.manager.Cis;
 
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -111,17 +105,13 @@ import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.Leave;
-import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Qualification;
 import org.societies.api.schema.cis.community.WhoRequest;
-import org.societies.api.schema.cis.community.WhoResponse;
 //import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
 
-import org.societies.api.schema.cis.community.Join;
 //import org.societies.api.schema.cis.community.Leave;
-import org.societies.api.schema.cis.community.Participant;
 
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -132,8 +122,6 @@ import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
-import org.societies.api.schema.cis.manager.Notification;
-import org.societies.api.schema.cis.manager.SubscribedTo;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -158,7 +146,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	List<Cis> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
-	ICommManager iCommMgr;
+	private ICommManager iCommMgr;
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote = null;
@@ -175,8 +163,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
 	private boolean privacyPolicyNegotiationIncluded;
-	
-	public IUserFeedback getiUsrFeedback() {
+    private String iActivityFeedManager;
+
+    public IUserFeedback getiUsrFeedback() {
 		return iUsrFeedback;
 	}
 
@@ -245,11 +234,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 
 	public ICommManager getICommMgr() {
-		return iCommMgr;
+		return getiCommMgr();
 	}
 
 	public void setICommMgr(ICommManager cSSendpoint) {
-		iCommMgr = cSSendpoint;
+		setiCommMgr(cSSendpoint);
 	}
 
 
@@ -328,16 +317,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
 		// throw exceptions
 		
-		while (iCommMgr.getIdManager() ==null)
+		while (getiCommMgr().getIdManager() ==null)
 			;//just wait untill the XCommanager is ready
 		
-		cisManagerId = iCommMgr.getIdManager().getThisNetworkNode();
+		cisManagerId = getiCommMgr().getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
 
 		try {
-			iCommMgr.register((IFeatureServer)this);
+			getiCommMgr().register((IFeatureServer) this);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		} // TODO unregister??
@@ -480,7 +469,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		try {
 			IIdentity cssOwnerId = this.cisManagerId;
-			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
+			IIdentity cisId = getiCommMgr().getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
 			if(privacyPolicyManager != null)
 				privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
@@ -850,7 +839,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					return response;
 				}
 				else{
-					JoinCallBackToAndroid jCallback = new JoinCallBackToAndroid(stanza.getFrom(),this.iCommMgr,ad.getId());
+					JoinCallBackToAndroid jCallback = new JoinCallBackToAndroid(stanza.getFrom(), this.getiCommMgr(),ad.getId());
 					this.joinRemoteCIS(ad, jCallback);// the real return will come in the callback
 					
 					ar.setStatus("pending");
@@ -874,7 +863,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					return response;
 				}
 				else{
-					LeaveCallBackToAndroid jCallback = new LeaveCallBackToAndroid(stanza.getFrom(),this.iCommMgr,c.getAskCisManagerForLeave().getTargetCisJid());
+					LeaveCallBackToAndroid jCallback = new LeaveCallBackToAndroid(stanza.getFrom(), this.getiCommMgr(),c.getAskCisManagerForLeave().getTargetCisJid());
 					this.leaveRemoteCIS(c.getAskCisManagerForLeave().getTargetCisJid(), jCallback);
 					
 					lr.setStatus("pending");
@@ -894,8 +883,24 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 
+    public ICommManager getiCommMgr() {
+        return iCommMgr;
+    }
 
-public class JoinCallBack implements ICisManagerCallback{
+    public void setiCommMgr(ICommManager iCommMgr) {
+        this.iCommMgr = iCommMgr;
+    }
+
+    public void setiActivityFeedManager(String iActivityFeedManager) {
+        this.iActivityFeedManager = iActivityFeedManager;
+    }
+
+    public String getiActivityFeedManager() {
+        return iActivityFeedManager;
+    }
+
+
+    public class JoinCallBack implements ICisManagerCallback{
 		
 	JoinResponse resp;
 	
@@ -1399,7 +1404,7 @@ public class JoinCallBack implements ICisManagerCallback{
 		LOG.info("going to start the negotiation");
 
 		try {
-			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())),
+			negotiator.startNegotiation(new RequestorCis(this.getiCommMgr().getIdManager().fromJid(adv.getCssownerid()) , this.getiCommMgr().getIdManager().fromJid(adv.getId())),
 					new INegCallBack(this,j,adv.getId(),callback));
 		}
 		catch (InvalidFormatException e) {
@@ -1470,7 +1475,7 @@ public class JoinCallBack implements ICisManagerCallback{
 				// -- Sending join
 				IIdentity toIdentity;
 				try {
-					toIdentity = cisMgm.iCommMgr.getIdManager().fromJid(targetJid);
+					toIdentity = cisMgm.getiCommMgr().getIdManager().fromJid(targetJid);
 					Stanza stanza = new Stanza(toIdentity);
 					CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 							stanza.getId(), callback, cisMgm);
@@ -1481,7 +1486,7 @@ public class JoinCallBack implements ICisManagerCallback{
 
 					try {
 						LOG.info("Sending stanza with join");
-						cisMgm.iCommMgr.sendIQGet(stanza, c, commsCallback);
+						cisMgm.getiCommMgr().sendIQGet(stanza, c, commsCallback);
 					} catch (CommunicationException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1514,14 +1519,14 @@ public class JoinCallBack implements ICisManagerCallback{
 	private void sendXmpp(CommunityMethods c, String targetJid, ICisManagerCallback callback){
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(targetJid);
+			toIdentity = this.getiCommMgr().getIdManager().fromJid(targetJid);
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
 			try {
 				LOG.info("Sending stanza");
-				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
+				this.getiCommMgr().sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1581,11 +1586,11 @@ public class JoinCallBack implements ICisManagerCallback{
 		return isDepencyInjectionDone(0);
 	}
 	private boolean isDepencyInjectionDone(int level) {
-		if (null == iCommMgr) {
+		if (null == getiCommMgr()) {
 			LOG.info("[Dependency Injection] Missing ICommManager");
 			return false;
 		}
-		if (null == iCommMgr.getIdManager()) {
+		if (null == getiCommMgr().getIdManager()) {
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
