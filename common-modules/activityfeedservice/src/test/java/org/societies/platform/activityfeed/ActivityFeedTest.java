@@ -29,15 +29,20 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.activity.ActivityFeedManager;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.socialdata.SocialData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +54,13 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.when;
 
 /**
  * 
@@ -67,44 +74,48 @@ AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
 			.getLogger(ActivityFeedTest.class);
 
-    @Qualifier(value = "test")
-	@Autowired
+    @Autowired
+    private SessionFactory sessionFactory;
+    private static ActivityFeedManager activityFeedManager;
+
 	private ActivityFeed actFeed;
-    //@Autowired
-    //private ActivityFeed pFeed;
-	private SessionFactory sessionFactory=null;
-	private Session session=null;
-	static {
+
+    //mocks
+    private static ICommManager mockCSSendpoint = mock(ICommManager.class);
+    private static IIdentityManager mockIdentityManager = mock(IIdentityManager.class);
+    private static IIdentity mockIdentity = mock(IIdentity.class);
+    private static final String FEED_ID="1";
+    private static final String FEED_JID="sintef";
+    private static PubsubClient mockPubsubClient = mock(PubsubClient.class);
+    private static List<String> mockDicoItems = new ArrayList<String>();
+
+
+    static {
 		ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
 	}
 	int feedid=0;
 
-    public ActivityFeedTest() {
-        LOG.info("in actfeedtest constructor");
-/*        actFeed = pFeed;*/
+    @BeforeClass
+    public static void setupBeforeClass() throws InvalidFormatException, CommunicationException, XMPPError {
+        mockDicoItems.add(FEED_ID);
+        when(mockCSSendpoint.getIdManager()).thenReturn(mockIdentityManager);
+        when(mockIdentityManager.fromJid(FEED_JID)).thenReturn(mockIdentity);
+        when(mockPubsubClient.discoItems(mockIdentity,FEED_ID)).thenReturn(mockDicoItems);
+        activityFeedManager = new ActivityFeedManager();
+        activityFeedManager.setCommManager(mockCSSendpoint);
+
+        activityFeedManager.setPubSubClient(mockPubsubClient);
     }
 
     @Before
 	public void setupBefore() throws Exception {
-        actFeed = new ActivityFeed();
-		if(sessionFactory==null){
-			sessionFactory = actFeed.getSessionFactory();
-		}
-
-//		if(session==null){
-//			session = sessionFactory.openSession();
-//			actFeed.setSession(session);
-//		}
-//		if(!session.isOpen())
-//			session = sessionFactory.openSession();
-		LOG.info("i startup ");
-		
+        activityFeedManager.setSessionFactory(this.sessionFactory);
+        actFeed = (ActivityFeed) activityFeedManager.getOrCreateFeed(FEED_JID,FEED_ID);
 	}
 	@After
 	public void tearDownAfter() throws Exception {
 		
 		actFeed.clear();
-//		session.close();
 		actFeed = null;
 	}
 	@Test
@@ -213,7 +224,6 @@ AbstractTransactionalJUnit4SpringContextTests {
 //		ActivityFeed queryFeed = ActivityFeed.startUp("0");
 //		assert(queryFeed != null);
 //	}
-	@Ignore
 	@Test
 	@Rollback(false)
 	public void testSNImporter(){
