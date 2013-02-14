@@ -15,6 +15,6 @@
 
     <osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl" />
     <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
-    <osgi:reference id="calculatorService" interface="org.societies.integration.example.service.api.IAddService" cardinality="0..1"/>
+    <osgi:reference id="addService" interface="org.societies.integration.example.service.api.IAddService" cardinality="0..1"/>
        
 </beans>

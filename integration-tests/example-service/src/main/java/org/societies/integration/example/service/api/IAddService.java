@@ -1,5 +1,7 @@
 package org.societies.integration.example.service.api;
 
+import java.util.concurrent.Future;
+
 
 /**
  * 
@@ -8,12 +10,7 @@ package org.societies.integration.example.service.api;
  */
 public interface IAddService {
 	
-	public int addNumbers(int a, int b);
+	public Future<Integer> addNumbers(int a, int b);
 
-	/**
-	 * @param i
-	 * @param j
-	 * @return
-	 */
 
 }
