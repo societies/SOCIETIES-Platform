@@ -77,9 +77,8 @@
 		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../../platform-infrastructure/sns/LinkedinConn</module>
-		<module>../../platform-infrastructure/sns/socialdata</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
-		<module>../../platform-infrastructure/sns/SocialDataCommsMgr</module>
+		<module>../../platform-infrastructure/sns/socialdata</module>
 		
 		<!-- Context Management: 2 bundles -->
 		<module>../../context-management</module>

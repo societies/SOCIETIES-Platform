@@ -17,6 +17,17 @@
 
 	<developers>
 		<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Owner</role>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>	    
+		<developer>
 			<name>S Gallacher</name>
 			<email>S.Gallacher@hw.ac.uk</email>
 			<organization>HWU</organization>
@@ -39,33 +50,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency-->
-		<!--dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		    <type>apklib</type>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<!--dependency>
+		<dependency>
    			<groupId>org.societies.android.platform.androidutils</groupId>
 		    <artifactId>SocietiesAndroidUtilities</artifactId>
-   			<version>${release.version}</version>
-   			<type>apklib</type>
-		</dependency-->
-		<dependency>
-   			<groupId>org.societies.android.platform.pubsub.helper</groupId>
-		    <artifactId>societies-android-pubsub-helper</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
@@ -74,29 +73,6 @@
 			<groupId>xpp3</groupId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- 
-        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-		</dependency>
-		-->
     </dependencies>
 
     <build>

@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
-        <groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
-        <version>RELEASE</version>
-   </parent>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
 
-   <groupId>org.societies.android.platform.useragent.feedback.container</groupId>
-   <artifactId>TestContainerFeedback</artifactId>
-   <name>TestContainerFeedback</name>
-   <version>${release.version}</version>
-   <packaging>apk</packaging>
+	<groupId>org.societies.android.platform.useragent.feedback.container</groupId>
+	<artifactId>TestContainerFeedback</artifactId>
+	<name>TestContainerFeedback</name>
+	<version>${release.version}</version>
+	<packaging>apk</packaging>
 
-   <developers>
-	    <developer>
-	      <name>S Gallacher</name>
-	      <email>S.Gallacher@hw.ac.uk</email>
-	      <organization>HWU</organization>
-	      <roles>
-	        <role>senior developer</role>
-	      </roles>
-	    </developer>
-	</developers>	
+	<developers>
+		<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Owner</role>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
+		<developer>
+			<name>S Gallacher</name>
+			<email>S.Gallacher@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<roles>
+				<role>senior developer</role>
+			</roles>
+		</developer>
+	</developers>
 
-	<dependencies>    
+	<dependencies>
 		<dependency>
-	    	<groupId>com.google.android</groupId>
-	        <artifactId>android</artifactId> 
-	        <exclusions>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<exclusions>
 				<!-- Provided by Android -->
 				<exclusion>
 					<artifactId>xpp3</artifactId>
@@ -37,75 +49,42 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency>
+<!-- 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
-		</dependency> -->
-		<!-- <dependency>
-	    	<groupId>org.societies.api.external</groupId>
-	    	<artifactId>societies-api</artifactId>
-	    	<version>${release.version}</version>
-		</dependency> -->
-		<dependency>
-   			<groupId>org.societies.android.api.external</groupId>
-   			<artifactId>societies-android-api</artifactId>
-  			<version>${release.version}</version>
-  			<type>apklib</type>
-		</dependency> 
-        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-        <dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
-		</dependency>
-		<!-- <dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.androidutils</groupId>
+			<artifactId>SocietiesAndroidUtilities</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency> -->
 		<dependency>
 			<groupId>org.societies.android.platform.useragent.feedback</groupId>
-   			<artifactId>AndroidUserFeedback</artifactId>
-   			<version>${release.version}</version>
-   			<type>apklib</type>
+			<artifactId>AndroidUserFeedback</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
-    </dependencies>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<version>1.1.4c</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
     <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
           <plugins>
-	          <!--plugin>
-			    <groupId>org.codehaus.mojo</groupId>
-			    <artifactId>build-helper-maven-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <phase>generate-sources</phase>
-			            <goals><goal>add-source</goal></goals>
-			            <configuration>
-			                <sources>
-			                    <source>../SocietiesAndroidEvents/src/</source>
-			                </sources>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin-->
               <plugin>
                   <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                   <artifactId>android-maven-plugin</artifactId>
