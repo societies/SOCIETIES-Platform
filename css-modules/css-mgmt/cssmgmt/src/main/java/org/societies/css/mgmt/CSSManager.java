@@ -27,6 +27,7 @@ package org.societies.css.mgmt;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -68,6 +69,7 @@ import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.css.ICSSManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -103,17 +105,15 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
-	
 	public static final String TEST_IDENTITY = "android";
-	
 	public static final String TEST_EMAIL = "somebody@tssg.org";
 	public static final String TEST_FORENAME = "4Name";
-	
 	public static final String TEST_NAME = "The CSS";
-	
 	private static final String THIS_NODE = "XCManager.societies.local";
-	private static final String CSS_PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
-    private static final List<String> cssPubsubClassList = Collections.singletonList(CSS_PUBSUB_CLASS);
+
+	private static final List<String> cssPubsubClassList = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.api.schema.cssmanagement.CssEvent",
+					  		"org.societies.api.schema.css.directory.CssFriendEvent"));
 
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
@@ -173,6 +173,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 
     			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
     	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+    	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT);
+    	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT);
     	        
     		} catch (XMPPError e) {
     			e.printStackTrace();
@@ -1625,10 +1627,25 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	}
 
 	@Override
-	public void handleInternalFriendRequest(IIdentity arg0,
-			CssRequestStatusType arg1) {
-		// TODO Auto-generated method stub
+	public void handleInternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
+		//PUBLISH PUBSUB EVENT FOR THIS RECEIVED FRIEND REQUEST
+		CssAdvertisementRecord advert = new CssAdvertisementRecord();
+		advert.setId(identity.getBareJid());
+		advert.setName("TBD");
 		
+		CssFriendEvent payload = new CssFriendEvent();
+		payload.setCssAdvert(advert);
+		
+		try {
+			String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
+			LOG.debug("Published friend request received event for: " + identity.getBareJid() + ". Status: " + status);
+		} catch (XMPPError e) {
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
+		
+		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
 	}
 	
 	public void pushtoContext(CssRecord record) {

@@ -37,6 +37,9 @@ public class CSSManagerEnums {
     public static final String DEPART_CSS_NODE = "departCSSNode";
     public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
 
+    public final static String CSS_FRIEND_REQUEST_RECEIVED_EVENT = "friendRequestReceived";
+    public final static String CSS_FRIEND_REQUEST_ACCEPTED_EVENT = "friendRequestAccepted";
+    
 	/**
 	 * Enum for device status types
 	 */
