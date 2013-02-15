@@ -143,8 +143,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     }
     public void init(){
         Session session = getSessionFactory().openSession();
+        List<IActivityFeed> tmpFeeds = null;
         try{
-            feeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+        	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+        	feeds.addAll(tmpFeeds);
         }catch(Exception e){
             LOG.error("CISManager startup queries failed..");
             e.printStackTrace();
