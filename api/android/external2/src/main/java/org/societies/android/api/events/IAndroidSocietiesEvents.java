@@ -1,5 +1,7 @@
 package org.societies.android.api.events;
 
+import org.societies.android.api.css.manager.IServiceManager;
+
 /**
  * Interface defines how 3rd party and optionally, platform components, can 
  * subscribe/publish to Societies platform events. The base eventing system used in Societies
@@ -12,7 +14,7 @@ package org.societies.android.api.events;
  * This interface should not be used for Android intra-node eventing - use Intents.  
  *
  */
-public interface IAndroidSocietiesEvents {
+public interface IAndroidSocietiesEvents extends IServiceManager{
 	
 	/**
 	 * Societies Events intents
@@ -121,13 +123,17 @@ public interface IAndroidSocietiesEvents {
 
 	
 	//Array of interface method signatures
+	//N.B. Must include any extended interface(s) method arrays
 	final static String methodsArray [] = {"subscribeToEvent(String client, String societiesIntent)",
 			"subscribeToEvents(String client, String intentFilter)",
 			"subscribeToAllEvents(String client)",
 			"unSubscribeFromEvent(String client, String societiesIntent)",
 			"unSubscribeFromEvents(String client, String intentFilter)",
 			"unSubscribeFromAllEvents(String client)",
-			"publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass)"
+			"publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass)",
+			"getNumScubscribedNodes(String client)",
+			"startService()",
+			"stopService()"
 	};
 
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
@@ -137,9 +143,9 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param societiesIntent specific event intent
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int subscribeToEvent(String client, String societiesIntent);
+	boolean subscribeToEvent(String client, String societiesIntent);
 	
 	/**
 	 * Subscribe to Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -147,26 +153,26 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param intentFilter event filter
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int subscribeToEvents(String client, String intentFilter);
+	boolean subscribeToEvents(String client, String intentFilter);
 	
 	/**
 	 * Subscribe to all platform events. This should only be used if really required.
 	 * 
 	 * @param client app package 
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int subscribeToAllEvents(String client);
+	boolean subscribeToAllEvents(String client);
 	
 	/**
 	 * Un-subscribe from a specified Societies platform event (Android Intent)
 	 * 
 	 * @param client app package 
 	 * @param societiesIntent specific event intent
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int unSubscribeFromEvent(String client, String societiesIntent);
+	boolean unSubscribeFromEvent(String client, String societiesIntent);
 	
 	/**
 	 * Un-subscribe from Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -174,17 +180,17 @@ public interface IAndroidSocietiesEvents {
 	 * 
 	 * @param client app package 
 	 * @param intentFilter event filter
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int unSubscribeFromEvents(String client, String intentFilter);
+	boolean unSubscribeFromEvents(String client, String intentFilter);
 	
 	/**
 	 * Un-subscribe from all current platform event subscriptions.
 	 * 
 	 * @param client app package 
-	 * @return int - number of subscribed events
+	 * @return boolean true if subscription takes place
 	 */
-	int unSubscribeFromAllEvents(String client);
+	boolean unSubscribeFromAllEvents(String client);
 	
 	/**
 	 * Publish an event to the Societies platform for consumption by other CSS nodes
@@ -196,4 +202,12 @@ public interface IAndroidSocietiesEvents {
 	 * @return boolean - returned via Android intent
 	 */
 	boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass);
+	
+	/**
+	 * Obtain the current number of subscribed to events
+	 * 
+	 * @param client
+	 * @return int number of subscribed to events
+	 */
+	int getNumSubscribedNodes(String client);
 }

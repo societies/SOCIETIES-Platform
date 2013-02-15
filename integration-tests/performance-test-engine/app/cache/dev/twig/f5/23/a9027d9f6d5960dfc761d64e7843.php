@@ -89,14 +89,14 @@ Test Parameters
             echo "\" >";
             echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "parameterName"), "html", null, true);
             echo "</label>
-\t \t\t<input type=\"text\" id=\"";
+\t \t\t<textarea id=\"";
             // line 32
             echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "id"), "html", null, true);
             echo "\" name=\"";
             echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "id"), "html", null, true);
-            echo "\" required=\"required\" value=\"";
+            echo "\" required=\"required\" >";
             echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "parameterValue"), "html", null, true);
-            echo "\" />\t
+            echo "</textarea>\t
 \t \t<br/>
 \t\t";
         }

@@ -87,12 +87,15 @@ public class ProviderImplemenation extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		Log.d(LOG_TAG, "CSS Content Provider created");
-		this.dbHelper = new DBHelper(this.getContext(), CssRecordDAO.SOCIETIES_DATABASE_NAME, null, CssRecordDAO.SOCIETIES_DATABASE_VERSION);
 		return true;
 	}
 
 	@Override
 	public Cursor query(Uri uri, String[] columns, String selectionCriteria, String[] selectionArgs, String sortOrder) {
+		if (null == this.dbHelper) {
+			this.dbHelper = new DBHelper(this.getContext(), CssRecordDAO.SOCIETIES_DATABASE_NAME, null, CssRecordDAO.SOCIETIES_DATABASE_VERSION);
+		}
+		
 		Log.d(LOG_TAG, "Content provider query");
 		Log.d(LOG_TAG,"Selection criteria: " + selectionCriteria);
 		if (null != columns) {

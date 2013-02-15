@@ -78,9 +78,6 @@
                 <action android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"></action>
    			</intent-filter>
         </service>
-       <service
-        	android:name="org.societies.android.platform.events.ServicePlatformEventsLocal">
-        </service>
         <service
         	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
         	android:label="SocietiesEvents">
@@ -88,24 +85,14 @@
                 <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
    			</intent-filter>
         </service>
-        <provider 
+        <!--provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:name="org.societies.android.platform.content.ProviderImplementation"
             android:exported="true"
             android:label="SocietiesCSSContentProvider">
-        </provider>
+        </provider-->
         
-          <!-- this needs to be copied manually  -->
-    <!--provider
-        android:name="org.societies.android.platform.SocialProvider"
-        android:authorities="@string/provider_authority"
-        android:exported="true"
-        android:syncable="true"
-        android:enabled="true"
-        android:readPermission="org.societies.android.SocialProvider.READ"
-        android:writePermission="org.societies.android.SocialProvider.WRITE">
-    </provider-->
-        
+         
     </application>
 
 </manifest>

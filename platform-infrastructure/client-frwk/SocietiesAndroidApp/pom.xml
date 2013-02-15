@@ -90,6 +90,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.android.platform.servicemonitor</groupId>
 			<artifactId>SocietiesServiceMonitor</artifactId>
@@ -126,14 +127,12 @@
 			<version>${version.pt}</version>
 			<type>apklib</type>
 		</dependency>
-		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
 			<artifactId>SocietiesPlatformEvents</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		 -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

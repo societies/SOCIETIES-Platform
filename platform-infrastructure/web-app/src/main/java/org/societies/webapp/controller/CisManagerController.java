@@ -43,7 +43,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.ActivityFeedClient;
+import org.societies.activity.client.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;

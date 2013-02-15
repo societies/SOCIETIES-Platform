@@ -182,6 +182,8 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(IAndroidCSSManager.GET_CSS_FRIENDS);
         intentFilter.addAction(IAndroidCSSManager.GET_FRIEND_REQUESTS);
         intentFilter.addAction(IAndroidCSSManager.READ_PROFILE_REMOTE);
+        intentFilter.addAction(IAndroidCSSManager.START_APP_SERVICES);
+        intentFilter.addAction(IAndroidCSSManager.STOP_APP_SERVICES);
         
         intentFilter.addAction(IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
         intentFilter.addAction(IAndroidCssDirectory.FIND_FOR_ALL_CSS);
@@ -275,6 +277,24 @@ public class PluginCSSManager extends Plugin {
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 
 					this.localCSSManager.loginCSS(data.getString(0), createCssRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 21))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+
+					this.localCSSManager.startAppServices(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 22))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+
+					this.localCSSManager.stopAppServices(data.getString(0));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -414,6 +434,36 @@ public class PluginCSSManager extends Plugin {
 		disconnectServiceBinding();
 	}
 	
+	/**
+	 * Return result to Javascript call for the App Services control functions
+	 * 
+	 * @param methodCallbackId
+	 * @param intent
+	 * @param key
+	 * 
+	 */
+	private void sendJavascriptResultForAppControl(String methodCallbackId, Intent intent, String key) {
+		Log.d(LOG_TAG, "sendJavascriptResultForAppControl called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
+
+		boolean resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
+		Log.d(LOG_TAG, "Start/Stop app services return result: " + resultStatus);
+
+		PluginResult pResult = null;
+		
+		if (resultStatus) {
+			pResult = new PluginResult(PluginResult.Status.OK, intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+			pResult.setKeepCallback(false);
+			this.success(pResult, methodCallbackId);
+		} else {
+			pResult = new PluginResult(PluginResult.Status.ERROR);
+			pResult.setKeepCallback(false);
+			this.error(pResult, methodCallbackId);
+		}
+		//remove callback ID for given method invocation
+		PluginCSSManager.this.methodCallbacks.remove(key);
+
+		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+	}
 	/**
 	 * Return result to Javascript call
 	 * 
@@ -694,6 +744,20 @@ public class PluginCSSManager extends Plugin {
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 21);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResultForAppControl(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(IAndroidCSSManager.STOP_APP_SERVICES)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 22);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResultForAppControl(methodCallbackId, intent, mapKey);
 				}
 			} 
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IAndroidCssDirectory >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
