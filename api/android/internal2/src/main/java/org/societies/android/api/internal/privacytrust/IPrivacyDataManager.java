@@ -27,6 +27,7 @@ package org.societies.android.api.internal.privacytrust;
 import java.util.List;
 
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -42,7 +43,14 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  * @author Olivier Maridat (Trialog)
  * @created 09-nov.-2011 16:45:26
  */
-public interface IPrivacyDataManager {
+public interface IPrivacyDataManager extends IServiceManager {
+	public String methodsArray [] = {"checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions)",
+			  	"obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper)",
+				"hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper)",
+				"startService()",
+				"stopService()"
+			 };
+	
 	/**
 	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
 	 * Must be used in the listening IntentFilter

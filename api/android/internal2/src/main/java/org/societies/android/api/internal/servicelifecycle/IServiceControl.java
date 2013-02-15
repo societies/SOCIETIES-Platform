@@ -26,6 +26,7 @@ package org.societies.android.api.internal.servicelifecycle;
 
 import java.net.URL;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -36,7 +37,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface IServiceControl {
+public interface IServiceControl extends IServiceManager {
 
 	//SERVICE LIFECYCLE INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicecontrol.ReturnValue";
@@ -52,7 +53,9 @@ public interface IServiceControl {
 								    "installService(String client, URL bundleLocation, String identity)",
 								    "uninstallService(String client, URL bundleLocation, String identity)",
 								    "shareService(String client, AService service, String identity)",
-								    "unshareService(String client, AService service, String identity)"
+								    "unshareService(String client, AService service, String identity)",
+								    "startService()",
+									"stopService()"
 								   };
 	
 	/**

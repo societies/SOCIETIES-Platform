@@ -107,7 +107,7 @@ public class Tester {
 
 	private void testOnDemandInference() throws Exception {
 
-		LOG.info("start testing testOnDemandInference ");
+		LOG.info("start testing testOnDemandInference...");
 
 		CtxAttribute userSymbolicLocationAttr = this.internalCtxBroker.retrieveAttribute(
 				this.userSymbolicLocationAttrId, false).get();
@@ -143,7 +143,6 @@ public class Tester {
 		assertEquals(CtxOriginType.INFERRED, userSymbolicLocationAttr.getQuality().getOriginType());
 		assertEquals(locationCssNodeAttrPZ.getQuality().getUpdateFrequency(),
 				userSymbolicLocationAttr.getQuality().getUpdateFrequency(), 1e-3);
-
 		
 		LOG.info("----- 2nd set of updates: Both PZ and RFID should be fresh -----");
 		// 2 update pz
@@ -177,13 +176,14 @@ public class Tester {
 
 	private void testContiniousInferenceByAttrId() throws Exception {
 
-		LOG.info("start testing testContiniousInferenceByAttrID ");
+		LOG.info("start testing testContiniousInferenceByAttrID...");
 		//1. register for changes on individual entity location 
 		//2. update location in css node
 		//3. receive update in listener and verify value
 
-		this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener("room3RFID"),
-				this.userSymbolicLocationAttrId);
+		final MyCtxChangeEventListener listener = new MyCtxChangeEventListener("room3RFID");
+		LOG.info("registering for changes of " + this.userSymbolicLocationAttrId);
+		this.internalCtxBroker.registerForChanges(listener,	this.userSymbolicLocationAttrId);
 
 		this.updateLocationCSSNode("room3RFID", CtxSourceNames.RFID, 1d/60);
 
@@ -192,7 +192,10 @@ public class Tester {
 		Thread.sleep(10000);
 		final CtxAttribute userSymLocAttr = 
 				this.internalCtxBroker.retrieveAttribute(this.userSymbolicLocationAttrId, false).get();
-		assertEquals("room3RFID", userSymLocAttr.getStringValue());
+		final String userSymLocValue = userSymLocAttr.getStringValue(); 
+		LOG.info("unregistering from changes of " + this.userSymbolicLocationAttrId);
+		this.internalCtxBroker.unregisterFromChanges(listener, this.userSymbolicLocationAttrId);
+		assertEquals("room3RFID", userSymLocValue);
 	}
 	
 	// helper methods

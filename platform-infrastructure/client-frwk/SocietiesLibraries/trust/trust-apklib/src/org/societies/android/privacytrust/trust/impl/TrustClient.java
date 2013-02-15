@@ -66,7 +66,7 @@ import android.widget.Toast;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
-public class TrustClient extends Service implements ITrustClient, IServiceManager {
+public class TrustClient extends Service implements ITrustClient {
 	
 	private static final String TAG = TrustClient.class.getName();
 	
