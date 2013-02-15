@@ -28,9 +28,20 @@ import junit.framework.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.societies.webapp.integration.selenium.components.ProfileSettingsTreeContextMenu;
 
 public class ProfileSettingsPage extends BaseSocietiesPage {
     private static final String TITLE = "//h4[@class='form_title']";
+    private static final String IDENTIFIER = "//li[contains(text(), 'Identifier:')]";
+    private static final String DOMAIN = "//li[contains(text(), 'Domain:')]";
+    private static final String TYPE = "//li[contains(text(), 'Type:')]";
+    private static final String JID = "//li[contains(text(), 'JID:')]";
+    private static final String BARE_JID = "//li[contains(text(), 'Bare JID:')]";
+
+    private static final String PREF_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_preference']";
+    private static final String CONDITION_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_condition']";
+    private static final String OUTCOME_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_outcome']";
+    private static final String NODE_ID_SEPARATOR = "_";
 
     public ProfileSettingsPage(WebDriver driver) {
         super(driver);
@@ -42,5 +53,90 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
         Assert.assertTrue("Username not found in title: \n" + title.getText(),
                 title.getText().contains(username));
+    }
+
+    public void verifyUserDetails(String identifier, String domain, String type, String jid, String bareJid) {
+        WebElement identifier_element = waitUntilVisible(By.xpath(IDENTIFIER));
+        Assert.assertTrue("Identifier not found in element: \n" + identifier_element.getText(), identifier_element.getText().contains(identifier));
+
+        WebElement domain_element = waitUntilVisible(By.xpath(DOMAIN));
+        Assert.assertTrue("Domain not found in element: \n" + domain_element.getText(), domain_element.getText().contains(domain));
+
+        WebElement type_element = waitUntilVisible(By.xpath(TYPE));
+        Assert.assertTrue("Type not found in element: \n" + type_element.getText(), type_element.getText().contains(type));
+
+        WebElement jid_element = waitUntilVisible(By.xpath(JID));
+        Assert.assertTrue("JID not found in element: \n" + jid_element.getText(), jid_element.getText().contains(jid));
+
+        WebElement barejid_element = waitUntilVisible(By.xpath(BARE_JID));
+        Assert.assertTrue("Bare JID not found in element: \n" + barejid_element.getText(), barejid_element.getText().contains(bareJid));
+
+    }
+
+    public void verifyPreferencesInTree(String[] preferences) {
+        verifyNodesInTree(new int[]{},
+                preferences,
+                PREF_NODE_BY_INDEX);
+    }
+
+    public void verifyConditionsInTree(int[] parents, String[] conditions) {
+        verifyNodesInTree(parents,
+                conditions,
+                CONDITION_NODE_BY_INDEX);
+    }
+
+    public void verifyOutcomeInTree(int[] parents, String outcome) {
+        verifyNodesInTree(parents,
+                new String[]{outcome},
+                OUTCOME_NODE_BY_INDEX);
+    }
+
+    private void verifyNodesInTree(int[] parentIDs, String[] expectedNodes, String xpath) {
+
+        // if this is the 3rd level of the tree, the ID string will look something like 1_0_2
+        // so we need to build the "1_0_" to append before the individual nodes on this level
+        String root_id = "";
+        for (int id : parentIDs) {
+            root_id += id + NODE_ID_SEPARATOR;
+        }
+
+        for (int i = 0; i < expectedNodes.length; i++) {
+            WebElement node = waitUntilVisible(By.xpath(String.format(xpath, root_id + i)));
+
+            Assert.assertEquals(expectedNodes[i], node.getText());
+        }
+    }
+
+
+    public ProfileSettingsTreeContextMenu openContextMenuOnPreferenceNode(int[] indicies, String expectedText) {
+        return openContextMenuOnNode(indicies, PREF_NODE_BY_INDEX, expectedText);
+    }
+
+    public ProfileSettingsTreeContextMenu openContextMenuOnConditionNode(int[] indicies, String expectedText) {
+        return openContextMenuOnNode(indicies, CONDITION_NODE_BY_INDEX, expectedText);
+    }
+
+    public ProfileSettingsTreeContextMenu openContextMenuOnOutcomeNode(int[] indicies, String expectedText) {
+        return openContextMenuOnNode(indicies, OUTCOME_NODE_BY_INDEX, expectedText);
+    }
+
+    private ProfileSettingsTreeContextMenu openContextMenuOnNode(int[] indicies, String xpath, String expectedText) {
+        // if this is the 3rd level of the tree, the ID string will look something like 1_0_2
+        // so we need to build the "1_0_" to append before the individual nodes on this level
+        String root_id = "";
+        for (int i = 0; i < indicies.length; i++) {
+            root_id += indicies[i];
+
+            if (i < indicies.length - 1)
+                root_id += NODE_ID_SEPARATOR;
+        }
+
+        WebElement node = waitUntilVisible(By.xpath(String.format(xpath, root_id)));
+
+        Assert.assertEquals(expectedText, node.getText());
+
+        super.openContextMenuOnElement(node);
+
+        return new ProfileSettingsTreeContextMenu(getDriver());
     }
 }

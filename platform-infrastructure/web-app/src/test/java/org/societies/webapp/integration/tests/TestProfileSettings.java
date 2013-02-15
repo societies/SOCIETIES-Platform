@@ -29,6 +29,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
+import org.societies.webapp.integration.selenium.components.ProfileSettingsEditConditionDialog;
+import org.societies.webapp.integration.selenium.components.ProfileSettingsTreeContextMenu;
 import org.societies.webapp.integration.selenium.pages.IndexPage;
 import org.societies.webapp.integration.selenium.pages.ProfileSettingsPage;
 
@@ -42,7 +44,7 @@ public class TestProfileSettings extends SeleniumTest {
     public void setupTest() {
         IndexPage indexPage = new IndexPage(getDriver());
 
-        indexPage.doLogin(USERNAME,  PASSWORD);
+        indexPage.doLogin(USERNAME, PASSWORD);
 
         profileSettingsPage = indexPage.navigateToProfileSettings();
     }
@@ -50,8 +52,57 @@ public class TestProfileSettings extends SeleniumTest {
     @Test
     public void userDetailsCorrect() {
         profileSettingsPage.verifyUsernameInTitle(USERNAME);
-
-        Assert.fail("Haven't quite finished this test yet");
+        profileSettingsPage.verifyUserDetails("paddy", "societies.local.macs.hw.ac.uk", "CSS_RICH",
+                "paddy.societies.local.macs.hw.ac.uk", "paddy.societies.local.macs.hw.ac.uk");
     }
 
+    @Test
+    public void verifyTreeDisplayedCorrectly() {
+        // verify the preferences have been displayed correctly
+        profileSettingsPage.verifyPreferencesInTree(
+                new String[]{"bgColour", "volume"}
+        );
+
+        // verify the volume conditions have been displayed
+        profileSettingsPage.verifyConditionsInTree(
+                new int[]{0}, //volume
+                new String[]{"locationSymbolic EQUALS home", "locationSymbolic EQUALS work"}
+        );
+        // verify the bgColor conditions have been displayed
+        profileSettingsPage.verifyConditionsInTree(
+                new int[]{1}, // bgColor
+                new String[]{"locationSymbolic EQUALS home", "locationSymbolic EQUALS work"}
+        );
+
+        // verify the volume outcomes are correct
+        profileSettingsPage.verifyOutcomeInTree(new int[]{0, 0}, "bgColour red");
+        profileSettingsPage.verifyOutcomeInTree(new int[]{0, 1}, "bgColour black");
+        profileSettingsPage.verifyOutcomeInTree(new int[]{1, 0}, "volume 10");
+        profileSettingsPage.verifyOutcomeInTree(new int[]{1, 1}, "volume 50");
+
+    }
+
+    @Test
+    public void openPopups_hitCancelButton_NoChangesMade() {
+
+        verifyTreeDisplayedCorrectly();
+
+        ProfileSettingsTreeContextMenu menu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{0, 0},
+                "locationSymbolic EQUALS home");
+        ProfileSettingsEditConditionDialog conditionDialog = menu.clickEdit();
+
+// change values to ensure it's not accidentally persisted
+        conditionDialog.setName("newName");
+        conditionDialog.setOperator("greater than");
+        conditionDialog.setValue("newValue");
+
+        conditionDialog.clickCancel();
+
+        verifyTreeDisplayedCorrectly();
+
+        Assert.fail("TODO: refresh page, verify again");
+
+        verifyTreeDisplayedCorrectly();
+    }
 }

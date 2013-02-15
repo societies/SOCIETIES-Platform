@@ -24,16 +24,32 @@
  */
 package org.societies.webapp.integration.selenium.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.societies.webapp.integration.selenium.AbstractSeleniumComponent;
-import org.societies.webapp.integration.selenium.components.LoginDialog;
 
 public class BaseSocietiesPage extends AbstractSeleniumComponent {
+    public static String GROWL_XPATH = "//*[contains(@class,'ui-growl-image')]";
+    public static String GROWL_CLOSE_ICON_XPATH = "//*[contains(@class,'ui-growl-icon-close')]";
+
 
     protected BaseSocietiesPage(WebDriver driver) {
         super(driver);
     }
 
-
+//    public void closeAllGrowls() {
+////        try {
+////            while (true) {
+//        WebElement growl = waitUntilVisible(By.xpath((GROWL_XPATH)));
+//
+//        moveMouseTo(growl);
+//
+//        clickButton(By.xpath(GROWL_CLOSE_ICON_XPATH));
+////            }
+////        } catch (NoSuchElementException ex) {
+////            no elements found, there mustn't be any growls (left)
+////        }
+//    }
 
 }

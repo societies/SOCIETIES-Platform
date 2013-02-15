@@ -31,7 +31,7 @@ import org.societies.webapp.integration.selenium.components.LoginDialog;
 
 public class IndexPage extends BaseSocietiesPage {
     private static final String NAV_ROOT = "//ul[@id='navigation']";
-    private static final String NAV_MY_ACCOUNT_MENU = NAV_ROOT + "/li/a[@href='myProfile.html']";
+    private static final String NAV_MY_ACCOUNT_MENU = NAV_ROOT + "/li/a[@href='myProfile.xhtml']";
     private static final String NAV_PROFILE_SETTINGS_ITEM = NAV_ROOT + "/li/ul[@class='sub-menu']/li/a[text()='Profile Settings']";
 
     public IndexPage(WebDriver driver) {
@@ -41,6 +41,8 @@ public class IndexPage extends BaseSocietiesPage {
     public void doLogin(String username, String password) {
         LoginDialog dialog = new LoginDialog(getDriver());
         dialog.doLogin(username, password);
+
+//        closeAllGrowls();
     }
 
     public ProfileSettingsPage navigateToProfileSettings() {

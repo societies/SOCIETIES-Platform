@@ -29,19 +29,6 @@
                     <li>Bare JID: <h:outputText value="#{loginController.identity.bareJid}"/></li>
                 </ul>
 
-                <p:contextMenu for="preferenceTree">
-                    <p:menuitem value="Add Condition" disabled="true"/>
-                    <p:menuitem value="Add Outcome" disabled="true"/>
-
-                    <p:menuitem value="Edit"
-                                update="editConditionDialog,editOutcomeDialog"
-                                actionListener="#{profileSettings.editSelectedNode}"/>
-                    <!--oncomplete="#{p:widgetVar('editConditionDialog')}.show()"-->
-
-                    <p:menuitem value="Delete" update="preferenceTree"
-                                actionListener="#{profileSettings.deleteSelectedNode}"/>
-                </p:contextMenu>
-
                 <p:tree id="preferenceTree" value="#{profileSettings.preferencesRootNode}" var="data"
                         orientation="horizontal"
                         selectionMode="single" selection="#{profileSettings.selectedTreeNode}"
@@ -52,23 +39,23 @@
                     </p:treeNode>
 
                     <p:treeNode id="preferenceNode" type="preference">
-                        <h:outputText value="#{data.preferenceName}" id="lblNode_preference"/>
+                        <h:outputText value="#{data.preferenceName}" id="lblNode_preference" style="color: #c00;"/>
                     </p:treeNode>
 
                     <p:treeNode id="conditionNode" type="condition">
-                        <h:outputText value="#{data.name} #{data.operator} #{data.value}"
+                        <h:outputText value="#{data.name} #{data.operator} #{data.value}" style="color: #0a0;"
                                       id="lblNode_condition"/>
                     </p:treeNode>
 
                     <p:treeNode id="outcomeNode" type="outcome">
-                        <h:outputText value="#{data.parameterName} #{data.value}" id="lblNode_outcome"/>
+                        <h:outputText value="#{data.parameterName} #{data.value}" id="lblNode_outcome" style="color: #00c;" />
                     </p:treeNode>
 
                 </p:tree>
 
                 <div class="hr dotted clearfix"></div>
 
-                <ui:include src="includes/dialogs/editPreferenceConditionDialog.xhtml"/>
+                <ui:include src="includes/dialogs/profileSettingsComponents.xhtml"/>
 
             </section>
         </section>

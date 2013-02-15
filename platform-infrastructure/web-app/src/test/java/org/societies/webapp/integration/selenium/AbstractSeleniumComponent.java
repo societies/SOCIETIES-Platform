@@ -28,7 +28,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
@@ -81,9 +80,10 @@ public abstract class AbstractSeleniumComponent {
         button.click();
     }
 
-    protected void sendKeysToField(String text, By by) {
+    protected void setFieldValue(String text, By by) {
         WebElement element = waitUntilVisible(by);
         threadSleep(sendKeysDelayMillis);
+        element.clear();
         element.sendKeys(text);
         threadSleep(sendKeysDelayMillis);
     }
@@ -245,4 +245,22 @@ public abstract class AbstractSeleniumComponent {
         }
     }
 
+    public void openContextMenuOnElement(WebElement element) {
+        RemoteWebElement ele = (RemoteWebElement) element;
+        RemoteWebDriver webDriver = ((RemoteWebDriver) driver);
+
+        if (driver instanceof RemoteWebDriver)
+            webDriver.getMouse().mouseMove(ele.getCoordinates());
+//        ((ChromeDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof FirefoxDriver)
+//            ((FirefoxDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof InternetExplorerDriver)
+//            ((InternetExplorerDriver) driver).getMouse().mouseMove(ele.getCoordinates());
+//        else if (driver instanceof RemoteWebDriver)
+        else {
+            log.error("Cannot move mouse for driver of type " + getDriver().getClass().getName());
+        }
+
+        webDriver.getMouse().contextClick(ele.getCoordinates());
+    }
 }

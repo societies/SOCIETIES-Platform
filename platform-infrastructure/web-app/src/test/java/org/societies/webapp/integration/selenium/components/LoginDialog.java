@@ -29,8 +29,8 @@ import org.openqa.selenium.WebDriver;
 
 public class LoginDialog extends BasePageComponent {
     private static final String LOGIN_REGISTER_LINK = "//a[@href='#login-box']";
-    private static final String USERNAME_FIELD = "//input[@id='username' and @type='text']";
-    private static final String PASSWORD_FIELD = "//input[@id='password' and @type='password']";
+    private static final String USERNAME_FIELD = "//input[@id='mainForm:username' and @type='text']";
+    private static final String PASSWORD_FIELD = "//input[@id='mainForm:password' and @type='password']";
     private static final String SUBMIT_BUTTON = "//input[@type='submit']";
     private static final String LOGIN_CONFIRM_MSG = "//div[@class='login-form']/span/strong[text()='%s']";
 
@@ -41,8 +41,8 @@ public class LoginDialog extends BasePageComponent {
     public void doLogin(String username, String password) {
         clickButton(By.xpath(LOGIN_REGISTER_LINK));
 
-        sendKeysToField(username, By.xpath(USERNAME_FIELD));
-        sendKeysToField(password, By.xpath(PASSWORD_FIELD));
+        setFieldValue(username, By.xpath(USERNAME_FIELD));
+        setFieldValue(password, By.xpath(PASSWORD_FIELD));
 
         clickButton(By.xpath(SUBMIT_BUTTON));
 
