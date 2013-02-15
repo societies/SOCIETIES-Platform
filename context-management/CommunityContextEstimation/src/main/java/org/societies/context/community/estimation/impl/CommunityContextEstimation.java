@@ -272,26 +272,92 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
+					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
 
-					for (CtxAttribute ca:setAttributesSymbolicLocations){
+					for (CtxAttribute ca:setAttributesCoordinatesLocations){
 						stringLocationValues.add(ca.getStringValue());			
 					}
 							
 				}
 				
-				String LocationsAsString = stringLocationValues.toString();
-				CommunityContextEstimation cce = new CommunityContextEstimation();
-				ArrayList<Point2D> points = CommunityContextEstimation.splitString(LocationsAsString);
-				ArrayList<Point2D> conHull = cce.cceGeomConvexHull(points);
+					String LocationsAsString = stringLocationValues.toString();
+					CommunityContextEstimation cce = new CommunityContextEstimation();
+					ArrayList<Point2D> points = CommunityContextEstimation.splitString(LocationsAsString);
+					ArrayList<Point2D> conHull = cce.cceGeomConvexHull(points);
+					
+					CtxAttribute comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_COORDINATES).get();
+					comLocationCoordinates.setStringValue(conHull.toString());   
+					comLocationCoordinates.setValueType(CtxAttributeValueType.STRING);
+					comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.update(comLocationCoordinates);
+					result = comLocationCoordinates;
+					result.getStringValue();
+																	
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+		}
+		
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$	
+		
+		if (retrievedType.getType().toString().equals("location_symbolic")){
+
+			ArrayList<String> stringLocationSymbolicValues = new ArrayList<String>();
+			ArrayList<String> individualsLocationSymbolicStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+
+					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_SYMBOLIC");
+
+					for (CtxAttribute ca:setAttributesSymbolicLocations){
+						stringLocationSymbolicValues.add(ca.getStringValue());			
+					}
+				}
 				
-				CtxAttribute comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_COORDINATES).get();
-				comLocationCoordinates.setStringValue(conHull.toString());   
-				comLocationCoordinates.setValueType(CtxAttributeValueType.STRING);
-				comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.update(comLocationCoordinates);
-				result =comLocationCoordinates;
+				individualsLocationSymbolicStrings.addAll(stringLocationSymbolicValues);
+				
+				for (String s:individualsLocationSymbolicStrings){
+					String[] helper = s.split(",");
+					for (String s1:helper){
+						finalArrayStringList.add(s1);
+					}
+				}
+								
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList);
+			
+			try {
+				CtxAttribute symbolicLocationMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+				symbolicLocationMode.setStringValue(modeStringValue.get(0).toString());
+				symbolicLocationMode.setValueType(CtxAttributeValueType.STRING);
+				symbolicLocationMode = (CtxAttribute) this.internalCtxBroker.update(symbolicLocationMode).get();
+				result =symbolicLocationMode;
 				result.getStringValue();
-				
 				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -303,9 +369,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
-		
 		}
+		
+		
 		
 		
 		//****************************************************************************************
@@ -386,8 +452,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 //
 //	}
 //		
-		
-		//the if statement ends here
 		return result;
 	}
 
