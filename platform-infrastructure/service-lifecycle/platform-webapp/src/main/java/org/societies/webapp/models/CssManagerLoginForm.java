@@ -112,6 +112,8 @@ public class CssManagerLoginForm {
 	    private String name;
 	    private int sex;
 	    private String socialURI;
+	    private String workplace;
+	    private String position;
 	    /** Css Record Details end **/
 		
 	    
@@ -140,6 +142,21 @@ public class CssManagerLoginForm {
 	    public String getCssIdentity() {
             return cssIdentity;
 	    }
+	    
+	    public void setWorkplace(String workplace) {
+            this.workplace = workplace;
+	    }
+	    public String getWorkplace() {
+	            return workplace;
+	    }
+	    
+	    public void setPosition(String position) {
+            this.position = position;
+	    }
+	    public String getPosition() {
+	            return position;
+	    }
+	    
 		/**
 		 * @return the cssAdRequests1
 		 */

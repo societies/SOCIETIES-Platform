@@ -195,7 +195,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	 * @param identity
 	 */
 	private void createMinimalCSSRecord(String identity) {
-		LOG.debug("Creating minimal CSSRecord");
+		LOG.info("Creating minimal CSSRecord with CSSID: " +identity);
 		
 		//cloud node details
 		CssNode cssNode = new CssNode();
@@ -208,7 +208,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			//if CssRecord does not exist create new CssRecord in persistance layer
 			
 			if (!this.cssRegistry.cssRecordExists()) {
-
+				
+				LOG.info("minimal CSSRecord -> Registering CSS with local database");
 				//Minimal CSS details
 				CssRecord cssProfile = new CssRecord();
 				cssProfile.getCssNodes().add(cssNode);
@@ -226,7 +227,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 
 				try {
 					this.cssRegistry.registerCss(cssProfile);
-					LOG.debug("Registering CSS with local database");
+					LOG.info("minimal CSSRecord -> Registering CSS with local database");
 				} catch (CssRegistrationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -234,7 +235,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				
 				
 				// internal eventing
-				LOG.info("Generating CSS_Record to piush to context");
+				LOG.info("minimal CSSRecord -> Generating CSS_Record to piush to context");
 
 				this.pushtoContext(cssProfile);
 				
@@ -242,6 +243,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				
 			} else {
 				// if CssRecord already persisted remove all nodes and add cloud node
+				
+				LOG.info("miminal record ELSE statement");
 				
 				CssRecord cssRecord  = this.cssRegistry.getCssRecord();
 				
@@ -448,11 +451,26 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
         CssInterfaceResult result = new CssInterfaceResult();
 		result.setProfile(profile);
 		result.setResultStatus(false);
+		
+		CssRecord cssRecord = null;
+
+		try{
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+
+				// update profile information
+				cssRecord.setEntity(profile.getEntity());
+				cssRecord.setForeName(profile.getForeName());
+				cssRecord.setName(profile.getName());
+				cssRecord.setEmailID(profile.getEmailID());
+				
+				cssRecord.setSex(profile.getSex());
+				
 			
 			
 				
 				// internal eventing
-				this.updateCssRegistry(profile);
+				this.updateCssRegistry(cssRecord);
 				LOG.info("Updating CSS with local database");
 
 				LOG.info("Pushing CSS_Record to Context from modifyCssRecord");		
@@ -463,6 +481,16 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 
 				result.setProfile(profile);
 				result.setResultStatus(true);
+				
+			} else {
+				LOG.equals("Css record does not exist");
+			}
+
+
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -1605,7 +1633,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	
 	public void pushtoContext(CssRecord record) {
 
-		final String cssIdStr = "jane.societies.local"; //record.getCssIdentity();
+		final String cssIdStr = record.getCssIdentity();
 		LOG.info("pushtoContext cssIdStr: " +cssIdStr);
 
 

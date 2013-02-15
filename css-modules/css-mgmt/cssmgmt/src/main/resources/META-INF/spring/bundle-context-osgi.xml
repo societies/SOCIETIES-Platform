@@ -21,6 +21,7 @@
 	<!-- <osgi:reference id="socialdata" interface="org.societies.platform.socialdata" /> -->
 	<osgi:reference id="socialData" interface="org.societies.api.internal.sns.ISocialData" /> 
 	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="ctxBroker" interface= "org.societies.api.internal.context.broker.ICtxBroker" />
 	
 	
 </beans>

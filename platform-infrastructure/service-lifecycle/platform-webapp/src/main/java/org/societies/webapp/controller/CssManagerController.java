@@ -12,6 +12,10 @@ import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectoryRemote;
@@ -35,6 +39,7 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
+import org.societies.css.mgmt.CSSManager;
 import org.societies.css.mgmt.CssDirectoryRemoteClient;
 import org.societies.webapp.models.CssManagerLoginForm;
 import org.societies.webapp.models.requests.CssServiceModel;
@@ -48,6 +53,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class CssManagerController {
 
+	private static Logger LOG = LoggerFactory.getLogger(CssManagerController.class);
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -279,6 +285,9 @@ public class CssManagerController {
 
 		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
 		cmControllerLoginForm.setCssAdId(cmLoginForm.getCssIdentity());
+		
+		LOG.info("WEBAPP -> CSSIdentity : " +cmControllerLoginForm.getCssIdentity());
+		LOG.info("WEBAPP -> CssAdId : " +cmControllerLoginForm.getCssAdId());
 
 		// Now we go a logon to the Css
 		CssRecord loginRecord = new CssRecord();
@@ -292,6 +301,8 @@ public class CssManagerController {
 
 		try {
 			getCssLocalManager().modifyCssRecord(loginRecord);
+			LOG.info("WEBAPP -> modifyCssRecord CSSIdentity : " +loginRecord.getCssIdentity());
+			
 			Future<CssInterfaceResult> asynCssDetails = getCssLocalManager()
 					.getCssRecord();
 			CssInterfaceResult cssDetails = asynCssDetails.get();
