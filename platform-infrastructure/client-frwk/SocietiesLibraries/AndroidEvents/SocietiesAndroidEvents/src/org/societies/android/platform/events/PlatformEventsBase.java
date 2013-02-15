@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.manager.IServiceManager;
@@ -14,6 +15,8 @@ import org.societies.android.api.pubsub.ISubscriber;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.pubsub.helper.PubsubHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
@@ -22,7 +25,7 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.util.Log;
 
-public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceManager {
+public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	
 	//Logging tag
     private static final String LOG_TAG = PlatformEventsBase.class.getName();
@@ -44,9 +47,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 	
 	private ArrayList <String> allPlatformEvents = null; 
 
-	private String domainCommsDestination = null;
-
-    private IIdentity cloudNodeIdentity = null;
+	private String cloudCommsDestination;
+    private IIdentity cloudNodeIdentity;
+    
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
     private List<String> classList;
@@ -72,6 +75,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	//tracks the events subscribed to Android Pubsub
     	this.subscribedToEvents = Collections.synchronizedMap(new HashMap<String, Integer>());
     	
+    	this.cloudCommsDestination = null;
+        this.cloudNodeIdentity = null;
+
     	//create list of event classes for Pubsub registration 
         this.classList = new ArrayList<String>();
 
@@ -106,7 +112,6 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 									try {
 										PlatformEventsBase.this.configureForPubsub();
 										PlatformEventsBase.this.connectedToPubsub = true;
-
 									} catch (ClassNotFoundException e) {
 										e.printStackTrace();
 										resultFlag = false;
@@ -153,6 +158,32 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		}
 		return false;
 	}
+	@Override
+	public int getNumSubscribedNodes(String client) {
+		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		Log.d(LOG_TAG, "Get number of subscribed to events for client: " + client);
+		
+		int numListeners = 0;
+		synchronized(this.subscribedToClientEvents) {
+			for (String key: PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
+				if (key.startsWith(client + KEY_DIVIDER)) {
+					numListeners++;
+				}
+			}
+			Intent intent = new Intent(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS);
+			intent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, numListeners);
+
+			if (this.restrictBroadcast) {
+    			intent.setPackage(client);
+			}
+			
+			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
+			PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+			Log.d(LOG_TAG, "SubscribeToPubsub return result sent");
+		}
+
+    	return 0;
+	}
 
 	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
@@ -162,17 +193,18 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 		return false;
 	}
 
-	public synchronized int subscribeToAllEvents(String client) {
+	public synchronized boolean subscribeToAllEvents(String client) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "Invocation of subscribeToAllEvents for client: " + client);
 		
 		return this.subscribeToEvents(client, ALL_EVENT_FILTER);
 	}
 
-	public int subscribeToEvent(String client, String intent) {
+	public boolean subscribeToEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-		Dbc.require("Intent must be specified", null != intent && intent.length() > 0);
+		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
 		Log.d(LOG_TAG, "Invocation of subscribeToEvent for client: " + client + " and intent: " + intent);
+		assignConnectionParameters();
 
 		//store client/event
 		synchronized (this.subscribedToClientEvents) {
@@ -185,17 +217,18 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
 			
-	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client); 
+	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.cloudNodeIdentity); 
 	    	subPubSub.execute(events);
 		}
 
-    	return 0;
+    	return false;
 	}
 
-	public synchronized int subscribeToEvents(String client, String intentFilter) {
+	public synchronized boolean subscribeToEvents(String client, String intentFilter) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Log.d(LOG_TAG, "Invocation of subscribeToEvents for client: " + client + " and filter: " + intentFilter);
+		assignConnectionParameters();
 
 		ArrayList<String> targetEvents = null;
 		String returnIntent;
@@ -205,7 +238,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			targetEvents = this.getAllPlatformEvents();
 			returnIntent = IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS;
 		} else {
-			targetEvents = this.getFilteredEvents(intentFilter);
+			targetEvents = getFilteredEvents(intentFilter);
 			returnIntent = IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS;
 		}
 		
@@ -218,51 +251,51 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			//add the client/intent pair if they do not already exist
 			for (String filteredEvent: targetEvents) {
 				//store client/event
-				if (!this.subscribedToClientEvents.containsKey(this.generateClientEventKey(client, filteredEvent))) {
-					this.subscribedToClientEvents.put(this.generateClientEventKey(client, filteredEvent), filteredEvent);
+				if (!this.subscribedToClientEvents.containsKey(generateClientEventKey(client, filteredEvent))) {
+					this.subscribedToClientEvents.put(generateClientEventKey(client, filteredEvent), filteredEvent);
 					unSubscribedEvents.add(filteredEvent);
 				}
 			}
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (unSubscribedEvents.size() > 0) {
-			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client); 
+			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client, this.cloudNodeIdentity); 
 		    	subPubSub.execute(unSubscribedEvents);
 			}
 		}
-		return 0;
+		return false;
 	}
 
-	public synchronized int unSubscribeFromAllEvents(String client) {
+	public synchronized boolean unSubscribeFromAllEvents(String client) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromAllEvents for client: " + client);
 		return this.unSubscribeFromEvents(client, ALL_EVENT_FILTER);
 	}
 
-	public synchronized int unSubscribeFromEvent(String client, String intent) {
+	public synchronized boolean unSubscribeFromEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-		Dbc.require("Intent must be specified", null != intent && intent.length() > 0);
+		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvent for client: " + client + " and intent: " + intent);
 
 		synchronized (this.subscribedToClientEvents) {
 			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			//remove client/event
 			
-			Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(this.generateClientEventKey(client, intent))
-					+ " for key: " + this.generateClientEventKey(client, intent));
+			Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(generateClientEventKey(client, intent))
+					+ " for key: " + generateClientEventKey(client, intent));
 			
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
-			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client); 
+			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.cloudNodeIdentity); 
 			unsubPubSub.execute(events);
 		}
 		
-    	return 0;
+    	return false;
 	}
 
-	public synchronized int unSubscribeFromEvents(String client, String intentFilter) {
+	public synchronized boolean unSubscribeFromEvents(String client, String intentFilter) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvents for client: " + client + " and filter: " + intentFilter);
@@ -274,7 +307,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			targetEvents = this.getAllPlatformEvents();
 			returnIntent = IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS;
 		} else {
-			targetEvents = this.getFilteredEvents(intentFilter);
+			targetEvents = getFilteredEvents(intentFilter);
 			returnIntent = IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS;
 		}
 		
@@ -286,10 +319,10 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
   
 			//remove the client/intent pair if they do already exist
 			for (String filteredEvent: targetEvents) {
-				if (this.subscribedToClientEvents.containsKey(this.generateClientEventKey(client, filteredEvent))) {
+				if (this.subscribedToClientEvents.containsKey(generateClientEventKey(client, filteredEvent))) {
 					//remove client/event
-					Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(this.generateClientEventKey(client, filteredEvent))
-							+ " for key: " + this.generateClientEventKey(client, filteredEvent));
+					Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(generateClientEventKey(client, filteredEvent))
+							+ " for key: " + generateClientEventKey(client, filteredEvent));
 					subscribedEvents.add(filteredEvent);
 				}
 			}
@@ -297,12 +330,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (subscribedEvents.size() > 0) {
-				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client); 
+				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client, this.cloudNodeIdentity); 
 				unsubPubSub.execute(subscribedEvents);
 			}
 		}
 		
-		return 0;
+		return false;
 	}
 
 	/**
@@ -357,6 +390,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	
     	private String intentValue;
     	private String client;
+    	private IIdentity pubsubService;
 
     	/**
     	 * Constructor
@@ -364,13 +398,16 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	 * @param intentValue
     	 * @param client
     	 */
-    	public UnSubscribeFromPubsub(String intentValue, String client) {
+    	public UnSubscribeFromPubsub(String intentValue, String client, IIdentity pubsubService) {
     		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
     		Dbc.require("Intent filter must be specified", null != intentValue && intentValue.length() > 0);
+    		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
     		Log.d(LOG_TAG, "UnSubscribeFromPubsub async task for client: " + client + " and filter: " + intentValue);
 
     		this.intentValue = intentValue;
     		this.client = client;
+    		this.pubsubService = pubsubService;
+
 		}
 
     	protected Boolean doInBackground(List<String>... args) {
@@ -378,45 +415,50 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be un-subscribed: " + events.size());
 
-    		IIdentity pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
-
     		try {
     			synchronized (PlatformEventsBase.this.subscribedToEvents) {
     				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
 
     				for (final String event: events) {
-
+        				//Create a latch to allow each unsubscription to occur sequentially
+    					//Failure to this caused unreliable unsubscriptions
+        				final CountDownLatch endCondition = new CountDownLatch(1);
+        				
+    					final long unsubscription = System.currentTimeMillis();
+    					
     		    		Integer numSubscriptions = PlatformEventsBase.this.subscribedToEvents.get(translateAndroidIntentToEvent(event));
     		    		
     		    		if ((null != numSubscriptions) && (1 == numSubscriptions)) {
            		    		Log.d(LOG_TAG, "Un-subscribe from Pubsub with event : " + translateAndroidIntentToEvent(event));
            		    	 
-    		    			PlatformEventsBase.this.pubsubClient.subscriberUnsubscribe(pubsubService, 
+	            			PlatformEventsBase.this.subscribedToEvents.remove(translateAndroidIntentToEvent(event));
+	            			
+    		    			PlatformEventsBase.this.pubsubClient.subscriberUnsubscribe(this.pubsubService, 
     		    									translateAndroidIntentToEvent(event), 
     		    									new IMethodCallback() {
-								
-								@Override
-								public void returnAction(String result) {
-								}
-								
-								@Override
-								public void returnAction(boolean resultFlag) {
-									if (resultFlag) {
-				            			PlatformEventsBase.this.subscribedToEvents.remove(translateAndroidIntentToEvent(event));
-				            			
-				               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + translateAndroidIntentToEvent(event));
-									}
-								}
-							});
+    							
+    							@Override
+    							public void returnAction(String result) {
+			               			Log.d(LOG_TAG, "Pubsub un-subscription created for event: " + translateAndroidIntentToEvent(event));
+			               			Log.d(LOG_TAG, "Time to subscribe event:" + Long.toString(System.currentTimeMillis() - unsubscription));
+			               			//notify latch
+			               			endCondition.countDown();
+    							}
+    							
+    							@Override
+    							public void returnAction(boolean resultFlag) {
+    							}
+    						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(event), numSubscriptions - 1);
         				}
+       		    		//wait for latch to release
+    		    		endCondition.await();
         			}
-    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
     			}
     			
 				Intent returnIntent = new Intent(intentValue);
-    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, this.numEventListeners(this.client));
+    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
 
     			if (PlatformEventsBase.this.restrictBroadcast) {
         			returnIntent.setPackage(this.client);
@@ -429,60 +471,36 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			} catch (Exception e) {
     			this.resultStatus = false;
 				Log.e(LOG_TAG, "Unable to unsubscribe for Societies events", e);
-
 			}
     		return resultStatus;
     	}
-        /**
-         * Get number of subscribed to events for a given client
-         * @param client
-         * @return int number of subscribed events
-         */
-        private int numEventListeners(String client) {
-    		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-
-    		int numListeners = 0;
-        	
-    		Log.d(LOG_TAG, "Invocation of numEventListeners for client: " + client);
-    		
-			for (String key: PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
-				if (key.startsWith(client + KEY_DIVIDER)) {
-					numListeners++;
-				}
-			}
-			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
- 
-        	return numListeners;
-        }
-
     }
 
+    
     /**
      * 
      * Async task to register for Societies Pubsub events
-     * Note: The Subscriber objects used to subscribe to the relevant Pubsub nodes
-     * are required to be used when un-registering - hence the use of the Map to store them.
      *
      */
     private class SubscribeToPubsub extends AsyncTask<List<String>, Void, Boolean> {
     	private String intentValue;
     	private String client;
-
+    	private IIdentity pubsubService;
     	/**
     	 * Constructor
     	 * 
     	 * @param intentValue
     	 * @param client
     	 */
-    	public SubscribeToPubsub(String intentValue, String client) {
+    	public SubscribeToPubsub(String intentValue, String client, IIdentity pubsubService) {
     		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
     		Dbc.require("Intent filter must be specified", null != intentValue && intentValue.length() > 0);
+    		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
     		Log.d(LOG_TAG, "SubscribeToPubsub async task for client: " + client + " and filter: " + intentValue);
     		
     		this.intentValue = intentValue;
     		this.client = client;
-    		
-    		PlatformEventsBase.this.assignConnectionParameters();
+    		this.pubsubService = pubsubService;
 		}
     	
 		private boolean resultStatus = true;
@@ -492,45 +510,51 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be subscribed: " + events.size());
 
-    		IIdentity pubsubService = PlatformEventsBase.this.cloudNodeIdentity;
-
     		try {
     			
        			synchronized (PlatformEventsBase.this.subscribedToEvents) {
     				Log.d(LOG_TAG, "Before size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
+
     				
-        			for (final String eventName: events) {
-    		    		Log.d(LOG_TAG, "Does event exist: " + translateAndroidIntentToEvent(eventName));
-    		    		
-    		    		Integer numSubscriptions = PlatformEventsBase.this.subscribedToEvents.get(translateAndroidIntentToEvent(eventName));
+    				for (final String eventName: events) {
+
+        				//Create a latch to allow each subscription to occur sequentially
+    					//Failure to this caused unreliable subscription
+        				final CountDownLatch endCondition = new CountDownLatch(1);
+
+    					final long unsubscription = System.currentTimeMillis();
+
+    					Integer numSubscriptions = PlatformEventsBase.this.subscribedToEvents.get(translateAndroidIntentToEvent(eventName));
     		    		if (null == numSubscriptions) {
         		    		Log.d(LOG_TAG, "Store event : " + translateAndroidIntentToEvent(eventName));
         		    		PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), 1);
         		    		Log.d(LOG_TAG, "Subscribe to Pubsub with event : " + translateAndroidIntentToEvent(eventName));
-                			PlatformEventsBase.this.pubsubClient.subscriberSubscribe(pubsubService, 
+                			PlatformEventsBase.this.pubsubClient.subscriberSubscribe(this.pubsubService, 
                 										translateAndroidIntentToEvent(eventName),
                 										new IMethodCallback() {
-								
-								@Override
-								public void returnAction(String result) {
-								}
-								
-								@Override
-								public void returnAction(boolean resultFlag) {
-									if (resultFlag) {
-			                			Log.d(LOG_TAG, "Pubsub subscription created for: " + translateAndroidIntentToEvent(eventName));
-									}
-								}
-							});
+    							
+    							@Override
+    							public void returnAction(String result) {
+		                			Log.d(LOG_TAG, "Pubsub subscription created for: " + translateAndroidIntentToEvent(eventName));
+			               			Log.d(LOG_TAG, "Time to subscribe event:" + Long.toString(System.currentTimeMillis() - unsubscription));
+			               			//notify latch
+			               			endCondition.countDown();
+    							}
+    							
+    							@Override
+    							public void returnAction(boolean resultFlag) {
+    							}
+    						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), numSubscriptions + 1);
         				}
-         			}
-    				Log.d(LOG_TAG, "After size of pubsubSubscribes: " + PlatformEventsBase.this.subscribedToEvents.size());
+    		    		//wait for latch to release
+    		    		endCondition.await();
+              		}
        			}
-
+       			
     			Intent returnIntent = new Intent(intentValue);
-    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, this.numEventListeners(this.client));
+    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
 
     			if (PlatformEventsBase.this.restrictBroadcast) {
         			returnIntent.setPackage(this.client);
@@ -547,44 +571,30 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
 			}
     		return resultStatus;
     	}
-        /**
-         * Get number of subscribed to events for a given client
-         * @param client
-         * @return int number of subscribed events
-         */
-        private int numEventListeners(String client) {
-    		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-
-    		int numListeners = 0;
-        	
-    		Log.d(LOG_TAG, "Invocation of numEventListeners for client: " + client);
-    		
-			for (String key: PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
-				if (key.startsWith(client + KEY_DIVIDER)) {
-					numListeners++;
-				}
-			}
-			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
- 
-        	return numListeners;
-        }
     }
+
+    
 
     /**
      * Assign connection parameters (must happen after successful XMPP login)
      */
     private void assignConnectionParameters() {
     	Log.d(LOG_TAG, "assignConnectionParameters invoked");
-    	try {
-        	if (null == this.domainCommsDestination) {
-            	Log.d(LOG_TAG, "determine destinations");
+    	if (null == cloudCommsDestination) {
+        	try {
+            	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
+        		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
 
-            	this.domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
-            	Log.d(LOG_TAG, "Domain Authority Node: " + this.domainCommsDestination);
+            	try {
+        			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
+        			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
+        			
+        		} catch (InvalidFormatException e) {
+        			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
+        		}     
+        	} catch (InvalidFormatException i) {
+        		Log.e(LOG_TAG, "ID Manager exception", i);
         	}
-    		
-    	} catch (Exception e ) {
-    		Log.e(LOG_TAG, e.getMessage(), e);
     	}
     }
 
@@ -617,24 +627,6 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	return this.allPlatformEvents;
     }
     
-//    /**
-//     * Is an event still subscribed to by other clients ?
-//     * 
-//     * @param client
-//     * @param event
-//     * @return boolean true if event subscribed to by another client
-//     */
-//    private boolean otherClientsSubscribed(String client, String event) {
-//    	boolean retValue = false;
-//    	
-//		for (String value : this.subscribedClientEvents.values()) {
-//			if (value.equals(event)) {
-//				retValue = true;
-//				break;
-//			}
-//		}
-//    	return retValue;
-//    }
     
     /**
      * Generate the Map key for client/event pair
@@ -712,5 +704,20 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents, IServiceMana
     	}
     	return retValue;
     }
-
+    /**
+     * Is a specified intent a valid , recognised intent
+     * @param intent
+     * @return boolean true if valid
+     */
+    private static boolean isEventValid(String intent) {
+    	boolean retValue = false;
+    	
+    	for (String validIntent : IAndroidSocietiesEvents.societiesAndroidIntents) {
+    		if (validIntent.equals(intent)) {
+    			retValue = true;
+    			break;
+    		}
+    	}
+    	return retValue;
+    }
 }

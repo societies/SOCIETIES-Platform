@@ -51,7 +51,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 	public void testSubscribeToAllEvents() throws Exception {
 		this.testCompleted = false;
 
-		BroadcastReceiver receiver = setupBroadcastReceiver();
+		BroadcastReceiver receiver = setupAllEventReceiver();
 
 		Intent eventsIntent = new Intent(getContext(), ServicePlatformEventsTest.class);
 		TestPlatformEventsBinder binder = (TestPlatformEventsBinder) bindService(eventsIntent);
@@ -64,14 +64,13 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     	
     	this.unregisterReceiver(receiver);
     	assertTrue(this.testCompleted);
-    	
 	}
 	
     @MediumTest
 	public void testSubscribeToOneEvent() throws Exception {
 		this.testCompleted = false;
         
-		BroadcastReceiver receiver = setupBroadcastReceiver();
+		BroadcastReceiver receiver = setupSingleEventReceiver();
 
 		Intent eventsIntent = new Intent(getContext(), ServicePlatformEventsTest.class);
 		TestPlatformEventsBinder binder = (TestPlatformEventsBinder) bindService(eventsIntent);
@@ -90,7 +89,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 	public void testSubscribeToEvents() throws Exception {
 		this.testCompleted = false;
 		
-		BroadcastReceiver receiver = setupBroadcastReceiver();
+		BroadcastReceiver receiver = setupMultipleEventReceiver();
 
 		Intent eventsIntent = new Intent(getContext(), ServicePlatformEventsTest.class);
 		TestPlatformEventsBinder binder = (TestPlatformEventsBinder) bindService(eventsIntent);
@@ -126,38 +125,75 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     /**
      * Broadcast receiver to receive intent return values from service method calls
      */
-    private class MainReceiver extends BroadcastReceiver {
+    private class SingleEventReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			
+			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
+			    
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
+
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
+				assertEquals(1, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				TestEventsLocal.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+			}
+		}
+    }
+
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class MultipleEventReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			
+			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
+			    
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
+
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
+				assertEquals(2, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				TestEventsLocal.this.eventService.unSubscribeFromEvents(CLIENT_PARAM_1, INTENT_FILTER);
+			}
+		}
+    }
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class AllEventReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
-				assertEquals(ALL_EVENTS_COUNT, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-			   	TestEventsLocal.this.eventService.unSubscribeFromAllEvents(CLIENT_PARAM_1);
-
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				assertEquals(1, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestEventsLocal.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
 			    
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				assertEquals(2, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestEventsLocal.this.eventService.unSubscribeFromEvents(CLIENT_PARAM_1, INTENT_FILTER);
-
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestEventsLocal.this.testCompleted = true;
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.testCompleted = true;
 
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestEventsLocal.this.testCompleted = true;
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
+				assertEquals(ALL_EVENTS_COUNT, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				TestEventsLocal.this.eventService.unSubscribeFromAllEvents(CLIENT_PARAM_1);
 			}
 		}
     }
-    /**
+
+/**
      * Broadcast receiver to receive intent return values from service method calls
      */
     private class AlternativeReceiver extends BroadcastReceiver {
@@ -167,27 +203,27 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
-				assertEquals(ALL_EVENTS_COUNT, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.eventService.subscribeToEvents(CLIENT_PARAM_2, INTENT_FILTER);
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				assertEquals(1, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.eventService.unSubscribeFromAllEvents(CLIENT_PARAM_1);
 			    
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				assertEquals(2, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.eventService.subscribeToEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.eventService.unSubscribeFromEvents(CLIENT_PARAM_2, INTENT_FILTER);
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestEventsLocal.this.testCompleted = true;
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				assertEquals(0, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 		    	eventService.unSubscribeFromEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
 			}
 		}
@@ -197,12 +233,40 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
      * 
      * @return the created broadcast receiver
      */
-    private BroadcastReceiver setupBroadcastReceiver() {
+    private BroadcastReceiver setupSingleEventReceiver() {
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        BroadcastReceiver receiver = new MainReceiver();
+        BroadcastReceiver receiver = new SingleEventReceiver();
         getContext().registerReceiver(receiver, createTestIntentFilter());    	
-        Log.d(LOG_TAG, "Register main broadcast receiver");
+        Log.d(LOG_TAG, "Register single broadcast receiver");
+
+        return receiver;
+    }
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupMultipleEventReceiver() {
+        Log.d(LOG_TAG, "Set up broadcast receiver");
+        
+        BroadcastReceiver receiver = new MultipleEventReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());    	
+        Log.d(LOG_TAG, "Register multiple broadcast receiver");
+
+        return receiver;
+    }
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupAllEventReceiver() {
+        Log.d(LOG_TAG, "Set up broadcast receiver");
+        
+        BroadcastReceiver receiver = new AllEventReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());    	
+        Log.d(LOG_TAG, "Register all broadcast receiver");
 
         return receiver;
     }

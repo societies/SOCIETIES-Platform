@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.societies.activity.ActivityFeed;
-import org.societies.activity.PersistedActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
@@ -56,17 +55,17 @@ public class ICISSimulated implements ICisOwned {
 		this.members = members;
 	}
 
-	public PersistedActivityFeed getFeed() {
+	public ActivityFeed getFeed() {
 		return feed;
 	}
 
-	public void setFeed(PersistedActivityFeed feed) {
+	public void setFeed(ActivityFeed feed) {
 		this.feed = feed;
 	}
-	private PersistedActivityFeed feed=null;
+	private ActivityFeed feed=null;
 	public ICISSimulated() {
 		members = new ArrayList<String>();
-		feed = new PersistedActivityFeed();
+		feed = new ActivityFeed();
 	}
 
 	@Override

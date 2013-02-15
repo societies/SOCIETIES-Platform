@@ -49,6 +49,7 @@
 
 		<!-- Activity Feed: 1 bundle -->
 		<module>../../common-modules/activityfeed</module>
+		<module>../../common-modules/activityfeedservice</module>
 
 
 		<!-- Directory Clients: 2 bundles (to be merged) -->

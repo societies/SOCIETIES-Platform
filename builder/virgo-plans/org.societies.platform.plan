@@ -14,6 +14,8 @@
 	
 	<artifact type="plan" name="org.societies.common.modules"/>
 	
+	<artifact type="plan" name="org.societies.activityfeed"/>
+	
 	<artifact type="plan" name="org.societies.security"/>
 	
 	<artifact type="plan" name="org.societies.privacy.and.trust"/>

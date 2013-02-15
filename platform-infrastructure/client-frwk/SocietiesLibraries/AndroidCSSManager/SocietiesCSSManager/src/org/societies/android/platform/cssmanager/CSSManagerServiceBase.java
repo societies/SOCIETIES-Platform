@@ -61,9 +61,13 @@ import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -110,8 +114,10 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	private String cloudCommsDestination = DEFAULT_DESTINATION;
 	private String domainCommsDestination = null;
 	
-	Context context;
-	boolean restrictBroadcast;
+	private Context context;
+	private boolean restrictBroadcast;
+	private boolean connectedToEvents;
+	private Messenger eventsMessenger;
 	
 //	private PubsubClientAndroid pubsubClient = null;
 	
@@ -199,6 +205,65 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		}
 		return null;
 	}
+	@Override
+	public void startAppServices(final String client) {
+		final SocietiesClientServicesController controller = new SocietiesClientServicesController(this.context);
+		controller.bindToServices(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				if (resultFlag) {
+					controller.startAllServices(new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+						}
+						
+						@Override
+						public void returnAction(boolean resultFlag) {
+							Intent intent  = new Intent(IAndroidCSSManager.START_APP_SERVICES);
+							intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+							intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+							if (CSSManagerServiceBase.this.restrictBroadcast) {
+								intent.setPackage(client);
+							}
+							CSSManagerServiceBase.this.context.sendBroadcast(intent);
+						}
+					});
+				}
+			}
+		});
+	}
+
+	@Override
+	public void stopAppServices(final String client) {
+		final SocietiesClientServicesController controller = new SocietiesClientServicesController(this.context);
+		controller.stopAllServices(new IMethodCallback() {
+			
+			@Override
+			public void returnAction(String result) {
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				if (resultFlag) {
+					controller.unbindFromServices();
+					
+					Intent intent  = new Intent(IAndroidCSSManager.STOP_APP_SERVICES);
+					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+					if (CSSManagerServiceBase.this.restrictBroadcast) {
+						intent.setPackage(client);
+					}
+					CSSManagerServiceBase.this.context.sendBroadcast(intent);
+				}
+			}
+		});
+	}
 
 	public CssRecord loginCSS(String client, CssRecord record) {
 		Log.d(LOG_TAG, "loginCSS called with client: " + client);
@@ -206,17 +271,11 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		//delay subscribing for Pubsub events until successful login to Domain Server
-		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
-//		this.registerForPubsub();
-
 		this.assignConnectionParameters();
 		
 		final CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		//CssRecord localCssrecord = convertAndroidCSSRecord(record);
 		
-		//add the local Android node information
-		//localCssrecord.setCssNodes(createAndroidLocalNode());
 		record.setCssNodes(createAndroidLocalNode());
 		
 		messageBean.setProfile(record);
@@ -1389,4 +1448,32 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			}
 		});
 	}
+    
+    private void bindToPubsubService(String eventFilter) {
+    	Log.d(LOG_TAG, "bindToPubsubService");
+    	
+    }
+    
+    /**
+     * Events service connection
+     * 
+     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back
+     * if service connection lost
+     */
+    private ServiceConnection eventsConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from Platform Events service");
+        	connectedToEvents = false;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to Platform Events service");
+
+        	//get a remote binder
+        	CSSManagerServiceBase.this.eventsMessenger = new Messenger(service);
+        }
+    };
+
+
 }

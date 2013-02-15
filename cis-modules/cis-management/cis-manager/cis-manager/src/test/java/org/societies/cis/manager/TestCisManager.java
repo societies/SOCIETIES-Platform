@@ -29,14 +29,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.ActivityFeed;
+import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
@@ -90,14 +93,14 @@ import static org.mockito.Mockito.*;
  * @author Thomas Vilarinho (Sintef)
  *
  */
-//@RunWith(PowerMockRunner.class)
+
 @RunWith(org.springframework.test.context.junit4.SpringJUnit4ClassRunner.class)  
-@PrepareForTest( { ActivityFeed.class })
+@PrepareForTest( { Activity.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
 			.getLogger(TestCisManager.class);
-	//@Autowired
+	
 	private CisManager cisManagerUnderTest;
 	private ICisManager cisManagerUnderTestInterface;
 
@@ -117,9 +120,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICtxBroker mockContextBroker;
 	private INegotiation mockNegotiation;
 	
+	private Activity mockActivity;
 	
-	//private ResponseItem positiveResp;
-	private PubsubClient mockPubSubClient;
+	private IActivityFeedManager mockActivityFeedManager;
+
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
@@ -195,6 +199,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	String city = "Paris";
 	String status = "married";
     String religion = "jedi";
+    
+	IActivityFeed mockActivityFeed_1;
+	IActivityFeed mockActivityFeed_2;
+	IActivityFeed mockActivityFeed_3;
+    
 		
 	void mockingContext() throws InterruptedException, ExecutionException, CtxException{
 		 mockContextBroker = mock(ICtxBroker.class);
@@ -255,10 +264,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockNegotiation = mock(INegotiation.class);
 		mockIPrivacyDataManager = mock(IPrivacyDataManager.class);
 		
-		//positiveResp =  new ResponseItem(null, Decision.PERMIT);
+
 		
-		
-		mockPubSubClient = mock(PubsubClient.class);
+		mockActivityFeedManager = mock (IActivityFeedManager.class);
 		
 		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);
@@ -285,15 +293,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		
-		//doNothing().when(mockICisDirRemote2).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
-		//doNothing().when(mockICisDirRemote3).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
-		
-		//pubsub mocking
-		//doNothing().when(mockPubSubClient).addJaxbPackages(anyListOf(String.class));
-		doNothing().when(mockPubSubClient).ownerCreate(any(org.societies.api.identity.IIdentity.class),anyString());
-		when(mockPubSubClient.publisherPublish(any(org.societies.api.identity.IIdentity.class)
-				, anyString(), anyString(), anyObject())).thenReturn("");
-		
+			
 		
 		// creating a NetworkNordImpl for each Identity Manager		
 		testCisId_1 = new NetworkNodeImpl(TEST_CISID_1);
@@ -329,6 +329,33 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		this.mockingContext();
 		
+		
+
+		
+		// mocking activity feeds themselves
+		mockActivityFeed_1  = mock (IActivityFeed.class);
+		mockActivityFeed_2 = mock (IActivityFeed.class);
+		mockActivityFeed_3 = mock (IActivityFeed.class);
+		
+		mockActivity = new Activity();
+		
+		when(mockActivityFeed_1.getEmptyIActivity()).thenReturn(mockActivity);
+		when(mockActivityFeed_2.getEmptyIActivity()).thenReturn(mockActivity);
+		when(mockActivityFeed_3.getEmptyIActivity()).thenReturn(mockActivity);
+		doNothing().when(mockActivityFeed_1).addActivity(any(org.societies.api.activity.IActivity.class), any (org.societies.api.activity.IActivityFeedCallback.class));
+		doNothing().when(mockActivityFeed_2).addActivity(any(org.societies.api.activity.IActivity.class), any (org.societies.api.activity.IActivityFeedCallback.class));
+		doNothing().when(mockActivityFeed_3).addActivity(any(org.societies.api.activity.IActivity.class), any (org.societies.api.activity.IActivityFeedCallback.class));
+
+		//acitivity feed mocking
+		
+		when(mockActivityFeedManager.deleteFeed(anyString(), anyString())).thenReturn(true);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_1))).thenReturn(mockActivityFeed_1);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_2))).thenReturn(mockActivityFeed_2);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_3))).thenReturn(mockActivityFeed_3);
+				
+
+		
+		System.out.println("done mocking activities!");
 	}
 	
 	@Before
@@ -404,6 +431,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void testCreateCIS() {
 		
+		System.out.println("testing create CIS");
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -441,6 +469,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println("end of testing create CIS");
 	
 	}
 	
@@ -449,6 +479,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing list CIS");
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -492,6 +523,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
 		 }
 
+		 System.out.println("end of list CIS");
+		 
 	}
 
 	//@Rollback(true)
@@ -499,6 +532,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
+		System.out.println("test delete CIS");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -551,6 +586,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			cisManagerUnderTestInterface.deleteCis( element.getCisId());
 	     }
 
+		System.out.println("end of delete CIS");
 	
 	}
 	
@@ -559,6 +595,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void testAddMemberToOwnedCIS() throws InterruptedException, ExecutionException {
 
+		
+		System.out.println("testing add member to owned CIS");
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -585,6 +623,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void testDeleteMemberToOwnedCIS() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing delete member to owned CIS");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -626,6 +666,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	@Test
 	public void searchCISbyName(){
+		
+		System.out.println("testing search CIS");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -666,6 +709,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	@Test
 	public void searchCISbyMember(){
+		
+		System.out.println("testing search CIS by member");
 		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
@@ -713,6 +758,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing list members");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -754,7 +801,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 	}
 	
-	//@Ignore
+	@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 
@@ -772,14 +819,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		iActivity.setActor("act");
 		iActivity.setObject("obj");
 		iActivity.setTarget("tgt");
-		iActivity.setPublished((System.currentTimeMillis() -55) + "");
 		iActivity.setVerb("verb");
 
 		IActivity iActivity2 = new org.societies.activity.model.Activity();
 		iActivity2.setActor("act2");
 		iActivity2.setObject("obj2");
 		iActivity2.setTarget("tgt2");
-		iActivity2.setPublished((System.currentTimeMillis() -500) + "");
 		iActivity2.setVerb("verb2");
 
 		class DummyAddActFeedCback implements IActivityFeedCallback {
@@ -848,6 +893,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing list w callback");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -926,6 +973,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
 
+		System.out.println("get info with callback");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -988,6 +1037,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing set info with callback");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -1054,6 +1105,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
+		System.out.println("testing check criteria");
+		
 		cisManagerUnderTest = new CisManager();
 		this.setMockingOnCISManager(cisManagerUnderTest);
 		
@@ -1107,8 +1160,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private void setMockingOnCISManager(CisManager cisManagerUnderTest){
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
-		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setPubsubClient(mockPubSubClient);
+		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setiActivityFeedManager(mockActivityFeedManager);
 		cisManagerUnderTest.setPrivacyDataManager(mockIPrivacyDataManager);
+		
 		cisManagerUnderTest.init();
 		
 	}

@@ -29,7 +29,7 @@ Test Parameters
 		{% for item in performanceTestParameters %}	 	
 	 		
 	 		<label class="required" for="{{ item.id }}" >{{ item.parameterName }}</label>
-	 		<input type="text" id="{{ item.id }}" name="{{ item.id }}" required="required" value="{{ item.parameterValue  }}" />	
+	 		<textarea id="{{ item.id }}" name="{{ item.id }}" required="required" >{{ item.parameterValue  }}</textarea>	
 	 	<br/>
 		{% endfor %}
 		

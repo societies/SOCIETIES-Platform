@@ -144,7 +144,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
-			<artifactId>activityfeed</artifactId>
+			<artifactId>activityfeed-client</artifactId>
 			<version>${version.cis}</version>
 			<scope>provided</scope>
 		</dependency>

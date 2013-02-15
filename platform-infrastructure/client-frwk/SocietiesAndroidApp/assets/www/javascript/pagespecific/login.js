@@ -64,7 +64,7 @@ var SocietiesLogin = {
 		console.log("Login to the chosen XMPP domain");
 
 		function success(data) {
-			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulCSSCloudLogin);
+			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulStartAllAppServices);
 		}
 		
 		function failure(data) {
@@ -72,6 +72,24 @@ var SocietiesLogin = {
 		}
 	    window.plugins.SocietiesLocalCSSManager.loginXMPPServer(success, failure);
 
+	},
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description Start all of the Societies Client app services
+	 * @returns null
+	 */
+
+	successfulStartAllAppServices: function() {
+		console.log("Start all Societies Client app native services");
+
+		function success(data) {
+			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulCSSCloudLogin);
+		}
+		
+		function failure(data) {
+			alert("successfulXMPPDomainLogin - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCSSManager.startAppServices(success, failure);
 	},
 	/**
 	 * @methodOf SocietiesLogin#
@@ -236,8 +254,7 @@ var SocietiesLogin = {
 		}
 		
 		function failure(data) {
-			//alert("successfulCSSCloudLogin - failure: " + data);
-			success(data);
+			alert("successfulCSSCloudLogin - failure: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.loginCSS(success, failure);
