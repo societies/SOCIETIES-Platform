@@ -43,9 +43,7 @@ public class AndroidUserFeedbackRemote extends Service{
 	@Override
 	public void onCreate () {
 		Log.d(LOG_TAG, "AndroidUserFeedbackRemote service starting...");
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
-		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(getApplicationContext());
-		AndroidUserFeedbackBase ufBase = new AndroidUserFeedbackBase(this.getApplicationContext(), ccm, pubsubClient, false);
+		AndroidUserFeedbackBase ufBase = new AndroidUserFeedbackBase(this.getApplicationContext(), false);
 		this.inMessenger = new Messenger(new RemoteServiceHandler(ufBase.getClass(), ufBase, IAndroidUserFeedback.methodsArray));
 	}
 	
