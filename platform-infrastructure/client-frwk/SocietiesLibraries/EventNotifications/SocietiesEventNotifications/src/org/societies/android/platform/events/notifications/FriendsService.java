@@ -28,6 +28,7 @@ import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssFriendEvent;
 
 import android.app.Notification;
 import android.app.Service;
@@ -149,18 +150,18 @@ public class FriendsService extends Service {
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				Log.d(LOG_TAG, "Un-subscribed from events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
 			}
-			//PUBSUB EVENTS
+			//PUBSUB EVENTS - payload is CssFriendEvent 
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request received: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = advert.getName() + " sent a friend request";
-				addNotification(description, "Friend Request", advert);
+				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = eventPayload.getCssAdvert().getName() + " sent a friend request";
+				addNotification(description, "Friend Request", eventPayload.getCssAdvert());
 			}
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_ACCEPTED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request accepted: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = advert.getName() + " accepted your friend request";
-				addNotification(description, "Friend Request Accepted", advert);
+				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = eventPayload.getCssAdvert().getName() + " accepted your friend request";
+				addNotification(description, "Friend Request Accepted", eventPayload.getCssAdvert());
 			}			
 		}
     }
