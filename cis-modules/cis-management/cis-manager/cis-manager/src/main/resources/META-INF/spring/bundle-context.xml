@@ -87,8 +87,9 @@
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
         <property name="negotiator" ref="NegotiationRequester"/>    
         <property name="iUsrFeedback" ref="userFeedback"/>
+        <property name="iActivityFeedManager" ref="activityFeedManager" />
         <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />
-        <property name="iActivityFeedManager" value="activityFeedManager" />
+        
         
     </bean>
     
