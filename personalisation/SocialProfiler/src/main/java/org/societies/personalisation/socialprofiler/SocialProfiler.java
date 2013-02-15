@@ -70,7 +70,8 @@ public class SocialProfiler  { //implements ISocialProfiler
 		this.databaseConnection	    = new DatabaseConnection(props);
 		
 		logger.info("Engine Initialization ...");
-		this.engine	= new ProfilerEngine(graph, databaseConnection, getSocialdata());
+//		this.engine	= new ProfilerEngine(graph, databaseConnection, getSocialdata());
+		this.engine	= new ProfilerEngine(graph, getSocialdata());
 		
 		// start Scheduler
 		scheduleNetworkUpdate();
@@ -117,7 +118,7 @@ public class SocialProfiler  { //implements ISocialProfiler
 	    	int initialDelay =0;
 			int period		 = (int)(1000 * 60 * 60 * 24 * daysFull); //30000
 	    	this.timer = new Timer();
-			SocialTimerTask task = new SocialTimerTask(this.engine,  this.databaseConnection);
+			SocialTimerTask task = new SocialTimerTask(this.engine);
 			timer.scheduleAtFixedRate(task, initialDelay, period);
 			logger.info("Next network update scheduled in " + daysFull + " days. The procedure will be repeated every " + daysFull + " days.");
 	 }

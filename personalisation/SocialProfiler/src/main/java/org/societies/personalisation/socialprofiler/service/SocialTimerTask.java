@@ -8,15 +8,13 @@ import org.slf4j.LoggerFactory;
 public class SocialTimerTask extends TimerTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocialTimerTask.class);
-	private DatabaseConnection		databaseConnection;
 	private ProfilerEngine				engine;
 	
 
-	public SocialTimerTask(ProfilerEngine engine, DatabaseConnection databaseConnection) {
+	public SocialTimerTask(ProfilerEngine engine) {
 		
 		super();
 		this.engine = engine;
-		this.databaseConnection = databaseConnection;
 	}
 
 

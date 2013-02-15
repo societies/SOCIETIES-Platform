@@ -24,10 +24,10 @@
  */
 package org.societies.personalisation.socialprofiler.service;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ProfilerEngine implements Variables{
 
 	private static final Logger logger = LoggerFactory.getLogger(ProfilerEngine.class);
 	private GraphManager					graph;
-	private DatabaseConnection 				databaseConnection;
+//	private DatabaseConnection 				databaseConnection;
 	private ISocialData						socialData;
 	
 	private List<?> 			friends 	= new ArrayList<Person>();
@@ -66,10 +66,11 @@ public class ProfilerEngine implements Variables{
 	public static final String	INITIAL_USER_ID = "0";
 	
 		
-	public ProfilerEngine(GraphManager graph, DatabaseConnection databaseConnection, ISocialData socialData){
-	
+//	public ProfilerEngine(GraphManager graph, DatabaseConnection databaseConnection, ISocialData socialData){
+	public ProfilerEngine(GraphManager graph, ISocialData socialData){
+			
 		this.graph 					= graph;
-		this.databaseConnection 	= databaseConnection;
+//		this.databaseConnection 	= databaseConnection;
 		this.socialData				= socialData;
 		generateCompleteNetwork();
 		
@@ -83,18 +84,6 @@ public class ProfilerEngine implements Variables{
 	public void setSocialData(ISocialData socialData){
 		this.socialData = socialData;
 		
-	}
-	
-	/**
-	 * returns the databaseConnection given as parameter to the constructor
-	 * @return
-	 */
-	public final DatabaseConnection getDatabaseConnection() {
-		return databaseConnection;
-	}
-	
-	public void setDatabaseConnection(DatabaseConnection databaseConnection) {
-		this.databaseConnection = databaseConnection;
 	}
 	
 	
@@ -122,10 +111,10 @@ public class ProfilerEngine implements Variables{
 		activities	= socialData.getSocialActivity();
 		
 
-		if (!databaseConnection.connectMysql()){
-		   logger.error("Cannot proceed with request due to database connection problems.");
-		   return;
-	    }
+//		if (!databaseConnection.connectMysql()){
+//		   logger.error("Cannot proceed with request due to database connection problems.");
+//		   return;
+//	    }
 		
 		logger.debug("=============================");
 		logger.debug("=== Traversing NEO GRAPH  ==="); 
@@ -156,7 +145,7 @@ public class ProfilerEngine implements Variables{
 		
 //		databaseConnection.addInfoForCommunityProfile();
 
-		databaseConnection.closeMysql();
+//		databaseConnection.closeMysql();
 		logger.debug("=============================================================");
 		logger.debug("====      SOCIAL PROFILER COMPLETED UPDATE              =====");
 		logger.debug("=============================================================");
@@ -166,15 +155,15 @@ public class ProfilerEngine implements Variables{
 		logger.debug("GENERATING the whole network including isolated clusters and/or nodes");
 		graph.createPerson(SocialPerson.ROOT);
 		
-		if (!databaseConnection.connectMysql()){
-		   logger.error("Cannot proceed with request due to database connection problems.");
-		   return;
-	    }
+//		if (!databaseConnection.connectMysql()){
+//		   logger.error("Cannot proceed with request due to database connection problems.");
+//		   return;
+//	    }
 		
 		createInitialUsers();
 		
 //		databaseConnection.addInfoForCommunityProfile();
-		databaseConnection.closeMysql();
+//		databaseConnection.closeMysql();
 	}
 	
 	private void createInitialUsers(){
@@ -230,7 +219,7 @@ public class ProfilerEngine implements Variables{
 			SocialPerson startPerson=graph.createPerson(current_id);			
 			linkToRoot(startPerson);
 			
-			databaseConnection.addUserToDatabase(current_id, startPerson.getName());
+//			databaseConnection.addUserToDatabase(current_id, startPerson.getName());
 						
 			logger.debug("---# initialising user"+current_id+" profile percentages");
 			
@@ -402,7 +391,7 @@ public class ProfilerEngine implements Variables{
 				}else{ // dead code for now.
 					logger.debug("removing current id"+current_id+" from neo network , index ");
 					graph.deletePerson(current_id);
-					databaseConnection.deleteUserFromDatabase(current_id);
+//					databaseConnection.deleteUserFromDatabase(current_id);
 				}
 			}
 		}	
@@ -865,7 +854,7 @@ public class ProfilerEngine implements Variables{
 			}
 		}
 		int number=	graph.getManiacNumber(userId+maniacType, ptype);								
-		databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+//		databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
 		if (number >=2){
 			long old_frequency=graph.getManiacFrequency(userId+maniacType, ptype);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");

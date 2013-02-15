@@ -443,37 +443,4 @@ public class DatabaseConnection implements Variables {
 		return result;
 	}
 	
-	
-	public int getLastBlogWeek(){
-		int lastWeek=-1;
-		try {
-			Statement st = connection.createStatement();
-			ResultSet result=st.executeQuery("select week from blog order by week desc;");
-			if (result.next()){
-				String number=result.getString("week");
-				if (number!=null){
-						lastWeek=Integer.parseInt(number);
-						logger.debug("number is"+lastWeek);
-				}
-			}
-		}catch (SQLException e) {
-			logger.debug("error while selecting last week from blog . Reason :"+e);
-			e.printStackTrace();
-		}
-		return lastWeek;
-		
-	}
-	
-	
-	public void insertBlogWeek( int week){
-		try {
-			logger.debug("adding blog week  "+week+" to table blog");
-			Statement st = connection.createStatement();
-			st.execute("INSERT into blog (week) values ("+week +") ;");
-		}catch (SQLException e) {
-			logger.debug("error while inserting blog week "+week+" "+e);
-			e.printStackTrace();
-		}
-	}	
-	
 }
