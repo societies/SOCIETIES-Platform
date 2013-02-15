@@ -31,29 +31,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 
 var SocietiesLogout = {
-	/**
-	 * @methodOf SocietiesLogout#
-	 * @description Carry out the logout process from the Cloud CSS node
-	 * @returns null
-	 */
-	successfulCSSCloudLogout: function() {
-		console.log("Logout from CSS");
+		/**
+		 * @methodOf SocietiesLogout#
+		 * @description Carry out the logout process from the Cloud CSS node
+		 * @returns null
+		 */
+		successfulCSSCloudLogout: function() {
+			console.log("Logout from CSS");
 
-		function success(data) {
-			jQuery("#loginUsername").val("");
-			jQuery("#loginPassword").val("");
-			SocietiesLogout.successfulXMPPServerLogout();
+			function success(data) {
+				jQuery("#loginUsername").val("");
+				jQuery("#loginPassword").val("");
+				SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulStopAllAppServices());
 
-		}
+			}
 
-		function failure(data) {
-			alert("successfulCSSCloudLogout : " + "failure: " + data);
-			success(data);
-		}
-		
-	    window.plugins.SocietiesLocalCSSManager.logoutCSS(success, failure);
+			function failure(data) {
+				alert("successfulCSSCloudLogout : " + "failure: " + data);
+			}
+			
+		    window.plugins.SocietiesLocalCSSManager.logoutCSS(success, failure);
 
-	},
+		},
+		/**
+		 * @methodOf SocietiesLogout#
+		 * @description Stop all Societies Cloud Services
+		 * @returns null
+		 */
+		successfulStopAllAppServices: function() {
+			console.log("Stop all Societies Client app services");
+
+			function success(data) {
+				SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulXMPPServerLogout());
+
+			}
+
+			function failure(data) {
+				alert("successfulStopAllAppServices : " + "failure: " + data);
+			}
+			
+		    window.plugins.SocietiesLocalCSSManager.stopAppServices(success, failure);
+
+		},
 	/**
 	 * @methodOf SocietiesLogout#
 	 * @description Carry out the logout process from the XMPP server domain

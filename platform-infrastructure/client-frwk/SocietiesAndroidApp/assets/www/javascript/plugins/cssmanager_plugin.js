@@ -67,6 +67,41 @@ var	SocietiesLocalCSSManager = {
 	},
 	/**
 	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Starts all of the relevant Societies Client app services
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns null
+	 */
+	startAppServices: function(successCallback, failureCallback) {
+		console.log("Call LocalCSSManagerService - startAppServices");
+		var client = "org.societies.android.platform.gui";
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'startAppServices',          //Telling the plugin, which action we want to perform
+		[client]);        //Passing a list of arguments to the plugin
+	},
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Stops all of the relevant Societies Client app services
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns null
+	 */
+	stopAppServices: function(successCallback, failureCallback) {
+		console.log("Call LocalCSSManagerService - stopAppServices");
+		var client = "org.societies.android.platform.gui";
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'stopAppServices',          //Telling the plugin, which action we want to perform
+		[client]);        //Passing a list of arguments to the plugin
+	},
+
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
 	 * @description Retrieve the current locally cached CSSRecord
 	 * @param {Object} successCallback The callback which will be called when result is successful
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
@@ -468,16 +503,16 @@ var	SocietiesLocalCSSManagerHelper = {
 
 		console.log(data);
 
-//		function success(data) {
-//			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
-//
-//			console.log(data);
-//		}
-//		
-//		function failure(data) {
-//			alert("disconnectFromLocalCSSManager - failure: " + data);
-//		}
-//	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
+		function success(data) {
+			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+
+			console.log(data);
+		}
+		
+		function failure(data) {
+			alert("disconnectFromLocalCSSManager - failure: " + data);
+		}
+	    window.plugins.SocietiesLocalCSSManager.disconnectService(success, failure);
 	},
 	/**
 	 * @methodOf SocietiesLocalCSSManagerHelper#

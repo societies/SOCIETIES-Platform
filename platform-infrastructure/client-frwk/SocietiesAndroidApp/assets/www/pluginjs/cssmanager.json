@@ -3,6 +3,8 @@
 		"exceptionThreshold" : 0,
 		"connectService" : "connected",
 		"disconnectService" : "disconnected",
+		"startAppServices" : "true",
+		"stopAppServices" : "true",
 		"loginCSS" : {
 						"archiveCSSNodes": [],
 	                    "cssIdentity": "android",

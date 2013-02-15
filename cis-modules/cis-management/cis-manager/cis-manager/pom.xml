@@ -60,6 +60,13 @@
 		  <version>${version.cis}</version>
 		  <scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>activityfeed-client</artifactId>
+		    <version>${release.version}</version>
+		    <scope>provided</scope>
+	    </dependency>
 		  
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -114,9 +121,9 @@
 
 		<dependency>
 			<groupId>org.societies</groupId>
-			<artifactId>activityfeed</artifactId>
+			<artifactId>activityfeedservice</artifactId>
 			<version>${version.cis}</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
