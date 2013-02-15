@@ -825,7 +825,6 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALBACK_ID);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			Log.d(LOG_TAG, "Pubsub node intent sent: " + packet.toXML());
-
 		}			
 	}
 	

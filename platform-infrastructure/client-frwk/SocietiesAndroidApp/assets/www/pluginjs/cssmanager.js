@@ -18,6 +18,22 @@ window.plugins.SocietiesLocalCSSManager = {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'disconnectService'));
 		}
 	},
+	startAppServices: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'startAppServices'));
+		}
+	},
+	stopAppServices: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'stopAppServices'));
+		}
+	},
 	loginCSS: function(successCallback, errorCallback){
 		if (phonegapdesktop.internal.randomException("CssManagerService")) {
 			errorCallback('A random error was generated');
