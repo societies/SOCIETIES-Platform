@@ -29,16 +29,20 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
-import org.societies.activity.PersistedActivityFeed;
+import org.societies.activity.ActivityFeedManager;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.socialdata.SocialData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +54,13 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.when;
 
 /**
  * 
@@ -62,56 +68,62 @@ import static org.mockito.Mockito.stub;
  * @author bjornmagnus adopted from solutanet
  * 
  */
-@ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml" })
+@ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedTest-context.xml"})
 public class ActivityFeedTest extends
 AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
 			.getLogger(ActivityFeedTest.class);
 
-    @Qualifier(value = "test")
-	@Autowired
-	private ActivityFeed actFeed;
     @Autowired
-    private PersistedActivityFeed pFeed;
-	private SessionFactory sessionFactory=null;
-	private Session session=null;
-	static {
+    private SessionFactory sessionFactory;
+    private static ActivityFeedManager activityFeedManager;
+
+	private ActivityFeed actFeed;
+
+    //mocks
+    private static ICommManager mockCSSendpoint = mock(ICommManager.class);
+    private static IIdentityManager mockIdentityManager = mock(IIdentityManager.class);
+    private static IIdentity mockIdentity = mock(IIdentity.class);
+    private static final String FEED_ID="1";
+    private static final String FEED_JID="sintef";
+    private static PubsubClient mockPubsubClient = mock(PubsubClient.class);
+    private static List<String> mockDicoItems = new ArrayList<String>();
+
+
+    static {
 		ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
 	}
 	int feedid=0;
 
-    public ActivityFeedTest() {
-        LOG.info("in actfeedtest constructor");
-        actFeed = pFeed;
+    @BeforeClass
+    public static void setupBeforeClass() throws InvalidFormatException, CommunicationException, XMPPError {
+        mockDicoItems.add(FEED_ID);
+        when(mockCSSendpoint.getIdManager()).thenReturn(mockIdentityManager);
+        when(mockIdentityManager.fromJid(FEED_JID)).thenReturn(mockIdentity);
+        when(mockPubsubClient.discoItems(mockIdentity,FEED_ID)).thenReturn(mockDicoItems);
+        activityFeedManager = new ActivityFeedManager();
+        activityFeedManager.setCommManager(mockCSSendpoint);
+
+        activityFeedManager.setPubSubClient(mockPubsubClient);
     }
 
     @Before
 	public void setupBefore() throws Exception {
-        actFeed = pFeed;
-		if(sessionFactory==null){
-			sessionFactory = actFeed.getSessionFactory();
-		}
-//		if(session==null){
-//			session = sessionFactory.openSession();
-//			actFeed.setSession(session);
-//		}
-//		if(!session.isOpen())
-//			session = sessionFactory.openSession();
-		LOG.info("i startup ");
-		
+        activityFeedManager.setSessionFactory(this.sessionFactory);
+        actFeed = (ActivityFeed) activityFeedManager.getOrCreateFeed(FEED_JID,FEED_ID);
 	}
 	@After
 	public void tearDownAfter() throws Exception {
 		
 		actFeed.clear();
-//		session.close();
 		actFeed = null;
 	}
 	@Test
 	@Rollback(false)
 	public void testAddCisActivity() {
 		LOG.info("@@@@@@@ IN TESTADDACTIVITY @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(1));
+        actFeed.setId("1");
+		actFeed.startUp(sessionFactory);
 		String actor="testUsertestAddCisActivity";
 		String verb="published";
 		IActivity iact = new Activity();
@@ -151,7 +163,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testCleanupFeed() {
 		LOG.info("@@@@@@@ IN TESTCLEANUPFEED @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(2));
+        actFeed.setId("2");
+		actFeed.startUp(sessionFactory);
 		JSONObject searchQuery = new JSONObject();
 		String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
 		try {
@@ -174,25 +187,24 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testFilter(){
 		LOG.info("@@@@@@@ IN TESTFILTER @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(3));
+        actFeed.setId("2");
+		actFeed.startUp(sessionFactory);
 		String actor="testFilterUser";
-		long now = System.currentTimeMillis();
-		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(now-100));
+		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
 		actFeed.addActivity(act1);
-		String timeSeries = Long.toString(now-1000)+" "+Long.toString(now+1000);
+		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
 		JSONObject searchQuery = new JSONObject();
 		try {
 			searchQuery.append("filterBy", "actor");
 			searchQuery.append("filterOp", "equals");
 			searchQuery.append("filterValue", actor);
 		} catch (JSONException e) {
-			LOG.info("JSON error: "+e.getMessage(), e);
-			fail("JSON error: "+e.getMessage());
+			e.printStackTrace();
 		}
 		LOG.info("sending timeSeries: "+timeSeries+ " act published: "+act1.getPublished());
 		List<IActivity> results = actFeed.getActivities(searchQuery.toString(), timeSeries);
 		LOG.info("testing filtering filter result: "+results.size());
-		assertTrue("Results is empty", results.size() > 0);
+		assert(results.size() > 0);
 	}
 
 //	@Test
@@ -212,12 +224,12 @@ AbstractTransactionalJUnit4SpringContextTests {
 //		ActivityFeed queryFeed = ActivityFeed.startUp("0");
 //		assert(queryFeed != null);
 //	}
-	@Ignore
 	@Test
 	@Rollback(false)
 	public void testSNImporter(){
 		LOG.info("@@@@@@@ IN TESTSNIMPORTER @@@@@@@");
-		actFeed.startUp(sessionFactory, Integer.toString(4));
+        actFeed.setId("4");
+		actFeed.startUp(sessionFactory);
 		LOG.info("actFeedcontent: "+ actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
 		ISocialConnector mockedSocialConnector; 
 		mockedSocialConnector = mock(ISocialConnector.class);
@@ -256,11 +268,11 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTREBOOT @@@@@@@");
 		String actor="testRebootActor";
 		String verb="published";
-		long now = System.currentTimeMillis();
-		actFeed.startUp(sessionFactory, Integer.toString(5));
+        actFeed.setId("5");
+		actFeed.startUp(sessionFactory);
 		IActivity iact = new Activity();
 		iact.setActor(actor);
-		iact.setPublished(Long.toString(now));
+		iact.setPublished(Long.toString(System.currentTimeMillis()));
 		iact.setVerb(verb);
 		iact.setObject("message");
 		iact.setTarget("testTarget");
@@ -275,14 +287,13 @@ AbstractTransactionalJUnit4SpringContextTests {
 		List<IActivity> results = null;
 		try {
 			JSONObject searchQuery = new JSONObject();
-			String timeSeries = "0 "+Long.toString(now+1000);
+			String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
 			try {
 				searchQuery.append("filterBy", "actor");
 				searchQuery.append("filterOp", "equals");
 				searchQuery.append("filterValue", actor);
 			} catch (JSONException e) {
-				LOG.info("JSON error: "+e.getMessage(), e);
-				fail("JSON error: "+e.getMessage());
+				e.printStackTrace();
 			}
 			LOG.info("sending timeSeries: "+timeSeries+ " act published: "+iact.getPublished());
 			results = actFeed.getActivities(searchQuery.toString(), timeSeries);
@@ -293,8 +304,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 			e.printStackTrace();
 		}
 		//assert(results!=null);
-		assertTrue("Result list is empty", results.size()>0);
-		assertTrue("Actor of the first result doesn't match", results.get(0).getActor().equals(actor));
+		assert(results.size()>0);
+		assert(results.get(0).getActor().equals(actor));
 	}
 	private static String readFileAsString(String filePath)
 			throws java.io.IOException{

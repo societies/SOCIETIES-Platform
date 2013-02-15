@@ -1,8 +1,8 @@
-/*
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp.,
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,27 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.cpa.test;
+package org.societies.activity;
 
-import java.util.ArrayList;
-
-import org.junit.Test;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Property;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.activity.model.Activity;
+import org.societies.activity.model.ActivityString;
 import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisParticipant;
-import org.societies.orchestration.cpa.impl.CPACreationPatterns;
-import org.societies.orchestration.cpa.impl.SocialGraphVertex;
-import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
-import org.societies.orchestration.cpa.impl.comparison.SimpleCounter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-@ContextConfiguration(locations = { "classpath:CPAUnitTest-context.xml" })
-public class CPAUnitTest  extends AbstractTransactionalJUnit4SpringContextTests {
-	@Test
-	public void cpaTestPlaceHolder(){
-		CPACreationPatterns pa = new CPACreationPatterns();
-		SocialGraphVertex m1 = null; 
-		SocialGraphVertex m2 = null;
-		ActorComparator actComp = new SimpleCounter();
-		assert(actComp.compare(m1, m2, new ArrayList<IActivity>()) == 0);
-	}
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.schema.activityfeed.AddActivityResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class RemovalActivityFeed {//, Subscriber {
+
+
 }

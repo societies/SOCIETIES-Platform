@@ -3,7 +3,7 @@
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp.,
- * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
@@ -16,33 +16,45 @@
  *    disclaimer in the documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
- * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
  * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.cpa.test;
 
-import java.util.ArrayList;
+package org.societies.api.activity;
 
-import org.junit.Test;
-import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisParticipant;
-import org.societies.orchestration.cpa.impl.CPACreationPatterns;
-import org.societies.orchestration.cpa.impl.SocialGraphVertex;
-import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
-import org.societies.orchestration.cpa.impl.comparison.SimpleCounter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-@ContextConfiguration(locations = { "classpath:CPAUnitTest-context.xml" })
-public class CPAUnitTest  extends AbstractTransactionalJUnit4SpringContextTests {
-	@Test
-	public void cpaTestPlaceHolder(){
-		CPACreationPatterns pa = new CPACreationPatterns();
-		SocialGraphVertex m1 = null; 
-		SocialGraphVertex m2 = null;
-		ActorComparator actComp = new SimpleCounter();
-		assert(actComp.compare(m1, m2, new ArrayList<IActivity>()) == 0);
-	}
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: bjornmagnus
+ * Date: 2/8/13
+ * Time: 16:06
+ */
+
+@SocietiesExternalInterface(type = SocietiesExternalInterface.SocietiesInterfaceType.PROVIDED)
+public interface IActivityFeedManager {
+    /**
+     *
+     * @param owner The id of the existing or new ActivityFeed
+     * @return {@link IActivityFeed}
+     */
+    public IActivityFeed getOrCreateFeed(String owner, String feedId);
+    public boolean deleteFeed(String owner, String id);
+    
+    
+    /**
+     * 
+     * This method returns a handler to a remote activity feed
+     * 
+     * @param {@link ICommManager} iCommMgr is the commManager responsible for dispatching the messages
+     * to the remote node
+     * @param {@link IIdentity} remoteCISid is the Identity of the remote node
+     * @return {@link IActivityFeed} is the handler to the remote activity feed 
+     */
+    public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid);
 }
