@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -17,10 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.example.calculator.ICalc;
+import org.societies.integration.example.service.api.IAddService;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -39,24 +39,28 @@ public class NominalTestCaseLowerTester {
 	 */
 	public static ServiceResourceIdentifier calculatorServiceId;
 	/**
-	 * Injection of ICalc interface
+	 * Injection of IAddService interface
 	 */
-	public static ICalc calculatorService;
+	public static IAddService addService;
 	/**
 	 * Tools for integration test
 	 */
-	public IntegrationTestUtils integrationTestUtils;
+	public static IntegrationTestUtils integrationTestUtils;
 	/**
 	 * Test case number
 	 */
 	public static int testCaseNumber;
 
+	/**
+	 * Relative path to the jar file in resources folder
+	 */
+	private static final String SERVICE_PATH = "IntegrationTestService-0.1.jar";
 
 	public NominalTestCaseLowerTester() {
 		integrationTestUtils = new IntegrationTestUtils();
 	}
 
-
+	
 	/**
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
@@ -68,10 +72,10 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#759] Prerequisite: The CSS is created");
 		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
-		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getSystemResource("Calculator-0.3.jar");//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
+		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_PATH);//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
 		calculatorServiceId = null;
-		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
 		LOG.info("[#759] Service location: "+serviceBundleUrl);
+		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
 	}
 
 	/**
@@ -138,6 +142,7 @@ public class NominalTestCaseLowerTester {
 				throw new Exception("Can't start the service. Returned value: "+startResult.getMessage());
 			}
 			LOG.info("[#759] Calculator service started");
+			NominalTestCaseUpperTester.calculatorServiceId = calculatorServiceId;
 
 			// -- Test case is now ready to consume the service
 			// The injection of ICalc will launch the UpperTester
@@ -154,11 +159,11 @@ public class NominalTestCaseLowerTester {
 		}
 	}
 
-	public void setCalculatorService(ICalc calculatorService) {
+	public void setAddService(IAddService addService) {
 		LOG.info("[#759] Calculator Service injected");
-		this.calculatorService = calculatorService;
+		NominalTestCaseLowerTester.addService = addService;
+		
 		// -- Launch the UpperTester to continue the test case by consuming a service
-		NominalTestCaseUpperTester.calculatorServiceId = calculatorServiceId;
-		integrationTestUtils.run(testCaseNumber, NominalTestCaseUpperTester.class);
+		//integrationTestUtils.run(testCaseNumber, NominalTestCaseUpperTester.class);
 	}
 }
