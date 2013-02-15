@@ -24,46 +24,25 @@
  */
 package org.societies.api.identity;
 
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+import org.societies.api.schema.identity.DataTypeDescription;
 
 /**
- * Utility method that helps manipulating DataIdentifier objects
- *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class DataIdentifierUtil {
-	/**
-	 * Generate a URI: sheme://ownerId/type
-	 * @param dataId
-	 * @return
-	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		return str.toString();
+public class DataTypeDescriptionUtilTest {
+
+	@Test
+	public void testComputedFriendlyName() {
+		String dataType = "HELLO_THE_WORLD";
+		String expectedResult = "Hello The World";
+		DataTypeDescription dataTypeDescriptionResult = DataTypeDescriptionUtil.create(dataType);
+		assertNotNull("Result should not be null", dataTypeDescriptionResult);
+		assertNotNull("Computed friendly name should not be null", dataTypeDescriptionResult.getFriendlyName());
+		assertEquals("Data type friendly name should be the same", expectedResult, dataTypeDescriptionResult.getFriendlyName());
 	}
 
-	@Deprecated
-	public static DataIdentifier fromUri(String dataIdUri)
-	{
-		String[] uri = dataIdUri.split("://");
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
-		String path = uri[1];
-		int pos = 0, end = 0, endType = 0;
-		if ((end = path.indexOf('/', pos)) >= 0) {
-			dataId.setOwnerId(path.substring(pos, end));
-		}
-		endType = path.length();
-		if (path.endsWith("/") && endType > 1) {
-			endType--;
-		}
-		dataId.setType(path.substring(end+1, endType));
-		return dataId;
-	}
 }

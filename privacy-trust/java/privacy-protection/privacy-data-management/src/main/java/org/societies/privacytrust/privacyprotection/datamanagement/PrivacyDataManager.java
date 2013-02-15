@@ -72,7 +72,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getName());
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
 
