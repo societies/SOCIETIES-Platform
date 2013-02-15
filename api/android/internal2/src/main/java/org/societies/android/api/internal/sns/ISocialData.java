@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.internal.sns;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 
 /**
@@ -32,10 +33,13 @@ import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
  * @author Edgar Domingues (PTIN)
  *
  */
-public interface ISocialData {
+public interface ISocialData extends IServiceManager {
 	String methodsArray [] = {"addSocialConnector(SocialNetwork socialNetwork, String token, long validity)",
 							  "removeSocialConnector(String client, String connectorId)",
-							  "getSocialConnectors(String client)"};
+							  "getSocialConnectors(String client)",
+							  "startService()",
+							  "stopService()"
+							 };
 	
 	public static final String ADD_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
 	public static final String REMOVE_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.REMOVE_SOCIAL_CONNECTOR";

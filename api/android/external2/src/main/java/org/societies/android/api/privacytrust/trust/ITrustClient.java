@@ -26,6 +26,7 @@ package org.societies.android.api.privacytrust.trust;
 
 import java.io.Serializable;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 
@@ -35,7 +36,7 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
-public interface ITrustClient {
+public interface ITrustClient extends IServiceManager {
 	
 	public static final String INTENT_RETURN_VALUE_KEY = 
 			"org.societies.android.api.privacytrust.trust.ReturnValue";
@@ -49,7 +50,9 @@ public interface ITrustClient {
 
     String methodsArray [] = {
     		"retrieveTrust(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-            "addTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean type, org.societies.android.api.privacytrust.trust.ADate timestamp, Serializable info"
+            "addTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean type, org.societies.android.api.privacytrust.trust.ADate timestamp, Serializable info",
+			"startService()",
+			"stopService()"
             };
 
 	/**

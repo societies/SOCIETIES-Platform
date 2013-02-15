@@ -43,7 +43,7 @@ import android.util.Log;
  * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
-public class PrivacyPolicyManager implements IPrivacyPolicyManager, IServiceManager {
+public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	private final static String TAG = PrivacyPolicyManager.class.getSimpleName();
 
 	private Context context;

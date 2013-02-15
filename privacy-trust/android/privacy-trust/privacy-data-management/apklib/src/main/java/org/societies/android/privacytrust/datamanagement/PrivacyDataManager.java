@@ -58,7 +58,7 @@ import android.util.Log;
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManager implements IPrivacyDataManager, IServiceManager {
+public class PrivacyDataManager implements IPrivacyDataManager {
 	private final static String TAG = PrivacyDataManager.class.getSimpleName();
 
 	private Context context;

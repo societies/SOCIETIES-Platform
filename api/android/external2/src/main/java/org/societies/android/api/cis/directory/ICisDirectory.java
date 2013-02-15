@@ -24,13 +24,14 @@
  */
 package org.societies.android.api.cis.directory;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisDirectory {
+public interface ICisDirectory extends IServiceManager {
     //CIS DIRECTORY INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
 	public static final String FIND_ALL_CIS     = "org.societies.android.platform.community.FIND_ALL_CIS";
@@ -39,7 +40,9 @@ public interface ICisDirectory {
 	
 	public String methodsArray[] = {"findAllCisAdvertisementRecords(String client)",
 							 		"findForAllCis(String client, String filter)",
-							 		"searchByID(String client, String cis_id)"
+							 		"searchByID(String client, String cis_id)",
+									"startService()",
+									"stopService()"
 									};
 	
 	/**

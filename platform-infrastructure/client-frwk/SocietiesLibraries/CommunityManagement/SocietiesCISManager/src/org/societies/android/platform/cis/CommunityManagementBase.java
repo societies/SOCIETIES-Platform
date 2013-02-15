@@ -75,7 +75,7 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CommunityManagementBase implements ICisManager, ICisSubscribed, IServiceManager {
+public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	//LOGGING TAG
 	private static final String LOG_TAG = CommunityManagementBase.class.getName();
 	

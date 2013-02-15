@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -32,7 +33,7 @@ import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
  * @author Babak.Farshchian@sintef.no
  * Implemented by the CommunityManager APKLib service
  */
-public interface ICisManager {
+public interface ICisManager extends IServiceManager {
 	//CIS MANAGER INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
 	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
@@ -50,8 +51,10 @@ public interface ICisManager {
 							 		"getCisList(String client, String query)",
 							 		"removeMember(String client, String cisId, String memberJid)",
 							 		"Join(String client, String cisId)",
-							 		"Leave(String client, String cisId)"
-	};
+							 		"Leave(String client, String cisId)",
+									"startService()",
+									"stopService()"
+									};
 	
 	/**
 	 * Create a new CIS. The Hosting CSS who creates the CIS will be the owner. Ownership can be changed
