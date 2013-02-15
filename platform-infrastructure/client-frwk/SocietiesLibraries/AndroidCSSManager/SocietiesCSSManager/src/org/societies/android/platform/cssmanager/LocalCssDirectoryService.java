@@ -58,7 +58,7 @@ import android.util.Log;
  * to and from the Android Comms service, otherwise this service is not going to work.
  *
  */
-public class LocalCssDirectoryService extends Service implements IAndroidCssDirectory, IServiceManager {
+public class LocalCssDirectoryService extends Service implements IAndroidCssDirectory {
 	private static final String LOG_TAG = LocalCssDirectoryService.class.getName();
 	
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssDirectoryBean", "cssDirectoryBeanResult");

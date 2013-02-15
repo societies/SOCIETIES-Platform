@@ -55,7 +55,7 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CisDirectoryBase implements ICisDirectory, IServiceManager {
+public class CisDirectoryBase implements ICisDirectory {
 	//LOGGING TAG
 	private static final String LOG_TAG = CisDirectoryBase.class.getName();
 	
