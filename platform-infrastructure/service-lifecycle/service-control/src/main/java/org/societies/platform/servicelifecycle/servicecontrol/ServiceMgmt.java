@@ -32,10 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.services.IServices;
 
 /**
@@ -50,6 +53,7 @@ public class ServiceMgmt implements IServices {
 	
 	private ICommManager commMngr;
 	private IServiceDiscovery serviceDiscovery;
+	private IServiceControl serviceControl;
 
 	
 	public IServiceDiscovery getServiceDiscovery() {
@@ -66,6 +70,14 @@ public class ServiceMgmt implements IServices {
 	
 	public ICommManager getCommMngr() {
 		return commMngr;
+	}
+	
+	public IServiceControl getServiceControl(){
+		return serviceControl;
+	}
+	
+	public void setServiceControl(IServiceControl serviceControl){
+		this.serviceControl = serviceControl;
 	}
 	
 	@Override
@@ -200,6 +212,38 @@ public class ServiceMgmt implements IServices {
 			return true;
 		else
 			return false;
+	}
+	
+	public boolean shareService(ServiceResourceIdentifier serviceId, IIdentity node){
+		
+		if(logger.isDebugEnabled())
+			logger.debug("ServiceManagement: sharing a service with a CIS");
+		
+		boolean result = false;
+		
+		try{
+			// First we get the calling Bundle
+			Future<Service> serviceAsync = getServiceDiscovery().getService(serviceId);
+			Service myService = serviceAsync.get();
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Found service: " + myService.getServiceName());
+			
+			Future<ServiceControlResult> shareAsync = getServiceControl().shareService(myService, node);
+			ServiceControlResult shareResult = shareAsync.get();
+			
+			if(shareResult.getMessage().equals(ResultMessage.SUCCESS)){
+				if(logger.isDebugEnabled())
+					logger.debug("Sharing with " + node.getJid() + " was successful.");
+				result = true;
+			}
+		} catch(Exception ex){
+			logger.error("Exception occured: " + ex);
+			ex.printStackTrace();
+			result=false;
+		} 
+
+		return result;
 	}
 
 }
