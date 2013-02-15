@@ -21,6 +21,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.example.calculator.ICalc;
+import org.societies.integration.example.service.api.IAddService;
 
 /**
  * This test case aims to verify that a service
@@ -33,9 +34,9 @@ public class SpecificTestCaseUpperTester {
 	private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.class);
 
 	/**
-	 * Injection of ICalc interface
+	 * Injection of IAddService interface
 	 */
-	public static ICalc calculatorService;
+	public static IAddService addService;
 	/**
 	 * URL of the JAR of the Calculator 3P service Bundle
 	 */
@@ -44,8 +45,14 @@ public class SpecificTestCaseUpperTester {
 	 * Id of the Calculator 3P service
 	 */
 	public static ServiceResourceIdentifier calculatorServiceId;
+	
+	public void readyForUpper(){
+		LOG.info("[#759] I'm ready to start upper testing!");
+		NominalTestCaseLowerTester.integrationTestUtils.run(NominalTestCaseLowerTester.testCaseNumber, NominalTestCaseUpperTester.class);
 
-
+	}
+	
+	private static final String SERVICE_PATH = "IntegrationTestService-0.1.jar";
 	/**
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
@@ -56,9 +63,10 @@ public class SpecificTestCaseUpperTester {
 		LOG.info("[#759] Prerequisite: The CSS is created");
 		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
-		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getSystemResource("Calculator-0.3.jar");//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
-		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
+		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_PATH);//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
 		LOG.info("[#759] Service location: "+serviceBundleUrl);
+		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
+
 	}
 
 	/**
@@ -87,6 +95,7 @@ public class SpecificTestCaseUpperTester {
 	public void bodyUseNotAvailableService() {
 		LOG.info("[#759] bodyUseNotAvailableService");
 
+		/*
 		// --- Preamble: stop/uninstall the Calculator service if necessary
 		try {
 			// -- Search all local services
@@ -133,17 +142,17 @@ public class SpecificTestCaseUpperTester {
 		// -- Consume the service
 		int expected = 3;
 		int actual = 0;
-		try {
-			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
+		//try {
+			actual = NominalTestCaseLowerTester.calculatorService.addNumbers(1, 2);
 			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
 			assertEquals("[#759] Consume Calculator Service", expected, actual);
-		} catch (InterruptedException e) {
+	/*	} catch (InterruptedException e) {
 			LOG.info("[#759] InterruptedException", e);
 			fail("[#759] InterruptedException: "+e.getMessage());
 		} catch (ExecutionException e) {
 			LOG.info("[#759] ExecutionException", e);
 			fail("[#759] ExecutionException: "+e.getMessage());
-		}
+		}*/
 	}
 
 	/**
@@ -153,7 +162,7 @@ public class SpecificTestCaseUpperTester {
 	@Test(expected=NullPointerException.class)
 	public void bodyUseStillNotAvailableService() {
 		LOG.info("[#759] bodyUseStillNotAvailableService");
-
+/*
 		// --- Preamble: install/stop the Calculator service if necessary
 		try {
 			// -- Search all local services
@@ -186,7 +195,7 @@ public class SpecificTestCaseUpperTester {
 				// - Install the service
 				LOG.info("[#759] Install the service");
 				URL serviceUrl = serviceBundleUrl;
-				Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.installService(serviceUrl, "");
+				Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.installService(serviceUrl);
 				ServiceControlResult scresult = asynchResult.get();
 				if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
 					throw new Exception("Can't install the service. Returned value: "+scresult.getMessage());
@@ -201,22 +210,22 @@ public class SpecificTestCaseUpperTester {
 		}
 
 		// --- Body
-		try {
+	//	try {
 			// -- Consume the service
 			int expected = 3;
 			int actual = 0;
-			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
+			actual = NominalTestCaseLowerTester.calculatorService.addNumbers(1, 2);
 			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
 			assertEquals("[#759] Consume Calculator Service", expected, actual);
-		} catch (InterruptedException e) {
+	/*	} catch (InterruptedException e) {
 			LOG.info("[#759] InterruptedException", e);
 			fail("[#759] InterruptedException: "+e.getMessage());
 		} catch (ExecutionException e) {
 			LOG.info("[#759] ExecutionException", e);
 			fail("[#759] ExecutionException: "+e.getMessage());
 		}
-
-
+*/
+/*
 		// --- Postemble
 		try {
 			LOG.info("[#759] Uninstall the service");
@@ -232,10 +241,11 @@ public class SpecificTestCaseUpperTester {
 			fail("[#759] Unknown Exception: "+e.getMessage());
 			return;
 		}
+		*/
 	}
 
-	public void setCalculatorService(ICalc calculatorService) {
+	public void setAddService(IAddService addService) {
 		LOG.info("[#759] Calculator Service injected");
-		this.calculatorService = calculatorService;
+		this.addService = addService;
 	}
 }

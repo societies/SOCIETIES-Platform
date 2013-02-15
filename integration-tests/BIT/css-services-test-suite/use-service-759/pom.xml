@@ -1,3 +1,11 @@
+
+
+
+
+
+
+
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -79,7 +87,15 @@
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
 			<scope>compile</scope>
-		</dependency>	
+		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.integration.example.service</groupId>
+			<artifactId>IntegrationTestService</artifactId>
+			<version>0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
@@ -95,7 +111,8 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
 							junit;scope=compile|runtime, 
-							integrationtestutil;scope=compile|runtime, 
+							integrationtestutil;scope=compile|runtime,
+							IntegrationTestService;scope=compile|runtime
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 						<!-- <Import-Package>
