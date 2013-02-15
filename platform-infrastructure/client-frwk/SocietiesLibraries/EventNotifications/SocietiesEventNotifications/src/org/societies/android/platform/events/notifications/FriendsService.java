@@ -65,6 +65,7 @@ public class FriendsService extends Service {
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsService";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
+	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	@Override
@@ -200,7 +201,7 @@ public class FriendsService extends Service {
 
     		//PARAMETERS
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT);
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), ALL_CSS_FRIEND_INTENTS);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
     		outMessage.setData(outBundle);
 
@@ -221,7 +222,7 @@ public class FriendsService extends Service {
 		AndroidNotifier notifier = new AndroidNotifier(FriendsService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), FriendsService.class);
+		Intent intent = new Intent(this.getApplicationContext(), FriendsActivity.class);
 		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
