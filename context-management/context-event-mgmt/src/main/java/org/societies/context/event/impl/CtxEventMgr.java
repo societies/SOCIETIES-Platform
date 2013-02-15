@@ -60,6 +60,7 @@ import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -117,6 +118,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
 	 */
 	@Override
+    // TODO async???
 	public void post(final CtxEvent event, final String[] topics,
 			final CtxEventScope scope) throws CtxException {
 		
@@ -415,6 +417,9 @@ public class CtxEventMgr implements ICtxEventMgr {
 		for (int i = 0; i < topics.length; ++i) {
 
 			if (LOG.isDebugEnabled()) 
+				LOG.debug("NOT posting remote context change event to topic '" + topics[i] + "'"
+						+ " with itemId '" + itemId + "' until pubsub is fixed");/* TODO
+			if (LOG.isDebugEnabled()) 
 				LOG.debug("Posting remote context change event to topic '" + topics[i] + "'"
 						+ " with itemId '" + itemId + "'");
 			try {
@@ -437,7 +442,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 				LOG.error("Could not post remote context change event to topic '" 
 						+ topics[i] + "'" + " with itemId '" + itemId + "': "
 						+ e.getLocalizedMessage(), e);
-			}
+			}*/
 		}
 	}
 	
