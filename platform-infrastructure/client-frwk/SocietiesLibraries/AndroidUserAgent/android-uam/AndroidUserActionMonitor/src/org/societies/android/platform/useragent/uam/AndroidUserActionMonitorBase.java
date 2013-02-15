@@ -29,17 +29,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.personalisation.model.AAction;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.useragent.IAndroidUserActionMonitor;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.personalisation.model.ActionBean;
 import org.societies.api.schema.useragent.monitoring.MonitoringMethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
 import android.content.Context;
@@ -64,17 +64,17 @@ public class AndroidUserActionMonitorBase implements IAndroidUserActionMonitor{
 	private ClientCommunicationMgr ccm;
 	private boolean restrictBroadcast;
 
-	public AndroidUserActionMonitorBase(Context androidContext, ClientCommunicationMgr ccm, boolean restrictBroadcast){
+	public AndroidUserActionMonitorBase(Context androidContext, boolean restrictBroadcast){
 		this.androidContext = androidContext;
-		this.ccm = ccm;
+		this.ccm = new ClientCommunicationMgr(androidContext, true);
 		this.restrictBroadcast = restrictBroadcast;
 		
 		this.assignConnectionParameters();
 	}
 
-	public void monitor(String client, String identity, AAction aaction) {
+	public void monitor(String client, String identity, ActionBean aaction) {
 		Log.d(LOG_TAG, "AndroidUserActionMonitor received monitored user action from client "+client+" with identity " +identity+ 
-				": "+aaction.getparameterName()+" = "+aaction.getvalue());
+				": "+aaction.getParameterName()+" = "+aaction.getValue());
 
 		//CREATE MESSAGE BEAN
 		UserActionMonitorBean uamBean = new UserActionMonitorBean();
@@ -82,8 +82,8 @@ public class AndroidUserActionMonitorBase implements IAndroidUserActionMonitor{
 		uamBean.setIdentity(identity);
 		uamBean.setServiceResourceIdentifier(aaction.getServiceID());
 		uamBean.setServiceType(aaction.getServiceType());
-		uamBean.setParameterName(aaction.getparameterName());
-		uamBean.setValue(aaction.getvalue());
+		uamBean.setParameterName(aaction.getParameterName());
+		uamBean.setValue(aaction.getValue());
 		uamBean.setMethod(MonitoringMethodType.MONITOR);
 
 		Stanza stanza = new Stanza(cloudNodeIdentity);
@@ -113,13 +113,14 @@ public class AndroidUserActionMonitorBase implements IAndroidUserActionMonitor{
 	 */
 	private void assignConnectionParameters() {
 		//Get the Cloud destination
-		String cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
-		Log.d(LOG_TAG, "Cloud Node: " + cloudCommsDestination);
 
 		//String domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
 		//Log.d(LOG_TAG, "Domain Authority Node: " + domainCommsDestination);
 
 		try {
+			String cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
+			Log.d(LOG_TAG, "Cloud Node: " + cloudCommsDestination);
+
 			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(cloudCommsDestination);
 			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
 

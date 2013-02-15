@@ -18,6 +18,7 @@ import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -51,7 +52,7 @@ public class CssManagerController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private ICSSLocalManager cssLocalManager;
+	private ICSSInternalManager cssLocalManager;
 	@Autowired
 	private ICommManager commManager;
 	@Autowired
@@ -90,11 +91,11 @@ public class CssManagerController {
 		this.commManagerControl = commManagerControl;
 	}
 
-	public ICSSLocalManager getCssLocalManager() {
+	public ICSSInternalManager getCssLocalManager() {
 		return cssLocalManager;
 	}
 
-	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
+	public void setCssLocalManager(ICSSInternalManager cssLocalManager) {
 		this.cssLocalManager = cssLocalManager;
 	}
 

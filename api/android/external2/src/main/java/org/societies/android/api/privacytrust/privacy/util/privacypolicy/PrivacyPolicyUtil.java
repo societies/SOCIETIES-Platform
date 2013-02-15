@@ -127,7 +127,9 @@ public class PrivacyPolicyUtil {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("globalBehaviour", globalBehaviour);
 		parameters.put("membershipCriteria", membershipCriteria);
-		parameters.putAll(configuration);
+		if (null != configuration) {
+			parameters.putAll(configuration);
+		}
 		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
 	}
 

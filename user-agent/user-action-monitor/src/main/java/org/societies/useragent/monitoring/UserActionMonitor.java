@@ -34,7 +34,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.management.ICSSLocalManager;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
@@ -55,7 +55,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
-	private ICSSLocalManager cssMgr;
+	private ICSSInternalManager cssMgr;
 	private ContextCommunicator ctxComm;
 	String myDeviceID;
 	IIdentity myCssID;
@@ -78,7 +78,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
 		LOG.debug("UAM - Received local user action!");
-		LOG.debug("action ServiceId: "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID()));
+		LOG.debug("action ServiceId: "+action.getServiceID().toString());
 		LOG.debug("action serviceType: "+action.getServiceType());
 		LOG.debug("action parameterName: "+action.getparameterName());
 		LOG.debug("action value: "+action.getvalue());
@@ -221,7 +221,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		this.commsMgr = commsMgr;
 	}
 	
-	public void setCssMgr(ICSSLocalManager cssMgr){
+	public void setCssMgr(ICSSInternalManager cssMgr){
 		this.cssMgr = cssMgr;
 	}
 

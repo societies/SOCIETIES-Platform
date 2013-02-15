@@ -49,7 +49,7 @@ public class ContextCacheUpdater {
 		if (this.attrList.contains(id)){
 			this.logging.debug("Already Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
 			return;
-		}
+		}/* Commented out because ICtxBroker.registerForUpdates has been removed from the internal API. See ICtxBroker.registerForChanges
 		try {
 			//this.broker.registerUpdateNotification(this, id);
 			this.broker.registerForUpdates(id);
@@ -57,7 +57,7 @@ public class ContextCacheUpdater {
 		} catch (CtxException e) {
 			this.logging.debug("Unable to register for context events for : "+id.getType()+" ID: "+id.toUriString());
 			e.printStackTrace();
-		}
+		}*/
 		
 	}
 	

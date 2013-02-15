@@ -24,8 +24,9 @@
  */
 package org.societies.integration.test.bit.privacytrust;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,14 +34,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * 
@@ -51,18 +50,32 @@ public class TestTrustBasedPrefEval {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestTrustBasedPrefEval.class);
 	
-	private static final String FOO_ENT_TYPE = "fooEntType";
-	private static final String FOO_ATTR_TYPE = "fooAttrType";
-	private static final String FOO_ATTR_VALUE = "fooAttrValue";
-	private static final String FOO_ATTR_VALUE2 = "fooAttrValue2";
+	private static final String USER_ID1 = "bob.societies.local";
+	private static final String USER_ID2 = "alice.societies.local";
 	
-	private ICtxBroker internalCtxBroker;
+	/**
+	 * The {@link #setUp()} method assigns trust values to {@link #USER_ID1}
+	 * and {@link #USER_ID2}, such that:
+	 * <ul>
+	 * <li>{@link #USER_ID1} is assigned a value <b>above</b> this threshold</li>
+	 * <li>{@link #USER_ID2} is assigned a value <b>below</b> this threshold</li>
+	 * </ul>
+	 */
+	private static final double TRUST_VALUE_THRESHOLD = 0.5d;
+	
+	private static final long WAIT_TRUST_EVAL = 1000l;
+	
+	private ITrustEvidenceCollector internalTrustEvidenceCollector;
+	private ITrustBroker internalTrustBroker;
 	private ICommManager commMgr;
 
-	private IIdentity cssOwnerId;
+	private IIdentity myUserId;
+	private IIdentity userId1;
+	private IIdentity userId2;
 	
-	private CtxAttributeIdentifier fooAttrId;
-	private CtxAttributeIdentifier fooAttrId2;
+	private TrustedEntityId myTeid;
+	private TrustedEntityId teid1;
+	private TrustedEntityId teid2;
 
 	public TestTrustBasedPrefEval() {
 	}
@@ -70,174 +83,73 @@ public class TestTrustBasedPrefEval {
 	@Before
 	public void setUp() throws Exception {
 		
-		this.internalCtxBroker = TestCase1678.getCtxBroker();
+		this.internalTrustEvidenceCollector = TestCase1678.getInternalTrustEvidenceCollector();
+		this.internalTrustBroker = TestCase1678.getInternalTrustBroker();
 		this.commMgr = TestCase1678.getCommManager();
 
-		final String cssOwnerStr = 
+		// setup my IDs
+		final String myUserIdStr = 
 				this.commMgr.getIdManager().getThisNetworkNode().getBareJid();
-		this.cssOwnerId = this.commMgr.getIdManager().fromJid(cssOwnerStr);
-		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
-		final CtxEntityIdentifier fooEntId =
-				this.internalCtxBroker.createEntity(FOO_ENT_TYPE).get().getId();
-		LOG.info("*** created fooEnt = " + fooEntId);
-		this.fooAttrId = 
-				this.internalCtxBroker.createAttribute(fooEntId, FOO_ATTR_TYPE).get().getId();
-		LOG.info("*** created fooAttr = " + this.fooAttrId);
-		this.fooAttrId2 = 
-				this.internalCtxBroker.createAttribute(fooEntId, FOO_ATTR_TYPE).get().getId();
-		LOG.info("*** created fooAttr2 = " + this.fooAttrId2);
+		this.myUserId = this.commMgr.getIdManager().fromJid(myUserIdStr);
+		LOG.info("*** myUserId = " + this.myUserId);
+		this.myTeid = new TrustedEntityId(TrustedEntityType.CSS, this.myUserId.toString());
+		LOG.info("*** myTeid = " + this.myTeid);
+		
+		// setup User 1 IDs
+		this.userId1 = this.commMgr.getIdManager().fromJid(USER_ID1);
+		LOG.info("*** userId1 = " + this.userId1);
+		this.teid1 = new TrustedEntityId(TrustedEntityType.CSS, this.userId1.toString());
+		LOG.info("*** teid1 = " + this.teid1);
+		
+		// setup User 2 IDs
+		this.userId2 = this.commMgr.getIdManager().fromJid(USER_ID2);
+		LOG.info("*** userId2 = " + this.userId2);
+		this.teid2 = new TrustedEntityId(TrustedEntityType.CSS, this.userId2.toString());
+		LOG.info("*** teid2 = " + this.teid2);
+		
+		// setup trust values
+		// User 1
+		// my CSS is friends with User 1
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				myTeid, teid1, TrustEvidenceType.FRIENDED_USER, new Date(), null);
+		// my CSS trusts User 1
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				myTeid, teid1, TrustEvidenceType.RATED, new Date(), new Double(0.75));
+		Thread.sleep(WAIT_TRUST_EVAL);
+		final Double trust1 = this.internalTrustBroker.retrieveTrust(myTeid, teid1).get();
+		LOG.info("*** trust1 = " + trust1);
+		// User 2
+		// my CSS doesn't trust User 2
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				myTeid, teid2, TrustEvidenceType.RATED, new Date(), new Double(0.25));
+		Thread.sleep(WAIT_TRUST_EVAL);
+		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
+		LOG.info("*** trust2 = " + trust2);
+		
+		// TODO privacy pref setup
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 		
-		if (this.fooAttrId != null) 
-				this.internalCtxBroker.remove(this.fooAttrId);
-		LOG.info("*** removed fooAttr = " + this.fooAttrId);
-		if (this.fooAttrId2 != null) 
-			this.internalCtxBroker.remove(this.fooAttrId2);
-		LOG.info("*** removed fooAttr2 = " + this.fooAttrId2);
+		// TODO
+		// 1. remove test trust data db? currently not supported
+		// 2. remove test privacy prefs 
 	}
 
 	@Test
-	public void TestByAttrId() throws Exception {
+	public void TestPrefEval() throws Exception {
 
-		LOG.info("*** Start TestByAttrId ...");
+		LOG.info("*** Start TestPrefEval ...");
 		
-		final MyCtxAttrChangeEventListener listener = 
-				new MyCtxAttrChangeEventListener(); 
-		LOG.info("*** registering for updates of fooAttr = " + this.fooAttrId);
-		this.internalCtxBroker.registerForChanges(listener, this.fooAttrId);
-		LOG.info("*** updating fooAttr = " + this.fooAttrId + " with value " + FOO_ATTR_VALUE);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId, FOO_ATTR_VALUE);
-		LOG.info("*** updating fooAttr2 = " + this.fooAttrId2 + " with value " + FOO_ATTR_VALUE2);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId2, FOO_ATTR_VALUE2);
-		// wait 2 secs
-		Thread.sleep(2000);
-		assertEquals(this.fooAttrId, listener.getReceivedId());
-		assertEquals(FOO_ATTR_VALUE, listener.getReceivedValue());
-		LOG.info("*** unregistering from updates of fooAttr = " + this.fooAttrId);
-		this.internalCtxBroker.unregisterFromChanges(listener, this.fooAttrId);
-	}
-	
-	@Test
-	public void TestByAttrScopeType() throws Exception {
-
-		LOG.info("*** Start TestByAttrScopeType ...");
+		// 1. Verify that trust values have been properly setup
+		// User 1
+		final Double trust1 = this.internalTrustBroker.retrieveTrust(myTeid, teid1).get();
+		assertTrue(trust1 > TRUST_VALUE_THRESHOLD);
+		// User 2
+		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
+		assertTrue(trust2 < TRUST_VALUE_THRESHOLD);
 		
-		final MyCtxAttrChangeEventListener listener = 
-				new MyCtxAttrChangeEventListener(); 
-		LOG.info("*** registering for updates of '" + FOO_ATTR_TYPE + "' attributes under entity " + this.fooAttrId.getScope());
-		this.internalCtxBroker.registerForChanges(listener, this.fooAttrId.getScope(), FOO_ATTR_TYPE);
-		LOG.info("*** updating fooAttr = " + this.fooAttrId + " with value " + FOO_ATTR_VALUE);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId, FOO_ATTR_VALUE);
-		// wait 2 secs
-		Thread.sleep(2000);
-		assertEquals(this.fooAttrId, listener.getReceivedId());
-		assertEquals(FOO_ATTR_VALUE, listener.getReceivedValue());
-		LOG.info("*** updating fooAttr2 = " + this.fooAttrId2 + " with value " + FOO_ATTR_VALUE2);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId2, FOO_ATTR_VALUE2);
-		// wait 2 secs
-		Thread.sleep(2000);
-		assertEquals(this.fooAttrId2, listener.getReceivedId());
-		assertEquals(FOO_ATTR_VALUE2, listener.getReceivedValue());
-		LOG.info("*** unregistering from updates of '" + FOO_ATTR_TYPE + "' attributes under entity " + this.fooAttrId.getScope());
-		this.internalCtxBroker.unregisterFromChanges(listener, this.fooAttrId.getScope(), FOO_ATTR_TYPE);
-	}
-	
-	@Test
-	public void TestByOwnerId() throws Exception {
-
-		LOG.info("*** Start TestByOwnerId ...");
-		
-		final MyCtxAttrChangeEventListener listener = 
-				new MyCtxAttrChangeEventListener(); 
-		LOG.info("*** registering for updates under IIdentity " + this.cssOwnerId);
-		this.internalCtxBroker.registerForChanges(listener, this.cssOwnerId);
-		LOG.info("*** updating fooAttr = " + this.fooAttrId + " with value " + FOO_ATTR_VALUE);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId, FOO_ATTR_VALUE);
-		// wait 2 secs
-		Thread.sleep(2000);
-		assertEquals(this.fooAttrId, listener.getReceivedId());
-		assertEquals(FOO_ATTR_VALUE, listener.getReceivedValue());
-		LOG.info("*** updating fooAttr2 = " + this.fooAttrId2 + " with value " + FOO_ATTR_VALUE2);
-		this.internalCtxBroker.updateAttribute(this.fooAttrId2, FOO_ATTR_VALUE2);
-		// wait 2 secs
-		Thread.sleep(2000);
-		assertEquals(this.fooAttrId2, listener.getReceivedId());
-		assertEquals(FOO_ATTR_VALUE2, listener.getReceivedValue());
-		LOG.info("*** unregistering from updates under IIdentity " + this.cssOwnerId);
-		this.internalCtxBroker.unregisterFromChanges(listener, this.cssOwnerId);
-	}
-
-	private class MyCtxAttrChangeEventListener implements CtxChangeEventListener {
-
-		private CtxIdentifier receivedId;
-		private String receivedValue;
-
-		private MyCtxAttrChangeEventListener() {
-		}
-
-		@Override
-		public void onCreation(CtxChangeEvent event) {
-			
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onModification(CtxChangeEvent event) {
-
-			LOG.info(event.getId() + ": *** MODIFIED event ***");
-			try {
-				if (!event.getId().equals(fooAttrId) && !event.getId().equals(fooAttrId2))
-						return;
-				final CtxAttribute fooAttr = 
-						(CtxAttribute) internalCtxBroker.retrieve(event.getId()).get();
-				this.receivedId = fooAttr.getId();
-				LOG.info("*** attribute id received:"+ this.receivedId);
-				this.receivedValue = fooAttr.getStringValue();
-				LOG.info("*** attribute value received:"+ this.receivedValue);
-
-			} catch (Exception e) {
-				
-				fail("onModicication threw exception: " + e.getLocalizedMessage());
-			}
-		}
-
-		@Override
-		public void onRemoval(CtxChangeEvent event) {
-			
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onUpdate(CtxChangeEvent event) {
-
-			LOG.info(event.getId() + ": *** UPDATED event ***");
-			try {
-				if (!event.getId().equals(fooAttrId) && !event.getId().equals(fooAttrId2))
-					return;
-				final CtxAttribute fooAttr =
-						(CtxAttribute) internalCtxBroker.retrieve(event.getId()).get();
-				this.receivedId = fooAttr.getId();
-				LOG.info("*** attribute id received:"+ this.receivedId);
-				this.receivedValue = fooAttr.getStringValue();
-				LOG.info("*** attribute value received:"+ this.receivedValue);
-
-			} catch (Exception e) {
-				
-				fail("onUpdate threw exception: " + e.getLocalizedMessage());
-			} 
-		}
-		
-		private CtxIdentifier getReceivedId() {
-			
-			return this.receivedId;
-		}
-		
-		private String getReceivedValue() {
-			
-			return this.receivedValue;
-		}
+		// TODO 2. privacy pref
 	}
 }

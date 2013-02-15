@@ -65,12 +65,28 @@ import org.societies.api.identity.IIdentity;
 public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker {
 	
 	/**
-	 * Creates a CtxAssociation
+	 * Creates a {@link CtxAssociation} on the local CSS. 
 	 * 
 	 * @param type
+	 *            the type of the context association to create
 	 * @throws CtxException 
+	 * @see {@link CtxAssociationTypes}
 	 */
 	public Future<CtxAssociation> createAssociation(String type) throws CtxException;
+
+	/**
+	 * Creates a {@link CtxAssociation} with the specified type on the
+	 * identified CSS or CIS.
+	 * 
+	 * @param targetId
+	 *            the {@link IIdentity} of the CSS or CIS where the context
+	 *            association will be created
+	 * @param type
+	 *            the type of the context association to create
+	 * @throws CtxException 
+	 */
+	public Future<CtxAssociation> createAssociation(final IIdentity targetId,
+			final String type) throws CtxException;
 
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated to
@@ -84,15 +100,31 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
+	public Future<CtxAttribute> createAttribute(final CtxEntityIdentifier scope,
+			final String type) throws CtxException;
 
 	/**
-	 * Creates a CtxEntity
+	 * Creates a {@link CtxEntity} on the local CSS.
 	 * 
 	 * @param type
+	 *            the type of the context entity to create
 	 * @throws CtxException 
 	 */
 	public Future<CtxEntity> createEntity(String type) throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxEntity} with the specified type on the identified
+	 * CSS or CIS.
+	 * 
+	 * @param targetId
+	 *            the {@link IIdentity} of the CSS or CIS where the context
+	 *            entity will be created
+	 * @param type
+	 *            the type of the context entity to create
+	 * @throws CtxException 
+	 */
+	public Future<CtxEntity> createEntity(final IIdentity targetId,
+			final String type) throws CtxException;
 
 	/**
 	 * Creates an {@link IndividualCtxEntity} that represents the owner of the
@@ -226,18 +258,6 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @return
 	 */
 	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value);
-	
-	
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param attrId
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(CtxChangeEventListener, CtxIdentifier)}
-	 */
-	@Deprecated
-	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException;
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for events of the

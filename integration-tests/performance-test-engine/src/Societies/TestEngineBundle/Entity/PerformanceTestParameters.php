@@ -52,7 +52,7 @@ class PerformanceTestParameters
     /**
      * @var string $parameter_value
      *
-     * @ORM\Column(name="parameter_value", type="string", length=255)
+     * @ORM\Column(name="parameter_value", type="text")
      */
     private $parameter_value;
 

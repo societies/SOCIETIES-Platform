@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.css.CSSManagerEnums;
+import org.societies.api.internal.css.CSSNode;
 
 public class TestCSSNode {
 

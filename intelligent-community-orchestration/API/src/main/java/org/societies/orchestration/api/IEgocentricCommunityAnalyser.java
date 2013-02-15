@@ -32,7 +32,6 @@ import org.societies.api.activity.IActivity;
 //import org.societies.orchestration.CommunityLifecycleManagement.impl.ICisRecord;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentity;
 
 import java.util.ArrayList;

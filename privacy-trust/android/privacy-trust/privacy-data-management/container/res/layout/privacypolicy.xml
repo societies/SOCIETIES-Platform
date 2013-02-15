@@ -21,6 +21,13 @@
             android:orientation="vertical" >
 
             <Button
+                android:id="@+id/btnConnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/txtOnConnect" />
+
+            <Button
                 android:id="@+id/btnLaunchTest1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

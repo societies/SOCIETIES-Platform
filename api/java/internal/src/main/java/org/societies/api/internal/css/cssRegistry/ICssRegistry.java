@@ -34,6 +34,7 @@ import org.societies.api.schema.cssmanagement.CssRequest;
 
 
 /**
+ * @deprecated
  * @author Maria Mannion - Intel
  */
 public interface ICssRegistry {

@@ -35,6 +35,7 @@ public class CreateCisParameters {
 	private String cisType;
 	private String cisDescription;
 	private String privacyPolicyWithoutRequestor;
+	private int waitingTime;
 
 	/**
 	 * 
@@ -43,18 +44,40 @@ public class CreateCisParameters {
 
 	}
 
+	
+
 	/**
 	 * @param cisName
 	 * @param cisType
 	 * @param cisDescription
 	 * @param privacyPolicyWithoutRequestor
+	 * @param waitingTime
 	 */
 	public CreateCisParameters(String cisName, String cisType,
-			String cisDescription, String privacyPolicyWithoutRequestor) {
+			String cisDescription, String privacyPolicyWithoutRequestor,
+			int waitingTime) {
+		super();
 		this.cisName = cisName;
 		this.cisType = cisType;
 		this.cisDescription = cisDescription;
 		this.privacyPolicyWithoutRequestor = privacyPolicyWithoutRequestor;
+		this.waitingTime = waitingTime;
+	}
+
+
+
+	/**
+	 * @return the waitingTime
+	 */
+	public int getWaitingTime() {
+		return waitingTime;
+	}
+
+	/**
+	 * @param waitingTime the waitingTime to set
+	 */
+	public void setWaitingTime(int waitingTime) {
+		this.waitingTime = waitingTime;
 	}
 
 	/**
