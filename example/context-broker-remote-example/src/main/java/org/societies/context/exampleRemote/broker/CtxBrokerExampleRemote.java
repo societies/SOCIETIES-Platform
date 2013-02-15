@@ -69,7 +69,7 @@ public class CtxBrokerExampleRemote 	{
 		this.commMgrService = commMgr;
 		
 		LOG.info("*** create remoteEntity");
-		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
+		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("john.societies.local","remoteEntityType");
 		LOG.info("*** remoteEntity created,  id : "+ remoteEntity.getId());
 
 		LOG.info("*** create remoteAttribute");
@@ -77,7 +77,7 @@ public class CtxBrokerExampleRemote 	{
 		LOG.info("*** remoteAttribute created,  id : "+ remoteAttribute.getId());		
 		
 		LOG.info("*** create remoteAssociation");
-		CtxAssociation remoteAssociation = this.ca3pService.createRemoteCtxAssociation(CtxAssociationTypes.USES_DEVICES);
+		CtxAssociation remoteAssociation = this.ca3pService.createRemoteCtxAssociation("john.societies.local", CtxAssociationTypes.USES_DEVICES);
 		LOG.info("*** remoteAssociation created,  id : "+ remoteAssociation.getId());		
 		
 		
@@ -93,7 +93,7 @@ public class CtxBrokerExampleRemote 	{
 		LOG.info("*** updated performed, remoteAttribute value : "+ updatedAttr.getStringValue());
 		
 		LOG.info("*** lookup attributes");
-		List<CtxIdentifier> lookupResults = this.ca3pService.lookupRemoteCtxAttribute(CtxAttributeTypes.ADDRESS_HOME_CITY);
+		List<CtxIdentifier> lookupResults = this.ca3pService.lookupRemoteCtxAttribute("john.societies.local", CtxAttributeTypes.ADDRESS_HOME_CITY);
 		
 		LOG.info("remote lookup performed,  results size "+ lookupResults.size());
 
@@ -108,10 +108,11 @@ public class CtxBrokerExampleRemote 	{
 	
 		
 		LOG.info("remote retrieve of individual entity ");
-		this.ca3pService.retrieveRemoteIndiEntity();
+		this.ca3pService.retrieveRemoteIndiEntity("john.societies.local");
 		LOG.info("remote retrieve of individual entity performed");
 		
-		
+		//LOG.info("*** lookup attributes estimateCommunityCtx ");
+		//this.ca3pService.estimateCommunityCtx();
 	}
 	
 	private class MyCtxChangeEventListener implements CtxChangeEventListener {

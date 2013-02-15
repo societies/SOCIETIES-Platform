@@ -66,7 +66,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyAgreementManagerTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerTest.class.getName());
 	
 	public static int testCaseNumber = 0;
 	

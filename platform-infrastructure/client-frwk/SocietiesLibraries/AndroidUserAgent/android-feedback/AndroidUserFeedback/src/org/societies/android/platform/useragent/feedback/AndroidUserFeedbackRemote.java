@@ -27,8 +27,7 @@ package org.societies.android.platform.useragent.feedback;
 
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.utilities.RemoteServiceHandler;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;

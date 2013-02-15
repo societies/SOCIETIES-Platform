@@ -27,11 +27,10 @@ package org.societies.android.platform.useragent.uam;
 
 import org.societies.android.api.useragent.IAndroidUserActionMonitor;
 import org.societies.android.api.utilities.RemoteServiceHandler;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
@@ -44,8 +43,8 @@ public class AndroidUserActionMonitorRemote extends Service{
 	@Override
 	public void onCreate () {
 		Log.d(LOG_TAG, "AndroidUserActionMonitorRemote service starting...");
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext());
-		AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(this.getApplicationContext(), ccm, false);
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext(), true);
+		AndroidUserActionMonitorBase uamBase = new AndroidUserActionMonitorBase(this.getApplicationContext(), false);
 		this.inMessenger = new Messenger(new RemoteServiceHandler(uamBase.getClass(), uamBase, IAndroidUserActionMonitor.methodsArray));
 	}
 	
