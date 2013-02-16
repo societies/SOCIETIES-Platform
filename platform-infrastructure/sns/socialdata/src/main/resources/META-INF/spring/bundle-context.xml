@@ -22,9 +22,9 @@
     
     <bean id="SocialDataCommsManager" 
   		class="org.societies.platform.socialdata.SocialDataServer"
-  		depends-on="CommManagerBundle" 
+  		depends-on="commsMgr" 
   		init-method="InitService">
-  		<property name="commManager" ref="CommManagerBundle"/>
+  		<property name="commManager" ref="commsMgr"/>
   		<property name="socialData" ref="iSocialData"/>
   </bean>
 
