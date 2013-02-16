@@ -11,7 +11,7 @@ import org.societies.android.api.css.manager.IServiceManager;
  * This interface allows local Android components to subscribe/publish XMPP events using a 
  * an Android Intents/ XMPP Pubsub events translation.
  * 
- * This interface should not be used for Android intra-node eventing - use Intents.  
+ * This interface should not be used for Android inter-node eventing - use Intents.  
  *
  */
 public interface IAndroidSocietiesEvents extends IServiceManager{
@@ -59,16 +59,18 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
 	final static String USER_FEEDBACK_REQUEST_INTENT = "org.societies.useragent.feedback.event.REQUEST"; 
 	final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
-	//Array of Societies Android Pubsub Intents
+	
+	//Array of Societies Android Pubsub Intents. 
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
+	//N.B. These events must be created at Virgo container start-up
 	final static String societiesAndroidIntents [] = {CONTEXT_MANAGER_CREATED_INTENT,
 										 CONTEXT_MANAGER_UPDATED_INTENT,
 										 CONTEXT_MANAGER_MODIFIED_INTENT,
 										 CONTEXT_MANAGER_REMOVED_INTENT,
 										 CSS_MANAGER_ADD_CSS_NODE_INTENT,
 										 CSS_MANAGER_DEPART_CSS_NODE_INTENT,
-										 CSS_FRIEND_REQUEST_RECEIVED_INTENT,
-										 CSS_FRIEND_REQUEST_ACCEPTED_INTENT,
+//										 CSS_FRIEND_REQUEST_RECEIVED_INTENT,
+//										 CSS_FRIEND_REQUEST_ACCEPTED_INTENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_INTENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
@@ -102,16 +104,18 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT =  "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
 	final static String USER_FEEDBACK_REQUEST_EVENT = "org/societies/useragent/feedback/event/REQUEST"; 
-	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 	
+	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 
+	
 	//N.B. Must be in same order as societiesAndroidIntents array to allow successful translation
+	//N.B. These events must be created at Virgo container start-up
 	final static String societiesAndroidEvents [] = {CONTEXT_MANAGER_CREATED_EVENT,
 										 CONTEXT_MANAGER_UPDATED_EVENT,
 										 CONTEXT_MANAGER_MODIFIED_EVENT,
 										 CONTEXT_MANAGER_REMOVED_EVENT,
 										 CSS_MANAGER_ADD_CSS_NODE_EVENT,
 										 CSS_MANAGER_DEPART_CSS_NODE_EVENT,
-										 CSS_FRIEND_REQUEST_RECEIVED_EVENT,
-										 CSS_FRIEND_REQUEST_ACCEPTED_EVENT,
+//										 CSS_FRIEND_REQUEST_RECEIVED_EVENT,
+//										 CSS_FRIEND_REQUEST_ACCEPTED_EVENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_EVENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
@@ -131,10 +135,15 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 			"unSubscribeFromEvents(String client, String intentFilter)",
 			"unSubscribeFromAllEvents(String client)",
 			"publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass)",
-			"getNumScubscribedNodes(String client)",
+			"getNumSubscribedNodes(String client)",
 			"startService()",
 			"stopService()"
 	};
+
+	//Pubsub event payload packages
+    //TODO: Insert all known event classes
+	static final String CSS_MANAGER_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
+	static final String CONTEXT_CLASS = "org.societies.api.schema.context.model.CtxIdentifierBean";
 
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	
@@ -201,7 +210,15 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 * @param eventClass class of event object
 	 * @return boolean - returned via Android intent
 	 */
-	boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass);
+	/**
+	 * Publish an event to the Societies platform for consumption by other CSS nodes
+	 * 
+	 * @param client app package
+	 * @param societiesIntent specific event intent
+	 * @param payload
+	 * @return boolean- returned via Android intent
+	 */
+	boolean publishEvent(String client, String societiesIntent, Object payload);
 	
 	/**
 	 * Obtain the current number of subscribed to events

@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 
 import android.content.BroadcastReceiver;
@@ -51,9 +52,6 @@ public class SocietiesClientServicesController {
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	//Service intents for relevant services
-	private final static String EVENTS_SERVICE_INTENT = "org.societies.android.platform.events.ServicePlatformEventsRemote";
-	private final static String PERSONALISATION_SERVICE_INTENT = "org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote";
 	private final static int NUM_SERVICES = 1;
 	private final static int EVENT_SERVICE = 0;
 	
@@ -164,7 +162,7 @@ public class SocietiesClientServicesController {
     		
     		boolean retValue = true;
         	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Events Service");
-        	Intent serviceIntent = new Intent(EVENTS_SERVICE_INTENT);
+        	Intent serviceIntent = new Intent(ICoreSocietiesServices.EVENTS_SERVICE_INTENT);
         	SocietiesClientServicesController.this.context.bindService(serviceIntent, eventsConnection, Context.BIND_AUTO_CREATE);
 
         	try {
