@@ -25,15 +25,16 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.util.Log;
 
+
+/**
+ * Implementation Events service
+ * TODO: Handle non-created pubsub nodes
+ *
+ */
 public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	
 	//Logging tag
     private static final String LOG_TAG = PlatformEventsBase.class.getName();
-
-	//Pubsub packages
-    //TODO: Insert all known event classes
-	private static final String CSS_MANAGER_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
-	private static final String CONTEXT_CLASS = "org.societies.api.schema.context.model.CtxIdentifierBean";
 	    
     private static final String ALL_EVENT_FILTER = "org.societies";
     private static final String KEY_DIVIDER = "$";
@@ -81,8 +82,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	//create list of event classes for Pubsub registration 
         this.classList = new ArrayList<String>();
 
-		this.classList.add(CONTEXT_CLASS);
-		this.classList.add(CSS_MANAGER_CLASS);
+		this.classList.add(IAndroidSocietiesEvents.CONTEXT_CLASS);
+		this.classList.add(IAndroidSocietiesEvents.CSS_MANAGER_CLASS);
 		
     }
 
@@ -161,7 +162,10 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	@Override
 	public int getNumSubscribedNodes(String client) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Get number of subscribed to events for client: " + client);
+		
 		
 		int numListeners = 0;
 		synchronized(this.subscribedToClientEvents) {
@@ -179,22 +183,25 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			
 			Log.d(LOG_TAG, "Number of subscribed events for client: " + client + " is: " + numListeners);
 			PlatformEventsBase.this.androidContext.sendBroadcast(intent);
-			Log.d(LOG_TAG, "SubscribeToPubsub return result sent");
+			Log.d(LOG_TAG, "getNumSubscribedNodes return result sent");
 		}
 
     	return 0;
 	}
 
-	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass) {
+	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Event Payload must be specified", null != eventPayload);
-		Dbc.require("Event Payload Class type must be specified", null != eventClass);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of publishEvent for client: " + client);
 		return false;
 	}
 
 	public synchronized boolean subscribeToAllEvents(String client) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of subscribeToAllEvents for client: " + client);
 		
 		return this.subscribeToEvents(client, ALL_EVENT_FILTER);
@@ -203,6 +210,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	public boolean subscribeToEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of subscribeToEvent for client: " + client + " and intent: " + intent);
 		assignConnectionParameters();
 
@@ -227,6 +236,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	public synchronized boolean subscribeToEvents(String client, String intentFilter) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of subscribeToEvents for client: " + client + " and filter: " + intentFilter);
 		assignConnectionParameters();
 
@@ -268,6 +279,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 	public synchronized boolean unSubscribeFromAllEvents(String client) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromAllEvents for client: " + client);
 		return this.unSubscribeFromEvents(client, ALL_EVENT_FILTER);
 	}
@@ -275,6 +288,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	public synchronized boolean unSubscribeFromEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvent for client: " + client + " and intent: " + intent);
 
 		synchronized (this.subscribedToClientEvents) {
@@ -298,6 +313,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	public synchronized boolean unSubscribeFromEvents(String client, String intentFilter) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvents for client: " + client + " and filter: " + intentFilter);
 
 		ArrayList<String> targetEvents = null;
