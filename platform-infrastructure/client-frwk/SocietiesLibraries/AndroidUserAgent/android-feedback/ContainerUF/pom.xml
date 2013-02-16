@@ -10,8 +10,8 @@
 	</parent>
 
 	<groupId>org.societies.android.platform.useragent.feedback.container</groupId>
-	<artifactId>TestContainerFeedback</artifactId>
-	<name>TestContainerFeedback</name>
+	<artifactId>ContainerUF</artifactId>
+	<name>Container User Feedback test</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
 
@@ -49,30 +49,33 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<!-- 		<dependency>
+  		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency>
+		</dependency> 
 		<dependency>
 			<groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency>
+		</dependency> 
+		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.androidutils</groupId>
 			<artifactId>SocietiesAndroidUtilities</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency> -->
-		<dependency>
+  		<dependency>
 			<groupId>org.societies.android.platform.useragent.feedback</groupId>
 			<artifactId>AndroidUserFeedback</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency>
+		</dependency>  
+
+		
 		<dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>
@@ -110,23 +113,23 @@
                           <!--  must be set for emma -->
                       </dex>
                   </configuration>
-                  <executions>
-			    	<!--execution>
+<!--                   <executions>
+			    	execution>
 				        <id>startEmulator</id>
 				        <phase>initialize</phase>
 				        <goals>
 				            <goal>emulator-start</goal>
 				        </goals>
-			    	</execution-->
-			    	<!--execution>
+			    	</execution
+			    	execution>
 				        <id>stopEmulator</id>
 				        <phase>initialize</phase>
 				        <goals>
 				            <goal>emulator-stop</goal>
 				        </goals>
-			    	</execution-->
+			    	</execution
 			    	
-				</executions>
+				</executions> -->
 				  
                   <extensions>true</extensions>
               </plugin>

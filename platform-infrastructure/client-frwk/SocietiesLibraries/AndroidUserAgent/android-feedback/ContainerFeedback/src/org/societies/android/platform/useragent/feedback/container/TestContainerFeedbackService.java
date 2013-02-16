@@ -25,9 +25,9 @@
 
 package org.societies.android.platform.useragent.feedback.container;
 
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
+/*import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackBase;
-
+*/
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -41,7 +41,7 @@ public class TestContainerFeedbackService extends Service{
 
 	@Override
 	public void onCreate () {
-		this.binder = new FeedbackContainerBinder();
+		//this.binder = new FeedbackContainerBinder();
 		Log.d(LOG_TAG, "TestContainerFeedbackService service starting...");
 	}
 
@@ -56,12 +56,12 @@ public class TestContainerFeedbackService extends Service{
 		return this.binder;
 	}
 
-	public class FeedbackContainerBinder extends Binder {
+/*	public class FeedbackContainerBinder extends Binder {
 		public IAndroidUserFeedback getService() {
 			AndroidUserFeedbackBase ufBase = new AndroidUserFeedbackBase(getApplicationContext(),  true);
 			return ufBase;
 		}
-	}
+	}*/
 	
 
 }

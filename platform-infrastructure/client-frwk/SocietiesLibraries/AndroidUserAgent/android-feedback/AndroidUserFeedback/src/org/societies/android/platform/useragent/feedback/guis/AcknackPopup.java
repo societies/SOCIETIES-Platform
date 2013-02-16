@@ -26,9 +26,10 @@
 package org.societies.android.platform.useragent.feedback.guis;
 
 
-import org.societies.android.api.R;
+
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.useragent.feedback.R;
 
 import android.app.Activity;
 import android.content.ComponentName;
