@@ -60,7 +60,7 @@ import android.util.Log;
  * 
  *
  */
-public class ServiceManagementBase implements IServiceDiscovery, IServiceControl, IServiceManager {
+public class ServiceManagementBase implements IServiceDiscovery, IServiceControl {
 	//Logging tag
     private static final String LOG_TAG = ServiceManagementBase.class.getName();
     

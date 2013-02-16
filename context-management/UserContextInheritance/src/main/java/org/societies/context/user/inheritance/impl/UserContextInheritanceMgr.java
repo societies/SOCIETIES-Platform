@@ -24,32 +24,30 @@
  */
 package org.societies.context.user.inheritance.impl;
 
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.identity.IIdentity;
 import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
 import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 
 	@Override
-	public void getCIS(EntityIdentifier cisId) {
+	public void getCIS(IIdentity cisId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void getContextAttribute(
-			CtxAttributeIdentifier contextAttributeIdentifier,
-			CtxAttributeValueType type, EntityIdentifier cisId) {
+	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void inheritContextAttribute(
-			CtxAttributeIdentifier contextAttributeIdentifier,
-			CtxAttributeValueType type) {
+	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier,CtxAttributeValueType type) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -60,4 +58,6 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 }

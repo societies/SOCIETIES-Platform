@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.integration.example.service.api.IAddService;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -27,8 +28,13 @@ public class NominalTestCaseUpperTester {
 	 * Id of the Calculator 3P service
 	 */
 	public static ServiceResourceIdentifier calculatorServiceId;
-	
+	private static IAddService addService;
 
+	public void readyForUpper(){
+		LOG.info("[#759] I'm ready to start upper testing!");
+		//NominalTestCaseLowerTester.integrationTestUtils.run(NominalTestCaseLowerTester.testCaseNumber, NominalTestCaseUpperTester.class);
+
+	}
 	/**
 	 * This method is called before every @Test methods.
 	 */
@@ -85,7 +91,7 @@ public class NominalTestCaseUpperTester {
 		int expected = 3;
 		int actual = 0;
 		try {
-			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
+			actual = addService.addNumbers(1, 2).get();
 			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
 			assertEquals("[#759] Consume Calculator Service", expected, actual);
 		} catch (InterruptedException e) {
@@ -94,6 +100,14 @@ public class NominalTestCaseUpperTester {
 		} catch (ExecutionException e) {
 			LOG.info("[#759] ExecutionException", e);
 			fail("[#759] ExecutionException: "+e.getMessage());
+		} catch(Exception ex){
+			ex.printStackTrace();
 		}
+	}
+	
+	public void setAddService(IAddService addService) {
+		LOG.info("[#759] Calculator Service injected");
+		this.addService = addService;
+
 	}
 }

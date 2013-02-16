@@ -45,7 +45,8 @@ public class Test1108 extends IntegrationTestCase{
 	
 	
 	public Test1108(){
-		super(1108, new Class[]{CreateCommunityCtx.class});
+		//super(1108, new Class[]{CreateCommunityCtx.class});
+		super(1108, new Class[]{EstimateCommunityCtx.class});
 	}
 
 	/**

@@ -26,7 +26,6 @@ package org.societies.context.community.estimation.impl;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -196,8 +195,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			ArrayList<String> stringInputValues = new ArrayList<String>();
 			ArrayList<String> individualsStrings = new ArrayList<String>();
 
-
-
 			try {
 				CommunityCtxEntity retrievedCommunity;
 				try {
@@ -259,6 +256,125 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			}
 
 		}
+		
+		
+		//***************************************************************************************
+		if (retrievedType.getType().toString().equals("location_coordinates")){
+			
+			ArrayList<String> stringLocationValues = new ArrayList<String>();
+			CommunityCtxEntity retrievedCommunity;
+
+			try {
+				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+
+					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
+
+					for (CtxAttribute ca:setAttributesCoordinatesLocations){
+						stringLocationValues.add(ca.getStringValue());			
+					}
+							
+				}
+				
+					String LocationsAsString = stringLocationValues.toString();
+					CommunityContextEstimation cce = new CommunityContextEstimation();
+					ArrayList<Point2D> points = CommunityContextEstimation.splitString(LocationsAsString);
+					ArrayList<Point2D> conHull = cce.cceGeomConvexHull(points);
+					
+					CtxAttribute comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_COORDINATES).get();
+					comLocationCoordinates.setStringValue(conHull.toString());   
+					comLocationCoordinates.setValueType(CtxAttributeValueType.STRING);
+					comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.update(comLocationCoordinates);
+					result = comLocationCoordinates;
+					result.getStringValue();
+																	
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+		}
+		
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$	
+		
+		if (retrievedType.getType().toString().equals("location_symbolic")){
+
+			ArrayList<String> stringLocationSymbolicValues = new ArrayList<String>();
+			ArrayList<String> individualsLocationSymbolicStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+
+					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_SYMBOLIC");
+
+					for (CtxAttribute ca:setAttributesSymbolicLocations){
+						stringLocationSymbolicValues.add(ca.getStringValue());			
+					}
+				}
+				
+				individualsLocationSymbolicStrings.addAll(stringLocationSymbolicValues);
+				
+				for (String s:individualsLocationSymbolicStrings){
+					String[] helper = s.split(",");
+					for (String s1:helper){
+						finalArrayStringList.add(s1);
+					}
+				}
+								
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList);
+			
+			try {
+				CtxAttribute symbolicLocationMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+				symbolicLocationMode.setStringValue(modeStringValue.get(0).toString());
+				symbolicLocationMode.setValueType(CtxAttributeValueType.STRING);
+				symbolicLocationMode = (CtxAttribute) this.internalCtxBroker.update(symbolicLocationMode).get();
+				result =symbolicLocationMode;
+				result.getStringValue();
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		
+		//****************************************************************************************
 
 		//Methods that can also be called
 		//double medianValue = cceNumMedian(inputValues);
@@ -336,22 +452,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 //
 //	}
 //		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		//the if statement ends here
 		return result;
 	}
 
@@ -677,7 +777,30 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		return mode;
 	}
-
+	
+	//method for splitting the LOCATION string. Location should be in String representation of a pair of double  values
+	public static ArrayList<Point2D> splitString (String s){
+		
+		Point2D.Double p = new Point2D.Double();
+		double x=0.0;
+		double y=0.0;
+		int l = 0;
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		String[] splited_string = s.split(",");
+		
+		System.out.println("The size of splitted string is "+splited_string.length);
+		
+		for (int k = 0; k< splited_string.length -1; k++){
+			x = Double.parseDouble(splited_string[l]);
+			y = Double.parseDouble(splited_string[l+1]);
+			l=l+2;
+			p.setLocation(x, y);
+			points.add(p);
+			//returns the point with the coordinates			
+		}
+			return points;	
+				
+	}
 
 	//@Override
 	public void cceSpecial1() {

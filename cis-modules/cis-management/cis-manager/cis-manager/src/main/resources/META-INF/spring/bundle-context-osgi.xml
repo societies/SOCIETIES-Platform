@@ -35,9 +35,9 @@
 	<osgi:reference id="NegotiationRequester"
 		interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
 
-	<osgi:reference id="PubsubClient"
-		interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" />
 
 	<osgi:reference id="userFeedback"
 		interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
+    <osgi:reference id="activityFeedManager"
+        interface="org.societies.api.activity.IActivityFeedManager" />
 </beans>

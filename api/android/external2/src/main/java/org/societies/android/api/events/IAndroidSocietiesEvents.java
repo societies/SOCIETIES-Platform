@@ -43,24 +43,23 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CONTEXT_MANAGER_REMOVED_INTENT = "org.societies.android.context.REMOVED";
 
 	//CSS Manager intents
-	final static String CSS_MANAGER_ADD_CSS_NODE_INTENT = "org.societies.android.css.manager.addCSSNode";
+	final static String CSS_MANAGER_ADD_CSS_NODE_INTENT    = "org.societies.android.css.manager.addCSSNode";
 	final static String CSS_MANAGER_DEPART_CSS_NODE_INTENT = "org.societies.android.css.manager.departCSSNode";
-	final static String CSS_FRIEND_REQUEST_RECEIVED_INTENT = "org.societies.android.css.manager.friendRequestReceived";
-	final static String CSS_FRIEND_REQUEST_ACCEPTED_INTENT = "org.societies.android.css.manager.friendRequestAccepted";
+	final static String CSS_FRIEND_REQUEST_RECEIVED_INTENT = "org.societies.android.css.friends.RequestReceived";
+	final static String CSS_FRIEND_REQUEST_ACCEPTED_INTENT = "org.societies.android.css.friends.RequestAccepted";
 
 	//Device Manager intents
-	final static String DEVICE_MANAGER_DEVICE_REGISTERED_INTENT = "org.societies.android.device.manager.DEVICE_CONNECTED";
+	final static String DEVICE_MANAGER_DEVICE_REGISTERED_INTENT   = "org.societies.android.device.manager.DEVICE_CONNECTED";
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT = "org.societies.android.device.manager.DEVICE_DISCONNECTED";
-	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT = "org.societies.android.device.manager.EVENTING_NODE_NAME";
-	
+	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT  = "org.societies.android.device.manager.EVENTING_NODE_NAME";	
 	
 	//UserFeedback intents
-	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT =  "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE"; 
+	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE"; 
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
-	final static String USER_FEEDBACK_REQUEST_INTENT = "org.societies.useragent.feedback.event.REQUEST"; 
+	final static String USER_FEEDBACK_REQUEST_INTENT 		   = "org.societies.useragent.feedback.event.REQUEST"; 
 	final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
 	
-	//Array of Societies Android Pubsub Intents. 
+	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
 	//N.B. These events must be created at Virgo container start-up
 	final static String societiesAndroidIntents [] = {CONTEXT_MANAGER_CREATED_INTENT,
@@ -83,25 +82,25 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	/**
 	 * Android intent Societies platform Pubsub related events
 	 */
-	//Context Manager intents
+	//Context Manager pubsub nodes
 	final static String CONTEXT_MANAGER_CREATED_EVENT  = "org/societies/context/change/event/CREATED";
 	final static String CONTEXT_MANAGER_UPDATED_EVENT  = "org/societies/context/change/event/UPDATED";
 	final static String CONTEXT_MANAGER_MODIFIED_EVENT = "org/societies/context/change/event/MODIFIED";
 	final static String CONTEXT_MANAGER_REMOVED_EVENT  = "org/societies/context/change/event/REMOVED";
 
-	//CSS Manager intents
+	//CSS Manager pubsub nodes
 	final static String CSS_MANAGER_ADD_CSS_NODE_EVENT    = "addCSSNode";
 	final static String CSS_MANAGER_DEPART_CSS_NODE_EVENT = "departCSSNode";
 	final static String CSS_FRIEND_REQUEST_RECEIVED_EVENT = "friendRequestReceived";
 	final static String CSS_FRIEND_REQUEST_ACCEPTED_EVENT = "friendRequestAccepted";
 	
-	//Device Manager intents
+	//Device Manager pubsub nodes
 	final static String DEVICE_MANAGER_DEVICE_REGISTERED_EVENT   = "DEVICE_CONNECTED";
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT = "DEVICE_DISCONNECTED";
 	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT  = "EVENTING_NODE_NAME";
 
-	//UserFeedback intents
-	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT =  "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
+	//UserFeedback pubsub nodes
+	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
 	final static String USER_FEEDBACK_REQUEST_EVENT = "org/societies/useragent/feedback/event/REQUEST"; 
 	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 
@@ -125,7 +124,6 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 USER_FEEDBACK_SHOW_NOTIFICATION_EVENT
 										 };
 
-	
 	//Array of interface method signatures
 	//N.B. Must include any extended interface(s) method arrays
 	final static String methodsArray [] = {"subscribeToEvent(String client, String societiesIntent)",

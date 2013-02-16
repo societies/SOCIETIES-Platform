@@ -24,18 +24,13 @@
  */
 package org.societies.android.api.internal.privacytrust;
 
-import java.util.Map;
-
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
-import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
-
 
 /**
  * Interface exposed to Societies components in order to do actions relative
@@ -44,7 +39,15 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Privacy
  * @author Olivier Maridat (Trialog)
  * @created 09-nov.-2011 16:45:29
  */
-public interface IPrivacyPolicyManager {
+public interface IPrivacyPolicyManager extends IServiceManager {
+	public String methodsArray [] = {"getPrivacyPolicy(String client, RequestorBean owner)",
+		  	"updatePrivacyPolicy(String client, RequestPolicy privacyPolicy)",
+			"updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean owner)",
+			"deletePrivacyPolicy(String client, RequestorBean owner)",
+			"startService()",
+			"stopService()"
+		 };
+	
 	/**
 	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
 	 * Must be used in the listening IntentFilter

@@ -85,8 +85,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		//inferrableTypes.add(CtxAttributeTypes.STATUS);
 		//inferrableTypes.add(CtxAttributeTypes.TEMPERATURE);
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info ("Inferrable Types=" + this.getInferrableTypes());
+		if (LOG.isDebugEnabled())
+			LOG.debug("Inferrable Types=" + this.getInferrableTypes());
 		try {
 			final String cssOwnerStr = this.commMgr.getIdManager().getThisNetworkNode().getBareJid();
 			this.cssOwnerId = this.commMgr.getIdManager().fromJid(cssOwnerStr);
@@ -114,10 +114,14 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public boolean isPoorQuality(CtxQuality quality) {
 		
+		if (quality == null)
+			throw new NullPointerException("quality can't be null");
+		
 		boolean isPoorQuality;
 
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("freshness = " + quality.getFreshness() + " updateFrequency = " 
+		if (LOG.isDebugEnabled())
+			LOG.debug(quality.getAttribute().getId() +  ": freshness = " 
+					+ quality.getFreshness() + " updateFrequency = " 
 					+ quality.getUpdateFrequency());
 
 		if (null == quality.getUpdateFrequency()) {
@@ -127,12 +131,13 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		} else {
 
 			final double timeBetweenUpdatesMillis = (1.0 / quality.getUpdateFrequency()) * 1000.0;
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("time between updates (in milliseconds) = " +timeBetweenUpdatesMillis);
+			if (LOG.isDebugEnabled())
+				LOG.debug(quality.getAttribute().getId() 
+						+  ": time between updates (in milliseconds) = " + timeBetweenUpdatesMillis);
 			isPoorQuality = (double) quality.getFreshness() > timeBetweenUpdatesMillis;
 		}
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("is poor quality = " + isPoorQuality);
+		if (LOG.isDebugEnabled())
+			LOG.debug(quality.getAttribute().getId() +  ": is poor quality = " + isPoorQuality);
 
 		return isPoorQuality;
 	}
@@ -194,8 +199,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public CtxAttribute refineOnDemand(CtxAttributeIdentifier attrId) throws UserCtxInferenceException {
 
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Refining attribute '" + attrId + "'");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Refining attribute '" + attrId + "'");
 		CtxAttribute refinedAttribute;
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			refinedAttribute = this.userCtxRefiner.refineOnDemand(attrId);
@@ -221,8 +226,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	public void refineContinuously(final CtxAttributeIdentifier attrId, 
 			final Double updateFrequency) throws UserCtxInferenceException {
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("Refining attribute '" + attrId + "'");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Refining attribute '" + attrId + "'");
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			this.userCtxRefiner.refineContinuously(attrId, 0d); // TODO handle updateFrequency
 		else

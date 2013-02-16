@@ -40,6 +40,7 @@
 	
 	<bean id="serviceManagement" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceMgmt" >
 		<property name="serviceDiscovery" ref="serviceDiscoveryRef" /> 	
+		<property name="serviceControl" ref="serviceControl" />
 		<property name="commMngr" ref="commMngrRef" />				
 	</bean>
 	
