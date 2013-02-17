@@ -71,6 +71,8 @@ public class CssRegistryEntry implements Serializable {
 	private int sex;
 	private String socialURI;
 	private int status;
+	private String position;
+	private String workplace;
 
 	/**
 	 * @return the cssHostingLocation
@@ -308,6 +310,34 @@ public class CssRegistryEntry implements Serializable {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+	
+	/**
+	 * @return the workplace
+	 */
+	@Column(name = "Workplace")
+	public String getWorkplace() {
+		return workplace;
+	}
+	/**
+	 * @param workplace the workplace to set
+	 */
+	public void setWorkplace(String workplace) {
+		this.workplace = workplace;
+	}
+	
+	/**
+	 * @return the position
+	 */
+	@Column(name = "Position")
+	public String getPosition() {
+		return position;
+	}
+	/**
+	 * @param Position the Position to set
+	 */
+	public void setPosition(String position) {
+		this.position = position;
+	}
 	/**
 	 * @param cssHostingLocation
 	 * @param cssIdentity
@@ -327,12 +357,14 @@ public class CssRegistryEntry implements Serializable {
 	 * @param sex
 	 * @param socialURI
 	 * @param status
+	 * @param workplace
+	 * @param position
 	 */
 	public CssRegistryEntry(String cssHostingLocation, String cssIdentity,
 			String cssInactivation, String cssRegistration, int cssUpTime, String domainServer,
 			String emailID, int entity, String foreName, String homeLocation,
 			String identityName, String imID, String name, String password,
-			int presence, int sex, String socialURI, int status) {
+			int presence, int sex, String socialURI, int status, String workplace, String position) {
 
 		super();
 		this.cssHostingLocation = cssHostingLocation;
@@ -353,6 +385,10 @@ public class CssRegistryEntry implements Serializable {
 		this.sex = sex;
 		this.socialURI = socialURI;
 		this.status = status;
+		this.workplace = workplace;
+		this.position = position;
+		
+		
 	}
 
 	public CssRegistryEntry() {

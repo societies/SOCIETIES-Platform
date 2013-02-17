@@ -105,6 +105,18 @@ public class CSSRecord {
 	int presence = 0;
 	
 	/**
+	 * Current workplace
+	 */
+
+	String workplace = null; 
+
+	/**
+	 * Current role within the workplace
+	 */
+
+	String position = null;
+	
+	/**
 	 * Default Contructor
 	 */
 	public CSSRecord() {
@@ -278,6 +290,23 @@ public class CSSRecord {
 	public void setPresence(int presence) {
 		this.presence = presence;
 	}
+	
+	public String getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(String workplace) {
+		this.workplace = workplace;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
 
 
 }

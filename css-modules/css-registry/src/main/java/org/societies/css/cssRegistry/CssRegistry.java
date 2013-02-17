@@ -123,7 +123,8 @@ public class CssRegistry implements ICssRegistry {
 					cssRecord.getImID(), cssRecord.getName(),
 					cssRecord.getPassword(), cssRecord.getPresence(),
 					cssRecord.getSex(), cssRecord.getSocialURI(),
-					cssRecord.getStatus());
+					cssRecord.getStatus(), cssRecord.getWorkplace(),
+					cssRecord.getPosition());
 
 			session.save(tmpRegistryEntry);
 			log.debug("CSSRegistry record entry saved");
@@ -200,7 +201,8 @@ public class CssRegistry implements ICssRegistry {
 					cssRecord.getImID(), cssRecord.getName(),
 					cssRecord.getPassword(), cssRecord.getPresence(),
 					cssRecord.getSex(), cssRecord.getSocialURI(),
-					cssRecord.getStatus());
+					cssRecord.getStatus(), cssRecord.getWorkplace(),
+					cssRecord.getPosition());
 
 			session.delete(tmpRegistryEntry);
 			log.debug("CSSRegistry record deleted");
@@ -270,6 +272,8 @@ public class CssRegistry implements ICssRegistry {
 						.getCssInactivation());
 				cssDetails.setCssUpTime(tmpRegistryEntryList.get(0).getCssUpTime());
 				cssDetails.setPresence(tmpRegistryEntryList.get(0).getPresence());
+				cssDetails.setWorkplace(tmpRegistryEntryList.get(0).getWorkplace());
+				cssDetails.setPosition(tmpRegistryEntryList.get(0).getPosition());
 
 				List<CssNodeEntry> tmpNodeRegistryEntryList = session
 						.createCriteria(CssNodeEntry.class).list();
@@ -385,6 +389,10 @@ public class CssRegistry implements ICssRegistry {
 					cssDetails.getCssUpTime());
 			tmpCssRegistryEntryList.get(0)
 					.setPresence(cssDetails.getPresence());
+			tmpCssRegistryEntryList.get(0)
+			.setWorkplace(cssDetails.getWorkplace());
+			tmpCssRegistryEntryList.get(0)
+			.setPosition(cssDetails.getPosition());
 
 			session.update(tmpCssRegistryEntryList);
 			log.debug("CSSRegistry record udated");

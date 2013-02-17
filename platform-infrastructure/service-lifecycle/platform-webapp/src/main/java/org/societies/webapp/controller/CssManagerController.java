@@ -218,6 +218,8 @@ public class CssManagerController {
 			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 			
 			// first get all the cssdirectory records
@@ -302,6 +304,8 @@ public class CssManagerController {
 		loginRecord.setImID(cmControllerLoginForm.getImID());
 		loginRecord.setName(cmLoginForm.getName());
 		loginRecord.setSex(cmLoginForm.getSex());
+		loginRecord.setWorkplace(cmLoginForm.getWorkplace());
+		loginRecord.setPosition(cmLoginForm.getPosition());
 
 		try {
 			getCssLocalManager().modifyCssRecord(loginRecord);
@@ -340,6 +344,8 @@ public class CssManagerController {
 			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
