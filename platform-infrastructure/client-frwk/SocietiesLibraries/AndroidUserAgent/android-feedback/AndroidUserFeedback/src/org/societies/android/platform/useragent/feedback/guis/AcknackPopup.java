@@ -25,6 +25,90 @@
 
 package org.societies.android.platform.useragent.feedback.guis;
 
-public class AcknackPopup {
 
+
+import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.useragent.feedback.R;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.util.Log;
+
+public class AcknackPopup extends Activity{
+	
+	
+	private static final String LOG_TAG = AcknackPopup.class.getName();
+	private Messenger eventMgrService = null;
+	
+	
+	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user_feedback);
+        Log.d(LOG_TAG, "onCreate in AcknackPopup");
+    }
+
+    
+    //connection to pubsub
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		
+		private boolean boundToEventMgrService;
+
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			boundToEventMgrService = true;
+			eventMgrService = new Messenger(service);
+			
+			Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
+			
+			//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
+			InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
+    		invoke.execute();
+		}
+		
+		public void onServiceDisconnected(ComponentName name) {
+			boundToEventMgrService = false;
+		}
+	};
+	
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SUBSCRIBE TO PUBSUB EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/** Async task to invoke remote service method */
+    private class InvokeRemoteMethod extends AsyncTask<Void, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeRemoteMethod.class.getName();
+    	private String client;
+
+    	public InvokeRemoteMethod(String client) {
+    		this.client = client;
+    	}
+
+    	protected Void doInBackground(Void... args) {
+    		//METHOD: subscribeToEvents(String client, String intentFilter) - ARRAY POSITION: 1
+    		String targetMethod = IAndroidSocietiesEvents.methodsArray[6];
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+
+    		//PARAMETERS
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT);
+    		//outBundle.putParcelable(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT, "");
+    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		outMessage.setData(outBundle);
+
+    		Log.d(LOCAL_LOG_TAG, "Sending event registration");
+    		try {
+    			eventMgrService.send(outMessage);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+    		return null;
+    	}
+    }
 }

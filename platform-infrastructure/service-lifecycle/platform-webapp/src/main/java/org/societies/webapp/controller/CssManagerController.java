@@ -980,7 +980,7 @@ public class CssManagerController {
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmLoginForm.getCssIdentity());
-		loginRecord.setPassword(cmLoginForm.getPassword());
+//		loginRecord.setPassword(cmLoginForm.getPassword());
 
 		if (cmLoginForm.getButtonLabel().contentEquals("Save")) {
 

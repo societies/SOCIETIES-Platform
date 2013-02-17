@@ -14,6 +14,8 @@
 </ul>
 </li>
 <li><a href="your_installed_apps.html"><br />Apps</a>
+<ul class="sub-menu">
+</ul>
 </li>
 <li><a href="your_societies_friends_list.html"><br />Friends</a>
 <ul class="sub-menu"> 

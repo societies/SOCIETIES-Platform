@@ -28,6 +28,7 @@ import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssFriendEvent;
 
 import android.app.Notification;
 import android.app.Service;
@@ -65,6 +66,7 @@ public class FriendsService extends Service {
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsService";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
+	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	@Override
@@ -148,18 +150,18 @@ public class FriendsService extends Service {
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				Log.d(LOG_TAG, "Un-subscribed from events - listening to: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
 			}
-			//PUBSUB EVENTS
+			//PUBSUB EVENTS - payload is CssFriendEvent 
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request received: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = advert.getName() + " sent a friend request";
-				addNotification(description, "Friend Request", advert);
+				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = eventPayload.getCssAdvert().getName() + " sent a friend request";
+				addNotification(description, "Friend Request", eventPayload.getCssAdvert());
 			}
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_ACCEPTED_EVENT)) {
 				Log.d(LOG_TAG, "Frient Request accepted: " + intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, -999));
-				CssAdvertisementRecord advert = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = advert.getName() + " accepted your friend request";
-				addNotification(description, "Friend Request Accepted", advert);
+				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				String description = eventPayload.getCssAdvert().getName() + " accepted your friend request";
+				addNotification(description, "Friend Request Accepted", eventPayload.getCssAdvert());
 			}			
 		}
     }
@@ -200,7 +202,7 @@ public class FriendsService extends Service {
 
     		//PARAMETERS
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT);
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), ALL_CSS_FRIEND_INTENTS);
     		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
     		outMessage.setData(outBundle);
 
@@ -221,7 +223,7 @@ public class FriendsService extends Service {
 		AndroidNotifier notifier = new AndroidNotifier(FriendsService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), FriendsService.class);
+		Intent intent = new Intent(this.getApplicationContext(), FriendsActivity.class);
 		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		

@@ -26,8 +26,6 @@
 package org.societies.android.platform.useragent.feedback;
 
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 
 import android.app.Service;
 import android.content.Intent;
@@ -59,22 +57,13 @@ public class AndroidUserFeedbackLocal extends Service{
 	
 	public class LocalFeedbackBinder extends Binder {
 		public IAndroidUserFeedback getService() {
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			PubsubClientAndroid pubsubClient = createPubsubClientAndroid();
+			
+			
 			AndroidUserFeedbackBase uamBase = new AndroidUserFeedbackBase(
 					AndroidUserFeedbackLocal.this.getApplicationContext(),
-					ccm, 
-					pubsubClient,
 					false);
 			return uamBase;
 		}
 	}
-	
-	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(getApplicationContext());
-	}
-	
-	protected PubsubClientAndroid createPubsubClientAndroid(){
-		return new PubsubClientAndroid(getApplicationContext());
-	}
+
 }

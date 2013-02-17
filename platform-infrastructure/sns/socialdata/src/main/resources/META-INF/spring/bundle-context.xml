@@ -19,5 +19,13 @@
            
     </bean>
     
+    
+    <bean id="SocialDataCommsManager" 
+  		class="org.societies.platform.socialdata.SocialDataServer"
+  		depends-on="commsMgr" 
+  		init-method="InitService">
+  		<property name="commManager" ref="commsMgr"/>
+  		<property name="socialData" ref="iSocialData"/>
+  </bean>
 
 </beans>

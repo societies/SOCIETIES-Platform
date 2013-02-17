@@ -198,6 +198,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 			String cisType = createCisParameters.getCisType();
 			String cisDescription = createCisParameters.getCisDescription();
 			String privacyPolicy = createCisParameters.getPrivacyPolicyWithoutRequestor();
+			int waitingTime = createCisParameters.getWaitingTime();
 			
 			if (null != cisName && null != cisType && null != privacyPolicy && !"".equals(cisName) && !"".equals(cisType) && !"".equals(privacyPolicy)) 
 			{
@@ -213,7 +214,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest {
 						
 						// Retrieve future CIS
 						try {
-							createdCis = futureCis.get(10, TimeUnit.SECONDS);
+							createdCis = futureCis.get(waitingTime, TimeUnit.SECONDS);
 						} catch (InterruptedException e)  {
 							LOG.error("[Error "+e.getLocalizedMessage()+"]", e);
 						

@@ -187,7 +187,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		LOG.debug("Remote call on loginCSS");
 
 		LOG.debug("Record profile identity: " + profile.getCssIdentity());
-		LOG.debug("Record profile password: " + profile.getPassword());
+//		LOG.debug("Record profile password: " + profile.getPassword());
 		IIdentity toIdentity;
 		try {
 			toIdentity = getIdentity();
@@ -200,13 +200,12 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			messageBean.setMethod(MethodType.LOGIN_CSS);
 			LOG.debug("Message Bean profile identity: "
 					+ messageBean.getProfile().getCssIdentity());
-			LOG.debug("Message Bean profile password: "
-					+ messageBean.getProfile().getPassword());
+//			LOG.debug("Message Bean profile password: "
+//					+ messageBean.getProfile().getPassword());
 
 			try {
 				LOG.debug("Sending stanza with CSS identity: "
-						+ profile.getCssIdentity() + " and password: "
-						+ profile.getPassword());
+						+ profile.getCssIdentity());
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block

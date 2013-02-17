@@ -57,7 +57,7 @@ import android.util.Log;
  * @author Edgar Domingues (PTIN)
  *
  */
-public class SocialData extends Service implements ISocialData, IServiceManager {
+public class SocialData extends Service implements ISocialData {
 	//LOGGING TAG
 	private static final String LOG_TAG = SocialData.class.getName();
 	

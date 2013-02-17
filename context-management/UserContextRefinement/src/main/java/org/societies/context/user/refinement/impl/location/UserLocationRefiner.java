@@ -68,7 +68,7 @@ public class UserLocationRefiner {
 	@Autowired(required=true)
 	private ICtxBroker internalCtxBroker;
 	
-	private final Set<CtxAttributeIdentifier> continuoulsyRefinedAttrIds = 
+	private final Set<CtxAttributeIdentifier> continuouslyRefinedAttrIds = 
 				new CopyOnWriteArraySet<CtxAttributeIdentifier>();
 	
 	private final ExecutorService executorService =
@@ -242,9 +242,9 @@ public class UserLocationRefiner {
 		if (!CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "': Unsupported attribute type: " + attrId.getType());
-		if (this.continuoulsyRefinedAttrIds.contains(attrId)) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Attribute " + attrId + " already continuously inferred");
+		if (this.continuouslyRefinedAttrIds.contains(attrId)) {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Attribute " + attrId + " already continuously inferred");
 			return;
 		}
 		final CtxEntityIdentifier ownerEntId = attrId.getScope();
@@ -268,6 +268,8 @@ public class UserLocationRefiner {
 						+ attrId + "': Association '" + ownsCssNodesAssocId +  "' does not exist");
 			if (ownsCssNodesAssoc.getChildEntities().isEmpty())
 				return; // Cannot refine without CSS_NODE entities
+			if (!ownerEntId.equals(ownsCssNodesAssoc.getParentEntity()))
+				return; // Should not refine attributes under the CSS_NODE entity
 			// TODO select User Interaction Node; pick first for now
 			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
 			if (LOG.isDebugEnabled())
@@ -276,7 +278,7 @@ public class UserLocationRefiner {
 					new LocationSymbolicChangeListener(attrId), cssNodeEntId, attrId.getType());
 			if (LOG.isDebugEnabled())
 				LOG.debug("Adding " + attrId + " to set of continuously inferred attributes");
-			this.continuoulsyRefinedAttrIds.add(attrId);
+			this.continuouslyRefinedAttrIds.add(attrId);
 			
 		} catch (Exception e) {
 			
@@ -327,7 +329,7 @@ public class UserLocationRefiner {
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			
-			if (LOG.isDebugEnabled()) // TODO DEBUG
+			if (LOG.isDebugEnabled())
 				LOG.debug("LocationSymbolicChangeListener received event " + event);
 			executorService.execute(new LocationSymbolicChangeHandler(this.attrId));
 		}

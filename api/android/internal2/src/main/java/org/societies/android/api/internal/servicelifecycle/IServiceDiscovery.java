@@ -25,6 +25,7 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -34,7 +35,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author aleckey
  *
  */
-public interface IServiceDiscovery {
+public interface IServiceDiscovery extends IServiceManager {
 	
     //SERVICE LIFECYCLE INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicediscovery.ReturnValue";
@@ -47,7 +48,9 @@ public interface IServiceDiscovery {
 	public String methodsArray[] = {"getServices(String client, String identity)",
 							 		"getService(String client, ServiceResourceIdentifier serviceId, String identity)",
 							 		"searchService(String client, Service filter, String identity)",
-							 		"getMyServices(String client)"
+							 		"getMyServices(String client)",
+							 		"startService()",
+									"stopService()"
 							};
 	
 	/**

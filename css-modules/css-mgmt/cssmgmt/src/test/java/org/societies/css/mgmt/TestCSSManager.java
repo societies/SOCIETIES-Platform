@@ -58,17 +58,17 @@ public class TestCSSManager {
 		profile.setEmailID(TEST_EMAIL);
 		profile.setForeName(TEST_FORENAME);
 		profile.setHomeLocation(TEST_HOME_LOCATION);
-		profile.setIdentityName(TEST_IDENTITY_NAME);
-		profile.setImID(TEST_IM_ID);
-		profile.setSocialURI(TEST_SOCIAL_URI);
+//		profile.setIdentityName(TEST_IDENTITY_NAME);
+//		profile.setImID(TEST_IM_ID);
+//		profile.setSocialURI(TEST_SOCIAL_URI);
 		
 		assertEquals(TEST_IDENTITY, profile.getCssIdentity());
 		assertEquals(TEST_EMAIL, profile.getEmailID());
 		assertEquals(TEST_FORENAME, profile.getForeName());
 		assertEquals(TEST_HOME_LOCATION, profile.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, profile.getIdentityName());
-		assertEquals(TEST_IM_ID, profile.getImID());
-		assertEquals(TEST_SOCIAL_URI, profile.getSocialURI());
+//		assertEquals(TEST_IDENTITY_NAME, profile.getIdentityName());
+//		assertEquals(TEST_IM_ID, profile.getImID());
+//		assertEquals(TEST_SOCIAL_URI, profile.getSocialURI());
 
 		
 		CSSManager manager = new CSSManager();

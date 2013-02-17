@@ -42,6 +42,7 @@ import org.societies.api.schema.cssmanagement.CssRecord;
  * 5. Allow the status of a device to be changed
  * 6. Synchronise profile data
  * 7. Modify the CSS profile 
+ * 8. Start all relevant Societies Android services
  * 
  * This interface will be implemented for android nodes. 
  *
@@ -73,6 +74,8 @@ public interface IAndroidCSSManager {
 	public static final String UNREGISTER_CSS = "org.societies.android.platform.cssmanager.UNREGISTER_CSS";
 	public static final String UNREGISTER_CSS_DEVICE = "org.societies.android.platform.cssmanager.UNREGISTER_CSS_DEVICE";
 	public static final String UNREGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.UNREGISTER_XMPP_SERVER";
+	public static final String START_APP_SERVICES = "org.societies.android.platform.cssmanager.START_APP_SERVICES";
+	public static final String STOP_APP_SERVICES = "org.societies.android.platform.cssmanager.STOP_APP_SERVICES";
 
 	public static final String SUGGESTED_FRIENDS = "org.societies.android.platform.cssmanager.SUGGESTED_FRIENDS";
 	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
@@ -101,8 +104,23 @@ public interface IAndroidCSSManager {
 			"readProfileRemote(String client, String cssId)",				//17
 			"sendFriendRequest(String client, String cssId)",				//18
 			"getFriendRequests(String client)",								//19
-			"acceptFriendRequest(String client, String cssId)"				//20
+			"acceptFriendRequest(String client, String cssId)",				//20
+			"startAppServices(String client)",
+			"stopAppServices(String client)"
 	};
+	
+	/**
+	 * Start all of the relevant Societies app services
+	 * 
+	 * @param client
+	 */
+	void startAppServices(String client);
+	/**
+	 * Stop all of the relevant Societies app services
+	 * 
+	 * @param client
+	 */
+	void stopAppServices(String client);
 	/**
 	 * Register with chosen Domain Server
 	 * 

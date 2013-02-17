@@ -58,3 +58,5 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 
 platform-infrastructure/sns/.DS_Store
+
+*.properties

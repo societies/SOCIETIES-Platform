@@ -11,11 +11,11 @@ class PerformanceTestParametersType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('parameter_name')
-            ->add('parameter_type')
-            ->add('parameter_description')
-            ->add('parameter_unit')
-            ->add('parameter_value')
+            ->add('parameter_name', 'text')
+            ->add('parameter_type', 'text')
+            ->add('parameter_description', 'textarea')
+            ->add('parameter_unit', 'text')
+            ->add('parameter_value', 'textarea')
         ;
     }
 

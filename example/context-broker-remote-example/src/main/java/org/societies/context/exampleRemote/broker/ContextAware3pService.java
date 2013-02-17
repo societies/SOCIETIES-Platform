@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
@@ -49,6 +50,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueMetrics;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -107,8 +109,6 @@ public class ContextAware3pService implements IContextAware3pService{
 	private IIdentity serviceIdentity;
 	private ServiceResourceIdentifier myServiceID;
 
-
-
 	@Autowired(required=true)
 	public ContextAware3pService( ICtxBroker ctxBroker, ICommManager commsMgr){
 
@@ -127,53 +127,6 @@ public class ContextAware3pService implements IContextAware3pService{
 		//this.requestor = getRequestor();
 	}
 
-
-	private Requestor getRequestor(){
-
-		Requestor requestor = null;
-
-		INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
-		
-		try {
-			this.serviceIdentity = this.idMgr.fromJid(cssNodeId.getBareJid());
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		myServiceID = new ServiceResourceIdentifier();
-		myServiceID.setServiceInstanceIdentifier("css://john@societies.org/ContextAware3pService");
-		try {
-			myServiceID.setIdentifier(new URI("css://john@societies.org/ContextAware3pService"));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		requestorService = new RequestorService(serviceIdentity, myServiceID);
-		
-		return requestor;
-	}
-
-
-
-
-	private Requestor getSimpleRequestor(){
-
-		Requestor requestor = null;
-
-		INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
-		IIdentity localID;
-		try {
-			localID = this.commsMgr.getIdManager().fromJid(cssNodeId.getBareJid());
-			requestor = new Requestor(localID);
-			LOG.info("simple requestor "+ requestor.getRequestorId().getJid());
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-
-		return requestor;
-	}
 
 
 	@Override
@@ -198,7 +151,7 @@ public class ContextAware3pService implements IContextAware3pService{
 
 
 	@Override
-	public List<CtxIdentifier> lookupRemoteCtxAttribute(String type){
+	public List<CtxIdentifier> lookupRemoteCtxAttribute(String targetID, String type){
 
 		List<CtxIdentifier> results = new ArrayList<CtxIdentifier>(); 
 		try {
@@ -211,7 +164,7 @@ public class ContextAware3pService implements IContextAware3pService{
 			requestor = new Requestor(localID);
 			LOG.info("simple requestor "+ requestor.getRequestorId().getJid());
 
-			IIdentity targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local"); 
+			IIdentity targetId = this.commsMgr.getIdManager().fromJid(targetID); 
 			LOG.info("targetId "+ targetId.getJid());
 
 			// lookup attribute
@@ -236,13 +189,13 @@ public class ContextAware3pService implements IContextAware3pService{
 
 
 	@Override
-	public List<CtxAttribute> lookupRemoteLocalCtxAttribute(){
-
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute(String targetID, String attrType){
+		//?
 		List<CtxAttribute> results = null; 
 
 		try {
 
-			IIdentity targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			IIdentity targetId = this.commsMgr.getIdManager().fromJid(targetID);
 			LOG.info("targetId "+ targetId.getJid());
 
 			// create remote entity
@@ -252,15 +205,15 @@ public class ContextAware3pService implements IContextAware3pService{
 			LOG.info("remote entity owner "+ entID.getOwnerId());
 
 			// create remote attribute
-			CtxAttribute remoteAttribute = this.ctxBroker.createAttribute(requestor, entID, CtxAttributeTypes.BOOKS).get();
+			CtxAttribute remoteAttribute = this.ctxBroker.createAttribute(requestor, entID, attrType).get();
 			CtxIdentifier attrID = remoteAttribute.getId();
 			LOG.info("remoteAttribute"+ attrID.toString());
 
 
-			//retrieve remote attribute
+			//retrieve remote attribute ??
 			LOG.info("retrieve remoteAttribute"+ attrID.toString());
-			attrID.setOwnerId("jane.societies.local");
-			LOG.info("remote attribute owner changed to local is jane : "+ attrID.getOwnerId());
+			attrID.setOwnerId("john.societies.local");
+			LOG.info("remote attribute owner changed : "+ attrID.getOwnerId());
 
 
 			CtxAttribute remoteAttributeRetrieved = (CtxAttribute) this.ctxBroker.retrieve(requestor, attrID).get();
@@ -307,7 +260,7 @@ public class ContextAware3pService implements IContextAware3pService{
 
 		// create remote attribute
 		try {
-			remoteAttribute = this.ctxBroker.createAttribute(requestor, remoteCtxEntityId, type.toString()).get();
+			remoteAttribute = this.ctxBroker.createAttribute(requestor, remoteCtxEntityId, type).get();
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -328,17 +281,17 @@ public class ContextAware3pService implements IContextAware3pService{
 
 
 	@Override
-	public CtxEntity createRemoteCtxEntity(String type) {
+	public CtxEntity createRemoteCtxEntity(String targetIDstring, String type) {
 
 		IIdentity targetId;
 		CtxEntity remoteEntity = null;
 
 		try {
-			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
-			LOG.info("targetId "+ targetId.getJid());
+			targetId = this.commsMgr.getIdManager().fromJid(targetIDstring);
+			//LOG.info("targetId "+ targetId.getJid());
 			// create remote entity
 			remoteEntity = this.ctxBroker.createEntity(requestor, targetId, type).get();
-			LOG.info("remote entity"+ remoteEntity);
+			//LOG.info("remote entity"+ remoteEntity);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -393,18 +346,22 @@ public class ContextAware3pService implements IContextAware3pService{
 	}
 
 	@Override
-	public void retrieveRemoteIndiEntity() {
-		
+	public IndividualCtxEntity retrieveRemoteIndiEntity(String targetIDstring) {
+
 
 		IIdentity targetId;
+		IndividualCtxEntity indiEntResult = null;
+
 		try {
-			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
-		
+			targetId = this.commsMgr.getIdManager().fromJid(targetIDstring);
+
 			CtxEntityIdentifier remoteEntityID = this.ctxBroker.retrieveIndividualEntityId(requestor, targetId).get();
-		
+
+
+			/*
 			CtxAttribute attrName = this.ctxBroker.createAttribute(requestor, remoteEntityID, CtxAttributeTypes.NAME).get();
 			attrName.setStringValue("Aris");
-		
+
 			CtxAttribute attrNameUpdated = (CtxAttribute) this.ctxBroker.update(requestor, attrName).get();
 
 			LOG.info("verify that remote ctx attribute name updated   "+attrNameUpdated.getStringValue());
@@ -425,11 +382,11 @@ public class ContextAware3pService implements IContextAware3pService{
 
 			LOG.info("retrieve remote ctxAttribute id   "+attrNameRemote.getId());
 			LOG.info("retrieve remote ctxAttribute value   "+attrNameRemote.getStringValue());
+			 */
 
-			LOG.info("retrieve remote indi entity 0");
-			IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.ctxBroker.retrieve(requestor, remoteEntityID).get();
-			LOG.info("retrieve remote indi entity 1 "+indiEnt.getId());  
-			
+			indiEntResult = (IndividualCtxEntity) this.ctxBroker.retrieve(requestor, remoteEntityID).get();
+
+
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -443,22 +400,24 @@ public class ContextAware3pService implements IContextAware3pService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		return indiEntResult;
 	}
 
 
 	@Override
-	public CtxAssociation createRemoteCtxAssociation(String type) {
-		
+	public CtxAssociation createRemoteCtxAssociation(String targetIDstring , String type) {
+
 		IIdentity targetId;
 		CtxAssociation remoteAssoc = null;
 
 		try {
-			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			targetId = this.commsMgr.getIdManager().fromJid(targetIDstring);
 			LOG.info("create remote Association:  targetId "+ targetId.getJid());
 
 			// create remote association
 			remoteAssoc = this.ctxBroker.createAssociation(requestor, targetId, type).get();
-			
+
 			LOG.info("remote association:"+ remoteAssoc);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
@@ -476,5 +435,127 @@ public class ContextAware3pService implements IContextAware3pService{
 
 		return remoteAssoc;
 	}
-	
+
+
+
+	public String estimateCommunityCtx(){
+
+		String result  = "";
+
+		//retrieve community entity
+
+		// retrieve cis
+
+		System.out.println(" retrieveCommunityEntity ");
+		IndividualCtxEntity individualEntity;
+		CommunityCtxEntity community = null;
+
+		INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+
+		try {
+			IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+
+			LOG.info( "cssOwnerId "+ cssOwnerId.getBareJid());
+
+			CtxEntityIdentifier entID  = this.ctxBroker.retrieveIndividualEntityId(requestor,cssOwnerId).get();
+			individualEntity =  (IndividualCtxEntity) this.ctxBroker.retrieve(requestor, entID).get();
+
+			Set<CtxEntityIdentifier> communitiesEntIdSet = individualEntity.getCommunities();
+
+			for(CtxEntityIdentifier commEntID : communitiesEntIdSet){
+				CommunityCtxEntity communityEntTemp = (CommunityCtxEntity) this.ctxBroker.retrieve(requestor,commEntID).get();
+
+				LOG.info("community: "+ communityEntTemp.toString());
+				if( communityEntTemp.getMembers().size()>1 ) {
+					community = communityEntTemp;
+
+					Set<CtxBond> bondSet = this.ctxBroker.retrieveBonds(requestor, community.getId()).get();
+
+					for(CtxBond bond : bondSet){
+						LOG.info("bond : "+ bond);	
+					}							
+				}
+			}		
+
+			if(community != null){
+				for( CtxEntityIdentifier membEntId : community.getMembers()){
+					LOG.info("membEntId : "+ membEntId);	
+				} 				
+
+				CtxAttribute commLoc = this.ctxBroker.createAttribute(requestor, community.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+				LOG.info("commLoc : "+ commLoc.getId());
+				CtxAttribute commLocRetrieved = (CtxAttribute) this.ctxBroker.retrieve(requestor, commLoc.getId()).get();
+			
+				LOG.info("commLocRetrieved : "+ commLocRetrieved.getId());
+			
+			}		
+			
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+
+
+
+	private Requestor getRequestor(){
+
+		Requestor requestor = null;
+
+		INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+
+		try {
+			this.serviceIdentity = this.idMgr.fromJid(cssNodeId.getBareJid());
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		myServiceID = new ServiceResourceIdentifier();
+		myServiceID.setServiceInstanceIdentifier("css://john@societies.org/ContextAware3pService");
+		try {
+			myServiceID.setIdentifier(new URI("css://john@societies.org/ContextAware3pService"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		requestorService = new RequestorService(serviceIdentity, myServiceID);
+
+		return requestor;
+	}
+
+	private Requestor getSimpleRequestor(){
+
+		Requestor requestor = null;
+
+		INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		IIdentity localID;
+		try {
+			localID = this.commsMgr.getIdManager().fromJid(cssNodeId.getBareJid());
+			requestor = new Requestor(localID);
+			LOG.info("simple requestor "+ requestor.getRequestorId().getJid());
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+
+		return requestor;
+	}
+
+
 }
