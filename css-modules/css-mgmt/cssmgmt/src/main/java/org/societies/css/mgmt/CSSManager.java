@@ -200,23 +200,23 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				CssRecord cssProfile = new CssRecord();
 				cssProfile.getCssNodes().add(cssNode);
 				cssProfile.setCssIdentity(identity);
-				cssProfile.setCssInactivation("0");
+//				cssProfile.setCssInactivation("0");
 				
-				cssProfile.setCssRegistration(this.getDate());
+//				cssProfile.setCssRegistration(this.getDate());
 
-				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-				cssProfile.setCssUpTime(0);
+//				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//				cssProfile.setCssUpTime(0);
 				cssProfile.setEmailID("");
 				cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 				cssProfile.setForeName("");
 				cssProfile.setHomeLocation("");
-				cssProfile.setIdentityName("");
-				cssProfile.setImID("");
+//				cssProfile.setIdentityName("");
+//				cssProfile.setImID("");
 				cssProfile.setName("");
-				cssProfile.setPassword("");
-				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+//				cssProfile.setPassword("");
+//				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-				cssProfile.setSocialURI("");
+//				cssProfile.setSocialURI("");
 				cssProfile.setWorkplace("");
 				cssProfile.setPosition("");
 

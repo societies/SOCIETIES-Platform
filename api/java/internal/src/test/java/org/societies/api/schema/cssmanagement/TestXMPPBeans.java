@@ -61,10 +61,10 @@ public class TestXMPPBeans {
 		this.record.getArchiveCSSNodes().add(cssNode_1);
 		this.record.getArchiveCSSNodes().add(cssNode_2);
 		
-		this.record.setCssInactivation(TEST_INACTIVE_DATE);
-		this.record.setCssRegistration(TEST_REGISTERED_DATE);
-		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		this.record.setCssUpTime(TEST_UPTIME);
+//		this.record.setCssInactivation(TEST_INACTIVE_DATE);
+//		this.record.setCssRegistration(TEST_REGISTERED_DATE);
+//		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//		this.record.setCssUpTime(TEST_UPTIME);
 		this.record.setEmailID(TEST_EMAIL);
 		this.record.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		this.record.setForeName(TEST_FORENAME);
@@ -80,11 +80,11 @@ public class TestXMPPBeans {
 		
 		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
+//		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
 		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
-		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
+//		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
+//		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
+//		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
 		assertEquals(TEST_EMAIL, this.record.getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), this.record.getEntity());
 		assertEquals(TEST_FORENAME, this.record.getForeName());
@@ -119,11 +119,11 @@ public class TestXMPPBeans {
 		
 		assertEquals(cssArchivedNodes.size(), bean.getProfile().getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, bean.getProfile().getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, bean.getProfile().getCssInactivation());
+//		assertEquals(TEST_INACTIVE_DATE, bean.getProfile().getCssInactivation());
 		assertEquals(cssNodes.size(), bean.getProfile().getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, bean.getProfile().getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), bean.getProfile().getStatus());
-		assertEquals(TEST_UPTIME, bean.getProfile().getCssUpTime());
+//		assertEquals(TEST_REGISTERED_DATE, bean.getProfile().getCssRegistration());
+//		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), bean.getProfile().getStatus());
+//		assertEquals(TEST_UPTIME, bean.getProfile().getCssUpTime());
 		assertEquals(TEST_EMAIL, bean.getProfile().getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), bean.getProfile().getEntity());
 		assertEquals(TEST_FORENAME, bean.getProfile().getForeName());

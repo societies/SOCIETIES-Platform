@@ -114,16 +114,10 @@ public class CssRegistry implements ICssRegistry {
 				}
 			}
 			tmpRegistryEntry = new CssRegistryEntry(
-					cssRecord.getCssHostingLocation(),
-					cssRecord.getCssIdentity(), cssRecord.getCssInactivation(),
-					cssRecord.getCssRegistration(), cssRecord.getCssUpTime(),
-					cssRecord.getDomainServer(), cssRecord.getEmailID(),
+					cssRecord.getCssIdentity(), cssRecord.getEmailID(),
 					cssRecord.getEntity(), cssRecord.getForeName(),
-					cssRecord.getHomeLocation(), cssRecord.getIdentityName(),
-					cssRecord.getImID(), cssRecord.getName(),
-					cssRecord.getPassword(), cssRecord.getPresence(),
-					cssRecord.getSex(), cssRecord.getSocialURI(),
-					cssRecord.getStatus(), cssRecord.getWorkplace(),
+					cssRecord.getHomeLocation(), cssRecord.getName(),
+					cssRecord.getSex(), cssRecord.getWorkplace(),
 					cssRecord.getPosition());
 
 			session.save(tmpRegistryEntry);
@@ -192,16 +186,10 @@ public class CssRegistry implements ICssRegistry {
 			}
 			
 			tmpRegistryEntry = new CssRegistryEntry(
-					cssRecord.getCssHostingLocation(),
-					cssRecord.getCssIdentity(), cssRecord.getCssInactivation(),
-					cssRecord.getCssRegistration(), cssRecord.getCssUpTime(),
-					cssRecord.getDomainServer(), cssRecord.getEmailID(),
+					cssRecord.getCssIdentity(), cssRecord.getEmailID(),
 					cssRecord.getEntity(), cssRecord.getForeName(),
-					cssRecord.getHomeLocation(), cssRecord.getIdentityName(),
-					cssRecord.getImID(), cssRecord.getName(),
-					cssRecord.getPassword(), cssRecord.getPresence(),
-					cssRecord.getSex(), cssRecord.getSocialURI(),
-					cssRecord.getStatus(), cssRecord.getWorkplace(),
+					cssRecord.getHomeLocation(), cssRecord.getName(),
+					cssRecord.getSex(), cssRecord.getWorkplace(),
 					cssRecord.getPosition());
 
 			session.delete(tmpRegistryEntry);
@@ -247,31 +235,15 @@ public class CssRegistry implements ICssRegistry {
 			if ((tmpRegistryEntryList != null) && (tmpRegistryEntryList.size() > 0))
 			{	
 
-				cssDetails.setDomainServer(tmpRegistryEntryList.get(0)
-						.getDomainServer());
-				cssDetails.setCssHostingLocation(tmpRegistryEntryList.get(0)
-						.getCssHostingLocation());
 				cssDetails.setEntity(tmpRegistryEntryList.get(0).getEntity());
 				cssDetails.setForeName(tmpRegistryEntryList.get(0).getForeName());
 				cssDetails.setName(tmpRegistryEntryList.get(0).getName());
-				cssDetails.setIdentityName(tmpRegistryEntryList.get(0)
-						.getIdentityName());
-				cssDetails.setPassword(tmpRegistryEntryList.get(0).getPassword());
 				cssDetails.setEmailID(tmpRegistryEntryList.get(0).getEmailID());
-				cssDetails.setImID(tmpRegistryEntryList.get(0).getImID());
-				cssDetails.setSocialURI(tmpRegistryEntryList.get(0).getSocialURI());
 				cssDetails.setSex(tmpRegistryEntryList.get(0).getSex());
 				cssDetails.setHomeLocation(tmpRegistryEntryList.get(0)
 						.getHomeLocation());
 				cssDetails.setCssIdentity(tmpRegistryEntryList.get(0)
 						.getCssIdentity());
-				cssDetails.setStatus(tmpRegistryEntryList.get(0).getStatus());
-				cssDetails.setCssRegistration(tmpRegistryEntryList.get(0)
-						.getCssRegistration());
-				cssDetails.setCssInactivation(tmpRegistryEntryList.get(0)
-						.getCssInactivation());
-				cssDetails.setCssUpTime(tmpRegistryEntryList.get(0).getCssUpTime());
-				cssDetails.setPresence(tmpRegistryEntryList.get(0).getPresence());
 				cssDetails.setWorkplace(tmpRegistryEntryList.get(0).getWorkplace());
 				cssDetails.setPosition(tmpRegistryEntryList.get(0).getPosition());
 
@@ -359,36 +331,16 @@ public class CssRegistry implements ICssRegistry {
 					.createCriteria(CssRegistryEntry.class).list();
 
 			// Now to update the main table
-			tmpCssRegistryEntryList.get(0).setDomainServer(
-					cssDetails.getDomainServer());
-			tmpCssRegistryEntryList.get(0).setCssHostingLocation(
-					cssDetails.getCssHostingLocation());
 			tmpCssRegistryEntryList.get(0).setEntity(cssDetails.getEntity());
 			tmpCssRegistryEntryList.get(0)
 					.setForeName(cssDetails.getForeName());
 			tmpCssRegistryEntryList.get(0).setName(cssDetails.getName());
-			tmpCssRegistryEntryList.get(0).setIdentityName(
-					cssDetails.getIdentityName());
-			tmpCssRegistryEntryList.get(0)
-					.setPassword(cssDetails.getPassword());
 			tmpCssRegistryEntryList.get(0).setEmailID(cssDetails.getEmailID());
-			tmpCssRegistryEntryList.get(0).setImID(cssDetails.getImID());
-			tmpCssRegistryEntryList.get(0).setSocialURI(
-					cssDetails.getSocialURI());
 			tmpCssRegistryEntryList.get(0).setSex(cssDetails.getSex());
 			tmpCssRegistryEntryList.get(0).setHomeLocation(
 					cssDetails.getHomeLocation());
 			tmpCssRegistryEntryList.get(0).setCssIdentity(
 					cssDetails.getCssIdentity());
-			tmpCssRegistryEntryList.get(0).setStatus(cssDetails.getStatus());
-			tmpCssRegistryEntryList.get(0).setCssRegistration(
-					cssDetails.getCssRegistration());
-			tmpCssRegistryEntryList.get(0).setCssInactivation(
-					cssDetails.getCssInactivation());
-			tmpCssRegistryEntryList.get(0).setCssUpTime(
-					cssDetails.getCssUpTime());
-			tmpCssRegistryEntryList.get(0)
-					.setPresence(cssDetails.getPresence());
 			tmpCssRegistryEntryList.get(0)
 			.setWorkplace(cssDetails.getWorkplace());
 			tmpCssRegistryEntryList.get(0)

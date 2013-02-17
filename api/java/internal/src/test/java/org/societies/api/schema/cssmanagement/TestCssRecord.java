@@ -74,10 +74,10 @@ public class TestCssRecord {
 //		cssProfile.getArchiveCSSNodes().add(cssNode_1);
 //		cssProfile.getArchiveCSSNodes().add(cssNode_2);
 		
-		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+//		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+//		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
 		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		cssProfile.setCssUpTime(TEST_UPTIME);
+//		cssProfile.setCssUpTime(TEST_UPTIME);
 		cssProfile.setEmailID(TEST_EMAIL);
 		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		cssProfile.setForeName(TEST_FORENAME);
@@ -93,11 +93,11 @@ public class TestCssRecord {
 		
 //		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
+//		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
 //		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
+//		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
-		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
+//		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
 		assertEquals(TEST_EMAIL, cssProfile.getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), cssProfile.getEntity());
 		assertEquals(TEST_FORENAME, cssProfile.getForeName());

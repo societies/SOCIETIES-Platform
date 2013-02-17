@@ -62,38 +62,38 @@ public class TestCssInterfaceResult {
 		this.record.getArchiveCSSNodes().add(cssNode_1);
 		this.record.getArchiveCSSNodes().add(cssNode_2);
 		
-		this.record.setCssInactivation(TEST_INACTIVE_DATE);
-		this.record.setCssRegistration(TEST_REGISTERED_DATE);
-		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		this.record.setCssUpTime(TEST_UPTIME);
+//		this.record.setCssInactivation(TEST_INACTIVE_DATE);
+//		this.record.setCssRegistration(TEST_REGISTERED_DATE);
+//		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//		this.record.setCssUpTime(TEST_UPTIME);
 		this.record.setEmailID(TEST_EMAIL);
 		this.record.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		this.record.setForeName(TEST_FORENAME);
 		this.record.setHomeLocation(TEST_HOME_LOCATION);
-		this.record.setIdentityName(TEST_IDENTITY_NAME);
-		this.record.setImID(TEST_IM_ID);
+//		this.record.setIdentityName(TEST_IDENTITY_NAME);
+//		this.record.setImID(TEST_IM_ID);
 		this.record.setName(TEST_NAME);
-		this.record.setPassword(TEST_PASSWORD);
-		this.record.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+//		this.record.setPassword(TEST_PASSWORD);
+//		this.record.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		this.record.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-		this.record.setSocialURI(TEST_SOCIAL_URI);
+//		this.record.setSocialURI(TEST_SOCIAL_URI);
 		
 		
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
-		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
-		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
+//		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
+//		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
+//		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
+//		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
 		assertEquals(TEST_EMAIL, this.record.getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), this.record.getEntity());
 		assertEquals(TEST_FORENAME, this.record.getForeName());
 		assertEquals(TEST_HOME_LOCATION, this.record.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, this.record.getIdentityName());
-		assertEquals(TEST_IM_ID, this.record.getImID());
+//		assertEquals(TEST_IDENTITY_NAME, this.record.getIdentityName());
+//		assertEquals(TEST_IM_ID, this.record.getImID());
 		assertEquals(TEST_NAME, this.record.getName());
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), this.record.getPresence());
+//		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), this.record.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), this.record.getSex());
-		assertEquals(TEST_SOCIAL_URI, this.record.getSocialURI());
+//		assertEquals(TEST_SOCIAL_URI, this.record.getSocialURI());
 
 	}
 
@@ -117,22 +117,22 @@ public class TestCssInterfaceResult {
 		assertNotNull(result.getProfile());
 		assertEquals(cssArchivedNodes.size(), result.getProfile().getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, result.getProfile().getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, result.getProfile().getCssInactivation());
+//		assertEquals(TEST_INACTIVE_DATE, result.getProfile().getCssInactivation());
 		assertEquals(cssNodes.size(), result.getProfile().getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, result.getProfile().getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), result.getProfile().getStatus());
-		assertEquals(TEST_UPTIME, result.getProfile().getCssUpTime());
+//		assertEquals(TEST_REGISTERED_DATE, result.getProfile().getCssRegistration());
+//		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), result.getProfile().getStatus());
+//		assertEquals(TEST_UPTIME, result.getProfile().getCssUpTime());
 		assertEquals(TEST_EMAIL, result.getProfile().getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), result.getProfile().getEntity());
 		assertEquals(TEST_FORENAME, result.getProfile().getForeName());
 		assertEquals(TEST_HOME_LOCATION, result.getProfile().getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, result.getProfile().getIdentityName());
-		assertEquals(TEST_IM_ID, result.getProfile().getImID());
+//		assertEquals(TEST_IDENTITY_NAME, result.getProfile().getIdentityName());
+//		assertEquals(TEST_IM_ID, result.getProfile().getImID());
 		assertEquals(TEST_NAME, result.getProfile().getName());
-		assertEquals(TEST_PASSWORD, result.getProfile().password);
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), result.getProfile().getPresence());
+//		assertEquals(TEST_PASSWORD, result.getProfile().password);
+//		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), result.getProfile().getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), result.getProfile().getSex());
-		assertEquals(TEST_SOCIAL_URI, result.getProfile().getSocialURI());
+//		assertEquals(TEST_SOCIAL_URI, result.getProfile().getSocialURI());
 
 	}
 
