@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.events.helper.EventsHelper;
 
 import android.test.AndroidTestCase;
@@ -93,56 +94,71 @@ public class TestEventsHelper extends AndroidTestCase {
 			@Override
 			public void returnAction(boolean resultFlag) {
 				assertTrue(resultFlag);
-				helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
-					
-					@Override
-					public void returnAction(String result) {
-						fail();
-					}
-					
-					@Override
-					public void returnAction(boolean resultFlag) {
-						assertTrue(resultFlag);
-						helper.getNumSubscribedNodes(new IMethodCallback() {
-							
-							@Override
-							public void returnAction(String result) {
-								assertEquals(1, Integer.parseInt(result));
-								helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
+				try {
+					helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+							fail();
+						}
+						
+						@Override
+						public void returnAction(boolean resultFlag) {
+							assertTrue(resultFlag);
+							try {
+								helper.getNumSubscribedNodes(new IMethodCallback() {
 									
 									@Override
 									public void returnAction(String result) {
-										fail();
+										assertEquals(1, Integer.parseInt(result));
+										try {
+											helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
+												
+												@Override
+												public void returnAction(String result) {
+													fail();
+												}
+												
+												@Override
+												public void returnAction(boolean resultFlag) {
+													assertTrue(resultFlag);
+													helper.tearDownService(new IMethodCallback() {
+														
+														@Override
+														public void returnAction(String result) {
+															fail();
+														}
+														
+														@Override
+														public void returnAction(boolean resultFlag) {
+															assertTrue(resultFlag);
+															TestEventsHelper.this.testCompleted = true;
+															latch.countDown();
+														}
+													});
+												}
+											});
+										} catch (PlatformEventsHelperNotConnectedException e) {
+											e.printStackTrace();
+											fail();
+										}
 									}
 									
 									@Override
 									public void returnAction(boolean resultFlag) {
-										assertTrue(resultFlag);
-										helper.tearDownService(new IMethodCallback() {
-											
-											@Override
-											public void returnAction(String result) {
-												fail();
-											}
-											
-											@Override
-											public void returnAction(boolean resultFlag) {
-												assertTrue(resultFlag);
-												TestEventsHelper.this.testCompleted = true;
-												latch.countDown();
-											}
-										});
+										fail();
 									}
 								});
-							}
-							
-							@Override
-							public void returnAction(boolean resultFlag) {
+							} catch (PlatformEventsHelperNotConnectedException e) {
+								e.printStackTrace();
 								fail();
 							}
-						});
-					}
-				});
+						}
+					});
+				} catch (PlatformEventsHelperNotConnectedException e) {
+					e.printStackTrace();
+					fail();
+				}
 			}
 		});
 		
@@ -165,56 +181,71 @@ public class TestEventsHelper extends AndroidTestCase {
 			@Override
 			public void returnAction(boolean resultFlag) {
 				assertTrue(resultFlag);
-				helper.subscribeToEvents(INTENTS_FILTER, new IMethodCallback() {
-					
-					@Override
-					public void returnAction(String result) {
-						fail();
-					}
-					
-					@Override
-					public void returnAction(boolean resultFlag) {
-						assertTrue(resultFlag);
-						helper.getNumSubscribedNodes(new IMethodCallback() {
-							
-							@Override
-							public void returnAction(String result) {
-								assertEquals(NUM_FILTER_EVENTS, Integer.parseInt(result));
-								helper.unSubscribeFromEvents(INTENTS_FILTER, new IMethodCallback() {
+				try {
+					helper.subscribeToEvents(INTENTS_FILTER, new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+							fail();
+						}
+						
+						@Override
+						public void returnAction(boolean resultFlag) {
+							assertTrue(resultFlag);
+							try {
+								helper.getNumSubscribedNodes(new IMethodCallback() {
 									
 									@Override
 									public void returnAction(String result) {
-										fail();
+										assertEquals(NUM_FILTER_EVENTS, Integer.parseInt(result));
+										try {
+											helper.unSubscribeFromEvents(INTENTS_FILTER, new IMethodCallback() {
+												
+												@Override
+												public void returnAction(String result) {
+													fail();
+												}
+												
+												@Override
+												public void returnAction(boolean resultFlag) {
+													assertTrue(resultFlag);
+													helper.tearDownService(new IMethodCallback() {
+														
+														@Override
+														public void returnAction(String result) {
+															fail();
+														}
+														
+														@Override
+														public void returnAction(boolean resultFlag) {
+															assertTrue(resultFlag);
+															TestEventsHelper.this.testCompleted = true;
+															latch.countDown();
+														}
+													});
+												}
+											});
+										} catch (PlatformEventsHelperNotConnectedException e) {
+											e.printStackTrace();
+											fail();
+										}
 									}
 									
 									@Override
 									public void returnAction(boolean resultFlag) {
-										assertTrue(resultFlag);
-										helper.tearDownService(new IMethodCallback() {
-											
-											@Override
-											public void returnAction(String result) {
-												fail();
-											}
-											
-											@Override
-											public void returnAction(boolean resultFlag) {
-												assertTrue(resultFlag);
-												TestEventsHelper.this.testCompleted = true;
-												latch.countDown();
-											}
-										});
+										fail();
 									}
 								});
-							}
-							
-							@Override
-							public void returnAction(boolean resultFlag) {
+							} catch (PlatformEventsHelperNotConnectedException e) {
+								e.printStackTrace();
 								fail();
 							}
-						});
-					}
-				});
+						}
+					});
+				} catch (PlatformEventsHelperNotConnectedException e) {
+					e.printStackTrace();
+					fail();
+				}
 			}
 		});
 		

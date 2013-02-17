@@ -1,6 +1,7 @@
 package org.societies.android.api.events;
 
 import org.societies.android.api.comms.IMethodCallback;
+
 import org.societies.android.api.services.ICoreSocietiesServices;
 /**
  * Companion interface to the <{@link IAndroidSocietiesEvents} interface 
@@ -17,7 +18,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean subscribeToEvent(String societiesIntent, IMethodCallback callback);
+	boolean subscribeToEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Subscribe to Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -27,7 +28,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean subscribeToEvents(String intentFilter, IMethodCallback callback);
+	boolean subscribeToEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Subscribe to all platform events. This should only be used if really required.
@@ -35,7 +36,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean subscribeToAllEvents(IMethodCallback callback);
+	boolean subscribeToAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Un-subscribe from a specified Societies platform event (Android Intent)
@@ -44,7 +45,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean unSubscribeFromEvent(String societiesIntent, IMethodCallback callback);
+	boolean unSubscribeFromEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Un-subscribe from Societies platform events (Android Intent), specified with a filter. All platform events 
@@ -54,7 +55,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean unSubscribeFromEvents(String intentFilter, IMethodCallback callback);
+	boolean unSubscribeFromEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Un-subscribe from all current platform event subscriptions.
@@ -62,7 +63,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean true if subscription takes place
 	 */
-	boolean unSubscribeFromAllEvents(IMethodCallback callback);
+	boolean unSubscribeFromAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Publish an event to the Societies platform for consumption by other CSS nodes
@@ -72,7 +73,7 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return boolean - returned via Android intent
 	 */
-	boolean publishEvent(String societiesIntent, Object eventPayload, IMethodCallback callback);
+	boolean publishEvent(String societiesIntent, Object eventPayload, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 	
 	/**
 	 * Obtain the current number of subscribed to events
@@ -80,6 +81,6 @@ public interface IAndroidSocietiesEventsHelper extends ICoreSocietiesServices {
 	 * @param callback callback to return the value
 	 * @return int number of subscribed to events (returned in String form)
 	 */
-	int getNumSubscribedNodes(IMethodCallback callback);
+	int getNumSubscribedNodes(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException;
 
 }

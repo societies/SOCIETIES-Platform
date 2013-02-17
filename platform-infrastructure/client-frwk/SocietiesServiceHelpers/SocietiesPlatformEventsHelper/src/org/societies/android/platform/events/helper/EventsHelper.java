@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IAndroidSocietiesEventsHelper;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.utilities.DBC.Dbc;
@@ -126,307 +127,339 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean subscribeToEvent(String societiesIntent, IMethodCallback callback) {
+	public boolean subscribeToEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToEvent called for intent: " + societiesIntent);
-
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.subscribeToEvent.ordinal());
-		this.methodQueues[classMethods.subscribeToEvent.ordinal()].add(callback);
 		
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[0];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
-		Log.d(LOG_TAG, "intent: " + societiesIntent);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.subscribeToEvent.ordinal());
+			this.methodQueues[classMethods.subscribeToEvent.ordinal()].add(callback);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[0];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
+			Log.d(LOG_TAG, "intent: " + societiesIntent);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean subscribeToEvents(String intentFilter, IMethodCallback callback) {
+	public boolean subscribeToEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToEvents called for filter: " + intentFilter);
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.subscribeToEvents.ordinal());
-		this.methodQueues[classMethods.subscribeToEvents.ordinal()].add(callback);
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.subscribeToEvents.ordinal());
+			this.methodQueues[classMethods.subscribeToEvents.ordinal()].add(callback);
 
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[1];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[1];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
 
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
 
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), intentFilter);
-		Log.d(LOG_TAG, "intent: " + intentFilter);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), intentFilter);
+			Log.d(LOG_TAG, "intent: " + intentFilter);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
 	}
 
 	@Override
-	public boolean subscribeToAllEvents(IMethodCallback callback) {
+	public boolean subscribeToAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToAllEvents called");
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.subscribeToAllEvents.ordinal());
-		this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].add(callback);
-		
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[2];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.subscribeToAllEvents.ordinal());
+			this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].add(callback);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[2];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
 	}
 
 	@Override
-	public boolean unSubscribeFromEvent(String societiesIntent, IMethodCallback callback) {
+	public boolean unSubscribeFromEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromEvent called for intent: " + societiesIntent);
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.unSubscribeFromEvent.ordinal());
-		this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].add(callback);
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.unSubscribeFromEvent.ordinal());
+			this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].add(callback);
 
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[3];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[3];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
 
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
 
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
-		Log.d(LOG_TAG, "intent: " + societiesIntent);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
+			Log.d(LOG_TAG, "intent: " + societiesIntent);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean unSubscribeFromEvents(String intentFilter, IMethodCallback callback) {
+	public boolean unSubscribeFromEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromEvents called for filter: " + intentFilter);
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.unSubscribeFromEvents.ordinal());
-		this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].add(callback);
-		
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[4];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), intentFilter);
-		Log.d(LOG_TAG, "intent: " + intentFilter);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.unSubscribeFromEvents.ordinal());
+			this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].add(callback);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[4];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), intentFilter);
+			Log.d(LOG_TAG, "intent: " + intentFilter);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
 	}
 
 	@Override
-	public boolean unSubscribeFromAllEvents(IMethodCallback callback) {
+	public boolean unSubscribeFromAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromAllEvents called");
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.unSubscribeFromAllEvents.ordinal());
-		this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].add(callback);
-		
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[5];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.unSubscribeFromAllEvents.ordinal());
+			this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].add(callback);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[5];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
 	}
 
 	@Override
-	public boolean publishEvent(String societiesIntent, Object eventPayload, IMethodCallback callback) {
+	public boolean publishEvent(String societiesIntent, Object eventPayload, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Event payload object class cannot be null", null != eventPayload);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "publishEvent called for intent: " + societiesIntent);
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.publishEvent.ordinal());
-		this.methodQueues[classMethods.publishEvent.ordinal()].add(callback);
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.publishEvent.ordinal());
+			this.methodQueues[classMethods.publishEvent.ordinal()].add(callback);
 
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[6];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[6];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
 
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-		
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
-		Log.d(LOG_TAG, "intent: " + societiesIntent);
-		
-		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), (Parcelable) eventPayload);
-		Log.d(LOG_TAG, "event payload: " + eventPayload.getClass().getName());
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), societiesIntent);
+			Log.d(LOG_TAG, "intent: " + societiesIntent);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), (Parcelable) eventPayload);
+			Log.d(LOG_TAG, "event payload: " + eventPayload.getClass().getName());
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
 	}
 
 	@Override
-	public int getNumSubscribedNodes(IMethodCallback callback) {
+	public int getNumSubscribedNodes(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "getNumSubscribedNodes called");
 
-		//add callback class to method queue tail
-		initialiseQueue(classMethods.getNumSubscribedNodes.ordinal());
-		this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].add(callback);
-		
-		//Select target method and create message to convey remote invocation
-   		String targetMethod = IAndroidSocietiesEvents.methodsArray[7];
-		android.os.Message outMessage = 
-				android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-
-		Bundle outBundle = new Bundle();
-		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
-		Log.d(LOG_TAG, "client: " + this.clientPackageName);
-		
-   		outMessage.setData(outBundle);
-		Log.d(LOG_TAG, "Call service method: " + targetMethod);
-
-		try {
-			this.targetService.send(outMessage);
-		} catch (RemoteException e) {
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.getNumSubscribedNodes.ordinal());
+			this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].add(callback);
 			
-			//Retrieve callback and signal failure
-			IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
-			if (null != retrievedCallback) {
-				retrievedCallback.returnAction(false);
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[7];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+		} else {
+			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return 0;
 	}

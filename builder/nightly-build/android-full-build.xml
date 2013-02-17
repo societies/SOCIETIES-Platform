@@ -73,6 +73,8 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
 		<!-- Not building
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
+		<!-- Client Framework Service Helpers -->
+               <module>../../platform-infrastructure/client-frwk/SocietiesServiceHelpers/SocietiesPlatformEventsHelper</module>
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
