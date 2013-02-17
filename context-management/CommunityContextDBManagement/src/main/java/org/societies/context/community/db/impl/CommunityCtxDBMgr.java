@@ -695,9 +695,9 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		if (origin == null)
 			throw new NullPointerException("bondOriginType can't be null");
 
-		final CommunityCtxEntityBaseDAO entityDAO;
+		final CommunityCtxEntityDAO entityDAO;
 		try {
-			entityDAO = this.retrieve(CommunityCtxEntityBaseDAO.class, scope);
+			entityDAO = this.retrieve(CommunityCtxEntityDAO.class, scope);
 		} catch (Exception e) {
 			throw new CommunityCtxDBMgrException("Could not create bond of model type '"
 					+ modelType + " and type '" + type + "': " + e.getLocalizedMessage(), e);

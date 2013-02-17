@@ -447,17 +447,17 @@ public class CommunityCtxDBMgrTest {
 		assertEquals(2, bonds.size());
 
 		CtxBond bond4 = bonds.get(0);
-		assertEquals(bond2.getModelType(), bond4.getModelType());
-		assertEquals(bond2.getType(), bond4.getType());
-		assertEquals(bond2.getOriginType(), bond4.getOriginType());
-//		assertEquals(bond2, bond4);
+		assertEquals(bond1.getModelType(), bond4.getModelType());
+		assertEquals(bond1.getType(), bond4.getType());
+		assertEquals(bond1.getOriginType(), bond4.getOriginType());
+//		assertEquals(bond1, bond4);
 //		assertTrue(bonds.get(0).equals(bond1));
-//		assertTrue(bonds.contains(bond2));
+//		assertTrue(bonds.contains(bond1));
 
 		CtxBond bond5 = bonds.get(1);
-		assertEquals(bond1.getModelType(), bond5.getModelType());
-		assertEquals(bond1.getType(), bond1.getType());
-		assertEquals(bond1.getOriginType(), bond1.getOriginType());
+		assertEquals(bond2.getModelType(), bond5.getModelType());
+		assertEquals(bond2.getType(), bond5.getType());
+		assertEquals(bond2.getOriginType(), bond5.getOriginType());
 		
 //		System.out.println("the Bonds are - " + bonds);
 //		commEntity.addBond(bond);

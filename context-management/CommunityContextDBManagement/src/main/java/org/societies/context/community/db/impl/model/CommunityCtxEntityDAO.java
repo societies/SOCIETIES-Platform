@@ -27,6 +27,7 @@ package org.societies.context.community.db.impl.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -37,6 +38,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -107,6 +109,15 @@ public class CommunityCtxEntityDAO extends CommunityCtxEntityBaseDAO {
 	
 	private static final long serialVersionUID = -4415679433140566711L;
 
+	@OneToMany(
+			cascade = { CascadeType.ALL },
+			fetch = FetchType.EAGER,
+			mappedBy="entity",
+			orphanRemoval = true,
+			targetEntity = CommunityCtxBondDAO.class
+	)
+	private Set<CommunityCtxBondDAO> bonds = new HashSet<CommunityCtxBondDAO>();
+
 	CommunityCtxEntityDAO() {
 		
 		super();
@@ -143,5 +154,17 @@ public class CommunityCtxEntityDAO extends CommunityCtxEntityBaseDAO {
 	
 		this.members = members;
 	}
+
+	public Set<CommunityCtxBondDAO> getBonds() {
+		
+		return this.bonds;
+	}
 	
+	public void addBond(CommunityCtxBondDAO bond) {
+		
+		this.bonds.add(bond);
+	
+		bond.setEntity(this);
+
+	}
 }

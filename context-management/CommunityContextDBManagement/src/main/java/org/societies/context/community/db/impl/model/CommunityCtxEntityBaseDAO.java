@@ -137,15 +137,6 @@ public class CommunityCtxEntityBaseDAO extends CtxModelObjectDAO {
 	)
 	private Set<CommunityCtxAttributeDAO> attributes = new HashSet<CommunityCtxAttributeDAO>();
 	
-	@OneToMany(
-			cascade = { CascadeType.ALL },
-			fetch = FetchType.EAGER,
-			mappedBy="entity",
-			orphanRemoval = true,
-			targetEntity = CommunityCtxBondDAO.class
-	)
-	private Set<CommunityCtxBondDAO> bonds = new HashSet<CommunityCtxBondDAO>();
-
 	@Transient
 	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
 	
@@ -192,17 +183,5 @@ public class CommunityCtxEntityBaseDAO extends CtxModelObjectDAO {
 		
 		this.associations = associations;
 	}
-
-	public Set<CommunityCtxBondDAO> getBonds() {
 	
-		return this.bonds;
-	}
-	
-	public void addBond(CommunityCtxBondDAO bond) {
-		
-		this.bonds.add(bond);
-	
-		bond.setEntity(this);
-
-	}
 }
