@@ -36,6 +36,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 
 /**
@@ -112,6 +113,29 @@ public interface ICommunityCtxDBMgr {
 	public CtxAssociation createAssociation(final String cisId,
 			final String type) throws CtxException;
 
+	/**
+	 * Creates a {@link CtxBond} with the specified context model type, context type 
+	 * and origin.
+	 * 
+	 * @param scope
+	 *            the identifier of the context entity to associate with the
+	 *            new bond.
+	 * @param modelType
+	 *            the context model type, i.e. {@link CtxModelType#ATTRIBUTE} or
+	 *            {@link CtxModelType#ASSOCIATION}
+	 * @param type
+	 *            the context type, e.g. "location"
+	 * @param originType
+	 *            the origin
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>
+	 * @thows CtxException 
+	 * 
+	 * @since 1.0 
+	 */
+	public CtxBond createBond(final CtxEntityIdentifier scope, final CtxModelType modelType, 
+			final String type, final CtxBondOriginType originType ) throws CtxException;
+	
 	/**
 	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
 	 * CtxAssociations, of the specified type.
@@ -198,7 +222,7 @@ public interface ICommunityCtxDBMgr {
 	 * @throws CtxException
 	 * @since 0.0.1
 	 */
-	public CtxBond retrieveBonds(CtxEntityIdentifier community) throws CtxException;
+	public List<CtxBond> retrieveBonds(CtxEntityIdentifier community) throws CtxException;
 
 	/**
 	 * Retrieves a list of Individual Context Entities that are members of the

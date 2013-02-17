@@ -47,6 +47,7 @@ import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -59,6 +60,7 @@ import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.societies.context.community.db.impl.model.CommunityCtxBondDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxModelDAOTranslator;
 import org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO;
@@ -67,6 +69,7 @@ import org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxEntityDAO;
 import org.societies.context.community.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxQualityDAO;
+import org.societies.context.community.db.impl.model.hibernate.CtxBondCompositeType;
 import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -404,10 +407,29 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public CtxBond retrieveBonds(CtxEntityIdentifier ctxId) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<CtxBond> retrieveBonds(CtxEntityIdentifier ctxId) throws CtxException {
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		final List<CtxBond> bonds = new ArrayList<CtxBond>();
+
+		final Session session = sessionFactory.openSession();
+		try {
+			final Query query = session.getNamedQuery("getCtxBondsByCommunityCtxEntityId");
+			query.setParameter("ctxId", ctxId.toString(), Hibernate.STRING);
+			bonds.addAll((List<CtxBond>)query.list());
+			
+        } catch (Exception e) {
+        	throw new CommunityCtxDBMgrException("Could not retrieve bonds for community entity '"
+        			+ ctxId + "': "	+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+			
+		return bonds;
 	}
 	
 	/*
@@ -505,6 +527,16 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
                 		}	            			
                 		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
                 		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
+                		
+            			query = session.getNamedQuery("getCommunityCtxEntitysBonds");
+            			query.setParameter("ctxId", ((CommunityCtxEntityBaseDAO) dao).getId().toString(), 
+            					Hibernate.STRING);
+            			final List<CommunityCtxBondDAO> bonds = query.list();
+
+                		for (final CommunityCtxBondDAO bond : bonds) {
+                    		((CommunityCtxEntityDAO) dao).addBond(bond);
+                		}
+                		
             		} else if (dao instanceof CommunityCtxEntityBaseDAO) {
             			// Retrieve CtxAssociationIds where this entity is parent
             			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
@@ -647,4 +679,66 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		
 		return objectNumberDAO.getNextValue();
 	}
+
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createBond(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String, org.societies.api.context.model.CtxBondOriginType)
+	 */
+	public CtxBond createBond(CtxEntityIdentifier scope, CtxModelType modelType, 
+			String type, CtxBondOriginType origin) throws CtxException {
+
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (origin == null)
+			throw new NullPointerException("bondOriginType can't be null");
+
+		final CommunityCtxEntityBaseDAO entityDAO;
+		try {
+			entityDAO = this.retrieve(CommunityCtxEntityBaseDAO.class, scope);
+		} catch (Exception e) {
+			throw new CommunityCtxDBMgrException("Could not create bond of model type '"
+					+ modelType + " and type '" + type + "': " + e.getLocalizedMessage(), e);
+		}
+		if (entityDAO == null)	
+			throw new CommunityCtxDBMgrException("Could not create bond of model type '" 
+					+ modelType + " and type '" + type + "': Scope not found: " + scope);
+
+		final CtxBond bond = new CtxBond(modelType, type, origin);
+		final CommunityCtxBondDAO bondDAO = new CommunityCtxBondDAO(bond);
+		entityDAO.addBond(bondDAO);
+		
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.save(bondDAO);
+			tx.commit();				
+		} catch (Exception e) {
+			if (tx != null)
+				tx.rollback();
+			throw new CommunityCtxDBMgrException("Could not create bond of model type '"
+					+ modelType + " and type '" + type + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+/*		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+*/
+//		return (CtxAttribute) this.retrieve(id);
+		return bond;
+
+	}
+
 }

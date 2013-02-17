@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public abstract class CtxBond implements Serializable {
+public class CtxBond implements Serializable {
 	
 	private static final long serialVersionUID = 2972314471738603009L;
 
@@ -67,7 +67,7 @@ public abstract class CtxBond implements Serializable {
 	 * @throws IllegalArgumentException if the specified modelType is not one of
 	 *         {@link CtxModelType#ATTRIBUTE} or {@link CtxModelType#ASSOCIATION}
 	 */
-	CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
+	public CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
 		
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");
@@ -86,6 +86,7 @@ public abstract class CtxBond implements Serializable {
 		this.modelType = modelType;
 		this.type = type;
 		this.originType = originType;
+		
 	}
 	
 	/**

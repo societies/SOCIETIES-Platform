@@ -36,6 +36,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -43,10 +45,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.context.community.db.impl.model.hibernate.CtxBondCompositeType;
 
 /**
  * Describe your class here...
@@ -132,6 +137,15 @@ public class CommunityCtxEntityBaseDAO extends CtxModelObjectDAO {
 	)
 	private Set<CommunityCtxAttributeDAO> attributes = new HashSet<CommunityCtxAttributeDAO>();
 	
+	@OneToMany(
+			cascade = { CascadeType.ALL },
+			fetch = FetchType.EAGER,
+			mappedBy="entity",
+			orphanRemoval = true,
+			targetEntity = CommunityCtxBondDAO.class
+	)
+	private Set<CommunityCtxBondDAO> bonds = new HashSet<CommunityCtxBondDAO>();
+
 	@Transient
 	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
 	
@@ -178,5 +192,17 @@ public class CommunityCtxEntityBaseDAO extends CtxModelObjectDAO {
 		
 		this.associations = associations;
 	}
+
+	public Set<CommunityCtxBondDAO> getBonds() {
 	
+		return this.bonds;
+	}
+	
+	public void addBond(CommunityCtxBondDAO bond) {
+		
+		this.bonds.add(bond);
+	
+		bond.setEntity(this);
+
+	}
 }

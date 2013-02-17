@@ -29,7 +29,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,6 +41,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -74,6 +78,8 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING7 = "myCIS7.societies.local";
 	private static final String CIS_IIDENTITY_STRING8 = "myCIS8.societies.local";
 	private static final String CIS_IIDENTITY_STRING9 = "myCIS9.societies.local";
+	private static final String CIS_IIDENTITY_STRING10 = "myCIS10.societies.local";
+	private static final String CIS_IIDENTITY_STRING11 = "myCIS11.societies.local";
 	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
 	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
@@ -125,6 +131,9 @@ public class CommunityCtxDBMgrTest {
 		assertTrue(entity.getAttributes().isEmpty());
 //		assertNotNull(entity.getAssociations());
 //		assertEquals(2, entity.getAssociations().size());
+		
+		assertNotNull(entity.getBonds());
+		assertTrue(entity.getAttributes().isEmpty());
 	}
 
 	@Test
@@ -293,6 +302,9 @@ public class CommunityCtxDBMgrTest {
 		assertEquals(entity.getAttributes().size(), entityFromDb.getAttributes().size());
 		assertNotNull(entityFromDb.getAssociations());
 		assertEquals(entity.getAssociations().size(), entityFromDb.getAssociations().size());
+		
+		assertNotNull(entityFromDb.getBonds());
+		assertEquals(entity.getBonds().size(), entityFromDb.getBonds().size());
 	}
 /*   
    @Test
@@ -416,4 +428,44 @@ public class CommunityCtxDBMgrTest {
 	   assertTrue(entity.getMembers().contains(childEntityId));
 	   assertTrue(entity.getMembers().contains(childEntityId2));
    }
+   
+	@Test
+	public void testBonds() throws CtxException {
+
+		CommunityCtxEntity commEntity = 
+				this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING10);
+		CommunityCtxEntity commEntity2 = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING11);
+
+		CtxBond bond1 = this.communityDB.createBond(commEntity.getId(), CtxModelType.ATTRIBUTE, "location", CtxBondOriginType.MANUALLY_SET);
+		CtxBond bond2 = this.communityDB.createBond(commEntity.getId(), CtxModelType.ASSOCIATION, "inRelationship", CtxBondOriginType.MANUALLY_SET);
+		CtxBond bond3 = this.communityDB.createBond(commEntity2.getId(), CtxModelType.ATTRIBUTE, "location", CtxBondOriginType.MANUALLY_SET);
+		
+
+		List<CtxBond> bonds = new ArrayList<CtxBond>();
+		
+		bonds = this.communityDB.retrieveBonds(commEntity.getId());
+		assertEquals(2, bonds.size());
+
+		CtxBond bond4 = bonds.get(0);
+		assertEquals(bond2.getModelType(), bond4.getModelType());
+		assertEquals(bond2.getType(), bond4.getType());
+		assertEquals(bond2.getOriginType(), bond4.getOriginType());
+//		assertEquals(bond2, bond4);
+//		assertTrue(bonds.get(0).equals(bond1));
+//		assertTrue(bonds.contains(bond2));
+
+		CtxBond bond5 = bonds.get(1);
+		assertEquals(bond1.getModelType(), bond5.getModelType());
+		assertEquals(bond1.getType(), bond1.getType());
+		assertEquals(bond1.getOriginType(), bond1.getOriginType());
+		
+//		System.out.println("the Bonds are - " + bonds);
+//		commEntity.addBond(bond);
+//		commEntity = (CommunityCtxEntity) this.communityDB.update(commEntity);
+
+		commEntity = (CommunityCtxEntity) this.communityDB.retrieve(commEntity.getId());
+		assertNotNull(commEntity.getBonds());
+//		assertTrue(commEntity.getBonds().contains(bond1));
+	}
+	
 }

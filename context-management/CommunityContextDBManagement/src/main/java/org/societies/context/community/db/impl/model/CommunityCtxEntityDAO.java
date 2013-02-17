@@ -27,15 +27,25 @@ package org.societies.context.community.db.impl.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.context.community.db.impl.model.hibernate.CtxBondCompositeType;
+import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
 
 /**
  * Describe your class here...
@@ -133,5 +143,5 @@ public class CommunityCtxEntityDAO extends CommunityCtxEntityBaseDAO {
 	
 		this.members = members;
 	}
-
+	
 }
