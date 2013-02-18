@@ -44,6 +44,7 @@ public interface ICisMgmtPerformanceTest {
 	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, JoinCisParameters joinCisParameters);
 	
 	/**
+	 * To test the creation of a CIS with a privacy policy  
 	 * 
 	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
 	 * @param createCisParameters an object containing parameters needed for this test
