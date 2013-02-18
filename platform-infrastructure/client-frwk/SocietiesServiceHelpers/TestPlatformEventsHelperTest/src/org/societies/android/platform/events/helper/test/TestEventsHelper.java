@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.events.helper.EventsHelper;
 
@@ -95,10 +96,10 @@ public class TestEventsHelper extends AndroidTestCase {
 			public void returnAction(boolean resultFlag) {
 				assertTrue(resultFlag);
 				try {
-					helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
+					helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 						
 						@Override
-						public void returnAction(String result) {
+						public void returnAction(int result) {
 							fail();
 						}
 						
@@ -106,16 +107,16 @@ public class TestEventsHelper extends AndroidTestCase {
 						public void returnAction(boolean resultFlag) {
 							assertTrue(resultFlag);
 							try {
-								helper.getNumSubscribedNodes(new IMethodCallback() {
+								helper.getNumSubscribedNodes(new IPlatformEventsCallback() {
 									
 									@Override
-									public void returnAction(String result) {
-										assertEquals(1, Integer.parseInt(result));
+									public void returnAction(int result) {
+										assertEquals(1, result);
 										try {
-											helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IMethodCallback() {
+											helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 												
 												@Override
-												public void returnAction(String result) {
+												public void returnAction(int result) {
 													fail();
 												}
 												
@@ -182,10 +183,10 @@ public class TestEventsHelper extends AndroidTestCase {
 			public void returnAction(boolean resultFlag) {
 				assertTrue(resultFlag);
 				try {
-					helper.subscribeToEvents(INTENTS_FILTER, new IMethodCallback() {
+					helper.subscribeToEvents(INTENTS_FILTER, new IPlatformEventsCallback() {
 						
 						@Override
-						public void returnAction(String result) {
+						public void returnAction(int result) {
 							fail();
 						}
 						
@@ -193,16 +194,16 @@ public class TestEventsHelper extends AndroidTestCase {
 						public void returnAction(boolean resultFlag) {
 							assertTrue(resultFlag);
 							try {
-								helper.getNumSubscribedNodes(new IMethodCallback() {
+								helper.getNumSubscribedNodes(new IPlatformEventsCallback() {
 									
 									@Override
-									public void returnAction(String result) {
-										assertEquals(NUM_FILTER_EVENTS, Integer.parseInt(result));
+									public void returnAction(int result) {
+										assertEquals(NUM_FILTER_EVENTS, result);
 										try {
-											helper.unSubscribeFromEvents(INTENTS_FILTER, new IMethodCallback() {
+											helper.unSubscribeFromEvents(INTENTS_FILTER, new IPlatformEventsCallback() {
 												
 												@Override
-												public void returnAction(String result) {
+												public void returnAction(int result) {
 													fail();
 												}
 												
@@ -248,6 +249,38 @@ public class TestEventsHelper extends AndroidTestCase {
 				}
 			}
 		});
+		
+		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
+		assertTrue(this.testCompleted);
+	}
+	
+	@MediumTest
+	/**
+	 * Try using the service with setting it up
+	 * @throws Exception
+	 */
+	public void testIllegalServiceUsage() throws Exception {
+		this.testCompleted = false;
+		final CountDownLatch latch = new CountDownLatch(1);
+		
+		final EventsHelper helper = new EventsHelper(getContext());
+		
+		try {
+			helper.subscribeToAllEvents(new IPlatformEventsCallback() {
+				
+				@Override
+				public void returnAction(int result) {
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+				}
+			});
+			fail();
+		} catch (PlatformEventsHelperNotConnectedException p) {
+			assertNotNull(p);
+			this.testCompleted = true;
+		}
 		
 		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
 		assertTrue(this.testCompleted);

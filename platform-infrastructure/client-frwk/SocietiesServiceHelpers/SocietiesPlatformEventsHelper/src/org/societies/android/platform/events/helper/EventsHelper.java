@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IAndroidSocietiesEventsHelper;
+import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
@@ -50,7 +51,10 @@ import android.os.RemoteException;
 import android.util.Log;
 /**
  * This class provides a simple callback interface to the Societies Android Platform Events service
- * It assumes that the service has already been bound to the Android Comms and Pubsub services
+ * It assumes that the service has already been bound to the Android Comms and Pubsub services.
+ * 
+ * TODO: Insert a timer to automatically unbind from the Platform Events service after a defined amount 
+ * of inactivity
  *
  */
 public class EventsHelper implements IAndroidSocietiesEventsHelper {
@@ -60,8 +64,6 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	
 	//Class method enum. Ensure that it remains up to date. Order does not matter. 
     private enum classMethods {
-    	setupService,
-    	teardownService,
     	subscribeToEvent,
     	subscribeToEvents,
     	subscribeToAllEvents,
@@ -77,11 +79,13 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	private boolean connectedToEvents;
 	private Messenger targetService;
 	private BroadcastReceiver receiver;
+	private IMethodCallback startupCallback;
+	
 	
 	//Array of queues to store callbacks for each method
 	//Assumption is that similar method calls will be answered in correct order
 	//as remote service call is via Messenger mechanism which is itself queue oriented
-	private ConcurrentLinkedQueue<IMethodCallback> methodQueues [];
+	private ConcurrentLinkedQueue<IPlatformEventsCallback> methodQueues [];
 
 	/**
 	 * Default constructor
@@ -93,7 +97,8 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 		this.clientPackageName = this.context.getApplicationContext().getPackageName();
 		this.connectedToEvents = false;
 		this.targetService = null;
-		this.methodQueues = (ConcurrentLinkedQueue<IMethodCallback>[])new ConcurrentLinkedQueue[NUM_METHODS];
+		this.methodQueues = (ConcurrentLinkedQueue<IPlatformEventsCallback>[])new ConcurrentLinkedQueue[NUM_METHODS];
+		this.startupCallback = null;
 		
 	}
 
@@ -104,10 +109,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 		if (!this.connectedToEvents) {
 			this.setupBroadcastReceiver();
 
-			//add callback class to method queue tail
-			initialiseQueue(classMethods.setupService.ordinal());
-			this.methodQueues[classMethods.setupService.ordinal()].add(callback);
-			
+			this.startupCallback = callback;
         	Intent serviceIntent = new Intent(ICoreSocietiesServices.EVENTS_SERVICE_INTENT);
         	this.context.bindService(serviceIntent, eventsConnection, Context.BIND_AUTO_CREATE);
 		}
@@ -127,7 +129,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean subscribeToEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean subscribeToEvent(String societiesIntent, IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToEvent called for intent: " + societiesIntent);
@@ -157,7 +159,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -171,7 +173,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean subscribeToEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean subscribeToEvents(String intentFilter, IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToEvents called for filter: " + intentFilter);
@@ -201,7 +203,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -214,7 +216,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean subscribeToAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean subscribeToAllEvents(IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "subscribeToAllEvents called");
 
@@ -240,7 +242,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -253,7 +255,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean unSubscribeFromEvent(String societiesIntent, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean unSubscribeFromEvent(String societiesIntent, IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromEvent called for intent: " + societiesIntent);
@@ -283,7 +285,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -297,7 +299,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean unSubscribeFromEvents(String intentFilter, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean unSubscribeFromEvents(String intentFilter, IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent filter must be specified", null != intentFilter && intentFilter.length() > 0);
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromEvents called for filter: " + intentFilter);
@@ -327,7 +329,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -340,7 +342,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean unSubscribeFromAllEvents(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean unSubscribeFromAllEvents(IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "unSubscribeFromAllEvents called");
 
@@ -366,7 +368,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -379,7 +381,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public boolean publishEvent(String societiesIntent, Object eventPayload, IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public boolean publishEvent(String societiesIntent, Object eventPayload, IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Intent event must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		Dbc.require("Event payload object class cannot be null", null != eventPayload);
 		Dbc.require("Callback class must be specified", null != callback);
@@ -413,7 +415,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -426,7 +428,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	}
 
 	@Override
-	public int getNumSubscribedNodes(IMethodCallback callback) throws PlatformEventsHelperNotConnectedException {
+	public int getNumSubscribedNodes(IPlatformEventsCallback callback) throws PlatformEventsHelperNotConnectedException {
 		Dbc.require("Callback class must be specified", null != callback);
 		Log.d(LOG_TAG, "getNumSubscribedNodes called");
 
@@ -452,7 +454,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			} catch (RemoteException e) {
 				
 				//Retrieve callback and signal failure
-				IMethodCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
@@ -475,6 +477,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 
         public void onServiceDisconnected(ComponentName name) {
         	Log.d(LOG_TAG, "Disconnecting from Platform Events service");
+        	
+        	//Unregister broadcast receiver if service binding broken. Otherwise
+        	//the next set-up of the service will one extra receiver causing possible problems.
+			EventsHelper.this.teardownBroadcastReceiver();
         	connectedToEvents = false;
         }
 
@@ -486,12 +492,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
         	EventsHelper.this.targetService = new Messenger(service);
         	Log.d(LOG_TAG, "Target service " + name.getShortClassName() + " acquired: " + EventsHelper.this.targetService.getClass().getName());
         	
-			IMethodCallback callback = EventsHelper.this.methodQueues[classMethods.setupService.ordinal()].poll();
 			Log.d(LOG_TAG, "Retrieve setup callback");
-			if (null != callback) {
+			if (null != EventsHelper.this.startupCallback) {
 				Log.d(LOG_TAG, "Setup callback valid");
-				
-				callback.returnAction(true);
+				EventsHelper.this.startupCallback.returnAction(true);
 			}
         }
     };
@@ -509,45 +513,45 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.PUBLISH_EVENT)) {
-//				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()].poll();
+//				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()].poll();
 //				if (null != retrievedCallback) {
 //					retrievedCallback.returnAction(Integer.toString(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE)));
 //				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
-				IMethodCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
 				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(Integer.toString(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE)));
+					retrievedCallback.returnAction(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE));
 				}
 			} 
 		}
@@ -601,7 +605,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
      */
     private void initialiseQueue(int index) {
     	if (null == this.methodQueues[index]) {
-    		this.methodQueues[index] = new ConcurrentLinkedQueue<IMethodCallback>();
+    		this.methodQueues[index] = new ConcurrentLinkedQueue<IPlatformEventsCallback>();
     	}
     }
 }

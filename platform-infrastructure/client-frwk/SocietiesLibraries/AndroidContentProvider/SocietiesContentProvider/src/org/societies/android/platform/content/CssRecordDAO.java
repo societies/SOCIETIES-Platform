@@ -137,23 +137,23 @@ public class CssRecordDAO {
 			Cursor cursor = database.query(DBHelper.CSS_RECORD_TABLE, DBHelper.ALL_CSSRECORD_COLUMNS, null, null, null, null, null);
 			cursor.moveToFirst();
 			
-			record.setCssHostingLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION)));
+//			record.setCssHostingLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION)));
 			record.setCssIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_IDENTITY)));
-			record.setCssInactivation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_INACTIVATION)));
-			record.setCssRegistration(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_REGISTRATION)));
-			record.setCssUpTime(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_UPTIME)));
+//			record.setCssInactivation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_INACTIVATION)));
+//			record.setCssRegistration(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_REGISTRATION)));
+//			record.setCssUpTime(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_UPTIME)));
 			record.setDomainServer(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_DOMAIN_SERVER)));
 			record.setEmailID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_EMAILID)));
 			record.setEntity(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_ENTITY)));
 			record.setForeName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_FORENAME)));
 			record.setHomeLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_HOME_LOCATION)));
-			record.setIdentityName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IDENTITY_NAME)));
-			record.setImID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IMID)));
+//			record.setIdentityName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IDENTITY_NAME)));
+//			record.setImID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IMID)));
 			record.setName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_NAME)));
 			record.setPassword(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_PASSWORD)));
 			record.setSex(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_SEX)));
-			record.setSocialURI(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_SOCIALURI)));
-			record.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_STATUS)));
+//			record.setSocialURI(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_SOCIALURI)));
+//			record.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_STATUS)));
 
 			cursor.close();
 			
@@ -308,23 +308,23 @@ public class CssRecordDAO {
 	private ContentValues populateCSSRecord(CssRecord record) {
 		ContentValues values = new ContentValues();
 		
-		values.put(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION, record.getCssHostingLocation());
+//		values.put(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION, record.getCssHostingLocation());
 		values.put(DBHelper.CSS_RECORD_CSS_IDENTITY, record.getCssIdentity());
 		values.put(DBHelper.CSS_RECORD_DOMAIN_SERVER, record.getDomainServer());
 		values.put(DBHelper.CSS_RECORD_EMAILID, record.getEmailID());
 		values.put(DBHelper.CSS_RECORD_ENTITY, record.getEntity());
 		values.put(DBHelper.CSS_RECORD_FORENAME, record.getForeName());
 		values.put(DBHelper.CSS_RECORD_HOME_LOCATION, record.getHomeLocation());
-		values.put(DBHelper.CSS_RECORD_IDENTITY_NAME, record.getIdentityName());
-		values.put(DBHelper.CSS_RECORD_IMID, record.getImID());
-		values.put(DBHelper.CSS_RECORD_INACTIVATION, record.getCssInactivation());
+//		values.put(DBHelper.CSS_RECORD_IDENTITY_NAME, record.getIdentityName());
+//		values.put(DBHelper.CSS_RECORD_IMID, record.getImID());
+//		values.put(DBHelper.CSS_RECORD_INACTIVATION, record.getCssInactivation());
 		values.put(DBHelper.CSS_RECORD_NAME, record.getName());
 		values.put(DBHelper.CSS_RECORD_PASSWORD, record.getPassword());
-		values.put(DBHelper.CSS_RECORD_REGISTRATION, record.getCssRegistration());
+//		values.put(DBHelper.CSS_RECORD_REGISTRATION, record.getCssRegistration());
 		values.put(DBHelper.CSS_RECORD_SEX, record.getSex());
-		values.put(DBHelper.CSS_RECORD_SOCIALURI, record.getSocialURI());
-		values.put(DBHelper.CSS_RECORD_STATUS, record.getStatus());
-		values.put(DBHelper.CSS_RECORD_UPTIME, record.getCssUpTime());
+//		values.put(DBHelper.CSS_RECORD_SOCIALURI, record.getSocialURI());
+//		values.put(DBHelper.CSS_RECORD_STATUS, record.getStatus());
+//		values.put(DBHelper.CSS_RECORD_UPTIME, record.getCssUpTime());
 		
 		return values;
 	}

@@ -62,6 +62,8 @@ public class CssRegistryEntry implements Serializable {
 	private int sex;
 	private String position;
 	private String workplace;
+	private String domainServer;
+	private String password;
 
 	/**
 	 * @return the cssIdentity
@@ -186,6 +188,33 @@ public class CssRegistryEntry implements Serializable {
 	public void setPosition(String position) {
 		this.position = position;
 	}
+	/**
+	* @return the domainServer
+	*/
+	@Column(name = "DomainServer")
+	public String getDomainServer() {
+		return domainServer;
+	}
+	/**
+	* @param domainServer the domainServer to set
+	*/
+	public void setDomainServer(String domainServer) {
+		this.domainServer = domainServer;
+	}
+	/**
+	* @return the password
+	*/
+	@Column(name = "Password")
+	public String getPassword() {
+		return password;
+	}
+	/**
+	* @param password the password to set
+	*/
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	/**
 	 * @param cssIdentity
 	 * @param emailID

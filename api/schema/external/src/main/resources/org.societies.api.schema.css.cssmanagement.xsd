@@ -53,6 +53,9 @@
 			<xs:element name="sex" type="xs:int" />
 			<xs:element name="workplace" type="xs:string" minOccurs="0" />
 			<xs:element name="position" type="xs:string" minOccurs="0" />
+			<xs:element name="domainServer" type="xs:string"
+				minOccurs="0" />
+			<xs:element name="password" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 
