@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxBond implements Serializable {
+public abstract class CtxBond implements Serializable {
 	
 	private static final long serialVersionUID = 2972314471738603009L;
 
@@ -49,7 +49,7 @@ public class CtxBond implements Serializable {
 	private final String type;
 	
 	/** The origin of this bond. */
-	private final CtxBondOriginType originType;
+	private CtxBondOriginType originType;
 	
 	/**
 	 * Constructs a <code>CtxBond</code> with the specified context model type, context type,
@@ -75,18 +75,14 @@ public class CtxBond implements Serializable {
 			throw new NullPointerException("type can't be null");
 		if (originType == null)
 			throw new NullPointerException("originType can't be null");
-		
-		
-		/*
-		if (!modelType.toString().equals(CtxModelType.ATTRIBUTE.toString()) || !modelType.toString().equals(CtxModelType.ASSOCIATION.toString()))
+		if (!CtxModelType.ATTRIBUTE.equals(modelType) && !CtxModelType.ASSOCIATION.equals(modelType))
 			throw new IllegalArgumentException("invalid modelType: "
 					+ modelType + ": valid values: " + CtxModelType.ATTRIBUTE
 					+ ", " + CtxModelType.ASSOCIATION);
-		*/
+		
 		this.modelType = modelType;
 		this.type = type;
 		this.originType = originType;
-		
 	}
 	
 	/**
@@ -114,5 +110,14 @@ public class CtxBond implements Serializable {
 	 */
 	public CtxBondOriginType getOriginType() {
 		return this.originType;
+	}
+	
+	/**
+	 * Returns the origin of this bond
+	 * 
+	 * @return the origin of this bond
+	 */
+	public void setOriginType(CtxBondOriginType originType) {
+		this.originType = originType;
 	}
 }

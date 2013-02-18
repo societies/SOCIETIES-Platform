@@ -54,6 +54,7 @@ import java.io.Serializable;
  * ageBond.setMinValue(new Integer(18));
  * </pre>
  *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.4
  */
 public class CtxAttributeBond extends CtxBond {
