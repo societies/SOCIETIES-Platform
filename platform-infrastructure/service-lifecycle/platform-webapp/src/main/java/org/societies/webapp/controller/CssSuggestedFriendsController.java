@@ -11,6 +11,7 @@ import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.FriendFilter;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.ICSSInternalManager;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 @Controller
 public class CssSuggestedFriendsController {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(CssSuggestedFriendsController.class);
 
 	/**
@@ -123,8 +124,14 @@ public class CssSuggestedFriendsController {
 			if (method.equalsIgnoreCase("findFriends")) {
 				res = "CSS Suggested Friends Result ";
 
+				//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
+				FriendFilter filter = new FriendFilter();
+				int filterFlag = 0x0000001111;
+
+				filter.setFilterFlag(filterFlag );
+
 				Future<HashMap<IIdentity, Integer>> asynchcssfriends = getCssLocalManager()
-						.getSuggestedFriends(null); //suggestedFriends();
+						.getSuggestedFriends(filter); //suggestedFriends();
 
 				model.put("result", res);
 				model.put("cssfriends", asynchcssfriends.get());
@@ -163,9 +170,17 @@ public class CssSuggestedFriendsController {
 
 		try {
 
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
-			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
-			
+			//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
+			FriendFilter filter = new FriendFilter();
+			Integer filterFlag = 0x0000001111;
+
+			filter.setFilterFlag(filterFlag );
+			LOG.info("SuggestedFriendsController called with filter: " +filter);
+
+			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
+			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
+
+			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends);
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -175,20 +190,22 @@ public class CssSuggestedFriendsController {
 			List<CssAdvertisementRecordDetailed> allcssDetails = asynchallcss.get();
 			List<CssAdvertisementRecordDetailed> otherFriends = new ArrayList<CssAdvertisementRecordDetailed>();
 			List<CssAdvertisementRecordDetailed> snsFriends = new ArrayList<CssAdvertisementRecordDetailed>();
-			
+
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
-			
-			
+
+			LOG.info("SuggestedFriendsController allcssDetails size : " +allcssDetails.size());
+
+
 			for (int index = 0; index < allcssDetails.size(); index++) {
 				// ignore myself!
-				
+
 				if (!allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(commManager.getIdManager().getThisNetworkNode().getBareJid())) 
 				{
 					// skip people we are already friends with	
 					if (allcssDetails.get(index).getStatus() != CssRequestStatusType.ACCEPTED) 
 					{
-						
+
 						for ( int indexFR = 0; indexFR < friendReq.size(); indexFR++)
 						{
 							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssDetails.get(index).getStatus() != CssRequestStatusType.DENIED))
@@ -197,10 +214,10 @@ public class CssSuggestedFriendsController {
 								// but not for the pilot
 								allcssDetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 								indexFR = friendReq.size();
-								
+
 							}
 						}
-						
+
 						// Now we want to check , if we have a pending FR from this people
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
@@ -219,6 +236,8 @@ public class CssSuggestedFriendsController {
 					}
 				}
 			}
+			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
+			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 
@@ -256,7 +275,7 @@ public class CssSuggestedFriendsController {
 				pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				getCssLocalManager().acceptCssFriendRequest(pendingFR);
-				
+
 			} else if (sfForm.getMethod().contains("cancel")) {
 				// Cancel the pending friend request
 				CssRequest pendingFR = new CssRequest();
@@ -265,7 +284,7 @@ public class CssSuggestedFriendsController {
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				//getCssLocalManager().updateCssRequest(pendingFR);
 				getCssLocalManager().updateCssFriendRequest(pendingFR);
-				
+
 			} else if (sfForm.getMethod().contains("denied")) {
 				// Decline the pending friend request
 				LOG.info("Webapp -> Decline Friend Requst Called: ");
@@ -275,7 +294,7 @@ public class CssSuggestedFriendsController {
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				//getCssLocalManager().updateCssRequest(pendingFR);
 				getCssLocalManager().declineCssFriendRequest(pendingFR);
-				
+
 			} else if (sfForm.getMethod().contains("delete")) {
 				// Decline the pending friend request
 				LOG.info("Webapp -> Delete Friend Called: ");
@@ -285,20 +304,25 @@ public class CssSuggestedFriendsController {
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				//getCssLocalManager().updateCssRequest(pendingFR);
 				getCssLocalManager().updateCssFriendRequest(pendingFR);
-				
+
 			}else {
 				// send fr
 				getCssLocalManager().sendCssFriendRequest(sfForm.getFriendId());
 			}
 		}
-		
+
 		String res = null;
 
 		try {
 
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
+			FriendFilter filter = new FriendFilter();
+			Integer filterFlag = 0x0000001111;
+
+			filter.setFilterFlag(filterFlag );
+
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(filter); //suggestedFriends();
 			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
-			
+
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -308,20 +332,20 @@ public class CssSuggestedFriendsController {
 			List<CssAdvertisementRecordDetailed> allcssDetails = asynchallcss.get();
 			List<CssAdvertisementRecordDetailed> otherFriends = new ArrayList<CssAdvertisementRecordDetailed>();
 			List<CssAdvertisementRecordDetailed> snsFriends = new ArrayList<CssAdvertisementRecordDetailed>();
-			
+
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
-			
+
 			for (int index = 0; index < allcssDetails.size(); index++) {
 				// ignore myself!
-				
+
 				if (!allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(commManager.getIdManager().getThisNetworkNode().getBareJid())) 
 				{
 					//Put the check for DENIED here on the outside -> see if this works
 					// skip people we are already friends with	
 					if (allcssDetails.get(index).getStatus() != CssRequestStatusType.ACCEPTED) 
 					{
-						
+
 						for ( int indexFR = 0; indexFR < friendReq.size(); indexFR++)
 						{
 							if (allcssDetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssDetails.get(index).getStatus() != CssRequestStatusType.DENIED))
@@ -330,10 +354,10 @@ public class CssSuggestedFriendsController {
 								// but not for the pilot
 								allcssDetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 								indexFR = friendReq.size();
-								
+
 							}
 						}
-						
+
 						// Now we want to check , if we have a pending FR from this people
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
@@ -352,6 +376,10 @@ public class CssSuggestedFriendsController {
 					}
 				}
 			}
+
+			LOG.info("SuggestedFriendsController POST otherFriends: " +otherFriends +"size : " +otherFriends.size());
+			LOG.info("SuggestedFriendsController POST snsFriends: " +snsFriends +"size : " +snsFriends.size());
+
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 
