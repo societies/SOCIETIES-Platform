@@ -44,7 +44,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+ 	
 	<xs:simpleType name="methodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="addCssAdvertisementRecord" />

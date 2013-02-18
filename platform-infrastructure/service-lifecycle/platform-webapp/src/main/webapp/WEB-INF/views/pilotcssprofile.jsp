@@ -62,6 +62,20 @@
 								</td>
 								<td>TODO: Create dropdown!</td>
 							</tr>
+							
+							<tr>
+								<td>Workplace</td>
+								<td><form:input path="workplace"
+										value="${cmLoginForm.workplace}" size="50" /> 
+								</td>
+							</tr>
+							
+							<tr>
+								<td>Position</td>
+								<td><form:input path="position"
+										value="${cmLoginForm.position}" size="50" /> 
+								</td>
+							</tr>
 						</table>
 						<br/>
 						

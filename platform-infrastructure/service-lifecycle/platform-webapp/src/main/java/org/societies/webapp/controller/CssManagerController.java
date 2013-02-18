@@ -205,19 +205,21 @@ public class CssManagerController {
 			}
 			cssDetails = loginResult.get();
 
-			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
-					.getCssHostingLocation());
-			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
-					.getDomainServer());
+//			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
+//					.getCssHostingLocation());
+//			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
+//					.getDomainServer());
 			cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-					.getIdentityName());
-			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+//			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
+//					.getIdentityName());
+//			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 			
 			// first get all the cssdirectory records
@@ -294,14 +296,16 @@ public class CssManagerController {
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmControllerLoginForm.getCssIdentity());
-		loginRecord.setCssHostingLocation(cmControllerLoginForm.getCssHostingLocation());
-		loginRecord.setDomainServer(cmControllerLoginForm.getDomainServer());
+//		loginRecord.setCssHostingLocation(cmControllerLoginForm.getCssHostingLocation());
+//		loginRecord.setDomainServer(cmControllerLoginForm.getDomainServer());
 		loginRecord.setEmailID(cmLoginForm.getEmailID());
 		loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
-		loginRecord.setIdentityName(cmControllerLoginForm.getIdentityName());
-		loginRecord.setImID(cmControllerLoginForm.getImID());
+//		loginRecord.setIdentityName(cmControllerLoginForm.getIdentityName());
+//		loginRecord.setImID(cmControllerLoginForm.getImID());
 		loginRecord.setName(cmLoginForm.getName());
 		loginRecord.setSex(cmLoginForm.getSex());
+		loginRecord.setWorkplace(cmLoginForm.getWorkplace());
+		loginRecord.setPosition(cmLoginForm.getPosition());
 
 		try {
 			getCssLocalManager().modifyCssRecord(loginRecord);
@@ -327,19 +331,21 @@ public class CssManagerController {
 			cmControllerLoginForm.setCssAdName(cmLoginForm.getCssAdName());
 			
 
-			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
-					.getCssHostingLocation());
-			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
-					.getDomainServer());
+//			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
+//					.getCssHostingLocation());
+//			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
+//					.getDomainServer());
 			cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-					.getIdentityName());
-			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+//			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
+//					.getIdentityName());
+//			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -434,18 +440,18 @@ public class CssManagerController {
 				} else {
 					cssDetails = loginResult.get();
 
-					cmControllerLoginForm.setCssHostingLocation(cssDetails
-							.getProfile().getCssHostingLocation());
-					cmControllerLoginForm.setDomainServer(cssDetails
-							.getProfile().getDomainServer());
+//					cmControllerLoginForm.setCssHostingLocation(cssDetails
+//							.getProfile().getCssHostingLocation());
+//					cmControllerLoginForm.setDomainServer(cssDetails
+//							.getProfile().getDomainServer());
 					cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 							.getEmailID());
 					cmControllerLoginForm.setHomeLocation(cssDetails
 							.getProfile().getHomeLocation());
-					cmControllerLoginForm.setIdentityName(cssDetails
-							.getProfile().getIdentityName());
-					cmControllerLoginForm.setImID(cssDetails.getProfile()
-							.getImID());
+//					cmControllerLoginForm.setIdentityName(cssDetails
+//							.getProfile().getIdentityName());
+//					cmControllerLoginForm.setImID(cssDetails.getProfile()
+//							.getImID());
 					cmControllerLoginForm.setName(cssDetails.getProfile()
 							.getName());
 					cmControllerLoginForm.setSex(cssDetails.getProfile()
@@ -974,17 +980,17 @@ public class CssManagerController {
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmLoginForm.getCssIdentity());
-		loginRecord.setPassword(cmLoginForm.getPassword());
+//		loginRecord.setPassword(cmLoginForm.getPassword());
 
 		if (cmLoginForm.getButtonLabel().contentEquals("Save")) {
 
-			loginRecord.setCssHostingLocation(cmLoginForm
-					.getCssHostingLocation());
-			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
+//			loginRecord.setCssHostingLocation(cmLoginForm
+//					.getCssHostingLocation());
+//			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
 			loginRecord.setEmailID(cmLoginForm.getEmailID());
 			loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
-			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
-			loginRecord.setImID(cmLoginForm.getImID());
+//			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
+//			loginRecord.setImID(cmLoginForm.getImID());
 			loginRecord.setName(cmLoginForm.getName());
 			loginRecord.setSex(cmLoginForm.getSex());
 		}
@@ -1066,18 +1072,18 @@ public class CssManagerController {
 
 					}
 
-					cmControllerLoginForm.setCssHostingLocation(cssDetails
-							.getProfile().getCssHostingLocation());
-					cmControllerLoginForm.setDomainServer(cssDetails
-							.getProfile().getDomainServer());
+//					cmControllerLoginForm.setCssHostingLocation(cssDetails
+//							.getProfile().getCssHostingLocation());
+//					cmControllerLoginForm.setDomainServer(cssDetails
+//							.getProfile().getDomainServer());
 					cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 							.getEmailID());
 					cmControllerLoginForm.setHomeLocation(cssDetails
 							.getProfile().getHomeLocation());
-					cmControllerLoginForm.setIdentityName(cssDetails
-							.getProfile().getIdentityName());
-					cmControllerLoginForm.setImID(cssDetails.getProfile()
-							.getImID());
+//					cmControllerLoginForm.setIdentityName(cssDetails
+// 						.getProfile().getIdentityName());
+//					cmControllerLoginForm.setImID(cssDetails.getProfile()
+//							.getImID());
 					cmControllerLoginForm.setName(cssDetails.getProfile()
 							.getName());
 					cmControllerLoginForm.setSex(cssDetails.getProfile()
@@ -1572,24 +1578,27 @@ public class CssManagerController {
 
 	void setupEmptyCssRecord(CssRecord rec) {
 		rec.setCssIdentity("");
-		rec.setPassword("");
-		rec.setDomainServer("");
-		rec.setCssHostingLocation("");
-		rec.setCssInactivation("");
-		rec.setCssRegistration("");
-		rec.setCssUpTime(0);
-		rec.setDomainServer("");
+//		rec.setPassword("");
+//		rec.setDomainServer("");
+//		rec.setCssHostingLocation("");
+//		rec.setCssInactivation("");
+//		rec.setCssRegistration("");
+//		rec.setCssUpTime(0);
+//		rec.setDomainServer("");
 		rec.setEmailID("");
 		rec.setEntity(0);
 		rec.setForeName("");
 		rec.setHomeLocation("");
-		rec.setIdentityName("");
-		rec.setImID("");
+//		rec.setIdentityName("");
+//		rec.setImID("");
 		rec.setName("");
-		rec.setPresence(0);
+//		rec.setPresence(0);
 		rec.setSex(0);
-		rec.setSocialURI("");
-		rec.setStatus(0);
+//		rec.setSocialURI("");
+//		rec.setStatus(0);
+		rec.setWorkplace("");
+		rec.setPosition("");
+		
 
 		List<CssNode> cssNodes = rec.getCssNodes();
 		cssNodes = new ArrayList<CssNode>();

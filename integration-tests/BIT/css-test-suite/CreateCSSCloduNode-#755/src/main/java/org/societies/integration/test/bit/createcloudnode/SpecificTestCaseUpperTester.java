@@ -99,21 +99,21 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 		//cssProfile.getArchiveCSSNodes().add(cssNode_2);
 		
 		cssProfile.setCssIdentity(TEST_IDENTITY);
-		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		cssProfile.setCssUpTime(TEST_UPTIME);
+//		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+//		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+//		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//		cssProfile.setCssUpTime(TEST_UPTIME);
 		cssProfile.setEmailID(TEST_EMAIL);
 		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		cssProfile.setForeName(TEST_FORENAME);
 		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
-		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
-		cssProfile.setImID(TEST_IM_ID);
+//		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+//		cssProfile.setImID(TEST_IM_ID);
 		cssProfile.setName(TEST_NAME);
-		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+//		cssProfile.setPassword(TEST_PASSWORD);
+//		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		cssProfile.setSex(CSSManagerEnums.genderType.Male.ordinal());
-		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+//		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 
 		
 		return cssProfile;

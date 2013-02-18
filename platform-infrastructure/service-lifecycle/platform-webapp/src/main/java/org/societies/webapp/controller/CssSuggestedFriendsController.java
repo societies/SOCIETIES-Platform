@@ -11,6 +11,7 @@ import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.FriendFilter;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.ICSSInternalManager;
@@ -123,8 +124,14 @@ public class CssSuggestedFriendsController {
 			if (method.equalsIgnoreCase("findFriends")) {
 				res = "CSS Suggested Friends Result ";
 
+				//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
+				FriendFilter filter = new FriendFilter();
+				int filterFlag = 0x0000001111;
+				
+				filter.setFilterFlag(filterFlag );
+				
 				Future<HashMap<IIdentity, Integer>> asynchcssfriends = getCssLocalManager()
-						.getSuggestedFriends(null); //suggestedFriends();
+						.getSuggestedFriends(filter); //suggestedFriends();
 
 				model.put("result", res);
 				model.put("cssfriends", asynchcssfriends.get());
@@ -162,10 +169,18 @@ public class CssSuggestedFriendsController {
 		String res = null;
 
 		try {
-
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
-			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
+			//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
+			FriendFilter filter = new FriendFilter();
+			Integer filterFlag = 0x0000001111;
+			
+			filter.setFilterFlag(filterFlag );
+			LOG.info("SuggestedFriendsController called with filter: " +filter);
+
+			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
+			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
+			
+			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends);
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -178,6 +193,8 @@ public class CssSuggestedFriendsController {
 			
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
+			
+			LOG.info("SuggestedFriendsController allcssDetails size : " +allcssDetails.size());
 			
 			
 			for (int index = 0; index < allcssDetails.size(); index++) {
@@ -219,6 +236,8 @@ public class CssSuggestedFriendsController {
 					}
 				}
 			}
+			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
+			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 
@@ -295,8 +314,13 @@ public class CssSuggestedFriendsController {
 		String res = null;
 
 		try {
+		
+			FriendFilter filter = new FriendFilter();
+			Integer filterFlag = 0x0000001111;
+			
+			filter.setFilterFlag(filterFlag );
 
-			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(null); //suggestedFriends();
+			Future<HashMap<IIdentity, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriends(filter); //suggestedFriends();
 			HashMap<IIdentity, Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 			
 
@@ -352,6 +376,10 @@ public class CssSuggestedFriendsController {
 					}
 				}
 			}
+			
+			LOG.info("SuggestedFriendsController POST otherFriends: " +otherFriends +"size : " +otherFriends.size());
+			LOG.info("SuggestedFriendsController POST snsFriends: " +snsFriends +"size : " +snsFriends.size());
+			
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 
