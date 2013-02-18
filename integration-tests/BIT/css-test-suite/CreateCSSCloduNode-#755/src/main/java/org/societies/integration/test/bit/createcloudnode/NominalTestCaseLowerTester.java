@@ -23,6 +23,7 @@ import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
 import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 
 public class NominalTestCaseLowerTester {
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
