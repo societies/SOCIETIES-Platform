@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="org.societies.platform.slm.container" />
+        android:targetPackage="org.societies.android.platform.slm.container" />
 
     <application
         android:icon="@drawable/ic_launcher"

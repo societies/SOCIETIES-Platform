@@ -16,7 +16,7 @@
    
    <properties>
         <tested.project.dir>${project.basedir}/../ContainerSocietiesServiceMonitor</tested.project.dir>
-        <tested.project.android.coverage>/data/data/org.societies.android.platform.cssmanager.container/files/coverage.ec</tested.project.android.coverage>
+        <tested.project.android.coverage>/data/data/org.societies.android.platform.slm.container/files/coverage.ec</tested.project.android.coverage>
    </properties>
 
    <developers>
