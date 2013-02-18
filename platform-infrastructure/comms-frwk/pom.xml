@@ -31,14 +31,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- Setup the identity of this builder -->
 	<groupId>org.societies</groupId>
 	<artifactId>comm-framework-examples</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>${release.version}</version>
 	<name>Communication Framework Examples Builder</name>
 
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
