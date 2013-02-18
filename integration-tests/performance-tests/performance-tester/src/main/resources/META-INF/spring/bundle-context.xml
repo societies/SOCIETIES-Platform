@@ -49,6 +49,9 @@
   		<property name="cisManager" ref="CisManager"/>
   		<property name="commManager" ref="commManager"/>
   		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+  		<property name="cssManager" ref="CssManager"/>
+  		<property name="cssDirectoryRemote" ref="CssDirectoryRemote"/>
+  		
   	</bean>
 	
 	<!-- Rafik's Declarations end -->

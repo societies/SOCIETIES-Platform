@@ -11,6 +11,11 @@
       
       <osgi:reference id="CisManager" interface="org.societies.api.cis.management.ICisManager"/>
       
+      <osgi:reference id="CssManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
+      
+      <osgi:reference id="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote"/>
+      
+      
       <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	
 	  <osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
@@ -29,12 +34,14 @@
       
       <!-- Add your Web Service Declaration, between this...................................................................................... --> 
        
-       <osgi:service ref="PerformanceTest">	
-			<osgi:interfaces>
+       <osgi:service ref="PerformanceTest" auto-export="interfaces">	
+			<!-- <osgi:interfaces>
 				<value>org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest</value>
-			</osgi:interfaces>
+				<value>org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.ICssMgmtPerfromanceTest</value>
+			</osgi:interfaces> -->
 			<osgi:service-properties>
 				<entry key="service.exported.interfaces" value="*"/>
+				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
 				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik}"/>
 			</osgi:service-properties>
        </osgi:service>
