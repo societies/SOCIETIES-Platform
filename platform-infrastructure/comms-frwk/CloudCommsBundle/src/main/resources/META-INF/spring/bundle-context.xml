@@ -17,11 +17,6 @@
    for integration testing outside of an OSGi environment -->
 
 	<context:annotation-config />
-		<!-- 
-	<context:property-placeholder properties-ref="componentConfig"/>
-
-	<context:property-placeholder properties-ref="platformConfig"/>
-	 -->
 	 
 	 <bean id="CloudCommsPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -80,14 +75,15 @@
 	    <constructor-arg value="${subDomain}"/>
 	    <constructor-arg value="${secretKey}"/>
 	    <constructor-arg value="${daNode}"/>
-		<!--property name="privacyLog" ref="privacyLog"/-->
+		<property name="privacyLog" ref="privacyLog"/>
     </bean>
     
     <bean id="cisCommMgrFactory" 
-    	class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl"
+    	class="org.societies.comm.impl.CISCommunicationMgrFactoryImpl"
     	destroy-method="destroyAllConnections">
     	<constructor-arg ref="xcCommunication"/>
         <constructor-arg value="${secretKey}"/>
+        <!-- <constructor-arg ref="sessionFactory"/>  -->
     </bean>
 
 	<bean id="pubsubService" class="org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter">

@@ -1,9 +1,10 @@
-package org.societies.comm.xmpp.xc.impl;
+package org.societies.comm.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -14,6 +15,8 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
+import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
+import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
 public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFactory {
@@ -22,13 +25,22 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			.getLogger(CISCommunicationMgrFactoryImpl.class);
 	
 	private HashMap<IIdentity,ICommManager> cisCommManagers;
+	private HashMap<IIdentity,PubsubServiceRouter> cisPubsubServices;
 	private String genericPassword;
 	private ICommManager originalEndpoint;
 	private IIdentityManager idm;
 	private String domainName;
+	private SessionFactory sf;
+	
+	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword, SessionFactory sf) {
+		this.genericPassword = genericPassword;
+		originalEndpoint = endpoint;
+		this.sf = sf;
+		
+		initCISCommunicationMgrFactoryImpl();
+	}
 	
 	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword) {
-		cisCommManagers = new HashMap<IIdentity, ICommManager>();
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
 		
@@ -36,6 +48,8 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	}
 	
 	public boolean initCISCommunicationMgrFactoryImpl() {
+		cisCommManagers = new HashMap<IIdentity, ICommManager>();
+		cisPubsubServices = new HashMap<IIdentity, PubsubServiceRouter>();
 		idm = originalEndpoint.getIdManager();
 		if (idm!=null && idm.getThisNetworkNode()!=null){
             domainName = idm.getThisNetworkNode().getDomain();
@@ -49,11 +63,23 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		if (!cisIdentity.getType().equals(IdentityType.CIS))
 			throw new CommunicationException("Provided identity does not belong to a CIS");
 		
+		// TODO verify if cisIdentity exists already
+		
+		// CIS Comms
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid());
 		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
 			throw new CommunicationException("Unable to create CISCommManager!");
+		
+		// CIS Pubsub
+		PubsubServiceRouter psr = null;
+		if (sf==null)
+			psr = new PubsubServiceRouter(commMgr);
+		else
+			psr = new PubsubServiceRouter(commMgr,sf);
+		
 		cisCommManagers.put(cisIdentity, commMgr);
+		cisPubsubServices.put(cisIdentity, psr);
 		return commMgr;
 	}
 
@@ -70,14 +96,8 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 					throw new CommunicationException("Not connected to domain!");
 				
 			String randomCisIdentifier = IdentityManagerImpl.CIS_PREFIX+UUID.randomUUID().toString()+"."+domainName;
-			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
-			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
-			commMgr.loginFromConfig();
-			if (commMgr.getIdManager()==null)
-				throw new CommunicationException("Unable to connect!");
-			cisCommManagers.put(cisIdentity, commMgr);
-			return commMgr;
+			return getNewCommManager(cisIdentity, genericPassword);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
@@ -91,12 +111,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		try {
 			// TODO verify if exists one with same JID logged int
 			IIdentity cisIdentity = idm.fromJid(jid);
-			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
-			commMgr.loginFromConfig();
-			if (commMgr.getIdManager()==null)
-				throw new CommunicationException("Unable to connect!");
-			cisCommManagers.put(cisIdentity, commMgr);
-			return commMgr;
+			return getNewCommManager(cisIdentity, genericPassword);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
