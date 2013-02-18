@@ -1747,48 +1747,75 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 	@Override
 	public void sendCSSFriendRequest(IIdentity identity, RequestorService service) {
-		// TODO Auto-generated method stub
+		//PUBLISH PUBSUB EVENT FOR THIS RECEIVED FRIEND REQUEST
+		CssAdvertisementRecord advert = new CssAdvertisementRecord();
+		advert.setId(identity.getBareJid());
+		advert.setName("TBD");
 
-		String targetCSSid = identity.toString();
+		CssFriendEvent payload = new CssFriendEvent();
+		payload.setCssAdvert(advert);
 
+		try {
+			String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
+			LOG.debug("Published friend request received event for: " + identity.getBareJid() + ". Status: " + status);
+		} catch (XMPPError e) {
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 
+		//SAVE TO DATABASE
+		String targetCSSid = identity.toString();		
 		CssRequest request = new CssRequest();
 		//request.setCssIdentity(targetCSSid);
 		request.setCssIdentity(service.getRequestorId().toString());
 		request.setRequestStatus(CssRequestStatusType.PENDING);
 		request.setOrigin(CssRequestOrigin.REMOTE);
-				try {
-					cssRegistry.updateCssRequestRecord(request);
-					//put it in here
+		try {
+			cssRegistry.updateCssRequestRecord(request);
 
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL)
+		{
 
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				// We only want to sent messages to remote Css's for this function if we initiated the call locally
-				if (request.getOrigin() == CssRequestOrigin.LOCAL)
-				{
-
-					// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
-					// otherwise send message to remote css
-					if (request.getRequestStatus() != CssRequestStatusType.DENIED )
-					{
-						//called updateCssFriendRequest on remote
-						request.setOrigin(CssRequestOrigin.REMOTE);
-						cssManagerRemote.updateCssFriendRequest(request);
-					}	
-				}
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+			if (request.getRequestStatus() != CssRequestStatusType.DENIED )
+			{
+				//called updateCssFriendRequest on remote
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				cssManagerRemote.updateCssFriendRequest(request);
+			}	
+		}
 
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void handleExternalFriendRequest(IIdentity identity,
-			CssRequestStatusType statusType) {
+	public void handleExternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
 
+		if (statusType.equals(CssRequestStatusType.ACCEPTED)) {
+			//PUBLISH PUBSUB EVENT FOR THIS NEW FRIEND
+			CssAdvertisementRecord advert = new CssAdvertisementRecord();
+			advert.setId(identity.getBareJid());
+			advert.setName("TBD");
+			CssFriendEvent payload = new CssFriendEvent();
+			payload.setCssAdvert(advert);
+
+			try {
+				String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
+				LOG.debug("Published friend accepted event for: " + identity.getBareJid() + ". Status: " + status);
+			} catch (XMPPError e) {
+				e.printStackTrace();
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		//identity is who the request has come FROM
 		CssRequest request = new CssRequest();
 
@@ -1801,70 +1828,46 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		LOG.info("Request  status: " +statusType);
 
 		try {
-				cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-				cssRegistry.updateCssRequestRecord(request);
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		LOG.info("updateCssFriendRequest and we're back : " );
+		// If this was initiated locally then inform remote css
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL)
+		{
 
-				LOG.info("updateCssFriendRequest and we're back : " );
-				// If this was initiated locally then inform remote css
-				// We only want to sent messages to remote Css's for this function if we initiated the call locally
-				if (request.getOrigin() == CssRequestOrigin.LOCAL)
-				{
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
 
-					// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
-					// otherwise send message to remote css
-
-					LOG.info("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
-						//called updateCssFriendRequest on remote
-						request.setOrigin(CssRequestOrigin.REMOTE);
-						cssManagerRemote.updateCssRequest(request);
-				}
+			LOG.info("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
+				//called updateCssFriendRequest on remote
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				cssManagerRemote.updateCssRequest(request);
+		}
 	}
 
 	@Override
 	public void handleInternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
-		//PUBLISH PUBSUB EVENT FOR THIS RECEIVED FRIEND REQUEST
-				CssAdvertisementRecord advert = new CssAdvertisementRecord();
-				advert.setId(identity.getBareJid());
-				advert.setName("TBD");
+		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
+		CssRequest request = new CssRequest();
 
-				CssFriendEvent payload = new CssFriendEvent();
-				payload.setCssAdvert(advert);
-
-				try {
-					String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
-					LOG.debug("Published friend request received event for: " + identity.getBareJid() + ". Status: " + status);
-				} catch (XMPPError e) {
-					e.printStackTrace();
-				} catch (CommunicationException e) {
-					e.printStackTrace();
-				}
-
-				//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
-
-
-				CssRequest request = new CssRequest();
-
-				request.setCssIdentity(identity.toString());
-
-
-				LOG.info("handleInternalFriendRequest called : ");
-				LOG.info("Request from identity: " +identity);
-				LOG.info("Request  status: " +statusType);
-				try {
-					cssRegistry.updateCssFriendRequestRecord(request);
-					//cssRegistry.updateCssFriendRequestRecord(request);
-					cssRegistry.updateCssRequestRecord(request);
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-
+		request.setCssIdentity(identity.toString());
+		LOG.info("handleInternalFriendRequest called : ");
+		LOG.info("Request from identity: " +identity);
+		LOG.info("Request  status: " +statusType);
+		try {
+			cssRegistry.updateCssFriendRequestRecord(request);
+			//cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void pushtoContext(CssRecord record) {
