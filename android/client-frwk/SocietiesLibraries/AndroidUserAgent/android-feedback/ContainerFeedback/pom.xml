@@ -10,8 +10,8 @@
 	</parent>
 
 	<groupId>org.societies.android.platform.useragent.feedback.container</groupId>
-	<artifactId>TestContainerFeedback</artifactId>
-	<name>TestContainerFeedback</name>
+	<artifactId>ContainerFeedback</artifactId>
+	<name>ContainerFeedback</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
 
@@ -49,92 +49,66 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<!--  		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency> 
+		<!-- <dependency> <groupId>org.societies.android.api.internal</groupId> 
+			<artifactId>societies-android-api-internal</artifactId> <version>${release.version}</version> 
+			<type>apklib</type> </dependency> <dependency> <groupId>org.societies.android.platform.comms.helper</groupId> 
+			<artifactId>societies-android-comms-helper</artifactId> <version>${release.version}</version> 
+			<type>apklib</type> </dependency> -->
+		<!-- <dependency> <groupId>org.societies.android.platform.androidutils</groupId> 
+			<artifactId>SocietiesAndroidUtilities</artifactId> <version>${release.version}</version> 
+			<type>apklib</type> </dependency> -->
 		<dependency>
-			<groupId>org.societies.android.platform.comms.helper</groupId>
-			<artifactId>societies-android-comms-helper</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency> -->
-		<!-- 
-		<dependency>
-			<groupId>org.societies.android.platform.androidutils</groupId>
-			<artifactId>SocietiesAndroidUtilities</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency> -->
- 		<dependency>
 			<groupId>org.societies.android.platform.useragent.feedback</groupId>
 			<artifactId>AndroidUserFeedback</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency> 
+		</dependency>
 
-<!-- 		
+
 		<dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>
 			<version>1.1.4c</version>
 			<scope>provided</scope>
-		</dependency> -->
+		</dependency>
 	</dependencies>
 
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
-          <plugins>
-              <plugin>
-                  <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                  <artifactId>android-maven-plugin</artifactId>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
 
-				  <configuration>
-				      <emulator>
-						  <avd>Nexus403</avd>
-						  <wait>60000</wait>
-						  <options>-no-skin</options>
-				      </emulator>
-                      <!-- emma start -->
-					    <emmaEnable>true</emmaEnable>
-					    <emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
-					    <emmaOutputMetaFile>${project.basedir}/target/emma/coverage.em</emmaOutputMetaFile>
-				      <!--emma>
-                          <enable>true</enable>
-                          <classFolders>${project.basedir}/target/classes</classFolders>
-                          <outputMetaFile>${project.basedir}/target/emma/coverage.em</outputMetaFile>
-                      </emma-->
-                      <!-- emma stop -->
-                      <dex>
-                          <noLocals>true</noLocals>
-                          <!--  must be set for emma -->
-                      </dex>
-                  </configuration>
-<!--                   <executions>
-			    	execution>
-				        <id>startEmulator</id>
-				        <phase>initialize</phase>
-				        <goals>
-				            <goal>emulator-start</goal>
-				        </goals>
-			    	</execution
-			    	execution>
-				        <id>stopEmulator</id>
-				        <phase>initialize</phase>
-				        <goals>
-				            <goal>emulator-stop</goal>
-				        </goals>
-			    	</execution
-			    	
-				</executions> -->
-				  
-                  <extensions>true</extensions>
-              </plugin>
-          </plugins>
+				<configuration>
+					<emulator>
+						<avd>Nexus403</avd>
+						<wait>60000</wait>
+						<options>-no-skin</options>
+					</emulator>
+					<!-- emma start -->
+					<emmaEnable>true</emmaEnable>
+					<emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
+					<emmaOutputMetaFile>${project.basedir}/target/emma/coverage.em</emmaOutputMetaFile>
+					<!--emma> <enable>true</enable> <classFolders>${project.basedir}/target/classes</classFolders> 
+						<outputMetaFile>${project.basedir}/target/emma/coverage.em</outputMetaFile> 
+						</emma -->
+					<!-- emma stop -->
+					<dex>
+						<noLocals>true</noLocals>
+						<!-- must be set for emma -->
+					</dex>
+				</configuration>
+				<!-- <executions> execution> <id>startEmulator</id> <phase>initialize</phase> 
+					<goals> <goal>emulator-start</goal> </goals> </execution execution> <id>stopEmulator</id> 
+					<phase>initialize</phase> <goals> <goal>emulator-stop</goal> </goals> </execution 
+					</executions> -->
 
-    </build>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
+
+	</build>
 
 </project>

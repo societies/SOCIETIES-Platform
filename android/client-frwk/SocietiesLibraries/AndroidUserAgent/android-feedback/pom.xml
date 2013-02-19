@@ -56,7 +56,7 @@
 	
 	<modules>
 		<module>AndroidUserFeedback</module>
-		<module>TestContainerFeedback</module>
+		<module>ContainerFeedback</module>
 		<module>JUnitTestsFeedback</module>
 		<!-- module>RemoteTestsFeedback</module-->
 	</modules>
