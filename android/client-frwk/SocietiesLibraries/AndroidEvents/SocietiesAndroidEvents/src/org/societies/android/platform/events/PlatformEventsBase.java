@@ -383,7 +383,13 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 					for (String key : PlatformEventsBase.this.subscribedToClientEvents.keySet()) {
 						if (key.contains(intentTarget)) {
 							Intent intent = new Intent(intentTarget);
-							intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (Parcelable) payload);
+							
+							if (payload instanceof String) {
+								intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (String) payload);
+							} else if (payload instanceof Parcelable) {
+								intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (Parcelable) payload);
+							}
+							
 							intent.setPackage(getClient(key));
 							
 							PlatformEventsBase.this.androidContext.sendBroadcast(intent);

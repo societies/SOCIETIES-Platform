@@ -35,9 +35,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
@@ -55,17 +53,6 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDi
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
 
-
-	
-//	//PREF NAMES
-//	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
-//	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
-//	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
-//	//PREF VALUES
-//	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
-//	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
-//	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
-	
 	private ICisDirectory cisDirectory;
 	private long testStartTime, testEndTime;
     private boolean testCompleted;
@@ -80,19 +67,12 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDi
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-//		//Create shared preferences for later use
-//		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-//		SharedPreferences.Editor editor = settings.edit();
-//		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
-//		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
-//		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
-//		
-//		editor.commit();
-
         Intent commsIntent = new Intent(getContext(), TestServiceCisDirectoryLocal.class);
         LocalCisDirectoryBinder binder = (LocalCisDirectoryBinder) bindService(commsIntent);
         assertNotNull(binder);
         this.cisDirectory = (ICisDirectory) binder.getService();
+        cisDirectory.startService();
+        Thread.sleep(DELAY);
 	}
 	
 	protected void tearDown() throws Exception {
@@ -166,19 +146,15 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDi
 	        		Log.i(LOG_TAG, advert.getId());
 	        		Log.i(LOG_TAG, advert.getName());
 	        	}
-	        	//signal that test has completed
-        		TestSocietiesCisDirectory.this.testCompleted = true;
                 
 	        } else if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID)) {
 	        	CisAdvertisementRecord advert = (CisAdvertisementRecord) intent.getParcelableExtra(ICisDirectory.INTENT_RETURN_VALUE);
 	        	assertNotNull(advert);
 	        	Log.i(LOG_TAG, advert.getId());
         		Log.i(LOG_TAG, advert.getName());
-
-        		//signal that test has completed
-        		TestSocietiesCisDirectory.this.testCompleted = true;
 	        } 
-	        
+	        //signal that test has completed
+    		TestSocietiesCisDirectory.this.testCompleted = true;
 	        TestSocietiesCisDirectory.this.testEndTime = System.currentTimeMillis();
             Log.d(LOG_TAG, intent.getAction() + " elapse time: " + (TestSocietiesCisDirectory.this.testEndTime - TestSocietiesCisDirectory.this.testStartTime));
         }

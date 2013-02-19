@@ -22,15 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.cismanager.test;
+package org.societies.android.platform.events.test;
+
+import org.societies.android.platform.events.container.TestServiceFriendsLocal;
+import org.societies.android.platform.events.container.TestServiceFriendsLocal.FriendsServiceBinder;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Parcelable;
-import android.preference.PreferenceManager;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
@@ -47,9 +54,11 @@ public class TestEventsNotifications  extends ServiceTestCase<TestServiceFriends
 	private static final String CLIENT = "org.societies.android.platform.events.testnotifications";
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
+	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 
 	private long testStartTime, testEndTime;
     private boolean testCompleted;
+    private Messenger eventMgrService = null;
 
 	/**
 	 * @param serviceClass
@@ -64,6 +73,8 @@ public class TestEventsNotifications  extends ServiceTestCase<TestServiceFriends
         Intent commsIntent = new Intent(getContext(), TestServiceFriendsLocal.class);
         FriendsServiceBinder binder = (FriendsServiceBinder) bindService(commsIntent);
         assertNotNull(binder);
+        
+        bindToEventsManagerService();
 	}
 	
 	protected void tearDown() throws Exception {
@@ -73,25 +84,44 @@ public class TestEventsNotifications  extends ServiceTestCase<TestServiceFriends
 		super.tearDown();
 	}
 
-	@MediumTest
-	public void testGetAllCisAdverts() throws Exception {
-		this.testCompleted = false;
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		/** Bind to the Events Manager Service */
+		private void bindToEventsManagerService() {
+	    	Intent serviceIntent = new Intent(SERVICE_ACTION);
+	    	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
+	    	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+		}
 		
-		BroadcastReceiver receiver = this.setupBroadcastReceiver();
-		this.testStartTime = System.currentTimeMillis();
-		this.testEndTime = this.testStartTime;
-		
-		Log.d(LOG_TAG, "testGetAllCisAdverts start time: " + this.testStartTime);
-        try {
-        	//this.cisDirectory.findAllCisAdvertisementRecords(CLIENT);
-        } catch (Exception e) {
-        	Log.d(LOG_TAG, "");
-        }
-        Thread.sleep(DELAY);
-		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
-        unregisterReceiver(receiver);
-        assertTrue(this.testCompleted);
-	}
+		private ServiceConnection serviceConnection = new ServiceConnection() {
+			
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				eventMgrService = new Messenger(service);
+				Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
+				
+				//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
+				//METHOD: subscribeToEvents(String client, String intentFilter) - ARRAY POSITION: 1
+	    		String targetMethod = IAndroidSocietiesEvents.methodsArray[1];
+	    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+	    		Bundle outBundle = new Bundle();
+
+	    		//PARAMETERS
+	    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+	    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), ALL_CSS_FRIEND_INTENTS);
+	    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+	    		outMessage.setData(outBundle);
+
+	    		Log.d(LOCAL_LOG_TAG, "Sending event registration");
+	    		try {
+	    			eventMgrService.send(outMessage);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+	    		return null;
+			}
+			
+			public void onServiceDisconnected(ComponentName name) {
+			}
+		};
 	
 	/**
      * Create a broadcast receiver

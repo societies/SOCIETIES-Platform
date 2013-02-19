@@ -32,14 +32,6 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
 	
-//	//PREF NAMES
-//	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
-//	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
-//	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
-//	//PREF VALUES
-//	private static final String DOMAIN_AUTHORITY_SERVER_PORT_VALUE = "5222";
-//	private static final String DOMAIN_AUTHORITY_NAME_VALUE = "john.societies.local";
-//	private static final String LOCAL_CSS_NODE_JID_RESOURCE_VALUE = "Nexus403";
 	//TEST VALUES
 	private static final String TEST_COMMUNITY_NAME = "Test NameXYZ";
 	private static final String TEST_COMMUNITY_DESC = "Test description for community XYZ";
@@ -48,6 +40,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	
     private ICisManager cisManager;
     private long testStartTime, testEndTime;
+    private boolean testCompleted;
 	
     public TestSocietiesCISManager() {
         super(TestServiceCISManagerLocal.class);
@@ -56,19 +49,12 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-//		//Create shared preferences for later use
-//		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-//		SharedPreferences.Editor editor = settings.edit();
-//		editor.putString(DOMAIN_AUTHORITY_SERVER_PORT, DOMAIN_AUTHORITY_SERVER_PORT_VALUE);
-//		editor.putString(DOMAIN_AUTHORITY_NAME, DOMAIN_AUTHORITY_NAME_VALUE);
-//		editor.putString(LOCAL_CSS_NODE_JID_RESOURCE, LOCAL_CSS_NODE_JID_RESOURCE_VALUE);
-//		
-//		editor.commit();
-
         Intent commsIntent = new Intent(getContext(), TestServiceCISManagerLocal.class);
         LocalCISManagerBinder binder = (LocalCISManagerBinder) bindService(commsIntent);
         assertNotNull(binder);
         this.cisManager = (ICisManager) binder.getService();
+        cisManager.startService();
+        Thread.sleep(DELAY);
 	}
 
 	protected void tearDown() throws Exception {
@@ -78,8 +64,9 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 		super.tearDown();
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testCreateCIS() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -104,10 +91,12 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+        assertTrue(this.testCompleted);
 	}
 	
-//	@MediumTest
+	@MediumTest
 	public void testCreateCISMembershipNull() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -121,10 +110,12 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+        assertTrue(this.testCompleted);
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testCreateCISCriteriaNull() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -140,11 +131,13 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+        assertTrue(this.testCompleted);
 	}
 
 	
-//	@MediumTest
+	@MediumTest
 	public void testListCommunities() throws Exception {
+		this.testCompleted = false;
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
@@ -158,6 +151,7 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
         Thread.sleep(DELAY);
 		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
         unregisterReceiver(receiver);
+        assertTrue(this.testCompleted);
 	}
 
     /**
@@ -208,7 +202,8 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 	        	}
 	        	assertTrue(listing.length > 0);
 	        } 
-	        
+	        //signal that test has completed
+	        TestSocietiesCISManager.this.testCompleted = true;
 	        TestSocietiesCISManager.this.testEndTime = System.currentTimeMillis();
             Log.d(LOG_TAG, intent.getAction() + " elapse time: " + (TestSocietiesCISManager.this.testEndTime - TestSocietiesCISManager.this.testStartTime));
         }
@@ -224,7 +219,8 @@ public class TestSocietiesCISManager extends ServiceTestCase<TestServiceCISManag
 
         intentFilter.addAction(ICisManager.CREATE_CIS);
         intentFilter.addAction(ICisManager.GET_CIS_LIST);
-        
+        intentFilter.addAction(ICisManager.GET_CIS_LIST);
+        intentFilter.addAction(ICisManager.INTENT_NOTSTARTED_EXCEPTION);
         return intentFilter;
     }
 
