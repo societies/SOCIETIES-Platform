@@ -26,11 +26,9 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.PrivacyPermission;
@@ -61,7 +59,7 @@ public class PrivacyPermissionUtils {
 		}
 		return privacyPermissions;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission toPrivacyPermissionBean(PrivacyPermission privacyPermission) throws DatatypeConfigurationException
 	{
 		if (null == privacyPermission) {
@@ -90,7 +88,7 @@ public class PrivacyPermissionUtils {
 		}
 		return privacyPermissionBeans;
 	}
-	
+
 	/**
 	 * To know if this privacy permission is still valid or not
 	 * @return True if the privacy permission is still valid

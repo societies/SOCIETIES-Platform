@@ -27,6 +27,7 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 
@@ -54,7 +55,7 @@ public class ActionUtils {
 		}
 		return actions;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action toActionBean(Action action)
 	{
 		if (null == action) {
@@ -77,7 +78,7 @@ public class ActionUtils {
 		}
 		return actionBeans;
 	}
-	
+
 	public static boolean contains(Action actionToCheck, List<Action> actions) {
 		if (null == actions || actions.size() <= 0 || null == actionToCheck) {
 			return false;
@@ -89,7 +90,7 @@ public class ActionUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean contains(List<Action> actionsToCheck, List<Action> actions) {
 		return contains(actionsToCheck, actions, null);
 	}
@@ -114,7 +115,7 @@ public class ActionUtils {
 		}
 		return true;
 	}
-	
+
 	public static boolean containsOr(List<Action> actionsToCheck, List<Action> actions) {
 		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
 			return false;
@@ -126,7 +127,7 @@ public class ActionUtils {
 		}
 		return false;
 	}
-	
+
 	public static List<Action> intersect(List<Action> actionsToCheck, List<Action> actions) {
 		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
 			return null;
@@ -138,5 +139,31 @@ public class ActionUtils {
 			}
 		}
 		return result;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action){
+		StringBuilder sb = new StringBuilder();
+		if (null != action) {
+			sb.append("\n<Action>\n");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\""+action.getActionConstant().getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("\t<optional>"+action.isOptional()+"</optional>\n");
+			sb.append("</Action>");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action) o2;
+		return new EqualsBuilder()
+		.append(o1.getActionConstant().name(), rhs.getActionConstant().name())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
 	}
 }

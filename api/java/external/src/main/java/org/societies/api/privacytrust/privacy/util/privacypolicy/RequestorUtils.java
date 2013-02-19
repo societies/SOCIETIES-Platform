@@ -27,6 +27,7 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -36,6 +37,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -125,4 +127,45 @@ public class RequestorUtils {
 	//		}
 	//		return sb.toString();
 	//	}
+
+	public static String toXmlString(RequestorBean requestor){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestor) {
+			sb.append("<Subject>");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+requestor.getRequestorId()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			if (requestor instanceof RequestorCisBean) {
+				sb.append("\t<Attribute AttributeId=\"CisId\" DataType=\""+IIdentity.class.getName()+"\">\n");
+				sb.append("\t\t<AttributeValue>"+((RequestorCisBean)requestor).getCisRequestorId()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			if (requestor instanceof RequestorServiceBean) {
+				sb.append("\t<Attribute AttributeId=\"serviceId\" DataType=\""+ServiceResourceIdentifier.class.getName()+"\">\n");
+				sb.append("\t\t<AttributeValue>"+((RequestorServiceBean)requestor).getRequestorServiceId()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			sb.append("</Subject>");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(RequestorBean o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		RequestorBean rhs = (RequestorBean) o2;
+		EqualsBuilder equalsBuilder = new EqualsBuilder();
+		equalsBuilder.append(o1.getRequestorId(), rhs.getRequestorId());
+		if (o1 instanceof RequestorCisBean) {
+			equalsBuilder.append(((RequestorCisBean)o1).getCisRequestorId(), ((RequestorCisBean)rhs).getCisRequestorId());
+		}
+		if (o1 instanceof RequestorServiceBean) {
+			equalsBuilder.append(((RequestorServiceBean)o1).getRequestorServiceId().getIdentifier(), ((RequestorServiceBean)rhs).getRequestorServiceId().getIdentifier());
+			equalsBuilder.append(((RequestorServiceBean)o1).getRequestorServiceId().getServiceInstanceIdentifier(), ((RequestorServiceBean)rhs).getRequestorServiceId().getServiceInstanceIdentifier());
+		}
+		return equalsBuilder.isEquals();
+	}
 }

@@ -27,7 +27,10 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -52,7 +55,7 @@ public class RequestItemUtils {
 		}
 		return requestItems;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem toRequestItemBean(RequestItem requestItem)
 	{
 		if (null == requestItem) {
@@ -75,5 +78,37 @@ public class RequestItemUtils {
 			requestItemBeans.add(RequestItemUtils.toRequestItemBean(requestItem));
 		}
 		return requestItemBeans;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestItem) {
+			sb.append("\n<Target>\n");
+			sb.append(ResourceUtils.toXmlString(requestItem.getResource()));
+			for (Action action : requestItem.getActions()){
+				sb.append(ActionUtils.toXmlString(action));
+			}
+			for (Condition condition : requestItem.getConditions()){
+				sb.append(ConditionUtils.toXmlString(condition));
+			}
+			sb.append("\t<optional>"+requestItem.isOptional()+"</optional>\n");
+			sb.append("</Target>");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem) o2;
+		return new EqualsBuilder()
+		.append(o1.getActions(), rhs.getActions())
+		.append(o1.getConditions(), rhs.getConditions())
+		.append(o1.getResource(), rhs.getResource())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
 	}
 }

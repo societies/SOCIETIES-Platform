@@ -27,9 +27,11 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -75,5 +77,32 @@ public class RequestPolicyUtils {
 			requestPolicyBeans.add(RequestPolicyUtils.toRequestPolicyBean(requestPolicy));
 		}
 		return requestPolicyBeans;
+	}
+	
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicy){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestPolicy) {
+			sb.append("<RequestPolicy>");
+			sb.append(RequestorUtils.toXmlString(requestPolicy.getRequestor()));
+			for (RequestItem requestItem : requestPolicy.getRequestItems()){
+				sb.append(RequestItemUtils.toXmlString(requestItem));
+			}
+			sb.append("</RequestPolicy>");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy) o2;
+		return new EqualsBuilder()
+		.append(o1.getPrivacyPolicyType(), rhs.getPrivacyPolicyType())
+		.append(o1.getRequestItems(), rhs.getRequestItems())
+		.append(o1.getRequestor(), rhs.getRequestor())
+		.isEquals();
 	}
 }
