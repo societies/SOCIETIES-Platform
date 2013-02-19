@@ -1,0 +1,110 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }}{% endblock %}
+ 
+{% block body %}
+	{{ parent() }}
+	
+	<h3>Test Result Table</h3>
+	
+	<div class="pagination pagination-centered">   
+    	<ul>
+    		{% if currentPage == 1  %}
+    		<li class="disabled"><a>Prev</a></li>
+    		{% elseif currentPage <= nbrPage %}
+    		<li><a href="{{ currentPage-1 }}">Prev</a></li>
+    		{% endif %}
+   			
+    		{% for item in 1..nbrPage %}
+    			{% if item == currentPage %}
+   	 			<li class="disabled"><a>{{ loop.index }}</a></li>
+   	 			{% elseif item != currentPage %}
+   	 			<li><a href="{{ loop.index }}">{{ loop.index }}</a></li>
+   	 			{% endif %}
+   			{% endfor %}
+   			
+   			{% if currentPage == nbrPage  %}
+    		<li class="disabled"><a>Next</a></li>
+    		{% elseif currentPage < nbrPage %}
+    		<li><a href="{{ currentPage+1 }}">Next</a></li>
+    		{% endif %}
+    		
+    	</ul>
+    </div>
+	   
+	  
+	<table class="table table-bordered">
+		<thead> 
+			<tr>
+    			<th>Test</th>
+    			<th>Sent to</th>
+    			<th>Start Date</th> 
+    			<th>End Date</th> 
+    			<th>Status</th> 
+    			<th>Message</th> 
+    			<th>Received from</th>
+			</tr> 
+		</thead>
+		<tbody>
+	
+		{% for item in test_result_list %}
+	 		
+	 		{% if item.status == "success"  %}
+	 			<tr class="success">
+	 		{% elseif item.status == "failed" %}
+	 			<tr class="error">
+	 		{% elseif item.status == "pending" %}
+	 			<tr class="warning">
+	 		{% endif %}
+	 		
+    			<td>{{ item.performanceTest.testName }}</td>
+    			<td>{{ item.node.nodeId }}</td>
+    			<td>{{ item.testStartDate }}</td> 
+    			<td>{{ item.testEndDate }}</td> 
+    			<td>{{ item.status }}</td> 
+    			<td>{{ item.message }}</td> 
+    			<td>{{ item.nodeJid }}</td>
+			</tr>
+		{% endfor %}
+			
+		</tbody>
+		<tfoot>
+			<tr>
+    			<th>Test</th>
+    			<th>Sent to</th>
+    			<th>Start Date</th> 
+    			<th>End Date</th> 
+    			<th>Status</th> 
+    			<th>Message</th> 
+    			<th>Received from</th>
+			</tr>
+		</tfoot>
+   	</table>
+   	
+   	<div class="pagination pagination-centered">   
+    	<ul>
+    		{% if currentPage == 1  %}
+    		<li class="disabled"><a>Prev</a></li>
+    		{% elseif currentPage <= nbrPage %}
+    		<li><a href="{{ currentPage-1 }}">Prev</a></li>
+    		{% endif %}
+   			
+    		{% for item in 1..nbrPage %}
+   	 			{% if item == currentPage %}
+   	 			<li class="disabled"><a>{{ loop.index }}</a></li>
+   	 			{% elseif item != currentPage %}
+   	 			<li><a href="{{ loop.index }}">{{ loop.index }}</a></li>
+   	 			{% endif %}
+   			{% endfor %}
+   			
+   			{% if currentPage == nbrPage  %}
+    		<li class="disabled"><a>Next</a></li>
+    		{% elseif currentPage < nbrPage %}
+    		<li><a href="{{ currentPage+1 }}">Next</a></li>
+    		{% endif %}
+    	</ul>
+    </div>
+	
+	
+
+{% endblock %}
