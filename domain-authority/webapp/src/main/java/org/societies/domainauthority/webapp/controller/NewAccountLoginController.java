@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.domainauthority.registry.DaRegistry;
 import org.societies.domainauthority.registry.DaUserRecord;
@@ -54,24 +53,7 @@ public class NewAccountLoginController {
 	@Autowired
 	private ICommManagerController commManagerControl;
 	@Autowired
-	ICISCommunicationMgrFactory ccmFactory;
-	@Autowired
 	DaRegistry daRegistry;
-	
-	/**
-	 * @return the ccmFactory
-	 */
-	public ICISCommunicationMgrFactory getCcmFactory() {
-		return ccmFactory;
-	}
-
-	/**
-	 * @param ccmFactory
-	 *            the ccmFactory to set
-	 */
-	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
-		this.ccmFactory = ccmFactory;
-	}
 
 	public ICommManager getCommManager() {
 		return commManager;
