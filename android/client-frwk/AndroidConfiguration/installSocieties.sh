@@ -22,12 +22,18 @@ installSocietiesAPK() {
 	echo ""
 	echo "Install SocietiesComms on $1"
 	echo "----------------------------------------------"
-	adb -s $1 install -r ../SocietiesAndroidComms/target/SocietiesComms.apk
+	adb -s $1 install -r ../SocietiesAndroidCommsApp/target/SocietiesAndroidCommsApp.apk
+ 
 	
 	echo ""
 	echo "Install SocietiesAndroidApp on $1"
 	echo "--------------------------"
  	adb -s $1 install -r ../SocietiesAndroidApp/target/SocietiesAndroidApp.apk
+
+        echo ""
+        echo "Install SocietiesLoginTester on $1"
+        echo "--------------------------"
+        adb -s $1 install -r ../SocietiesLibraries/SocietiesLoginTesterApp/target/SocietiesLoginTesterApp.apk
 
 }
 
