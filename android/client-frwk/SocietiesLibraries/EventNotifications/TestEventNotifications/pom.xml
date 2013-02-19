@@ -8,15 +8,15 @@
         <version>RELEASE</version>
    </parent>
 
-   <groupId>org.societies.android.platform.cismanager.test</groupId>
-   <artifactId>TestSocietiesCISManager</artifactId>
-   <name>TestPlatform CISManager</name>
+   <groupId>org.societies.android.platform.events.test</groupId>
+   <artifactId>TestEventsNotifications</artifactId>
+   <name>Test Events Notifications</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
    
    <properties>
-        <tested.project.dir>${project.basedir}/../ContainerSocietiesCISManager</tested.project.dir>
-        <tested.project.android.coverage>/data/data/org.societies.android.platform.cismanager.container/files/coverage.ec</tested.project.android.coverage>
+        <tested.project.dir>${project.basedir}/../ContainerEventNotifications</tested.project.dir>
+        <tested.project.android.coverage>/data/data/org.societies.android.platform.events.container/files/coverage.ec</tested.project.android.coverage>
    </properties>
 
    <developers>
@@ -46,25 +46,18 @@
             <artifactId>android-test</artifactId>
 		</dependency>
 		<dependency>
-			   <groupId>org.societies.android.platform.cismanager.container</groupId>
-			   <artifactId>ContainerSocietiesCISManager</artifactId>
-			   <version>${release.version}</version>
-				<scope>provided</scope>
-				<type>jar</type>
-		</dependency>
-        <dependency>
-			   <groupId>org.societies.android.platform.cismanager.container</groupId>
-			   <artifactId>ContainerSocietiesCISManager</artifactId>
-                <version>${release.version}</version>
-                <type>apk</type>
-        </dependency>
-		<dependency>
-		   <groupId>org.societies.android.platform.cis</groupId>
-		   <artifactId>CommunityManagerService</artifactId>
+			<groupId>org.societies.android.platform.events.container</groupId>
+			<artifactId>ContainerEventsNotifications</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
-			<type>apklib</type>
-		</dependency>   
+			<type>jar</type>
+		</dependency>
+        <dependency>
+			<groupId>org.societies.android.platform.events.container</groupId>
+			<artifactId>ContainerEventsNotifications</artifactId>
+			<version>${release.version}</version>
+			<type>apk</type>
+        </dependency>
         <dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>
