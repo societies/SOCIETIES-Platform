@@ -34,6 +34,8 @@
                         selectionMode="single" selection="#{profileSettings.selectedTreeNode}"
                         dynamic="true">
 
+                    <p:ajax event="select" listener="#{profileSettings.updateTreeSelection}"/>
+
                     <p:treeNode id="defaultNode">
                         <h:outputText value="#{data}" id="lblNode_default"/>
                     </p:treeNode>
@@ -48,7 +50,8 @@
                     </p:treeNode>
 
                     <p:treeNode id="outcomeNode" type="outcome">
-                        <h:outputText value="#{data.parameterName} #{data.value}" id="lblNode_outcome" style="color: #00c;" />
+                        <h:outputText value="#{data.parameterName} #{data.value}" id="lblNode_outcome"
+                                      style="color: #00c;"/>
                     </p:treeNode>
 
                 </p:tree>

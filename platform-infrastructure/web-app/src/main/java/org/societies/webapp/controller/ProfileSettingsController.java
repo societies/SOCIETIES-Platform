@@ -37,15 +37,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-//@Controller // Spring
 @ManagedBean(name = "profileSettings") // JSF
 @SessionScoped // JSF
-//@Scope("Request") // Spring
 public class ProfileSettingsController extends BasePageController {
 
     public static final String OUTCOME_NODE = "outcome";
@@ -64,18 +59,20 @@ public class ProfileSettingsController extends BasePageController {
 
     private TreeNode preferencesRootNode;
     private TreeNode selectedTreeNode;
-    private IPreferenceCondition conditionToEdit;
-    private IPreferenceOutcome outcomeToEdit;
-    private PreferenceDetails preferenceToEdit;
-    private IPreferenceCondition conditionToDelete;
-    private IPreferenceOutcome outcomeToDelete;
-    private PreferenceDetails preferenceToDelete;
+    private PreferenceDetails selectedPreference;
+    private IPreferenceCondition selectedCondition;
+    private IPreferenceOutcome selectedOutcome;
+    private IPreferenceCondition conditionToAdd = new ContextPreferenceCondition(null, OperatorConstants.EQUALS, "", "");
+    private IPreferenceOutcome outcomeToAdd = new PreferenceOutcome(null, "", "", "");
+    private String addConditionMode;
 
     /* The following are used for the edit/delete methods, to map a condition/outcome to the parent preference */
     private final Map<IPreferenceCondition, PreferenceDetails> conditionToPDMap = new HashMap<IPreferenceCondition, PreferenceDetails>();
     private final Map<IPreferenceOutcome, PreferenceDetails> outcomeToPDMap = new HashMap<IPreferenceOutcome, PreferenceDetails>();
     private final Map<IPreferenceCondition, IPreference> conditionToPreferenceMap = new HashMap<IPreferenceCondition, IPreference>();
     private final Map<IPreferenceOutcome, IPreference> outcomeToPreferenceMap = new HashMap<IPreferenceOutcome, IPreference>();
+    private final Map<PreferenceDetails, IPreference> pdToPreferenceMap = new HashMap<PreferenceDetails, IPreference>();
+
 
     public ProfileSettingsController() {
         log.info("ProfileSettingsController ctor");
@@ -131,88 +128,32 @@ public class ProfileSettingsController extends BasePageController {
         return selectedTreeNode;
     }
 
-    public PreferenceDetails getPreferenceToEdit() {
-//        log.trace("getPreferenceToEdit()");
-        return preferenceToEdit;
+    public PreferenceDetails getSelectedPreference() {
+        return selectedPreference;
     }
 
-    public IPreferenceCondition getConditionToEdit() {
-//        log.trace("getConditionToEdit() = " + conditionToEdit);
-        return conditionToEdit;
+    public IPreferenceCondition getSelectedCondition() {
+        return selectedCondition;
     }
 
-    public IPreferenceOutcome getOutcomeToEdit() {
-//        log.trace("getOutcomeToEdit()");
-        return outcomeToEdit;
+    public IPreferenceOutcome getSelectedOutcome() {
+        return selectedOutcome;
     }
 
-    public IPreferenceCondition getConditionToDelete() {
-        return conditionToDelete;
+    public IPreferenceCondition getConditionToAdd() {
+        return conditionToAdd;
     }
 
-    public IPreferenceOutcome getOutcomeToDelete() {
-        return outcomeToDelete;
+    public IPreferenceOutcome getOutcomeToAdd() {
+        return outcomeToAdd;
     }
 
-    public PreferenceDetails getPreferenceToDelete() {
-        return preferenceToDelete;
+    public OperatorConstants[] getConditionOperators() {
+        return OperatorConstants.values().clone();
     }
+
 
     /* Public methods */
-    public void editSelectedNode() {
-        log.trace("editSelectedNode()");
-        this.preferenceToEdit = null;
-        this.conditionToEdit = null;
-        this.outcomeToEdit = null;
-        this.preferenceToDelete = null;
-        this.conditionToDelete = null;
-        this.outcomeToDelete = null;
-
-        if (getSelectedTreeNode() == null) {
-            super.addGlobalMessage("No node selected", "No node selected", FacesMessage.SEVERITY_WARN);
-
-        } else if (PREFERENCE_NODE.equals(getSelectedTreeNode().getType())) {
-            PreferenceDetails preferenceDetails = (PreferenceDetails) getSelectedTreeNode().getData();
-            log.debug("setting preference to edit: " + preferenceDetails);
-            this.preferenceToEdit = preferenceDetails;
-
-//            super.addGlobalMessage(preferenceDetails.getPreferenceName(), "Selected edit on preference", FacesMessage.SEVERITY_INFO);
-        } else if (CONDITION_NODE.equals(getSelectedTreeNode().getType())) {
-            IPreferenceCondition condition = (IPreferenceCondition) getSelectedTreeNode().getData();
-            log.debug("setting condition to edit: " + condition);
-            this.conditionToEdit = condition;
-
-//            super.addGlobalMessage(condition.getname(), "Selected edit on condition", FacesMessage.SEVERITY_INFO);
-        } else if (OUTCOME_NODE.equals(getSelectedTreeNode().getType())) {
-            IPreferenceOutcome outcome = (IPreferenceOutcome) getSelectedTreeNode().getData();
-            log.debug("setting outcome to edit: " + outcome);
-            this.outcomeToEdit = outcome;
-
-//            super.addGlobalMessage(outcome.getparameterName(), "Selected edit on outcome", FacesMessage.SEVERITY_INFO);
-        } else {
-            super.addGlobalMessage("No node selected", "You've probably tried to edit the root node. Well done. You win a gold star", FacesMessage.SEVERITY_WARN);
-        }
-
-    }
-
-//    public void saveConditionListener() {
-//        log.trace("saveConditionListener()");
-//
-//        PreferenceDetails preferenceDetails = conditionToPDMap.get(conditionToEdit);
-//        IPreference preference = conditionToPreferenceMap.get(conditionToEdit);
-//
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
-//    }
-//
-//    public void saveOutcomeListener() {
-//        log.trace("saveOutcomeListener()");
-//
-//        PreferenceDetails preferenceDetails = outcomeToPDMap.get(outcomeToEdit);
-//        IPreference preference = outcomeToPreferenceMap.get(outcomeToEdit);
-//
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
-//    }
-
     public void savePreferenceState() {
         log.trace("savePreferenceState()");
 
@@ -233,8 +174,8 @@ public class ProfileSettingsController extends BasePageController {
             userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
 
             String fmt = "%s %s %s";
-            addGlobalMessage("Condition updated",
-                    String.format(fmt, condition.getname() + " " + condition.getoperator() + " " + condition.getvalue()),
+            addGlobalMessage("Condition updated for " + preferenceDetails.getPreferenceName(),
+                    String.format(fmt, condition.getname(), condition.getoperator(), condition.getvalue()),
                     FacesMessage.SEVERITY_INFO);
 
         } else if (node.getData() instanceof IPreferenceOutcome) {
@@ -245,7 +186,7 @@ public class ProfileSettingsController extends BasePageController {
             userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
 
             String fmt = "%s = %s (q=%s, p=%s)";
-            addGlobalMessage("Outcome updated",
+            addGlobalMessage("Outcome updated for " + preferenceDetails.getPreferenceName(),
                     String.format(fmt, outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
                     FacesMessage.SEVERITY_INFO);
 
@@ -260,40 +201,144 @@ public class ProfileSettingsController extends BasePageController {
 
     public void deleteSelectedNode() {
         log.trace("deleteSelectedNode()");
-        this.preferenceToEdit = null;
-        this.conditionToEdit = null;
-        this.outcomeToEdit = null;
-        this.preferenceToDelete = null;
-        this.conditionToDelete = null;
-        this.outcomeToDelete = null;
 
+        TreeNode node = getSelectedTreeNode();
+        if (node == null) {
+
+            addGlobalMessage("Cannot delete", "No node selected", FacesMessage.SEVERITY_WARN);
+
+        } else if (node.getData() == null) {
+
+            addGlobalMessage("Cannot delete", "No data in selected node", FacesMessage.SEVERITY_WARN);
+
+        } else if (node.getData() instanceof IPreferenceCondition) {
+
+            IPreferenceCondition condition = (IPreferenceCondition) node.getData();
+            PreferenceDetails preferenceDetails = conditionToPDMap.get(condition);
+            IPreference preference = conditionToPreferenceMap.get(condition);
+
+            log.debug("Deleting condition...");
+            IPreference parent = (IPreference) preference.getParent();
+            // remove the preference from its parent
+            parent.remove(preference);
+
+            // TODO: remove child nodes?
+
+            userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
+
+            // clear down the preference tree, which will cause it to be rebuilt from the UPM
+            preferencesRootNode = null;
+
+            String fmt = "%s %s %s";
+            addGlobalMessage("Condition removed for " + preferenceDetails.getPreferenceName(),
+                    String.format(fmt, condition.getname(), condition.getoperator(), condition.getvalue()),
+                    FacesMessage.SEVERITY_INFO);
+
+        } else if (node.getData() instanceof IPreferenceOutcome) {
+
+            IPreferenceOutcome outcome = (IPreferenceOutcome) node.getData();
+            PreferenceDetails preferenceDetails = outcomeToPDMap.get(outcome);
+            IPreference preference = outcomeToPreferenceMap.get(outcome);
+
+            log.debug("Deleting outcome...");
+            IPreference parent = (IPreference) preference.getParent();
+            // remove the preference from its parent
+            parent.remove(preference);
+
+            // TODO: remove child nodes?
+
+            userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
+
+            // clear down the preference tree, which will cause it to be rebuilt from the UPM
+            preferencesRootNode = null;
+
+            String fmt = "%s = %s (q=%s, p=%s)";
+            addGlobalMessage("Outcome removed for " + preferenceDetails.getPreferenceName(),
+                    String.format(fmt, outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
+                    FacesMessage.SEVERITY_INFO);
+
+        } else {
+
+            addGlobalMessage("Cannot delete", "The node you selected cannot be deleted", FacesMessage.SEVERITY_WARN);
+
+        }
+    }
+
+    public boolean isShowAddCondition() {
+        // ONLY time not to show "add condition" is when the root preference is selected, and it has no children
+
+        if (selectedPreference != null) {
+            IPreference preference = pdToPreferenceMap.get(selectedPreference);
+
+            // only enable this if the preference has current children
+            return hasConditionAsDirectChild(preference) || hasOutcomeAsDirectChild(preference);
+        }
+
+        return true;
+    }
+
+    public boolean isShowAddOutcome() {
+        // DON'T show add outcome if:
+        // - Adding a condition before anything
+
+        return !"before".equals(addConditionMode);
+    }
+
+    public void addConditionAndOutcome() {
+
+    }
+
+    public void addConditionBefore() {
+
+    }
+
+    public void addConditionAfter() {
+
+    }
+
+    public void addOutcomeOnly() {
+
+    }
+
+    public void updateTreeSelection() {
+        this.selectedCondition = null;
+        this.selectedOutcome = null;
+        this.selectedPreference = null;
 
         if (getSelectedTreeNode() == null) {
-            super.addGlobalMessage("No node selected", "No node selected", FacesMessage.SEVERITY_WARN);
+//            super.addGlobalMessage("No node selected", "No node selected", FacesMessage.SEVERITY_WARN);
 
         } else if (PREFERENCE_NODE.equals(getSelectedTreeNode().getType())) {
             PreferenceDetails preferenceDetails = (PreferenceDetails) getSelectedTreeNode().getData();
-            log.debug("setting preference to delete: " + preferenceDetails);
-            this.preferenceToDelete = preferenceDetails;
+            log.debug("setting preference to edit: " + preferenceDetails);
+            this.selectedPreference = preferenceDetails;
 
-//            super.addGlobalMessage(preferenceDetails.getPreferenceName(), "Selected delete on preference", FacesMessage.SEVERITY_INFO);
+//            super.addGlobalMessage(preferenceDetails.getPreferenceName(), "Selected edit on preference", FacesMessage.SEVERITY_INFO);
         } else if (CONDITION_NODE.equals(getSelectedTreeNode().getType())) {
             IPreferenceCondition condition = (IPreferenceCondition) getSelectedTreeNode().getData();
-            log.debug("setting condition to delete: " + condition);
-            this.conditionToDelete = condition;
+            log.debug("setting condition to edit: " + condition);
+            this.selectedCondition = condition;
 
-//            super.addGlobalMessage(condition.getname(), "Selected delete on condition", FacesMessage.SEVERITY_INFO);
+//            super.addGlobalMessage(condition.getname(), "Selected edit on condition", FacesMessage.SEVERITY_INFO);
         } else if (OUTCOME_NODE.equals(getSelectedTreeNode().getType())) {
             IPreferenceOutcome outcome = (IPreferenceOutcome) getSelectedTreeNode().getData();
-            log.debug("setting outcome to delete: " + outcome);
-            this.outcomeToDelete = outcome;
+            log.debug("setting outcome to edit: " + outcome);
+            this.selectedOutcome = outcome;
 
-//            super.addGlobalMessage(outcome.getparameterName(), "Selected delete on outcome", FacesMessage.SEVERITY_INFO);
+//            super.addGlobalMessage(outcome.getparameterName(), "Selected edit on outcome", FacesMessage.SEVERITY_INFO);
         } else {
-            super.addGlobalMessage("No node selected", "You've probably tried to delete the root node. Well done. You win a gold star", FacesMessage.SEVERITY_WARN);
+//            super.addGlobalMessage("No node selected", "You've probably tried to edit the root node. Well done. You win a gold star", FacesMessage.SEVERITY_WARN);
         }
-
     }
+
+    public void selectAddConditionBefore() {
+        this.addConditionMode = "before";
+    }
+
+    public void selectAddConditionAfter() {
+        this.addConditionMode = "after";
+    }
+
 
     /* Private helper methods */
     private void populatePreferencesRootNode() {
@@ -314,12 +359,18 @@ public class ProfileSettingsController extends BasePageController {
         }
 
         List<PreferenceDetails> detailsList = userPreferenceManagement.getPreferenceDetailsForAllPreferences();
-
         if (detailsList == null) {
             log.warn("userPreferenceManagement returned null preference details list");
             return;
         }
 
+        // sort the preferences by name
+        Collections.sort(detailsList, new Comparator<PreferenceDetails>() {
+            @Override
+            public int compare(PreferenceDetails o1, PreferenceDetails o2) {
+                return o1.getPreferenceName().compareTo(o2.getPreferenceName());
+            }
+        });
 
         for (PreferenceDetails preferenceDetails : detailsList) {
             IPreferenceTreeModel preferenceTreeModel =
@@ -339,6 +390,8 @@ public class ProfileSettingsController extends BasePageController {
         log.trace("Creating preference node: " + preferenceDetails.getPreferenceName());
 
         IPreference preference = preferenceTreeModel.getRootPreference();
+
+        pdToPreferenceMap.put(preferenceDetails, preference);
 
         processSubnodes(preference, preferenceNode, preferenceDetails);
 
@@ -389,41 +442,108 @@ public class ProfileSettingsController extends BasePageController {
 
     private void processSubnodes(IPreference preference, TreeNode node, PreferenceDetails preferenceDetails) {
         Enumeration<IPreference> e = preference.postorderEnumeration();
-        boolean conditionsFound = false;
-        // process conditions ONLY
+
+        List<IPreference> conditions = new ArrayList<IPreference>();
+        List<IPreference> outcomes = new ArrayList<IPreference>();
+
         while (e.hasMoreElements()) {
             IPreference ele = e.nextElement();
             if (ele == preference) continue;
-
             if (ele.isBranch()) {
                 // this is a CONDITION
-                populateConditionNode(ele, node, preferenceDetails);
-                conditionsFound = true;
+                conditions.add(ele);
+//                populateConditionNode(ele, node, preferenceDetails);
             } else if (ele.isLeaf()) {
                 // this is an OUTCOME
-//                populateOutcomeNode(ele, node);
+                outcomes.add(ele);
+//                populateOutcomeNode(ele, node, preferenceDetails);
             }
         }
-        // process outcomes ONLY
-        if (!conditionsFound) {
-            e = preference.postorderEnumeration();
-            while (e.hasMoreElements()) {
-                IPreference ele = e.nextElement();
-                if (ele == preference) continue;
 
-                if (ele.isBranch()) {
-                    // this is a CONDITION
-//                    populateConditionNode(ele, node);
-                } else if (ele.isLeaf()) {
-                    // this is an OUTCOME
-                    populateOutcomeNode(ele, node, preferenceDetails);
+        // process conditions
+        if (conditions.size() > 0) {
+            Collections.sort(conditions, new Comparator<IPreference>() {
+                @Override
+                public int compare(IPreference o1, IPreference o2) {
+                    int c;
+                    IPreferenceCondition c1 = o1.getCondition();
+                    IPreferenceCondition c2 = o2.getCondition();
+
+                    // compare by name
+                    c = c1.getname().compareTo(c2.getname());
+                    if (c != 0)
+                        return c;
+
+                    // if same, compare by operator
+                    c = c1.getoperator().getDescription().compareTo(c2.getoperator().getDescription());
+                    if (c != 0)
+                        return c;
+
+                    // if same, compare by value
+                    c = c1.getvalue().compareTo(c2.getvalue());
+                    return c;
                 }
+            });
+
+            for (IPreference ele : conditions) {
+                populateConditionNode(ele, node, preferenceDetails);
+            }
+        }
+        // process outcomes only if no conditions found
+        else if (outcomes.size() > 0) {
+            Collections.sort(outcomes, new Comparator<IPreference>() {
+                @Override
+                public int compare(IPreference o1, IPreference o2) {
+                    int c;
+                    IPreferenceOutcome c1 = o1.getOutcome();
+                    IPreferenceOutcome c2 = o2.getOutcome();
+
+                    // compare by value
+                    c = c1.getvalue().compareTo(c2.getvalue());
+                    return c;
+                }
+            });
+
+            for (IPreference ele : outcomes) {
+                populateOutcomeNode(ele, node, preferenceDetails);
             }
         }
     }
 
+    private boolean hasConditionAsDirectChild(IPreference parent) {
+        Enumeration<IPreference> e = parent.breadthFirstEnumeration();
 
-    public OperatorConstants[] getConditionOperators() {
-        return OperatorConstants.values();
+        while (e.hasMoreElements()) {
+            IPreference ele = e.nextElement();
+            if (ele == parent) continue;
+
+            if (ele.isBranch()) {
+                return true;
+            }
+
+        }
+
+        return false;
     }
+
+    private boolean hasOutcomeAsDirectChild(IPreference parent) {
+        Enumeration<IPreference> e = parent.breadthFirstEnumeration();
+
+        boolean foundOutcome = false;
+        while (e.hasMoreElements()) {
+            IPreference ele = e.nextElement();
+            if (ele == parent) continue;
+
+            if (ele.isBranch()) {
+                return false;
+            }
+
+            if (ele.isLeaf()) {
+                foundOutcome = true;
+            }
+        }
+
+        return foundOutcome;
+    }
+
 }

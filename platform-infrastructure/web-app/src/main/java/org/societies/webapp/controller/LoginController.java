@@ -3,7 +3,6 @@ package org.societies.webapp.controller;
 import org.societies.api.identity.IIdentity;
 import org.societies.webapp.service.OpenfireLoginService;
 import org.societies.webapp.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.faces.application.FacesMessage;
@@ -16,10 +15,10 @@ import javax.faces.bean.SessionScoped;
 @SessionScoped // indicates the lifetime of this object
 public class LoginController extends BasePageController {
 
-//    @Autowired
+    //    @Autowired
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
-//    @Autowired
+    //    @Autowired
     @ManagedProperty(value = "#{openfireLoginService}")
     private OpenfireLoginService openfireLoginService;
 
@@ -64,6 +63,10 @@ public class LoginController extends BasePageController {
 
         String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
         if (result == null) {
+            String summary = "Login failed";
+            String detail = "Incorrect username or password";
+            addGlobalMessage(summary, detail, FacesMessage.SEVERITY_WARN);
+
             return "false";
         }
 

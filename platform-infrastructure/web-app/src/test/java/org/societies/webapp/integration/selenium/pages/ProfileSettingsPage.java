@@ -30,6 +30,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.societies.webapp.integration.selenium.components.ProfileSettingsTreeContextMenu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProfileSettingsPage extends BaseSocietiesPage {
     private static final String TITLE = "//h4[@class='form_title']";
     private static final String IDENTIFIER = "//li[contains(text(), 'Identifier:')]";
@@ -38,15 +41,39 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
     private static final String JID = "//li[contains(text(), 'JID:')]";
     private static final String BARE_JID = "//li[contains(text(), 'Bare JID:')]";
 
+    private static final String ROOT_NODE_XPATH = "//*[@id='mainForm:preferenceTree:lblNode_default']";
+    private static final String PREF_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_preference')]";
+    private static final String CONDITION_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_condition')]";
+    private static final String OUTCOME_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_outcome')]";
+
     private static final String PREF_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_preference']";
     private static final String CONDITION_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_condition']";
     private static final String OUTCOME_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_outcome']";
     private static final String NODE_ID_SEPARATOR = "_";
 
+
+    public enum TreeNodeType {PREFERENCE, CONDITION, ROOT, OUTCOME}
+
+    public static class TreeNode {
+
+        public String text;
+        public TreeNodeType type;
+        public final List<TreeNode> subNodes = new ArrayList<TreeNode>();
+
+        public TreeNode(String text, TreeNodeType type) {
+            this.text = text;
+            this.type = type;
+        }
+
+        public TreeNode(String text, TreeNodeType type, TreeNode parentNode) {
+            this(text, type);
+            parentNode.subNodes.add(this);
+        }
+    }
+
     public ProfileSettingsPage(WebDriver driver) {
         super(driver);
     }
-
 
     public void verifyUsernameInTitle(String username) {
         WebElement title = waitUntilVisible(By.xpath(TITLE));
@@ -73,40 +100,52 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
     }
 
-    public void verifyPreferencesInTree(String[] preferences) {
-        verifyNodesInTree(new int[]{},
-                preferences,
-                PREF_NODE_BY_INDEX);
-    }
 
-    public void verifyConditionsInTree(int[] parents, String[] conditions) {
-        verifyNodesInTree(parents,
-                conditions,
-                CONDITION_NODE_BY_INDEX);
-    }
+    public void verifyPreferenceTreeState(TreeNode rootNode) {
+        // always wait until the root node is visible - it ensures that the page is loaded
+        waitUntilVisible(By.xpath(ROOT_NODE_XPATH));
 
-    public void verifyOutcomeInTree(int[] parents, String outcome) {
-        verifyNodesInTree(parents,
-                new String[]{outcome},
-                OUTCOME_NODE_BY_INDEX);
-    }
+        List<WebElement> nodes;
+        String xpath;
 
-    private void verifyNodesInTree(int[] parentIDs, String[] expectedNodes, String xpath) {
+        // now that we know the root node is visible, we can just do a simple verify
+        // this will stop time being wasted if the test is going to fail - it all adds up if this method is repeated often
+        switch (rootNode.type) {
+            case ROOT:
+                xpath = ROOT_NODE_XPATH;
+                break;
+            case PREFERENCE:
+                xpath = PREF_NODE_XPATH;
+                break;
+            case CONDITION:
+                xpath = CONDITION_NODE_XPATH;
+                break;
+            case OUTCOME:
+                xpath = OUTCOME_NODE_XPATH;
+                break;
 
-        // if this is the 3rd level of the tree, the ID string will look something like 1_0_2
-        // so we need to build the "1_0_" to append before the individual nodes on this level
-        String root_id = "";
-        for (int id : parentIDs) {
-            root_id += id + NODE_ID_SEPARATOR;
+            default:
+                Assert.fail("invalid node type" + rootNode.type.toString());
+                return;
         }
 
-        for (int i = 0; i < expectedNodes.length; i++) {
-            WebElement node = waitUntilVisible(By.xpath(String.format(xpath, root_id + i)));
+        nodes = verifyElementsVisible(By.xpath(xpath));
 
-            Assert.assertEquals(expectedNodes[i], node.getText());
+        boolean found = false;
+        for (WebElement node : nodes) {
+            if (rootNode.text.equals(node.getText())) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            Assert.fail("Node with text " + rootNode.text + " not found by xpath " + xpath);
+        }
+
+        for (TreeNode subNode : rootNode.subNodes) {
+            verifyPreferenceTreeState(subNode);
         }
     }
-
 
     public ProfileSettingsTreeContextMenu openContextMenuOnPreferenceNode(int[] indicies, String expectedText) {
         return openContextMenuOnNode(indicies, PREF_NODE_BY_INDEX, expectedText);

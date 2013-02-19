@@ -24,10 +24,7 @@
  */
 package org.societies.webapp.integration.selenium;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
@@ -126,6 +123,28 @@ public abstract class AbstractSeleniumComponent {
         throw new NoSuchElementException("Element identified by [" + by.toString() + "] not enabled after " + findTimeoutMillis + "ms", lastEx);
     }
 
+    protected List<WebElement> verifyElementsVisible(By by) {
+        List<WebElement> elements = driver.findElements(by);
+
+        for (WebElement element : elements) {
+            if (element == null || !element.isDisplayed()) {
+                throw new NoSuchElementException("Element identified by [" + by.toString() + "] not visible");
+            }
+        }
+
+        return elements;
+    }
+
+    protected WebElement verifyVisible(By by) {
+        WebElement element = driver.findElement(by);
+
+        if (element != null && element.isDisplayed()) {
+            return element;
+        }
+
+        throw new NoSuchElementException("Element identified by [" + by.toString() + "] not visible");
+    }
+
     protected WebElement waitUntilVisible(By by) {
         // Sleep until the element we want is visible or timeout is over
         long end = System.currentTimeMillis() + findTimeoutMillis;
@@ -140,6 +159,9 @@ public abstract class AbstractSeleniumComponent {
             } catch (NoSuchElementException ex) {
                 // do nothing
                 lastEx = ex;
+            } catch (StaleElementReferenceException ex) {
+                // occasionally happens when isDisplayed() is called in this fashion, shouldn't be an issue
+                continue; // just try again
             }
 
             threadSleep();

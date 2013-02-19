@@ -25,12 +25,10 @@
 package org.societies.webapp.integration.tests;
 
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
-import org.societies.webapp.integration.selenium.components.ProfileSettingsEditConditionDialog;
-import org.societies.webapp.integration.selenium.components.ProfileSettingsTreeContextMenu;
+import org.societies.webapp.integration.selenium.components.*;
 import org.societies.webapp.integration.selenium.pages.IndexPage;
 import org.societies.webapp.integration.selenium.pages.ProfileSettingsPage;
 
@@ -40,6 +38,18 @@ public class TestProfileSettings extends SeleniumTest {
 
     private ProfileSettingsPage profileSettingsPage;
 
+    private ProfileSettingsPage.TreeNode preferenceTreeRoot;
+    private ProfileSettingsPage.TreeNode bgColourNode;
+    private ProfileSettingsPage.TreeNode bgColourHomeConditionNode;
+    private ProfileSettingsPage.TreeNode bgColourWorkConditionNode;
+    private ProfileSettingsPage.TreeNode bgColourHomeOutcomeNode;
+    private ProfileSettingsPage.TreeNode bgColourWorkOutcomeNode;
+    private ProfileSettingsPage.TreeNode volumeNode;
+    private ProfileSettingsPage.TreeNode volumeHomeConditionNode;
+    private ProfileSettingsPage.TreeNode volumeWorkConditionNode;
+    private ProfileSettingsPage.TreeNode volumeHomeOutcomeNode;
+    private ProfileSettingsPage.TreeNode volumeWorkOutcomeNode;
+
     @Before
     public void setupTest() {
         IndexPage indexPage = new IndexPage(getDriver());
@@ -47,6 +57,26 @@ public class TestProfileSettings extends SeleniumTest {
         indexPage.doLogin(USERNAME, PASSWORD);
 
         profileSettingsPage = indexPage.navigateToProfileSettings();
+
+        buildDefaultPreferenceTree();
+
+
+    }
+
+    private void buildDefaultPreferenceTree() {
+        preferenceTreeRoot = new ProfileSettingsPage.TreeNode("Preferences", ProfileSettingsPage.TreeNodeType.ROOT);
+
+        bgColourNode = new ProfileSettingsPage.TreeNode("bgColour", ProfileSettingsPage.TreeNodeType.PREFERENCE, preferenceTreeRoot);
+        bgColourHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home", ProfileSettingsPage.TreeNodeType.CONDITION, bgColourNode);
+        bgColourWorkConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS work", ProfileSettingsPage.TreeNodeType.CONDITION, bgColourNode);
+        bgColourHomeOutcomeNode = new ProfileSettingsPage.TreeNode("bgColour red", ProfileSettingsPage.TreeNodeType.OUTCOME, bgColourHomeConditionNode);
+        bgColourWorkOutcomeNode = new ProfileSettingsPage.TreeNode("bgColour black", ProfileSettingsPage.TreeNodeType.OUTCOME, bgColourWorkConditionNode);
+
+        volumeNode = new ProfileSettingsPage.TreeNode("volume", ProfileSettingsPage.TreeNodeType.PREFERENCE, preferenceTreeRoot);
+        volumeHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home", ProfileSettingsPage.TreeNodeType.CONDITION, volumeNode);
+        volumeWorkConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS work", ProfileSettingsPage.TreeNodeType.CONDITION, volumeNode);
+        volumeHomeOutcomeNode = new ProfileSettingsPage.TreeNode("volume 10", ProfileSettingsPage.TreeNodeType.OUTCOME, volumeHomeConditionNode);
+        volumeWorkOutcomeNode = new ProfileSettingsPage.TreeNode("volume 50", ProfileSettingsPage.TreeNodeType.OUTCOME, volumeWorkConditionNode);
     }
 
     @Test
@@ -58,51 +88,212 @@ public class TestProfileSettings extends SeleniumTest {
 
     @Test
     public void verifyTreeDisplayedCorrectly() {
-        // verify the preferences have been displayed correctly
-        profileSettingsPage.verifyPreferencesInTree(
-                new String[]{"bgColour", "volume"}
-        );
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+    }
 
-        // verify the volume conditions have been displayed
-        profileSettingsPage.verifyConditionsInTree(
-                new int[]{0}, //volume
-                new String[]{"locationSymbolic EQUALS home", "locationSymbolic EQUALS work"}
-        );
-        // verify the bgColor conditions have been displayed
-        profileSettingsPage.verifyConditionsInTree(
-                new int[]{1}, // bgColor
-                new String[]{"locationSymbolic EQUALS home", "locationSymbolic EQUALS work"}
-        );
+    @Test
+    public void openPopups_hitCancelButton_noChangesMade() {
+        ProfileSettingsTreeContextMenu ctxMenu;
 
-        // verify the volume outcomes are correct
-        profileSettingsPage.verifyOutcomeInTree(new int[]{0, 0}, "bgColour red");
-        profileSettingsPage.verifyOutcomeInTree(new int[]{0, 1}, "bgColour black");
-        profileSettingsPage.verifyOutcomeInTree(new int[]{1, 0}, "volume 10");
-        profileSettingsPage.verifyOutcomeInTree(new int[]{1, 1}, "volume 50");
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD... TO PREFERENCE DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnPreferenceNode(
+                new int[]{1},
+                "volume");
+        ProfileSettingsAddConditionAndOutcomeDialog addConditionAndOutcomeDialog = ctxMenu.clickAdd();
+        addConditionAndOutcomeDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD CONDITION BEFORE CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{1, 0},
+                "locationSymbolic EQUALS home");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddBefore();
+        addConditionAndOutcomeDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD CONDITION AND OUTCOME TO CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{1, 0},
+                "locationSymbolic EQUALS home");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddConditionAndOutcome();
+        addConditionAndOutcomeDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // EDIT CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{0, 0},
+                "locationSymbolic EQUALS home");
+        ProfileSettingsEditConditionDialog editConditionDialog = ctxMenu.clickEditCondition();
+        // change values to ensure it's not accidentally persisted
+        editConditionDialog.setName("newName");
+        editConditionDialog.setOperator("greater than");
+        editConditionDialog.setValue("newValue");
+        editConditionDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // DELETE CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{1, 0},
+                "locationSymbolic EQUALS home");
+        ProfileSettingsDeleteDialog deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD CONDITION BEFORE OUTCOME DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{1, 0, 0},
+                "volume 10");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddBefore();
+        addConditionAndOutcomeDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // EDIT OUTCOME DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{0, 1, 0},
+                "bgColour black");
+        ProfileSettingsEditOutcomeDialog editOutcomeDialog = ctxMenu.clickEditOutcome();
+        // change values to ensure it's not accidentally persisted
+        editOutcomeDialog.setValue("newValue2");
+        editOutcomeDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // DELETE OUTCOME DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{1, 0, 0},
+                "volume 10");
+        deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickCancel();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+
+        // refresh page, verify again
+        getDriver().get(getDriver().getCurrentUrl());
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+    }
+
+    @Test
+    public void addConditionAndOutcomeDialog_correctFieldsShown() {
+        ProfileSettingsTreeContextMenu ctxMenu;
+
+        // just to make sure the test is set up correctly
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD... TO PREFERENCE DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnPreferenceNode(
+                new int[]{1},
+                "volume");
+        ProfileSettingsAddConditionAndOutcomeDialog addConditionAndOutcomeDialog = ctxMenu.clickAdd();
+        addConditionAndOutcomeDialog.verifyConditionFieldsVisible();
+        addConditionAndOutcomeDialog.verifyOutcomeFieldsVisible();
+        addConditionAndOutcomeDialog.clickCancel();
+
+
+        // ADD CONDITION BEFORE CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{1, 0},
+                "locationSymbolic EQUALS home");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddBefore();
+        addConditionAndOutcomeDialog.verifyConditionFieldsVisible();
+        addConditionAndOutcomeDialog.verifyOutcomeFieldsNotVisible();
+        addConditionAndOutcomeDialog.clickCancel();
+
+
+        // ADD CONDITION AND OUTCOME TO CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{1, 0},
+                "locationSymbolic EQUALS home");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddConditionAndOutcome();
+        addConditionAndOutcomeDialog.verifyConditionFieldsVisible();
+        addConditionAndOutcomeDialog.verifyOutcomeFieldsVisible();
+        addConditionAndOutcomeDialog.clickCancel();
+
+
+        // ADD CONDITION BEFORE OUTCOME DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{1, 0, 0},
+                "volume 10");
+        addConditionAndOutcomeDialog = ctxMenu.clickAddBefore();
+        addConditionAndOutcomeDialog.verifyConditionFieldsVisible();
+        addConditionAndOutcomeDialog.verifyOutcomeFieldsNotVisible();
+        addConditionAndOutcomeDialog.clickCancel();
 
     }
 
     @Test
-    public void openPopups_hitCancelButton_NoChangesMade() {
+    public void editCondition_update3values_correctValuesUpdated() {
+        ProfileSettingsTreeContextMenu ctxMenu;
 
-        verifyTreeDisplayedCorrectly();
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
-        ProfileSettingsTreeContextMenu menu = profileSettingsPage.openContextMenuOnConditionNode(
+        // EDIT CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
                 new int[]{0, 0},
                 "locationSymbolic EQUALS home");
-        ProfileSettingsEditConditionDialog conditionDialog = menu.clickEdit();
+        ProfileSettingsEditConditionDialog editConditionDialog = ctxMenu.clickEditCondition();
 
-// change values to ensure it's not accidentally persisted
-        conditionDialog.setName("newName");
-        conditionDialog.setOperator("greater than");
-        conditionDialog.setValue("newValue");
+        // change values to ensure it's not accidentally persisted
+        editConditionDialog.setName("newName");
+        editConditionDialog.setOperator("greater than");
+        editConditionDialog.setValue("newValue");
+        editConditionDialog.clickSave();
 
-        conditionDialog.clickCancel();
+        // this is what the node should now display
+        bgColourWorkConditionNode.text = "newName GREATER THAN newValue";
 
-        verifyTreeDisplayedCorrectly();
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+        // refresh page, verify again
+        String url = getDriver().getCurrentUrl();
+        getDriver().get(BASE_URL);
+        getDriver().get(url);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+    }
 
-        Assert.fail("TODO: refresh page, verify again");
+    @Test
+    public void editOutcome_updateValue_correctValuesUpdated() {
+        ProfileSettingsTreeContextMenu ctxMenu;
 
-        verifyTreeDisplayedCorrectly();
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        // EDIT CONDITION DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{0, 1, 0},
+                "bgColour black");
+        ProfileSettingsEditOutcomeDialog dialog = ctxMenu.clickEditOutcome();
+
+        // change values to ensure it's not accidentally persisted
+        dialog.setValue("blue");
+        dialog.clickSave();
+
+        // this is what the node should now display
+        bgColourWorkOutcomeNode.text = "bgColour blue";
+
+        // verify tree
+//        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+        // refresh page, verify again
+        String url = getDriver().getCurrentUrl();
+        getDriver().get(BASE_URL);
+        getDriver().get(url);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 }

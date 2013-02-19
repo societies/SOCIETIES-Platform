@@ -30,27 +30,30 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.webapp.integration.selenium.rules.BrowserControlRule;
+import org.societies.webapp.integration.selenium.rules.SqlScriptRule;
 
 public abstract class SeleniumTest {
     public static final String BASE_URL = "http://localhost:8080/societies/";
-        public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
+    public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
 //    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
-
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
     private WebDriver driver;
+
+    @Rule
+    public SqlScriptRule sqlScriptRule;
 
     @Rule
     public BrowserControlRule browserControlRule;
 
     protected SeleniumTest() {
         this.driver = new ChromeDriver();
+        this.sqlScriptRule = new SqlScriptRule(this.getClass());
         this.browserControlRule = new BrowserControlRule(driver, BASE_URL, CLOSE_BROWSER_ON_FAILURE);
     }
 
     protected WebDriver getDriver() {
         return driver;
     }
-
 
 }

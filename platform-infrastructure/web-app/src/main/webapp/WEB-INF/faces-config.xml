@@ -19,6 +19,11 @@
 
     </application>
 
+    <converter>
+        <converter-for-class>org.societies.personalisation.preference.api.model.OperatorConstants</converter-for-class>
+        <converter-class>javax.faces.convert.EnumConverter</converter-class>
+    </converter>
+
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <!--<navigation-case>
