@@ -37,6 +37,8 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.DataIdentifierUtil;
+import org.societies.api.identity.DataTypeFactory;
+import org.societies.api.identity.DataTypeUtil;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
@@ -109,9 +111,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (!atLeast1MandatoryAction(actions)) {
 			throw new PrivacyException("[Parameters] At least one mandatory action is required, they can't be all optional.");
 		}
+		// Uncomment when data hiearchy will be ready :-)
+//		if (!(new DataTypeUtil().isLeaf(DataTypeFactory.getType(dataId)))) {
+//			throw new PrivacyException("[Parameters] Can't manage access control on data type "+DataTypeFactory.getType(dataId)+" (it is not a leaf in the data type hiearchy)");
+//		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
+		
 
 		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();

@@ -42,8 +42,7 @@ public class DataTypeFactory {
 	 * @return the relevant DataIdentifier type instance
 	 * @throws MalformedCtxIdentifierException 
 	 */
-	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
-	{
+	public static DataIdentifier fromUri(String dataIdUri) {
 		String[] uri = dataIdUri.split("://");
 		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
 
@@ -60,5 +59,12 @@ public class DataTypeFactory {
 		}
 		dataId.setType(path.substring(end+1, endType));
 		return dataId;
+	}
+	
+	public static String getType(DataIdentifier dataId) {
+		if (null != dataId.getType()) {
+			return dataId.getType();
+		}
+		return fromUri(dataId.getUri()).getType();
 	}
 }
