@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +62,6 @@ import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -95,6 +96,12 @@ public class CtxEventMgr implements ICtxEventMgr {
 	private final Set<LocalChangeEventHandler> localHandlers =
 			new CopyOnWriteArraySet<LocalChangeEventHandler>();
 	
+	private final ExecutorService localDispatchingService =
+			Executors.newSingleThreadExecutor();
+	
+	private final ExecutorService remoteDispatchingService =
+			Executors.newSingleThreadExecutor();
+	
 	@Autowired(required=true)
 	CtxEventMgr(PubsubClient pubsubClient) throws Exception {
 		
@@ -118,9 +125,8 @@ public class CtxEventMgr implements ICtxEventMgr {
 	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
 	 */
 	@Override
-    // TODO async???
 	public void post(final CtxEvent event, final String[] topics,
-			final CtxEventScope scope) throws CtxException {
+			final CtxEventScope scope) {
 		
 		if (event == null)
 			throw new NullPointerException("event can't be null");
@@ -137,25 +143,29 @@ public class CtxEventMgr implements ICtxEventMgr {
 			switch (scope) {
 
 			case LOCAL:
-				this.postLocalChangeEvent((CtxChangeEvent) event, topics);
+				this.localDispatchingService.execute(new LocalChangeEventDispatcher(
+						(CtxChangeEvent) event, topics));
 				break;
 			case INTRA_CSS:
 				// TODO Handle intra-CSS event publishing
 				break;
 			case INTER_CSS:
-				this.postRemoteChangeEvent((CtxChangeEvent) event, topics);
+				this.remoteDispatchingService.execute(new RemoteChangeEventDispatcher(
+						(CtxChangeEvent) event, topics));
 				break;
 			case BROADCAST:
-				this.postLocalChangeEvent((CtxChangeEvent) event, topics);
-				this.postRemoteChangeEvent((CtxChangeEvent) event, topics);
+				this.localDispatchingService.execute(new LocalChangeEventDispatcher(
+						(CtxChangeEvent) event, topics));
+				this.remoteDispatchingService.execute(new RemoteChangeEventDispatcher(
+						(CtxChangeEvent) event, topics));
 				break;	
 			default:
-				throw new CtxEventMgrException("Cannot post event to topics "
+				LOG.error("Cannot post event to topics "
 						+ Arrays.toString(topics) 
 						+ ": Unsupported CtxEventScope: " + scope);
 			}
 		} else {
-			throw new CtxEventMgrException("Cannot post event to topics "
+			LOG.error("Cannot post event to topics "
 					+ Arrays.toString(topics) 
 					+ ": Unsupported CtxEvent implementation");
 		}
@@ -360,89 +370,120 @@ public class CtxEventMgr implements ICtxEventMgr {
 		}
 	}
 	
-	private void postLocalChangeEvent(CtxChangeEvent event, String[] topics) 
-			throws CtxEventMgrException {
+	private class LocalChangeEventDispatcher implements Runnable {
 		
-		if (LOG.isDebugEnabled()) 
-			LOG.debug("Posting local context change event '" + event 
-					+ "' to topics '" + Arrays.toString(topics) + "'");
-		for (int i = 0; i < topics.length; ++i) {
+		private final CtxChangeEvent event;
+		
+		private final String[] topics;
+		
+		private LocalChangeEventDispatcher(CtxChangeEvent event, String[] topics) {
 			
-			final InternalEvent internalEvent = new InternalEvent(
-					topics[i], event.getId().toString(), event.getId().toString(), event.getId());
-			if (LOG.isDebugEnabled())
-				LOG.debug("Posting local context change event to topic '" 
-						+ topics[i] + "'" + " with internal event name '" 
-						+ internalEvent.geteventName() + "'");
-			try {
-				if (this.eventMgr == null)
-					throw new CtxEventMgrException(
-							"Could not post local context change event to topic '"
+			this.event = event;
+			this.topics = topics;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			if (LOG.isDebugEnabled()) 
+				LOG.debug("Posting local context change event '" + this.event 
+						+ "' to topics '" + Arrays.toString(this.topics) + "'");
+			for (int i = 0; i < this.topics.length; ++i) {
+
+				final InternalEvent internalEvent = new InternalEvent(
+						this.topics[i], this.event.getId().toString(), 
+						this.event.getId().toString(), this.event.getId());
+				if (LOG.isDebugEnabled())
+					LOG.debug("Posting local context change event to topic '" 
+							+ this.topics[i] + "'" + " with internal event name '" 
+							+ internalEvent.geteventName() + "'");
+				try {
+					if (eventMgr == null) {
+						LOG.error("Could not post local context change event to topic '"
+								+ this.topics[i] + "' with internal event name '" 
+								+ internalEvent.geteventName() 
+								+ "'': IEventMgr service is not available");
+						return;
+					}
+					eventMgr.publishInternalEvent(internalEvent);
+				} catch (EMSException emse) {
+
+					LOG.error("Could not post local context change event to topic '"
 							+ topics[i] + "' with internal event name '" 
 							+ internalEvent.geteventName() 
-							+ "'': IEventMgr service is not available");
-				this.eventMgr.publishInternalEvent(internalEvent);
-			} catch (EMSException emse) {
-
-				throw new CtxEventMgrException(
-						"Could not send post context change event to topic '"
-						+ topics[i] + "' with internal event name '" 
-						+ internalEvent.geteventName() 
-						+ "': " + emse.getLocalizedMessage(), emse);
+							+ "': " + emse.getLocalizedMessage(), emse);
+				}
 			}
 		}
 	}
 	
-	private void postRemoteChangeEvent(CtxChangeEvent event, String[] topics) 
-			throws CtxEventMgrException {
+	private class RemoteChangeEventDispatcher implements Runnable {
 		
-		if (LOG.isDebugEnabled()) 
-			LOG.debug("Posting remote context change event '" + event 
-					+ "' to topics '" + Arrays.toString(topics) + "'");
-		final IIdentity pubsubId;
-		final String itemId;
-		final CtxChangeEventBean eventBean;
-		try {
-			pubsubId = this.commMgr.getIdManager().fromJid(
-					event.getId().getOwnerId());
-			itemId = event.getId().toString();
-			eventBean = new CtxChangeEventBean();
-			eventBean.setId(itemId);
-		} catch (Exception e) {
-			throw new CtxEventMgrException("Could not post remote context change event '" 
-					+ event	+ "' to topics '" + Arrays.toString(topics) + "': "
-					+ e.getLocalizedMessage(), e);
-		}
+		private final CtxChangeEvent event;
+		
+		private final String[] topics;
+		
+		private RemoteChangeEventDispatcher(CtxChangeEvent event, String[] topics) {
 			
-		for (int i = 0; i < topics.length; ++i) {
+			this.event = event;
+			this.topics = topics;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
 
 			if (LOG.isDebugEnabled()) 
-				LOG.debug("NOT posting remote context change event to topic '" + topics[i] + "'"
-						+ " with itemId '" + itemId + "' until pubsub is fixed");/* TODO
-			if (LOG.isDebugEnabled()) 
-				LOG.debug("Posting remote context change event to topic '" + topics[i] + "'"
-						+ " with itemId '" + itemId + "'");
+				LOG.debug("Posting remote context change event '" + this.event 
+						+ "' to topics '" + Arrays.toString(this.topics) + "'");
+			final IIdentity pubsubId;
+			final String itemId;
+			final CtxChangeEventBean eventBean;
 			try {
-				if (this.pubsubClient == null)
-					throw new CtxEventMgrException("Could not post remote context change event to topic '"
-							+ topics[i] + "': PubsubClient service is not available");
-				if (!this.pubsubOwners.contains(pubsubId)) {
-					if (LOG.isInfoEnabled())
-						LOG.info("Creating pubsub nodes for IIdentity " + pubsubId);
-					this.pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.CREATED);
-					this.pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.UPDATED);
-					this.pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.MODIFIED);
-					this.pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.REMOVED);
-					this.pubsubOwners.add(pubsubId);
-				}
-				this.pubsubClient.publisherPublish(pubsubId, topics[i], 
-						itemId, eventBean);
+				pubsubId = commMgr.getIdManager().fromJid(
+						this.event.getId().getOwnerId());
+				itemId = this.event.getId().toString();
+				eventBean = new CtxChangeEventBean();
+				eventBean.setId(itemId);
 			} catch (Exception e) {
-				//throw new CtxEventMgrException("Could not post remote context change event to topic '" 
-				LOG.error("Could not post remote context change event to topic '" 
-						+ topics[i] + "'" + " with itemId '" + itemId + "': "
+				LOG.error("Could not post remote context change event '" 
+						+ this.event + "' to topics '" + Arrays.toString(this.topics) + "': "
 						+ e.getLocalizedMessage(), e);
-			}*/
+				return;
+			}
+
+			for (int i = 0; i < this.topics.length; ++i) {
+
+				if (LOG.isDebugEnabled()) 
+					LOG.debug("Posting remote context change event to topic '" 
+							+ this.topics[i] + "'" + " with itemId '" + itemId + "'");
+				try {
+					if (pubsubClient == null) {
+						LOG.error("Could not post remote context change event to topic '"
+								+ topics[i] + "': PubsubClient service is not available");
+						return;
+					}
+					if (!pubsubOwners.contains(pubsubId)) {
+						if (LOG.isInfoEnabled())
+							LOG.info("Creating pubsub nodes for IIdentity " + pubsubId);
+						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.CREATED);
+						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.UPDATED);
+						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.MODIFIED);
+						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.REMOVED);
+						pubsubOwners.add(pubsubId);
+					}
+					pubsubClient.publisherPublish(pubsubId, topics[i], 
+							itemId, eventBean);
+				} catch (Exception e) { 
+					LOG.error("Could not post remote context change event to topic '" 
+							+ topics[i] + "'" + " with itemId '" + itemId + "': "
+							+ e.getLocalizedMessage(), e);
+				}
+			}
 		}
 	}
 	
