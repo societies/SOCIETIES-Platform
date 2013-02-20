@@ -47,6 +47,7 @@ import org.societies.utilities.DBC.Dbc;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -67,11 +68,15 @@ public class CisDirectoryBase implements ICisDirectory {
 	private ClientCommunicationMgr commMgr;
     private Context androidContext;
     private boolean connectedToComms = false;
+    private boolean restrictBroadcast;
     
-    /**
-     * Default constructor
-     */
+    /**Default constructor*/
     public CisDirectoryBase(Context androidContext) {
+    	this(androidContext, true);
+    }
+    
+    /**Parameterised constructor*/
+    public CisDirectoryBase(Context androidContext, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.androidContext = androidContext;    	
@@ -300,31 +305,25 @@ public class CisDirectoryBase implements ICisDirectory {
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				
-				//TODO: Investigate why stanza is not returning
-				
-//				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
+				Log.d(LOG_TAG, ">>>>>Return Stanza: " + returnStanza.toString());
 				if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
 				// --------- cisDirectoryBeanResult Bean ---------
 				if (msgBean instanceof CisDirectoryBeanResult) {
 					Log.d(LOG_TAG, "CisDirectoryBeanResult Result!");
 					CisDirectoryBeanResult dirResult = (CisDirectoryBeanResult) msgBean;
 					List<CisAdvertisementRecord> listReturned = dirResult.getResultCis();
-					//CONVERT TO PARCEL BEANS
-					//Parcelable returnArray[] = new Parcelable[listReturned.size()];
-					//for (int i=0; i<listReturned.size(); i++) {
-					//	ACisAdvertisementRecord record = ACisAdvertisementRecord.convertCisAdvertRecord(listReturned.get(i)); 
-					//	returnArray[i] = record;
-					//	Log.d(LOG_TAG, "Added record: " + record.getId());
-					//}
-					 CisAdvertisementRecord returnArray[] = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
+					CisAdvertisementRecord[] returnArray = listReturned.toArray(new CisAdvertisementRecord[listReturned.size()]);
 					
-					//NOTIFY CALLING CLIENT
+					if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID))
+						intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, (Parcelable) returnArray[0]);
+					else
 						intent.putExtra(ICisDirectory.INTENT_RETURN_VALUE, returnArray);
 					
-					//TODO: investigate why wrong client is being used
-//					intent.setPackage(client);
+					//NOTIFY CALLING CLIENT
+					if (restrictBroadcast)
+						intent.setPackage(client);
+					
 					CisDirectoryBase.this.androidContext.sendBroadcast(intent);
-					//CisDirectoryBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 				}
 			}
 		}

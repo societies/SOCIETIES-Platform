@@ -75,14 +75,21 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
     private boolean connectedToComms = false;
-
-    /**
-     * Default constructor
-     */
+    private boolean restrictBroadcast;
+    
+    /**DEFAULT CONSTRUCTOR*/
     public ServiceManagementBase(Context androidContext) {
+    	this(androidContext, true);
+    }
+    
+    /**
+     * constructor
+     */
+    public ServiceManagementBase(Context androidContext, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.androidContext = androidContext;
+    	this.restrictBroadcast = restrictBroadcast;
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -167,7 +174,8 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 		if (client != null) {
 			Intent intent = new Intent(method);
 			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
-			intent.setPackage(client);
+			if (restrictBroadcast)
+				intent.setPackage(client);
 			androidContext.sendBroadcast(intent);
 		}
 	}
@@ -400,8 +408,9 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
 					org.societies.api.schema.servicelifecycle.model.Service serviceArray[] = serviceList.toArray(new org.societies.api.schema.servicelifecycle.model.Service[serviceList.size()]);
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray); 
-					intent.setPackage(client);
+					intent.putExtra(IServiceDiscovery.INTENT_RETURN_VALUE, serviceArray);
+					if(restrictBroadcast)
+						intent.setPackage(client);
 				} 
 				// --------- Service Control Bean ---------
 				if(msgBean instanceof ServiceControlResultBean) {
@@ -412,7 +421,8 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 					
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(IServiceControl.INTENT_RETURN_VALUE, result);
-					intent.setPackage(client);
+					if(restrictBroadcast)
+						intent.setPackage(client);
 				}
 				ServiceManagementBase.this.androidContext.sendBroadcast(intent);
 			}
