@@ -208,7 +208,7 @@ public class XMLPolicyReader {
 				if (attributeIdAttribute.compareToIgnoreCase("urn:oasis:names:tc:xacml:1.0:subject:subject-id")==0){
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase("org.societies.api.identity.IIdentity")==0){
+					if (dataType.compareToIgnoreCase(IIdentity.class.getName())==0){
 						this.log("Reading: "+dataType);
 						NodeList attributeValueList =  attributeElement.getElementsByTagName("AttributeValue");
 						if (attributeValueList==null){
@@ -237,7 +237,7 @@ public class XMLPolicyReader {
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
 
-					if (dataType.compareToIgnoreCase("org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier")==0){
+					if (dataType.compareToIgnoreCase(ServiceResourceIdentifier.class.getName())==0){
 						this.log("Reading: "+dataType);
 						//NodeList nl = attributeElement.getElementsByTagName("AttributeValue");
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
@@ -252,7 +252,7 @@ public class XMLPolicyReader {
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
 
-					if (dataType.compareToIgnoreCase("org.societies.api.identity.IIdentity")==0){
+					if (dataType.compareToIgnoreCase(IIdentity.class.getName())==0){
 						this.log("Reading: "+dataType);
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 
@@ -431,7 +431,8 @@ public class XMLPolicyReader {
 				String attributeId = attributeElement.getAttribute("AttributeId");
 				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
 					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
+					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.class.getName())==0
+							|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 						Element attributeValueElement = (Element) attributeValueList.item(0);
 						ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
@@ -476,7 +477,8 @@ public class XMLPolicyReader {
 				String attributeId = attributeElement.getAttribute("AttributeId");
 				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
 					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
+					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.class.getName())==0
+							|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 						Element attributeValueElement = (Element) attributeValueList.item(0);
 						ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));

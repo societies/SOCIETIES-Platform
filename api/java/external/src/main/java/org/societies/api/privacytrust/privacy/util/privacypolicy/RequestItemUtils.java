@@ -27,6 +27,7 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
@@ -34,6 +35,27 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
  * @author Olivier Maridat (Trialog)
  */
 public class RequestItemUtils {
+	
+	/**
+	 * Instantiate a mandatory request item
+	 * @param resource
+	 * @param actions
+	 * @param conditions
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions) {
+		return create(resource, actions, conditions, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem();
+		requestItem.setResource(resource);
+		requestItem.setActions(actions);
+		requestItem.setConditions(conditions);
+		requestItem.setOptional(optional);
+		return requestItem;
+	}
+	
 	public static RequestItem toRequestItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItemBean)
 	{
 		if (null == requestItemBean) {
@@ -52,7 +74,7 @@ public class RequestItemUtils {
 		}
 		return requestItems;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem toRequestItemBean(RequestItem requestItem)
 	{
 		if (null == requestItem) {
@@ -75,5 +97,43 @@ public class RequestItemUtils {
 			requestItemBeans.add(RequestItemUtils.toRequestItemBean(requestItem));
 		}
 		return requestItemBeans;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestItem) {
+			sb.append("\n<Target>\n");
+			sb.append(ResourceUtils.toXmlString(requestItem.getResource()));
+			sb.append(ActionUtils.toXmlString(requestItem.getActions()));
+			sb.append(ConditionUtils.toXmlString(requestItem.getConditions()));
+			sb.append("\t<optional>"+requestItem.isOptional()+"</optional>\n");
+			sb.append("</Target>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem : requestItems) {
+				sb.append(toXmlString(requestItem));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem) o2;
+		return new EqualsBuilder()
+		.append(o1.getActions(), rhs.getActions())
+		.append(o1.getConditions(), rhs.getConditions())
+		.append(o1.getResource(), rhs.getResource())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
 	}
 }

@@ -22,48 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+
 
 /**
- * Utility method that helps manipulating DataIdentifier objects
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
- *
  */
-public class DataIdentifierUtil {
-	/**
-	 * Generate a URI: sheme://ownerId/type
-	 * @param dataId
-	 * @return
-	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		return str.toString();
+public class DecisionUtils {
+
+	public static String toXmlString(Decision decision){
+		StringBuilder sb = new StringBuilder();
+		if (null != decision) {
+			sb.append("\n<Decision>\n");
+			sb.append("\t<Attribute AttributeId=\"Decision\" DataType=\""+decision.getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+decision.name()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("</Decision>");
+		}
+		return sb.toString();
 	}
 
-	@Deprecated
-	public static DataIdentifier fromUri(String dataIdUri)
-	{
-		String[] uri = dataIdUri.split("://");
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
-		String path = uri[1];
-		int pos = 0, end = 0, endType = 0;
-		if ((end = path.indexOf('/', pos)) >= 0) {
-			dataId.setOwnerId(path.substring(pos, end));
-		}
-		endType = path.length();
-		if (path.endsWith("/") && endType > 1) {
-			endType--;
-		}
-		dataId.setType(path.substring(end+1, endType));
-		return dataId;
+	public static boolean equals(Decision o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		Decision rhs = (Decision) o2;
+		return o1.name().equals(rhs.name());
 	}
 }

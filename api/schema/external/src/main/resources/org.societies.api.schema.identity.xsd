@@ -51,5 +51,14 @@
       <xs:enumeration value="css"/>
     </xs:restriction>
   </xs:simpleType>
+  
+  <xs:complexType name="dataTypeDescription">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="1"/>
+      <xs:element name="friendlyName" type="xs:string" minOccurs="1"/>
+      <xs:element name="friendlyDescription" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
 </xs:schema>
 

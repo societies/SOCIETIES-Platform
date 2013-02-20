@@ -27,10 +27,12 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -106,9 +108,57 @@ public class ResourceUtils {
 		}
 		return resourceBeans;
 	}
-	
+
 	public static String getDataIdUri(
 			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
 		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(String dataIdUri) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
+		resource.setDataIdUri(dataIdUri);
+		return resource;
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(DataIdentifierScheme dataScheme, String dataType) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
+		resource.setScheme(dataScheme);
+		resource.setDataType(dataType);
+		return resource;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource){
+		StringBuilder sb = new StringBuilder();
+		if (null != resource) {
+			sb.append("\n<Resource>\n");
+			// URI
+			if (null != resource.getDataIdUri()){
+				sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\" DataType=\"org.societies.api.context.model.CtxIdentifier\">\n");
+				sb.append("\t\t<AttributeValue>"+resource.getDataIdUri()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			// Scheme + Type
+			if (null != resource.getDataType()){
+				sb.append("\t<Attribute AttributeId=\""+resource.getScheme()+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">\n");
+				sb.append("\t\t<AttributeValue>"+resource.getDataType()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			sb.append("</Resource>\n");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource) o2;
+		return new EqualsBuilder()
+		.append(o1.getDataIdUri(), rhs.getDataIdUri())
+		.append(o1.getDataType(), rhs.getDataType())
+		.append(o1.getScheme(), rhs.getScheme())
+		.isEquals();
 	}
 }

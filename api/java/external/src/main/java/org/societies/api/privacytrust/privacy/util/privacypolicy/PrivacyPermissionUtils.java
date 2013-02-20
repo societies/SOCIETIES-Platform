@@ -26,12 +26,11 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.PrivacyPermission;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -61,7 +60,7 @@ public class PrivacyPermissionUtils {
 		}
 		return privacyPermissions;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission toPrivacyPermissionBean(PrivacyPermission privacyPermission) throws DatatypeConfigurationException
 	{
 		if (null == privacyPermission) {
@@ -90,7 +89,7 @@ public class PrivacyPermissionUtils {
 		}
 		return privacyPermissionBeans;
 	}
-	
+
 	/**
 	 * To know if this privacy permission is still valid or not
 	 * @return True if the privacy permission is still valid
@@ -99,5 +98,23 @@ public class PrivacyPermissionUtils {
 		Date now = new Date();
 		//return (now.getTime() > (privacyPermissionBean.getCreationDate().toGregorianCalendar().getTimeInMillis()+privacyPermissionBean.getValidityDuration()));
 		return (now.getTime() > (privacyPermissionBean.getCreationDate().getTime() + privacyPermissionBean.getValidityDuration()));
+	}
+	
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission) o2;
+		return new EqualsBuilder()
+		.append(o1.getObfuscationLevel(), rhs.getObfuscationLevel())
+		.append(o1.getValidityDuration(), rhs.getValidityDuration())
+		.append(o1.getCreationDate(), rhs.getCreationDate())
+		.append(o1.getDecision(), rhs.getDecision())
+		.append(o1.getRequestItem(), rhs.getRequestItem())
+		.append(o1.getRequestor(), rhs.getRequestor())
+		.isEquals();
 	}
 }

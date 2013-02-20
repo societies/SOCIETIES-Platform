@@ -72,7 +72,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getName());
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
 
@@ -254,7 +254,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 					if (null == cisMemberList) {
 						cisMemberList = retrieveCisMemberList(dataId.getOwnerId());
 					}
-				//  All requested actions are matching AND if this data is members only
+					//  All requested actions are matching AND if this data is members only
 					if (allRequestedActionsMatch && canBeSharedWithCisMembersOnly) {
 						LOG.info("[checkPermissionCisData] All requested items are matching (members only): PERMIT if necessary");
 						// Is it a CIS member?
@@ -313,7 +313,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 */
 	private List<ICisParticipant> retrieveCisMemberList(String cisId){
 		Set<ICisParticipant> ciMemberListIncome = cisManager.getOwnedCis(cisId).getMemberList();
-			return new ArrayList<ICisParticipant>(ciMemberListIncome);
+		return new ArrayList<ICisParticipant>(ciMemberListIncome);
 	}
 
 
@@ -328,6 +328,31 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permission;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, java.util.List, java.util.List)
+	 */
+	@Override
+	public List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
+		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
+		for(DataIdentifier dataId : dataIds) {
+			responseItemList.add(checkPermission(requestor, dataId, actions));
+		}
+		return responseItemList;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, java.util.List, org.societies.api.privacytrust.privacy.model.privacypolicy.Action)
+	 */
+	@Override
+	public List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException {
+		// List of actions
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		return checkPermission(requestor, dataIds, actions);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -353,6 +378,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return checkPermission(requestor, dataId, actions);
 	}
 
+	
 	/*
 	 * 
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)

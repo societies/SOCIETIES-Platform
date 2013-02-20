@@ -27,7 +27,7 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 
@@ -36,6 +36,25 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
  * @author Olivier Maridat (Trialog)
  */
 public class ConditionUtils {
+	
+	/**
+	 * Instantiate a mandatory condition
+	 * @param conditionConstant
+	 * @param value
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant, String value) {
+		return create(conditionConstant, value, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant, String value, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition();
+		condition.setConditionConstant(conditionConstant);
+		condition.setValue(value);
+		condition.setOptional(optional);
+		return condition;
+	}
+	
 	public static Condition toCondition(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionBean)
 	{
 		if (null == conditionBean) {
@@ -55,7 +74,7 @@ public class ConditionUtils {
 		}
 		return conditions;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition toConditionBean(Condition condition)
 	{
 		if (null == condition) {
@@ -79,7 +98,7 @@ public class ConditionUtils {
 		}
 		return conditionBeans;
 	}
-	
+
 	public static boolean contains(ConditionConstants conditionToCheck, List<Condition> conditions) {
 		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
 			return false;
@@ -91,7 +110,7 @@ public class ConditionUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean contains(Condition conditionToCheck, List<Condition> conditions) {
 		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
 			return false;
@@ -103,7 +122,7 @@ public class ConditionUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean contains(List<Condition> conditionsToCheck, List<Condition> conditions) {
 		if (null == conditions || conditions.size() <= 0 || null == conditionsToCheck || conditionsToCheck.size() <= 0 || conditionsToCheck.size() < conditionsToCheck.size()) {
 			return false;
@@ -115,7 +134,7 @@ public class ConditionUtils {
 		}
 		return true;
 	}
-	
+
 	public static boolean containsOr(List<Condition> conditionsToCheck, List<Condition> conditions) {
 		if (null == conditions || conditions.size() <= 0 || null == conditionsToCheck || conditionsToCheck.size() <= 0 || conditionsToCheck.size() < conditionsToCheck.size()) {
 			return false;
@@ -126,5 +145,42 @@ public class ConditionUtils {
 			}
 		}
 		return false;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
+		StringBuilder sb = new StringBuilder();
+		if (null != condition) {
+			sb.append("\n<Condition>\n");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\""+condition.getConditionConstant().getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("\t<optional>"+condition.isOptional()+"</optional>\n");
+			sb.append("</Condition>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions){
+		StringBuilder sb = new StringBuilder();
+		if (null != conditions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+				sb.append(toXmlString(condition));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition) o2;
+		return new EqualsBuilder()
+		.append(o1.getConditionConstant().name(), rhs.getConditionConstant().name())
+		.append(o1.getValue(), rhs.getValue())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
 	}
 }
