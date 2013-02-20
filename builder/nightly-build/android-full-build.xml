@@ -54,27 +54,28 @@
 		 				
 		<!-- Android Communication components -->
 		<module>../../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons/android-pom.xml</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsub</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsubHelper</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidCommsApp</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/SocietiesLoginTesterApp</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidComms</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidComms/SocietiesAndroidCommsHelper</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsub</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidPubSub/SocietiesAndroidPubsubHelper</module>
+		<module>../../android/client-frwk/SocietiesAndroidCommsApp</module>
+		<module>../../android/client-frwk/SocietiesLibraries/SocietiesLoginTesterApp</module>
 
 		<!-- Client Framework Libraries -->
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/ServiceLifecycle/SocietiesServiceMonitor</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/CommunityManagement/SocietiesCISManager</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidCSSManager/SocietiesCSSManager</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidContentProvider/SocietiesContentProvider</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidUtilities</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/EventNotifications/SocietiesEventNotifications</module>
-		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
+		<module>../../android/client-frwk/SocietiesLibraries/ServiceLifecycle/SocietiesServiceMonitor</module>
+		<module>../../android/client-frwk/SocietiesLibraries/CommunityManagement/SocietiesCISManager</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidCSSManager/SocietiesCSSManager</module>
+		<module>../../android/client-frwk/SocietiesDeviceStatus</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidContentProvider/SocietiesContentProvider</module>
+		<module>../../android/client-frwk/SocietiesAndroidUtilities</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
+		<module>../../android/client-frwk/SocietiesLibraries/EventNotifications/SocietiesEventNotifications</module>
+		<module>../../android/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidUserAgent/android-feedback/AndroidUserFeedback</module>
 		<!-- Not building
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
 		<!-- Client Framework Service Helpers -->
-               <module>../../platform-infrastructure/client-frwk/SocietiesServiceHelpers/SocietiesPlatformEventsHelper</module>
+               <module>../../android/client-frwk/SocietiesServiceHelpers/SocietiesPlatformEventsHelper</module>
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
@@ -88,7 +89,7 @@
 		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/apklib</module>
 
 		<!-- Societies Android Client APK-->
-		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
+		<module>../../android/client-frwk/SocietiesAndroidApp</module>
 		
 	</modules>
 </project>
