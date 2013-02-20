@@ -24,8 +24,7 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Arrays;
 
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
@@ -62,9 +61,6 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 	
-	/** The executor service. */
-	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-	
 	PostUpdateUserCtxEventListener() {
 		
 		if (LOG.isInfoEnabled())
@@ -85,7 +81,17 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 			return;
 		
 		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-		this.executorService.execute(new CtxChangeEventDispatcher(
-				this.ctxEventMgr, new CtxChangeEvent(ctxId), EVENT_TOPICS, EVENT_SCOPE));
+		final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(ctxId); 
+		if (LOG.isDebugEnabled())
+			LOG.debug("Sending context change event " + ctxChangeEvent
+					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
+					+ "' with scope '" + EVENT_SCOPE + "'");
+		if (this.ctxEventMgr != null)
+			this.ctxEventMgr.post(ctxChangeEvent, EVENT_TOPICS, EVENT_SCOPE);
+		else
+			LOG.error("Could not send context change event '" + ctxChangeEvent
+					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
+					+ "' with scope '" + EVENT_SCOPE + "': "
+					+ "ICtxEventMgr service is not available");
 	}
 }

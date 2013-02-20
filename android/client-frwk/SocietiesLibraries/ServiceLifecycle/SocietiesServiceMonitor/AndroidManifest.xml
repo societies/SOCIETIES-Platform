@@ -12,7 +12,6 @@
         
         <service android:name=".CoreServiceMonitor" />
         <service android:name=".ServiceManagementLocal" />
-        <service android:name=".ServiceUtilitiesLocal" />
         <service android:name=".ServiceUtilitiesRemote" />
     </application>
 

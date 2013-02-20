@@ -22,7 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.cis;
+package org.societies.android.platform.events.container;
+
+import java.lang.ref.WeakReference;
+
+import org.societies.android.platform.events.notifications.FriendsService;
 
 import android.app.Service;
 import android.content.Intent;
@@ -36,31 +40,50 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class CommunityManagementLocal extends Service {
+public class TestServiceFriendsLocal extends Service {
 	
-    private static final String LOG_TAG = CommunityManagementLocal.class.getName();
-    private IBinder binder = null;
+    private static final String LOG_TAG = TestServiceFriendsLocal.class.getName();
+    private FriendsServiceBinder binder = null;
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "CommunityManagementLocal service starting");
+		this.binder = new FriendsServiceBinder();
+		//inject reference to current service
+		this.binder.addouterClassreference(new FriendsService());
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "CommunityManagementLocal service terminating");
+		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service terminating");
 	}
 
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public CommunityManagementBase getService() {
-			return new CommunityManagementBase(CommunityManagementLocal.this.getApplicationContext());
-		}
-	}
-	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return this.binder;
 	}
+
+	/**
+	 * Create Binder object for local service invocation
+	 * 
+	 * N.B. In order to prevent the exporting of the Service (outer class) via the
+	 * Binder extended class, the Binder reference to the service object is via 
+	 * a {@link WeakReference} instead of the normal inner class "strong" reference.
+	 * This allows the service (outer) class object to be garbage collected (GC) when it
+	 * ceases to exist. Using a "strong" reference prevents the GC removing the object as
+	 * any clients that have a Binder reference, indirectly hold the Service object reference.
+	 * This prevents a common Android Service memory leak.
+	 */
+	 public static class FriendsServiceBinder extends Binder {
+		 private WeakReference<FriendsService> outerClassReference = null;
+		 
+		 public void addouterClassreference(FriendsService instance) {
+			 this.outerClassReference = new WeakReference<FriendsService>(instance);
+		 }
+		 
+		 public FriendsService getService() {
+	            return outerClassReference.get();
+		 }
+	}
+
 }
