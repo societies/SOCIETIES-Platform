@@ -24,106 +24,82 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class ActionUtils {
-	public static List<Action> fromFormattedString(String actionsString) {
-		List<Action> actions = new ArrayList<Action>();
-		if (null != actionsString && !"".equals(actionsString)) {
-			int pos = 0, end;
-			// Loop over actions
-			while ((end = actionsString.indexOf('/', pos)) >= 0) {
-				String actionString = actionsString.substring(pos, end);
-				int positionOptional = actionString.indexOf(':');
-				Action action = new Action();
-				action.setActionConstant(ActionConstants.fromValue(actionString.substring(0, positionOptional)));
-				action.setOptional("false".equals(actionString.substring(positionOptional+1, actionString.length())) ? false : true);
-				actions.add(action);
-				pos = end + 1;
-			}
-		}
-		return actions;
-	}
-	public static String toFormattedString(List<Action> actions) {
-		StringBuilder sb = new StringBuilder();
-		if (null != actions) {
-			for(int i=0; i<actions.size(); i++) {
-				sb.append(actions.get(i).getActionConstant().name()+":"+(actions.get(i).isOptional() ? "true" : "false")+"/");
-			}
-		}
-		return sb.toString();
-	}
+public class ConditionUtils {
 
 	/**
-	 * Create a mandatory action
-	 * 
-	 * @param actionConstant
+	 * Instantiate a mandatory condition
+	 * @param conditionConstant
+	 * @param value
 	 * @return
 	 */
-	public static Action create(ActionConstants actionConstant) {
-		return create(actionConstant, true);
+	public static Condition create(ConditionConstants conditionConstant, String value) {
+		return create(conditionConstant, value, true);
 	}
 
-	public static Action create(ActionConstants actionConstant, boolean optional) {
-		Action action = new Action();
-		action.setActionConstant(actionConstant);
-		action.setOptional(optional);
-		return action;
+	public static Condition create(ConditionConstants conditionConstant, String value, boolean optional) {
+		Condition condition = new Condition();
+		condition.setConditionConstant(conditionConstant);
+		condition.setValue(value);
+		condition.setOptional(optional);
+		return condition;
 	}
 
-	public static String toXmlString(Action action){
+	public static String toXmlString(Condition condition){
 		StringBuilder sb = new StringBuilder();
-		if (null != action) {
-			sb.append("\n<Action>\n");
-			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\""+action.getActionConstant().getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>\n");
+		if (null != condition) {
+			sb.append("\n<Condition>\n");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\""+condition.getConditionConstant().getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>\n");
 			sb.append("\t</Attribute>\n");
-			sb.append("\t<optional>"+action.isOptional()+"</optional>\n");
-			sb.append("</Action>");
+			sb.append("\t<optional>"+condition.isOptional()+"</optional>\n");
+			sb.append("</Condition>");
 		}
 		return sb.toString();
 	}
 
-	public static String toXmlString(List<Action> actions){
+	public static String toXmlString(List<Condition> conditions){
 		StringBuilder sb = new StringBuilder();
-		if (null != actions) {
-			for(Action action : actions) {
-				sb.append(toXmlString(action));
+		if (null != conditions) {
+			for(Condition condition : conditions) {
+				sb.append(toXmlString(condition));
 			}
 		}
 		return sb.toString();
 	}
 
-	public static boolean equals(Action o1, Object o2) {
+	public static boolean equals(Condition o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		Action rhs = (Action) o2;
-		return (o1.getActionConstant().name().equals(rhs.getActionConstant().name())
-				&& o1.isOptional() == rhs.isOptional());
+		Condition rhs = (Condition) o2;
+		return ((o1.getConditionConstant().name().equals(rhs.getConditionConstant().name())
+				&& o1.getValue().equals(rhs.getValue())
+				&& o1.isOptional() == rhs.isOptional())
+				);
 	}
 
-	public static boolean equals(List<Action> o1, Object o2) {
+	public static boolean equals(List<Condition> o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		List<Action> rhs = (List<Action>) o2;
+		List<Condition> rhs = (List<Condition>) o2;
 		boolean result = true;
 		int i = 0;
-		for(Action o1Action : o1) {
-			result &= equals(o1Action, rhs.get(i++));
+		for(Condition o1Element : o1) {
+			result &= equals(o1Element, rhs.get(i++));
 		}
 		return result;
 	}

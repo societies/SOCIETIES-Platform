@@ -24,63 +24,34 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class ResourceUtils {
-	
-	public static String getDataIdUri(Resource resource) {
-		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
-	}
+public class DecisionUtils {
 
-	public static Resource create(String dataIdUri) {
-		Resource resource = new Resource();
-		resource.setDataIdUri(dataIdUri);
-		return resource;
-	}
-
-	public static Resource create(DataIdentifierScheme dataScheme, String dataType) {
-		Resource resource = new Resource();
-		resource.setScheme(dataScheme);
-		resource.setDataType(dataType);
-		return resource;
-	}
-
-	public static String toXmlString(Resource resource){
+	public static String toXmlString(Decision decision){
 		StringBuilder sb = new StringBuilder();
-		if (null != resource) {
-			sb.append("\n<Resource>\n");
-			// URI
-			if (null != resource.getDataIdUri()){
-				sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\" DataType=\"org.societies.api.context.model.CtxIdentifier\">\n");
-				sb.append("\t\t<AttributeValue>"+resource.getDataIdUri()+"</AttributeValue>\n");
-				sb.append("\t</Attribute>\n");
-			}
-			// Scheme + Type
-			if (null != resource.getDataType()){
-				sb.append("\t<Attribute AttributeId=\""+resource.getScheme()+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">\n");
-				sb.append("\t\t<AttributeValue>"+resource.getDataType()+"</AttributeValue>\n");
-				sb.append("\t</Attribute>\n");
-			}
-			sb.append("</Resource>\n");
+		if (null != decision) {
+			sb.append("\n<Decision>\n");
+			sb.append("\t<Attribute AttributeId=\"Decision\" DataType=\""+decision.getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+decision.name()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("</Decision>");
 		}
 		return sb.toString();
 	}
 
-	public static boolean equals(Resource o1, Object o2) {
+	public static boolean equals(Decision o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		Resource rhs = (Resource) o2;
-		return (o1.getDataIdUri().equals(rhs.getDataIdUri())
-				&& o1.getDataType().equals(rhs.getDataType())
-				&& o1.getScheme().equals(rhs.getScheme())
-				);
+		Decision rhs = (Decision) o2;
+		return o1.name().equals(rhs.name());
 	}
 }

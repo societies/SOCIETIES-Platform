@@ -36,6 +36,25 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
  * @author Olivier Maridat (Trialog)
  */
 public class ConditionUtils {
+	
+	/**
+	 * Instantiate a mandatory condition
+	 * @param conditionConstant
+	 * @param value
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant, String value) {
+		return create(conditionConstant, value, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant, String value, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition();
+		condition.setConditionConstant(conditionConstant);
+		condition.setValue(value);
+		condition.setOptional(optional);
+		return condition;
+	}
+	
 	public static Condition toCondition(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionBean)
 	{
 		if (null == conditionBean) {

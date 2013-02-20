@@ -32,6 +32,7 @@ import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -112,7 +113,19 @@ public class ResourceUtils {
 			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
 		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
 	}
-
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(String dataIdUri) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
+		resource.setDataIdUri(dataIdUri);
+		return resource;
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(DataIdentifierScheme dataScheme, String dataType) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
+		resource.setScheme(dataScheme);
+		resource.setDataType(dataType);
+		return resource;
+	}
 
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource){
 		StringBuilder sb = new StringBuilder();

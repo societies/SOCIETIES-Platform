@@ -140,6 +140,23 @@ public class ActionUtils {
 		}
 		return result;
 	}
+	
+	/**
+	 * Create a mandatory action
+	 * 
+	 * @param actionConstant
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant) {
+		return create(actionConstant, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action();
+		action.setActionConstant(actionConstant);
+		action.setOptional(optional);
+		return action;
+	}
 
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action){
 		StringBuilder sb = new StringBuilder();

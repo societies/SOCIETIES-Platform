@@ -24,106 +24,87 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class ActionUtils {
-	public static List<Action> fromFormattedString(String actionsString) {
-		List<Action> actions = new ArrayList<Action>();
-		if (null != actionsString && !"".equals(actionsString)) {
-			int pos = 0, end;
-			// Loop over actions
-			while ((end = actionsString.indexOf('/', pos)) >= 0) {
-				String actionString = actionsString.substring(pos, end);
-				int positionOptional = actionString.indexOf(':');
-				Action action = new Action();
-				action.setActionConstant(ActionConstants.fromValue(actionString.substring(0, positionOptional)));
-				action.setOptional("false".equals(actionString.substring(positionOptional+1, actionString.length())) ? false : true);
-				actions.add(action);
-				pos = end + 1;
-			}
-		}
-		return actions;
-	}
-	public static String toFormattedString(List<Action> actions) {
-		StringBuilder sb = new StringBuilder();
-		if (null != actions) {
-			for(int i=0; i<actions.size(); i++) {
-				sb.append(actions.get(i).getActionConstant().name()+":"+(actions.get(i).isOptional() ? "true" : "false")+"/");
-			}
-		}
-		return sb.toString();
-	}
+public class RequestItemUtils {
 
 	/**
-	 * Create a mandatory action
-	 * 
-	 * @param actionConstant
+	 * Instantiate a mandatory request item
+	 * @param resource
+	 * @param actions
+	 * @param conditions
 	 * @return
 	 */
-	public static Action create(ActionConstants actionConstant) {
-		return create(actionConstant, true);
+	public static RequestItem create(Resource resource, List<Action> actions, List<Condition> conditions) {
+		return create(resource, actions, conditions, true);
 	}
 
-	public static Action create(ActionConstants actionConstant, boolean optional) {
-		Action action = new Action();
-		action.setActionConstant(actionConstant);
-		action.setOptional(optional);
-		return action;
+	public static RequestItem create(Resource resource, List<Action> actions, List<Condition> conditions, boolean optional) {
+		RequestItem requestItem = new RequestItem();
+		requestItem.setResource(resource);
+		requestItem.setActions(actions);
+		requestItem.setConditions(conditions);
+		requestItem.setOptional(optional);
+		return requestItem;
 	}
 
-	public static String toXmlString(Action action){
+	public static String toXmlString(RequestItem requestItem){
 		StringBuilder sb = new StringBuilder();
-		if (null != action) {
-			sb.append("\n<Action>\n");
-			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\""+action.getActionConstant().getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>\n");
-			sb.append("\t</Attribute>\n");
-			sb.append("\t<optional>"+action.isOptional()+"</optional>\n");
-			sb.append("</Action>");
+		if (null != requestItem) {
+			sb.append("\n<Target>\n");
+			sb.append(ResourceUtils.toXmlString(requestItem.getResource()));
+			sb.append(ActionUtils.toXmlString(requestItem.getActions()));
+			sb.append(ConditionUtils.toXmlString(requestItem.getConditions()));
+			sb.append("\t<optional>"+requestItem.isOptional()+"</optional>\n");
+			sb.append("</Target>");
 		}
 		return sb.toString();
 	}
 
-	public static String toXmlString(List<Action> actions){
+	public static String toXmlString(List<RequestItem> requestItems){
 		StringBuilder sb = new StringBuilder();
-		if (null != actions) {
-			for(Action action : actions) {
-				sb.append(toXmlString(action));
+		if (null != requestItems) {
+			for(RequestItem requestItem : requestItems) {
+				sb.append(toXmlString(requestItem));
 			}
 		}
 		return sb.toString();
 	}
 
-	public static boolean equals(Action o1, Object o2) {
+	public static boolean equals(RequestItem o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		Action rhs = (Action) o2;
-		return (o1.getActionConstant().name().equals(rhs.getActionConstant().name())
-				&& o1.isOptional() == rhs.isOptional());
+		RequestItem rhs = (RequestItem) o2;
+		return (ActionUtils.equals(o1.getActions(), rhs.getActions())
+				&& ConditionUtils.equals(o1.getConditions(), rhs.getConditions())
+				&& ResourceUtils.equals(o1.getResource(), rhs.getResource())
+				&& o1.isOptional() == rhs.isOptional()
+				);
 	}
 
-	public static boolean equals(List<Action> o1, Object o2) {
+	public static boolean equals(List<RequestItem> o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		List<Action> rhs = (List<Action>) o2;
+		List<RequestItem> rhs = (List<RequestItem>) o2;
 		boolean result = true;
 		int i = 0;
-		for(Action o1Action : o1) {
-			result &= equals(o1Action, rhs.get(i++));
+		for(RequestItem o1Element : o1) {
+			result &= equals(o1Element, rhs.get(i++));
 		}
 		return result;
 	}

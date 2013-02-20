@@ -37,6 +37,14 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
  * @author Olivier Maridat (Trialog)
  */
 public class ResponseItemUtils {
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem();
+		responseItem.setDecision(decision);
+		responseItem.setRequestItem(requestItem);
+		return responseItem;
+	}
+	
 	public static ResponseItem toResponseItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItemBean)
 	{
 		if (null == responseItemBean) {

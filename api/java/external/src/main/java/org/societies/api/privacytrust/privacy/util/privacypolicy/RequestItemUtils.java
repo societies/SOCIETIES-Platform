@@ -35,6 +35,27 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
  * @author Olivier Maridat (Trialog)
  */
 public class RequestItemUtils {
+	
+	/**
+	 * Instantiate a mandatory request item
+	 * @param resource
+	 * @param actions
+	 * @param conditions
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions) {
+		return create(resource, actions, conditions, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem();
+		requestItem.setResource(resource);
+		requestItem.setActions(actions);
+		requestItem.setConditions(conditions);
+		requestItem.setOptional(optional);
+		return requestItem;
+	}
+	
 	public static RequestItem toRequestItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItemBean)
 	{
 		if (null == requestItemBean) {

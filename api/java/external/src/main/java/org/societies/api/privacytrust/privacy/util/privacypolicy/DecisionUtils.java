@@ -35,6 +35,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
  * @author Olivier Maridat (Trialog)
  */
 public class DecisionUtils {
+	
 	public static Decision toDecision(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decisionBean)
 	{
 		if (null == decisionBean) {

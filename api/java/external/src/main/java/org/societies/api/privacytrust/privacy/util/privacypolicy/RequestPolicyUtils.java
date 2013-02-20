@@ -31,6 +31,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
@@ -38,6 +40,15 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Request
  * @author Olivier Maridat (Trialog)
  */
 public class RequestPolicyUtils {
+
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy create(PrivacyPolicyTypeConstants privacyPolicyType, RequestorBean requestor, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItems) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicy = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy();
+		requestPolicy.setPrivacyPolicyType(privacyPolicyType);
+		requestPolicy.setRequestor(requestor);
+		requestPolicy.setRequestItems(requestItems);
+		return requestPolicy;
+	}
+
 	public static RequestPolicy toRequestPolicy(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == requestPolicyBean) {
@@ -56,7 +67,7 @@ public class RequestPolicyUtils {
 		}
 		return requestPolicys;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy toRequestPolicyBean(RequestPolicy requestPolicy)
 	{
 		if (null == requestPolicy) {
@@ -78,7 +89,7 @@ public class RequestPolicyUtils {
 		}
 		return requestPolicyBeans;
 	}
-	
+
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicy){
 		StringBuilder sb = new StringBuilder();
 		if (null != requestPolicy) {

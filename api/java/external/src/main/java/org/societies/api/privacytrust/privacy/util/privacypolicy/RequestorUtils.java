@@ -127,6 +127,26 @@ public class RequestorUtils {
 	//		}
 	//		return sb.toString();
 	//	}
+	
+	public static RequestorBean create(String requestorId) {
+		RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(requestorId);
+		return requestor;
+	}
+
+	public static RequestorCisBean create(String requestorId, String requestorCisId) {
+		RequestorCisBean requestor = new RequestorCisBean();
+		requestor.setRequestorId(requestorId);
+		requestor.setCisRequestorId(requestorCisId);
+		return requestor;
+	}
+
+	public static RequestorServiceBean create(String requestorId, ServiceResourceIdentifier requestorServiceId) {
+		RequestorServiceBean requestor = new RequestorServiceBean();
+		requestor.setRequestorId(requestorId);
+		requestor.setRequestorServiceId(requestorServiceId);
+		return requestor;
+	}
 
 	public static String toXmlString(RequestorBean requestor){
 		StringBuilder sb = new StringBuilder();

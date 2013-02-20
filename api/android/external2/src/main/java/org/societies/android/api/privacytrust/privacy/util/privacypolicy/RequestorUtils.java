@@ -25,9 +25,11 @@
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
 import org.societies.android.api.servicelifecycle.ServiceUtils;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -56,7 +58,7 @@ public class RequestorUtils {
 		}
 		return sb.toString();
 	}
-	
+
 	public static RequestorBean fromFormattedString(String requestorString) {
 		String[] requestorInfo = requestorString.split(":");
 		// CIS
@@ -81,5 +83,66 @@ public class RequestorUtils {
 			requestor.setRequestorId(requestorInfo[1]);
 			return requestor;
 		}
+	}
+
+	public static RequestorBean create(String requestorId) {
+		RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(requestorId);
+		return requestor;
+	}
+
+	public static RequestorCisBean create(String requestorId, String requestorCisId) {
+		RequestorCisBean requestor = new RequestorCisBean();
+		requestor.setRequestorId(requestorId);
+		requestor.setCisRequestorId(requestorCisId);
+		return requestor;
+	}
+
+	public static RequestorServiceBean create(String requestorId, ServiceResourceIdentifier requestorServiceId) {
+		RequestorServiceBean requestor = new RequestorServiceBean();
+		requestor.setRequestorId(requestorId);
+		requestor.setRequestorServiceId(requestorServiceId);
+		return requestor;
+	}
+
+	public static String toXmlString(RequestorBean requestor){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestor) {
+			sb.append("<Subject>");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+requestor.getRequestorId()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			if (requestor instanceof RequestorCisBean) {
+				sb.append("\t<Attribute AttributeId=\"CisId\" DataType=\""+IIdentity.class.getName()+"\">\n");
+				sb.append("\t\t<AttributeValue>"+((RequestorCisBean)requestor).getCisRequestorId()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			if (requestor instanceof RequestorServiceBean) {
+				sb.append("\t<Attribute AttributeId=\"serviceId\" DataType=\""+ServiceResourceIdentifier.class.getName()+"\">\n");
+				sb.append("\t\t<AttributeValue>"+((RequestorServiceBean)requestor).getRequestorServiceId()+"</AttributeValue>\n");
+				sb.append("\t</Attribute>\n");
+			}
+			sb.append("</Subject>");
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(RequestorBean o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		RequestorBean rhs = (RequestorBean) o2;
+		boolean isEqual = true;
+		isEqual = o1.getRequestorId().equals(rhs.getRequestorId());
+		if (o1 instanceof RequestorCisBean) {
+			isEqual &= ((RequestorCisBean)o1).getCisRequestorId().equals(((RequestorCisBean)rhs).getCisRequestorId());
+		}
+		if (o1 instanceof RequestorServiceBean) {
+			isEqual &= ((RequestorServiceBean)o1).getRequestorServiceId().getIdentifier().equals(((RequestorServiceBean)rhs).getRequestorServiceId().getIdentifier());
+			isEqual &= ((RequestorServiceBean)o1).getRequestorServiceId().getServiceInstanceIdentifier().equals(((RequestorServiceBean)rhs).getRequestorServiceId().getServiceInstanceIdentifier());
+		}
+		return isEqual;
 	}
 }
