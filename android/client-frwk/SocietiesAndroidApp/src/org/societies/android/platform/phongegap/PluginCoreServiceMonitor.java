@@ -40,6 +40,7 @@ import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
+import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -130,7 +131,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
 
         	//GET LOCAL BINDER
-        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
+        	LocalSLMBinder binder = (LocalSLMBinder) service;
 
             //OBTAIN SERVICE DISCOVERY API
             serviceDisco = (IServiceDiscovery) binder.getService();
@@ -152,7 +153,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         	Log.d(LOG_TAG, "Connecting to IServiceControl service");
 
         	//GET LOCAL BINDER
-        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
+        	LocalSLMBinder binder = (LocalSLMBinder) service;
 
             //OBTAIN SERVICE CONTROL API
             serviceControl = (IServiceControl) binder.getService();
@@ -683,7 +684,6 @@ public class PluginCoreServiceMonitor extends Plugin {
 			
 			Log.d(LOG_TAG, jObj.toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
