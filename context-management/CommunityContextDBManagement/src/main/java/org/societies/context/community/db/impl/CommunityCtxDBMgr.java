@@ -604,6 +604,37 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		return foundList;
 	}
 	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#lookupCommunityCtxEntity(java.lang.String)
+	 */
+	@Override
+	public List<CtxIdentifier> lookupCommunityCtxEntity(String attrType)
+			throws CtxException {
+		
+		if (attrType == null)
+			throw new NullPointerException("attribute type can't be null");
+		
+		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		
+		final Session session = sessionFactory.openSession();
+        try {
+        	final Query query;
+        	
+           	query = session.getNamedQuery("getCommunityCtxEntityIdsByAttrType");
+           	query.setParameter("attrType", attrType, Hibernate.STRING);
+            foundList.addAll(query.list());
+            
+        } catch (Exception e) {
+        	throw new CommunityCtxDBMgrException("Could not lookup CommunityCtxEntity objects of type '" + attrType + "': "
+        			+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+        
+		return foundList;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <T extends CtxModelObjectDAO> T retrieve(
 			final Class<T> modelObjectClass,
@@ -647,4 +678,6 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		
 		return objectNumberDAO.getNextValue();
 	}
+
+
 }
