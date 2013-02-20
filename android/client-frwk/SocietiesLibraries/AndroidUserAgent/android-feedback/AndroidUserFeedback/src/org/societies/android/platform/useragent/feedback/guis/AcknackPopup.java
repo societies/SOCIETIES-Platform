@@ -30,6 +30,7 @@ package org.societies.android.platform.useragent.feedback.guis;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.useragent.feedback.R;
+import org.societies.android.platform.useragent.feedback.R.layout;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -52,7 +53,7 @@ public class AcknackPopup extends Activity{
 	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_feedback);
+        setContentView(R.layout.acknack_activity);
         Log.d(LOG_TAG, "onCreate in AcknackPopup");
     }
 
