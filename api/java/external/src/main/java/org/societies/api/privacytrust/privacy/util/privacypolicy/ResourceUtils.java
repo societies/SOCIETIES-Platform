@@ -126,7 +126,7 @@ public class ResourceUtils {
 			}
 			// Scheme + Type
 			if (null != resource.getDataType()){
-				sb.append("\t<Attribute AttributeId=\""+resource.getScheme().name()+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">\n");
+				sb.append("\t<Attribute AttributeId=\""+resource.getScheme()+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">\n");
 				sb.append("\t\t<AttributeValue>"+resource.getDataType()+"</AttributeValue>\n");
 				sb.append("\t</Attribute>\n");
 			}

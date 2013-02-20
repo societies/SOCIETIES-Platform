@@ -29,8 +29,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -85,14 +83,20 @@ public class RequestItemUtils {
 		if (null != requestItem) {
 			sb.append("\n<Target>\n");
 			sb.append(ResourceUtils.toXmlString(requestItem.getResource()));
-			for (Action action : requestItem.getActions()){
-				sb.append(ActionUtils.toXmlString(action));
-			}
-			for (Condition condition : requestItem.getConditions()){
-				sb.append(ConditionUtils.toXmlString(condition));
-			}
+			sb.append(ActionUtils.toXmlString(requestItem.getActions()));
+			sb.append(ConditionUtils.toXmlString(requestItem.getConditions()));
 			sb.append("\t<optional>"+requestItem.isOptional()+"</optional>\n");
 			sb.append("</Target>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem : requestItems) {
+				sb.append(toXmlString(requestItem));
+			}
 		}
 		return sb.toString();
 	}

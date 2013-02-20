@@ -91,6 +91,16 @@ public class ResponseItemUtils {
 		return sb.toString();
 	}
 
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
+				sb.append(toXmlString(responseItem));
+			}
+		}
+		return sb.toString();
+	}
+
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }

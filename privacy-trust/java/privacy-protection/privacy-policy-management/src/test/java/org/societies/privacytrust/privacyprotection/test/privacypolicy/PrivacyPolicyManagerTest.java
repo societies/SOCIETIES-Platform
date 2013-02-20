@@ -110,7 +110,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration//(locations = { "PrivacyPolicyManagerTest-context.xml" })
 public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getName());
 
 	@Autowired
 	private IPrivacyPolicyManager privacyPolicyManager;
@@ -460,12 +460,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("Error "+e.getMessage()+": "+testTitle);
 		}
 		assertNotNull("Privacy policy generated should not be null", privacyPolicy);
-		LOG.info("**** Original XML privacy policy ****");
-		LOG.info(""+cisPolicy.toXMLString());
-		LOG.info("**** Generated RequestPolicy ****");
-		LOG.info(privacyPolicy.toXMLString());
-		LOG.info("**** Generated RequestPolicy (second time)****");
-		LOG.info(""+privacyPolicy.toXMLString());
+		LOG.error("**** Original XML privacy policy ****");
+		LOG.error(cisPolicy.toXMLString());
+		LOG.error("**** Generated RequestPolicy ****");
+		LOG.error(privacyPolicy.toXMLString());
 		assertEquals("Privacy policy generated (xml) not equal to the original policy", cisPolicy.toXMLString(), privacyPolicy.toXMLString());
 		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
 	}
@@ -565,19 +563,19 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"</Attribute>" +
 				"</Resource>" +
 				"<Action>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">" +
 				"<AttributeValue>WRITE</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>false</optional>" +
 				"</Action>" +
 				"<Condition>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">" +
 				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>true</optional>" +
 				"</Condition>" +
 				"<Condition>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">" +
 				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>true</optional>" +
@@ -663,19 +661,19 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"</Attribute>" +
 				"</Resource>" +
 				"<Action>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">" +
 				"<AttributeValue>WRITE</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>false</optional>" +
 				"</Action>" +
 				"<Condition>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">" +
 				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>true</optional>" +
 				"</Condition>" +
 				"<Condition>" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">" +
 				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
 				"</Attribute>" +
 				"<optional>true</optional>" +

@@ -431,7 +431,7 @@ public class XMLPolicyReader {
 				String attributeId = attributeElement.getAttribute("AttributeId");
 				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
 					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase(ActionConstants.class.getName())==0){
+					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.class.getName())==0){
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 						Element attributeValueElement = (Element) attributeValueList.item(0);
 						ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
@@ -476,7 +476,7 @@ public class XMLPolicyReader {
 				String attributeId = attributeElement.getAttribute("AttributeId");
 				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
 					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase(ConditionConstants.class.getName())==0){
+					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.class.getName())==0){
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 						Element attributeValueElement = (Element) attributeValueList.item(0);
 						ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));

@@ -164,7 +164,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// Retrieve the privacy policy
 		RequestPolicy privacyPolicy = fromXMLString(privacyPolicyXml);
 		if (null == privacyPolicy) {
-			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
+			throw new PrivacyException("This XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
 		privacyPolicy.setRequestor(requestor);

@@ -24,17 +24,11 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -159,56 +153,20 @@ public class PrivacyPolicyUtil {
 
 	/**
 	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy
-	 * @param privacyPolicy Privacy policy
+	 * The format of the privacy policy follows the XACML specification
+	 * @param privacyPolicy Privacy policy as a Java object
 	 * @return A string containing the XML version the privacy policy
 	 */	
 	public static String toXmlString(RequestPolicy privacyPolicy) {
 		String encoding = "UTF-8";
+		StringBuilder privacyPolicyXmlString = new StringBuilder("<?xml version=\"1.0\" encoding=\""+encoding+"\"?>");
 		// -- Empty Privacy Policy
 		if (null == privacyPolicy) {
-			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
+			return privacyPolicyXmlString.append("<RequestPolicy></RequestPolicy>").toString();
 		}
 
-		Serializer serializer = new Persister(); 
-		Writer result = new StringWriter();
-		try {
-			serializer.write(privacyPolicy, result);
-		} catch (Exception e) {
-			return null;
-		}
-		return result.toString();
-	}
-
-	/**
-	 * Create a Privacy Policy in a Java format from a XML format Privacy Policy
-	 * @param privacyPolicy Privacy policy
-	 * @return A Java object containing the privacy policy
-	 * @throws PrivacyException 
-	 */
-	public static RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
-		// -- Verify
-		// Empty privacy policy
-		if (null == privacyPolicy || privacyPolicy.equals("")) {
-			return null;
-		}
-		// Fill XML header if necessary
-		String encoding = "UTF-8";
-		if (!privacyPolicy.startsWith("<?xml")) {
-			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
-		}
-		// If only contains the XML header: empty privacy policy
-		if (privacyPolicy.endsWith("?>")) {
-			return null;
-		}
-
-		// -- Convert Xml to Java
-		RequestPolicy result = null;
-		Serializer serializer = new Persister();       
-		Reader reader = new StringReader(privacyPolicy);
-		try {
-			result = serializer.read(RequestPolicy.class, reader, false);
-		} catch (Exception e) {
-		}
-		return result;
+		// -- Generate XML privacy policy
+		privacyPolicyXmlString.append(RequestPolicyUtils.toXmlString(privacyPolicy));
+		return privacyPolicyXmlString.toString();
 	}
 }

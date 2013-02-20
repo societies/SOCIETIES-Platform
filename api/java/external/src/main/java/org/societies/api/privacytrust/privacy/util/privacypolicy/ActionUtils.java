@@ -154,6 +154,16 @@ public class ActionUtils {
 		return sb.toString();
 	}
 
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions){
+		StringBuilder sb = new StringBuilder();
+		if (null != actions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action : actions) {
+				sb.append(toXmlString(action));
+			}
+		}
+		return sb.toString();
+	}
+
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }

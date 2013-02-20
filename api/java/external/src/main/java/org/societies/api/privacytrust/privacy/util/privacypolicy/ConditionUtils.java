@@ -141,6 +141,16 @@ public class ConditionUtils {
 		return sb.toString();
 	}
 
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions){
+		StringBuilder sb = new StringBuilder();
+		if (null != conditions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+				sb.append(toXmlString(condition));
+			}
+		}
+		return sb.toString();
+	}
+
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
