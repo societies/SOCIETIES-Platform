@@ -24,15 +24,13 @@
  */
 package org.societies.android.privacytrust.policymanagement;
 
-import org.societies.android.api.css.manager.IServiceManager;
-import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.utilities.MissingClientPackageException;
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -56,8 +54,8 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 		intentSender = new PrivacyPolicyIntentSender(context);
 	}
-	
-	
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#getPrivacyPolicy(java.lang.String, org.societies.android.api.identity.RequestorBean)
@@ -84,7 +82,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			this.context = context;
 			this.clientPackage = clientPackage;
 		}
-		
+
 		@Override
 		protected void onPreExecute() {
 			publishProgress(progress, "Loading...");
@@ -95,7 +93,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			boolean result = false;
 			// Retrieve parameter
 			RequestorBean owner = (RequestorBean) args[0];
-			
+
 			try {
 				// -- TODO Retrieve a stored privacy policy
 				progress += 50;
@@ -103,7 +101,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 				if (isCancelled()) {
 					return false;
 				}
-				
+
 				// -- PrivacyPolicy not available: remote call
 				Log.d(TAG, "No Local Privacy policy retrieved: remote call");
 				result = privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, owner);
@@ -143,29 +141,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		UpdatePrivacyPolicyTask task = new UpdatePrivacyPolicyTask(context, clientPackage); 
 		task.execute(privacyPolicy);
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, java.lang.String, org.societies.android.api.identity.RequestorBean)
-	 */
-	@Override
-	public void updatePrivacyPolicy(String clientPackage, String privacyPolicyXml, RequestorBean owner) throws PrivacyException {
-		// -- Verify
-		if (null == clientPackage || "".equals(clientPackage)) {
-			throw new PrivacyException(new MissingClientPackageException());
-		}
-		if (null == privacyPolicyXml || "".equals(privacyPolicyXml)) {
-			throw new PrivacyException("The XML privacy policy to update is empty.");
-		}
-		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = (RequestPolicy) PrivacyPolicyUtil.fromXmlString(privacyPolicyXml);
-		if (null == privacyPolicy) {
-			throw new PrivacyException("The XML formatted string of the privacy policy can not be parsed as a privacy policy.");
-		}
-		// Fill the requestor id
-		privacyPolicy.setRequestor(owner);
-		// Create / Store it
-		updatePrivacyPolicy(clientPackage, privacyPolicy);
-	}
 	public class UpdatePrivacyPolicyTask extends AsyncTask<RequestPolicy, Object, Boolean> {
 		private Context context;
 		private String clientPackage;
@@ -175,7 +150,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			this.context = context;
 			this.clientPackage = clientPackage;
 		}
-		
+
 		@Override
 		protected void onPreExecute() {
 			publishProgress(progress, "Loading...");
@@ -186,7 +161,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			boolean result = false;
 			// Retrieve parameter
 			RequestPolicy privacyPolicy = (RequestPolicy) args[0];
-			
+
 			try {
 				// -- TODO Update the stored privacy policy
 				progress += 50;
@@ -194,7 +169,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 				if (isCancelled()) {
 					return false;
 				}
-				
+
 				// -- PrivacyPolicy not available: remote call
 				result = privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
 				progress = 100;
@@ -239,7 +214,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			this.context = context;
 			this.clientPackage = clientPackage;
 		}
-		
+
 		@Override
 		protected void onPreExecute() {
 			publishProgress(progress, "Loading...");
@@ -250,7 +225,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			boolean result = false;
 			// Retrieve parameter
 			RequestorBean owner = (RequestorBean) args[0];
-			
+
 			try {
 				// -- TODO Delete the stored privacy policy
 				progress += 50;
@@ -258,7 +233,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 				if (isCancelled()) {
 					return false;
 				}
-				
+
 				// -- Delete the remote PrivacyPolicy
 				result = privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, owner);
 				progress = 100;
@@ -276,13 +251,43 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			return result;
 		}
 	}
-	
+
+	public RequestPolicy fromXmlString(String privacyPolicy) throws PrivacyException {
+		// -- Verify
+		// Empty privacy policy
+		if (null == privacyPolicy || privacyPolicy.equals("")) {
+			Log.d(TAG, "Empty privacy policy. Return a null java object.");
+			return null;
+		}
+		// Fill XML header if necessary
+		String encoding = "UTF-8";
+		if (!privacyPolicy.startsWith("<?xml")) {
+			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
+		}
+		// If only contains the XML header: empty privacy policy
+		if (privacyPolicy.endsWith("?>")) {
+			Log.d(TAG, "Empty privacy policy. Return a null java object.");
+			return null;
+		}
+
+		// -- Convert Xml to Java
+		RequestPolicy result = null;
+		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader();
+		try {
+			// Transform XML Privacy Policy to Java Privacy Policy
+			result = xmlPolicyReader.fromXmlString(privacyPolicy);
+		} catch (Exception e) {
+			Log.e(TAG, "[Error fromXMLString] Can't parse the privacy policy: "+e.getMessage(), e);
+		}
+		return result;
+	}
+
 	@Override
 	public boolean startService() {
 		privacyPolicyManagerRemote.bindToComms();
 		return true;
 	}
-	
+
 	@Override
 	public boolean stopService() {
 		privacyPolicyManagerRemote.unbindFromComms();

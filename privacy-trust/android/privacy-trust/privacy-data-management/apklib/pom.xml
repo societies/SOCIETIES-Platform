@@ -68,13 +68,13 @@
 		</dependency>
 		<!-- Comm -->
 		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		    <type>apklib</type>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.android.platform.comms.helper</groupId>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>

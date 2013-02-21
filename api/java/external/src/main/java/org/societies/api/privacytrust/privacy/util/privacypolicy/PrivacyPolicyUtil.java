@@ -159,14 +159,20 @@ public class PrivacyPolicyUtil {
 	 */	
 	public static String toXmlString(RequestPolicy privacyPolicy) {
 		String encoding = "UTF-8";
-		StringBuilder privacyPolicyXmlString = new StringBuilder("<?xml version=\"1.0\" encoding=\""+encoding+"\"?>");
+		String header = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>";
+		StringBuilder sb = new StringBuilder();
 		// -- Empty Privacy Policy
 		if (null == privacyPolicy) {
-			return privacyPolicyXmlString.append("<RequestPolicy></RequestPolicy>").toString();
+			return sb.append(header).append("<RequestPolicy></RequestPolicy>").toString();
 		}
 
 		// -- Generate XML privacy policy
-		privacyPolicyXmlString.append(RequestPolicyUtils.toXmlString(privacyPolicy));
-		return privacyPolicyXmlString.toString();
+		String privacyPolicyXml = RequestPolicyUtils.toXmlString(privacyPolicy);
+		// Fill XML header if necessary
+		if (!privacyPolicyXml.startsWith("<?xml")) {
+			sb.append(header);
+		}
+		sb.append(privacyPolicyXml);
+		return sb.toString();
 	}
 }
