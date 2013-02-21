@@ -90,15 +90,19 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
     private boolean connectedToComms = false;
+    private boolean restrictBroadcast;
     
-    /**
-     * CONSTRUCTOR
-     */
+    /**DEFAULT CONSTRUCTOR*/
     public CommunityManagementBase(Context androidContext) {
+    	this(androidContext, true);
+    }
+    
+    /**Parameterised CONSTRUCTOR */
+    public CommunityManagementBase(Context androidContext, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "CommunityManagementBase created");
     	
     	this.androidContext = androidContext;
-    	
+    	this.restrictBroadcast = restrictBroadcast;
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -674,8 +678,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					if (communityMessage.getJoinResponse() != null) {
 						boolean bJoined = communityMessage.getJoinResponse().isResult();
 						if (bJoined) {
-							//CONVERT TO PARCEL BEAN
-							//Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
 							Parcelable joined = communityMessage.getJoinResponse();
 							//NOTIFY CALLING CLIENT
 							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
@@ -685,7 +687,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 				}
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
-				//CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 
@@ -707,11 +708,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						Log.d(LOG_TAG, "Create CIS Result!");
 						if(communityResult.getCreate().isResult() == true){
 							Community cis = communityResult.getCreate().getCommunity();
-							//CONVERT TO PARCEL BEAN
-							//Parcelable pCis  = ACommunity.convertCommunity(cis);
-							Parcelable pCis  = cis;
 							//NOTIFY CALLING CLIENT
-							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, pCis);
+							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, (Parcelable)cis);
 						}
 						intent.putExtra(ICisManager.INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}
@@ -729,13 +727,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					Log.d(LOG_TAG, "List CIS Result!");
 					ListResponse response = (ListResponse) msgBean;
 					List<Community> listReturned = response.getCommunity();
-					//CONVERT TO PARCEL BEANS
-					//Parcelable returnArray[] = new Parcelable[listReturned.size()];
-					//for (int i=0; i<listReturned.size(); i++) {
-					//	ACommunity cis = ACommunity.convertCommunity(listReturned.get(i)); 
-					//	returnArray[i] = cis;
-					//	Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
-					//}
 					Community returnArray[] = listReturned.toArray(new Community[listReturned.size()]);
 					//NOTIFY CALLING CLIENT
 					intent.putExtra(ICisManager.INTENT_RETURN_VALUE, returnArray);
@@ -748,13 +739,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					//GET MEMBERS RESULT
 					if (communityResponse.getWhoResponse() != null) {
 						List<Participant> listReturned = communityResponse.getWhoResponse().getParticipant();
-						//CONVERT TO PARCEL BEANS
-						//Parcelable returnArray[] = new Parcelable[listReturned.size()];
-						//for (int i=0; i<listReturned.size(); i++) {
-						//	AParticipant member = AParticipant.convertParticipant(listReturned.get(i)); 
-						//	returnArray[i] = member;
-						//	Log.d(LOG_TAG, "member: " + member.getJid());
-						//}
 						Participant returnArray[] = listReturned.toArray(new Participant[listReturned.size()]);
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
@@ -775,13 +759,6 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					//GET ACTIVITIES RESULT
 					if (response.getGetActivitiesResponse() != null) {
 						List<MarshaledActivity> listReturned = response.getGetActivitiesResponse().getMarshaledActivity();
-						//CONVERT TO PARCEL BEANS
-						//Parcelable returnArray[] = new Parcelable[listReturned.size()];
-						//for (int i=0; i<listReturned.size(); i++) {
-						//	AActivity activity = AActivity.convertActivity(listReturned.get(i)); 
-						//	returnArray[i] = activity;
-						//	Log.d(LOG_TAG, "publish: " + activity.getPublished());
-						//}
 						MarshaledActivity returnArray[] = listReturned.toArray(new MarshaledActivity[listReturned.size()]);
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, returnArray);
@@ -800,10 +777,9 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, bDeleted);
 					}
 				}
-				
-				intent.setPackage(client);
+				if(restrictBroadcast)
+					intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
-				//CommunityManagementBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

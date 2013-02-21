@@ -51,13 +51,11 @@ public interface ICtxEventMgr {
      *            the topics to which the event will be published.
      * @param scope
      *            the scope under which the event will be published.
-     * @throws CtxException 
-     *             if publishing of the specified event fails.
      * @throws NullPointerException
      *             if any of the specified parameters is <code>null</code>.
      */
     public void post(final CtxEvent event, final String[] topics,
-    		final CtxEventScope scope) throws CtxException;
+    		final CtxEventScope scope);
 	
     /**
      * Registers the specified {@link CtxChangeEventListener} for events of the
@@ -217,4 +215,14 @@ public interface ICtxEventMgr {
     public void unregisterChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxEntityIdentifier scope,
             final String attrType) throws CtxException;
+    
+    /**
+     * 
+     * @param ownerId
+     * @param topics
+     * @throws CtxException
+     * @since 1.0
+     */
+    public void createTopics(final IIdentity ownerId, final String[] topics)
+    		throws CtxException;
 }

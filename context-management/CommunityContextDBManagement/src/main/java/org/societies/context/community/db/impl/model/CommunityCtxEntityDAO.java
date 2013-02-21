@@ -55,8 +55,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 	@NamedQuery(
 			name = "getCommunityCtxEntityIdsByAttrType",
 			query = "select distinct entity.ctxId from CommunityCtxEntityDAO as entity inner join entity.attributes as attribute " +
-					"where entity.ctxId.type = :entType " +
-					"and attribute.ctxId.type = :attrType"
+					"where attribute.ctxId.type = :attrType"
 	),
 	@NamedQuery(
 			name = "getCommunityCtxEntityIdsByAttrStringValue",

@@ -53,15 +53,21 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
     private static final String LOG_TAG = ServiceUtilitiesBase.class.getName();
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
+    private boolean restrictBroadcast;
 
+    
+    public ServiceUtilitiesBase(Context androidContext) {
+    	this(androidContext, true);
+    }
+    
     /**
      * Constructor
      */
-    public ServiceUtilitiesBase(Context androidContext) {
+    public ServiceUtilitiesBase(Context androidContext, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
     	this.androidContext = androidContext;
-    	
+    	this.restrictBroadcast = restrictBroadcast;
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(androidContext, true);
@@ -146,7 +152,8 @@ public class ServiceUtilitiesBase implements IServiceUtilities {
 			if (params[0] != null) {
 				Intent intent = new Intent(GET_MY_SERVICE_ID);
 				intent.putExtra(INTENT_RETURN_VALUE, (Parcelable)sri);
-				intent.setPackage(params[0]);
+				if (restrictBroadcast)
+					intent.setPackage(params[0]);
 				ServiceUtilitiesBase.this.androidContext.sendBroadcast(intent);
 			}
 	 

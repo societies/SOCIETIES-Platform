@@ -579,26 +579,17 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxChangeEvent event = new CtxChangeEvent(modelObject.getId());
 		final String[] eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
 		final CtxEventScope eventScope = CtxEventScope.BROADCAST;
-		if (this.ctxEventMgr != null) {
-			try {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Sending context change event " + event
-							+ " to topics '" + Arrays.toString(eventTopics) 
-							+ "' with scope '" + eventScope + "'");
-				this.ctxEventMgr.post(event, eventTopics, eventScope);
-			} catch (Exception e) {
-				
-				LOG.error("Could not send context change event " + event 
-						+ " to topics '" + Arrays.toString(eventTopics) 
-						+ "' with scope '" + eventScope + "': "
-						+ e.getLocalizedMessage(), e);
-			}
-		} else {
+		if (LOG.isDebugEnabled())
+			LOG.debug("Sending context change event " + event
+					+ " to topics '" + Arrays.toString(eventTopics) 
+					+ "' with scope '" + eventScope + "'");
+		if (this.ctxEventMgr != null)
+			this.ctxEventMgr.post(event, eventTopics, eventScope);
+		else
 			LOG.error("Could not send context change event " + event
 					+ " to topics '" + Arrays.toString(eventTopics) 
 					+ "' with scope '" + eventScope + "': "
 					+ "ICtxEventMgr service is not available");
-		}
 		      
 		return this.retrieve(modelObject.getId());
 	}

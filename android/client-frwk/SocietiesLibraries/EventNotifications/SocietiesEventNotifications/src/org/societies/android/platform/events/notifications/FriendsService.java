@@ -39,9 +39,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
@@ -55,52 +57,81 @@ import android.util.Log;
  *
  */
 public class FriendsService extends Service {
+
 	private static final String LOG_TAG = FriendsService.class.getName();
-	
-	//THIS LOCAL SERVICE
-	private IBinder binder = null;
-	
-	//TRACKING CONNECTION TO EVENTS MANAGER
-	private boolean boundToEventMgrService = false;
-	private Messenger eventMgrService = null;
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsService";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
 	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	//TRACKING CONNECTION TO EVENTS MANAGER
+	private boolean boundToEventMgrService = false;
+	private Messenger eventMgrService = null;
+	private BroadcastReceiver receiver;
+	private Looper mServiceLooper;
+	private ServiceHandler mServiceHandler;
+
+	// Handler that receives messages from the thread
+	private final class ServiceHandler extends Handler {
+		  
+		public ServiceHandler(Looper looper) {
+			super(looper);
+		}
+		      
+		@Override
+		public void handleMessage(Message msg) {
+			if (!boundToEventMgrService) {
+				setupBroadcastReceiver();
+				bindToEventsManagerService();
+			}
+			// Stop the service using the startId, so that we don't stop
+			// the service in the middle of handling another job
+			//stopSelf(msg.arg1);
+		}
+	}
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>FRIENDS SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	@Override
 	public IBinder onBind(Intent intent) {
-		return this.binder;
+		return null;	//NO-ONE ALLOWED TO BIND TO THIS SERVICE
+	}
+
+	@Override
+	public void onCreate() {
+		// START BACKGROUND THREAD FOR SERVICE
+		HandlerThread thread = new HandlerThread("FriendServiceStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+		thread.start();
+		
+		// Get the HandlerThread's Looper and use it for our Handler 
+		mServiceLooper = thread.getLooper();
+		mServiceHandler = new ServiceHandler(mServiceLooper);
 	}
 	
 	@Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "Friends service starting");
-		
-		setupBroadcastReceiver();
-		bindToEventsManagerService();
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		// For each start request, send a message to start a job and deliver the
+		//start ID so we know which request we're stopping when we finish the job
+		//Message msg = mServiceHandler.obtainMessage();
+		//msg.arg1 = startId;
+	  	//mServiceHandler.sendMessage(msg);
+	  
+	  	//If we get killed, after returning from here, restart
+		return START_STICKY;
 	}
 	
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "Friends service terminating");
+		this.unregisterReceiver(receiver);
+		this.unbindService(serviceConnection);
 	}
 	
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public FriendsService getService() {
-			return FriendsService.this;
-		}
-	}
-
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/** Bind to the Events Manager Service */
 	private void bindToEventsManagerService() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
     	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
-    	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+   		bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 	
 	private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -119,20 +150,14 @@ public class FriendsService extends Service {
 			boundToEventMgrService = false;
 		}
 	};
-
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/**Create a broadcast receiver
-     * @return the created broadcast receiver
-     */
-    private BroadcastReceiver setupBroadcastReceiver() {
-    	BroadcastReceiver receiver = null;
-        Log.d(LOG_TAG, "Set up broadcast receiver");
-        
-        receiver = new MainReceiver();
+	/**Create a broadcast receiver */
+    private void setupBroadcastReceiver() {
+    	Log.d(LOG_TAG, "Set up broadcast receiver");
+    	receiver = new MainReceiver();
         this.registerReceiver(receiver, createIntentFilter());
         Log.d(LOG_TAG, "Registered broadcast receiver");
-
-        return receiver;
     }
     
     /**Broadcast receiver to receive intent return values from EventManager service*/
@@ -166,8 +191,7 @@ public class FriendsService extends Service {
 		}
     }
     
-    /**
-     * Create a suitable intent filter
+    /**Create a suitable intent filter
      * @return IntentFilter
      */
     private IntentFilter createIntentFilter() {
@@ -229,4 +253,5 @@ public class FriendsService extends Service {
 		
 		notifier.notifyMessage(description, eventType, FriendsActivity.class, intent);
 	}
+
 }

@@ -123,6 +123,13 @@ public interface ICommunityCtxDBMgr {
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
+	 * Looks up CommunityCtxEntities containing the specified attributes
+	 * 
+	 * @param attrType
+	 */
+	public List<CtxIdentifier> lookupCommunityCtxEntity(String attrType) throws CtxException;
+
+	/**
 	 * Retrieves the context model object identified by the specified
 	 * {@link CtxIdentifier}. The method returns <code>null</code> if the
 	 * identified CtxModelObject is not present in the Community Context DB.

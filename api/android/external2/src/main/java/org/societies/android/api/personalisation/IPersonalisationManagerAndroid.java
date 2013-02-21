@@ -1,5 +1,6 @@
 package org.societies.android.api.personalisation;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.personalisation.model.ActionBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -16,14 +17,15 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @created 11-Nov-2011 14:42:55
  */
 
-public interface IPersonalisationManagerAndroid {
+public interface IPersonalisationManagerAndroid extends IServiceManager{
 
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.personalisation.ReturnValue";
 	public static final String GET_INTENT_ACTION = "org.societies.android.api.personalisation.getIntentAction";
 	public static final String GET_PREFERENCE = "org.societies.android.api.personalisation.getPreference";
 
 	public String methodsArray[] = {"getIntentAction(String clientID, org.societies.api.schema.identity.RequestorBean requestor, String ownerID, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier serviceID, String preferenceName)",
-	"getPreference(String clientID, org.societies.api.schema.identity.RequestorBean requestor, String ownerID, String serviceType, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier serviceID, String preferenceName)"};
+	"getPreference(String clientID, org.societies.api.schema.identity.RequestorBean requestor, String ownerID, String serviceType, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier serviceID, String preferenceName)," +
+	"startService(), stopService()"};
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object

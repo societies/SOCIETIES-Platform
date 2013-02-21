@@ -39,9 +39,9 @@ import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
-import org.societies.android.platform.cis.CisDirectoryLocal;
-import org.societies.android.platform.cis.CommunityManagementLocal;
-import org.societies.android.platform.cis.CommunityManagementLocal.LocalBinder;
+import org.societies.android.platform.cis.CisDirectoryRemote;
+import org.societies.android.platform.cis.CisManagerRemote;
+import org.societies.android.platform.cis.CisSubscribedRemote;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
@@ -57,8 +57,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.Parcelable;
+import android.os.RemoteException;
 import android.util.Log;
 import com.google.gson.Gson;
 
@@ -84,13 +88,13 @@ public class PluginCISFunctions extends Plugin {
 	//Required to match method calls with callbackIds
 	private HashMap<String, String> methodCallbacks;;
 
-	private ICisManager serviceCISManager;
+	private Messenger messengerCISManager;
     private boolean serviceCISManagerConnected = false;
     
-    private ICisSubscribed serviceCISsubscribe;
+    private Messenger messengerCISsubscribe;
     private boolean serviceCISsubscribeConnected = false;
 
-    private ICisDirectory serviceCISdir;
+    private Messenger messengerCISdir;
     private boolean serviceCISdirConnected = false;
     /**
      * Constructor
@@ -107,11 +111,10 @@ public class PluginCISFunctions extends Plugin {
 
     	public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to CISManager service");
-        	//get a local binder
-        	LocalBinder binder = (LocalBinder) service;
-            //OBTAIN ICisManager SERVICE API
-        	serviceCISManager = (ICisManager) binder.getService();
+        	//GET REMOTE BINDER
+        	messengerCISManager = new Messenger(service);
             serviceCISManagerConnected = true;
+            Log.d(LOG_TAG, "Successfully connected to CisManager service");
         }
     	
         public void onServiceDisconnected(ComponentName name) {
@@ -127,12 +130,10 @@ public class PluginCISFunctions extends Plugin {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to ICisSubsribed service");
-        	//GET LOCAL BINDER
-            LocalBinder binder = (LocalBinder) service;
-
-            //OBTAIN ICisSubscribed API
-            serviceCISsubscribe = (ICisSubscribed) binder.getService();
+        	//GET REMOTE BINDER
+        	messengerCISsubscribe = new Messenger(service);
             serviceCISsubscribeConnected = true;
+            Log.d(LOG_TAG, "Successfully connected to CisSubscribed service");
         }
         
         public void onServiceDisconnected(ComponentName name) {
@@ -148,12 +149,10 @@ public class PluginCISFunctions extends Plugin {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to ICisDirectory service");
-        	//get a local binder
-        	org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder binder = (org.societies.android.platform.cis.CisDirectoryLocal.LocalBinder) service;
-            //obtain the service's API
-        	serviceCISdir = (ICisDirectory) binder.getService();
+        	//GET REMOTE BINDER
+        	messengerCISdir = new Messenger(service);
         	serviceCISdirConnected = true;
-            Log.d(LOG_TAG, "Successfully connected to ICisDirectory service");
+            Log.d(LOG_TAG, "Successfully connected to CisDirectory service");
         }
         
         public void onServiceDisconnected(ComponentName name) {
@@ -167,9 +166,9 @@ public class PluginCISFunctions extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//CREATE INTENT FOR EACH SERVICE
-    	Intent intentCisManager = new Intent(this.ctx.getContext(), CommunityManagementLocal.class);
-    	Intent intentCisSubscribe = new Intent(this.ctx.getContext(), CommunityManagementLocal.class);
-    	Intent intentCisDir = new Intent(this.ctx.getContext(), CisDirectoryLocal.class);
+    	Intent intentCisManager = new Intent(this.ctx.getContext(), CisManagerRemote.class);
+    	Intent intentCisSubscribe = new Intent(this.ctx.getContext(), CisSubscribedRemote.class);
+    	Intent intentCisDir = new Intent(this.ctx.getContext(), CisDirectoryRemote.class);
     	
     	//BIND TO SERVICES
     	this.ctx.getContext().bindService(intentCisManager, cisManagerConnection, Context.BIND_AUTO_CREATE);
@@ -250,94 +249,227 @@ public class PluginCISFunctions extends Plugin {
 					List<Criteria> criteriaList = CreateCriteriaList(jArray);
 					MembershipCrit membCrit = new MembershipCrit();
 					membCrit.setCriteria(criteriaList);
-					this.serviceCISManager.createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), membCrit, data.getString(5));
+					
+					//createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), membCrit, data.getString(5));
+	        		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 2), data.getString(2));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 3), data.getString(3));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 3), membCrit);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 3), data.getString(5));
+	        		
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 1))) {
 				try { // DELETE CIS
-					this.serviceCISManager.deleteCis(data.getString(0), data.getString(1));
+					//deleteCis(data.getString(0), data.getString(1));
+	        		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 2))) {
 				try {// GET CIS LISTING
-					this.serviceCISManager.getCisList(data.getString(0), data.getString(1));
+					//getCisList(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3))) {
 				try { //REMOVE PARTICIPANT FROM CIS
-					this.serviceCISManager.removeMember(data.getString(0), data.getString(1), data.getString(2));
+					//removeMember(data.getString(0), data.getString(1), data.getString(2));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 2), data.getString(2));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 4))) {
 				try { //JOIN A CIS
-					this.serviceCISManager.Join(data.getString(0), createCisAdvertFromJSON(data.getJSONObject(1)));
+					//Join(data.getString(0), createCisAdvertFromJSON(data.getJSONObject(1)));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), createCisAdvertFromJSON(data.getJSONObject(1)));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 5))) {
 				try { //LEAVE A CIS
-					this.serviceCISManager.Leave(data.getString(0), data.getString(1));
+					//Leave(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISManager.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			}
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 0))) {
 				try { //GET MEMBERS LIST
-					this.serviceCISsubscribe.getMembers(data.getString(0), data.getString(1));
+					//getMembers(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISsubscribe.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 2))) {
 				try { //GET ACTIVITY FEED 
-					this.serviceCISsubscribe.getActivityFeed(data.getString(0), data.getString(1));
+					//getActivityFeed(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISsubscribe.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3))) {
 				try { //ADD AN ACTIVITY TO THE FEED
 					JSONObject jObj = data.getJSONObject(2);
 					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
-					this.serviceCISsubscribe.addActivity(data.getString(0), data.getString(1), activity);
+					//addActivity(data.getString(0), data.getString(1), activity);
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), activity);
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISsubscribe.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4))) {
 				try { //DELETE AN ACTIVITY FROM THE FEED
 					JSONObject jObj = data.getJSONObject(2);
 					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
-					this.serviceCISsubscribe.deleteActivity(data.getString(0), data.getString(1), activity);
+					//deleteActivity(data.getString(0), data.getString(1), activity);
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), activity);
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISsubscribe.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 5))) {
 				try { //CLEAN UP THE ACTIVITY FEED
-					this.serviceCISsubscribe.cleanActivityFeed(data.getString(0), data.getString(1));
+					//cleanActivityFeed(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISsubscribe.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			}
 			//>>>>>>>>>  ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 0))) {
 				try { //findAllCisAdvertisementRecords
-					this.serviceCISdir.findAllCisAdvertisementRecords(data.getString(0));
+					//findAllCisAdvertisementRecords(data.getString(0));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+
+	        		outMessage.setData(outBundle);
+	    			messengerCISdir.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 1))) {
 				try { //findForAllCis
-					this.serviceCISdir.findForAllCis(data.getString(0), data.getString(1));
+					//findForAllCis(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	        		messengerCISdir.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 2))) {
 				try { //searchByID
-					this.serviceCISdir.searchByID(data.getString(0), data.getString(1));
+					//searchByID(data.getString(0), data.getString(1));
+					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+	        		Bundle outBundle = new Bundle();
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+
+	        		outMessage.setData(outBundle);
+	        		messengerCISdir.send(outMessage);
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 			}

@@ -24,6 +24,7 @@
  */
 package org.societies.android.platform.servicemonitor;
 
+import java.lang.ref.WeakReference;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -42,7 +43,7 @@ public class ServiceManagementLocal extends Service {
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalBinder();
+		this.binder = new LocalSLMBinder(new ServiceManagementBase(getApplicationContext()));
 		Log.d(LOG_TAG, "ServiceManagementLocal service starting");
 	}
 
@@ -52,9 +53,15 @@ public class ServiceManagementLocal extends Service {
 	}
 
 	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
+	public class LocalSLMBinder extends Binder {
+		private WeakReference<ServiceManagementBase> outerClassReference = null;
+		
+		public LocalSLMBinder(ServiceManagementBase instance) {
+			 this.outerClassReference = new WeakReference<ServiceManagementBase>(instance);
+		 }
+		
 		public ServiceManagementBase getService() {
-			return new ServiceManagementBase(ServiceManagementLocal.this.getApplicationContext());
+			return outerClassReference.get();
 		}
 	}
 	
