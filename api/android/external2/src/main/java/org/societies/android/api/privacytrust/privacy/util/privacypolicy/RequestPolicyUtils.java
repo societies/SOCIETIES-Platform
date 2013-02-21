@@ -24,8 +24,11 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -84,5 +87,53 @@ public class RequestPolicyUtils {
 			result &= equals(o1Element, rhs.get(i++));
 		}
 		return result;
+	}
+	
+
+	/**
+	 * Retrieve all data types requested in a privacy policy
+	 * Warning: data types are stored without scheme, so these data can be from several schemes (cis, context)
+	 * 
+	 * @param privacyPolicy Privacy policy
+	 * @return A list of data types requested, or null if the privacy policy is null or empty
+	 */
+	public static List<String> getDataTypes(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
+		List<String> dataTypes = null;
+		// -- Empty privacy policy
+		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0) {
+			return dataTypes;
+		}
+
+		// -- Retrieve data type list
+		dataTypes = new ArrayList<String>();
+		for(RequestItem requestItem : privacyPolicy.getRequestItems()) {
+			dataTypes.add(ResourceUtils.getDataType(requestItem.getResource()));
+		}
+		return dataTypes;
+	}
+
+	/**
+	 * Retrieve all data types of a peculiar scheme (cis, context, ...) in a privacy policy
+	 * 
+	 * @param schemeFilter Scheme of the data types
+	 * @param privacyPolicy Privacy policy
+	 * @return A list of data types of the peculiar scheme, or null if the privacy policy is null or empty
+	 */
+	public static List<String> getDataTypes(DataIdentifierScheme schemeFilter, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
+		List<String> dataTypes = null;
+		// -- Empty privacy policy
+		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0) {
+			return dataTypes;
+		}
+
+		// -- Retrieve data type list
+		dataTypes = new ArrayList<String>();
+		for(RequestItem requestItem : privacyPolicy.getRequestItems()) {
+			DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
+			if (dataId.getScheme().name().equals(schemeFilter.name())) {
+				dataTypes.add(dataId.getType());
+			}
+		}
+		return dataTypes;
 	}
 }

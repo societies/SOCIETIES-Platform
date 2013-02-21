@@ -24,6 +24,9 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import org.societies.android.api.identity.DataIdentifierFactory;
+import org.societies.android.api.identity.DataTypeFactory;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
@@ -33,8 +36,27 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resourc
  */
 public class ResourceUtils {
 	
-	public static String getDataIdUri(Resource resource) {
+
+	public static String getDataIdUri(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
 		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+	}
+
+	public static String getDataType(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return resource.getDataType();
+		}
+		// URI available
+		return DataTypeFactory.fromUri(resource.getDataIdUri()).getType();
+	}
+	
+	public static DataIdentifier getDataIdentifier(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return DataIdentifierFactory.fromType(resource.getScheme(), resource.getDataType());
+		}
+		// URI available
+		return DataTypeFactory.fromUri(resource.getDataIdUri());
 	}
 
 	public static Resource create(String dataIdUri) {

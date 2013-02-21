@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.android.api.identity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
 
 /**
@@ -42,7 +39,6 @@ import org.societies.api.schema.identity.DataTypeDescription;
  * @author Olivier Maridat (Trialog)
  */
 public class DataTypeUtil {
-	private static Logger LOG = LoggerFactory.getLogger(DataTypeUtil.class.getName());
 	private static Map<String, Set<String>> dataTypeHierarchy;
 	private static Map<String, String> dataTypeAntiHierarchy;
 	private static Map<String, DataTypeDescription> dataTypeDescription;
@@ -51,7 +47,6 @@ public class DataTypeUtil {
 
 	public DataTypeUtil() {
 		if (!loaded) {
-			LOG.debug("SOCIETIES data type hierarchy loading... This message should apear only one time. If you see it several times, please contact Olivier Maridat (Trialog)");
 			dataTypeHierarchy = new HashMap<String, Set<String>>();
 			dataTypeAntiHierarchy = new HashMap<String, String>();
 			dataTypeDescription = new HashMap<String, DataTypeDescription>();
@@ -188,34 +183,34 @@ public class DataTypeUtil {
 	 * @return True if success
 	 */
 	private boolean loadDataHierarchy() {
-		Set<String> postAddressHomeChildren = new HashSet<String>();
-		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
-		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
-		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_CITY);
-		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_COUNTRY);
-		dataTypeHierarchy.put("ADDRESS_HOME", postAddressHomeChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_CITY, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_COUNTRY, "ADDRESS_HOME");
-
-		Set<String> postAddressWorkChildren = new HashSet<String>();
-		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER);
-		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME);
-		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_CITY);
-		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_COUNTRY);
-		dataTypeHierarchy.put("ADDRESS_WORK", postAddressWorkChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_CITY, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_COUNTRY, "ADDRESS_WORK");
-
-		Set<String> nameChildren = new HashSet<String>();
-		nameChildren.add(CtxAttributeTypes.NAME_FIRST);
-		nameChildren.add(CtxAttributeTypes.NAME_LAST);
-		dataTypeHierarchy.put(CtxAttributeTypes.NAME, nameChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_FIRST, CtxAttributeTypes.NAME);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_LAST, CtxAttributeTypes.NAME);
+//		Set<String> postAddressHomeChildren = new HashSet<String>();
+//		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
+//		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+//		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_CITY);
+//		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_COUNTRY);
+//		dataTypeHierarchy.put("ADDRESS_HOME", postAddressHomeChildren);
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER, "ADDRESS_HOME");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME, "ADDRESS_HOME");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_CITY, "ADDRESS_HOME");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_COUNTRY, "ADDRESS_HOME");
+//
+//		Set<String> postAddressWorkChildren = new HashSet<String>();
+//		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER);
+//		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME);
+//		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_CITY);
+//		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_COUNTRY);
+//		dataTypeHierarchy.put("ADDRESS_WORK", postAddressWorkChildren);
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER, "ADDRESS_WORK");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME, "ADDRESS_WORK");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_CITY, "ADDRESS_WORK");
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_COUNTRY, "ADDRESS_WORK");
+//
+//		Set<String> nameChildren = new HashSet<String>();
+//		nameChildren.add(CtxAttributeTypes.NAME_FIRST);
+//		nameChildren.add(CtxAttributeTypes.NAME_LAST);
+//		dataTypeHierarchy.put(CtxAttributeTypes.NAME, nameChildren);
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_FIRST, CtxAttributeTypes.NAME);
+//		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_LAST, CtxAttributeTypes.NAME);
 		return true;
 	}
 
@@ -224,10 +219,10 @@ public class DataTypeUtil {
 	 * @return True if success
 	 */
 	private boolean loadDataTypeDescription() {
-		addDataTypeDescription(CtxAttributeTypes.ABOUT, "Information about this entity");
-		addDataTypeDescription(CtxAttributeTypes.ACTION, "Action done by this entity");
-		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
-		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
+//		addDataTypeDescription(CtxAttributeTypes.ABOUT, "Information about this entity");
+//		addDataTypeDescription(CtxAttributeTypes.ACTION, "Action done by this entity");
+//		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
+//		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
 		return true;
 	}
 

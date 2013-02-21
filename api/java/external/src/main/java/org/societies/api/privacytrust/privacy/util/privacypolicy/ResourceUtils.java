@@ -30,8 +30,11 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
+import org.societies.api.identity.DataIdentifierUtil;
+import org.societies.api.identity.DataTypeFactory;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
@@ -109,17 +112,34 @@ public class ResourceUtils {
 		return resourceBeans;
 	}
 
-	public static String getDataIdUri(
-			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
+	public static String getDataIdUri(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
 		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
 	}
+
+	public static String getDataType(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return resource.getDataType();
+		}
+		// URI available
+		return DataTypeFactory.fromUri(resource.getDataIdUri()).getType();
+	}
 	
+	public static DataIdentifier getDataIdentifier(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return DataIdentifierFactory.fromType(resource.getScheme(), resource.getDataType());
+		}
+		// URI available
+		return DataTypeFactory.fromUri(resource.getDataIdUri());
+	}
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(String dataIdUri) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
 		resource.setDataIdUri(dataIdUri);
 		return resource;
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(DataIdentifierScheme dataScheme, String dataType) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
 		resource.setScheme(dataScheme);

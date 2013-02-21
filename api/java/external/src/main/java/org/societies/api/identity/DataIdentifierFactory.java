@@ -30,7 +30,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * Utility method that helps manipulating DataIdentifier objects
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -78,5 +78,20 @@ public class DataIdentifierFactory {
 		}
 		dataId.setType(path.substring(end+1, endType));
 		return dataId;
+	}
+
+	/**
+	 * Generate a simple DataIdentifier from schema and type
+	 * 
+	 * @param scheme
+	 * @param dataType
+	 * @return
+	 */
+	public static DataIdentifier fromType(DataIdentifierScheme scheme, String dataType) {
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(scheme);
+		dataId.setType(dataType);
+		dataId.setUri(DataIdentifierUtil.toUriString(scheme, dataType));
+		return null;
 	}
 }

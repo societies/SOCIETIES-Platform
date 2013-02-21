@@ -28,7 +28,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * Utility method that helps manipulating DataIdentifier objects
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -48,11 +48,28 @@ public class DataTypeFactory {
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
 		String path = uri[1];
-		int pos = 0, end = 0;
+		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
 			dataId.setOwnerId(path.substring(pos, end));
 		}
-		dataId.setType(path.substring(end+1, path.length()));
+		endType = path.length();
+		if (path.endsWith("/") && endType > 1) {
+			endType--;
+		}
+		dataId.setType(path.substring(end+1, endType));
+		dataId.setUri(dataIdUri);
 		return dataId;
+	}
+	
+	/**
+	 * Retrieve the type of a DataIdentifier for sure: from its URI or its type field
+	 * @param dataId
+	 * @return Data type
+	 */
+	public static String getType(DataIdentifier dataId) {
+		if (null != dataId.getType()) {
+			return dataId.getType();
+		}
+		return fromUri(dataId.getUri()).getType();
 	}
 }

@@ -29,7 +29,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * Utility method that helps manipulating DataIdentifier objects
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -58,9 +58,15 @@ public class DataTypeFactory {
 			endType--;
 		}
 		dataId.setType(path.substring(end+1, endType));
+		dataId.setUri(dataIdUri);
 		return dataId;
 	}
 	
+	/**
+	 * Retrieve the type of a DataIdentifier for sure: from its URI or its type field
+	 * @param dataId
+	 * @return Data type
+	 */
 	public static String getType(DataIdentifier dataId) {
 		if (null != dataId.getType()) {
 			return dataId.getType();
