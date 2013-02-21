@@ -42,7 +42,7 @@ public class ItemConverterHelper {
 		org.jabber.protocol.pubsub.event.Item item = new org.jabber.protocol.pubsub.event.Item();
 		if (node.getAttribute("id")!=null)
 			item.setId(node.getAttribute("id").getValue());
-		InputNode payloadNode = node.getNext();
+		InputNode payloadNode = node.getNext(); // not good?
 		if (payloadNode!=null) {
 			Document d = builder.newDocument();
 			Element e = getElement(d, payloadNode);

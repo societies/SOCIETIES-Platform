@@ -22,7 +22,7 @@ public class EventItemsConverter implements Converter<Items> {
 		i.setNode(node.getAttribute("node").getValue());
 		InputNode n = node.getNext();
 		while (n!=null) {
-			i.getItem().add(ich.readEventItemAnyToElement(node));
+			i.getItem().add(ich.readEventItemAnyToElement(n));
 			n = node.getNext();
 		}
 		return i;
