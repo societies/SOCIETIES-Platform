@@ -38,9 +38,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -166,6 +164,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
 
     public void setPubSubClient(PubsubClient pubSubClient) {
         this.pubSubClient = pubSubClient;
+        try {
+            pubSubClient.addSimpleClasses(Collections
+                    .unmodifiableList(Arrays.asList("org.societies.api.schema.activity.MarshaledActivity")));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public PubsubClient getPubSubClient() {
