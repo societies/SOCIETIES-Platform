@@ -54,6 +54,12 @@
 			<type>apklib</type>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.android.platform.cssmanager</groupId>
+			<artifactId>SocietiesCSSManager</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>
 			<scope>provided</scope>
@@ -65,51 +71,10 @@
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
           <plugins>
-              <plugin>
-                  <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                  <artifactId>android-maven-plugin</artifactId>
-
-				  <configuration>
-				      <emulator>
-						  <avd>Nexus403</avd>
-						  <wait>60000</wait>
-						  <options>-no-skin</options>
-				      </emulator>
-                      <!-- emma start -->
-					    <emmaEnable>true</emmaEnable>
-					    <emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
-					    <emmaOutputMetaFile>${project.basedir}/target/emma/coverage.em</emmaOutputMetaFile>
-				      <!--emma>
-                          <enable>true</enable>
-                          <classFolders>${project.basedir}/target/classes</classFolders>
-                          <outputMetaFile>${project.basedir}/target/emma/coverage.em</outputMetaFile>
-                      </emma-->
-                      <!-- emma stop -->
-                      <dex>
-                          <noLocals>true</noLocals>
-                          <!--  must be set for emma -->
-                      </dex>
-                  </configuration>
-                  <executions>
-			    	<!--execution>
-				        <id>startEmulator</id>
-				        <phase>initialize</phase>
-				        <goals>
-				            <goal>emulator-start</goal>
-				        </goals>
-			    	</execution-->
-			    	<!--execution>
-				        <id>stopEmulator</id>
-				        <phase>initialize</phase>
-				        <goals>
-				            <goal>emulator-stop</goal>
-				        </goals>
-			    	</execution-->
-			    	
-				</executions>
-				  
-                  <extensions>true</extensions>
-              </plugin>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
           </plugins>
 
     </build>
