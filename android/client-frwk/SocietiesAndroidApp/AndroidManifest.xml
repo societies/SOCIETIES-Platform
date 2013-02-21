@@ -62,7 +62,7 @@
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
 		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
-          <service android:name="org.societies.android.platform.cssmanager.ServiceCSSManagerLocal" />
+        <service android:name="org.societies.android.platform.cssmanager.ServiceCSSManagerLocal" />
         <service android:name="org.societies.android.platform.cssmanager.LocalCssDirectoryService" />
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />

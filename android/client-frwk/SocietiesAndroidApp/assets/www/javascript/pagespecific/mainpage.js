@@ -189,6 +189,11 @@ $(document).on('pageinit', '#index', function(event) {
 		SocietiesLogin.clearElementValue('#loginPassword')
 	});
 	
+	$('#updatewithpreferences').off('click').on('click', function(){
+		SocietiesLogin.refreshWithAppPreferences();
+	});
+	
+	
 	$("form#login").submit(function() {
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);

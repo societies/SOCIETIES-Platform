@@ -1,8 +1,10 @@
 package org.societies.android.platform.events.test;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.eventscontainer.ServicePlatformEventsTest;
 import org.societies.android.platform.eventscontainer.ServicePlatformEventsTest.TestPlatformEventsBinder;
+import org.societies.api.schema.cssmanagement.CssEvent;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,7 +24,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 	private static final String INTENT_FILTER = "org.societies.android.css.manager";
 	private static final int SLEEP_DELAY = 10000;
 	
-	private static final int ALL_EVENTS_COUNT = 9;
+	private static final int ALL_EVENTS_COUNT = 13;
 	
 	private boolean testCompleted;
 	private IAndroidSocietiesEvents eventService;
@@ -58,7 +60,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     	assertNotNull(binder);
     	
     	this.eventService = (IAndroidSocietiesEvents) binder.getService();
-    	this.eventService.subscribeToAllEvents(CLIENT_PARAM_1);
+    	this.eventService.startService();
 
      	Thread.sleep(SLEEP_DELAY);
     	
@@ -77,7 +79,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     	assertNotNull(binder);
     	
     	this.eventService = (IAndroidSocietiesEvents) binder.getService();
-    	this.eventService.subscribeToEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+    	this.eventService.startService();
  
     	Thread.sleep(SLEEP_DELAY);
 
@@ -96,7 +98,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     	assertNotNull(binder);
     	
     	this.eventService = (IAndroidSocietiesEvents) binder.getService();
-    	this.eventService.subscribeToEvents(CLIENT_PARAM_1, INTENT_FILTER);
+    	this.eventService.startService();
      	
     	Thread.sleep(SLEEP_DELAY);
 
@@ -114,7 +116,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
     	assertNotNull(binder);
     	
     	this.eventService = (IAndroidSocietiesEvents) binder.getService();
-    	this.eventService.subscribeToAllEvents(CLIENT_PARAM_1);
+    	this.eventService.startService();
 
     	Thread.sleep(SLEEP_DELAY);
 
@@ -133,15 +135,27 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 			
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
+				TestEventsLocal.this.eventService.getNumSubscribedNodes(CLIENT_PARAM_1);
 			    
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.testCompleted = true;
-
+				TestEventsLocal.this.eventService.stopService();
+				
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
 				assertEquals(1, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestEventsLocal.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+				TestEventsLocal.this.eventService.publishEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, getCssEvent());
+				
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.PUBLISH_EVENT)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.subscribeToEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
 			}
 		}
     }
@@ -157,15 +171,23 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 			
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
+				TestEventsLocal.this.eventService.getNumSubscribedNodes(CLIENT_PARAM_1);
 			    
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.testCompleted = true;
+				TestEventsLocal.this.eventService.stopService();
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
 				assertEquals(2, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
 				TestEventsLocal.this.eventService.unSubscribeFromEvents(CLIENT_PARAM_1, INTENT_FILTER);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.subscribeToEvents(CLIENT_PARAM_1, INTENT_FILTER);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
 			}
 		}
     }
@@ -180,15 +202,27 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 			
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.eventService.getNumScubscribedNodes(CLIENT_PARAM_1);
+				TestEventsLocal.this.eventService.getNumSubscribedNodes(CLIENT_PARAM_1);
 			    
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.testCompleted = true;
+				TestEventsLocal.this.eventService.stopService();
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
 				assertEquals(ALL_EVENTS_COUNT, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
 				TestEventsLocal.this.eventService.unSubscribeFromAllEvents(CLIENT_PARAM_1);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.subscribeToAllEvents(CLIENT_PARAM_1);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.subscribeToAllEvents(CLIENT_PARAM_1);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
 			}
 		}
     }
@@ -212,7 +246,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 			    
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.eventService.subscribeToEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+				TestEventsLocal.this.eventService.subscribeToEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
@@ -220,11 +254,19 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-				TestEventsLocal.this.testCompleted = true;
-
+				TestEventsLocal.this.eventService.stopService();
+				
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-		    	eventService.unSubscribeFromEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+		    	eventService.unSubscribeFromEvent(CLIENT_PARAM_3, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
+		    	
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.eventService.subscribeToAllEvents(CLIENT_PARAM_1);
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
+				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
+				TestEventsLocal.this.testCompleted = true;
 			}
 		}
     }
@@ -310,8 +352,16 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
         intentFilter.addAction(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS);
         intentFilter.addAction(IAndroidSocietiesEvents.PUBLISH_EVENT);
         intentFilter.addAction(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS);
+        intentFilter.addAction(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+        intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
         
         return intentFilter;
-
+    }
+    
+    private static CssEvent getCssEvent() {
+    	CssEvent event = new CssEvent();
+    	event.setDescription("test Css Event");
+    	event.setType("test");
+    	return event;
     }
 }

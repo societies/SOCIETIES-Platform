@@ -32,6 +32,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 
 var SocietiesLogin = {
+		/**
+		 * @methodOf SocietiesLogin#
+		 * @description Refresh the Login page based on current app preferences
+		 * @returns void
+		 */
+	
+	refreshWithAppPreferences: function() {
+		SocietiesAppConfig.isDisplayPassword(SocietiesLogin.displayConnectionInfo);
+	},
 	/**
 	 * @methodOf SocietiesLogin#
 	 * @description Validate that viable login credentials have been entered
@@ -158,7 +167,7 @@ var SocietiesLogin = {
 	
 	/**
 	 * @methodOf SocietiesLogin#
-	 * @description Gets the CSS Identity Password app preference value
+	 * @description Gets the CSS Domain Server (DNS name) app preference value
 	 * @returns null
 	 */
 

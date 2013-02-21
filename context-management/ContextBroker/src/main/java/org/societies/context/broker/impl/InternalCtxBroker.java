@@ -111,13 +111,13 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** to define a dedicated Logger for Performance Testing */
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
-	
+
 	/** The event topics to create for local CSSs and CISs */
 	static final String[] EVENT_TOPICS = new String[] {
-					CtxChangeEventTopic.CREATED,
-					CtxChangeEventTopic.UPDATED,
-					CtxChangeEventTopic.MODIFIED,
-					CtxChangeEventTopic.REMOVED };
+		CtxChangeEventTopic.CREATED,
+		CtxChangeEventTopic.UPDATED,
+		CtxChangeEventTopic.MODIFIED,
+		CtxChangeEventTopic.REMOVED };
 
 	/** The Comms Mgr service reference. */
 	@Autowired(required=true)
@@ -285,7 +285,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.ctxEventMgr.createTopics(cisId, EVENT_TOPICS);
 
 		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId.toString());
-		
+
 		LOG.info("Community Context CREATE ENTITY performed with context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
@@ -447,8 +447,40 @@ public class InternalCtxBroker implements ICtxBroker {
 		} else if (IdentityType.CIS.equals(target.getType())) {
 
 			// TODO check if CIS is locally maintained or a remote call is necessary
+			// TODO cis monitor should have previously add specific type in inferable types list
+
 			attribute = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
-			// TODO integrate with Community Inference Mgr
+		//	LOG.info("0 estimateCommunityContext identifier:" +attribute.getId() +" attribute.getQuality()"+ attribute.getQuality().getLastUpdated());
+
+			if ((enableInference 
+					&& !CtxBrokerUtils.hasValue(attribute)) || 
+					(enableInference &&	this.userCtxInferenceMgr.isPoorQuality(attribute.getQuality()))){
+
+		//		LOG.info("1 estimateCommunityContext identifier:" +identifier);
+				// if community attribute has no  value initiate value estimation 
+	//			LOG.info("2 estimateCommunityContext has no value");
+				CtxAttribute commAttrEstimated = this.communityCtxInferenceMgr.estimateCommunityContext(identifier.getScope(), identifier);
+
+				if(commAttrEstimated != null ){
+
+
+					if(CtxBrokerUtils.hasValue(commAttrEstimated)) {
+						// persist in community db the estimated attribute and return it to requestor
+//						LOG.info("4 estimateCommunityContext persisting "+ commAttrEstimated.getId());
+						try {
+							attribute = (CtxAttribute) this.update(commAttrEstimated).get();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ExecutionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+//						LOG.info("5 estimateCommunityContext persisted ");
+					}
+
+				}
+			}
 
 		} else 
 			throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
@@ -1460,7 +1492,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			// CIS case
 		} else if (IdentityType.CIS.equals(targetID.getType())){
 			//LOG.info("skata 4 community " +targetID.toString() +" type "+type); 
-			
+
 			entityResult = this.communityCtxDBMgr.createEntity(targetID.toString(), type);
 			LOG.info("Community Context CREATE ENTITY performed with context ID:"+entityResult.getId()+" of type:"+entityResult.getType());
 
@@ -1495,7 +1527,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ ": Invalid owner IIdentity String: " 
 					+ e1.getLocalizedMessage(), e1);
 		} 
-		
+
 		if (IdentityType.CSS.equals(scopeID.getType()) 
 				|| IdentityType.CSS_RICH.equals(scopeID.getType())
 				|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
@@ -1557,26 +1589,26 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_LIGHT.equals(targetId.getType())) {
 
 
-		
-		if (this.commMgr.getIdManager().isMine(targetId)) {
 
-			associationResult = this.userCtxDBMgr.createAssociation(type);
+			if (this.commMgr.getIdManager().isMine(targetId)) {
 
-		}else {
+				associationResult = this.userCtxDBMgr.createAssociation(type);
 
-			final CreateAssociationCallback callback = new CreateAssociationCallback();
-			this.ctxBrokerClient.createAssociation(requestor, targetId, type, callback);
+			}else {
 
-			synchronized (callback) {
-				try {
-					callback.wait();
-					associationResult = callback.getResult();
+				final CreateAssociationCallback callback = new CreateAssociationCallback();
+				this.ctxBrokerClient.createAssociation(requestor, targetId, type, callback);
 
-				} catch (InterruptedException e) {
-					throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
-				}
-			}			
-		}
+				synchronized (callback) {
+					try {
+						callback.wait();
+						associationResult = callback.getResult();
+
+					} catch (InterruptedException e) {
+						throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
+					}
+				}			
+			}
 
 		} else if (IdentityType.CIS.equals(targetId.getType())){
 
@@ -1584,7 +1616,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			LOG.info("Community Context CREATE ASSOCIATION performed with context ID:"+associationResult.getId()+" of type:"+associationResult.getType());
 		} 
 
-		
+
 		if (associationResult!=null)
 			return new AsyncResult<CtxAssociation>(associationResult);
 		else 
@@ -1732,7 +1764,15 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
+			LOG.info("skata 1 inside cis lookup, type:"+type);
+			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+			//.lookup(modelType, type);
+
+			LOG.info("skata 2 this.communityCtxDBMgr.lookupCommunityCtxEntity(type);:"+localCtxIdListResult);
+
+			LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
+
+
 
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
@@ -2036,12 +2076,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void unregisterFromChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxIdentifier ctxId)
 					throws CtxException {
-		
+
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
-		
+
 		if (requestor == null)
 			requestor = this.getLocalRequestor();
 
@@ -2056,7 +2096,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
 			this.ctxEventMgr.unregisterChangeListener(listener, topics, ctxId);
 
-/* TODO
+			/* TODO
 			try {
 				if (ctxId instanceof CtxAttributeIdentifier 
 						&& this.userCtxInferenceMgr.getInferrableTypes().contains(ctxId.getType())) {
@@ -2070,12 +2110,12 @@ public class InternalCtxBroker implements ICtxBroker {
 				LOG.warn("Could not check if attribute requires inference: "
 						+ "User Context Inference Mgr is not available");
 			}
-*/
+			 */
 		} else {
 			throw new CtxBrokerException(
 					"Could not unregister context change event listener for object '"
-					+ ctxId + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
+							+ ctxId + "' to topics '" + Arrays.toString(topics)
+							+ "': ICtxEventMgr service is not available");
 		}
 	}
 
@@ -2121,12 +2161,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void unregisterFromChanges(Requestor requestor,
 			CtxChangeEventListener listener, CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
-		
+
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		
+
 		if (requestor == null)
 			requestor = this.getLocalRequestor();
 
@@ -2145,8 +2185,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		} else {
 			throw new CtxBrokerException(
 					"Could not unregister context change event listener for attributes with scope '"
-					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
-					+ "': ICtxEventMgr service is not available");
+							+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+							+ "': ICtxEventMgr service is not available");
 		}
 	}
 
