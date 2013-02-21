@@ -35,7 +35,9 @@
 	<artifact type="plan" name="org.societies.useragent"/>
 	
 	<artifact type="plan" name="org.societies.personalisation"/>
-	
+
+	<artifact type="plan" name="org.societies.orchestration"/>
+
 	<artifact type="plan" name="org.societies.webapp"/>
 
 </plan>
