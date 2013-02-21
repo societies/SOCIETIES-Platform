@@ -111,6 +111,13 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** to define a dedicated Logger for Performance Testing */
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
+	
+	/** The event topics to create for local CSSs and CISs */
+	static final String[] EVENT_TOPICS = new String[] {
+					CtxChangeEventTopic.CREATED,
+					CtxChangeEventTopic.UPDATED,
+					CtxChangeEventTopic.MODIFIED,
+					CtxChangeEventTopic.REMOVED };
 
 	/** The Comms Mgr service reference. */
 	@Autowired(required=true)
@@ -230,6 +237,11 @@ public class InternalCtxBroker implements ICtxBroker {
 		IndividualCtxEntity cssOwnerEnt = null;
 
 		try {
+			if (LOG.isInfoEnabled())
+				LOG.info("Creating event topics '" + Arrays.toString(EVENT_TOPICS) 
+						+ "' for CSS owner " + cssId);
+			this.ctxEventMgr.createTopics(cssId, EVENT_TOPICS);
+
 			LOG.info("Checking if CSS owner context entity " + cssId + " exists...");
 			cssOwnerEnt = this.retrieveIndividualEntity(cssId).get();
 			if (cssOwnerEnt != null) {
@@ -265,9 +277,15 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (cisId == null)
 			throw new NullPointerException("cisId can't be null");
 		if (!IdentityType.CIS.equals(cisId.getType()))
-			throw new IllegalArgumentException("Inserted id is not of type CIS");
+			throw new IllegalArgumentException("cisId is not of type CIS");
+
+		if (LOG.isInfoEnabled())
+			LOG.info("Creating event topics '" + Arrays.toString(EVENT_TOPICS) 
+					+ "' for CIS " + cisId);
+		this.ctxEventMgr.createTopics(cisId, EVENT_TOPICS);
 
 		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId.toString());
+		
 		LOG.info("Community Context CREATE ENTITY performed with context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
