@@ -30,8 +30,8 @@ import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 
+import android.app.IntentService;
 import android.app.Notification;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,7 +39,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -54,11 +53,10 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class FriendsService extends Service {
+public class FriendsService extends IntentService {
+
 	private static final String LOG_TAG = FriendsService.class.getName();
-	
-	//THIS LOCAL SERVICE
-	private IBinder binder = null;
+	private static final String SERVICE_NAME = "SOCIETIES Friends Service";
 	
 	//TRACKING CONNECTION TO EVENTS MANAGER
 	private boolean boundToEventMgrService = false;
@@ -69,18 +67,27 @@ public class FriendsService extends Service {
 	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/**Constructor 
+	 * @param name service name
+	 */
+	public FriendsService() {
+		super(SERVICE_NAME);
+	}
+
 	@Override
-	public IBinder onBind(Intent intent) {
-		return this.binder;
+	protected void onHandleIntent(Intent intent) {
+		//DO NOTHING
 	}
 	
 	@Override
-	public void onCreate () {
-		this.binder = new LocalBinder();
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(LOG_TAG, "Friends service starting");
-		
-		setupBroadcastReceiver();
-		bindToEventsManagerService();
+
+		if (!boundToEventMgrService) {
+			setupBroadcastReceiver();
+			bindToEventsManagerService();
+		}
+		return super.onStartCommand(intent,flags,startId);
 	}
 	
 	@Override
@@ -88,19 +95,12 @@ public class FriendsService extends Service {
 		Log.d(LOG_TAG, "Friends service terminating");
 	}
 	
-	/**Create Binder object for local service invocation */
-	public class LocalBinder extends Binder {
-		public FriendsService getService() {
-			return FriendsService.this;
-		}
-	}
-
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/** Bind to the Events Manager Service */
 	private void bindToEventsManagerService() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
     	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
-    	bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+   		bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 	
 	private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -125,10 +125,8 @@ public class FriendsService extends Service {
      * @return the created broadcast receiver
      */
     private BroadcastReceiver setupBroadcastReceiver() {
-    	BroadcastReceiver receiver = null;
-        Log.d(LOG_TAG, "Set up broadcast receiver");
-        
-        receiver = new MainReceiver();
+    	Log.d(LOG_TAG, "Set up broadcast receiver");
+    	BroadcastReceiver receiver = new MainReceiver();
         this.registerReceiver(receiver, createIntentFilter());
         Log.d(LOG_TAG, "Registered broadcast receiver");
 
@@ -166,8 +164,7 @@ public class FriendsService extends Service {
 		}
     }
     
-    /**
-     * Create a suitable intent filter
+    /**Create a suitable intent filter
      * @return IntentFilter
      */
     private IntentFilter createIntentFilter() {
@@ -229,4 +226,5 @@ public class FriendsService extends Service {
 		
 		notifier.notifyMessage(description, eventType, FriendsActivity.class, intent);
 	}
+
 }
