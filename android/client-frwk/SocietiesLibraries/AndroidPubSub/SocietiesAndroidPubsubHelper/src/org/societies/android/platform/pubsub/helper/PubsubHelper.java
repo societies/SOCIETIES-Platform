@@ -155,10 +155,15 @@ public class PubsubHelper implements IPubsubClient {
 		Log.d(LOG_TAG, "addSimpleClasses called");
 		
 		for (String c : classList) {
+			Log.d(LOG_TAG, "Adding Simple Class: " + c);
+			
 			Class<?> clazz = Class.forName(c);
+			Log.d(LOG_TAG, "clazz: " + clazz.getName());
+			
 			Root rootAnnotation = clazz.getAnnotation(Root.class);
 			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
 			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				Log.d(LOG_TAG, "Adding Simple Class: " + c + " key: " + "{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name());
 				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
 			}
 		}
@@ -344,15 +349,22 @@ public class PubsubHelper implements IPubsubClient {
 		
 		if (xmppObject instanceof org.jabber.protocol.pubsub.event.Event) {
 		    org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)xmppObject).getItems();
+		    
 		    String node = items.getNode();
+		    Log.d(LOG_TAG, "Node of event is: " + node);
+		    Log.d(LOG_TAG, "Number of items: " + items.getItem().size());
+		    
 		    org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-	        String object = MarshallUtils.nodeToString((Element)i.getAny());
+		    
+		    Log.d(LOG_TAG, "ID: " + i.getId());
+		    
+	        String xmlPayload = MarshallUtils.nodeToString((Element)i.getAny());
+	        Log.d(LOG_TAG, "Event XML: " + xmlPayload);
 	        
-//            IIdentity pubsubServiceIdentity = IdentityManagerImpl.staticfromJid(pubsubService);
-
-            Class<?> c = elementToClass.get(getElementIdentifier(object));
-            Object bean = serializer.read(c, new ByteArrayInputStream(object.getBytes()));
-	        returnValue = new PubsubNodePayload(object, i.getId(), node);
+            Class<?> c = elementToClass.get(getElementIdentifier(xmlPayload));
+            Log.d(LOG_TAG, "Class: " + c.getName());
+            Object bean = serializer.read(c, new ByteArrayInputStream(xmlPayload.getBytes()));
+	        returnValue = new PubsubNodePayload(bean, i.getId(), node);
 
 		}
 		return returnValue;
@@ -367,6 +379,7 @@ public class PubsubHelper implements IPubsubClient {
                 endIndex = nsStr.indexOf("'");
         nsStr = nsStr.substring(0,endIndex);
         
+        Log.d(LOG_TAG, "Element identifier: " + "{"+nsStr+"}"+elementName);
         return "{"+nsStr+"}"+elementName;
 }
 

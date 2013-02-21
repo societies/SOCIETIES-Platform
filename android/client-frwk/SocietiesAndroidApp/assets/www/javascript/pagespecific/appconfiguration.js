@@ -52,6 +52,8 @@ var SocietiesAppConfig = {
 		function success(data) {
 			if (data.value) {
 				SocietiesAppConfig.DISPLAY_PASSWORDS_ON_ENTRY = true;
+			} else {
+				SocietiesAppConfig.DISPLAY_PASSWORDS_ON_ENTRY = false;
 			}
 			console.log("isDisplayPassword - successful: " + SocietiesAppConfig.DISPLAY_PASSWORDS_ON_ENTRY);
 			action();

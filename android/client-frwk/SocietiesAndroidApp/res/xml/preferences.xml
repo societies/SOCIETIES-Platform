@@ -18,12 +18,12 @@
    		    	android:key="daServerURI" 
    		    	android:defaultValue="societies.local" 
    		    	android:summary="URI of Domain Authority Server"/>
-    		<EditTextPreference 
+		    <EditTextPreference 
    		    	android:title="Domain Authority Node" 
    		    	android:key="daNode" 
    		    	android:defaultValue="danode" 
    		    	android:summary="Domain Authority Node"/>
-    			<EditTextPreference 
+    		<EditTextPreference 
    		    	android:title="CSS Identity" 
    		    	android:key="cssIdentity" 
    		    	android:defaultValue="" 

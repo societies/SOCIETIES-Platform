@@ -138,11 +138,13 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 			"stopService()"
 	};
 
-	//Pubsub event payload packages
+	//Pubsub event payload classes
     //TODO: Insert all known event classes
 	static final String CSS_MANAGER_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS = "org.societies.api.schema.context.model.CtxIdentifierBean";
-
+	//N.B. Add any new event payload classes to this array - order is unimportant
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS};
+	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	
 	/**

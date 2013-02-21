@@ -4,8 +4,10 @@ import java.util.concurrent.CountDownLatch;
 
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.platform.events.realcontainer.RealPlatformEventsTest;
 import org.societies.android.platform.events.realcontainer.RealPlatformEventsTest.RealPlatformEventsBinder;
+import org.societies.api.schema.cssmanagement.CssEvent;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,15 +17,25 @@ import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
+/**
+ * Required for test
+ * 1. Virgo and Openfire running and correctly configured.
+ * 2. Societies Android Client app running and successfully logged in
+ * 3. Does not test starting and stopping Pubsub service as this functionality
+ *    is already performed in the Societies Android Client app
+ *
+ */
 public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsTest>  {
 	//Logging tag
 	private static final String LOG_TAG = TestRealPlatformEvents.class.getName();
-	private static final int ALL_EVENTS_COUNT = 9;
+	private static final int ALL_EVENTS_COUNT = 13;
 
 	private static final String CLIENT_PARAM_1 = "org.societies.android.platform.events.test";
 	private static final String CLIENT_PARAM_2 = "org.societies.android.platform.events.test.alternate";
 	private static final String CLIENT_PARAM_3 = "org.societies.android.platform.events.test.other";
 	private static final String INTENT_FILTER = "org.societies.android.css.manager";
+	
+	private static final int DELAY = 10000;
 
 	
 	private boolean testCompleted;
@@ -72,7 +84,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     	assertTrue(this.testCompleted);
     	
 	}
-    @MediumTest
+//    @MediumTest
 	public void testSubscribeToAllEvents() throws Exception {
 		this.endCondition = new CountDownLatch(1);
 
@@ -93,7 +105,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     	assertTrue(this.testCompleted);
     	
 	}
-    @MediumTest
+//    @MediumTest
 	public void testSubscribeToMultipleEvents() throws Exception {
 		this.endCondition = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -119,7 +131,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
      * Broadcast receiver to receive intent return values from service method calls
      */
     private class SingleEventReceiver extends BroadcastReceiver {
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
@@ -131,9 +143,10 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
 				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 				TestRealPlatformEvents.this.eventService.stopService();
+				
 			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
 				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
-		    	TestRealPlatformEvents.this.eventService.subscribeToEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+		    	TestRealPlatformEvents.this.eventService.subscribeToEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
 
 			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
 				assertTrue(intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false));
@@ -143,7 +156,17 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
 				
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
 				assertEquals(1, intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, 0));
-				TestRealPlatformEvents.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.societiesAndroidIntents[0]);
+				TestRealPlatformEvents.this.eventService.publishEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, getCssEvent());
+				
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.PUBLISH_EVENT)) {
+				assertTrue(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT)) {
+				Log.d(LOG_TAG, "Received event: " + IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
+				CssEvent event = (CssEvent) intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				Log.d(LOG_TAG, "CssEvent type: " + event.getType());
+				Log.d(LOG_TAG, "CssEvent description: " + event.getDescription());
+				TestRealPlatformEvents.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
 			}
 		}
     }
@@ -285,8 +308,16 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
         intentFilter.addAction(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
         intentFilter.addAction(IServiceManager.INTENT_NOTSTARTED_EXCEPTION);
         intentFilter.addAction(IServiceManager.INTENT_SERVICE_EXCEPTION_INFO);
+        
+        intentFilter.addAction(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
         return intentFilter;
-
+    }
+    
+    private static CssEvent getCssEvent() {
+    	CssEvent event = new CssEvent();
+    	event.setDescription("test Css Event");
+    	event.setType("test");
+    	return event;
     }
 
 }
