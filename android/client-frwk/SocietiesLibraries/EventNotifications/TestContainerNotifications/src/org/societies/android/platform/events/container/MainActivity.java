@@ -26,7 +26,6 @@ public class MainActivity extends Activity {
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.TestContainer";
 	private static final String LOG_TAG = MainActivity.class.getName();
-	private FriendsService friendService;
 	private Messenger eventMgrService = null;
 	
 	@Override
@@ -36,7 +35,7 @@ public class MainActivity extends Activity {
 		
 		//START FRIENDS SERVICE
         Intent intentFriends = new Intent(this.getApplicationContext(), FriendsService.class);
-        this.getApplicationContext().bindService(intentFriends, serviceFriendsConnection, Context.BIND_AUTO_CREATE);
+        startService(intentFriends);
         
         //BIND TO EVENT MANAGER SERVICE
         Intent serviceIntent = new Intent(SERVICE_ACTION);
@@ -50,29 +49,6 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO "FriendService">>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    private ServiceConnection serviceFriendsConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to FriendsService service");
-        	try {
-	        	//GET LOCAL BINDER
-        		FriendsService.LocalBinder binder = (FriendsService.LocalBinder) service;
-	
-	            //OBTAIN SERVICE
-        		friendService = binder.getService();
-	            Log.d(LOG_TAG, "Successfully connected to FriendService service");
-
-        	} catch (Exception ex) {
-        		Log.d(LOG_TAG, "Error binding to service: " + ex.getMessage());
-        	}
-        }
-        
-        public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from ServiceDiscovery service");
-        }
-    };
-    
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
   	private ServiceConnection serviceEventsConnection = new ServiceConnection() {
 
