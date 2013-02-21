@@ -91,8 +91,6 @@ public class CtxEventMgr implements ICtxEventMgr {
 	@Autowired(required=true)
 	private ICommManager commMgr;
 	
-	private final Set<IIdentity> pubsubOwners = new CopyOnWriteArraySet<IIdentity>();
-	
 	private final Set<LocalChangeEventHandler> localHandlers =
 			new CopyOnWriteArraySet<LocalChangeEventHandler>();
 	
@@ -370,6 +368,39 @@ public class CtxEventMgr implements ICtxEventMgr {
 		}
 	}
 	
+	/*
+	 * @see org.societies.context.api.event.ICtxEventMgr#createTopics(org.societies.api.identity.IIdentity, java.lang.String[])
+	 */
+	@Override
+	public void createTopics(final IIdentity ownerId, final String[] topics)
+			throws CtxException {
+
+		final List<String> existingTopics;
+		try {
+			existingTopics = this.pubsubClient.discoItems(ownerId, null);
+		} catch (Exception e) {
+			throw new CtxEventMgrException("Failed to discover topics for IIdentity "
+					+ ownerId + ": " + e.getLocalizedMessage(), e);
+		}
+		for (int i = 0; i < topics.length; ++i) {
+			final String topic = topics[i];
+			if (existingTopics == null || !existingTopics.contains(topic)) {
+				if (LOG.isInfoEnabled())
+					LOG.info("Creating pubsub node '" + topic + "' for IIdentity " + ownerId);
+				try {
+					this.pubsubClient.ownerCreate(ownerId, topic);
+				} catch (Exception e) {
+					throw new CtxEventMgrException("Failed to create topic '"
+							+ topic + "' for IIdentity " + ownerId + ": " 
+							+ e.getLocalizedMessage(), e);
+				}
+			} else {
+				if (LOG.isInfoEnabled())
+					LOG.info("Found pubsub node '" + topic + "' for IIdentity " + ownerId);
+			}
+		}
+	}
+	
 	private class LocalChangeEventDispatcher implements Runnable {
 		
 		private final CtxChangeEvent event;
@@ -467,16 +498,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 								+ topics[i] + "': PubsubClient service is not available");
 						return;
 					}
-					if (!pubsubOwners.contains(pubsubId)) {
-						if (LOG.isInfoEnabled())
-							LOG.info("Creating pubsub nodes for IIdentity " + pubsubId);
-						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.CREATED);
-						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.UPDATED);
-						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.MODIFIED);
-						pubsubClient.ownerCreate(pubsubId, CtxChangeEventTopic.REMOVED);
-						pubsubOwners.add(pubsubId);
-					}
-					pubsubClient.publisherPublish(pubsubId, topics[i], 
+					pubsubClient.publisherPublish(pubsubId, topics[i],
 							itemId, eventBean);
 				} catch (Exception e) { 
 					LOG.error("Could not post remote context change event to topic '" 

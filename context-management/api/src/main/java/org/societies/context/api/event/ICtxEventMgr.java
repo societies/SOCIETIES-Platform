@@ -215,4 +215,14 @@ public interface ICtxEventMgr {
     public void unregisterChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxEntityIdentifier scope,
             final String attrType) throws CtxException;
+    
+    /**
+     * 
+     * @param ownerId
+     * @param topics
+     * @throws CtxException
+     * @since 1.0
+     */
+    public void createTopics(final IIdentity ownerId, final String[] topics)
+    		throws CtxException;
 }
