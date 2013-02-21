@@ -30,8 +30,8 @@ import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 
-import android.app.IntentService;
 import android.app.Notification;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,7 +40,10 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
@@ -53,53 +56,84 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class FriendsService extends IntentService {
+public class FriendsService extends Service {
 
 	private static final String LOG_TAG = FriendsService.class.getName();
-	private static final String SERVICE_NAME = "SOCIETIES Friends Service";
-	
-	//TRACKING CONNECTION TO EVENTS MANAGER
-	private boolean boundToEventMgrService = false;
-	private Messenger eventMgrService = null;
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsService";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
 	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>STARTING THIS SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/**Constructor 
-	 * @param name service name
-	 */
-	public FriendsService() {
-		super(SERVICE_NAME);
+	//TRACKING CONNECTION TO EVENTS MANAGER
+	private boolean boundToEventMgrService = false;
+	private Messenger eventMgrService = null;
+	private BroadcastReceiver receiver;
+	private Looper mServiceLooper;
+	private ServiceHandler mServiceHandler;
+
+	// Handler that receives messages from the thread
+	private final class ServiceHandler extends Handler {
+		  
+		public ServiceHandler(Looper looper) {
+			super(looper);
+		}
+		      
+		@Override
+		public void handleMessage(Message msg) {
+			Log.d(this.getClass().getName(), "Message received in Friends Service thread");
+			if (!boundToEventMgrService) {
+				setupBroadcastReceiver();
+				bindToEventsManagerService();
+			}
+			// Stop the service using the startId, so that we don't stop
+			// the service in the middle of handling another job
+			//stopSelf(msg.arg1);
+		}
+	}
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>FRIENDS SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;	//NO-ONE ALLOWED TO BIND TO THIS SERVICE
 	}
 
 	@Override
-	protected void onHandleIntent(Intent intent) {
-		//DO NOTHING
+	public void onCreate() {
+		Log.d(this.getClass().getName(), "Friends Service creating...");
+		// START BACKGROUND THREAD FOR SERVICE
+		HandlerThread thread = new HandlerThread("FriendServiceStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+		thread.start();
+		
+		// Get the HandlerThread's Looper and use it for our Handler 
+		mServiceLooper = thread.getLooper();
+		mServiceHandler = new ServiceHandler(mServiceLooper);
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(LOG_TAG, "Friends service starting");
-
-		if (!boundToEventMgrService) {
-			setupBroadcastReceiver();
-			bindToEventsManagerService();
-		}
-		return super.onStartCommand(intent,flags,startId);
+		// For each start request, send a message to start a job and deliver the
+		//start ID so we know which request we're stopping when we finish the job
+		Message msg = mServiceHandler.obtainMessage();
+		msg.arg1 = startId;
+	  	mServiceHandler.sendMessage(msg);
+	  
+	  	//If we get killed, after returning from here, restart
+		return START_STICKY;
 	}
 	
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "Friends service terminating");
+		boundToEventMgrService = false;
+		this.unregisterReceiver(receiver);
+		this.unbindService(serviceConnection);
 	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/** Bind to the Events Manager Service */
 	private void bindToEventsManagerService() {
-    	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
+		Log.d(LOG_TAG, "Binding to Events Manager Service...");
+		Intent serviceIntent = new Intent(SERVICE_ACTION);
    		bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 	
@@ -119,18 +153,14 @@ public class FriendsService extends IntentService {
 			boundToEventMgrService = false;
 		}
 	};
-
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/**Create a broadcast receiver
-     * @return the created broadcast receiver
-     */
-    private BroadcastReceiver setupBroadcastReceiver() {
-    	Log.d(LOG_TAG, "Set up broadcast receiver");
-    	BroadcastReceiver receiver = new MainReceiver();
+	/**Create a broadcast receiver */
+    private void setupBroadcastReceiver() {
+    	Log.d(LOG_TAG, "Setting up broadcast receiver...");
+    	receiver = new MainReceiver();
         this.registerReceiver(receiver, createIntentFilter());
         Log.d(LOG_TAG, "Registered broadcast receiver");
-
-        return receiver;
     }
     
     /**Broadcast receiver to receive intent return values from EventManager service*/
@@ -160,7 +190,7 @@ public class FriendsService extends IntentService {
 				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 				String description = eventPayload.getCssAdvert().getName() + " accepted your friend request";
 				addNotification(description, "Friend Request Accepted", eventPayload.getCssAdvert());
-			}			
+			}
 		}
     }
     

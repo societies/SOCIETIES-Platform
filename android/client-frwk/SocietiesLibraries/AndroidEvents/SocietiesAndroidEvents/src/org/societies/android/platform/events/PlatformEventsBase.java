@@ -5,10 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.pubsub.ISubscriber;
@@ -38,6 +41,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	    
     private static final String ALL_EVENT_FILTER = "org.societies";
     private static final String KEY_DIVIDER = "$";
+    private static final String INVALID_EVENT_PAYLOAD = "Invalid payload";
 
 	private Context androidContext;
 	private PubsubHelper pubsubClient = null;
@@ -48,21 +52,24 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	
 	private ArrayList <String> allPlatformEvents = null; 
 
-	private String cloudCommsDestination;
-    private IIdentity cloudNodeIdentity;
+	private String domainAuthorityDestination;
+//	private String cloudCommsDestination;
+//    private IIdentity cloudNodeIdentity;
+    private IIdentity domainNodeIdentity;
     
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
     private List<String> classList;
     private boolean connectedToComms;
     private boolean connectedToPubsub;
+    private Random randomGenerator;
 
 
     /**
      * Default constructor
      */
     public PlatformEventsBase(Context androidContext, PubsubHelper pubsubClient, ClientCommunicationMgr ccm, boolean restrictBroadcast) {
-    	Log.d(LOG_TAG, "Object created");
+    	Log.d(LOG_TAG, "PlatformEventsBase created");
     	
     	this.pubsubClient = pubsubClient;
 		this.ccm = ccm;
@@ -76,14 +83,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	//tracks the events subscribed to Android Pubsub
     	this.subscribedToEvents = Collections.synchronizedMap(new HashMap<String, Integer>());
     	
-    	this.cloudCommsDestination = null;
-        this.cloudNodeIdentity = null;
+    	this.domainAuthorityDestination = null;
+        this.domainNodeIdentity = null;
 
-    	//create list of event classes for Pubsub registration 
-        this.classList = new ArrayList<String>();
-
-		this.classList.add(IAndroidSocietiesEvents.CONTEXT_CLASS);
-		this.classList.add(IAndroidSocietiesEvents.CSS_MANAGER_CLASS);
+		//Create random id generator
+		this.randomGenerator = new Random(System.currentTimeMillis());
 		
     }
 
@@ -189,12 +193,45 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	return 0;
 	}
 
-	public synchronized boolean publishEvent(String client, String societiesIntent, Object eventPayload) {
+	public synchronized boolean publishEvent(final String client, String societiesIntent, Object eventPayload) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Event Payload must be specified", null != eventPayload);
 		//Invariant condition
 		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of publishEvent for client: " + client);
+		
+		try {
+			PlatformEventsBase.this.pubsubClient.publisherPublish(this.domainNodeIdentity, 
+						translateAndroidIntentToEvent(societiesIntent), 
+						Integer.toString(this.randomGenerator.nextInt()), 
+						eventPayload, new IMethodCallback() {
+				
+				@Override
+				public void returnAction(String result) {
+					Intent returnIntent = new Intent(IAndroidSocietiesEvents.PUBLISH_EVENT);
+	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
+
+	    			if (PlatformEventsBase.this.restrictBroadcast) {
+	        			returnIntent.setPackage(client);
+	    			}
+	    			
+	    			Log.d(LOG_TAG, "Publish event return result sent");
+
+	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+				}
+			});
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -226,7 +263,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
 			
-	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.cloudNodeIdentity); 
+	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.domainNodeIdentity); 
 	    	subPubSub.execute(events);
 		}
 
@@ -270,7 +307,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (unSubscribedEvents.size() > 0) {
-			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client, this.cloudNodeIdentity); 
+			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client, this.domainNodeIdentity); 
 		    	subPubSub.execute(unSubscribedEvents);
 			}
 		}
@@ -303,7 +340,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
-			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.cloudNodeIdentity); 
+			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.domainNodeIdentity); 
 			unsubPubSub.execute(events);
 		}
 		
@@ -347,7 +384,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (subscribedEvents.size() > 0) {
-				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client, this.cloudNodeIdentity); 
+				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client, this.domainNodeIdentity); 
 				unsubPubSub.execute(subscribedEvents);
 			}
 		}
@@ -357,11 +394,16 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 	/**
 	 * Configure for Pubsub events
-	 * @throws ClassNotFoundException 
 	 */
 	private void configureForPubsub() throws ClassNotFoundException {
 		
 		Log.d(LOG_TAG, "Configuring Pubsub");
+    	//create list of event classes for Pubsub registration 
+        this.classList = new ArrayList<String>();
+
+        for (String payload : IAndroidSocietiesEvents.pubsubPayloadClasses) {
+        	this.classList.add(payload);
+        }
 		
 		this.pubsubClient.addSimpleClasses(classList);
 		this.pubsubClient.setSubscriberCallback(createSubscriber());
@@ -384,13 +426,15 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 						if (key.contains(intentTarget)) {
 							Intent intent = new Intent(intentTarget);
 							
-							if (payload instanceof String) {
-								intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (String) payload);
-							} else if (payload instanceof Parcelable) {
+							if (payload instanceof Parcelable) {
 								intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, (Parcelable) payload);
+							} else {
+								intent.putExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, INVALID_EVENT_PAYLOAD);
 							}
 							
-							intent.setPackage(getClient(key));
+							if (PlatformEventsBase.this.restrictBroadcast) {
+								intent.setPackage(getClient(key));
+							}
 							
 							PlatformEventsBase.this.androidContext.sendBroadcast(intent);
 
@@ -425,7 +469,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
     		Dbc.require("Intent filter must be specified", null != intentValue && intentValue.length() > 0);
     		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
-    		Log.d(LOG_TAG, "UnSubscribeFromPubsub async task for client: " + client + " and filter: " + intentValue);
+    		Log.d(LOG_TAG, "UnSubscribeFromPubsub async task for client: " + client + " and intent: " + intentValue);
 
     		this.intentValue = intentValue;
     		this.client = client;
@@ -474,6 +518,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(event), numSubscriptions - 1);
+	               			//notify latch
+	               			endCondition.countDown();
+
         				}
        		    		//wait for latch to release
     		    		endCondition.await();
@@ -519,7 +566,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
     		Dbc.require("Intent filter must be specified", null != intentValue && intentValue.length() > 0);
     		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
-    		Log.d(LOG_TAG, "SubscribeToPubsub async task for client: " + client + " and filter: " + intentValue);
+    		Log.d(LOG_TAG, "SubscribeToPubsub async task for client: " + client + " and intent: " + intentValue);
     		
     		this.intentValue = intentValue;
     		this.client = client;
@@ -570,6 +617,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), numSubscriptions + 1);
+	               			//notify latch
+	               			endCondition.countDown();
+
         				}
     		    		//wait for latch to release
     		    		endCondition.await();
@@ -603,17 +653,17 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
      */
     private void assignConnectionParameters() {
     	Log.d(LOG_TAG, "assignConnectionParameters invoked");
-    	if (null == cloudCommsDestination) {
+    	if (null == domainAuthorityDestination) {
         	try {
-            	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
-        		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
+            	this.domainAuthorityDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
+        		Log.d(LOG_TAG, "Domain Authority Node: " + this.domainAuthorityDestination);
 
             	try {
-        			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
-        			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
+        			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainAuthorityDestination);
+        			Log.d(LOG_TAG, "Domain Authority identity: " + this.domainNodeIdentity);
         			
         		} catch (InvalidFormatException e) {
-        			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
+        			Log.e(LOG_TAG, "Unable to get Domain Authority identity", e);
         		}     
         	} catch (InvalidFormatException i) {
         		Log.e(LOG_TAG, "ID Manager exception", i);

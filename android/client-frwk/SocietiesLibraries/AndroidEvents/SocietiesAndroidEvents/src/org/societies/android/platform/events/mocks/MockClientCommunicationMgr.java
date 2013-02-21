@@ -2,6 +2,7 @@ package org.societies.android.platform.events.mocks;
 
 import java.util.Set;
 
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityContextMapper;
@@ -16,6 +17,15 @@ import android.content.Context;
  * Mock version of {@link MockClientCommunicationMgr} class for use in testing
  */
 public class MockClientCommunicationMgr extends ClientCommunicationMgr {
+
+	
+	public void bindCommsService(IMethodCallback bindCallback) {
+		bindCallback.returnAction(true);
+	}
+
+	public boolean unbindCommsService() {
+		return true;
+	}
 
 	public boolean isConnected() {
 		return true;

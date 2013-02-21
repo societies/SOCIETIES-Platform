@@ -33,13 +33,17 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		//BIND TO EVENT MANAGER SERVICE
+        Intent serviceIntent = new Intent(SERVICE_ACTION);
+      	bindService(serviceIntent, serviceEventsConnection, Context.BIND_AUTO_CREATE);
+      	
 		//START FRIENDS SERVICE
         Intent intentFriends = new Intent(this.getApplicationContext(), FriendsService.class);
         startService(intentFriends);
         
-        //BIND TO EVENT MANAGER SERVICE
-        Intent serviceIntent = new Intent(SERVICE_ACTION);
-      	bindService(serviceIntent, serviceEventsConnection, Context.BIND_AUTO_CREATE);
+        //PUBLISH EVENT TO TEST SERVICE
+        InvokePublishEvent publish  = new InvokePublishEvent();
+  		publish.execute();
 	}
 
 	@Override
@@ -54,10 +58,10 @@ public class MainActivity extends Activity {
 
   		public void onServiceConnected(ComponentName name, IBinder service) {
   			eventMgrService = new Messenger(service);
-  			Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
+  			Log.d(LOG_TAG, "Connected to the Societies Event Mgr Service");
   			
-  			//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
-  			InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
+  			//BOUND TO SERVICE - PUBLISH EVENT FOR TESTING
+  			InvokeStartService invoke  = new InvokeStartService();
       		invoke.execute();
   		}
   		
@@ -65,19 +69,36 @@ public class MainActivity extends Activity {
   		}
   	};
   	
-  	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>PUBLISH PUBSUB EVENT>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  	/** Async task to invoke remote service method */
-      private class InvokeRemoteMethod extends AsyncTask<Void, Void, Void> {
+  	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>START EVENTS MANAGER SERVICE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  	/** Async task to invoke StartService method */
+	private class InvokeStartService extends AsyncTask<Void, Void, Void> {
 
-      	private final String LOCAL_LOG_TAG = InvokeRemoteMethod.class.getName();
-      	private String client;
-
-      	public InvokeRemoteMethod(String client) {
-      		this.client = client;
-      	}
+      	private final String LOCAL_LOG_TAG = InvokeStartService.class.getName();
 
       	protected Void doInBackground(Void... args) {
-      		//METHOD: "publishEvent(String client, String societiesIntent, Object eventPayload)" - ARRAY POSITION: 6
+      		//METHOD: "startService()" - ARRAY POSITION: 8
+      		String targetMethod = IAndroidSocietiesEvents.methodsArray[8];
+      		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+      		Bundle outBundle = new Bundle();
+      		outMessage.setData(outBundle);
+      		Log.d(LOCAL_LOG_TAG, "Sending StartService() event message");
+      		try {
+      			eventMgrService.send(outMessage);
+  			} catch (RemoteException e) {
+  				e.printStackTrace();
+  			}
+      		return null;
+		}
+	}
+
+  	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>PUBLISH PUBSUB EVENT>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/** Async task to invoke PublishEvent method */
+	private class InvokePublishEvent extends AsyncTask<Void, Void, Void> {
+
+      	private final String LOCAL_LOG_TAG = InvokePublishEvent.class.getName();
+
+      	protected Void doInBackground(Void... args) {
+			//METHOD: "publishEvent(String client, String societiesIntent, Object eventPayload)" - ARRAY POSITION: 6
       		String targetMethod = IAndroidSocietiesEvents.methodsArray[6];
       		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
       		Bundle outBundle = new Bundle();
@@ -91,10 +112,10 @@ public class MainActivity extends Activity {
       		eventInfo.setCssAdvert(advert);
       		
       		//PARAMETERS
-      		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);													//client
+      		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), MainActivity.CLIENT_NAME);										//client
       		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT);	//societiesIntent
       		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), eventInfo);												//eventPayload
-      		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+      		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + MainActivity.CLIENT_NAME);
       		outMessage.setData(outBundle);
 
       		Log.d(LOCAL_LOG_TAG, "Sending publish event message");
@@ -104,6 +125,7 @@ public class MainActivity extends Activity {
   				e.printStackTrace();
   			}
       		return null;
-      	}
+		}
 	}
+
 }

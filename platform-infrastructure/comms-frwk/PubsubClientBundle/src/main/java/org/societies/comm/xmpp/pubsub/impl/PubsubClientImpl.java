@@ -158,6 +158,13 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			//SERIALISE OBJECT
 			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
 			Class<?> c = elementToClass.get(elementID);
+			if (c==null) {
+				String[] keyArray = new String[elementToClass.keySet().size()];
+				keyArray = elementToClass.keySet().toArray(keyArray);
+				LOG.error("No class found for namespace{element} '"+elementID+"'... Registered entries are: "+Arrays.toString(keyArray));
+				// TODO throw exception here?
+			}
+				
 			Object bean = null;
 			try {
 				bean = serializer.read(c, eventBeanXML);
