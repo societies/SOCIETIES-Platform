@@ -56,9 +56,9 @@ public class MainActivity extends Activity {
   			eventMgrService = new Messenger(service);
   			Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
   			
-  			//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
-  			InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
-      		invoke.execute();
+  			//BOUND TO SERVICE - PUBLISH EVENT FOR TESTING
+  			//InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
+      		//invoke.execute();
   		}
   		
   		public void onServiceDisconnected(ComponentName name) {
