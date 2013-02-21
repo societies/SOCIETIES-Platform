@@ -68,8 +68,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 CONTEXT_MANAGER_REMOVED_INTENT,
 										 CSS_MANAGER_ADD_CSS_NODE_INTENT,
 										 CSS_MANAGER_DEPART_CSS_NODE_INTENT,
-//										 CSS_FRIEND_REQUEST_RECEIVED_INTENT,
-//										 CSS_FRIEND_REQUEST_ACCEPTED_INTENT,
+										 CSS_FRIEND_REQUEST_RECEIVED_INTENT,
+										 CSS_FRIEND_REQUEST_ACCEPTED_INTENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_INTENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
@@ -113,8 +113,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 CONTEXT_MANAGER_REMOVED_EVENT,
 										 CSS_MANAGER_ADD_CSS_NODE_EVENT,
 										 CSS_MANAGER_DEPART_CSS_NODE_EVENT,
-//										 CSS_FRIEND_REQUEST_RECEIVED_EVENT,
-//										 CSS_FRIEND_REQUEST_ACCEPTED_EVENT,
+										 CSS_FRIEND_REQUEST_RECEIVED_EVENT,
+										 CSS_FRIEND_REQUEST_ACCEPTED_EVENT,
 										 DEVICE_MANAGER_DEVICE_REGISTERED_EVENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
@@ -139,11 +139,12 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	};
 
 	//Pubsub event payload classes
-    //TODO: Insert all known event classes
-	static final String CSS_MANAGER_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
-	static final String CONTEXT_CLASS = "org.societies.api.schema.context.model.CtxIdentifierBean";
+    //TODO: Insert all known event classes. Class must be an <xs:element> in the XSD!!! Not a <xs:complexType>. Check!!!
+	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
+	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
+	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	

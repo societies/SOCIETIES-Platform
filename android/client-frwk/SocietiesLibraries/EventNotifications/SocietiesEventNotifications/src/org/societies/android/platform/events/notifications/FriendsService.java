@@ -80,6 +80,7 @@ public class FriendsService extends Service {
 		      
 		@Override
 		public void handleMessage(Message msg) {
+			Log.d(this.getClass().getName(), "Message received in Friends Service thread");
 			if (!boundToEventMgrService) {
 				setupBroadcastReceiver();
 				bindToEventsManagerService();
@@ -98,6 +99,7 @@ public class FriendsService extends Service {
 
 	@Override
 	public void onCreate() {
+		Log.d(this.getClass().getName(), "Friends Service creating...");
 		// START BACKGROUND THREAD FOR SERVICE
 		HandlerThread thread = new HandlerThread("FriendServiceStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
@@ -111,9 +113,9 @@ public class FriendsService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// For each start request, send a message to start a job and deliver the
 		//start ID so we know which request we're stopping when we finish the job
-		//Message msg = mServiceHandler.obtainMessage();
-		//msg.arg1 = startId;
-	  	//mServiceHandler.sendMessage(msg);
+		Message msg = mServiceHandler.obtainMessage();
+		msg.arg1 = startId;
+	  	mServiceHandler.sendMessage(msg);
 	  
 	  	//If we get killed, after returning from here, restart
 		return START_STICKY;
@@ -122,6 +124,7 @@ public class FriendsService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "Friends service terminating");
+		boundToEventMgrService = false;
 		this.unregisterReceiver(receiver);
 		this.unbindService(serviceConnection);
 	}
@@ -129,8 +132,8 @@ public class FriendsService extends Service {
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/** Bind to the Events Manager Service */
 	private void bindToEventsManagerService() {
-    	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Binding to Events Manager Service: ");
+		Log.d(LOG_TAG, "Binding to Events Manager Service...");
+		Intent serviceIntent = new Intent(SERVICE_ACTION);
    		bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 	
@@ -154,7 +157,7 @@ public class FriendsService extends Service {
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/**Create a broadcast receiver */
     private void setupBroadcastReceiver() {
-    	Log.d(LOG_TAG, "Set up broadcast receiver");
+    	Log.d(LOG_TAG, "Setting up broadcast receiver...");
     	receiver = new MainReceiver();
         this.registerReceiver(receiver, createIntentFilter());
         Log.d(LOG_TAG, "Registered broadcast receiver");
@@ -187,7 +190,7 @@ public class FriendsService extends Service {
 				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 				String description = eventPayload.getCssAdvert().getName() + " accepted your friend request";
 				addNotification(description, "Friend Request Accepted", eventPayload.getCssAdvert());
-			}			
+			}
 		}
     }
     
