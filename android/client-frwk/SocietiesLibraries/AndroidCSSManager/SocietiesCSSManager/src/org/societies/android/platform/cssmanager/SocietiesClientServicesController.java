@@ -36,7 +36,6 @@ import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
-import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -257,26 +256,26 @@ public class SocietiesClientServicesController {
     };
     
     
-    private ServiceConnection slmControlConnection = new ServiceConnection() {
-
-        public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from Platform SLM Service Control service");
-        	SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_CONTROL_SERVICE] = false;
-        }
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to Platform SLM Service Control service");
-
-        	SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_CONTROL_SERVICE] = true;
-
-        	//Get a local binder
-        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
-            //Retrieve the local service API
-            SocietiesClientServicesController.this.slmManagementService = (IServiceDiscovery) binder.getService();
-        	SocietiesClientServicesController.this.servicesBinded.countDown();
-        }
-    };
-    
+//    private ServiceConnection slmControlConnection = new ServiceConnection() {
+//
+//        public void onServiceDisconnected(ComponentName name) {
+//        	Log.d(LOG_TAG, "Disconnecting from Platform SLM Service Control service");
+//        	SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_CONTROL_SERVICE] = false;
+//        }
+//
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//        	Log.d(LOG_TAG, "Connecting to Platform SLM Service Control service");
+//
+//        	SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_CONTROL_SERVICE] = true;
+//
+//        	//Get a local binder
+//        	ServiceManagementLocal.LocalBinder binder = (ServiceManagementLocal.LocalBinder) service;
+//            //Retrieve the local service API
+//            SocietiesClientServicesController.this.slmManagementService = (IServiceDiscovery) binder.getService();
+//        	SocietiesClientServicesController.this.servicesBinded.countDown();
+//        }
+//    };
+//    
     private ServiceConnection privacyDataConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
