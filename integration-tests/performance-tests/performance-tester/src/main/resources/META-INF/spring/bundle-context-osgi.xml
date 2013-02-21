@@ -13,8 +13,7 @@
       
       <osgi:reference id="CssManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
       
-      <osgi:reference id="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote"/>
-      
+      <osgi:reference id="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote"/>  
       
       <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	
@@ -32,19 +31,30 @@
       
       
       
-      <!-- Add your Web Service Declaration, between this...................................................................................... --> 
+      <!-- Add your Web Services Declaration, between this...................................................................................... --> 
        
-       <osgi:service ref="PerformanceTest" auto-export="interfaces">	
-			<!-- <osgi:interfaces>
+       <osgi:service ref="CisMgmtPerformanceTest">	
+			<osgi:interfaces>
 				<value>org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest</value>
-				<value>org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.ICssMgmtPerfromanceTest</value>
-			</osgi:interfaces> -->
+			</osgi:interfaces>
 			<osgi:service-properties>
 				<entry key="service.exported.interfaces" value="*"/>
 				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
-				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik}"/>
+				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik.cismgmt}"/>
 			</osgi:service-properties>
        </osgi:service>
+       
+       <osgi:service ref="CssMgmtPerformanceTest">	
+			<osgi:interfaces>
+				<value>org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.ICssMgmtPerfromanceTest</value>
+			</osgi:interfaces>
+			<osgi:service-properties>
+				<entry key="service.exported.interfaces" value="*"/>
+				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
+				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik.cssmgmt}"/>
+			</osgi:service-properties>
+       </osgi:service>
+       
        
        
        
