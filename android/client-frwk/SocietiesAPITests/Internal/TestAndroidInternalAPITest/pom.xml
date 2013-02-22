@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>android-parent</artifactId>
+        <version>RELEASE</version>
+   </parent>
+
+   <groupId>org.societies.android.api.internal.test</groupId>
+   <artifactId>TestAndroidInternalAPI</artifactId>
+   <name>APIInternalTest</name>
+   <version>${release.version}</version>
+   <packaging>apk</packaging>
+
+	<properties>
+	       <tested.project.dir>${project.basedir}/../ContainerAndroidInternalAPI/</tested.project.dir>
+	       <tested.project.coverage.file>/data/data/org.societies.android.api.internal.container/files/coverage.ec</tested.project.coverage.file>
+	</properties>
+   
+   <developers>
+      <developer>
+		 <name>WP4 Client Framework Team</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
+
+
+    <dependencies>
+			<dependency>
+		                <groupId>com.google.android</groupId>
+		                <artifactId>android</artifactId>
+		                <exclusions>
+		                <!-- Provided by Android -->
+		                  <exclusion>
+		                      <artifactId>xpp3</artifactId>
+		                      <groupId>xpp3</groupId>
+		                 </exclusion>
+		                </exclusions>
+			</dependency>
+			<dependency>
+		            <groupId>com.google.android</groupId>
+		            <artifactId>android-test</artifactId>
+			</dependency>
+			
+			<!--dependency>
+				<groupId>org.societies.android.api.internal</groupId>
+				<artifactId>societies-android-api-internal</artifactId>
+				<version>${release.version}</version>
+				<scope>provided</scope>
+			</dependency-->
+			<!--dependency>
+				<groupId>org.societies.api.schema</groupId>
+				<artifactId>societies-api-schema</artifactId>
+				<version>${release.version}</version>
+				<scope>provided</scope>
+			</dependency-->
+			<dependency>
+			   <groupId>org.societies.android.api.internal.container</groupId>
+			   <artifactId>ContainerAndroidInternalAPI</artifactId>
+			   <version>${release.version}</version>
+			   <type>apk</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+			   <groupId>org.societies.android.api.internal.container</groupId>
+			   <artifactId>ContainerAndroidInternalAPI</artifactId>
+			   <version>${release.version}</version>
+			   <type>jar</type>
+			   <scope>provided</scope>
+			</dependency>
+			<dependency>
+		   		<groupId>com.google.code.gson</groupId>
+		       	<artifactId>gson</artifactId>
+		       	<scope>compile</scope>
+			</dependency>   
+			<dependency>
+		            <groupId>emma</groupId>
+		            <artifactId>emma</artifactId>
+		            <scope>compile</scope>
+		    </dependency>
+		    <!--dependency>
+	   			<groupId>org.societies.android.platform.androidutils</groupId>
+			    <artifactId>SocietiesAndroidUtilities</artifactId>
+	   			<version>${release.version}</version>
+	   			<type>apklib</type>
+	   			<scope>provided</scope>
+			</dependency-->
+			
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <configuration>
+	                <testCoverage>true</testCoverage>
+	             	<testCreateReport>true</testCreateReport>
+	          		<testTestSize>medium</testTestSize>
+	          		<testCoverageFile>${tested.project.coverage.file}</testCoverageFile>
+                </configuration>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>pull-coverage</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>pull</goal>
+                        </goals>
+                        <configuration>
+                            <pullSource>${tested.project.coverage.file}</pullSource>
+                            <pullDestination>${tested.project.dir}/target/emma/coverage.ec</pullDestination>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+	</build>
+</project>

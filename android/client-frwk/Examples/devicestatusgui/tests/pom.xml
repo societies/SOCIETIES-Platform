@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../../../../parent/android.xml</relativePath>
+	</parent>
+
+	<groupId>org.societies.android.platform.test</groupId>
+	<artifactId>devicestatus</artifactId>
+	<name>DeviceStatusGui</name>
+	<version>${release.version}</version>
+	<packaging>apk</packaging>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform</groupId>
+			<artifactId>devicestatus</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>emma</groupId>
+			<artifactId>emma</artifactId>
+			<version>2.1.5320</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<extensions>true</extensions>
+			</plugin>
+		<!-- 	<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<test>
+						Run test with flag "-w coverage true" this is need for generate 
+							coverage.ec file, result file
+						<coverage>true</coverage>
+						<createReport>true</createReport>
+					</test>
+				</configuration>
+				<extensions>true</extensions>
+				need for pull coverage.ec file and move to tested project
+				<executions>
+					<execution>
+						<id>pull-coverage</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>pull</goal>
+						</goals>
+						<configuration>
+							<pullSource>/data/data/${project.groupId}/files/coverage.ec</pullSource>
+							<pullDestination>${project.build.directory}/emma/coverage.ec</pullDestination>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-1</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								read project properties ( can be build.properties or default.properties 
+									Most important property is tested.project.dir - should be path to project 
+									which we want measure coverage
+								<file>project.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+		</plugins>
+	</build>
+	<!-- <reporting>
+		<plugins>
+			<plugin>
+				Plugin for generate report
+				<groupId>org.sonatype.maven.plugin</groupId>
+				<artifactId>emma4it-maven-plugin</artifactId>
+				<version>1.3</version>
+				<configuration>
+					<metadatas>${project.build.directory}/emma/coverage.em,src/</metadatas>
+					<instrumentations>${project.build.directory}/emma/coverage.ec</instrumentations>
+					<reportDirectory>${project.build.directory}/emma/</reportDirectory>
+					<baseDirectory>${project.build.directory}/</baseDirectory>
+					<formats>xml,html</formats>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting> -->
+</project>

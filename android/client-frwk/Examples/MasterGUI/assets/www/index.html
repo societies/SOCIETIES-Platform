@@ -1,0 +1,632 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+		<title>Societies</title>
+		<script type="text/javascript" charset="utf-8" src="cordova-1.7.0.js"></script>
+
+		<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap jS library-->
+		<!--script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
+		<link rel="stylesheet" href="themes/Kilkenny-1.10.css"/>
+		<link rel="stylesheet" href="jquery.mobile.structure-1.1.0.css" /> 
+		<script type="text/javascript" src="jquery-1.7.1.js"></script>
+		<script src="jquery.mobile-1.1.0.js"></script>
+		<link rel="stylesheet" href="css/societies.css"/> 
+
+		<!-- App specific JS -->
+		
+		<!-- PhoneGap plugins -->
+		<script type="text/javascript" src="javascript/plugins/apppreferences_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/coreservicemonitor_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script>
+		
+		<!-- Page Specific -->
+		<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/deviceinfo.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicemanager.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicestatus.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/login.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/logout.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/refreshcssrecord.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/registerxmpp.js"></script>
+		
+			
+		<!-- Uncomment lines below to enable PhoneGap desktop-->
+		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
+		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cismanager.js"></script-->
+		<!--script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/preferences.js"></script-->
+
+
+		<!-- Ignore -->
+		<!-- Weinre target insert. Uncomment to Weinre -->
+		<!--script src="http://10.0.2.2:8081/target/target-script-min.js"></script-->
+	
+	</head> 
+<body> 
+<!-- Start of first page (cf. http://jquerymobile.com/themeroller/ to create custom themes -->
+<div data-role="page" id="main" data-theme="a" data-content-theme="a">
+
+	<div data-role="header" data-theme="a"  data-position="fixed" >
+		<h1><img src="societies-images/societies_xsmall.png" alt="Societies" align="middle"/></h1>
+		<!-- Invoke a new page via an icon -->
+		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
+		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
+		<a href="#cisManagementPage" data-role="button" data-icon="info" data-inline="true" data-theme="a">Create CIS</a>
+		
+	</div><!-- /header -->
+
+	<div data-role="content" >	
+
+   		<div id= "loginDialog">
+			<div data-role="fieldcontain" >
+		    	<label for="username">User Name: </label>
+		    	<input type="text" name="userLogin" id="username" value="" />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="userpass">Password: </label>
+		    	<input type="password" name="userpass" id="userpass" value="" />
+			</div>
+
+
+				<div data-role="fieldcontain" >
+			    	<label for="cloudNode">Cloud Node: </label>
+			    	<input type="text" name="cloudNode" id="cloudnode" value="" />
+				</div>
+	
+				<div data-role="fieldcontain" >
+			    	<label for="identityDomain">Identity Domain: </label>
+			    	<input type="text" name="identityDomain" id="identitydomain" value=""  />
+				</div>
+			
+			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
+			<a href="#xmppDomainReg" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Register</a>
+			
+		</div>
+    	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a"  data-position="fixed" >
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Societies Domain Server registration page -->
+<div data-role="page" id="xmppDomainReg">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Domain Registration</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+   		<div id= "xmppRegDialog">
+			<div data-role="fieldcontain" >
+		    	<label for="regUsername">Username: </label>
+		    	<input type="text" name="regUserLogin" id="regUsername" value=""  />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="regUserpass">Password: </label>
+		    	<input type="password" name="regUserPass" id="regUserpass" value="" />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="repeatRegUserpass">Repeat Password: </label>
+		    	<input type="password" name="repeatRegUserPass" id="repeatRegUserpass" value="" />
+			</div>
+
+			<div>
+				<label for="domainServers">Societies Domain Servers</label>
+				
+				<select name="domainServersList" id="domainServers">
+		  			<option value="societies.local" selected="selected">societies.local</option>
+		  			<option value="societies.alternative">societies.alternative</option>
+				</select> 
+			</div>
+	
+			<div data-role="collapsible">
+				<h3>SOCIETIES Terms</h3>
+			
+				<label for="societiesTCs">SOCIETIES Terms of Use:</label>
+				<textarea name="textareaSocietiesTCs" id="societiesTCs">
+				Societies Terms & Conditions. 1. You must be mad 2. Paranoid helps 3. Infinite time
+				</textarea>
+			</div>
+			<div>
+				<label for="regSocietiesTerms">I agree with the Terms of Use for SOCIETIES software</label>
+				<input type="checkbox" name="regSocietiesTerms" id="regSocietiesTerms" class="custom" value="true"/>
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>Identity Terms</h3>
+				<label for="domainTCs">Identity Domain Terms of Use:</label>
+				<textarea name="textareaDomainTCs" id="domainTCs">
+				Domain Server Terms & Conditions 1. Exists 2. Free 3. Never goes missing
+				</textarea>
+			</div>
+
+			<div>
+				<label for="regDomainTerms">I agree with the Terms of Use for the Identity Domain:</label>
+				<input type="checkbox" name="regDomainTerms" id="regDomainTerms" class="custom" />
+			</div>
+			
+			<input id="registerXMPP" type="button" value="Register" data-icon="gear" data-inline="true" /> 
+			
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of Menu page -->
+<div data-role="page" id="menu">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Menu</p>
+		<a href="#main" id="logoutIcon" data-role="button" data-icon="gear" data-inline="true" data-theme="a" class="ui-btn-right">Logout</a>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+    	<a href="#deviceManager" data-theme="a" data-transition="pop" data-role="button" >Device Manager</a>
+    	<a href="#cssRegistration" data-theme="a" data-transition="pop" data-role="button" >CSS Registration</a>
+    	<a href="#cssRecord" data-theme="a" data-transition="pop" data-role="button" >CSS Record</a>
+    	<a href="#cisRecordPage" data-theme="a" data-transition="pop" data-role="button" >CIS Record</a>
+    	<a href="#cisManagementPage" data-theme="a" data-transition="pop" data-role="button" >Cis Mgmt</a>
+    	<a href="#activeServices" data-theme="a" data-transition="pop" data-role="button" >Active Services Monitor</a>
+    	<a href="#activeTasks" data-theme="a" data-transition="pop" data-role="button" >Active Tasks Monitor</a>
+    	<a href="#deviceMonitor" data-theme="a" data-transition="pop" data-role="button" >Device Monitor</a>
+    	<a href="#appPreferences" data-theme="a" data-transition="pop" data-role="button" >App Preferences</a>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device page -->
+<div data-role="page" id="device">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Characteristics</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+	
+		<button id="deviceChar" data-theme="a">Characteristics</button>	
+		
+    	<div id="info">
+        	<h4>PhoneGap: <span id="phoneGapVer"> &nbsp;</span>,   Platform: <span id="platform"> &nbsp;</span>,   Version: <span id="version">&nbsp;</span></h4>
+        	<h4>UUID: <span id="uuid"> &nbsp;</span>,   Name: <span id="name">&nbsp;</span></h4>
+        	<h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+                   </span>, Colour Depth: <span id="colorDepth"></span>, Pixel Depth: <span id="pixelDepth"></span></h4>
+        	<h4>Agent: <span id="browserAgent"></span></h4>
+     	</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Information page -->
+<div data-role="page" id="information">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Information</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<p> This page should be used to give some basic information to the user of the 
+		Societies Android Client</p>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device Manager example page -->
+<div data-role="page" id="deviceManager">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Active Services page -->
+<div data-role="page" id="activeServices">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Active Services</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<button id="refreshServices" data-theme="a">Refresh services</button>	
+	
+		<table id="activeServicesTable" border="1">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<!--th>Package Name</th-->
+				<!--th>Process</th-->
+				<th>Elapsed Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!--tr>
+				<td>row 2, cell 1</td>
+				<td>row 2, cell 2</td>
+				<td>row 2, cell 3</td>
+			</tr-->
+		</tbody>
+		</table>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Active Tasks page -->
+<div data-role="page" id="activeTasks">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Active Services</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<button id="refreshTasks" data-theme="a">Refresh tasks</button>	
+	
+		<table id="activeTasksTable" border="1">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Running Activities</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!--tr>
+				<td>row 2, cell 1</td>
+				<td>row 2, cell 2</td>
+				<td>row 2, cell 3</td>
+			</tr-->
+		</tbody>
+		</table>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of CSS Registration example page -->
+<div data-role="page" id="cssRegistration">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CSS Registration</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+			<div data-role="fieldcontain" >
+			<!-- CSS Organisation Type-->
+				<label for="cssorgtype">CSS Entity Type:</label>
+				<select name="cssOrgType" id="cssorgtype" data-role="slider">
+					<option value="off">Individual</option>
+					<option value="on">Entity</option>
+				</select>
+			</div>
+
+			<!-- CSS Owner Forename (optional)-->
+			<div data-role="fieldcontain">
+		    	<label for="cssforename">Forename: </label>
+		    	<input type="text" name="cssForeName" id="cssforename" value="" disabled="true"/>
+			</div>
+
+			<!-- CSS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cssname">Name: </label>
+		    	<input type="text" name="cssName" id="cssname" value=""/>
+			</div>
+
+			<!-- CSS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cssidentity">Public Identity: </label>
+		    	<input type="text" name="cssIdentity" id="cssidentity" value=""/>
+			</div>
+
+			<div data-role="collapsible-set">
+			
+				<div data-role="collapsible">
+					<h3>Contact Details</h3>
+					
+					<!-- CSS e-mail Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssemaildetails">e-Mail: </label>
+				    	<input type="text" name="cssEmailDetails" id="cssemaildetails" value=""/>
+					</div>
+					
+					<!-- CSS IM Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssimdetails">IM: </label>
+				    	<input type="text" name="cssImDetails" id="cssimdetails" value=""/>
+					</div>
+					<!-- CSS SNS Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="csssnsdetails">Social: </label>
+				    	<input type="text" name="cssSNSDetails" id="csssnsdetails" value=""/>
+					</div>
+				</div>
+				
+				<div data-role="collapsible">
+					<h3>Personal Details</h3>
+					
+					<div data-role="fieldcontain" >
+						<!-- Sex -->
+						<label for="csssextype">Sex:</label>
+						<select name="cssSexType" id="csssextype" data-role="slider">
+							<option value="off">Male</option>
+							<option value="on">Female</option>
+						</select>
+					</div>
+					
+					<!-- CSS Location -->
+					<div data-role="fieldcontain" >
+				    	<label for="cssuserlocation">Home Location: </label>
+				    	<input type="text" name="cssUserLocation" id="cssuserlocation" value=""/>
+					</div>
+					
+				</div>
+			</div>
+			
+			<input id="createCSS" type="button" value="Register CSS" data-icon="gear" data-inline="true"/> 
+			
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of CSS Record page -->
+<div data-role="page" id="cssRecord">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CSS Record</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+			<button id="refreshCssRecord" data-theme="a">Refresh Profile</button>	
+	
+			<div data-role="fieldcontain" >
+
+			<!-- CSS Organisation Type-->
+				<label for="cssrecordorgtype">CSS Entity Type:</label>
+				<select name="cssRecordOrgType" id="cssrecordorgtype" data-role="slider" disabled="true">
+					<option value="0">Individual</option>
+					<option value="1">Entity</option>
+				</select>
+			</div>
+
+			<!-- CSS Owner Forename (optional)-->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordforename">Forename: </label>
+		    	<input type="text" name="cssRecordForeName" id="cssrecordforename" value="" disabled="true"/>
+			</div>
+
+			<!-- CSS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordname">Name: </label>
+		    	<input type="text" name="cssRecordName" id="cssrecordname" value="" disabled="true"/>
+			</div>
+
+			<!-- CSS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cssrecordidentity">Identity: </label>
+		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value="" disabled="true"/>
+			</div>
+
+			<div data-role="collapsible-set">
+			
+				<div data-role="collapsible">
+					<h3>Contact Details</h3>
+					
+					<!-- CSS e-mail Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordemaildetails">e-Mail: </label>
+				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value="" disabled="true"/>
+					</div>
+					
+					<!-- CSS IM Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordimdetails">IM: </label>
+				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value="" disabled="true"/>
+					</div>
+					<!-- CSS SNS Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordsnsdetails">Social: </label>
+				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value="" disabled="true"/>
+					</div>
+				</div>
+				
+				<div data-role="collapsible">
+					<h3>Personal Details</h3>
+					
+					<div data-role="fieldcontain" >
+						<!-- Sex -->
+						<label for="cssrecordsextype">Sex:</label>
+						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider"  disabled="true">
+							<option value="0">Male</option>
+							<option value="1">Female</option>
+						</select>
+					</div>
+					
+					<!-- CSS Location -->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecorduserlocation">Home Location: </label>
+				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value="" disabled="true"/>
+					</div>
+					
+				</div>
+				<div data-role="collapsible">
+					<h3>Current CSS Nodes</h3>
+					
+					<table id="cssNodesTable" border="1">
+					<thead>
+						<tr>
+							<th>Identity</th>
+							<th>Status</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!--tr>
+							<td>row 2, cell 1</td>
+							<td>row 2, cell 2</td>
+							<td>row 2, cell 3</td>
+						</tr-->
+					</tbody>
+					</table>
+					
+				</div>
+			</div>
+			
+			
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<section data-role="page" id="deviceMonitor">
+	<header data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Status</p>
+	</header>
+	
+	<article data-role="content">
+		<input type="button" name="connectivity" id="connectivity" value="Connectivity Status" data-role="button" data-inline="true" />
+		<input type="button" name="location" id="location" value="Location Status" data-role="button" data-inline="true" />
+		<input type="button" name="battery" id="battery" value="Battery Status" data-role="button" data-inline="true" />
+		<input type="button" name="registerBattery" id="registerBattery" value="Register to Battery Status" data-role="button" data-inline="true" />
+		<br />
+	</article>
+	
+	<footer data-role="footer" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</footer>
+</section>
+<!-- Start of Preferences page -->
+<div data-role="page" id="appPreferences">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;App Preferences</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<button id="getPref" data-theme="a">Get Preference Value</button>	
+		
+		<label for="prefType">Name: </label>
+		
+		<select name="preferenceType" id="prefType">
+  			<option value="string" selected="selected">String</option>
+  			<option value="boolean">Boolean</option>
+  			<option value="integer">Integer</option>
+  			<option value="long">Long</option>
+  			<option value="float">Float</option>
+		</select> 
+
+		<label for="prefName">Name: </label>
+		<input type="text" name="preferenceName" id="prefName" value="" />
+
+		<label for="prefValue">Value: </label>
+		<input type="text" name="preferenceValue" id="prefValue" value="" disabled="true"/>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Societies CIS mgmgt page -->
+<div data-role="page" id="cisManagementPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Management</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+   		<div id= "CisMgmt">
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">Cis Name: </label>
+		    	<input type="text" name="cisName" id="cisname" value=""  />
+			</div>
+			
+			<input id="createCIS" type="button" value="CreateCIS" data-icon="gear" data-inline="true" /> 
+			<input id="listCIS" type="button" value="ListCIS" data-icon="gear" data-inline="true" />
+			<input id="joinCIS" type="button" value="JoinCIS" data-icon="gear" data-inline="true" />
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of CIS Record page -->
+<div data-role="page" id="cisRecordPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Record</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+	
+			<div data-role="fieldcontain" >
+
+
+			<!-- CIS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cisowner">Name: </label>
+		    	<input type="text" name="cisOwner" id="cisowner" value="" disabled="true"/>
+			</div>
+
+			<!-- CIS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisrecordidentity">Identity: </label>
+		    	<input type="text" name="cisRecordIdentity" id="cisrecordidentity" value="" disabled="true"/>
+			</div>
+
+			<!-- CIS Name-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">e-Mail: </label>
+		    	<input type="text" name="cisName" id="cisname" value="" disabled="true"/>
+			</div>
+				
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+</body>
+</html>

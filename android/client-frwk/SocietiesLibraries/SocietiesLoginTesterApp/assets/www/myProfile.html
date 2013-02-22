@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+			<style type="text/css" media="screen">
+	.containing-element .ui-slider-switch { width: 15em; }
+</style>
+</head>
+<body>
+
+
+<!-- Start of first page: #friends -->
+<div data-role="page" id="my-profile">
+	<!-- header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+	</div>
+	<!-- /header -->
+	 
+	<div data-role="header" data-theme="b" >
+		<a href="#" data-icon="delete" id="btnProfileCancel" data-role="button">Cancel</a>
+		<h1>My Profile</h1>
+		<a href="#" data-icon="check" id="btnProfileSave" data-role="button">Save</a>
+	</div>
+	<div data-role="content">
+		<form id="form1">
+			<!-- CSS Organisation Type-->
+			<div data-role="fieldcontain" class="containing-element">
+				<label for="cssrecordorgtype">Type:</label>
+				<select name="cssRecordOrgType" id="cssrecordorgtype" data-role="slider">
+					<option value="0">Individual</option>
+					<option value="1">Entity</option>
+				</select>
+			</div>
+
+			<!-- CSS Identity -->
+			<div data-role="fieldcontain" >
+		    	<label for="cssrecordidentity">Identity: </label>
+		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value="" readonly/>
+			</div>
+			
+			<!-- CSS Owner Forename (optional)-->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordforename">First name: </label>
+		    	<input type="text" name="cssRecordForeName" id="cssrecordforename" value="" />
+			</div>
+
+			<!-- CSS Owner Name: Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordname">Surname: </label>
+		    	<input type="text" name="cssRecordName" id="cssrecordname" value=""/>
+			</div>
+
+			<!-- <div data-role="collapsible-set">  -->
+			
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
+					<h3>Contact Details</h3>					
+					<!-- CSS e-mail Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordemaildetails">e-Mail: </label>
+				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
+					</div>
+					<!-- CSS IM Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordimdetails">Phone: </label>
+				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value=""/>
+					</div>
+					<!-- CSS SNS Details-->
+					<!-- 
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordsnsdetails">Social: </label>
+				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value=""/>
+					</div>
+					 -->
+				</div>
+				
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
+					<h3>Personal Details</h3>
+					
+					<div data-role="fieldcontain" >
+						<!-- Sex -->
+						<label for="cssrecordsextype">Sex:</label>
+						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider">
+							<option value="0">Male</option>
+							<option value="1">Female</option>
+						</select>
+					</div>
+					
+					<!-- CSS Location -->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecorduserlocation">Home Location: </label>
+				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value=""/>
+					</div>
+					
+				</div>
+				<div data-role="collapsible" data-theme="b" data-content-theme="d">
+					<h3>My Devices</h3>
+					<ul data-role="listview" data-theme="d" data-divider-theme="b" id="cssNodesList">
+					<!-- PLACE NODE RECORDS HERE -->
+					
+					</ul>
+				</div>
+			<!-- 
+			<div class="sign_up">
+				<input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/> 
+			</div>
+			-->
+		</form>
+		<br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+		<!-- footer -->
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="images/icons/home_logo.png"  data-role="none"/>
+			</li>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="images/icons/my_profile.png"  data-role="none"/>	
+			</li>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="images/icons/settings.png"  data-role="none"/>	
+			</li>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="images/icons/about.png"  data-role="none"/>	
+			</li>
+		</ul><!-- /global navbar -->
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

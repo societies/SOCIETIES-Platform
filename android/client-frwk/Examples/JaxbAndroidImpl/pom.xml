@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.societies.comm.android</groupId>
+    <artifactId>JaxbAndroidImpl</artifactId>
+    <version>${version.comm}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+	    <groupId>org.societies</groupId>
+	    <artifactId>android-parent</artifactId>
+	    <version>0.1</version>
+    </parent>
+
+    <dependencies>
+	    <dependency>
+	        <groupId>com.google.android</groupId>
+            	<artifactId>android</artifactId>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.societies.comm.android</groupId>
+	        <artifactId>JaxbAndroidApi</artifactId>
+	        <version>${version.comm}</version>
+	    </dependency>
+    </dependencies>
+    
+    
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-dependency-plugin</artifactId> 
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal> 
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.societies.comm.android</groupId>
+	       							<artifactId>JaxbAndroidApi</artifactId>
+  								</artifactItem>
+  							</artifactItems>
+  							<outputDirectory>${project.build.directory}/endorsed</outputDirectory> 
+  						</configuration>
+  					</execution>
+  				</executions>
+  			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-compiler-plugin</artifactId> 
+				<version>2.3.2</version> 
+				<configuration>
+					<source>1.6</source> 
+					<target>1.6</target> 
+					<compilerArgument>-Djava.endorsed.dirs=${project.build.directory}/endorsed</compilerArgument> 
+ 				</configuration>
+ 			</plugin>
+    	</plugins>
+    </build>
+</project>

@@ -24,6 +24,7 @@
  */
 package org.societies.context.broker.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,15 +63,19 @@ public class CtxBootLoader {
 	
 	/** The User Context DB Mgmt service reference. */
 	private IUserCtxDBMgr userCtxDBMgr;
+
+	/** The Context Event Mgmt service reference. */
+	private ICtxEventMgr ctxEventMgr;
 	
 	@Autowired(required=true)
-	CtxBootLoader(ICommManager commMgr, IUserCtxDBMgr userCtxDBMgr) throws Exception {
+	CtxBootLoader(ICommManager commMgr, IUserCtxDBMgr userCtxDBMgr, ICtxEventMgr ctxEventMgr) throws Exception {
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
 		
 		this.commMgr = commMgr;
 		this.userCtxDBMgr = userCtxDBMgr;
+		this.ctxEventMgr = ctxEventMgr;
 		
 		final INetworkNode localCssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("Found local CSS node ID " + localCssNodeId);
@@ -92,6 +98,11 @@ public class CtxBootLoader {
 		IndividualCtxEntity cssOwnerEnt = null;
 
 		try {
+			if (LOG.isInfoEnabled())
+				LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
+						+ "' for CSS owner " + cssId);
+			this.ctxEventMgr.createTopics(cssId, InternalCtxBroker.EVENT_TOPICS);
+
 			LOG.info("Checking if CSS owner context entity " + cssId + " exists...");
 			cssOwnerEnt = this.userCtxDBMgr.retrieveIndividualEntity(cssId.getBareJid());
 			if (cssOwnerEnt != null) {

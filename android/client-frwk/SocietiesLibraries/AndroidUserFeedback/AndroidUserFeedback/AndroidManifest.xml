@@ -1,0 +1,30 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.societies.android.platform.useragent.feedback"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="11" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup"
+            android:label="@string/societies_Notifications" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".AndroidUserFeedbackService" >
+        </service>
+    </application>
+
+</manifest>

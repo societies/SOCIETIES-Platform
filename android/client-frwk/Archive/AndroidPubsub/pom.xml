@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.societies.comm.android</groupId>
+    <artifactId>AndroidPubsub</artifactId>
+    <version>${version.comm}</version>
+    <packaging>apklib</packaging>
+
+    <parent>
+	    <groupId>org.societies</groupId>
+	    <artifactId>android-parent</artifactId>
+	    <version>RELEASE</version>
+    </parent>
+
+    <dependencies>
+	<dependency>
+	    	<groupId>com.google.android</groupId>
+           	<artifactId>android</artifactId> 
+           	<exclusions>
+			<!-- Provided by Android -->
+			<exclusion>
+				<artifactId>xpp3</artifactId>
+				<groupId>xpp3</groupId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		    <groupId>org.societies.api.external</groupId>
+		    <artifactId>societies-api</artifactId>
+		    <version>${release.version}</version>
+	</dependency>
+	<dependency>
+		    <groupId>org.societies.comm.android</groupId>
+		    <artifactId>AndroidPubsubApi</artifactId>
+		    <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>AndroidAgentApi</artifactId>
+		    <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		    <groupId>org.societies.comm.android</groupId>
+		    <artifactId>AndroidIPC</artifactId>
+		    <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-android</artifactId>
+		    <version>1.6.1-RC1</version>
+	</dependency>
+	<dependency>
+		    <groupId>org.asmack</groupId>
+		    <artifactId>asmack</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.simpleframework</groupId>
+		<artifactId>simple-xml</artifactId>
+		<exclusions>
+			<!-- StAX is not available on Android -->
+			<exclusion>
+				<artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			</exclusion>
+			<exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			 </exclusion>
+			    <!-- Provided by Android -->
+			 <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			 </exclusion>
+		</exclusions>
+	</dependency>
+
+	    <!--dependency>
+	    <groupId>xerces</groupId>
+	    <artifactId>xercesImpl</artifactId>
+	    <version>2.10.0</version>
+	    <exclusions>
+		<exclusion>
+		    <groupId>xml-apis</groupId> 
+		    <artifactId>xml-apis</artifactId>
+		</exclusion>
+	    </exclusions>
+	</dependency-->
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <pluginRepositories>
+        <pluginRepository>
+           <id>societies</id>
+	   <name>Societies Maven Repository</name>
+	   <url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>

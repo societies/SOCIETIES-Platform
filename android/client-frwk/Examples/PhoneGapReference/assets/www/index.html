@@ -1,0 +1,335 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Page Title</title> 
+	
+	<script type="text/javascript" charset="utf-8" src="cordova-1.7.0.js"></script>
+	<link rel="stylesheet" href="jquery.mobile-1.1.0.css" /> 
+	<script type="text/javascript" src="jquery-1.7.1.js"></script> 
+	<script type="text/javascript" src="jquery.mobile-1.1.0.js"></script>
+	<script type="text/javascript" src="reference.js"></script>
+	
+	<!-- Weinre target insert -->
+	<!--script src="http://10.0.2.2:8081/target/target-script-min.js"></script-->
+	
+</head> 
+<body> 
+<!-- Start of first page -->
+<div data-role="page" id="main">
+
+	<div data-role="header">
+		<h1>PhoneGap/Cordova Reference</h1>
+		<h1>Version 1.7.0</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+    	<a href="#file" data-transition="pop" data-role="button" >File</a>
+    	<a href="#device" data-transition="pop" data-role="button" >Device</a>
+    	<a href="#accelerate" data-transition="pop" data-role="button" >Accelerometer</a>
+    	<a href="#compass" data-transition="fade" data-role="button" >Compass</a>
+    	<a href="#geo" data-transition="slideup" data-role="button" >Geo Location</a>
+    	<a href="#notification" data-transition="flip" data-role="button" >Notification</a>
+    	<a href="#camera" data-transition="slide" data-role="button" >Camera</a>
+    	<a href="#connection" data-transition="pop" data-role="button" >Connection</a>
+    	<a href="#events" data-transition="slide" data-role="button" >Events</a>
+    	<a href="#media" data-transition="pop" data-role="button" >Media</a>
+    	<a href="#storage" data-transition="slide" data-role="button" >Storage</a>
+    	<a href="#capture" data-transition="pop" data-role="button" >Capture</a>
+    	<a href="#contacts" data-transition="slide" data-role="button" >Contacts</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>SOCIETIES</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+<!-- Start of Accelerometer page -->
+<div data-role="page" data-theme="a" id="accelerate">
+
+	<div data-role="header">
+		<h1>Accelerometer Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	
+		<button id="toggleAcceleromter">Toggle Accelerometer</button>	
+		
+      	<p>X:<span id="accelX">&nbsp;</span></p>
+      	<p>Y:<span id="accelY">&nbsp;</span></p>
+      	<p>Z:<span id="accelZ">&nbsp;</span></p>
+		
+				
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Compass page -->
+<div data-role="page" data-theme="b" id="compass">
+
+	<div data-role="header">
+		<h1>Compass Functionality</h1>
+	</div><!-- /header -->
+
+	<button id="compassReading">Current Heading</button>
+		
+	<div data-role="content">	
+	<h4>Current Compass Heading: <span id="compassHeading"> &nbsp;</span>	
+	
+	<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device page -->
+<div data-role="page" data-theme="a" id="device">
+
+	<div data-role="header">
+		<h1>Device Characteristics</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	
+		<button id="deviceChar">Characteristics</button>	
+		
+    	<div id="info">
+        	<h4>PhoneGap: <span id="phoneGapVer"> &nbsp;</span>,   Platform: <span id="platform"> &nbsp;</span>,   Version: <span id="version">&nbsp;</span></h4>
+        	<h4>UUID: <span id="uuid"> &nbsp;</span>,   Name: <span id="name">&nbsp;</span></h4>
+        	<h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+                   </span>, Colour Depth: <span id="colorDepth"></span>, Pixel Depth: <span id="pixelDepth"></span></h4>
+        	<h4>Agent: <span id="browserAgent"></span></h4>
+     	</div>
+		
+				
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+		
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of GeoLocation page -->
+<div data-role="page" data-theme="d" id="geo">
+
+	<div data-role="header">
+		<h1>GeoLocation Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<button id="geoLocation">Get Current Location</button>	
+	<button id="geoLocationWatch">Track Location</button>	
+	<button id="geoLocWatchStop">Stop Tracking Location</button>	
+
+  	<p>Latitude: <span id="latitude">&nbsp;</span></p>
+  	<p>Longitude: <span id="longitude">&nbsp;</span></p>
+	<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Notification page -->
+<div data-role="page" data-theme="e" id="notification">
+
+	<div data-role="header">
+		<h1>Notification Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="notifyAlert">Create Alert</button>	
+		<button id="notifyConfirm">Create Confirmation</button>	
+		<button id="notifyBeep">Create Beep</button>	
+		<button id="notifyVibrate">Create Vibration</button>	
+
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Camera page -->
+<div data-role="page" id="camera">
+
+	<div data-role="header">
+		<h1>Camera Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="cameraPictureURI">Capture Image URI</button>	
+		<button id="cameraPictureDisplay">Capture and Display Image</button>	
+		<img style="display:none;width:120px;height:120px;" id="smallImage" src="" />
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Connection page -->
+<div data-role="page" id="connection">
+
+	<div data-role="header">
+		<h1>Connection Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="connectStatus">Network Connection Status</button>	
+		<button id="connectStatusListener">Create Connection Listener</button>	
+
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Events page -->
+<div data-role="page" id="events">
+
+	<div data-role="header">
+		<h1>Events Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="registerEvents">Register for background/foreground events</button>	
+		
+		<a href="#main" data-role="button" data-icon="back">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Media page -->
+<div data-role="page" id="media">
+
+	<div data-role="header">
+		<h1>Media Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<a href="#main" data-role="button" data-icon="back">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Storage page -->
+<div data-role="page" id="storage">
+
+	<div data-role="header">
+		<h1>Storage Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<a href="#main" data-role="button" data-icon="back">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Capture page -->
+<div data-role="page" id="capture">
+
+	<div data-role="header">
+		<h1>Capture Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<a href="#main" data-role="button" data-icon="back">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Contacts page -->
+<div data-role="page" id="contacts">
+
+	<div data-role="header">
+		<h1>Contacts Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="userContacts">Get Contacts</button>	
+
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of File page -->
+<div data-role="page" id="file">
+
+	<div data-role="header">
+		<h1>File Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<p>File : SocietiesPhoneGapTest.txt</p>
+		<button id="createFile">Create File</button>	
+		<button id="fileExists">File exists?</button>	
+		<button id="displayFile">Display File</button>	
+		<button id="writeToFile">Write to File</button>	
+		<button id="deleteFile">Delete File</button>	
+		
+		<p>File System: <span id="fileSystemData">&nbsp;</span></p>
+		<p>File Exists: <span id="fileStatus">&nbsp;</span></p>
+		<p>File Contents: <code id="fileContents">&nbsp;</code></p>
+		<p>Error: <code id="fileErrors">&nbsp;</code></p>
+
+		<a href="#main" data-role="button" data-icon="back">Back to main</a>
+
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Networks page -->
+<div data-role="page" id="networks">
+
+	<div data-role="header">
+		<h1>Networks Functionality</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<button id="networkStatus">Network Status</button>	
+
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		</hr>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+</body>
+</html>

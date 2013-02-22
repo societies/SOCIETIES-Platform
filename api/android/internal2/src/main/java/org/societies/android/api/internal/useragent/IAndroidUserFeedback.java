@@ -30,6 +30,9 @@ import org.societies.android.api.internal.useragent.model.ImpProposalContent;
 
 public interface IAndroidUserFeedback{
 	
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.internal.useragent.ReturnValue";
+	public static final String GET_EXPLICITFB = "org.societies.android.api.internal.useragent.getExplicitFB";
+	public static final String GET_IMPLICITFB = "org.societies.android.api.internal.useragent.getImplicitFB";
 	//Array of interface method signatures
 	String methodsArray [] = {
 			"getExplicitFB(String client, int type, ExpProposalContent content)",

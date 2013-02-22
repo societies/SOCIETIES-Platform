@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,6 +45,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
@@ -74,6 +76,8 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING7 = "myCIS7.societies.local";
 	private static final String CIS_IIDENTITY_STRING8 = "myCIS8.societies.local";
 	private static final String CIS_IIDENTITY_STRING9 = "myCIS9.societies.local";
+	private static final String CIS_IIDENTITY_STRING10 = "myCIS10.societies.local";
+	private static final String CIS_IIDENTITY_STRING11 = "myCIS11.societies.local";
 	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
 	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
@@ -352,6 +356,30 @@ public class CommunityCtxDBMgrTest {
        assertTrue(ids.contains(attrId2));
        assertEquals(1, ids.size());
 	}*/
+   
+   @Test
+   public void testLookupCommunityCtxEntity() throws CtxException{
+	   
+	   System.out.println("---- testLookupCommunityCtxEntity");
+
+	   List<CtxIdentifier> ids;
+	   CommunityCtxEntity entity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING10);
+	   final CtxAttribute attribute = this.communityDB.createAttribute(entity.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   final CtxAttribute attribute2 = this.communityDB.createAttribute(entity.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
+	   
+	   CommunityCtxEntity entity2 = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING11);
+	   final CtxAttribute attribute3 = this.communityDB.createAttribute(entity2.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   
+	   ids = communityDB.lookupCommunityCtxEntity(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   assertTrue(ids.contains(entity.getId()));
+	   assertTrue(ids.contains(entity2.getId()));
+	   assertEquals(2, ids.size());
+	   
+	   ids = communityDB.lookupCommunityCtxEntity(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
+	   assertTrue(ids.contains(entity.getId()));
+	   assertEquals(1, ids.size());
+
+   }
    
    @Test
    public void testCommunityHierarchies() throws CtxException{

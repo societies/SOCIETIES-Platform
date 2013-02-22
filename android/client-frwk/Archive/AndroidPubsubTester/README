@@ -1,0 +1,3 @@
+This project creates an Android Activity that tests the AndroidPubsub by subscribing and publishing to a pubsub server. 
+To run it the AndroidAgent must be properly configured. By default it connects to the openfire server running at societies.local (see https://redmine.ict-societies.eu/projects/sp/wiki/Android_Communications#Configuration for how to add this DNS name to the Android hosts file) using the user android (password android).
+To run this project a pubsub server must be running at xcmanager.societies.local.

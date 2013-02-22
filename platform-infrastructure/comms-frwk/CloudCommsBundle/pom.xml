@@ -17,6 +17,20 @@
     <version>${version.comm}</version>
 
     <dependencies>
+    <!-- Embedded Dependency -->
+   		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+				<exclusions>
+					<!-- slf4j already provided -->
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+		</dependency>
     	<!-- Communication Components -->
     	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
@@ -65,8 +79,6 @@
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
     						org.simpleframework.xml.stream,
-    						org.xmpp.component,
-    						org.jivesoftware.whack,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
@@ -84,7 +96,7 @@
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
+						<Embed-Transitive>true</Embed-Transitive>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>

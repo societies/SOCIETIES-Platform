@@ -212,6 +212,24 @@ public class CisCtxMonitor extends EventListener implements Subscriber {
 				if (value != null && !value.isEmpty())
 					updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.ABOUT, value);
 				
+				// TODO add attribute types defined in privacy policy, 
+				// adding some attributes for testing purposes
+				// INTERESTS
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.INTERESTS, null);
+				// LOCATION SYMBOLIC				
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, null);
+				// LOCATION COORDINATES				
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.LOCATION_COORDINATES, null);
+				// BOOKS				
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.BOOKS, null);
+				// MOVIES				
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.MOVIES, null);
+				//LANGUAGES 
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.LANGUAGES , null);
+				//FAVOURITE_QUOTES
+				updateCtxAttribute(cisEntity.getId(), CtxAttributeTypes.FAVOURITE_QUOTES , null);
+				
+				
 				final String cisOwnerIdStr = cis.getOwnerJid();
 				final IIdentity cisOwnerId = commMgr.getIdManager().fromJid(cisOwnerIdStr);
 				final IndividualCtxEntity cisOwnerEntity = ctxBroker.retrieveIndividualEntity(cisOwnerId).get();

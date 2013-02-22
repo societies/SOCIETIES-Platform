@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+
+</head>
+<body>
+
+
+<div data-role="page" id="communities-landing" data-add-back-btn='true'>
+	<!-- header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="societies logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+	</div>
+	<!-- /header -->
+	<div data-role="content">
+		<form id="formCISDirSearch" >
+			<input type="search" id="search-communities" value="Search Communities" data-theme="b" />
+		</form>
+		<br />
+		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
+			<li><a href="#" id="createCommunity">
+				<h2>Create a new Community</h2>
+				<p>Setup a new Community</p>
+				<p></p>
+				</a></li>
+			<li><a href="#" id="listCommunities" >
+				<h2>My Communities</h2>
+				<p>A list of your communities <span id="myCommunitiesCount" class="ui-li-count" style="visibility:hidden;">15</span></p>
+				<p></p>
+				</a></li>
+			<li><a href="#" id="suggestedCommunities">
+				<h2>Suggested Communities</h2>
+				<p>Some communities we think you might <br/>be interested in joining <span id="mySuggestedCommunitiesCount" class="ui-li-count" style="visibility:hidden;">4</span></p>
+				<p></p>
+				</a></li>
+			<li><a href="#" id="manageCommunities">
+				<h2>Manage your Communities</h2>
+				<p>Edit profile details and settings <span id="myCommunitiesAdminCount" class="ui-li-count" style="visibility:hidden;">5</span></p>
+				<p></p>
+				</a></li>
+		</ul>
+		<br/><br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+ <!-- footer -->
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="images/icons/home_logo.png"  data-role="none"/>
+			</li>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="images/icons/my_profile.png"  data-role="none"/>	
+			</li>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="images/icons/settings.png"  data-role="none"/>	
+			</li>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="images/icons/about.png"  data-role="none"/>	
+			</li>
+		</ul><!-- /global navbar -->
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

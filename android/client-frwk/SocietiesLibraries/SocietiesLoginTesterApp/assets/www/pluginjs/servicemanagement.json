@@ -1,0 +1,90 @@
+{ 
+	"ServiceManagementService" : 
+		{
+		"exceptionThreshold" : 0,
+		"allArray" : true,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"getServices" : [ {
+	                    "authorSignature": "John Doe",
+    					"privacyPolicy": "privacy policy info: you're on your own!",
+    					"serviceDescription": "Performs basic calculator services, Add/Subtract",
+    					"serviceEndpoint": "http://societies.local/calculator",
+    					"serviceIdentifier": { 
+    								"identifier": "http://societies.local/calculator",
+    								"serviceInstanceIdentifier": "myInstance"
+    								}, 
+    					"serviceInstance": { 
+    								"fullJid": "john@societies.local",
+    								"cssJid":  "john.societies.local",
+									"parentJid": "john.societies.local",
+									"serviceImpl": {  
+											"serviceNameSpace": "http://societies.org/calculator",
+											"serviceProvider": "Honest John's calculators",
+											"serviceVersion": "1.0",
+											"serviceClient": "http://societies.org/calculator"
+											},
+									"xmppNode" : "Cloud node"
+    								},
+    					"serviceLocation": "Local",
+    					"serviceName": "Calculator",
+    					"serviceCategory": "Maths Tools",
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
+						},
+						{
+	                    "authorSignature": "Jane Smith",
+    					"privacyPolicy": "privacy policy info: you're on your own!",
+    					"serviceDescription": "Provides a fortune telling service",
+    					"serviceEndpoint": "http://societies.local/fortune",
+    					"serviceIdentifier": { 
+    								"identifier": "http://societies.local/fortune",
+    								"serviceInstanceIdentifier": "myInstance"
+    								}, 
+    					"serviceInstance": { 
+    								"fullJid": "jane@societies.local",
+    								"cssJid":  "jane.societies.local",
+									"parentJid": "jane.societies.local",
+									"serviceImpl": {  
+											"serviceNameSpace": "http://societies.org/fortune",
+											"serviceProvider": "Know your future",
+											"serviceVersion": "0.5",
+											"serviceClient": "http://societies.org/fortune"
+											},
+									"xmppNode" : "Cloud node"
+    								},  
+    					"serviceLocation": "Local", 
+    					"serviceName": "FortuneCookie",
+    					"serviceCategory": "Future Casting",
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
+						},
+						{
+	                    "authorSignature": "Bob Hope",
+    					"privacyPolicy": "privacy policy info: you're on your own!",
+    					"serviceDescription": "Performs Complex services cheap",
+    					"serviceEndpoint": "http://societies.local/complex",
+    					"serviceIdentifier": { 
+    								"identifier": "http://societies.local/complex",
+    								"serviceInstanceIdentifier": "myInstance"
+    								}, 
+    					"serviceInstance": { 
+    								"fullJid": "bob@societies.local",
+    								"cssJid":  "bob.societies.local",
+									"parentJid": "bob.societies.local",
+									"serviceImpl": {  
+											"serviceNameSpace": "http://societies.org/fortune",
+											"serviceProvider": "Complexity Solutions",
+											"serviceVersion": "2.1",
+											"serviceClient": "http://societies.org/complex"
+											},
+									"xmppNode" : "Cloud node"
+    								},  
+    					"serviceLocation": "Local", 
+    					"serviceName": "Complex Service",
+    					"serviceCategory": "Complexity Tools",
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
+						} ]
+		}
+}

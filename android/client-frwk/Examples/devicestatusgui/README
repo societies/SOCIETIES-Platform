@@ -1,0 +1,8 @@
+This an Android GUI to test how to manage devices in an Android smartphone:
+* battery status,
+* connectivity providers status;
+* location provider status,
+* and so on.
+This may duplicate functionality of the Device Manager component and will require discussion with the responsible team. 
+
+Please run: "mvn site" to generate the documentation (in target/doc).
