@@ -112,8 +112,10 @@ public class CommManagerHelper {
 	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
 
 	private Serializer s;
+	private ClassLoaderManager clm;
 	
 	public CommManagerHelper () {
+		this.clm = new ClassLoaderManager();
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		s = new Persister(strategy);
@@ -190,7 +192,7 @@ public class CommManagerHelper {
 			}
 		} catch (DocumentException e) {
 			LOG.error(e.getMessage());
-			return buildErrorResponse(iq.getFrom(), iq.getID(), e.getMessage());
+			return buildErrorResponse(iq.getFrom(), iq.getID(), e.getMessage(), e);
 		}
 		
 		// return empty answer
@@ -235,12 +237,6 @@ public class CommManagerHelper {
 		return (IFeatureServer) ifNotNull(featureServers.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
-	
-//	private IFeatureServer getMessageFeatureServer(String namespace)
-//			throws UnavailableException {
-//		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
-//				"namespace", namespace);
-//	}
 
 	private ICommCallback getCommCallback(String iqId)
 			throws UnavailableException {
@@ -261,14 +257,18 @@ public class CommManagerHelper {
 	 * @throws UnavailableException
 	 */
 	private String getPackage(String namespace) throws UnavailableException {
-		return nsToPackage.get(namespace);
+		String p = nsToPackage.get(namespace);
+		if (p==null)
+			throw new UnavailableException("No namespace registered: "+namespace);
+		return p;
 	}
 
 	public void dispatchIQResult(IQ iq) {
-//		LOG.info("result got with id "+iq.getID());
 		Element element = getElementAny(iq);
+		ClassLoader oldCl = null;
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
+			oldCl = clm.classLoaderMagicTemp(iq.getID());
 			
 			// payloadless (confirmation) iqs
 			if (element==null) {
@@ -287,16 +287,8 @@ public class CommManagerHelper {
 				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), nodeMap.getKey(), nodeMap.getValue());
 				return;
 			}
-//			LOG.info("not disco... callback is "+callback);
-//			LOG.info("ns="+ns+" nsToPackage.keySet()="+Arrays.toString(nsToPackage.keySet().toArray()));
-
-			//GET CLASS TO BE SERIALISED
-			String packageStr = getPackage(ns);
-			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-			Class<?> c = Class.forName(packageStr + "." + beanName);
 			
-			//GET SIMPLE SERIALISER 
-			//TreeStrategy tree = new TreeStrategy();
+			Class<?> c = getClass(ns,element.getName());
 			
 			Object bean = s.read(c, element.asXML() );
 			
@@ -310,21 +302,23 @@ public class CommManagerHelper {
 		} catch (Exception e) {
 			LOG.error("Unable to serialise Simple element", e);
 		}
+		
+		if (oldCl!=null)
+			Thread.currentThread().setContextClassLoader(oldCl);
 	}
 
-	public void dispatchIQError(IQ iq) {
+	public void dispatchIQError(IQ iq) { // TODO fix this
+		ClassLoader oldCl = null;
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
-//			LOG.warn("dispatchIQError: XMPP ERROR!");
+			
 			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
-//			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
 			String errorElementStr = ((Element)errorElement.elements().get(0)).getName(); // TODO assumes the stanza error comes first
-//			LOG.info("errorElement.elements().get(0)).getName()=" + errorElementStr);
 			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
 			XMPPError error = new XMPPError(se, null);
+			oldCl = clm.classLoaderMagicTemp(iq.getID());
 			if (errorElement.elements().size()>1)
 				error = parseApplicationError(se, errorElement.elements());
-//			LOG.info("XMPPError:"+error.getStanzaErrorString());
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
 			LOG.error("Unable to find package for namespace",e);
@@ -333,6 +327,9 @@ public class CommManagerHelper {
 		} catch (ClassNotFoundException e) {
 			LOG.error("Unable to find class during Simple serialisation prep", e);
 		}
+		
+		if (oldCl!=null)
+			Thread.currentThread().setContextClassLoader(oldCl);
 	}
 
 	private XMPPError parseApplicationError(StanzaError error, List list) throws UnavailableException, ClassNotFoundException {
@@ -345,10 +342,7 @@ public class CommManagerHelper {
 				if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
 					text = e.getText();
 				} else {
-					//GET CLASS TO BE SERIALISED
-					String packageStr = getPackage(e.getNamespaceURI());  
-					String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-					Class<?> c = Class.forName(packageStr + "." + beanName);
+					Class<?> c = getClass(e.getNamespaceURI(),e.getName());
 					
 					try {
 						appError = s.read(c, e.asXML());
@@ -369,59 +363,64 @@ public class CommManagerHelper {
 		Element element = getElementAny(iq);
 		String namespace = element.getNamespace().getURI();
 		JID originalFrom = iq.getFrom();
-//		LOG.info("iq.getFrom().toString()="+iq.getFrom().toString());
 		String id = iq.getID();
 
 		try {
-			//GET CLASS FIRST
-			String packageStr = getPackage(namespace);  
-			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-			Class<?> c = Class.forName(packageStr + "." + beanName);
+			IFeatureServer fs = getFeatureServer(namespace);
+			ClassLoader oldClassloader = clm.classLoaderMagic(fs);
+			
+			Class<?> c = getClass(namespace,element.getName());
 			
 			Object bean = s.read(c, element.asXML());
 			
-			IFeatureServer fs = getFeatureServer(namespace);
 			Object responseBean = null;
 			if (iq.getType().equals(IQ.Type.get))
 				responseBean = fs.getQuery(TinderUtils.stanzaFromPacket(iq), bean);
 			if (iq.getType().equals(IQ.Type.set))
 				responseBean = fs.setQuery(TinderUtils.stanzaFromPacket(iq), bean);
 			
-			return buildResponseIQ(originalFrom, id, responseBean);
+			return buildResponseIQ(originalFrom, id, responseBean, oldClassloader);
 		} catch (XMPPError e) {
 			return buildApplicationErrorResponse(originalFrom, id, e);
 		} catch (UnavailableException e) {
-			LOG.warn("Unable to find package or feature server for namespace",e);
-			return buildErrorResponse(originalFrom, id, e.getMessage());
+			return buildErrorResponse(originalFrom, id, e.getMessage(), e);
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message);
-			return buildErrorResponse(originalFrom, id, message);
+			return buildErrorResponse(originalFrom, id, message, e);
 		} catch (InvalidFormatException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.warn(message);
-			return buildErrorResponse(originalFrom, id, message);
+			return buildErrorResponse(originalFrom, id, message, e);
 		} catch (ClassNotFoundException e) {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
-			LOG.warn(message, e);
-			return buildErrorResponse(originalFrom, id, message);
+			return buildErrorResponse(originalFrom, id, message, e);
 		} catch (Exception e) {
 			String message = e.getClass().getName() + "Unable to serialise Simple element"; 
-			LOG.warn(message, e);
-			return buildErrorResponse(originalFrom, id, message);
+			return buildErrorResponse(originalFrom, id, message, e);
 		}
+	}
+
+	private Class<?> getClass(String namespace, String name) throws ClassNotFoundException, UnavailableException {
+		String packageStr = getPackage(namespace);  
+		String beanName = name.substring(0,1).toUpperCase() + name.substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+		return Thread.currentThread().getContextClassLoader().loadClass(packageStr + "." + beanName);
 	}
 
 	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
 		String namespace = element.getNamespace().getURI();
+		ClassLoader oldCl = null;
 		try {
-			//GET CLASS FIRST
-			String packageStr = getPackage(namespace);  
-			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-			Class<?> c = Class.forName(packageStr + "." + beanName);
+			try {
+				ICommCallback cb = getMessageCommCallback(namespace);
+				oldCl = clm.classLoaderMagic(cb);
+			} catch (UnavailableException e) {
+				IFeatureServer fs = getFeatureServer(namespace);
+				oldCl = clm.classLoaderMagic(fs);
+			}
+			
+			Class<?> c = getClass(namespace,element.getName());
 			
 			Object bean = s.read(c, element.asXML());
 			
@@ -438,16 +437,18 @@ public class CommManagerHelper {
 			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
 			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.error(m);
+			LOG.error(m, e);
 		} catch (Exception e) {
 			String m = e.getClass().getName() + "Error de-serializing the message:" + e.getMessage();
-			LOG.error(m);
+			LOG.error(m, e);
 		}
+		
+		if (oldCl!=null)
+			Thread.currentThread().setContextClassLoader(oldCl);
 	}
 
 	public synchronized IQ sendIQ(Stanza stanza, IQ.Type type, Object payload, ICommCallback callback) 
 			throws CommunicationException {
-		// Usual disclaimer about how this needs to be optimized ;)
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			
@@ -458,7 +459,10 @@ public class CommManagerHelper {
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			iqCommCallbacks.put(iq.getID(), callback);
+			clm.addTempClassloader(iq.getID());
 			return iq;
+		} catch (ClassNotFoundException e) {
+			throw new CommunicationException("ClassNotFoundException for class "+payload.getClass().toString(), e);
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
 		}
@@ -486,6 +490,7 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
+		clm.classloaderRegistry(fs);
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
 			featureServers.put(ns, fs);
@@ -494,13 +499,10 @@ public class CommManagerHelper {
 	
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-//		for (String ns : messageCallback.getXMLNamespaces()) {
-//			LOG.info("registering CommCallback for namespace" + ns);
-//			iqCommCallbacks.put(ns, messageCallback);
-//		}
+		clm.classloaderRegistry(messageCallback);
 		if (messageCallback.getXMLNamespaces().size()>0) {
 			String mainNs = messageCallback.getXMLNamespaces().get(0);
-			if (mainNs.indexOf("#")>-1) {
+			if (mainNs.indexOf("#")>-1) { // ICommCallback has priority only for the mainNs in case it has a fragment
 				LOG.info("registering Callback for namespace " + mainNs);
 				nsCommCallbacks.put(mainNs, messageCallback);
 			}
@@ -509,35 +511,11 @@ public class CommManagerHelper {
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
 		// TODO latest namespace register sticks! no multiple namespace support atm
-		if (packages.size()>0) {
-			StringBuilder contextPath = new StringBuilder(packages.get(0));
-			for (int i = 1; i < packages.size(); i++)
-				contextPath.append(":" + packages.get(i));
-		}
-		/*
-		try {
-			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(), this.getClass().getClassLoader());
-			Unmarshaller u = jc.createUnmarshaller();
-			Marshaller m = jc.createMarshaller();
-			for (String ns : namespaces) {
-				nsToUnmarshaller.put(ns, u);
-				nsToMarshaller.put(ns, m);
-			}
-			for (String packageStr : packages) {
-				pkgToMarshaller.put(packageStr, m);
-			}
-		} catch (JAXBException e) {
-			throw new CommunicationException(
-					"Could not register NamespaceExtension... caused by JAXBException: ",
-					e);
-		}
-		*/
-		//TODO: SIMPLE
 		//assumes a 1:1 mapping between NS and package (for prototyping)
 		try {
 			for (int i=0; i<packages.size(); i++) {
 				String packageStr = packages.get(i);
-				String nsStr = namespaces.get(i); 
+				String nsStr = namespaces.get(i);
 				LOG.info("registering namespace-package mapping: "+nsStr+" <-> "+packageStr);
 				nsToPackage.put(nsStr, packageStr);
 			}	
@@ -597,30 +575,29 @@ public class CommManagerHelper {
 			errorResponse.getElement().add(dom4jError.getRootElement());
 			
 			return errorResponse;
-
 		} catch (DocumentException e) {
-			return buildErrorResponse(originalFrom, id, "DocumentException while building application error");
+			return buildErrorResponse(originalFrom, id, "DocumentException while building application error", e);
 		} catch (Exception e) {
-			return buildErrorResponse(originalFrom, id, "Serializing Exception while building application error");
+			return buildErrorResponse(originalFrom, id, "Serializing Exception while building application error", e);
 		}
 	}
 
-	private IQ buildErrorResponse(JID originalFrom, String id, String message) {
-		LOG.info("Error occurred:" + message);
+	private IQ buildErrorResponse(JID originalFrom, String id, String message, Exception e) {
+		LOG.warn("Error occurred:" + message);
 		IQ errorResponse = new IQ(Type.error, id);
 		errorResponse.setTo(originalFrom);
-		PacketError error = new PacketError(
-				PacketError.Condition.internal_server_error,
-				PacketError.Type.cancel, message);
+		// default error
+		PacketError error = new PacketError(PacketError.Condition.internal_server_error,PacketError.Type.cancel, message);
+		if (e instanceof UnavailableException) // unrecognized namespace
+			error = new PacketError(PacketError.Condition.service_unavailable, PacketError.Type.cancel);
 		errorResponse.getElement().add(error.getElement());
 		return errorResponse;
 	}
 
-	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
+	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean, ClassLoader oldClassloader)
 			throws DocumentException {
-		IQ responseIq = new IQ(Type.result, id);
-		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		Document document = null;
 		if (responseBean!=null) {
 			try {
 				s.write(responseBean, os);
@@ -629,9 +606,17 @@ public class CommManagerHelper {
 			}
 			
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-			Document document = reader.read(is);
-			responseIq.getElement().add(document.getRootElement());
+			document = reader.read(is);
 		}
+
+		if (oldClassloader!=null)
+			Thread.currentThread().setContextClassLoader(oldClassloader);
+		
+		IQ responseIq = new IQ(Type.result, id);
+		responseIq.setTo(originalFrom);
+		if (document!=null)
+			responseIq.getElement().add(document.getRootElement());
+		
 		return responseIq;
 	}
 
