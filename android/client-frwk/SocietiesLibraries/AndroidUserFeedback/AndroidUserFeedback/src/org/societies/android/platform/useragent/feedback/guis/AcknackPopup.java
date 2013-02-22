@@ -28,16 +28,19 @@ package org.societies.android.platform.useragent.feedback.guis;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
+import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.events.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -66,6 +69,7 @@ public class AcknackPopup extends Activity{
 	private String resultPayload = "";
 	
 	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
+	private String requestID;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,7 +78,7 @@ public class AcknackPopup extends Activity{
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
 		String clientID = bundle.getString(UserFeedbackActivityIntentExtra.CLIENT_ID);
-		String requestID = bundle.getString(UserFeedbackActivityIntentExtra.REQUEST_ID);
+		requestID = bundle.getString(UserFeedbackActivityIntentExtra.REQUEST_ID);
 		int type = bundle.getInt(UserFeedbackActivityIntentExtra.TYPE);
 		String proposalText = bundle.getString(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT);
 		ArrayList<String> options = bundle.getStringArrayList(UserFeedbackActivityIntentExtra.OPTIONS);
@@ -124,8 +128,12 @@ public class AcknackPopup extends Activity{
 	private void publishEvent(){
     	try {
 
-    		
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, new String[]{this.resultPayload}, new IPlatformEventsCallback() {
+    		ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
+    		List<String> feedback = new ArrayList<String>();
+    		feedback.add(this.resultPayload);
+    		bean.setFeedback(feedback);
+    		bean.setRequestId(requestID);
+			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, feedback, new IPlatformEventsCallback() {
 				
 				@Override
 				public void returnAction(int result) {

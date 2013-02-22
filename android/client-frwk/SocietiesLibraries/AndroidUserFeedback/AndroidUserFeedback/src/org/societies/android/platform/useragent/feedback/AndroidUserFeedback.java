@@ -84,7 +84,7 @@ public class AndroidUserFeedback {
 	/*
 	 * This method returns null - String[] return type returned using Intents
 	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content) {
+	public ExpFeedbackResultBean getExplicitFB(String client, int type, ExpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for explicit feedback");
 		Log.d(LOG_TAG, "Content: "+content.getProposalText());
 		Log.d(LOG_TAG, "Options size:" +content.getOptions().length);
@@ -122,7 +122,7 @@ public class AndroidUserFeedback {
 	}
 
 
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content) {
+	public ImpFeedbackResultBean getImplicitFB(String client, int type, ImpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for implicit feedback");
 		Log.d(LOG_TAG, "Content: "+ content.getProposalText());
 
