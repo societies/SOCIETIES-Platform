@@ -35,7 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.activity.ActivityFeedManager;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -45,6 +48,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -150,6 +154,33 @@ public class  ActivityFeedManagerTest {
     public void testDeleteNonExistentActivityFeed(){
         boolean ret = activityFeedManagerUnderTest.deleteFeed(this.mockJid,FEED_ID);
         assert (!ret);
+    }
+    @Test
+    public void testReboot(){
+        IActivityFeed feed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID+"1");
+        IActivity act = new Activity();
+        final String actor = "testActor";
+        act.setActor(actor);
+        act.setObject("testObject");
+        act.setTarget("testTarget");
+        act.setVerb("testVerb");
+        feed.addActivity(act, new IActivityFeedCallback() {
+            @Override
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                //do nothing
+            }
+        });
+        activityFeedManagerUnderTest = null;
+        beforeTest();
+        activityFeedManagerUnderTest.init();
+        feed = activityFeedManagerUnderTest.getOrCreateFeed(this.mockJid,FEED_ID+"1");
+        feed.getActivities("0 "+Long.toString(System.currentTimeMillis()+1),new IActivityFeedCallback() {
+            @Override
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                assert(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0).getActor().contains(actor));
+            }
+        });
+
     }
     public ICommManager getMockCSSendpoint() {
         return mockCSSendpoint;
