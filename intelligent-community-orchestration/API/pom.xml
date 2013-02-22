@@ -88,7 +88,7 @@
 							*
 						</_exportcontents>
 				        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-					    <Embed-Transitive>true</Embed-Transitive>						
+					    <Embed-Transitive>false</Embed-Transitive>
 					    <Export-Package>org.societies.orchestration.api.*</Export-Package>
 				    </instructions>
 				</configuration>

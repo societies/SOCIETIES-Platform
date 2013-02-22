@@ -186,6 +186,7 @@
 			<artifactId>com.springsource.org.dom4j</artifactId>
 			<version>1.6.1</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
@@ -201,6 +202,7 @@
 			    </exclusion>
 			</exclusions>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

@@ -67,8 +67,21 @@
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
-        <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
-        <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
+        <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
+           <intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisDirectoryRemote" />
+   			</intent-filter>
+   		</service>
+		<service android:name="org.societies.android.platform.cis.CisManagerRemote" android:label="Cis Manager Remote" >
+			<intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisManagerRemote" />
+   			</intent-filter>
+   		</service>
+		<service android:name="org.societies.android.platform.cis.CisSubscribedRemote" android:label="Cis Subscribed Remote" >
+			<intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
+   			</intent-filter>
+   		</service>
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
         <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <service

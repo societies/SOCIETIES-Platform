@@ -27,6 +27,8 @@ package org.societies.android.api.internal.useragent;
 
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 
 public interface IAndroidUserFeedback{
 	
@@ -47,7 +49,7 @@ public interface IAndroidUserFeedback{
 	 * @param content - the content for the feedback form
 	 * @return - an array of result strings
 	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content);
+	public ExpFeedbackResultBean getExplicitFB(String client, int type, ExpProposalContent content);
 
 	/**
 	 * Get implicit feedback from the user - only require them to interact with the notification box
@@ -58,7 +60,7 @@ public interface IAndroidUserFeedback{
 	 * @return - a boolean value, true indicating that the proposed action should continue and 
 	 * false indicating that the proposed action should be aborted.
 	 */
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content);
+	public ImpFeedbackResultBean getImplicitFB(String client, int type, ImpProposalContent content);
 
 	/**
 	 * Show a notification popup to the user.  This popup does not give any option for user interation and is
