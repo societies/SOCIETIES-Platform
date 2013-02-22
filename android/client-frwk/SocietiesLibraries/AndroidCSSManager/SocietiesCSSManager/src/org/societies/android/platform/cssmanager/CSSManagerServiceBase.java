@@ -216,6 +216,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	}
 	@Override
 	public void startAppServices(final String client) {
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Log.d(LOG_TAG, "startAppServices called with client: " + client);
+
 		this.serviceController.bindToServices(new IMethodCallback() {
 			
 			@Override
@@ -249,6 +252,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 	@Override
 	public void stopAppServices(final String client) {
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Log.d(LOG_TAG, "stopAppServices called with client: " + client);
+
 		this.serviceController.stopAllServices(new IMethodCallback() {
 			
 			@Override
