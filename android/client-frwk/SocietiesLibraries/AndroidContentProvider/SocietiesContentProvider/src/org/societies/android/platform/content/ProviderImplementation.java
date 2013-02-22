@@ -43,8 +43,8 @@ import android.util.Log;
  * basic CSS data (CSSRecord)
  *
  */
-public class ProviderImplemenation extends ContentProvider {
-	private final static String LOG_TAG = ProviderImplemenation.class.getName();
+public class ProviderImplementation extends ContentProvider {
+	private final static String LOG_TAG = ProviderImplementation.class.getName();
 	
 	private final static int CSS_NODES_MATCHER = 1;
 	private final static int CSS_ARCHIVED_NODES_MATCHER = 2;
@@ -60,7 +60,7 @@ public class ProviderImplemenation extends ContentProvider {
 											CSSContentProvider.CssPreferences.CSS_CURRENT_NODE_JID};
 
 	
-    public ProviderImplemenation() {
+    public ProviderImplementation() {
     	super();
     	this.uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     	this.buildUriMatcher(this.uriMatcher);

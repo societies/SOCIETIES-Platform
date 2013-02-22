@@ -85,12 +85,12 @@
                 <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
    			</intent-filter>
         </service>
-        <!--provider 
+        <provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:name="org.societies.android.platform.content.ProviderImplementation"
             android:exported="true"
             android:label="SocietiesCSSContentProvider">
-        </provider-->
+        </provider>
         
          
     </application>

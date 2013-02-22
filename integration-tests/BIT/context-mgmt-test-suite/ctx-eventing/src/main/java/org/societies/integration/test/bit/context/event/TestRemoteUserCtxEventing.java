@@ -24,8 +24,7 @@
  */
 package org.societies.integration.test.bit.context.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
@@ -161,11 +160,16 @@ public class TestRemoteUserCtxEventing {
 			LOG.info("*** registering for updates of '" + FOO_ATTR_TYPE + "' attributes under entity " + this.fooEntId);
 			this.internalCtxBroker.registerForChanges(listener, this.fooEntId, FOO_ATTR_TYPE);
 			// wait
+			LOG.info("*** sleeping for " + SUBSCRIBER_TIMEOUT + " msec"); 
 			Thread.sleep(SUBSCRIBER_TIMEOUT);
-			assertEquals(this.fooAttrId, listener.getReceivedId());
+			assertTrue(listener.getReceivedId() instanceof CtxAttributeIdentifier);
+			final CtxAttributeIdentifier receivedAttrId = 
+					(CtxAttributeIdentifier) listener.getReceivedId(); 
+			assertEquals(this.fooEntId, receivedAttrId.getScope());
+			assertEquals(FOO_ATTR_TYPE, receivedAttrId.getType());
 			/* TODO
 			assertEquals(FOO_ATTR_VALUE, listener.getReceivedValue()); */
-			LOG.info("*** unregistering from updates of '" + FOO_ATTR_TYPE + "' attributes under entity " + this.fooAttrId.getScope());
+			LOG.info("*** unregistering from updates of '" + FOO_ATTR_TYPE + "' attributes under entity " + this.fooEntId);
 			this.internalCtxBroker.unregisterFromChanges(listener, this.fooEntId, FOO_ATTR_TYPE);
 		}
 	}

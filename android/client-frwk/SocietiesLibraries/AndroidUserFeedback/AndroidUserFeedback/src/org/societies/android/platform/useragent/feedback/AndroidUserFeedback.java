@@ -25,6 +25,7 @@
 package org.societies.android.platform.useragent.feedback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -32,11 +33,13 @@ import java.util.UUID;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
 import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
 import org.societies.android.platform.useragent.feedback.guis.ExplicitPopup;
 import org.societies.android.platform.useragent.feedback.guis.ImplicitPopup;
 import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
+import org.societies.android.platform.useragent.feedback.guis.UserFeedbackNotification;
 import org.societies.android.platform.useragent.feedback.model.UserFeedbackEventTopics;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -46,6 +49,10 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 /**
@@ -58,8 +65,11 @@ public class AndroidUserFeedback {
 	private HashMap<String, ExplicitPopup> expPopups;
 	private HashMap<String, ImplicitPopup> impPopups;
 	private IIdentity myCloudID;
-	
-	public AndroidUserFeedback() {
+	private final Context androidContext;
+
+	public AndroidUserFeedback(Context context) {
+		this.androidContext = context;
+
 		expPopups = new HashMap<String, ExplicitPopup>();
 		impPopups = new HashMap<String, ImplicitPopup>();
 	}
@@ -77,7 +87,7 @@ public class AndroidUserFeedback {
 	public String[] getExplicitFB(String client, int type, ExpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for explicit feedback");
 		Log.d(LOG_TAG, "Content: "+content.getProposalText());
-
+		Log.d(LOG_TAG, "Options size:" +content.getOptions().length);
 		//generate unique ID for this pubsub event and feedback request
 		String requestID = UUID.randomUUID().toString();
 
@@ -86,15 +96,20 @@ public class AndroidUserFeedback {
 		ufBean.setRequestId(requestID);
 		ufBean.setType(type);
 		ufBean.setProposalText(content.getProposalText());
-		List<String> optionsList = new ArrayList<String>();
-		for(String nextOption: content.getOptions()){
-			optionsList.add(nextOption);
+		ArrayList<String> optionsList = new ArrayList<String>();
+		String[] options = content.getOptions();
+		for (int i=0; i<options.length; i++){
+			optionsList.add(options[i]);
 		}
+		
 		ufBean.setOptions(optionsList);
 		ufBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
 
+		
+		processExpFeedbackRequestEvent(client, requestID, type, content.getProposalText(), optionsList);
+
 		//send pubsub event to all user agents
-/*		try {
+		/*		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
 			//eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 			//TODO: send the event
@@ -105,8 +120,8 @@ public class AndroidUserFeedback {
 		}*/
 		return null;
 	}
-	
-	
+
+
 	public Boolean getImplicitFB(String client, int type, ImpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for implicit feedback");
 		Log.d(LOG_TAG, "Content: "+ content.getProposalText());
@@ -123,7 +138,7 @@ public class AndroidUserFeedback {
 		ufBean.setMethod(FeedbackMethodType.GET_IMPLICIT_FB);
 
 		//send pubsub event to all user agents
-/*		try {
+		/*		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
 			eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 			//TODO: send the event
@@ -134,7 +149,7 @@ public class AndroidUserFeedback {
 		}*/
 		return null;
 	}
-	
+
 	public void showNotification(String client, String notificationText) {
 		Log.d(LOG_TAG, "Received request for notification");
 		Log.d(LOG_TAG, "Content: "+ notificationText);
@@ -148,8 +163,9 @@ public class AndroidUserFeedback {
 		ufBean.setProposalText(notificationText);
 		ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
 
+
 		//send pubsub event to all user agents
-/*		try {
+		/*		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
 			eventMgrService.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
 			//TODO: send the event
@@ -183,8 +199,9 @@ public class AndroidUserFeedback {
 				String expRequestID = feedbackBean.getRequestId();
 				int expType = feedbackBean.getType();
 				String expProposalText = feedbackBean.getProposalText();
-				List<String> optionsList = feedbackBean.getOptions();
-				processExpFeedbackRequestEvent(expRequestID, expType, expProposalText, optionsList);
+				ArrayList<String> optionsList = (ArrayList<String>) feedbackBean.getOptions();
+
+				processExpFeedbackRequestEvent("returnToCloud", expRequestID, expType, expProposalText, optionsList);
 				break;
 			case GET_IMPLICIT_FB:
 				String impRequestID = feedbackBean.getRequestId();
@@ -200,10 +217,10 @@ public class AndroidUserFeedback {
 				break;
 			}
 		}	
-		
+
 	}
-	
-	private void processExpFeedbackRequestEvent(String requestID, int type, String proposalText, List<String> optionsList){
+
+	private void processExpFeedbackRequestEvent(String clientID, String requestID, int type, String proposalText, ArrayList<String> optionsList){
 		//use android notification system
 		//popupWindow with sound
 		switch(type){
@@ -217,7 +234,21 @@ public class AndroidUserFeedback {
 			List<String> result = cbPopup.getFeedback(proposalText, optionsList);
 			break;
 		case 2: //acknackPopup
-			AcknackPopup acknackPopup = new AcknackPopup();
+			//AcknackPopup acknackPopup = new AcknackPopup();
+			//UserFeedbackNotification notification = new UserFeedbackNotification(this.androidContext);
+			//notification.getExplicitFB(requestID);
+			Log.d(LOG_TAG, "Starting AckNack activity");
+
+
+			Intent ackNackIntent = new Intent(androidContext, AcknackPopup.class);
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.CLIENT_ID, clientID);
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.REQUEST_ID, requestID);
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.TYPE, type);
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT, proposalText);
+			ackNackIntent.putStringArrayListExtra(UserFeedbackActivityIntentExtra.OPTIONS, optionsList);
+			
+			ackNackIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			this.androidContext.startActivity(ackNackIntent);
 			break;
 		}
 
@@ -240,14 +271,14 @@ public class AndroidUserFeedback {
 	private void processImpResponseEvent(String responseID, Boolean result){
 
 	}
-	
+
 	public void pubsubEvent(IIdentity identity, String eventTopic, String itemID, Object item) {
 		Log.d(LOG_TAG, "Received pubsub event with topic: "+eventTopic);
 
 		if(eventTopic.equalsIgnoreCase(UserFeedbackEventTopics.REQUEST)){
 			//read from request bean
 			UserFeedbackBean ufBean = (UserFeedbackBean)item;
-/*			switch(ufBean.getMethod()){
+			/*			switch(ufBean.getMethod()){
 			case GET_EXPLICIT_FB:
 				String expRequestID = ufBean.getRequestId();
 				int expType = ufBean.getType();

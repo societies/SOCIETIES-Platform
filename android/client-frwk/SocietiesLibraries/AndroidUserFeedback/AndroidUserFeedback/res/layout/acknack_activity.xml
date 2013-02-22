@@ -1,8 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@style/AppTheme" >
+    android:layout_height="match_parent" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -10,6 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:contentDescription="@string/notifications_description"
         android:src="@drawable/societies_header" />
 
     <LinearLayout
@@ -27,11 +27,13 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/societies_Notifications"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:text="@string/societies_Notifications"/>
     </LinearLayout>
 
-    <ImageView
+
+
+    <!--
+         <ImageView
         android:id="@+id/imageView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,5 +68,6 @@
         android:layout_marginLeft="40dp"
         android:layout_toRightOf="@+id/imageView1"
         android:src="@drawable/about" />
+    -->
 
 </RelativeLayout>
