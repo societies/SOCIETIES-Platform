@@ -57,7 +57,7 @@
 		    <groupId>org.societies.simple.converters</groupId>
 		    <artifactId>SimpleXMLConvertersBasic</artifactId>
 		    <version>${release.version}</version>
-		    <scope>compile</scope>
+		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
 
