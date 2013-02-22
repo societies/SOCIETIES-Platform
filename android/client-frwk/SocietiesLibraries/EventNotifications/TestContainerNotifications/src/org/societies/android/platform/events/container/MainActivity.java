@@ -23,7 +23,7 @@ import android.view.Menu;
 
 public class MainActivity extends Activity {
 
-	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+	private static final String EVENTS_SERVICE_REMOTE   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.TestContainer";
 	private static final String LOG_TAG = MainActivity.class.getName();
 	private Messenger eventMgrService = null;
@@ -33,13 +33,20 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		//BIND TO EVENT MANAGER SERVICE
-        Intent serviceIntent = new Intent(SERVICE_ACTION);
+		//START EVENT MANAGER SERVICE
+        Intent serviceIntent = new Intent(EVENTS_SERVICE_REMOTE);
       	bindService(serviceIntent, serviceEventsConnection, Context.BIND_AUTO_CREATE);
       	
-		//START FRIENDS SERVICE
+  		//START FRIENDS SERVICE
         Intent intentFriends = new Intent(this.getApplicationContext(), FriendsService.class);
         startService(intentFriends);
+        
+        //SLEEP FOR 10 SECONDS BEFORE PUBLISHING EVENT
+        try {
+			Thread.sleep(10 * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         
         //PUBLISH EVENT TO TEST SERVICE
         InvokePublishEvent publish  = new InvokePublishEvent();
@@ -53,6 +60,12 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	protected void onDestroy() {
+		Log.d(LOG_TAG, "Test Activity for Notificaitons terminating");
+		this.unbindService(serviceEventsConnection);	
+	}
+	
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BIND TO EXTERNAL "EVENT MANAGER">>>>>>>>>>>>>>>>>>>>>>>>>>>>
   	private ServiceConnection serviceEventsConnection = new ServiceConnection() {
 
@@ -60,7 +73,7 @@ public class MainActivity extends Activity {
   			eventMgrService = new Messenger(service);
   			Log.d(LOG_TAG, "Connected to the Societies Event Mgr Service");
   			
-  			//BOUND TO SERVICE - PUBLISH EVENT FOR TESTING
+  			//BOUND TO SERVICE - INVOKE THE startService() FOR COMMS
   			InvokeStartService invoke  = new InvokeStartService();
       		invoke.execute();
   		}
