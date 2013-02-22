@@ -74,7 +74,8 @@ import android.util.Log;
 public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback, IServiceManager{
 
 	private static final String LOG_TAG = AndroidUserFeedbackService.class.getName();
-	private static final String SERVICE_ACTION = "org.societies.android.platform.events.ServicePlatformEventsRemote";
+	public static final String USER_FEEDBACK_EVENTS_ALL = "";
+	
 	private static final String CLIENT_NAME = AndroidUserFeedbackService.class.getCanonicalName();
 	
 	private Context androidContext;
@@ -155,12 +156,12 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT);
 		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT);
 		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_EVENT);
-
+		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_SHOW_NOTIFICATION_EVENT);
 		return intentFilter;
 	}
 	public AndroidUserFeedbackService(Context androidContext, boolean restrictBroadcast){
 		this.androidContext = androidContext;
-		this.userFeedback = new AndroidUserFeedback();
+		this.userFeedback = new AndroidUserFeedback(androidContext);
 		//check with Alec that login has been completed
 		this.clientCommsMgr = new ClientCommunicationMgr(androidContext, true);
 
@@ -231,40 +232,46 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 	
 				@Override
 				public void returnAction(String result) {
-					
+					Log.d(LOG_TAG, "comms callback: returnAction(string) called. ??");
 				}
 				
 				@Override
 				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "Connected to comms");
+					Log.d(LOG_TAG, "comms callback: returnAction(boolean) called. Connected");
 					if (resultFlag){
+						Log.d(LOG_TAG, "Connected to comms - resultflag true");
 						assignConnectionParameters();
+						Log.d(LOG_TAG, "Assigned connection parameters");
 						setupBroadcastReceiver();
-					
+						Log.d(LOG_TAG, "Setup broadcast receiver");
 						eventsHelper = new EventsHelper(AndroidUserFeedbackService.this.androidContext);
+						Log.d(LOG_TAG, "new EventService");
 						eventsHelper.setUpService(new IMethodCallback() {
 							
 							@Override
 							public void returnAction(String result) {
-								// TODO Auto-generated method stub
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
 								
 							}
 							
 							@Override
 							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
 								if (resultFlag){
-									
+									Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
 									try {
-										
-										AndroidUserFeedbackService.this.eventsHelper.subscribeToEvents(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_INTENT, new IPlatformEventsCallback() {
+										//subscribing to all user feedback events. 
+										AndroidUserFeedbackService.this.eventsHelper.subscribeToEvents(AndroidUserFeedbackService.USER_FEEDBACK_EVENTS_ALL, new IPlatformEventsCallback() {
 											
 											@Override
 											public void returnAction(int result) {	
+												Log.d(LOG_TAG, "eventMgr callback: ReturnAction(int) called. ??");
 											}
 											@Override
 											public void returnAction(boolean resultFlag) {
+												Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Subscribed to userfeedback events");
 												if (resultFlag){
-													Log.d(LOG_TAG, "Subscribed to "+IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_EVENT);
+													Log.d(LOG_TAG, "resultFlag true - Subscribed to "+AndroidUserFeedbackService.USER_FEEDBACK_EVENTS_ALL+" events");
 												}
 												
 											}

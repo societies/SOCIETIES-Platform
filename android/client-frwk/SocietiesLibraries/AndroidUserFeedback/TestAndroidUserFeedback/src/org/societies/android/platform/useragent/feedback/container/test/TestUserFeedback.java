@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,25 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.android.platform.useragent.feedback.container.test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.societies.android.api.identity.ARequestor;
-import org.societies.android.api.identity.ARequestorService;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ExpProposalType;
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
-import org.societies.android.platform.personalisation.container.PersonalisationAndroidTest;
-import org.societies.android.platform.personalisation.container.PersonalisationAndroidTest.TestPersonalisationBinder;
-import org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroid;
-import org.societies.android.platform.personalisation.impl.mocks.MockClientCommunicationMgr;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-
+import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService.FeedbackContainerBinder;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -57,8 +47,9 @@ import android.util.Log;
 public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackService>{
 
 	private static final String LOG_TAG = TestUserFeedback.class.getName();
-	private static final String CLIENT_ID = "org.societies.android.platform.personalisation.test";
-	private ARequestor requestor;
+	private static final String CLIENT_ID = LOG_TAG;
+
+
 	private Boolean receivedResult = false;
 	
 	public TestUserFeedback() {
@@ -71,8 +62,8 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		super.setUp();
 	}
 
-	private class PersonalisationBroadcastReceiver extends BroadcastReceiver{
-		private final String LOG_TAG = PersonalisationBroadcastReceiver.class.getName();
+	private class UserFeedbackBroadcastReceiver extends BroadcastReceiver{
+		private final String LOG_TAG = UserFeedbackBroadcastReceiver.class.getName();
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
@@ -82,25 +73,19 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		}
 
 	}
+
 	
 	@MediumTest
-	public void testGetPreference() throws URISyntaxException{
-		BroadcastReceiver receiver = setupBroadcastReceiver();
+	public void testGetExplicitFB() {
+		setupBroadcastReceiver();
 		Intent userFeedbackIntent = new Intent(getContext(), TestContainerFeedbackService.class);
 		
-		TestUserFeedback binder =  (TestUserFeedback) bindService(userFeedbackIntent);
+		FeedbackContainerBinder binder =  (FeedbackContainerBinder) bindService(userFeedbackIntent);
 		
 		
 		IAndroidUserFeedback ufService = (IAndroidUserFeedback) binder.getService();
-		
-		 serviceID = new AServiceResourceIdentifier();
-		serviceID.setIdentifier(new URI("http://service.societies.local"));
-		serviceID.setServiceInstanceIdentifier("service_1232");
-		ARequestorService requestorService = new ARequestorService("service@societies.local", serviceID);
-		
-		
-		
-		ufService.getPreference(CLIENT_ID, requestorService, "emma@societies.local", "media", serviceID, "volume");
+
+	
 		
 		ExpProposalContent proposal = new ExpProposalContent("Testing explicit proposal user feedback", new String[]{"Yes","No"});
 		ufService.getExplicitFB(CLIENT_ID, ExpProposalType.ACKNACK, proposal);
@@ -118,18 +103,16 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
     /**
      * Create a broadcast receiver
      * 
-     * @return the created broadcast receiver
      */
-    private BroadcastReceiver setupBroadcastReceiver() {
+    private void setupBroadcastReceiver() {
     	BroadcastReceiver receiver = null;
     	
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        receiver = new PersonalisationBroadcastReceiver();
+        receiver = new UserFeedbackBroadcastReceiver();
         getContext().registerReceiver(receiver, createTestIntentFilter());    	
         Log.d(LOG_TAG, "Register broadcast receiver");
 
-        return receiver;
     }
     
 	
