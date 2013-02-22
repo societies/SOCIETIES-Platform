@@ -88,7 +88,6 @@ public class SocietiesClientServicesController {
 		this.connectedToServices = new boolean[NUM_SERVICES];
 		allMessengers = new Messenger[NUM_SERVICES];
 		this.platformServiceConnections = new ServiceConnection[NUM_SERVICES];
-		setupBroadcastReceiver();
 	}
 	
 	/**
@@ -97,6 +96,9 @@ public class SocietiesClientServicesController {
 	 * @param IMethodCallback callback
 	 */
 	public void bindToServices(IMethodCallback callback) {
+		//set up broadcast receiver for start/bind actions
+		setupBroadcastReceiver();
+
 		InvokeBindAllServices invoker = new InvokeBindAllServices(callback);
 		invoker.execute();
 	}
@@ -112,6 +114,7 @@ public class SocietiesClientServicesController {
 		        this.context.unbindService(this.platformServiceConnections[i]);
 			}
 	   	}
+	   	//tear down broadcast receiver after stop/unbind actions
 	   	this.teardownBroadcastReceiver();
 	}
 	/**
@@ -127,6 +130,9 @@ public class SocietiesClientServicesController {
 	 * @param callback
 	 */
 	public void stopAllServices(IMethodCallback callback) {
+		//set up broadcast receiver for stop/unbind actions
+		setupBroadcastReceiver();
+
 		InvokeStopAllServices invoker = new InvokeStopAllServices(callback);
 		invoker.execute();
 	}
@@ -480,6 +486,8 @@ public class SocietiesClientServicesController {
 				e.printStackTrace();
 			} finally {
     			callback.returnAction(retValue);
+    			//tear down broadcast receiver after initial bind/start actions
+    		   	SocietiesClientServicesController.this.teardownBroadcastReceiver();
     		}
 
     		return null;
@@ -553,12 +561,13 @@ public class SocietiesClientServicesController {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 
 			if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STOPPED_STATUS)) {
-				//As each service starts decrement the latch
+				//As each service stops decrement the latch
 				SocietiesClientServicesController.this.servicesStopped.countDown();
 				
 			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
 				//As each service starts decrement the latch
 				SocietiesClientServicesController.this.servicesStarted.countDown();
+				
 			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_EXCEPTION_INFO)) {
 				
 			} 

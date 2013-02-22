@@ -132,7 +132,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 			"unSubscribeFromEvent(String client, String societiesIntent)",
 			"unSubscribeFromEvents(String client, String intentFilter)",
 			"unSubscribeFromAllEvents(String client)",
-			"publishEvent(String client, String societiesIntent, Object eventPayload, Class eventClass)",
+			"publishEvent(String client, String societiesIntent, Object payload)",
 			"getNumSubscribedNodes(String client)",
 			"startService()",
 			"stopService()"

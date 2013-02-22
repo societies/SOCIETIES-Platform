@@ -213,7 +213,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 //				cssProfile.setIdentityName("");
 //				cssProfile.setImID("");
 				cssProfile.setName("");
-//				cssProfile.setPassword("");
+				cssProfile.setPassword("");
 //				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
 //				cssProfile.setSocialURI("");
@@ -341,18 +341,19 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 					this.updateCssRegistry(cssRecord);
 					LOG.debug("Updating CSS with local database");
 
-					result.setProfile(cssRecord);
-					result.setResultStatus(true);
 
-					CssEvent event = new CssEvent();
-					event.setType(CSSManagerEnums.ADD_CSS_NODE);
-					event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-
-					this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 				} else {
-					LOG.error("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " has already logged in");
+					LOG.debug("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " was already logged in and is re-establishing connection");
 				}
+				//Send event
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.ADD_CSS_NODE);
+				event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
 
+				this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
 			} else {
 				LOG.error("CSS record does not exist");
 			}
