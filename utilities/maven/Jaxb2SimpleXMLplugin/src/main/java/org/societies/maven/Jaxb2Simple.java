@@ -749,6 +749,10 @@ public class Jaxb2Simple extends AbstractMojo
 								   "in.readByteArray(" + fieldName + ")";
 				return sByteCode;
 			}
+			if (globalType.endsWith("List")) {
+			    return "if (null == "+fieldName+") { "+fieldName+" = new ArrayList(); }\n\t\t"+
+			      readMethod+"("+fieldName+")";
+			   }
 			return readMethod+"("+fieldName+")";
 		}
 		if ("URI".equals(typeToParcelableRawType(type, false))) {
