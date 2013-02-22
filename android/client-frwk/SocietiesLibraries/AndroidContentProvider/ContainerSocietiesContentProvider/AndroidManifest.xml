@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme" >
         <provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
-            android:name="org.societies.android.platform.content.ProviderImplemenation"
+            android:name="org.societies.android.platform.content.ProviderImplementation"
             android:exported="true"
             android:label="SocietiesCSSContentProvider"
             >

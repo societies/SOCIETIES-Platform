@@ -35,6 +35,9 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
 	private static final String CLIENT_PARAM_3 = "org.societies.android.platform.events.test.other";
 	private static final String INTENT_FILTER = "org.societies.android.css.manager";
 	
+	private static final String CSS_EVENT_TEST_DESCRIPTION = "test Css Event";
+	private static final String CSS_EVENT_TEST_TYPE = "test type";
+	
 	private static final int DELAY = 10000;
 
 	
@@ -164,8 +167,8 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT)) {
 				Log.d(LOG_TAG, "Received event: " + IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
 				CssEvent event = (CssEvent) intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				Log.d(LOG_TAG, "CssEvent type: " + event.getType());
-				Log.d(LOG_TAG, "CssEvent description: " + event.getDescription());
+				assertEquals(CSS_EVENT_TEST_TYPE, event.getType());
+				assertEquals(CSS_EVENT_TEST_DESCRIPTION, event.getDescription());
 				TestRealPlatformEvents.this.eventService.unSubscribeFromEvent(CLIENT_PARAM_1, IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT);
 			}
 		}
@@ -315,8 +318,8 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     
     private static CssEvent getCssEvent() {
     	CssEvent event = new CssEvent();
-    	event.setDescription("test Css Event");
-    	event.setType("test");
+    	event.setDescription(CSS_EVENT_TEST_DESCRIPTION);
+    	event.setType(CSS_EVENT_TEST_TYPE);
     	return event;
     }
 
