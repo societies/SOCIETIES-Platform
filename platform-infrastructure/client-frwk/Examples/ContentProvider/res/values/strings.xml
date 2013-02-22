@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">ContentProvider</string>
-	<string name="autority">org.societies.android.platform.contentprovider</string>
-</resources>

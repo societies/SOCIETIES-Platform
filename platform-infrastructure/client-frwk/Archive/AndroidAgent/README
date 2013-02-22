@@ -1,1 +1,0 @@
-AndroidAgent reads the XMPP configurations from a properties file in the android external storage. This file is created after the first run. This file is located in /sdcard/Android/data/org.societies/files/AndroidAgent.properties .
