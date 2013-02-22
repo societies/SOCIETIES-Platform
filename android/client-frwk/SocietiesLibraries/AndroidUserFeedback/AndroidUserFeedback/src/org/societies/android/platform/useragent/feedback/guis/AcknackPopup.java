@@ -27,89 +27,123 @@ package org.societies.android.platform.useragent.feedback.guis;
 
 
 
+import java.util.ArrayList;
+
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.IPlatformEventsCallback;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.events.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class AcknackPopup extends Activity{
-	
-	
+
+
 	private static final String LOG_TAG = AcknackPopup.class.getName();
-	private Messenger eventMgrService = null;
-	
+	EventsHelper eventsHelper = null;
+	private boolean isEventsConnected = false;
+	private String resultPayload = "";
 	
 	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.acknack_activity);
-        Log.d(LOG_TAG, "onCreate in AcknackPopup");
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.acknack_activity);
 
-    
-    //connection to pubsub
-	private ServiceConnection serviceConnection = new ServiceConnection() {
+		Intent intent = getIntent();
+		Bundle bundle = intent.getExtras();
+		String clientID = bundle.getString(UserFeedbackActivityIntentExtra.CLIENT_ID);
+		String requestID = bundle.getString(UserFeedbackActivityIntentExtra.REQUEST_ID);
+		int type = bundle.getInt(UserFeedbackActivityIntentExtra.TYPE);
+		String proposalText = bundle.getString(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT);
+		ArrayList<String> options = bundle.getStringArrayList(UserFeedbackActivityIntentExtra.OPTIONS);
+
+
+		TextView txtView = (TextView) findViewById(R.id.textView1);
+		txtView.setText(proposalText);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout1);
 		
-		private boolean boundToEventMgrService;
-
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			boundToEventMgrService = true;
-			eventMgrService = new Messenger(service);
-			
-			Log.d(this.getClass().getName(), "Connected to the Societies Event Mgr Service");
-			
-			//BOUND TO SERVICE - SUBSCRIBE TO RELEVANT EVENTS
-			InvokeRemoteMethod invoke  = new InvokeRemoteMethod(CLIENT_NAME);
-    		invoke.execute();
+		for (String option : options){
+			Button button = new Button(this);
+			button.setText(option);
+			button.setTag(option);
+			layout.addView(button);
+	         
+	         button.setOnClickListener(new View.OnClickListener() {
+	             public void onClick(View v) {
+	            	 AcknackPopup.this.resultPayload = (String) v.getTag();
+	                if (isEventsConnected){
+	                	publishEvent();
+	                }else{
+	                	eventsHelper = new EventsHelper(AcknackPopup.this);
+	                	eventsHelper.setUpService(new IMethodCallback() {
+							
+							@Override
+							public void returnAction(String result) {
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+								
+							}
+							
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+								if (resultFlag){
+									Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+									publishEvent();
+								}
+							}
+						});
+	                }
+	             }
+	         });
 		}
-		
-		public void onServiceDisconnected(ComponentName name) {
-			boundToEventMgrService = false;
+		Log.d(LOG_TAG, "onCreate in AcknackPopup");
+	}
+
+	private void publishEvent(){
+    	try {
+
+    		
+			eventsHelper.publishEvent(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY, new String[]{this.resultPayload}, new IPlatformEventsCallback() {
+				
+				@Override
+				public void returnAction(int result) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		} catch (PlatformEventsHelperNotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	};
-	
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SUBSCRIBE TO PUBSUB EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/** Async task to invoke remote service method */
-    private class InvokeRemoteMethod extends AsyncTask<Void, Void, Void> {
+	}
 
-    	private final String LOCAL_LOG_TAG = InvokeRemoteMethod.class.getName();
-    	private String client;
 
-    	public InvokeRemoteMethod(String client) {
-    		this.client = client;
-    	}
-
-    	protected Void doInBackground(Void... args) {
-    		//METHOD: subscribeToEvents(String client, String intentFilter) - ARRAY POSITION: 1
-    		String targetMethod = IAndroidSocietiesEvents.methodsArray[6];
-    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
-    		Bundle outBundle = new Bundle();
-
-    		//PARAMETERS
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT);
-    		//outBundle.putParcelable(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT, "");
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
-    		outMessage.setData(outBundle);
-
-    		Log.d(LOCAL_LOG_TAG, "Sending event registration");
-    		try {
-    			eventMgrService.send(outMessage);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-    		return null;
-    	}
-    }
 }

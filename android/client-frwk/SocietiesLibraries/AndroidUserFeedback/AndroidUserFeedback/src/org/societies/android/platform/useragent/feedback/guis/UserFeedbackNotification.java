@@ -22,46 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.android.platform.useragent.feedback.guis;
 
-package org.societies.android.platform.useragent.feedback.container;
+import org.societies.android.platform.useragent.feedback.R;
 
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackService;
-
-import android.app.Service;
+import android.app.Notification;
+import android.app.Notification.Builder;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
 import android.util.Log;
 
-public class TestContainerFeedbackService extends Service{
+/**
+ * @author Eliza
+ *
+ */
+@Deprecated
+public class UserFeedbackNotification {
 
-	private static final String LOG_TAG = TestContainerFeedbackService.class.getName();
-	IBinder binder;
+	private static final String LOG_CAT = UserFeedbackNotification.class.getName();
+	private Context context;
 
-	@Override
-	public void onCreate () {
-		this.binder = new FeedbackContainerBinder();
-		Log.d(LOG_TAG, "TestContainerFeedbackService service starting...");
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "TestContainerFeedbackService service terminating...");
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		Log.d(LOG_TAG, "TestContainerFeedbackService service onbind...");
-		return this.binder;
-	}
-
-	public class FeedbackContainerBinder extends Binder {
-		public IAndroidUserFeedback getService() {
-			AndroidUserFeedbackService ufBase = new AndroidUserFeedbackService(getApplicationContext(),  true);
-			return ufBase;
-		}
+	public UserFeedbackNotification(Context context) {
+		this.context = context;
 	}
 	
-
+	public void getExplicitFB(String notificationTag){
+		Log.d(LOG_CAT, "Request for ExplicitFB Notification window");
+		Builder mBuilder =
+		        new Builder(context)
+		        .setSmallIcon(R.drawable.home_logo)
+		        .setContentTitle("My notification")
+		        .setContentText("Hello World!");
+		
+		// Creates an explicit intent for an Activity in your app
+		Intent resultIntent = new Intent(this.context, AcknackPopup.class);
+		
+		// The stack builder object will contain an artificial back stack for the
+		// started Activity.
+		// This ensures that navigating backward from the Activity leads out of
+		// your application to the Home screen.
+		//TaskStackBuilder stackBuilder = TaskStackBuilder.create(this.context);
+		
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		mBuilder.setContentIntent(pendingIntent);
+		Notification notification = mBuilder.getNotification();
+		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(notificationTag, 0, notification);
+		Log.d(LOG_CAT, "ExplicitFB Notification created");
+		
+	}
 }

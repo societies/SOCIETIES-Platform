@@ -22,46 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.android.platform.useragent.feedback.constants;
 
-package org.societies.android.platform.useragent.feedback.container;
+/**
+ * @author Eliza
+ *
+ */
+public class UserFeedbackActivityIntentExtra {
 
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackService;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
-
-public class TestContainerFeedbackService extends Service{
-
-	private static final String LOG_TAG = TestContainerFeedbackService.class.getName();
-	IBinder binder;
-
-	@Override
-	public void onCreate () {
-		this.binder = new FeedbackContainerBinder();
-		Log.d(LOG_TAG, "TestContainerFeedbackService service starting...");
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "TestContainerFeedbackService service terminating...");
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		Log.d(LOG_TAG, "TestContainerFeedbackService service onbind...");
-		return this.binder;
-	}
-
-	public class FeedbackContainerBinder extends Binder {
-		public IAndroidUserFeedback getService() {
-			AndroidUserFeedbackService ufBase = new AndroidUserFeedbackService(getApplicationContext(),  true);
-			return ufBase;
-		}
-	}
-	
-
+	public static final String REQUEST_ID = "request_id";
+	public static final String CLIENT_ID = "client_id";
+	public static final String PROPOSAL_TEXT = "proposal_text";
+	public static final String OPTIONS  = "options";
+	public static final String TYPE = "type";
 }
