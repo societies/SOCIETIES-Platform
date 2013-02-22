@@ -62,7 +62,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:META-INF/ActivityFeedManagerTest-context.xml"})
-public class ActivityFeedManagerTest {
+public class  ActivityFeedManagerTest {
     public static final String FEED_ID = "myTestGetNewActivityFeedFeed";
     private static Logger LOG = LoggerFactory
             .getLogger(ActivityFeedManagerTest.class);
