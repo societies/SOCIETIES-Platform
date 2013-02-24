@@ -380,13 +380,13 @@ public class ClientCommunicationMgr {
 		return false;
 	}
 	
-	public INetworkNode newMainIdentity(final String identifier, final String domain, final String password, IMethodCallback callback) throws XMPPError { 
+	public INetworkNode newMainIdentity(final String identifier, final String domain, final String password, IMethodCallback callback, String host) throws XMPPError { 
 		Dbc.require("User identifier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("User password must be specified", null != password && password.length() > 0);
 		Dbc.require("Method callback object must be specified", null != callback);
 		
-		Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password);
+		Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password + " host: " + host);
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -395,7 +395,7 @@ public class ClientCommunicationMgr {
 			this.methodCallbackMap.put(callbackID, callback);
 		}
 		
-		InvokeNewMainIdentity invoke  = new InvokeNewMainIdentity(this.clientPackageName, identifier, domain, password, callbackID);
+		InvokeNewMainIdentity invoke  = new InvokeNewMainIdentity(this.clientPackageName, identifier, domain, password, callbackID, host);
 		invoke.execute();
 
 		return null;
@@ -1337,6 +1337,7 @@ public class ClientCommunicationMgr {
     	private String domain;
     	private String password;
     	private long remoteCallId;
+    	private String host;
 
     	/**
     	 * Default Constructor
@@ -1344,12 +1345,13 @@ public class ClientCommunicationMgr {
     	 * @param packageName
     	 * @param client
     	 */
-    	public InvokeNewMainIdentity(String client, String identifier, String domain, String password, long remoteCallId) {
+    	public InvokeNewMainIdentity(String client, String identifier, String domain, String password, long remoteCallId, String host) {
     		this.client = client;
         	this.identifier = identifier;
         	this.domain = domain;
         	this.password = password;
         	this.remoteCallId = remoteCallId;
+        	this.host = host;
     	}
 
     	protected Void doInBackground(Void... args) {
@@ -1375,6 +1377,9 @@ public class ClientCommunicationMgr {
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.remoteCallId);
     		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.host);
+    		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
 
     		outMessage.setData(outBundle);
 

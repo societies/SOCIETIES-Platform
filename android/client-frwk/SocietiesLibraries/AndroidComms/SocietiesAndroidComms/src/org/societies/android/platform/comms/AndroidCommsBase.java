@@ -416,7 +416,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		return retValue;
 	}
 	
-	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId) { 
+	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId, String host) { 
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
@@ -434,7 +434,9 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		
 		String serverHost = domain;
-//		int port = defaultConfig.getPort();
+		if (null != host) {
+			serverHost = host;
+		}
 		String serviceName = domain;
 		
 		try {
@@ -449,14 +451,14 @@ public class AndroidCommsBase implements XMPPAgent {
 				Log.d(LOG_TAG, "Created user JID: " + retValue);
 			}
 			else {
-				ConnectionConfiguration config = new ConnectionConfiguration(domain, port, domain);
+				ConnectionConfiguration config = new ConnectionConfiguration(serverHost, port, serviceName);
 				Connection newIdConnection = new XMPPConnection(config);			
 				newIdConnection.connect();
 				
 				createAccount(newIdConnection, identifier, password);
 				
 				newIdConnection.disconnect();
-				retValue = username(identifier, domain) + "/" + resource;
+				retValue = username(identifier, serviceName) + "/" + resource;
 				Log.d(LOG_TAG, "Created user JID: " + retValue);
 			}
 			
@@ -470,7 +472,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		return null;
 	}
-	
+	/**
+	 * Allow the XMPP server to be found with its IP address
+	 */
 	public String login(String client, String identifier, String domain, String password, String host, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
@@ -504,7 +508,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		return null;
 	}
 
-	
+	/**
+	 * Allow the XMPP server to be found with its DNS resolved name
+	 */
 	public String login(String client, String identifier, String domain, String password, long remoteCallId) {
 		this.login(client, identifier, domain, password, null, remoteCallId);
 		return null;
@@ -576,8 +582,7 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	
 	@Override
-	public boolean configureAgent(String client, String xmppDomainAuthorityNode,
-		int xmppPort, String xmppResource, boolean xmppDebug, long remoteCallId) {
+	public boolean configureAgent(String client, String xmppDomainAuthorityNode, int xmppPort, String xmppResource, boolean xmppDebug, long remoteCallId) {
 		
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Domain Authority Node must be specified", null != xmppDomainAuthorityNode && xmppDomainAuthorityNode.length() > 0);
@@ -756,7 +761,6 @@ public class AndroidCommsBase implements XMPPAgent {
 				public boolean accept(Packet packet) {
 					return true;
 				}
-				
 			});
 			connection.addPacketSendingListener(new PacketListener() {
 	
@@ -769,7 +773,6 @@ public class AndroidCommsBase implements XMPPAgent {
 				public boolean accept(Packet packet) {
 					return true;
 				}
-				
 			});
 		}
 	}
