@@ -40,7 +40,8 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 public interface IActivityFeedManager {
     /**
      *
-     * @param owner The id of the existing or new ActivityFeed
+     * @param owner The owner id of the existing or new ActivityFeed, this would typically be a CSS jid.
+     * @param feedId The id of the existing or new ActivityFeed.
      * @return {@link IActivityFeed}
      */
     public IActivityFeed getOrCreateFeed(String owner, String feedId);
