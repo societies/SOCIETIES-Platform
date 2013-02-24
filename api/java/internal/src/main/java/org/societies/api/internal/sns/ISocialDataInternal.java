@@ -3,7 +3,9 @@ package org.societies.api.internal.sns;
 import java.util.List;
 import java.util.Map;
 
-public interface ISocialData {
+import org.societies.api.sns.ISocialConnector;
+
+public interface ISocialDataInternal extends org.societies.api.sns.ISocialData{
 
 	// verbs
 	public static final String POST = "post";
@@ -26,16 +28,6 @@ public interface ISocialData {
 	public static final String PLACE = "places";
 	public static final String CHECKIN = "checkin";	
 	
-	public static final String POST_NAME = "name";
-	public static final String POST_TYPE = "type";	
-	public static final String POST_LAT = "lat";
-	public static final String POST_LON = "lon";
-	public static final String POST_FROM = "from";
-	public static final String POST_TO 	 = "to";
-	public static final String POST_MESSAGE = "message";
-	public static final String POST_PLACE = "place";
-	public static final String POST_DESCR = "description";
-	public static final String POST_LOCATION = "location";
 	
 	
 	
@@ -46,7 +38,7 @@ public interface ISocialData {
      * @param socialConnector Interface of the specific connector
      * @throws Exception 
      */
-    void addSocialConnector(ISocialConnector social) throws Exception;
+    void addSocialConnector(ISocialConnectorInternal social) throws Exception;
     
     /**
      * Remove a social connector by his unique ID
@@ -60,13 +52,13 @@ public interface ISocialData {
      * @param connectorId
      * @throws Exception 
      */
-    void removeSocialConnector(ISocialConnector connector) throws Exception;
+    void removeSocialConnector(ISocialConnectorInternal connector) throws Exception;
     
     /**
      * Provide a list of the available social connector
      * @return List of Social Connector
      */
-    List<ISocialConnector> getSocialConnectors();
+    List<ISocialConnectorInternal> getSocialConnectors();
     
     /**
      * Provide the list of Profiles coming from different social Networks
@@ -109,7 +101,7 @@ public interface ISocialData {
       * @param params  to generate correctly the connector (Must be present the token)
       * @return the implementation of the spicific social connector castest as the interfeace ISocialConnector
       */
-    ISocialConnector createConnector(ISocialConnector.SocialNetwork socialNetworkName, Map<String, String> params);
+    ISocialConnectorInternal createConnector(ISocialConnector.SocialNetwork socialNetworkName, Map<String, String> params);
     
     
     /**
@@ -117,7 +109,7 @@ public interface ISocialData {
      * @param connector Connetor instance
      * @return boolean
      */
-    boolean isAvailable(ISocialConnector connector);
+    boolean isAvailable(ISocialConnectorInternal connector);
     
     
     /**

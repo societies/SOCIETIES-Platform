@@ -43,9 +43,11 @@ import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialDataInternal;
+import org.societies.api.sns.ISocialConnector;
+import org.societies.api.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.sns.ISocialData;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 /**
@@ -65,7 +67,7 @@ public class SocialDataServer implements IFeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(SocialDataServer.class);
 	
 	private ICommManager commManager;
-	private ISocialData socialData;
+	private ISocialDataInternal socialData;
 	
 	public ICommManager getCommManager() {
 		return commManager;
@@ -75,11 +77,11 @@ public class SocialDataServer implements IFeatureServer {
 		this.commManager = commManager;
 	}
 		
-	public ISocialData getSocialData() {
+	public ISocialDataInternal getSocialData() {
 		return socialData;
 	}
 
-	public void setSocialData(ISocialData socialData) {
+	public void setSocialData(ISocialDataInternal socialData) {
 		this.socialData = socialData;
 	}
 
@@ -131,10 +133,10 @@ public class SocialDataServer implements IFeatureServer {
 			
 			switch(messageBean.getMethod()) {	
 			case GET_CONNECTOR_LIST:
-				List<ISocialConnector> connectors = socialData.getSocialConnectors();
+				List<ISocialConnectorInternal> connectors = socialData.getSocialConnectors();
 						
 				List<ConnectorBean> connectorBeanList = new ArrayList<ConnectorBean>(connectors.size());
-				for(ISocialConnector connector:connectors) 
+				for(ISocialConnectorInternal connector:connectors) 
 					connectorBeanList.add(SocialDataCommsUtils.convertSocialConnectorToBean(connector));
 				
 				ConnectorsList connectorsList = new ConnectorsList();				
@@ -166,10 +168,10 @@ public class SocialDataServer implements IFeatureServer {
 				SocialNetwork socialNetwork = SocialDataCommsUtils.socialNetwork(messageBean.getSnName());
 				long validity = messageBean.getValidity(); // TODO if 0 remove connector
 				Map<String, String> params = new HashMap<String, String>();
-				params.put(ISocialConnector.AUTH_TOKEN, messageBean.getToken());
-				params.put(ISocialConnector.IDENTITY,   messageBean.getIdentity());
+				params.put(ISocialConnectorInternal.AUTH_TOKEN, messageBean.getToken());
+				params.put(ISocialConnectorInternal.IDENTITY,   messageBean.getIdentity());
 
-				ISocialConnector connector = socialData.createConnector(socialNetwork, params);
+				ISocialConnectorInternal connector = socialData.createConnector(socialNetwork, params);
 				connector.setTokenExpiration(validity);
 				
 				socialData.addSocialConnector(connector);			

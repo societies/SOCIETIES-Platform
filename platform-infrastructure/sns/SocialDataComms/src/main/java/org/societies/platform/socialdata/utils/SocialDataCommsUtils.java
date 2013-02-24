@@ -34,8 +34,9 @@ import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialDataMethod;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.sns.ISocialConnector;
+import org.societies.api.sns.ISocialConnector.SocialNetwork;
 import org.societies.platform.socialdata.SocialConnectorDTO;
 
 /**
@@ -51,7 +52,7 @@ public class SocialDataCommsUtils {
 	
 	public static final String PARAM_NAME_VALIDITY = "validity";
 
-	public static Socialnetwork socialNetwork(ISocialConnector.SocialNetwork socialNetwork) {
+	public static Socialnetwork socialNetwork(ISocialConnectorInternal.SocialNetwork socialNetwork) {
 		return Socialnetwork.fromValue(socialNetwork.name().toLowerCase());
 	}
 	
@@ -105,7 +106,7 @@ public class SocialDataCommsUtils {
 		return messageBean;
 	}
 	
-	public static ConnectorBean convertSocialConnectorToBean(ISocialConnector socialConnector) {
+	public static ConnectorBean convertSocialConnectorToBean(ISocialConnectorInternal socialConnector) {
 		ConnectorBean connectorBean = new ConnectorBean();
 		
 		connectorBean.setId(socialConnector.getID());
@@ -115,15 +116,15 @@ public class SocialDataCommsUtils {
 		return connectorBean;
 	}
 	
-	public static List<ISocialConnector> convertConnectorBeanListToSocialConnectorList(ConnectorsList connectorsList) {
+	public static List<ISocialConnectorInternal> convertConnectorBeanListToSocialConnectorList(ConnectorsList connectorsList) {
 		List<ConnectorBean> connectorBeanList = connectorsList.getConnectorBean();
-		List<ISocialConnector> socialConnectorsList = new ArrayList<ISocialConnector>(connectorBeanList.size());
+		List<ISocialConnectorInternal> socialConnectorsList = new ArrayList<ISocialConnectorInternal>(connectorBeanList.size());
 		for(ConnectorBean connectorBean:connectorBeanList)
 			socialConnectorsList.add(convertBeanToSocialConnector(connectorBean));
 		return socialConnectorsList;
 	}
 	
-	public static ISocialConnector convertBeanToSocialConnector(ConnectorBean connectorBean) {
+	public static ISocialConnectorInternal convertBeanToSocialConnector(ConnectorBean connectorBean) {
 		return SocialConnectorDTO.createFromBean(connectorBean);
 	}
 }

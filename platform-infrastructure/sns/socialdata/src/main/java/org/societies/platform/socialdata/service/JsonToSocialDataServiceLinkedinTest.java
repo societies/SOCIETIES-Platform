@@ -1,7 +1,7 @@
 package org.societies.platform.socialdata.service;
 
 
-import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
 import org.societies.platform.sns.connecor.linkedin.LinkedinConnector;
 
 
@@ -12,7 +12,7 @@ public class JsonToSocialDataServiceLinkedinTest {
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");
 		String access_token = "";
-		ISocialConnector c = new LinkedinConnector(access_token,"luca");
+		ISocialConnectorInternal c = new LinkedinConnector(access_token,"luca");
 
 		
 		// Test FRIENDS PART

@@ -2,8 +2,8 @@ package org.societies.api.internal.personalisation;
 
 import java.util.List;
 
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialDataInternal;
 
 
 
@@ -14,13 +14,13 @@ public interface ISocialProfiler  {
 	 * Add a new Social Network connector to fetch social data
 	 * @param connector
 	 */
-	public void addSocialNetwork(List<ISocialConnector> connectors);
+	public void addSocialNetwork(List<ISocialConnectorInternal> connectors);
 	
 	/**
 	 * Remove a connector from the connectors list
 	 * @param connector
 	 */
-	public void removeSocialNetwork(List<ISocialConnector> connectors);
+	public void removeSocialNetwork(List<ISocialConnectorInternal> connectors);
 	
 	/**
 	 * Set frequency on how the graph will be updated
@@ -38,19 +38,19 @@ public interface ISocialProfiler  {
 	 * Get a list of all the available connectors
 	 * @return List<ISocialConnector>
 	 */
-	public List<ISocialConnector> getListOfLinkedSN();
+	public List<ISocialConnectorInternal> getListOfLinkedSN();
 	
 	/**
 	 * Get instance of ISocialData 
 	 * @return ISocialData interdace
 	 */
-	public ISocialData getSocialdata();
+	public ISocialDataInternal getSocialdata();
 
 	/**
 	 * Set an instanco of ISocialData
 	 * @param socialdata inferface
 	 */
-	public void setSocialdata(ISocialData socialdata);
+	public void setSocialdata(ISocialDataInternal socialdata);
 	
 	
 }

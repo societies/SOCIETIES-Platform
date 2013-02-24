@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
 import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
 import org.societies.platform.socialdata.converters.ActivityConverterFromTwitter;
 import org.societies.platform.socialdata.converters.FriendsConverterFromTwitter;
@@ -22,7 +22,7 @@ public class JsonToSocialDataServiceTwitterTest {
 		String access_token = "";
 //		String access_token = "";
 //		String access_token = " , ";
-		ISocialConnector c = new TwitterConnectorImpl(access_token,"dingqi");
+		ISocialConnectorInternal c = new TwitterConnectorImpl(access_token,"dingqi");
 
 		//		friends test
 		try {

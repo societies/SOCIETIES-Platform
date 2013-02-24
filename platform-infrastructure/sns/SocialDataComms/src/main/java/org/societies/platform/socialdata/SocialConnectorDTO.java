@@ -27,7 +27,8 @@ package org.societies.platform.socialdata;
 import java.util.Map;
 
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
-import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.sns.ISocialConnector;
 
 /**
  * Social connector implemented as a data transfer object 
@@ -36,7 +37,7 @@ import org.societies.api.internal.sns.ISocialConnector;
  * @author Edgar Domingues (PTIN)
  *
  */
-public class SocialConnectorDTO implements ISocialConnector {
+public class SocialConnectorDTO implements ISocialConnectorInternal {
 
 	private String id, token, name;
 	private long expires;
@@ -135,12 +136,27 @@ public class SocialConnectorDTO implements ISocialConnector {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
-	public static ISocialConnector createFromBean(ConnectorBean bean) {
-		ISocialConnector socialConnector = new SocialConnectorDTO(bean.getId());
+	public static ISocialConnectorInternal createFromBean(ConnectorBean bean) {
+		ISocialConnectorInternal socialConnector = new SocialConnectorDTO(bean.getId());
 		socialConnector.setConnectorName(bean.getName());
 		socialConnector.setToken(bean.getToken());
 		socialConnector.setTokenExpiration(bean.getExpires());
 		return socialConnector;
+	}
+
+	@Override
+	public String getApiKey() {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public String getApiSecret() {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public String getCallabackURL() {
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 }

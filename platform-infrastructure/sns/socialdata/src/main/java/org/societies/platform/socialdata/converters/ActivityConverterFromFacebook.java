@@ -19,8 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.SocialData;
+import org.societies.api.internal.sns.ISocialDataInternal;
 import org.societies.platform.socialdata.model.ActionLink;
 
 public class ActivityConverterFromFacebook implements ActivityConverter {
@@ -115,7 +114,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				entry.setActor(setActor(elm.getString(FROM)));
 				
 				entry.setProvider(providerObj);  // FIX with facebook
-				entry.setVerb(ISocialData.POST);
+				entry.setVerb(ISocialDataInternal.POST);
 				entry.setUpdated(elm.getString(UPDATED_TIME));
 				entry.setPublished(elm.getString(CREATED_TIME));
 			
@@ -188,7 +187,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	     Matcher m1 = p1.matcher(story);
 	     if (m1.find()){
 	    	 
-	    	 entry.setVerb(ISocialData.TAG);
+	    	 entry.setVerb(ISocialDataInternal.TAG);
 	    	 entry.setObject(entry.getActor());
 	    	 
 	    	 ActivityObject aObj = new ActivityObjectImpl();
@@ -197,7 +196,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				
 	    	 
 	    	 if (m1.group(2)!=null){
-	    		aObj.setObjectType(ISocialData.COLLECTION);
+	    		aObj.setObjectType(ISocialDataInternal.COLLECTION);
 				aObj.setDisplayName(m1.group(2));
 	    	 }
 	    	 else{
@@ -213,11 +212,11 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	     Matcher m2 = p2.matcher(story);
 	     if (m2.find()){
 	    	 
-	    	 entry.setVerb(ISocialData.POST);
+	    	 entry.setVerb(ISocialDataInternal.POST);
 	    	 entry.setContent(m2.group(1));
 	    	
 	    	 ActivityObject object = new ActivityObjectImpl();
-	    	 object.setObjectType(ISocialData.COMMENT);
+	    	 object.setObjectType(ISocialDataInternal.COMMENT);
 	    	 entry.setObject(object);
 	    	 
 	    	 ActivityObject target = new ActivityObjectImpl();
@@ -248,7 +247,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			}
 			
 			
-			entry.setVerb(ISocialData.MAKE_FRIEND);
+			entry.setVerb(ISocialDataInternal.MAKE_FRIEND);
 			fb_user user = users.get(0);
 			ActivityObject object = new ActivityObjectImpl();
 			object.setDisplayName(user.name);
@@ -261,7 +260,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 					
 					ActivityEntry activity = new ActivityEntryImpl();
 					activity.setActor(entry.getActor());
-					activity.setVerb(ISocialData.MAKE_FRIEND);
+					activity.setVerb(ISocialDataInternal.MAKE_FRIEND);
 					activity.setContent(entry.getContent());
 					
 					ActivityObject object1 = new ActivityObjectImpl();
@@ -308,7 +307,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 
 			
 			
-			entry.setVerb(ISocialData.LIKE);
+			entry.setVerb(ISocialDataInternal.LIKE);
 			
 			if (users.size()>0){
 				fb_user user = users.get(0);
@@ -325,7 +324,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 
 						ActivityEntry activity = new ActivityEntryImpl();
 						activity.setActor(entry.getActor());
-						activity.setVerb(ISocialData.LIKE);
+						activity.setVerb(ISocialDataInternal.LIKE);
 						activity.setContent(entry.getContent());
 
 						ActivityObject object1 = new ActivityObjectImpl();
@@ -344,9 +343,9 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		 Pattern p5 = Pattern.compile(".* (?:changed|updated) .* (?:picture|photo).");
 		 Matcher m5 = p5.matcher(story);
 		 if (m5.find()){
-			 entry.setVerb(ISocialData.UPDATE);
+			 entry.setVerb(ISocialDataInternal.UPDATE);
 			 ActivityObject obj = new ActivityObjectImpl();
-			 obj.setObjectType(ISocialData.PERSON);
+			 obj.setObjectType(ISocialDataInternal.PERSON);
 			 obj.setDisplayName(entry.getActor().getDisplayName());
 			 entry.setObject(obj);
 			 return;
@@ -359,12 +358,12 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		     Matcher m6 = p6.matcher(story);
 		     if (m6.find()){
 		    	 
-		    	 	entry.setVerb(ISocialData.POST);
+		    	 	entry.setVerb(ISocialDataInternal.POST);
 		    	 	ActivityObject obj = new ActivityObjectImpl();
 		    	 	obj.setObjectType(genType(elm.getString(TYPE)));
 		    	 	entry.setObject(obj);
 		    	 	ActivityObject target = new ActivityObjectImpl();
-		    	 	target.setObjectType(ISocialData.COLLECTION);
+		    	 	target.setObjectType(ISocialDataInternal.COLLECTION);
 		    	 	target.setDisplayName(m6.group(2));
 		    	 	entry.setTarget(target);
 		    	 	
@@ -393,14 +392,14 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			 Pattern p7 = Pattern.compile(".* went to (.*) at (.*).");
 		     Matcher m7 = p7.matcher(story);
 		     if (m7.find()){		    	 
-		    	 entry.setVerb(ISocialData.ATTEND);
+		    	 entry.setVerb(ISocialDataInternal.ATTEND);
 		    	 ActivityObject obj = new ActivityObjectImpl();
-		    	 obj.setObjectType(ISocialData.EVENT);
+		    	 obj.setObjectType(ISocialDataInternal.EVENT);
 		    	 obj.setDisplayName(m7.group(1));
 		    	 entry.setObject(obj);
 		    	 
 		    	 ActivityObject target = new ActivityObjectImpl();
-		    	 target.setObjectType(ISocialData.PLACE);
+		    	 target.setObjectType(ISocialDataInternal.PLACE);
 		    	 target.setDisplayName(m7.group(2));
 		    	 entry.setTarget(target);
 		    	 
@@ -410,9 +409,9 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		     Pattern p8 = Pattern.compile(".* shared a link.");
 		     Matcher m8 = p8.matcher(story);
 		     if (m8.find()){
-		    	 entry.setVerb(ISocialData.SHARE);
+		    	 entry.setVerb(ISocialDataInternal.SHARE);
 		    	 ActivityObject obj = new ActivityObjectImpl();
-		    	 obj.setObjectType(ISocialData.BOOKMARK);
+		    	 obj.setObjectType(ISocialDataInternal.BOOKMARK);
 		    	 obj.setDisplayName(elm.getString("name"));
 		    	 
 		    	 if (elm.has(LINK)) obj.setUrl(elm.getString(LINK));
@@ -425,11 +424,11 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			 Pattern p10 = Pattern.compile(".* asked: (.*).");
 		     Matcher m10 = p10.matcher(story);
 		     if (m10.find()){
-		    	 entry.setVerb(ISocialData.POST);
+		    	 entry.setVerb(ISocialDataInternal.POST);
 		    	 entry.setContent(m10.group(1));
 		    	 
 		    	 ActivityObject obj = new ActivityObjectImpl();
-		    	 obj.setObjectType(ISocialData.QUESTION);
+		    	 obj.setObjectType(ISocialDataInternal.QUESTION);
 		    	 entry.setObject(obj);
 		    	 return;
 		     }
@@ -438,15 +437,15 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			 Pattern p11 = Pattern.compile(".* answered (.*) with (.*).");
 		     Matcher m11 = p11.matcher(story);
 		     if (m11.find()){
-		    	 entry.setVerb(ISocialData.POST);
+		    	 entry.setVerb(ISocialDataInternal.POST);
 		    	 entry.setContent(m11.group(2));
 		    	 
 		    	 ActivityObject obj = new ActivityObjectImpl();
-		    	 obj.setObjectType(ISocialData.NOTE);
+		    	 obj.setObjectType(ISocialDataInternal.NOTE);
 		    	 entry.setObject(obj);
 		    	 
 		    	 ActivityObject target = new ActivityObjectImpl();
-		    	 target.setObjectType(ISocialData.QUESTION);
+		    	 target.setObjectType(ISocialDataInternal.QUESTION);
 		    	 target.setDisplayName(m11.group(1));
 		    	 entry.setTarget(target);
 		    	 
@@ -462,13 +461,13 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 
 
 	private String genType(String string) {
-		if ("photo".equalsIgnoreCase(string)) 			return ISocialData.IMAGE;
-		else if ("link".equalsIgnoreCase(string)) 		return ISocialData.BOOKMARK;
-		else if ("status".equalsIgnoreCase(string)) 	return ISocialData.NOTE;
-		else if ("wall".equalsIgnoreCase(string)) 		return ISocialData.COLLECTION;
-		else if ("timeline".equalsIgnoreCase(string)) 	return ISocialData.COLLECTION;
-		else if ("user".equalsIgnoreCase(string)) 		return ISocialData.PERSON;
-		else if ("page".equalsIgnoreCase(string)) 		return ISocialData.BOOKMARK;
+		if ("photo".equalsIgnoreCase(string)) 			return ISocialDataInternal.IMAGE;
+		else if ("link".equalsIgnoreCase(string)) 		return ISocialDataInternal.BOOKMARK;
+		else if ("status".equalsIgnoreCase(string)) 	return ISocialDataInternal.NOTE;
+		else if ("wall".equalsIgnoreCase(string)) 		return ISocialDataInternal.COLLECTION;
+		else if ("timeline".equalsIgnoreCase(string)) 	return ISocialDataInternal.COLLECTION;
+		else if ("user".equalsIgnoreCase(string)) 		return ISocialDataInternal.PERSON;
+		else if ("page".equalsIgnoreCase(string)) 		return ISocialDataInternal.BOOKMARK;
 		
 		else return string.toLowerCase();
  		
@@ -519,7 +518,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			actor.setId(elm.getString(ID));
 			actor.setDisplayName(elm.getString(AUTHOR_NAME));
 			actor.setUrl(imageUrl.replaceAll("FBID", actor.getId()));
-			actor.setObjectType(ISocialData.PERSON);
+			actor.setObjectType(ISocialDataInternal.PERSON);
 		
 		} catch (JSONException e) {
 			e.printStackTrace();

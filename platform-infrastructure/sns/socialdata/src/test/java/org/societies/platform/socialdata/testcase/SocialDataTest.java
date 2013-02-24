@@ -3,16 +3,13 @@ package org.societies.platform.socialdata.testcase;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
@@ -22,11 +19,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
-import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.ContextUpdater;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialDataInternal;
+import org.societies.api.sns.ISocialConnector.SocialNetwork;
 import org.societies.platform.socialdata.SocialData;
 
 
@@ -34,11 +29,11 @@ public class SocialDataTest {
 
 
 	private static String access_token = "";
-	private static ISocialConnector fbConnector=null;
-	private static ISocialData		socialData =null;
+	private static ISocialConnectorInternal fbConnector=null;
+	private static ISocialDataInternal		socialData =null;
 	private static final Logger logger   = Logger.getLogger(SocialDataTest.class.getSimpleName());
 
-	private static ISocialConnector mockedSocialConnector; 
+	private static ISocialConnectorInternal mockedSocialConnector; 
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -46,7 +41,7 @@ public class SocialDataTest {
 
 
 
-		mockedSocialConnector = mock(ISocialConnector.class);
+		mockedSocialConnector = mock(ISocialConnectorInternal.class);
 		stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
 		stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
 		stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
@@ -193,13 +188,13 @@ public class SocialDataTest {
 
 	@Test
 	public void printConnectors(){
-		List<ISocialConnector> connectors = null;
+		List<ISocialConnectorInternal> connectors = null;
 		connectors = socialData.getSocialConnectors();
 		assertNotNull("Connector list is null", connectors);
-		Iterator<ISocialConnector> it = connectors.iterator();
+		Iterator<ISocialConnectorInternal> it = connectors.iterator();
 		int index =1;
 		while(it.hasNext()){
-			ISocialConnector conn = it.next();
+			ISocialConnectorInternal conn = it.next();
 			logger.info(index +"] Connector for " +conn.getConnectorName() + " ID: "+conn.getID());
 			index++;
 		}

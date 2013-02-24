@@ -1,21 +1,18 @@
 package org.societies.css.mgmt;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.List;
 
-import javax.xml.bind.JAXBException;
-
+import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -40,11 +37,21 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.CSSNode;
 import org.societies.api.internal.css.ICSSInternalManager;
-import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.css.cssRegistry.ICssRegistry;
+import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
 import org.societies.api.internal.css.management.ICSSLocalManager;
-import org.societies.api.css.ICSSManager;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialDataInternal;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -52,28 +59,13 @@ import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
-import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.sns.ISocialConnector;
+import org.societies.api.sns.ISocialData;
+import org.societies.utilities.DBC.Dbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.societies.api.internal.css.cssRegistry.ICssRegistry;
-import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.utilities.DBC.Dbc;
-
-import org.societies.api.schema.servicelifecycle.model.Service;
-
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialData;
-//import org.societies.platform.socialdata.SocialData;
-
-import org.apache.shindig.social.opensocial.model.Person;
-
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
 
 public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
@@ -819,15 +811,15 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-	private ISocialData socialdata;
+	private ISocialDataInternal socialdata;
 
 	//Spring injection
 
-	public ISocialData getSocialData() {
+	public ISocialDataInternal getSocialData() {
 		return socialdata;
 	}
 
-	public void setSocialData(ISocialData socialData) {
+	public void setSocialData(ISocialDataInternal socialData) {
 		this.socialdata = socialData;
 	}
 
@@ -1361,7 +1353,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	LOG.info("getSocialData() returns " +getSocialData());
 
 	// Generate the connector
-	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+	Iterator<ISocialConnectorInternal> it = socialdata.getSocialConnectors().iterator();
 	socialdata.updateSocialData();
 
 	while (it.hasNext()){
@@ -1671,7 +1663,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	LOG.info("getSocialData() returns " +getSocialData());
 
 	// Generate the connector
-	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+	Iterator<ISocialConnectorInternal> it = socialdata.getSocialConnectors().iterator();
 	socialdata.updateSocialData();
 
 	while (it.hasNext()){

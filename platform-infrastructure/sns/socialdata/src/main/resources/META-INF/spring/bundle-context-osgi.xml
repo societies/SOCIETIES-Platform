@@ -12,7 +12,7 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container
     -->
-     <osgi:service ref="iSocialData" 		interface="org.societies.api.internal.sns.ISocialData"/>
+     <osgi:service ref="iSocialData" 		interface="org.societies.api.internal.sns.ISocialDataInternal"/>
      <osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
 	 <osgi:reference id="commsMgr" 			interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	

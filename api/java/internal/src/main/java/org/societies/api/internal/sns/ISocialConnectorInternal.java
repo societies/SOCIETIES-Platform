@@ -1,38 +1,10 @@
 package org.societies.api.internal.sns;
 
-import java.io.Serializable;
 import java.util.Map;
 
 
+public interface ISocialConnectorInternal extends org.societies.api.sns.ISocialConnector {
 
-public interface ISocialConnector extends Serializable {
-
-	
-	public final static String FACEBOOK_CONN 		= "facebook";
-	public final static String TWITTER_CONN  		= "twitter";
-	public final static String FOURSQUARE_CONN 		= "foursquare";
-	public final static String LINKEDIN_CONN 		= "linkedin";
-	public final static String GOOGLEPLUS_CONN 		= "googleplus";
-	
-	public enum SocialNetwork{
-		Facebook,
-		Foursquare,
-		twitter,
-		linkedin,
-		googleplus;
-		
-		private final String value = "";
-		
-		public static SocialNetwork fromValue(String v) {
-	        for (SocialNetwork c: SocialNetwork.values()) {
-	            if (c.value.equals(v)) {
-	                return c;
-	            }
-	        }
-	        throw new IllegalArgumentException(v);
-	    }
-	}
-	
 	
 	/**
 	 * Constants
@@ -40,6 +12,10 @@ public interface ISocialConnector extends Serializable {
 	public final static String AUTH_TOKEN 			= "auth_token";
 	public final static String IDENTITY 			= "identity";
 
+	
+	/**
+	 * Enumeration Social Data type 
+	 */
 	
 	public enum  SocialDataType{
 		PROFILE,
@@ -49,12 +25,6 @@ public interface ISocialConnector extends Serializable {
 	}
 	
 	/**
-	 * Get Social Connector id, because for a single social network there can be more than one instance for the same user.
-	 * @return unique string, which the first part should contains the name of the SN
-	 */
-	String getID();
-	
-	/**
 	 * Set token to access social network data
 	 * @param access_token  
 	 */
@@ -62,7 +32,7 @@ public interface ISocialConnector extends Serializable {
 	
 	
 	/**
-	 * set token expiration time
+	 * Set token expiration time
 	 */
 	void setTokenExpiration(long expires);
 	
@@ -155,12 +125,14 @@ public interface ISocialConnector extends Serializable {
      */
     String getUserGroups();
     
-    /**
-     * This method write a message in the social network by using the connector.
-     * 
-     * @param activity MUST be a JSON document to allow the connector to post in the right way the post
-     */
-    void post(String activityEntry);
+    
+    String getApiKey();
+    
+    
+    String getApiSecret();
+    
+    
+    String getCallabackURL();
     
     
 }

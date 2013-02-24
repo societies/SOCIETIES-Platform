@@ -1,18 +1,12 @@
 package org.societies.platform.socialdata.service;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
 import org.societies.platform.socialdata.SocialData;
-import org.societies.platform.socialdata.converters.ActivityConverterFromFacebook;
-import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
 
 
 
@@ -50,11 +44,14 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "";
-		  HashMap<String, String> pars = new HashMap<String, String>();
-		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
+		  String access_token = "98d8df36-b9fc-41bf-abd6-0ab97f07247e,d73af323-2ff8-4625-b919-748576221396";
 		  
-		  ISocialConnector c = sd.createConnector(ISocialConnector.SocialNetwork.Facebook, pars);
+		  
+		  
+		  HashMap<String, String> pars = new HashMap<String, String>();
+		  pars.put(ISocialConnectorInternal.AUTH_TOKEN, access_token);
+		  
+		  ISocialConnectorInternal c = sd.createConnector(ISocialConnectorInternal.SocialNetwork.linkedin, pars);
 		  
 		 
 		  
@@ -79,11 +76,10 @@ public class JsonToSocialDataService {
 //		}
 		  
 		  
-		  String data = c.getUserProfile();
+		  String data = c.getUserActivities();
 		  logger.info("profile Data:"+data);
 		  System.out.println("data:"+data);
-		  PersonConverterFromFacebook parser = new PersonConverterFromFacebook();
-		  Person p = parser.load(data);
+		  
 		  
 		  
 	  }

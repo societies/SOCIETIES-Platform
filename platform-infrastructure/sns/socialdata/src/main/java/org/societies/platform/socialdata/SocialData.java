@@ -1,6 +1,5 @@
 package org.societies.platform.socialdata;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.ISOSignatureSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -27,9 +27,11 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
-import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialDataInternal;
+import org.societies.api.sns.ISocialConnector;
+import org.societies.api.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.sns.ISocialData;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
@@ -45,11 +47,10 @@ import org.societies.platform.socialdata.converters.PersonConverterFactory;
 import org.springframework.stereotype.Service;
 
 import com.restfb.json.JsonObject;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 
 @Service
-public class SocialData implements ISocialData{
+public class SocialData implements ISocialDataInternal{
 
 
 	private static final Logger logger = LoggerFactory.getLogger(SocialData.class);
@@ -94,7 +95,7 @@ public class SocialData implements ISocialData{
 	}
 
 	
-	HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
+	HashMap<String, ISocialConnectorInternal> connectors = new HashMap<String, ISocialConnectorInternal>();
 
 	Map<String, Object> 			socialFriends;
 	Map<String, Object>				socialGroups;
@@ -175,8 +176,8 @@ public class SocialData implements ISocialData{
 							logger.info("connector bean:"+connectorBlob);
 							
 							HashMap<String, String> params = new HashMap<String, String>();
-							params.put(ISocialConnector.AUTH_TOKEN, connectorBlob.getToken());
-							params.put(ISocialConnector.IDENTITY, connectorBlob.getIdentity());
+							params.put(ISocialConnectorInternal.AUTH_TOKEN, connectorBlob.getToken());
+							params.put(ISocialConnectorInternal.IDENTITY, connectorBlob.getIdentity());
 							
 							connectorsInCtxBroker.put(connectorBlob.getId(), ctxConn.getId());
 							this.addSocialConnector(createConnector(getSocialNetowkName(connectorBlob.getSnName()), params));
@@ -232,7 +233,7 @@ public class SocialData implements ISocialData{
 	 
 	
 	@Override
-	public void addSocialConnector(ISocialConnector socialConnector) throws Exception {
+	public void addSocialConnector(ISocialConnectorInternal socialConnector) throws Exception {
 		
 		if (connectors.containsKey(socialConnector.getID())){
 			logger.warn("the connector id :"+socialConnector.getID() +" is already loaded");
@@ -280,6 +281,7 @@ public class SocialData implements ISocialData{
 				internalCtxBroker.remove(connectorsInCtxBroker.get(connectorId));
 				connectorsInCtxBroker.remove(connectorId);
 				logger.info("Removed Connector ID:"+connectorId + " from CtxBroker");
+				updateSocialData();
 			}
 			
 		}
@@ -290,9 +292,9 @@ public class SocialData implements ISocialData{
 
 
 	@Override
-	public List<ISocialConnector> getSocialConnectors() {
-		Iterator<ISocialConnector>it = connectors.values().iterator();
-		List <ISocialConnector> list = new ArrayList<ISocialConnector>();
+	public List<ISocialConnectorInternal> getSocialConnectors() {
+		Iterator<ISocialConnectorInternal>it = connectors.values().iterator();
+		List <ISocialConnectorInternal> list = new ArrayList<ISocialConnectorInternal>();
 		while (it.hasNext()){
 			list.add(it.next());
 		}
@@ -329,11 +331,17 @@ public class SocialData implements ISocialData{
 	@Override
 	public void updateSocialData() {
 		
-		Iterator<ISocialConnector>it = connectors.values().iterator();
+		
+		socialActivities.clear();
+		socialFriends.clear();
+		socialGroups.clear();
+		socialProfiles.clear();
+		
+		Iterator<ISocialConnectorInternal>it = connectors.values().iterator();
 		
 		socialActivities = new HashMap<String, Object>();  // reset old Activities
 		while (it.hasNext()){
-			ISocialConnector connector = it.next();
+			ISocialConnectorInternal connector = it.next();
 			
 			getActivities(connector);
 			updateProfile(connector);
@@ -352,7 +360,7 @@ public class SocialData implements ISocialData{
 
 
 
-	private void updateGroups(ISocialConnector connector) {
+	private void updateGroups(ISocialConnectorInternal connector) {
 		GroupConverter parser = GroupConveterFactory.getPersonConverter(connector);
 		List<Group> groups = parser.load(connector.getUserGroups());
 		Iterator<Group> it = groups.iterator();
@@ -371,7 +379,7 @@ public class SocialData implements ISocialData{
 	}
 
 
-	private void getActivities(ISocialConnector connector) {
+	private void getActivities(ISocialConnectorInternal connector) {
 
 		ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
 		List<?> activities = parser.load(connector.getUserActivities());
@@ -379,7 +387,7 @@ public class SocialData implements ISocialData{
 	}
 
 
-	private void updateFriends(ISocialConnector connector) {
+	private void updateFriends(ISocialConnectorInternal connector) {
 
 		FriendsConverter parser = FriendsConveterFactory.getPersonConverter(connector);
 		List<Person> friends = parser.load(connector.getUserFriends());
@@ -399,7 +407,7 @@ public class SocialData implements ISocialData{
 	}
 
 
-	private void updateProfile(ISocialConnector connector) {
+	private void updateProfile(ISocialConnectorInternal connector) {
 		
 		PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 		Person profile = parser.load(connector.getUserProfile());
@@ -437,7 +445,7 @@ public class SocialData implements ISocialData{
 	}
 
 	@Override
-	public boolean isAvailable(ISocialConnector connector) {
+	public boolean isAvailable(ISocialConnectorInternal connector) {
 
 		if (connector==null) return false;
 
@@ -446,7 +454,7 @@ public class SocialData implements ISocialData{
 
 
 	@Override
-	public void removeSocialConnector(ISocialConnector connector)
+	public void removeSocialConnector(ISocialConnectorInternal connector)
 			throws Exception {
 
 
@@ -459,34 +467,34 @@ public class SocialData implements ISocialData{
 	}
 
 	@Override
-	public ISocialConnector createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
+	public ISocialConnectorInternal createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
 		
 		String name="me";
 		try{
 			name=this.cssOwnerId.getJid();
-			if (params.containsKey(ISocialConnector.IDENTITY)) name=params.get(ISocialConnector.IDENTITY);
+			if (params.containsKey(ISocialConnectorInternal.IDENTITY)) name=params.get(ISocialConnectorInternal.IDENTITY);
 		}
 		catch(Exception ex){}
 
 		logger.info("Create a new connector with "+snName + " name");
 		switch(snName){
-		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
+		case Facebook:   return (ISocialConnectorInternal) new FacebookConnectorImpl(params.get(ISocialConnectorInternal.AUTH_TOKEN), name);
 
 		case twitter:    
 			// Just for now that we don't have a way to use our persona token
 			//return (ISocialConnector) new TwitterConnectorImpl();
-			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), name);
+			return (ISocialConnectorInternal) new TwitterConnectorImpl (params.get(ISocialConnectorInternal.AUTH_TOKEN), name);
 
 		case Foursquare: 
 
 			// Just for now ...
 			// return (ISocialConnector) new FoursquareConnectorImpl();
-			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
+			return (ISocialConnectorInternal) new FoursquareConnectorImpl(params.get(ISocialConnectorInternal.AUTH_TOKEN), name);
 
 		case linkedin: 
 
 
-			return (ISocialConnector) new LinkedinConnector(params.get(ISocialConnector.AUTH_TOKEN), name);
+			return (ISocialConnectorInternal) new LinkedinConnector(params.get(ISocialConnectorInternal.AUTH_TOKEN), name);
 
 		default : return null;
 		}
@@ -525,7 +533,7 @@ public class SocialData implements ISocialData{
 
 
 	private List<ISocialConnector> getConnectorsByName(SocialNetwork name){
-		Iterator <ISocialConnector> it = connectors.values().iterator();
+		Iterator <ISocialConnectorInternal> it = connectors.values().iterator();
 		ArrayList<ISocialConnector> results = new ArrayList<ISocialConnector>();
 		while (it.hasNext()){
 			ISocialConnector conn = it.next();
@@ -539,7 +547,7 @@ public class SocialData implements ISocialData{
 	private String genJsonPostMessage(Map<String,?> map){
 		String type = map.get(ISocialData.POST_TYPE).toString();
 		JsonObject result= new JsonObject(type);
-		if (type.equals(ISocialData.CHECKIN)){
+		if (type.equals(ISocialDataInternal.CHECKIN)){
 
 			//			Example:
 			//			String value="{ \"checkin\": {"+
@@ -582,6 +590,11 @@ public class SocialData implements ISocialData{
 		}
 
 		return result.toString(1);
+	}
+
+	@Override
+	public boolean isAvailable(org.societies.api.sns.ISocialConnector connector) {
+		return false;
 	}
 
 

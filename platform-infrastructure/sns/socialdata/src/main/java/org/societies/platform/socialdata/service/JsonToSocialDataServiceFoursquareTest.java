@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnectorInternal;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 import org.societies.platform.socialdata.converters.ActivityConverterFromFoursquare;
 import org.societies.platform.socialdata.converters.FriendsConverterFromFoursquare;
@@ -19,7 +19,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");
 		String access_token = "";
-		ISocialConnector c = new FoursquareConnectorImpl(access_token,"dingqi");
+		ISocialConnectorInternal c = new FoursquareConnectorImpl(access_token,"dingqi");
 
 		//		profile test
 		try {
