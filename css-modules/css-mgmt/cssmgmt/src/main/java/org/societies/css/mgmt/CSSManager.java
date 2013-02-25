@@ -1888,6 +1888,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext ownerCtxId: " +ownerCtxId);
 
 			String value;
+			List<CssNode> value1;
+			int value2;
 
 			// NAME
 			value = record.getName();
@@ -1900,42 +1902,49 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext EMAIL value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
-/*			
+			
 			// Entity
-			value = record.getName();
+			value2 = record.getEntity();
+			LOG.info("pushtoContext ENTITY value: " +value2);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ENTITY, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ENTITY, value2);
 
-			// Forename
-			value = record.getEmailID();
+			// ForeName
+			value = record.getForeName();
+			LOG.info("pushtoContext FORENAME value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FORENAME, value);
 			
 			// Sex
-			value = record.getName();
+			value2 = record.getSex();
+			LOG.info("pushtoContext SEX value: " +value2);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value2);
 
 			// CSS Identity
-			value = record.getEmailID();
+			value = record.getCssIdentity();
+			LOG.info("pushtoContext IDENTITY value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSIDENTITY, value);
 			
 			// CSS Nodes
-			value = record.getName();
+			value1 = record.getCssNodes();
+			LOG.info("pushtoContext CSSNODES value: " +value1);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSNODES, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSNODES, value1);
 
 			// Workplace
-			value = record.getEmailID();
+			value = record.getWorkplace();
+			LOG.info("pushtoContext WORKPLACE value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORKPLACE, value);
 			
 			// Position
-			value = record.getEmailID();
+			value = record.getPosition();
+			LOG.info("pushtoContext POSITION value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.POSITION, value);
-*/
+
 
 		} catch (InvalidFormatException ife) {
 
