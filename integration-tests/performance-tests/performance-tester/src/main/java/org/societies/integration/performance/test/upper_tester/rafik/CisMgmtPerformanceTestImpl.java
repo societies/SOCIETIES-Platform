@@ -39,12 +39,9 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.css.directory.ICssDirectoryCallback;
-import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
-import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -56,21 +53,14 @@ import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.Cis
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.CreateCisParameters;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.ICisMgmtPerformanceTest;
 import org.societies.integration.performance.test.upper_tester.rafik.cismgmt.JoinCisParameters;
-import org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.CssDirectoryCallback;
-import org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.ICssMgmtPerfromanceTest;
-import org.societies.integration.performance.test.upper_tester.rafik.cssmgmt.SendMultiFriendInvParameters;
 
 
-public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPerfromanceTest {
+public class CisMgmtPerformanceTestImpl implements ICisMgmtPerformanceTest{
 
-	private static Logger LOG = LoggerFactory.getLogger(PerformanceTestImpl.class);
+	private static Logger LOG = LoggerFactory.getLogger(CisMgmtPerformanceTestImpl.class);
 
 	private ICisManager cisManager;
 	private ICisManagerCallback cisManagerClientCallback;
-	
-	private ICSSInternalManager cssManager;
-	private ICssDirectoryRemote cssDirectoryRemote;
-	private ICssDirectoryCallback cssDirectoryCallback;
 	
 	private IPrivacyPolicyManager privacyPolicyManager;
 	
@@ -79,7 +69,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPer
 	private PerformanceLowerTester performanceLowerTester;
 	private PerformanceTestResult performanceTestResult;
 
-	public PerformanceTestImpl(){	
+	public CisMgmtPerformanceTestImpl(){	
 	}
 
 	public void setCisManager(ICisManager cisManager) {
@@ -99,26 +89,6 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPer
 		else {
 			LOG.info("### [PerformanceTestImpl] this.cisManager null");
 			return null;
-		}
-	}
-
-	public ICSSInternalManager getCssManager() 
-	{
-		if (null != cssManager) {
-			LOG.info("### [PerformanceTestImpl] this.cssManager not null");
-			return cssManager;
-		}
-		else {
-			LOG.info("### [PerformanceTestImpl] this.cssManager null");
-			return null;
-		}
-	}
-	
-	public void setCssManager(ICSSInternalManager cssManager) {
-		if (null != cisManager) 
-		{
-			LOG.info("### [PerformanceTestImpl] cssManager injected");
-			this.cssManager = cssManager;
 		}
 	}
 
@@ -150,21 +120,7 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPer
 			this.commManager = commManager;
 		}
 	}
-
-	/**
-	 * @return the cssDirectoryRemote
-	 */
-	public ICssDirectoryRemote getCssDirectoryRemote() {
-		return cssDirectoryRemote;
-	}
-
-	/**
-	 * @param cssDirectoryRemote the cssDirectoryRemote to set
-	 */
-	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
-		this.cssDirectoryRemote = cssDirectoryRemote;
-	}
-
+	
 	public ICommManager getCommManager()
 	{
 		if (null != commManager) {
@@ -176,7 +132,6 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPer
 			return null;
 		}
 	}
-
 
 	@Override
 	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, JoinCisParameters joinCisParameters) 
@@ -418,58 +373,5 @@ public class PerformanceTestImpl implements ICisMgmtPerformanceTest, ICssMgmtPer
 			performanceLowerTester.testFinish(performanceTestResult);
 		}
 		
-	}
-
-
-	@Override
-	public void sendMultiFriendInvTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, SendMultiFriendInvParameters sendMultiFriendInvParameters) {
-		
-		//The following 2 lines are mandatory in the beginning of the test 
-		performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
-		performanceLowerTester.testStart(this.getClass().getName(), getCommManager());
-		
-		if (null != sendMultiFriendInvParameters) 
-		{
-			String cssInvInitiatorId = sendMultiFriendInvParameters.getCssInvInitiatorId();
-			
-			String thisCss = null;
-			if (null != getCommManager()) 
-			{ 
-				thisCss = getCommManager().getIdManager().getThisNetworkNode().getBareJid();
-			}
-
-			if (null != thisCss && null != cssInvInitiatorId && !"".equals(cssInvInitiatorId)) 
-			{
-				//This node is the initiator or the invitation
-				if (thisCss.equals(cssInvInitiatorId)) 
-				{	
-					cssDirectoryCallback = new CssDirectoryCallback(performanceLowerTester, cssManager); 
-					
-					cssDirectoryRemote.findAllCssAdvertisementRecords(cssDirectoryCallback);
-					
-				}
-//				//This node will receive the invitation
-//				else
-//				{
-//					
-//				}
-			}
-			else
-			{
-				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "The cssInvInitiatorId is null or empty and/or commsManager is null !",
-						PerformanceTestResult.ERROR_STATUS);
-				performanceLowerTester.testFinish(performanceTestResult);
-			}
-		}
-		else
-		{
-			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "sendMultiFriendInvParameters are null!",
-					PerformanceTestResult.ERROR_STATUS);
-			performanceLowerTester.testFinish(performanceTestResult);
-		}
-		
-		
-	}
-
-	
+	}	
 }
