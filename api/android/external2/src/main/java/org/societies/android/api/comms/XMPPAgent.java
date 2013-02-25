@@ -16,7 +16,7 @@ public interface XMPPAgent {
 							  "getDomainAuthorityNode(String client, long remoteCallId)",
 							  "getItems(String client, String entity, String node, long remoteCallId)",
 							  "isConnected(String client, long remoteCallId)",
-							  "newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId)",
+							  "newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId, String host)",
 							  "login(String client, String identifier, String domain, String password, long remoteCallId)",
 							  "logout(String client, long remoteCallId)",
 							  "destroyMainIdentity(String client, long remoteCallId)",
@@ -77,24 +77,34 @@ public interface XMPPAgent {
 	public String getItems(String client, String entity, String node, long remoteCallId);
 	
 	public boolean isConnected(String client, long remoteCallId);
-	
-	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId);
 	/**
-	 * Allows a user to login to the a designated XMPP server
 	 * 
 	 * @param client Calling component's app package. Used to restrict broadcast of return value via intent.
 	 * @param identifier User's user name
-	 * @param domain XMPP Domain server (DNS name)
+	 * @param domain XMPP Domain server (service name)
+	 * @param password User's password
+	 * @param remoteCallId Callback identifier to allow ClientCommunicationMgr to invoke correct callback action
+	 * @param host IP address of XMPP server. Prevents DNS lookup to resolve XMPP server address
+	 * @return boolean via Intent
+	 */
+	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId, String host);
+	/**
+	 * Allows a user to login to the designated XMPP server
+	 * 
+	 * @param client Calling component's app package. Used to restrict broadcast of return value via intent.
+	 * @param identifier User's user name
+	 * @param domain XMPP Domain server (service name)
 	 * @param password User's password
 	 * @param remoteCallId Callback identifier to allow ClientCommunicationMgr to invoke correct callback action
 	 * @return identity but via Intent
 	 */
 	public String login(String client, String identifier, String domain, String password, long remoteCallId);
 	/**
-	 * Allows a user to login to the a designated XMPP server
+	 * Allows a user to login to the designated XMPP server
+	 * 
 	 * @param client Calling component's app package. Used to restrict broadcast of return value via intent.
 	 * @param identifier User's user name
-	 * @param domain XMPP Domain server (DNS name)
+	 * @param domain XMPP Domain server (service name)
 	 * @param password User's password
 	 * @param host IP address of XMPP server. Prevents DNS lookup to resolve XMPP server address
 	 * @param remoteCallId Callback identifier to allow ClientCommunicationMgr to invoke correct callback action

@@ -54,19 +54,16 @@ import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
-//import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.androidutils.AppPreferences;
+import org.societies.android.platform.androidutils.EntityRegularExpressions;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.content.CssRecordDAO;
 
 import android.app.Notification;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.AsyncTask;
-import android.os.IBinder;
 import android.os.Messenger;
 import android.os.Parcelable;
 import android.util.Log;
@@ -86,8 +83,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	private static final String NODE_LOGIN = "Node Logged in";
 	
 	private static final String DOMAIN_AUTHORITY_SERVER_PORT = "daServerPort";
-	private static final String DOMAIN_AUTHORITY_NAME = "daNode";
+	private static final String DOMAIN_AUTHORITY_NODE = "daNode";
 	private static final String LOCAL_CSS_NODE_JID_RESOURCE = "cssNodeResource";
+	private static final String XMPP_SERVER_IP_ADDR = "daServerIP";
 
 	
 	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
@@ -1234,17 +1232,23 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					AppPreferences appPreferences = new AppPreferences(CSSManagerServiceBase.this.context);
 
 					int xmppServerPort = appPreferences.getIntegerPrefValue(DOMAIN_AUTHORITY_SERVER_PORT);
-					String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
+					final String domainAuthorityNode = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NODE);
 					String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
+					final String xmppServerIPAddress = appPreferences.getStringPrefValue(XMPP_SERVER_IP_ADDR);
 					
-					CSSManagerServiceBase.this.ccm.configureAgent(domainAuthorityName, xmppServerPort, nodeJIDResource, false, new IMethodCallback() {
+					CSSManagerServiceBase.this.ccm.configureAgent(domainAuthorityNode, xmppServerPort, nodeJIDResource, false, new IMethodCallback() {
 						
 						public void returnAction(String result) {
 						}
 						
 						public void returnAction(boolean resultFlag) {
 							if (resultFlag) {
-								CSSManagerServiceBase.this.ccm.login(identity, domainAuthority, password, new IMethodCallback() {
+								String host = null;
+
+								if (EntityRegularExpressions.isValidIPv4Address(xmppServerIPAddress)) {
+									host = xmppServerIPAddress;
+								}
+								CSSManagerServiceBase.this.ccm.login(identity, domainAuthority, password, host, new IMethodCallback() {
 									
 									public void returnAction(String result) {
 										Log.d(LOG_TAG, "Logged in identity: " + result);
@@ -1324,10 +1328,12 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					AppPreferences appPreferences = new AppPreferences(CSSManagerServiceBase.this.context);
 
 					int xmppServerPort = appPreferences.getIntegerPrefValue(DOMAIN_AUTHORITY_SERVER_PORT);
-					String domainAuthorityName = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NAME);
+					String domainAuthorityNode = appPreferences.getStringPrefValue(DOMAIN_AUTHORITY_NODE);
 					String nodeJIDResource = appPreferences.getStringPrefValue(LOCAL_CSS_NODE_JID_RESOURCE);
+					final String xmppServerIPAddress = appPreferences.getStringPrefValue(XMPP_SERVER_IP_ADDR);
 					
-					CSSManagerServiceBase.this.ccm.configureAgent(domainAuthorityName, xmppServerPort, nodeJIDResource, false, new IMethodCallback() {
+
+					CSSManagerServiceBase.this.ccm.configureAgent(domainAuthorityNode, xmppServerPort, nodeJIDResource, false, new IMethodCallback() {
 						
 						public void returnAction(String result) {
 						}
@@ -1335,6 +1341,12 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 						public void returnAction(boolean resultFlag) {
 							if (resultFlag) {
 								try {
+									String host = null;
+
+									if (EntityRegularExpressions.isValidIPv4Address(xmppServerIPAddress)) {
+										host = xmppServerIPAddress;
+									}
+
 									CSSManagerServiceBase.this.ccm.newMainIdentity(identity, domainAuthority, password, new IMethodCallback() {
 										
 										public void returnAction(String result) {
@@ -1372,7 +1384,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 										
 										public void returnAction(boolean resultFlag) {
 										}
-									});
+									}, host);
 									
 								} catch (XMPPError x) {
 									Log.e(LOG_TAG, "New Identity error", x);
@@ -1380,37 +1392,10 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 							}
 						}
 					});
-
 				}
 			}
 		});
 	}
-    
-    private void bindToPubsubService(String eventFilter) {
-    	Log.d(LOG_TAG, "bindToPubsubService");
-    	
-    }
-    
-    /**
-     * Events service connection
-     * 
-     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back
-     * if service connection lost
-     */
-    private ServiceConnection eventsConnection = new ServiceConnection() {
-
-        public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from Platform Events service");
-        	connectedToEvents = false;
-        }
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to Platform Events service");
-
-        	//get a remote binder
-        	CSSManagerServiceBase.this.eventsMessenger = new Messenger(service);
-        }
-    };
 
 	@Override
 	public void startAppServices(String client) {
@@ -1423,6 +1408,4 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 }
