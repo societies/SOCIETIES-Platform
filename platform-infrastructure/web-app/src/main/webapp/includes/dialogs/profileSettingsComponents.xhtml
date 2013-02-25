@@ -4,187 +4,248 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <p:contextMenu for="preferenceTree" nodeType="preference">
-        <p:menuitem value="Add..."
-                    update="addConditionAndOutcomeDialog"
-                    process="@this,preferenceTree"
-                    actionListener="#{profileSettings.selectAddConditionAfter}"
-                    oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
-    </p:contextMenu>
+<p:contextMenu for="preferenceTree">
+    <p:menuitem value="Add preference"
+                update="addPreferenceDialog"
+                process="@this,preferenceTree"
+                actionListener="#{profileSettings.selectAddConditionAfter}"
+                oncomplete="#{p:widgetVar('addPreferenceDialog')}.show()"/>
+</p:contextMenu>
 
-    <p:contextMenu for="preferenceTree" nodeType="condition">
-        <p:menuitem value="Add Condition BEFORE"
-                    update="addConditionAndOutcomeDialog"
-                    process="@this,preferenceTree"
-                    actionListener="#{profileSettings.selectAddConditionBefore}"
-                    oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()">
-        </p:menuitem>
+<p:contextMenu for="preferenceTree" nodeType="preference">
+    <p:menuitem value="Add..."
+                update="addConditionAndOutcomeDialog"
+                process="@this,preferenceTree"
+                actionListener="#{profileSettings.selectAddConditionAfter}"
+                oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
 
-        <p:menuitem value="Add Condition and Outcome"
-                    update="addConditionAndOutcomeDialog"
-                    process="@this,preferenceTree"
-                    actionListener="#{profileSettings.selectAddConditionAfter}"
-                    oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
+    <p:separator/>
 
-        <p:separator/>
+    <p:menuitem value="Delete"
+                update="confirmDeleteConditionDialog"
+                process="@this,preferenceTree"
+                oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.show()"/>
+</p:contextMenu>
 
-        <p:menuitem value="Edit"
-                    update="editConditionDialog"
-                    process="@this,preferenceTree"
-                    oncomplete="#{p:widgetVar('editConditionDialog')}.show()"/>
+<p:contextMenu for="preferenceTree" nodeType="condition">
+    <p:menuitem value="Add Condition BEFORE"
+                update="addConditionAndOutcomeDialog"
+                process="@this,preferenceTree"
+                actionListener="#{profileSettings.selectAddConditionBefore}"
+                oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()">
+    </p:menuitem>
 
-        <p:menuitem value="Delete"
-                    update="confirmDeleteConditionDialog"
-                    process="@this,preferenceTree"
-                    oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.show()"/>
-    </p:contextMenu>
+    <p:menuitem value="Add Condition and Outcome"
+                update="addConditionAndOutcomeDialog"
+                process="@this,preferenceTree"
+                actionListener="#{profileSettings.selectAddConditionAfter}"
+                oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
 
-    <p:contextMenu for="preferenceTree" nodeType="outcome">
-        <p:menuitem value="Add Condition BEFORE"
-                    update="addConditionAndOutcomeDialog"
-                    process="@this,preferenceTree"
-                    actionListener="#{profileSettings.selectAddConditionBefore}"
-                    oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
+    <p:separator/>
 
-        <p:separator/>
+    <p:menuitem value="Edit"
+                update="editConditionDialog"
+                process="@this,preferenceTree"
+                oncomplete="#{p:widgetVar('editConditionDialog')}.show()"/>
 
-        <p:menuitem value="Edit"
-                    update="editConditionDialog"
-                    process="@this,preferenceTree"
-                    oncomplete="#{p:widgetVar('editConditionDialog')}.show()"/>
+    <p:menuitem value="Delete"
+                update="confirmDeleteConditionDialog"
+                process="@this,preferenceTree"
+                oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.show()"/>
+</p:contextMenu>
 
-        <p:menuitem value="Delete"
-                    update="confirmDeleteConditionDialog"
-                    process="@this,preferenceTree"
-                    oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.show()"/>
-    </p:contextMenu>
+<p:contextMenu for="preferenceTree" nodeType="outcome">
+    <p:menuitem value="Add Condition BEFORE"
+                update="addConditionAndOutcomeDialog"
+                process="@this,preferenceTree"
+                actionListener="#{profileSettings.selectAddConditionBefore}"
+                oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.show()"/>
 
-    <p:dialog id="addConditionAndOutcomeDialog" header="Add Preference Details" modal="true" appendToBody="true"
-              closeOnEscape="true" dynamic="true">
-        <p:panelGrid columns="2">
-            <f:facet name="header">
-                <p:outputLabel value="Add Condition and Outcome"
-                               rendered="#{profileSettings.showAddCondition and profileSettings.showAddOutcome}"/>
-                <p:outputLabel value="Add Condition"
-                               rendered="#{profileSettings.showAddCondition and !profileSettings.showAddOutcome}"/>
-                <p:outputLabel value="Add Outcome"
-                               rendered="#{!profileSettings.showAddCondition and profileSettings.showAddOutcome}"/>
-            </f:facet>
+    <p:separator/>
 
-            <h:outputLabel for="addConditionName" value="Condition name: *"
-                           rendered="#{profileSettings.showAddCondition}"/>
-            <p:inputText id="addConditionName" value="#{profileSettings.conditionToAdd.name}"
-                         required="true" label="Condition name"
-                         rendered="#{profileSettings.showAddCondition}"/>
+    <p:menuitem value="Edit"
+                update="editConditionDialog"
+                process="@this,preferenceTree"
+                oncomplete="#{p:widgetVar('editConditionDialog')}.show()"/>
 
-            <h:outputLabel for="addConditionOperator" value="Condition operator: *"
-                           rendered="#{profileSettings.showAddCondition}"/>
-            <p:selectOneMenu value="#{profileSettings.conditionToAdd.operator}" effect="fade"
-                             id="addConditionOperator"
-                             rendered="#{profileSettings.showAddCondition}">
+    <p:menuitem value="Delete"
+                update="confirmDeleteConditionDialog"
+                process="@this,preferenceTree"
+                oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.show()"/>
+</p:contextMenu>
 
-                <f:selectItems value="#{profileSettings.conditionOperators}"
-                               var="item"
-                               itemLabel="#{item.description}"/>
-            </p:selectOneMenu>
+<p:dialog id="addPreferenceDialog" header="Add Preference Details" modal="true" closeOnEscape="true" dynamic="true">
+    <p:panelGrid columns="2">
+        <f:facet name="header">
+            <p:outputLabel value="Add Preference"/>
+        </f:facet>
 
-            <h:outputLabel for="addConditionValue" value="Condition value: *"
-                           rendered="#{profileSettings.showAddCondition}"/>
-            <p:inputText id="addConditionValue" value="#{profileSettings.conditionToAdd.value}"
-                         required="true" label="Condition value"
-                         rendered="#{profileSettings.showAddCondition}"/>
+        <h:outputLabel for="addPreferenceName" value="Preference name: *"/>
+        <p:inputText id="addPreferenceName" value="#{profileSettings.newPreferenceName}"
+                     required="true" label="Preference name"/>
 
-            <h:outputLabel for="addOutcomeValue" value="Outcome value: *"
-                           rendered="#{profileSettings.showAddOutcome}"/>
-            <p:inputText id="addOutcomeValue" value="#{profileSettings.outcomeToAdd.value}"
-                         required="true" label="Outcome value"
-                         rendered="#{profileSettings.showAddOutcome}"/>
+        <f:facet name="footer">
+            <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
+                             actionListener="#{profileSettings.addPreference}"
+                             update="preferenceTree"
+                             id="addPreferenceDialog_okButton"
+                             process="@this,addPreferenceName"
+                             oncomplete="#{p:widgetVar('addPreferenceDialog')}.hide()"/>
+            <p:commandButton value="Cancel" icon="ui-icon-" style="margin:0"
+                             id="addPreferenceDialog_cancelButton"
+                             onclick="#{p:widgetVar('addPreferenceDialog')}.hide()"
+                             process="@this"/>
+        </f:facet>
+    </p:panelGrid>
+</p:dialog>
 
-            <f:facet name="footer">
-                <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
-                                 actionListener="#{profileSettings.addConditionAndOutcome}"
-                                 update="preferenceTree"
-                                 process="@form"
-                                 oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
-                <p:commandButton value="Cancel" icon="ui-icon-" style="margin:0"
-                                 onclick="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"
-                                 process="@this"/>
-            </f:facet>
-        </p:panelGrid>
-    </p:dialog>
+<p:dialog id="addConditionAndOutcomeDialog" header="Add Preference Details" modal="true"
+          closeOnEscape="true" dynamic="true">
+    <p:panelGrid columns="2">
+        <f:facet name="header">
+            <p:outputLabel value="Add Condition and Outcome"
+                           rendered="#{profileSettings.showAddCondition and profileSettings.showAddOutcome}"/>
+            <p:outputLabel value="Add Condition"
+                           rendered="#{profileSettings.showAddCondition and !profileSettings.showAddOutcome}"/>
+            <p:outputLabel value="Add Outcome"
+                           rendered="#{!profileSettings.showAddCondition and profileSettings.showAddOutcome}"/>
+        </f:facet>
 
-    <p:dialog id="editConditionDialog" header="Edit Preference Values" modal="true" appendToBody="true"
-              closeOnEscape="true"
-              dynamic="true">
-        <p:panelGrid columns="2" rendered="#{profileSettings.selectedCondition ne null}">
-            <f:facet name="header">
-                Edit Condition
-            </f:facet>
+        <h:outputLabel for="addConditionName" value="Condition name: *"
+                       rendered="#{profileSettings.showAddCondition}"/>
+        <p:inputText id="addConditionName" value="#{profileSettings.conditionToAdd.name}"
+                     required="true" label="Condition name"
+                     rendered="#{profileSettings.showAddCondition}"/>
 
-            <h:outputLabel for="conditionName" value="Condition name: *"/>
-            <p:inputText id="conditionName" value="#{profileSettings.selectedCondition.name}"
-                         required="true" label="Condition name"/>
+        <h:outputLabel for="addConditionOperator" value="Condition operator: *"
+                       rendered="#{profileSettings.showAddCondition}"/>
+        <p:selectOneMenu value="#{profileSettings.conditionToAdd.operator}" effect="fade"
+                         id="addConditionOperator"
+                         rendered="#{profileSettings.showAddCondition}">
 
-<!--
-            <h:outputLabel for="conditionOperator" value="Condition operator: *"/>
-            <p:selectOneMenu value="#{profileSettings.selectedCondition.operator}" effect="fade"
-                             id="conditionOperator">
+            <f:selectItems value="#{profileSettings.conditionOperators}"
+                           var="item"
+                           itemLabel="#{item.description}"/>
+        </p:selectOneMenu>
 
-                <f:selectItems value="#{profileSettings.conditionOperators}"
-                               var="item"
-                               itemLabel="#{item.description}"/>
-            </p:selectOneMenu>
--->
+        <h:outputLabel for="addConditionValue" value="Condition value: *"
+                       rendered="#{profileSettings.showAddCondition}"/>
+        <p:inputText id="addConditionValue" value="#{profileSettings.conditionToAdd.value}"
+                     required="true" label="Condition value"
+                     rendered="#{profileSettings.showAddCondition}"/>
 
-            <h:outputLabel for="conditionValue" value="Condition value: *"/>
-            <p:inputText id="conditionValue" value="#{profileSettings.selectedCondition.value}"
-                         required="true" label="Condition value"/>
+        <h:outputLabel for="addOutcomeValue" value="Outcome value: *"
+                       rendered="#{profileSettings.showAddOutcome}"/>
+        <p:inputText id="addOutcomeValue" value="#{profileSettings.outcomeToAdd.value}"
+                     required="true" label="Outcome value"
+                     rendered="#{profileSettings.showAddOutcome}"/>
 
-            <f:facet name="footer">
-                <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
-                                 actionListener="#{profileSettings.savePreferenceState}"
-                                 update="preferenceTree"
-                                 oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
-                <p:commandButton value="Cancel" icon="ui-icon-check" style="margin:0"
-                                 process="@this"
-                                 onclick="#{p:widgetVar('editConditionDialog')}.hide()"/>
-            </f:facet>
-        </p:panelGrid>
+        <f:facet name="footer">
+            <p:commandButton value="Save Condition and Outcome" icon="ui-icon-check" style="margin:0"
+                             rendered="#{profileSettings.showAddCondition and profileSettings.showAddOutcome}"
+                             actionListener="#{profileSettings.addConditionAndOutcome}"
+                             update="preferenceTree"
+                             process="@this,addConditionName,addConditionOperator,addConditionValue,addOutcomeValue"
+                             oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
+            <p:commandButton value="Save Condition" icon="ui-icon-check" style="margin:0"
+                             rendered="#{profileSettings.showAddCondition and !profileSettings.showAddOutcome}"
+                             actionListener="#{profileSettings.addConditionOnly}"
+                             update="preferenceTree"
+                             process="@this,addConditionName,addConditionOperator,addConditionValue"
+                             oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
+            <p:commandButton value="Save Outcome" icon="ui-icon-check" style="margin:0"
+                             rendered="#{!profileSettings.showAddCondition and profileSettings.showAddOutcome}"
+                             actionListener="#{profileSettings.addOutcomeOnly}"
+                             update="preferenceTree"
+                             process="@this,addOutcomeValue"
+                             oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
 
-        <p:panelGrid columns="2" rendered="#{profileSettings.selectedOutcome ne null}">
-            <f:facet name="header">
-                Edit Outcome
-            </f:facet>
+            <p:commandButton value="Cancel" icon="ui-icon-" style="margin:0"
+                             id="addConditionAndOutcomeDialog_cancelButton"
+                             onclick="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"
+                             process="@this"/>
+        </f:facet>
+    </p:panelGrid>
+</p:dialog>
 
-            <h:outputLabel for="outcomeValue" value="#{profileSettings.selectedOutcome.parameterName} *"/>
-            <p:inputText id="outcomeValue" value="#{profileSettings.selectedOutcome.value}" required="true"
-                         label="Outcome value"/>
+<p:dialog id="editConditionDialog" header="Edit Preference Values" modal="true"
+          closeOnEscape="true"
+          dynamic="true">
+    <p:panelGrid columns="2" rendered="#{profileSettings.selectedCondition ne null}">
+        <f:facet name="header">
+            Edit Condition
+        </f:facet>
 
-            <f:facet name="footer">
-                <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
-                                 actionListener="#{profileSettings.savePreferenceState}"
-                                 update="preferenceTree"
-                                 process="@form"
-                                 oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
-                <p:commandButton value="Cancel" icon="ui-icon-" style="margin:0"
-                                 onclick="#{p:widgetVar('editConditionDialog')}.hide()"
-                                 process="@this"/>
-            </f:facet>
-        </p:panelGrid>
-    </p:dialog>
+        <h:outputLabel for="conditionName" value="Condition name: *"/>
+        <p:inputText id="conditionName" value="#{profileSettings.selectedCondition.name}"
+                     required="true" label="Condition name"/>
 
-    <p:confirmDialog id="confirmDeleteConditionDialog"
-                     message="Are you sure you want to delete this condition?"
-                     header="Confirm delete" severity="alert">
+        <h:outputLabel for="conditionOperator" value="Condition operator: *"/>
+        <p:selectOneMenu value="#{profileSettings.selectedCondition.operator}" effect="fade"
+                         id="conditionOperator">
 
-        <p:commandButton value="Yes Sure" update="messages,preferenceTree"
-                         actionListener="#{profileSettings.deleteSelectedNode}"
-                         process="@this"
-                         oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.hide()"/>
-        <p:commandButton value="Not Yet"
-                         onclick="#{p:widgetVar('confirmDeleteConditionDialog')}.hide()"
-                         process="@this"/>
+            <f:selectItems value="#{profileSettings.conditionOperators}"
+                           var="item"
+                           itemLabel="#{item.description}"/>
+        </p:selectOneMenu>
 
-    </p:confirmDialog>
+        <h:outputLabel for="conditionValue" value="Condition value: *"/>
+        <p:inputText id="conditionValue" value="#{profileSettings.selectedCondition.value}"
+                     required="true" label="Condition value"/>
+
+        <f:facet name="footer">
+            <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
+                             actionListener="#{profileSettings.savePreferenceState}"
+                             id="editConditionDialog_okButton1"
+                             update="preferenceTree"
+                             process="@this,conditionName,conditionOperator,conditionValue"
+                             oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
+            <p:commandButton value="Cancel" icon="ui-icon-check" style="margin:0"
+                             id="editConditionDialog_cancelButton1"
+                             process="@this"
+                             onclick="#{p:widgetVar('editConditionDialog')}.hide()"/>
+        </f:facet>
+    </p:panelGrid>
+
+    <p:panelGrid columns="2" rendered="#{profileSettings.selectedOutcome ne null}">
+        <f:facet name="header">
+            Edit Outcome
+        </f:facet>
+
+        <h:outputLabel for="outcomeValue" value="#{profileSettings.selectedOutcome.parameterName} *"/>
+        <p:inputText id="outcomeValue" value="#{profileSettings.selectedOutcome.value}" required="true"
+                     label="Outcome value"/>
+
+        <f:facet name="footer">
+            <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
+                             actionListener="#{profileSettings.savePreferenceState}"
+                             update="preferenceTree"
+                             id="editConditionDialog_okButton2"
+                             process="@this,outcomeValue"
+                             oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
+            <p:commandButton value="Cancel" icon="ui-icon-" style="margin:0"
+                             id="editConditionDialog_cancelButton2"
+                             onclick="#{p:widgetVar('editConditionDialog')}.hide()"
+                             process="@this"/>
+        </f:facet>
+    </p:panelGrid>
+</p:dialog>
+
+<p:confirmDialog id="confirmDeleteConditionDialog"
+                 message="Are you sure you want to delete? This cannot be undone. All conditions and outcomes after this node will be deleted too?"
+                 header="Confirm delete" severity="alert">
+
+    <p:commandButton value="Yes Sure"
+                     actionListener="#{profileSettings.deleteSelectedNode}"
+                     id="confirmDeleteConditionDialog_okButton"
+                     update="preferenceTree"
+                     process="@this"
+                     oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.hide()"/>
+    <p:commandButton value="Not Yet"
+                     id="confirmDeleteConditionDialog_cancelButton"
+                     onclick="#{p:widgetVar('confirmDeleteConditionDialog')}.hide()"
+                     process="@this"/>
+
+</p:confirmDialog>
 
 </ui:composition>
