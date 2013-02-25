@@ -133,7 +133,7 @@ public class AcknackPopup extends Activity{
     		feedback.add(this.resultPayload);
     		bean.setFeedback(feedback);
     		bean.setRequestId(requestID);
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, feedback, new IPlatformEventsCallback() {
+			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
 				
 				@Override
 				public void returnAction(int result) {
