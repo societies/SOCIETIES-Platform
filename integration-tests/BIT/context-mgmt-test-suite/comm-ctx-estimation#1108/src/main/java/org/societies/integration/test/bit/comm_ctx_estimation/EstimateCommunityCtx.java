@@ -222,7 +222,7 @@ public class EstimateCommunityCtx {
 			if(communityInterestsList.size() > 0 ) {
 				CtxAttributeIdentifier communityAttrId = (CtxAttributeIdentifier) communityInterestsList.get(0);	
 
-				CtxAttribute communityInterestsAttribute = (CtxAttribute) this.ctxBroker.retrieveAttribute(communityAttrId,true).get();
+				CtxAttribute communityInterestsAttribute = (CtxAttribute) this.ctxBroker.retrieve(communityAttrId).get();
 
 				LOG.info("**** communityInterests id : " + communityInterestsAttribute.getId());
 				LOG.info("**** communityInterests value : " + communityInterestsAttribute.getStringValue());
