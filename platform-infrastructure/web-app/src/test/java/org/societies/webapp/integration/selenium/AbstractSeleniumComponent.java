@@ -37,7 +37,7 @@ public abstract class AbstractSeleniumComponent {
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
 
     private static final long WAIT_UNTIL_THREAD_SLEEP = 100;
-    public static final long DEFAULT_FIND_TIMEOUT_MILLIS = 5000;
+    public static final long DEFAULT_FIND_TIMEOUT_MILLIS = 10000;
     public static final long DEFAULT_SENDKEYS_DELAY_MILLIS = 100;
 
     private long findTimeoutMillis = DEFAULT_FIND_TIMEOUT_MILLIS;
@@ -284,5 +284,10 @@ public abstract class AbstractSeleniumComponent {
         }
 
         webDriver.getMouse().contextClick(ele.getCoordinates());
+    }
+
+    public void pickDropdownValue(String value, String fieldId) {
+        clickButton(By.xpath(String.format("//*[@id='%s']//*[contains(@class, 'ui-selectonemenu-trigger')]", fieldId)));
+        clickButton(By.xpath(String.format("//*[@id='%s_panel']//*[text()='%s']", fieldId, value)));
     }
 }

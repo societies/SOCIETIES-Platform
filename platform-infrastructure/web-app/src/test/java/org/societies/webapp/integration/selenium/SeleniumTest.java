@@ -29,6 +29,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.webapp.integration.selenium.pages.IndexPage;
 import org.societies.webapp.integration.selenium.rules.BrowserControlRule;
 import org.societies.webapp.integration.selenium.rules.SqlScriptRule;
 
@@ -56,4 +57,12 @@ public abstract class SeleniumTest {
         return driver;
     }
 
+    public IndexPage doLogin(String username, String password) {
+        getDriver().manage().deleteAllCookies();
+        getDriver().get(BASE_URL + "index.xhtml");
+        IndexPage indexPage = new IndexPage(getDriver());
+        indexPage.doLogin(username, password);
+
+        return indexPage;
+    }
 }

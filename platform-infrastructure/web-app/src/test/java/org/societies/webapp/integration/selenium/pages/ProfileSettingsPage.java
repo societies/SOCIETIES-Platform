@@ -26,6 +26,7 @@ package org.societies.webapp.integration.selenium.pages;
 
 import junit.framework.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.societies.webapp.integration.selenium.components.ProfileSettingsTreeContextMenu;
@@ -43,14 +44,18 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
     private static final String ROOT_NODE_XPATH = "//*[@id='mainForm:preferenceTree:lblNode_default']";
     private static final String PREF_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_preference')]";
-    private static final String CONDITION_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_condition')]";
-    private static final String OUTCOME_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_outcome')]";
+//    private static final String CONDITION_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_condition')]";
+//    private static final String OUTCOME_NODE_XPATH = "//*[starts-with(@id,'mainForm:preferenceTree:') and contains(@id,':lblNode_outcome')]";
 
     private static final String PREF_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_preference']";
     private static final String CONDITION_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_condition']";
     private static final String OUTCOME_NODE_BY_INDEX = "//*[@id='mainForm:preferenceTree:%s:lblNode_outcome']";
-    private static final String NODE_ID_SEPARATOR = "_";
 
+    private static final String PREF_NODE_BY_PARTIAL_INDEX = "//*[starts-with(@id,'mainForm:preferenceTree:%s') and contains(@id, ':lblNode_preference')]";
+    private static final String CONDITION_NODE_BY_PARTIAL_INDEX = "//*[starts-with(@id,'mainForm:preferenceTree:%s') and contains(@id, ':lblNode_condition')]";
+    private static final String OUTCOME_NODE_BY_PARTIAL_INDEX = "//*[starts-with(@id,'mainForm:preferenceTree:%s') and contains(@id, ':lblNode_outcome')]";
+
+    private static final String NODE_ID_SEPARATOR = "_";
 
     public enum TreeNodeType {PREFERENCE, CONDITION, ROOT, OUTCOME}
 
@@ -102,26 +107,37 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
 
     public void verifyPreferenceTreeState(TreeNode rootNode) {
+        verifyPreferenceTreeState(rootNode, new int[]{}, 1);
+    }
+
+    private void verifyPreferenceTreeState(TreeNode rootNode, int[] parentIDs, int expectedSiblings) {
         // always wait until the root node is visible - it ensures that the page is loaded
         waitUntilVisible(By.xpath(ROOT_NODE_XPATH));
 
-        List<WebElement> nodes;
-        String xpath;
+
+        String root_id = "";
+        for (int i = 0; i < parentIDs.length; i++) {
+            root_id += parentIDs[i];
+
+            if (i < parentIDs.length - 1)
+                root_id += NODE_ID_SEPARATOR;
+        }
 
         // now that we know the root node is visible, we can just do a simple verify
         // this will stop time being wasted if the test is going to fail - it all adds up if this method is repeated often
+        String xpath;
         switch (rootNode.type) {
             case ROOT:
                 xpath = ROOT_NODE_XPATH;
                 break;
             case PREFERENCE:
-                xpath = PREF_NODE_XPATH;
+                xpath = String.format(PREF_NODE_BY_PARTIAL_INDEX, root_id);
                 break;
             case CONDITION:
-                xpath = CONDITION_NODE_XPATH;
+                xpath = String.format(CONDITION_NODE_BY_PARTIAL_INDEX, root_id);
                 break;
             case OUTCOME:
-                xpath = OUTCOME_NODE_XPATH;
+                xpath = String.format(OUTCOME_NODE_BY_PARTIAL_INDEX, root_id);
                 break;
 
             default:
@@ -129,22 +145,75 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
                 return;
         }
 
-        nodes = verifyElementsVisible(By.xpath(xpath));
+        List<WebElement> nodes = verifyElementsVisible(By.xpath(xpath));
 
-        boolean found = false;
-        for (WebElement node : nodes) {
-            if (rootNode.text.equals(node.getText())) {
-                found = true;
+        Assert.assertEquals("Wrong number of nodes found by xpath " + xpath,
+                expectedSiblings, nodes.size());
+
+        WebElement node = null;
+        for (WebElement ele : nodes) {
+            if (rootNode.text.equals(ele.getText())) {
+                node = ele;
                 break;
             }
         }
-        if (!found) {
+        if (node == null) {
             Assert.fail("Node with text " + rootNode.text + " not found by xpath " + xpath);
         }
 
-        for (TreeNode subNode : rootNode.subNodes) {
-            verifyPreferenceTreeState(subNode);
+        // find this node's ID
+        int[] newParentIDs;
+
+        if (rootNode.type != TreeNodeType.ROOT) {
+            String idString = node.getAttribute("id");
+            idString = idString.split(":")[2];
+
+            String[] ids = idString.split(NODE_ID_SEPARATOR);
+            idString = ids[ids.length - 1];
+
+            newParentIDs = new int[parentIDs.length + 1];
+            for (int i = 0; i < parentIDs.length; i++) {
+                newParentIDs[i] = parentIDs[i];
+            }
+            newParentIDs[newParentIDs.length - 1] = Integer.valueOf(idString);
+
+        } else {
+            newParentIDs = new int[0];
         }
+
+        if (rootNode.subNodes.size() == 0) {
+            // verify no children
+            verifyNodeHasNoChildren(newParentIDs);
+        } else {
+            for (TreeNode subNode : rootNode.subNodes) {
+                verifyPreferenceTreeState(subNode, newParentIDs, rootNode.subNodes.size());
+            }
+        }
+
+    }
+
+    private void verifyNodeHasNoChildren(int[] nodeIDpath) {
+
+        String root_id = "";
+        for (int aNodeIDpath : nodeIDpath) {
+            root_id += aNodeIDpath + NODE_ID_SEPARATOR;
+        }
+
+        String xpath;
+
+        xpath = String.format(PREF_NODE_BY_PARTIAL_INDEX, root_id);
+        Assert.assertEquals("Expected no child nodes for xpath " + xpath, 0, waitUntilElementsFound(By.xpath(xpath)).size());
+
+        xpath = String.format(CONDITION_NODE_BY_PARTIAL_INDEX, root_id);
+        Assert.assertEquals("Expected no child nodes for xpath " + xpath, 0, waitUntilElementsFound(By.xpath(xpath)).size());
+
+        xpath = String.format(OUTCOME_NODE_BY_PARTIAL_INDEX, root_id);
+        Assert.assertEquals("Expected no child nodes for xpath " + xpath, 0, waitUntilElementsFound(By.xpath(xpath)).size());
+
+    }
+
+    public ProfileSettingsTreeContextMenu openContextMenuOnRootNode() {
+        return openContextMenuOnNode(new int[]{}, ROOT_NODE_XPATH, "Preferences");
     }
 
     public ProfileSettingsTreeContextMenu openContextMenuOnPreferenceNode(int[] indicies, String expectedText) {
@@ -178,4 +247,25 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
         return new ProfileSettingsTreeContextMenu(getDriver());
     }
+
+    public void removeAllPreferences() {
+
+
+        try {
+            List<WebElement> preferenceNodes = waitUntilElementsFound(By.xpath(PREF_NODE_XPATH));
+
+            while (preferenceNodes.size() > 0) {
+                openContextMenuOnPreferenceNode(new int[]{0}, preferenceNodes.get(0).getText())
+                        .clickDelete()
+                        .clickOk();
+
+                preferenceNodes = waitUntilElementsFound(By.xpath(PREF_NODE_XPATH));
+            }
+        } catch (NoSuchElementException ex) {
+            // do nothing - none are left
+        }
+
+    }
+
+
 }

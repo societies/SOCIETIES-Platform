@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 public class ProfileSettingsTreeContextMenu extends BasePageComponent {
+    private static final String ADD_PREFERENCE_XPATH = "//div[contains(@style, 'display: block')]/ul/li/a/span[@class='ui-menuitem-text' and text()='Add preference']";
     private static final String ADD_XPATH = "//div[contains(@style, 'display: block')]/ul/li/a/span[@class='ui-menuitem-text' and text()='Add...']";
     private static final String ADD_CONDITION_BEFORE = "//div[contains(@style, 'display: block')]/ul/li/a/span[@class='ui-menuitem-text' and text()='Add Condition BEFORE']";
     private static final String ADD_CONDITION_AND_OUTCOME = "//div[contains(@style, 'display: block')]/ul/li/a/span[@class='ui-menuitem-text' and text()='Add Condition and Outcome']";
@@ -49,5 +50,11 @@ public class ProfileSettingsTreeContextMenu extends BasePageComponent {
         clickButton(By.xpath(ADD_CONDITION_AND_OUTCOME));
 
         return new ProfileSettingsAddConditionAndOutcomeDialog(getDriver());
+    }
+
+    public ProfileSettingsAddPreferenceDialog clickAddPreference() {
+        clickButton(By.xpath(ADD_PREFERENCE_XPATH));
+
+        return new ProfileSettingsAddPreferenceDialog(getDriver());
     }
 }
