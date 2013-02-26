@@ -41,6 +41,7 @@ import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -437,11 +438,9 @@ public class PluginCoreServiceMonitor extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-					Service services[] = (Service[]) parcels;
-					//AService services[] = new AService[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	services[i] = (AService) parcels[i];
-					//}
+					Service services[] = new Service[parcels.length];
+					System.arraycopy(parcels, 0, services, 0, parcels.length);
+					
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
@@ -459,11 +458,9 @@ public class PluginCoreServiceMonitor extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-					Service services[] = (Service[]) parcels;
-					//AService services[] = new AService[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	services[i] = (AService) parcels[i];
-					//}
+					Service services[] = new Service[parcels.length];
+					System.arraycopy(parcels, 0, services, 0, parcels.length);
+					
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
