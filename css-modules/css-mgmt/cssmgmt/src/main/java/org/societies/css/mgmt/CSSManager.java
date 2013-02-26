@@ -1888,6 +1888,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext ownerCtxId: " +ownerCtxId);
 
 			String value;
+			List<CssNode> value1;
+			int value2;
 
 			// NAME
 			value = record.getName();
@@ -1900,42 +1902,82 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext EMAIL value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
-/*			
+			
 			// Entity
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ENTITY, value);
+			value2 = record.getEntity();
+			LOG.info("pushtoContext ENTITY value: " +value2);
+			if (value2 <= 0 && value2 >=2){
+				
+				if(value2 == 0){
+					value = "Person";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
+				}
+				if(value2 == 1){
+					value = "Organisation";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
+				}
+				if(value2 == 2){
+					value = "Undefined";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
+				}
+				
+			}
+				
 
-			// Forename
-			value = record.getEmailID();
+			// ForeName
+			value = record.getForeName();
+			LOG.info("pushtoContext FORENAME value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FORENAME, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME_FIRST, value);
 			
 			// Sex
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
-
+			value2 = record.getSex();
+			LOG.info("pushtoContext SEX value: " +value2);
+			//if (value2 != null && !value2.isEmpty())
+			if (value2 <= 0 && value2 >=2){
+							
+				if(value2 == 0){
+					value = "Male";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				if(value2 == 1){
+					value = "Female";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				if(value2 == 2){
+					value = "Undefined";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				
+			}
 			// CSS Identity
-			value = record.getEmailID();
+			value = record.getCssIdentity();
+			LOG.info("pushtoContext IDENTITY value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSIDENTITY, value);
-			
-			// CSS Nodes
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSNODES, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ID, value);
 
 			// Workplace
-			value = record.getEmailID();
+			value = record.getWorkplace();
+			LOG.info("pushtoContext WORKPLACE value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORKPLACE, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_WORK_CITY, value);
 			
 			// Position
-			value = record.getEmailID();
+			value = record.getPosition();
+			LOG.info("pushtoContext POSITION value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.POSITION, value);
-*/
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORK_POSITION, value);
+			
+			// CSS Nodes
+			value1 = record.getCssNodes();
+			if (record.getCssNodes() != null) {
+				for (CssNode cssNode : record.getCssNodes()) {
+					IIdentity cssNodeId = commManager.getIdManager().fromJid(cssNode.getIdentity());
+					LOG.info("pushtoContext CSSNODES value: " +value1);
+//					this.ctxBroker.createCssNode(ownerCtxId, cssNodeId);
+				}
+			}
+			
 
 		} catch (InvalidFormatException ife) {
 
