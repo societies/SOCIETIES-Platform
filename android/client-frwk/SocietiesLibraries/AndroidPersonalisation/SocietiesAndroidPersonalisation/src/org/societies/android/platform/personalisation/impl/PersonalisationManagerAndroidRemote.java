@@ -24,13 +24,22 @@
  */
 package org.societies.android.platform.personalisation.impl;
 
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.internal.personalisation.IPersonalisationManagerInternalAndroid;
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.android.api.utilities.RemoteServiceHandler;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.personalisation.mgmt.PersonalisationManagerBean;
+import org.societies.api.schema.personalisation.model.ActionBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
@@ -38,22 +47,83 @@ import android.util.Log;
  * @author Eliza
  *
  */
-public class PersonalisationManagerAndroidRemote extends Service{
+public class PersonalisationManagerAndroidRemote extends Service implements IPersonalisationManagerInternalAndroid{
 
 	private static final String LOG_TAG = PersonalisationManagerAndroidRemote.class.getName();
-	private Messenger inMessenger;
+	private Messenger inMessenger = new Messenger(new IncomingHandler());
+	private ClientCommunicationMgr ccm;
+	private Context androidContext;
+	private PersonalisationManagerAndroid personalisationService;
+
+
+	public PersonalisationManagerAndroidRemote(Context androidContext, boolean restrictBroadcast){
+		this.androidContext = androidContext;
+		personalisationService = new PersonalisationManagerAndroid(androidContext, restrictBroadcast, ccm);
+
+	}
+
+	/**
+	 * For remote IPC
+	 * @author Eliza
+	 *
+	 */
+	class IncomingHandler extends Handler{
+		@Override
+		public void handleMessage(Message msg) {
+			Log.d(LOG_TAG, "Received msg");
+			if (msg.getData().containsKey(IPersonalisationManagerAndroid.GET_PREFERENCE)){
+				Log.d(LOG_TAG, "Received request for "+IPersonalisationManagerAndroid.GET_PREFERENCE);
+				PersonalisationManagerBean payload = msg.getData().getParcelable(IPersonalisationManagerAndroid.GET_PREFERENCE);
+
+			}else{
+				Log.d(LOG_TAG, "Received request for "+IPersonalisationManagerAndroid.GET_INTENT_ACTION);
+				PersonalisationManagerBean payload = msg.getData().getParcelable(IPersonalisationManagerAndroid.GET_INTENT_ACTION);
+			}
+		}
+	}
+	
 	
 	@Override
 	public void onCreate () {
-		//TODO: check if login has been completed, that's what the boolean in the clientCommunicationMgr is for
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(getApplicationContext(), false);
-		
-		PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(this.getApplicationContext(),  false);
-		
-		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IPersonalisationManagerAndroid.methodsArray));
+		ccm = new ClientCommunicationMgr(getApplicationContext(), true);
+
+		ccm.bindCommsService(new IMethodCallback() {
+
+			@Override
+			public void returnAction(String result) {
+				Log.d(LOG_TAG, "comms callback: returnAction(string) called. ??");
+			}
+
+			@Override
+			public void returnAction(boolean resultFlag) {
+				Log.d(LOG_TAG, "comms callback: returnAction(boolean) called. Connected");
+				ccm.register(PersonalisationManagerAndroid.ELEMENT_NAMES, PersonalisationManagerAndroid.NAMESPACES, PersonalisationManagerAndroid.PACKAGES, new IMethodCallback() {
+
+					@Override
+					public void returnAction(String result) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void returnAction(boolean resultFlag) {
+						Log.d(LOG_TAG, "comms callback: returnAction(boolean) called. Registered");
+
+					}
+				});
+				PersonalisationManagerAndroid serviceBase = new PersonalisationManagerAndroid(PersonalisationManagerAndroidRemote.this.getApplicationContext(),  false, PersonalisationManagerAndroidRemote.this.ccm);
+
+				PersonalisationManagerAndroidRemote.this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IPersonalisationManagerAndroid.methodsArray));
+			}
+		});
+
+
 		Log.i(LOG_TAG, "PersonalisationManagerAndroidRemote creation");
 	}
-	
+
+
+
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		Log.d(LOG_TAG, "PersonalisationManagerAndroidRemote onBind");
@@ -62,6 +132,47 @@ public class PersonalisationManagerAndroidRemote extends Service{
 
 	@Override
 	public void onDestroy() {
+		this.ccm.unregister(PersonalisationManagerAndroid.ELEMENT_NAMES, PersonalisationManagerAndroid.NAMESPACES, new IMethodCallback() {
+
+			@Override
+			public void returnAction(String result) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void returnAction(boolean resultFlag) {
+				Log.d(LOG_TAG, "comms callback: returnAction(boolean) called. Unregistered");
+				PersonalisationManagerAndroidRemote.this.ccm.unbindCommsService();
+			}
+		});
 		Log.i(LOG_TAG, "PersonalisationManagerAndroidRemote terminating");
+	}
+
+	@Override
+	public ActionBean getIntentAction(String clientID, RequestorBean requestor,
+			String ownerID, ServiceResourceIdentifier serviceID,
+			String preferenceName) {
+		return this.personalisationService.getIntentAction(clientID, requestor, ownerID, serviceID, preferenceName);
+	}
+
+	@Override
+	public ActionBean getPreference(String clientID, RequestorBean requestor,
+			String ownerID, String serviceType,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
+		return this.personalisationService.getPreference(clientID, requestor, ownerID, serviceType, serviceID, preferenceName);
+	}
+
+	@Override
+	public ActionBean getIntentAction(String clientID, String ownerID,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
+		return this.personalisationService.getIntentAction(clientID, ownerID, serviceID, preferenceName);
+	}
+
+	@Override
+	public ActionBean getPreference(String clientID, String ownerID,
+			String serviceType, ServiceResourceIdentifier serviceID,
+			String preferenceName) {
+		return this.personalisationService.getPreference(clientID, ownerID, serviceType, serviceID, preferenceName);
 	}
 }

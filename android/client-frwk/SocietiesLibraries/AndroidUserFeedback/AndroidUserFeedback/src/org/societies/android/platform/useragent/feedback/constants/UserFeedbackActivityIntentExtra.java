@@ -35,4 +35,5 @@ public class UserFeedbackActivityIntentExtra {
 	public static final String PROPOSAL_TEXT = "proposal_text";
 	public static final String OPTIONS  = "options";
 	public static final String TYPE = "type";
+	public static final String INTENT_RETURN = "IntentReturn";
 }

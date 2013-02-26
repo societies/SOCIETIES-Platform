@@ -17,7 +17,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @created 11-Nov-2011 14:42:55
  */
 
-public interface IPersonalisationManagerAndroid extends IServiceManager{
+public interface IPersonalisationManagerAndroid{
 
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.personalisation.ReturnValue";
 	public static final String GET_INTENT_ACTION = "org.societies.android.api.personalisation.getIntentAction";
