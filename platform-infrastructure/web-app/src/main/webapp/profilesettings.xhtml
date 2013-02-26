@@ -55,10 +55,17 @@
                     </p:treeNode>
 
                 </p:tree>
+                <p:commandButton id="saveButton" actionListener="#{profileSettings.saveTreeChanges}"
+                                 update="preferenceTree"
+                                 rendered="#{profileSettings.treeChangesMade}"
+                                 value="Save Changes"/>
+                <p:commandButton id="revertButton" actionListener="#{profileSettings.revertChanges}"
+                                 update="preferenceTree"
+                                 rendered="#{profileSettings.treeChangesMade}"
+                                 value="Revert"/>
 
                 <div class="hr dotted clearfix"></div>
 
-                <ui:include src="includes/dialogs/profileSettingsComponents.xhtml"/>
 
             </section>
         </section>
@@ -68,6 +75,7 @@
     </ui:define>
 
     <ui:define name="dialogs">
+        <ui:include src="includes/dialogs/profileSettingsComponents.xhtml"/>
     </ui:define>
 
 </ui:composition>

@@ -87,7 +87,7 @@
         <f:facet name="footer">
             <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
                              actionListener="#{profileSettings.addPreference}"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              id="addPreferenceDialog_okButton"
                              process="@this,addPreferenceName"
                              oncomplete="#{p:widgetVar('addPreferenceDialog')}.hide()"/>
@@ -144,19 +144,19 @@
             <p:commandButton value="Save Condition and Outcome" icon="ui-icon-check" style="margin:0"
                              rendered="#{profileSettings.showAddCondition and profileSettings.showAddOutcome}"
                              actionListener="#{profileSettings.addConditionAndOutcome}"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              process="@this,addConditionName,addConditionOperator,addConditionValue,addOutcomeValue"
                              oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
             <p:commandButton value="Save Condition" icon="ui-icon-check" style="margin:0"
                              rendered="#{profileSettings.showAddCondition and !profileSettings.showAddOutcome}"
                              actionListener="#{profileSettings.addConditionOnly}"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              process="@this,addConditionName,addConditionOperator,addConditionValue"
                              oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
             <p:commandButton value="Save Outcome" icon="ui-icon-check" style="margin:0"
                              rendered="#{!profileSettings.showAddCondition and profileSettings.showAddOutcome}"
                              actionListener="#{profileSettings.addOutcomeOnly}"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              process="@this,addOutcomeValue"
                              oncomplete="#{p:widgetVar('addConditionAndOutcomeDialog')}.hide()"/>
 
@@ -197,7 +197,7 @@
             <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
                              actionListener="#{profileSettings.savePreferenceState}"
                              id="editConditionDialog_okButton1"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              process="@this,conditionName,conditionOperator,conditionValue"
                              oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
             <p:commandButton value="Cancel" icon="ui-icon-check" style="margin:0"
@@ -219,7 +219,7 @@
         <f:facet name="footer">
             <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
                              actionListener="#{profileSettings.savePreferenceState}"
-                             update="preferenceTree"
+                             update="preferenceTree,saveButton,revertButton"
                              id="editConditionDialog_okButton2"
                              process="@this,outcomeValue"
                              oncomplete="#{p:widgetVar('editConditionDialog')}.hide()"/>
@@ -238,7 +238,7 @@
     <p:commandButton value="Yes Sure"
                      actionListener="#{profileSettings.deleteSelectedNode}"
                      id="confirmDeleteConditionDialog_okButton"
-                     update="preferenceTree"
+                     update="preferenceTree,saveButton,revertButton"
                      process="@this"
                      oncomplete="#{p:widgetVar('confirmDeleteConditionDialog')}.hide()"/>
     <p:commandButton value="Not Yet"
