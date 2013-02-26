@@ -31,6 +31,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -98,7 +99,7 @@ public class MonitoredInfo {
 		
 		while (i.hasNext()){
 			PreferenceDetails pd = i.next();
-			if (pd.equalsServiceOnlyDetails(serviceType, serviceID)){
+			if (ServiceModelUtils.compare(serviceID, pd.getServiceID())){
 				this.list.remove(pd);
 			}
 		}		

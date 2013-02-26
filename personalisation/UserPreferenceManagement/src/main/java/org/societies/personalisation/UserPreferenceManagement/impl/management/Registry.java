@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class Registry implements Serializable{
@@ -100,7 +101,7 @@ public class Registry implements Serializable{
 		Enumeration<PreferenceDetails> e = this.mappings.keys();
 		while (e.hasMoreElements()){
 			PreferenceDetails d = e.nextElement();
-			if (d.equalsServiceOnlyDetails(serviceType, serviceID)){
+			if (ServiceModelUtils.compare(serviceID, d.getServiceID())){
 				prefNames.add(d.getPreferenceName());
 			}
 		}

@@ -83,36 +83,10 @@ public class PreferenceDetails implements Serializable {
 		this.preferenceName = preferenceName;
 	}
 
-	/**
-	 * 
-	 * @param prefName
-	 */
-	private boolean comparePreferenceName(String prefName){
-		return this.preferenceName.equalsIgnoreCase(prefName);
-	}
-
-	/**
-	 * 
-	 * @param sID
-	 */
-	private boolean compareServiceID(ServiceResourceIdentifier sID){
-		//return this.serviceID.toString().equalsIgnoreCase(sID.toString());
-		return ServiceModelUtils.compare(serviceID, sID);
-		
-	}
-
-	/**
-	 * 
-	 * @param sType
-	 */
-	private boolean compareServiceType(String sType){
-		return this.serviceType.equalsIgnoreCase(sType);
-	}
-
-	/**
+/*	*//**
 	 * 
 	 * @param details
-	 */
+	 *//*
 	@Override
 	public boolean equals(Object details){
 		if (details instanceof PreferenceDetails){
@@ -125,12 +99,12 @@ public class PreferenceDetails implements Serializable {
 
 		}
 		return false;
-	}
+	}*/
 
-	/**
+/*	*//**
 	 * 
 	 * @param details
-	 */
+	 *//*
 	public boolean equalsServiceOnlyDetails(PreferenceDetails details){
 
 		if (compareServiceType(((PreferenceDetails) details).getServiceType())){
@@ -142,13 +116,13 @@ public class PreferenceDetails implements Serializable {
 		}
 
 		return false;
-	}
+	}*/
 
-	/**
+/*	*//**
 	 * 
 	 * @param serviceType
 	 * @param serviceID
-	 */
+	 *//*
 	public boolean equalsServiceOnlyDetails(String serviceType, ServiceResourceIdentifier serviceID){
 		if (compareServiceType(serviceType)){
 			if (compareServiceID(serviceID)){
@@ -159,7 +133,7 @@ public class PreferenceDetails implements Serializable {
 		}
 
 		return false;
-	}
+	}*/
 
 	public String getPreferenceName(){
 		return this.preferenceName;
@@ -216,6 +190,42 @@ public class PreferenceDetails implements Serializable {
 		return "ServiceType: "+st+"\n"
 		+ "ServiceID: "+sID+"\n"
 		+ "PreferenceName: "+this.preferenceName+"\n";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((preferenceName == null) ? 0 : preferenceName.hashCode());
+		result = prime * result
+				+ ((serviceID == null) ? 0 : serviceID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PreferenceDetails other = (PreferenceDetails) obj;
+		if (preferenceName == null) {
+			if (other.preferenceName != null)
+				return false;
+		} else if (!preferenceName.equals(other.preferenceName))
+			return false;
+		if (serviceID == null) {
+			if (other.serviceID != null)
+				return false;
+		} else if (other.serviceID==null){
+			return false;
+		}else if(!ServiceModelUtils.compare(serviceID, other.serviceID)){
+			return false;
+		}
+		return true;
 	}
 
 }
