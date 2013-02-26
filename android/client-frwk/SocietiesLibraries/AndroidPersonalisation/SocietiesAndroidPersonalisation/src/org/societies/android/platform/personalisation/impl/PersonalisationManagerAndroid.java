@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
@@ -56,13 +57,13 @@ import android.util.Log;
  */
 public class PersonalisationManagerAndroid implements IPersonalisationManagerInternalAndroid{
 
-	private static final List<String> ELEMENT_NAMES = Collections.unmodifiableList(Arrays.asList("PersonalisationManagerBean","ActionBean"));
-	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+	protected static final List<String> ELEMENT_NAMES = Collections.unmodifiableList(Arrays.asList("PersonalisationManagerBean","ActionBean"));
+	protected static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/schema/personalisation/model",
 					"http://societies.org/api/schema/personalisation/mgmt",
 					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/servicelifecycle/model"));
-	private static final List<String> PACKAGES = Collections.unmodifiableList(
+	protected static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.schema.personalisation.model",
 					"org.societies.api.schema.personalisation.mgmt",
 					"org.societies.api.schema.identity",
@@ -77,9 +78,9 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 	private final boolean restrictBroadcast;
 
 	public PersonalisationManagerAndroid(Context applicationContext,
-			boolean restrictBroadcast) {
+			boolean restrictBroadcast, ClientCommunicationMgr ccm) {
 		this.applicationContext = applicationContext;
-		this.commMgr = new ClientCommunicationMgr(applicationContext, true);
+		this.commMgr = ccm;
 		this.restrictBroadcast = restrictBroadcast;
 	}
 
@@ -89,9 +90,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 			String preferenceName) {
 		// TODO Auto-generated method stub
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_INTENT_ACTION, clientID);
-		IIdentityManager idm = this.commMgr.getIdManager();
+		
 		//only service my identities
 		try{
+			IIdentityManager idm = this.commMgr.getIdManager();
 			if (idm.isMine(idm.fromJid(ownerID))){
 				IIdentity cloudNode = idm.getCloudNode();
 				PersonalisationManagerBean bean = new PersonalisationManagerBean();
@@ -103,7 +105,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 				Stanza stanza = new Stanza(cloudNode);
 
-				commMgr.register(ELEMENT_NAMES, callback);
+				
 			
 				commMgr.sendIQ(stanza, IQ.Type.GET, bean, callback);
 			}
@@ -125,9 +127,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 			String ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_PREFERENCE, clientID);
-		IIdentityManager idm = this.commMgr.getIdManager();
+		
 		//only service my identities
 		try{
+			IIdentityManager idm = this.commMgr.getIdManager();
 			if (idm.isMine(idm.fromJid(ownerID))){
 				IIdentity cloudNode = idm.getCloudNode();
 				PersonalisationManagerBean bean = new PersonalisationManagerBean();
@@ -140,7 +143,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 				Stanza stanza = new Stanza(cloudNode);
 
-				commMgr.register(ELEMENT_NAMES, callback);
+				
 				commMgr.sendIQ(stanza, IQ.Type.GET, bean, callback);
 				
 				
@@ -159,9 +162,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 	public ActionBean getIntentAction(String clientID, String ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_INTENT_ACTION, clientID);
-		IIdentityManager idm = this.commMgr.getIdManager();
+		
 		//only service my identities
 		try {
+			IIdentityManager idm = this.commMgr.getIdManager();
 			if (idm.isMine(idm.fromJid(ownerID))){
 				IIdentity cloudNode = idm.getCloudNode();
 				PersonalisationManagerBean bean = new PersonalisationManagerBean();
@@ -172,7 +176,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 				Stanza stanza = new Stanza(cloudNode);
 
-				commMgr.register(ELEMENT_NAMES, callback);
+				
 				
 					commMgr.sendIQ(stanza, IQ.Type.GET, bean, callback);
 				
@@ -191,9 +195,10 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 	public ActionBean getPreference(String clientID, String ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		PersonalisationCommCallback callback = new PersonalisationCommCallback(GET_PREFERENCE, clientID);
-		IIdentityManager idm = this.commMgr.getIdManager();
+		
 		//only service my identities
 		try {
+			IIdentityManager idm = this.commMgr.getIdManager();
 			if (idm.isMine(idm.fromJid(ownerID))){
 				IIdentity cloudNode = idm.getCloudNode();
 				PersonalisationManagerBean bean = new PersonalisationManagerBean();
@@ -205,7 +210,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 				Stanza stanza = new Stanza(cloudNode);
 
-				commMgr.register(ELEMENT_NAMES, callback);
+				
 				commMgr.sendIQ(stanza, IQ.Type.GET, bean, callback);
 				
 			}
@@ -280,7 +285,7 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 					}
 					PersonalisationManagerAndroid.this.applicationContext.sendBroadcast(intent);
 					Log.d(LOG_TAG, "SendBroadcast intent with action object");
-					PersonalisationManagerAndroid.this.commMgr.unregister(ELEMENT_NAMES, this);
+					
 
 				}else{
 					Log.d(LOG_TAG, "Received bean not instance of ActionBean");
@@ -292,8 +297,6 @@ public class PersonalisationManagerAndroid implements IPersonalisationManagerInt
 
 
 	}
-
-
 
 
 }

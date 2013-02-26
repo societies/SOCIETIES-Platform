@@ -24,10 +24,11 @@
  */
 package org.societies.android.platform.personalisation.container;
 
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.android.platform.personalisation.impl.mocks.MockClientCommunicationMgr;
 import org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroid;
+import org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -63,16 +64,10 @@ public class PersonalisationAndroidTest extends Service{
 	/**Create Binder object for local service invocation */
 	public class TestPersonalisationBinder extends Binder {
 		public IPersonalisationManagerAndroid getService(){
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			PersonalisationManagerAndroid perso = new PersonalisationManagerAndroid(getApplicationContext(), ccm, false);
+			
+			PersonalisationManagerAndroidRemote perso = new PersonalisationManagerAndroidRemote(getApplicationContext(), false);
 			return perso;
 		}
 	}
-	/**
-	 * Factory method to get instance of {@link ClientCommunicationMgr}
-	 * @return ClientCommunicationMgr
-	 */
-	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
-	}
+
 }

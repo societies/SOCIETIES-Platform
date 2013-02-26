@@ -71,7 +71,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback, IServiceManager{
+public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback{
 
 	private static final String LOG_TAG = AndroidUserFeedbackService.class.getName();
 	public static final String USER_FEEDBACK_EVENTS_ALL = "";
