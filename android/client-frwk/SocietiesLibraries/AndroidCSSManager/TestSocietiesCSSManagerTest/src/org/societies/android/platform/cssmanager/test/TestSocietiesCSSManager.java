@@ -43,8 +43,8 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 	private static final String XMPP_SERVER_NAME_VALUE = "societies.bespoke";
 	
 	public static final String XMPP_SERVER_NAME_IP = "daServerIP";
-//	public static final String XMPP_SERVER_NAME_IP_VALUE = "10.0.2.2";
-	public static final String XMPP_SERVER_NAME_IP_VALUE = "192.168.1.2";
+	//use AVD to machine host IP address
+	public static final String XMPP_SERVER_NAME_IP_VALUE = "10.0.2.2";
 
 	
     public static final String TEST_IDENTITY_1 = "alan";

@@ -33,13 +33,14 @@
 
 
 
-	<xs:complexType name="impFeedbackResultBean">
-		<xs:sequence>
-			<xs:element name="requestId" type="xs:string" minOccurs="0" />
-			<xs:element name="accepted" type="xs:boolean" />
-		</xs:sequence>
-	</xs:complexType>
-
+	<xs:element name="impFeedbackResultBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
+				<xs:element name="accepted" type="xs:boolean" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 
 	<xs:simpleType name="feedbackMethodType">
