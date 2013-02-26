@@ -45,9 +45,7 @@ public class TestServiceCisDirectoryLocal extends Service {
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalCisDirectoryBinder();
-		//inject reference to current service
-		this.binder.addouterClassreference(new CisDirectoryBase(this));
+		this.binder = new LocalCisDirectoryBinder(new CisDirectoryBase(this, false));
 		Log.d(LOG_TAG, "TestServiceCSSManagerLocal service starting");
 	}
 
@@ -73,16 +71,16 @@ public class TestServiceCisDirectoryLocal extends Service {
 	 * any clients that have a Binder reference, indirectly hold the Service object reference.
 	 * This prevents a common Android Service memory leak.
 	 */
-	 public static class LocalCisDirectoryBinder extends Binder {
-		 private WeakReference<CisDirectoryBase> outerClassReference = null;
-		 
-		 public void addouterClassreference(CisDirectoryBase instance) {
-			 this.outerClassReference = new WeakReference<CisDirectoryBase>(instance);
-		 }
-		 
-		 public CisDirectoryBase getService() {
-	            return outerClassReference.get();
-	            }
-		 }
+	public static class LocalCisDirectoryBinder extends Binder {
+		private WeakReference<CisDirectoryBase> outerClassReference = null;
+		
+		public LocalCisDirectoryBinder(CisDirectoryBase instance) {
+			this.outerClassReference = new WeakReference<CisDirectoryBase>(instance);
+		}
+		
+		public CisDirectoryBase getService() {
+			return outerClassReference.get();
+		}
+	}
 
 }
