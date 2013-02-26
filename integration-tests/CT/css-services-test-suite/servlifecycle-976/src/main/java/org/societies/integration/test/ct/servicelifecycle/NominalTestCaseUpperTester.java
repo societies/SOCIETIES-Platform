@@ -197,6 +197,7 @@ public class NominalTestCaseUpperTester {
 			
 		} catch(Exception ex){
 			LOG.error("[#976] Exception occurred: " + ex);
+			ex.printStackTrace();
 			fail("[#976] Exception occurred: " + ex);
 		}
 		

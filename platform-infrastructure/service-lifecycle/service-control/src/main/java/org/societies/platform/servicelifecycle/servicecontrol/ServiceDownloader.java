@@ -88,7 +88,12 @@ public class ServiceDownloader {
 	
 	public static URI downloadJar(URL jarURL){
 		
-		String filePath = SERVERFOLDER+"/"+jarURL.getFile();
+		String filePath = jarURL.getFile();
+
+		if(jarURL.getProtocol().toLowerCase().equals("file")){
+			filePath = SERVERFOLDER+"/"+ filePath.substring(filePath.lastIndexOf('/')+1);
+		} else
+			filePath = SERVERFOLDER+"/"+jarURL.getFile();
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Trying to download " + jarURL.toString() + " to " + filePath);
