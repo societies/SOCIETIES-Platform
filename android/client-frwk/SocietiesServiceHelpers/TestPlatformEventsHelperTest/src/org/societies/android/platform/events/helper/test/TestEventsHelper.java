@@ -8,6 +8,7 @@ import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.api.schema.cssmanagement.CssEvent;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -28,6 +29,8 @@ public class TestEventsHelper extends AndroidTestCase {
 	private static final int LATCH_TIME_OUT = 10000;
 	private static final String INTENTS_FILTER = "org.societies.android.css.manager";
 	private static final int NUM_FILTER_EVENTS = 2;
+	private static final String CSS_EVENT_TEST_DESCRIPTION = "test Css Event";
+	private static final String CSS_EVENT_TEST_TYPE = "test type";
 	
 	private boolean testCompleted;
 	private long startTime;
@@ -42,7 +45,7 @@ public class TestEventsHelper extends AndroidTestCase {
 
 		super.tearDown();
 	}
-	@MediumTest
+//	@MediumTest
 	public void testServiceConfiguration() throws Exception {
 		this.testCompleted = false;
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -113,35 +116,52 @@ public class TestEventsHelper extends AndroidTestCase {
 									public void returnAction(int result) {
 										assertEquals(1, result);
 										try {
-											helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
+											helper.publishEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, getCssEvent(), new IPlatformEventsCallback() {
 												
 												@Override
-												public void returnAction(int result) {
-													fail();
+												public void returnAction(int arg0) {
 												}
 												
 												@Override
-												public void returnAction(boolean resultFlag) {
-													assertTrue(resultFlag);
-													helper.tearDownService(new IMethodCallback() {
-														
-														@Override
-														public void returnAction(String result) {
-															fail();
-														}
-														
-														@Override
-														public void returnAction(boolean resultFlag) {
-															assertTrue(resultFlag);
-															TestEventsHelper.this.testCompleted = true;
-															latch.countDown();
-														}
-													});
+												public void returnAction(boolean result) {
+													assertTrue(result);
+													try {
+														helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
+															
+															@Override
+															public void returnAction(int result) {
+																fail();
+															}
+															
+															@Override
+															public void returnAction(boolean resultFlag) {
+																assertTrue(resultFlag);
+																helper.tearDownService(new IMethodCallback() {
+																	
+																	@Override
+																	public void returnAction(String result) {
+																		fail();
+																	}
+																	
+																	@Override
+																	public void returnAction(boolean resultFlag) {
+																		assertTrue(resultFlag);
+																		TestEventsHelper.this.testCompleted = true;
+																		latch.countDown();
+																	}
+																});
+															}
+														});
+													} catch (PlatformEventsHelperNotConnectedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}
+													
 												}
 											});
-										} catch (PlatformEventsHelperNotConnectedException e) {
-											e.printStackTrace();
-											fail();
+										} catch (PlatformEventsHelperNotConnectedException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
 										}
 									}
 									
@@ -166,7 +186,7 @@ public class TestEventsHelper extends AndroidTestCase {
 		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
 		assertTrue(this.testCompleted);
 	}
-	@MediumTest
+//	@MediumTest
 	public void testSubscribeToSomeEvents() throws Exception {
 		this.testCompleted = false;
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -254,7 +274,7 @@ public class TestEventsHelper extends AndroidTestCase {
 		assertTrue(this.testCompleted);
 	}
 	
-	@MediumTest
+//	@MediumTest
 	/**
 	 * Try using the service with setting it up
 	 * @throws Exception
@@ -285,4 +305,12 @@ public class TestEventsHelper extends AndroidTestCase {
 		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
 		assertTrue(this.testCompleted);
 	}
+	
+    private static CssEvent getCssEvent() {
+    	CssEvent event = new CssEvent();
+    	event.setDescription(CSS_EVENT_TEST_DESCRIPTION);
+    	event.setType(CSS_EVENT_TEST_TYPE);
+    	return event;
+    }
+
 }

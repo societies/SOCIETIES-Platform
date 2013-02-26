@@ -504,7 +504,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
      * Broadcast receiver to receive intent return values from service method calls
      * Essentially this receiver invokes callbacks for relevant intents received from Android Communications. 
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
-     * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
+     * callback IDs or queues cannot be assumed to exist for a particular Broadcast receiver.
      */
     private class MainReceiver extends BroadcastReceiver {
 		
@@ -513,45 +513,61 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 
 			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_ALL_EVENTS)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.PUBLISH_EVENT)) {
-//				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()].poll();
-//				if (null != retrievedCallback) {
-//					retrievedCallback.returnAction(Integer.toString(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE)));
-//				}
+				if (null != EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
-				IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
-				if (null != retrievedCallback) {
-					retrievedCallback.returnAction(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE));
+				if (null != EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+					if (null != retrievedCallback) {
+						retrievedCallback.returnAction(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE));
+					}
 				}
 			} 
 		}
@@ -605,6 +621,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
      */
     private void initialiseQueue(int index) {
     	if (null == this.methodQueues[index]) {
+    		Log.d(LOG_TAG, "Create queue for index: " + index);
     		this.methodQueues[index] = new ConcurrentLinkedQueue<IPlatformEventsCallback>();
     	}
     }

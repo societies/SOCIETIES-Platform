@@ -28,6 +28,9 @@ package org.societies.android.platform.cssmanager;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.societies.android.api.cis.directory.ICisDirectory;
+import org.societies.android.api.cis.management.ICisManager;
+import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
@@ -50,12 +53,17 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
+/**
+ * Class used to bind to, unbind from, invoke Societies defined methods in {@link IServiceManager}. Any service
+ * that needs access to Android Comms and/or Android Comms Pubsub need to included in this class.
+ *
+ */
 public class SocietiesClientServicesController {
 	private final static String LOG_TAG = SocietiesClientServicesController.class.getName();
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	private final static int NUM_SERVICES = 1;
+	private final static int NUM_SERVICES = 5;
 	
 	private final static int EVENT_SERVICE = 0;
 	private final static int CIS_DIRECTORY_SERVICE = 1;
@@ -238,10 +246,12 @@ public class SocietiesClientServicesController {
         	LocalCssDirectoryBinder binder = (LocalCssDirectoryBinder) service;
             //Retrieve the local service API
             SocietiesClientServicesController.this.cssDirectoryService = (IAndroidCssDirectory) binder.getService();
+        	SocietiesClientServicesController.this.platformServiceConnections[CSS_DIRECTORY_SERVICE] = this;
         	SocietiesClientServicesController.this.servicesBinded.countDown();
         }
     };
     
+    //Potential platform services
     private ServiceConnection trustConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
@@ -403,25 +413,37 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.servicesBinded = new CountDownLatch(NUM_SERVICES);
     		
     		boolean retValue = true;
-
+    		//Remote platform services
     		Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Events Service");
         	Intent serviceIntent = new Intent(ICoreSocietiesServices.EVENTS_SERVICE_INTENT);
         	SocietiesClientServicesController.this.context.bindService(serviceIntent, eventsConnection, Context.BIND_AUTO_CREATE);
-        	
+
+        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Directory Service");
+        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_DIRECTORY_SERVICE_INTENT);
+        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisDirectoryConnection, Context.BIND_AUTO_CREATE);
+
+        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Manager Service");
+        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
+        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
+
+        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Subscribed Service");
+        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
+        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
+
+        	//Local platform services
+        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CSS Directory Service");
+        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
+        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
+
 //    		Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Personalisation Manager Service");
 //        	serviceIntent = new Intent(ICoreSocietiesServices.PERSONALISATION_SERVICE_INTENT);
 //        	SocietiesClientServicesController.this.context.bindService(serviceIntent, personalisationMgrConnection, Context.BIND_AUTO_CREATE);
 //        	
-//        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CSS Directory Service");
-//        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
-//        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
 //
 //        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SLM Service Management Service");
 //        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
 //        	SocietiesClientServicesController.this.context.bindService(serviceIntent, slmControlConnection, Context.BIND_AUTO_CREATE);
 
-
-        	
         	try {
         		//To prevent hanging this latch uses a timeout
         		SocietiesClientServicesController.this.servicesBinded.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -458,7 +480,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.servicesStarted = new CountDownLatch(NUM_SERVICES);
     		
     		boolean retValue = true;
-    		
+    		//Start remote platform services
     		for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
     			
     			if (null != SocietiesClientServicesController.this.allMessengers[i]) {
@@ -475,9 +497,8 @@ public class SocietiesClientServicesController {
         			}
     			}
      		}
-    		
-//    		SocietiesClientServicesController.this.cssDirectoryService.startService();
-//    		SocietiesClientServicesController.this.slmManagementService.startService();
+    		//Start local platform services
+    		SocietiesClientServicesController.this.cssDirectoryService.startService();
     		
     		try {
 				SocietiesClientServicesController.this.servicesStarted.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -516,6 +537,7 @@ public class SocietiesClientServicesController {
     		
     		boolean retValue = true;
     		
+    		//Stop remote platform services
     		for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
     			if (null != SocietiesClientServicesController.this.allMessengers[i]) {
             		String targetMethod = IServiceManager.methodsArray[1];
@@ -532,8 +554,9 @@ public class SocietiesClientServicesController {
         			}
     			}
      		}
-//    		SocietiesClientServicesController.this.cssDirectoryService.stopService();
-//    		SocietiesClientServicesController.this.slmManagementService.stopService();
+
+    		//Stop local platform services
+    		SocietiesClientServicesController.this.cssDirectoryService.stopService();
    		
     		try {
 				SocietiesClientServicesController.this.servicesStopped.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -624,7 +647,16 @@ public class SocietiesClientServicesController {
 		case EVENT_SERVICE:
 			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
 			break;
-//		case PRIVACY_POLICY_SERVICE:
+		case CIS_DIRECTORY_SERVICE:
+			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisDirectory.methodsArray, targetMethod), 0, 0);
+			break;
+		case CIS_MANAGER_SERVICE:
+			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, targetMethod), 0, 0);
+			break;
+		case CIS_SUBSCRIBED_SERVICE:
+			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisSubscribed.methodsArray, targetMethod), 0, 0);
+			break;
+//		case ???_SERVICE:
 //			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(???.methodsArray, targetMethod), 0, 0);
 //			break;
 		default:
