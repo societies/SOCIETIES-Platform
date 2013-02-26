@@ -25,12 +25,13 @@
 
 package org.societies.android.api.internal.useragent;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 
-public interface IAndroidUserFeedback{
+public interface IAndroidUserFeedback extends IServiceManager{
 	
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.api.internal.useragent.ReturnValue";
 	public static final String GET_EXPLICITFB = "org.societies.android.api.internal.useragent.getExplicitFB";
