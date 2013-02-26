@@ -49,6 +49,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -157,6 +158,25 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @param cisId
 	 */
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId) throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxEntity} which represents the identified CSS node.
+	 * The method returns the newly created CtxEntity or the existing one if
+	 * this is already available.
+	 * 
+	 * @param cssNodeId
+	 *            the INetworkNode identifying the CSS Node context entity to
+	 *            create
+	 * @return the {@link CtxEntity} which represents the identified CSS node
+	 * @throws CtxException
+	 *             if the CtxEntity representing the identified CSS Node cannot
+	 *             be created
+	 * @throws NullPointerException if the specified INetworkNode is 
+	 *             <code>null</code>
+	 * @since 1.0
+	 */
+	public Future<CtxEntity> createCssNode(final INetworkNode cssNodeId)
+			throws CtxException;
 	
 	/**
 	 * Disables context monitoring to Context Database

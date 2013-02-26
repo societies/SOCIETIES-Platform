@@ -66,6 +66,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -290,7 +291,56 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createCssNode(org.societies.api.identity.INetworkNode)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntity> createCssNode(final INetworkNode cssNodeId)
+			throws CtxException {
+		
+		if (cssNodeId == null)
+			throw new NullPointerException("cssNodeId can't be null");
 
+		CtxEntity result = null;
+		try {
+			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
+			result = this.retrieveCssNode(cssNodeId).get();
+			if (result != null) {
+				LOG.info("Found CSS node context entity " + result);
+			} else {
+				final IIdentity cssId = this.commMgr.getIdManager().fromJid(cssNodeId.getBareJid());
+				final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
+				if (cssEnt == null)
+					throw new CtxBrokerException("The IndividualCtxEntity for CSS '" 
+							+ cssId + "' could not be found. Does node " + cssNodeId
+							+ " belong to a local CSS?");
+				final CtxAssociation ownsCssNodesAssoc;
+				if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+					ownsCssNodesAssoc = this.userCtxDBMgr.createAssociation(
+							CtxAssociationTypes.OWNS_CSS_NODES);
+				else
+					ownsCssNodesAssoc = (CtxAssociation) this.userCtxDBMgr.retrieve(
+							cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next());
+				ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
+				result = this.userCtxDBMgr.createEntity(CtxEntityTypes.CSS_NODE);
+				ownsCssNodesAssoc.addChildEntity(result.getId());
+				this.userCtxDBMgr.update(ownsCssNodesAssoc);
+				final CtxAttribute cssNodeIdAttr = this.userCtxDBMgr.createAttribute(
+						result.getId(), CtxAttributeTypes.ID);
+				cssNodeIdAttr.setStringValue(cssNodeId.toString());
+				this.userCtxDBMgr.update(cssNodeIdAttr);
+				LOG.info("Created CSS node context entity " + result.getId());
+			}
+
+		} catch (Exception e) {
+			throw new CtxBrokerException("Could not create CSS node context entity " + cssNodeId
+					+ ": " + e.getLocalizedMessage(), e);
+		}
+		
+		return new AsyncResult<CtxEntity>(result);
+	}
+	
 	@Override
 	@Async
 	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType,
