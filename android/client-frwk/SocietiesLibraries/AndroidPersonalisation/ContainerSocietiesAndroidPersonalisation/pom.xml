@@ -28,36 +28,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency>
 
-
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<!--exclusions> <exclusion> <groupId>org.societies.android.jaxb</groupId> 
-				<artifactId>jaxb-android-societies</artifactId> </exclusion> </exclusions -->
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.societies.android.platform</groupId>
 			<artifactId>personalisation</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<version>1.1.4c</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -65,10 +47,6 @@
 		<finalName>${project.artifactId}</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
-			<!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>build-helper-maven-plugin</artifactId> 
-				<executions> <execution> <phase>generate-sources</phase> <goals><goal>add-source</goal></goals> 
-				<configuration> <sources> <source>../SocietiesAndroidEvents/src/</source> 
-				</sources> </configuration> </execution> </executions> </plugin -->
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
@@ -92,13 +70,10 @@
 						<!-- must be set for emma -->
 					</dex>
 				</configuration>
-				<executions>
-					<!--execution> <id>startEmulator</id> <phase>initialize</phase> <goals> 
-						<goal>emulator-start</goal> </goals> </execution -->
-					<!--execution> <id>stopEmulator</id> <phase>initialize</phase> <goals> 
-						<goal>emulator-stop</goal> </goals> </execution -->
-
-				</executions>
+				<!-- <executions> execution> <id>startEmulator</id> <phase>initialize</phase> 
+					<goals> <goal>emulator-start</goal> </goals> </execution execution> <id>stopEmulator</id> 
+					<phase>initialize</phase> <goals> <goal>emulator-stop</goal> </goals> </execution 
+					</executions> -->
 
 				<extensions>true</extensions>
 			</plugin>

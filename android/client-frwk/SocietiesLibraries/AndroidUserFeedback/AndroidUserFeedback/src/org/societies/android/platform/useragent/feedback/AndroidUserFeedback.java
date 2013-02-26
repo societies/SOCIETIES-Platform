@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
@@ -108,6 +109,7 @@ public class AndroidUserFeedback {
 		
 		processExpFeedbackRequestEvent(client, requestID, type, content.getProposalText(), optionsList);
 
+		
 		//send pubsub event to all user agents
 		/*		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
@@ -246,7 +248,7 @@ public class AndroidUserFeedback {
 			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.TYPE, type);
 			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT, proposalText);
 			ackNackIntent.putStringArrayListExtra(UserFeedbackActivityIntentExtra.OPTIONS, optionsList);
-			
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.INTENT_RETURN, IAndroidUserFeedback.GET_EXPLICITFB);
 			ackNackIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			this.androidContext.startActivity(ackNackIntent);
 			break;
