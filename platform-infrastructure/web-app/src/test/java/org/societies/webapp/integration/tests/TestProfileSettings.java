@@ -52,15 +52,11 @@ public class TestProfileSettings extends SeleniumTest {
 
     @Before
     public void setupTest() {
-        IndexPage indexPage = new IndexPage(getDriver());
-
-        indexPage.doLogin(USERNAME, PASSWORD);
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
 
         profileSettingsPage = indexPage.navigateToProfileSettings();
 
         buildDefaultPreferenceTree();
-
-
     }
 
     private void buildDefaultPreferenceTree() {
@@ -95,6 +91,14 @@ public class TestProfileSettings extends SeleniumTest {
     public void openPopups_hitCancelButton_noChangesMade() {
         ProfileSettingsTreeContextMenu ctxMenu;
 
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // ADD PREFERENCE TO ROOT DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnRootNode();
+        ProfileSettingsAddPreferenceDialog addPreferenceDialog = ctxMenu.clickAddPreference();
+        addPreferenceDialog.clickCancel();
+        // verify tree
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
@@ -184,9 +188,9 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
-
         // refresh page, verify again
-        getDriver().get(getDriver().getCurrentUrl());
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
+        profileSettingsPage = indexPage.navigateToProfileSettings();
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
@@ -240,10 +244,29 @@ public class TestProfileSettings extends SeleniumTest {
     }
 
     @Test
-    public void editCondition_update3values_correctValuesUpdated() {
+    public void editOutcome_editCondition_correctValuesUpdated() {
         ProfileSettingsTreeContextMenu ctxMenu;
 
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // EDIT OUTCOME DIALOG
+        ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
+                new int[]{0, 1, 0},
+                "bgColour black");
+        ProfileSettingsEditOutcomeDialog dialog = ctxMenu.clickEditOutcome();
+
+        // change values to ensure it's not accidentally persisted
+        dialog.setValue("blue");
+        dialog.clickSave();
+
+        // this is what the node should now display
+        bgColourWorkOutcomeNode.text = "bgColour blue";
+
+
+        // verify tree
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
 
         // EDIT CONDITION DIALOG
         ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
@@ -258,42 +281,144 @@ public class TestProfileSettings extends SeleniumTest {
         editConditionDialog.clickSave();
 
         // this is what the node should now display
-        bgColourWorkConditionNode.text = "newName GREATER THAN newValue";
+        bgColourWorkConditionNode.text = "newName GREATER_THAN newValue";
+
 
         // verify tree
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
         // refresh page, verify again
-        String url = getDriver().getCurrentUrl();
-        getDriver().get(BASE_URL);
-        getDriver().get(url);
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
+        profileSettingsPage = indexPage.navigateToProfileSettings();
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
     @Test
-    public void editOutcome_updateValue_correctValuesUpdated() {
+    public void delete_deletesCorrectData() {
         ProfileSettingsTreeContextMenu ctxMenu;
+        ProfileSettingsDeleteDialog deleteDialog;
 
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
-        // EDIT CONDITION DIALOG
+        // Delete volume home outcome
         ctxMenu = profileSettingsPage.openContextMenuOnOutcomeNode(
-                new int[]{0, 1, 0},
-                "bgColour black");
-        ProfileSettingsEditOutcomeDialog dialog = ctxMenu.clickEditOutcome();
-
-        // change values to ensure it's not accidentally persisted
-        dialog.setValue("blue");
-        dialog.clickSave();
-
-        // this is what the node should now display
-        bgColourWorkOutcomeNode.text = "bgColour blue";
-
+                new int[]{1, 0, 0},
+                "volume 10");
+        deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickOk();
         // verify tree
-//        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
-        // refresh page, verify again
-        String url = getDriver().getCurrentUrl();
-        getDriver().get(BASE_URL);
-        getDriver().get(url);
+        volumeHomeConditionNode.subNodes.remove(volumeHomeOutcomeNode);
+//        volumeNode.subNodes.clear();
+//        volumeNode.subNodes.add(volumeWorkConditionNode);
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        // Delete bgColor work condition
+        ctxMenu = profileSettingsPage.openContextMenuOnConditionNode(
+                new int[]{0, 1},
+                "locationSymbolic EQUALS work");
+        deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickOk();
+        // verify tree
+        bgColourNode.subNodes.remove(bgColourWorkConditionNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        // Delete volume preference
+        ctxMenu = profileSettingsPage.openContextMenuOnPreferenceNode(
+                new int[]{1},
+                "volume");
+        deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickOk();
+        // verify tree
+        preferenceTreeRoot.subNodes.remove(volumeNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // Delete bgColor preference
+        ctxMenu = profileSettingsPage.openContextMenuOnPreferenceNode(
+                new int[]{0},
+                "bgColour");
+        deleteDialog = ctxMenu.clickDelete();
+        deleteDialog.clickOk();
+        // verify tree
+        preferenceTreeRoot.subNodes.remove(bgColourNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        // refresh page, verify again
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
+        profileSettingsPage = indexPage.navigateToProfileSettings();
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+    }
+
+    @Test
+    public void addEntirePreferenceTree() {
+        ProfileSettingsPage.TreeNode beerStrengthNode, beerStrengthOutcomeNode;
+        ProfileSettingsPage.TreeNode afternoonConditionNode, afternoonOutcomeNode;
+        ProfileSettingsPage.TreeNode locationHomeConditionNode, locationHomeOutcomeNode;
+
+        profileSettingsPage.removeAllPreferences();
+
+        preferenceTreeRoot.subNodes.clear();
+
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        profileSettingsPage.openContextMenuOnRootNode()
+                .clickAddPreference()
+                .setName("beerStrength")
+                .clickSave();
+
+        beerStrengthNode = new ProfileSettingsPage.TreeNode("beerStrength",
+                ProfileSettingsPage.TreeNodeType.PREFERENCE,
+                preferenceTreeRoot);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        profileSettingsPage.openContextMenuOnPreferenceNode(new int[]{0}, "beerStrength")
+                .clickAdd()
+                .setOutcomeValue("strong")
+                .clickSave();
+
+        beerStrengthOutcomeNode = new ProfileSettingsPage.TreeNode("strong",
+                ProfileSettingsPage.TreeNodeType.OUTCOME,
+                beerStrengthNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        profileSettingsPage.openContextMenuOnOutcomeNode(new int[]{0,0}, "strong")
+                .clickAddBefore()
+                .setName("timeOfDay")
+                .setOperator("equals")
+                .setConditionValue("afternoon")
+                .clickSave();
+
+        beerStrengthNode.subNodes.remove(beerStrengthOutcomeNode);
+        afternoonConditionNode = new ProfileSettingsPage.TreeNode("timeOfDay EQUALS afternoon",
+                ProfileSettingsPage.TreeNodeType.CONDITION,
+                beerStrengthNode);
+        afternoonOutcomeNode = new ProfileSettingsPage.TreeNode("strong",
+                ProfileSettingsPage.TreeNodeType.OUTCOME,
+                afternoonConditionNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        profileSettingsPage.openContextMenuOnConditionNode(new int[]{0,0}, "timeOfDay EQUALS afternoon")
+                .clickAddBefore()
+                .setName("locationSymbolic")
+                .setOperator("equals")
+                .setConditionValue("pub")
+                .clickSave();
+
+
+        beerStrengthNode.subNodes.remove(afternoonConditionNode);
+        locationHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
+                ProfileSettingsPage.TreeNodeType.CONDITION,
+                beerStrengthNode);
+        locationHomeConditionNode.subNodes.add(afternoonConditionNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+
+
     }
 }
