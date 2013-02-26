@@ -67,6 +67,7 @@ public class AndroidUserFeedback {
 	private HashMap<String, ImplicitPopup> impPopups;
 	private IIdentity myCloudID;
 	private final Context androidContext;
+	public final static String RETURN_TO_CLOUD = "returnToCloud";
 
 	public AndroidUserFeedback(Context context) {
 		this.androidContext = context;
@@ -203,7 +204,7 @@ public class AndroidUserFeedback {
 				String expProposalText = feedbackBean.getProposalText();
 				ArrayList<String> optionsList = (ArrayList<String>) feedbackBean.getOptions();
 
-				processExpFeedbackRequestEvent("returnToCloud", expRequestID, expType, expProposalText, optionsList);
+				processExpFeedbackRequestEvent(this.RETURN_TO_CLOUD, expRequestID, expType, expProposalText, optionsList);
 				break;
 			case GET_IMPLICIT_FB:
 				String impRequestID = feedbackBean.getRequestId();
