@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -27,16 +27,11 @@ package org.societies.android.platform.personalisation.container.test;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.societies.android.api.identity.ARequestor;
-import org.societies.android.api.identity.ARequestorService;
 import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.platform.personalisation.container.PersonalisationAndroidTest;
 import org.societies.android.platform.personalisation.container.PersonalisationAndroidTest.TestPersonalisationBinder;
-import org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroid;
-import org.societies.android.platform.personalisation.impl.mocks.MockClientCommunicationMgr;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-
+import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -54,7 +49,7 @@ public class TestPersonalisation extends ServiceTestCase <PersonalisationAndroid
 
 	private static final String LOG_TAG = TestPersonalisation.class.getName();
 	private static final String CLIENT_ID = "org.societies.android.platform.personalisation.test";
-	private ARequestor requestor;
+
 	private Boolean receivedResult = false;
 	
 	public TestPersonalisation() {
@@ -89,10 +84,12 @@ public class TestPersonalisation extends ServiceTestCase <PersonalisationAndroid
 		
 		IPersonalisationManagerAndroid persoService = binder.getService();
 		
-		AServiceResourceIdentifier serviceID = new AServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceID = new ServiceResourceIdentifier();
 		serviceID.setIdentifier(new URI("http://service.societies.local"));
 		serviceID.setServiceInstanceIdentifier("service_1232");
-		ARequestorService requestorService = new ARequestorService("service@societies.local", serviceID);
+		RequestorServiceBean requestorService = new RequestorServiceBean();
+		requestorService.setRequestorId("service@societies.local");
+		requestorService.setRequestorServiceId(serviceID);
 		persoService.getPreference(CLIENT_ID, requestorService, "emma@societies.local", "media", serviceID, "volume");
 		
 		while (!this.receivedResult){

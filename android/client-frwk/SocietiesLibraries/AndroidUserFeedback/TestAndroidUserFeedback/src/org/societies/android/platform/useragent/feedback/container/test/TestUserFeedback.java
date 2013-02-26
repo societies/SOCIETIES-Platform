@@ -25,12 +25,14 @@
 
 package org.societies.android.platform.useragent.feedback.container.test;
 
+import java.util.List;
+
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ExpProposalType;
-import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService.FeedbackContainerBinder;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -68,7 +70,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			TestUserFeedback.this.receivedResult = true;
-			assertNotNull(intent.getParcelableExtra(IPersonalisationManagerAndroid.INTENT_RETURN_VALUE));
+			assertNotNull(intent.getParcelableExtra(IAndroidUserFeedback.INTENT_RETURN_VALUE));
 			Log.d(LOG_TAG, "OnReceive finished");
 		}
 
@@ -78,7 +80,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 	@MediumTest
 	public void testGetExplicitFB() {
 		setupBroadcastReceiver();
-		Intent userFeedbackIntent = new Intent(getContext(), TestContainerFeedbackService.class);
+		Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
 		
 		FeedbackContainerBinder binder =  (FeedbackContainerBinder) bindService(userFeedbackIntent);
 		
@@ -88,10 +90,13 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 	
 		
 		ExpProposalContent proposal = new ExpProposalContent("Testing explicit proposal user feedback", new String[]{"Yes","No"});
-		ufService.getExplicitFB(CLIENT_ID, ExpProposalType.ACKNACK, proposal);
+		ExpFeedbackResultBean bean = ufService.getExplicitFB(CLIENT_ID, ExpProposalType.ACKNACK, proposal);
+
 		while (!this.receivedResult){
 			try {
+				Log.d(LOG_TAG, "Not received result");
 				Thread.sleep(1000);
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -110,8 +115,11 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
         receiver = new UserFeedbackBroadcastReceiver();
-        getContext().registerReceiver(receiver, createTestIntentFilter());    	
-        Log.d(LOG_TAG, "Register broadcast receiver");
+        IntentFilter intentFilter = createTestIntentFilter();
+        
+        getContext().registerReceiver(receiver, intentFilter); 
+        
+        Log.d(LOG_TAG, "Registered broadcast receiver");
 
     }
     
@@ -124,9 +132,10 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
-        intentFilter.addAction(IPersonalisationManagerAndroid.GET_INTENT_ACTION);
-        intentFilter.addAction(IPersonalisationManagerAndroid.GET_PREFERENCE);
-        intentFilter.addAction(IPersonalisationManagerAndroid.INTENT_RETURN_VALUE);
+        intentFilter.addAction(IAndroidUserFeedback.GET_IMPLICITFB);
+        intentFilter.addAction(IAndroidUserFeedback.GET_EXPLICITFB);
+        intentFilter.addAction(IAndroidUserFeedback.INTENT_RETURN_VALUE);
+        
         return intentFilter;
     }
 }

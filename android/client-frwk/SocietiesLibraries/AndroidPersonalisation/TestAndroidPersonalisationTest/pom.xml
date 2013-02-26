@@ -70,17 +70,6 @@
 			<type>apklib</type>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
-		</dependency>
 
 		<dependency>
 			<groupId>emma</groupId>

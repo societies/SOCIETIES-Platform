@@ -341,7 +341,7 @@ public class CtxAttributeTypes {
      * @since 0.0.8
      */
     public static final String POLITICAL_VIEWS = "politicalViews";
- 
+    
     /**
      * The comma separated string values of this attribute type contains information about the religious views of an entity.
      * Possible value types: {@link CtxAttributeValueType.STRING}
@@ -398,6 +398,14 @@ public class CtxAttributeTypes {
      * @since 0.0.8
      */
     public static final String WEIGHT = "weight";
+    
+    /**
+     * This attribute type contains information about the work position of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String WORK_POSITION = "workPosition";
        
     /**
      * TODO moved to platform CtxAttributeTypes
