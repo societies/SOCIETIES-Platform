@@ -122,7 +122,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		ArrayList<String> finalArrayStringList = new ArrayList<String>();
 
 		try {
-			retrievedType = (CtxAttribute) internalCtxBroker.retrieve(ctxAttributeIdentifier).get();
+			retrievedType = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
