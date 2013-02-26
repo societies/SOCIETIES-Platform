@@ -49,6 +49,7 @@ import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 import android.app.Notification;
 import android.content.BroadcastReceiver;
@@ -526,8 +527,6 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					//Parcelable parcel =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
-					//ACommunity cis = (ACommunity) parcel;
 					Community cis =  intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
@@ -561,11 +560,9 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisManager.INTENT_RETURN_VALUE);
-					Community communities[] = (Community[]) parcels;
-					//ACommunity communities[] = new ACommunity[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	communities[i] = (ACommunity) parcels[i];
-					//}
+					Community communities[] = new Community [parcels.length];
+					System.arraycopy(parcels, 0, communities, 0, parcels.length);
+
 					//RETURN JSON ARRAY
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCommunitiesToJSONArray(communities));
 					result.setKeepCallback(false);
@@ -596,8 +593,6 @@ public class PluginCISFunctions extends Plugin {
 					//UNMARSHALL THE RESPONSE FROM Parcel
 					boolean bJoined = intent.getBooleanExtra(ICisManager.INTENT_RETURN_BOOLEAN, false);
 					if (bJoined) {
-						//Parcelable parcel = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);
-						//AJoinResponse response = (AJoinResponse) parcel;
 						JoinResponse response = intent.getParcelableExtra(ICisManager.INTENT_RETURN_VALUE);;
 						//RETURN A JSON OBJECT
 						PluginResult result = new PluginResult(PluginResult.Status.OK, createJoinResponseJSON(response));
@@ -627,11 +622,8 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					Participant members[] = (Participant[]) parcels;  
-					//AParticipant members[] = new AParticipant[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	members[i] = (AParticipant) parcels[i];
-					//}
+					Participant members[] = new Participant [parcels.length];
+					System.arraycopy(parcels, 0, members, 0, parcels.length);
 					//RETURN JSON ARRAY
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertPartipantToJSONArray(members));
 					result.setKeepCallback(false);
@@ -646,8 +638,6 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITY FROM Parcel
-					//Parcelable parcel =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					//ACommunity cis = (ACommunity) parcel;
 					Community cis =  intent.getParcelableExtra(ICisSubscribed.INTENT_RETURN_VALUE);
 					//RETURN JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
@@ -664,11 +654,8 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE ACTIVITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisSubscribed.INTENT_RETURN_VALUE);
-					MarshaledActivity activities[] = (MarshaledActivity[]) parcels;
-					//AActivity activities[] = new AActivity[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	activities[i] = (AActivity) parcels[i];
-					//}
+					MarshaledActivity activities[] = new MarshaledActivity [parcels.length];
+					System.arraycopy(parcels, 0, activities, 0, parcels.length);
 					//RETURN JSON ARRAY
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertActiviesToJSONArray(activities));
 					result.setKeepCallback(false);
@@ -714,11 +701,8 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-					CisAdvertisementRecord adverts[] = (CisAdvertisementRecord[]) parcels;
-					//ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	adverts[i] = (ACisAdvertisementRecord) parcels[i];
-					//}
+					CisAdvertisementRecord adverts[] = new CisAdvertisementRecord [parcels.length];
+					System.arraycopy(parcels, 0, adverts, 0, parcels.length);
 					//RETURN JSON ARRAY
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);
@@ -734,11 +718,8 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-					CisAdvertisementRecord adverts[] = (CisAdvertisementRecord[]) parcels;
-					//ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	adverts[i] = (ACisAdvertisementRecord) parcels[i];
-					//}
+					CisAdvertisementRecord adverts[] = new CisAdvertisementRecord [parcels.length];
+					System.arraycopy(parcels, 0, adverts, 0, parcels.length);
 					//RETURN JSON ARRAY
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertCisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);

@@ -1,8 +1,7 @@
 package org.societies.platform.slm.container.test;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.android.platform.androidutils.AppPreferences;
-import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.platform.slm.container.ServiceManagementTest;
 import org.societies.platform.slm.container.ServiceManagementTest.LocalSLMBinder;
 
@@ -10,9 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
@@ -25,7 +22,7 @@ import android.util.Log;
  */
 public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
 	private static final String LOG_TAG = TestSLMmanager.class.getName();
-	private static final String CLIENT = "org.societies.android.platform.cssmanager.test";
+	private static final String CLIENT = "org.societies.android.platform.slm.test";
 	private static final int DELAY = 10000;
 	private static final int TEST_END_DELAY = 2000;
 	private static final String TEST_IDENTITY = "john.societies.local";
@@ -45,6 +42,8 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
         LocalSLMBinder binder = (LocalSLMBinder) bindService(commsIntent);
         assertNotNull(binder);
         this.serviceDisco = (IServiceDiscovery) binder.getService();
+        this.serviceDisco.startService();
+        Thread.sleep(DELAY);
 	}
 
 	protected void tearDown() throws Exception {
@@ -124,11 +123,24 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
 	        Log.d(LOG_TAG, "Received action: " + intent.getAction());
 	
 	        if (intent.getAction().equals(IServiceDiscovery.GET_MY_SERVICES) || intent.getAction().equals(IServiceDiscovery.GET_SERVICES)) {
-                Parcelable[] returnedServices =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-                assertNotNull(returnedServices);
+	        	boolean notStarted = intent.getBooleanExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, false);
+	        	if (notStarted)
+	        		fail("'Service Not Started' returned from service");
+	        	else {
+	        		Parcelable[] returnedServices =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
+	        		assertNotNull(returnedServices);
+	        		for (int i=0; i< returnedServices.length; i++) {
+	        			org.societies.api.schema.servicelifecycle.model.Service service = (org.societies.api.schema.servicelifecycle.model.Service) returnedServices[i]; 
+	        			Log.d(LOG_TAG, service.getServiceName());
+	        		}
+	        	}
 	        	
                 TestSLMmanager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, intent.getAction() + " elapse time: " + (TestSLMmanager.this.testEndTime - TestSLMmanager.this.testStartTime));
+	        }
+	        else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+	        	boolean started = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+	        	Log.d(LOG_TAG, "Service started: " + started);
 	        }
         }
     }
@@ -145,6 +157,8 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
         intentFilter.addAction(IServiceDiscovery.GET_SERVICE);
         intentFilter.addAction(IServiceDiscovery.GET_SERVICES);
         intentFilter.addAction(IServiceDiscovery.SEARCH_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.INTENT_NOTSTARTED_EXCEPTION);
+        intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
         
         return intentFilter;
     }

@@ -482,22 +482,14 @@ public class PluginCSSManager extends Plugin {
 		if (IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() || IAndroidCSSManager.GET_CSS_FRIENDS==intent.getAction() || IAndroidCSSManager.SUGGESTED_FRIENDS==intent.getAction()) {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
 			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
-			advertRecord = (CssAdvertisementRecord[]) parcels;
-			//advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			//Log.d(LOG_TAG, "Number of friends: " + parcelable.length);
-			//for (int i  = 0; i < parcelable.length; i++) {
-			//	advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
-			//}
+			advertRecord = new CssAdvertisementRecord [parcels.length];
+			System.arraycopy(parcels, 0, advertRecord, 0, parcels.length);
 		} 
 		else if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ) {
 			resultStatus = intent.getBooleanExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, false);
 			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY);
-			advertRecord = (CssAdvertisementRecord[]) parcels;
-			//advertRecord = new ACssAdvertisementRecord[parcelable.length];
-			//Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
-			//for (int i  = 0; i < parcelable.length; i++) {
-			//	advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
-			//}
+			advertRecord = new CssAdvertisementRecord [parcels.length];
+			System.arraycopy(parcels, 0, advertRecord, 0, parcels.length);
 		} 
 		//CSS RECORDS 
 		else  {

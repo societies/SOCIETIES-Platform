@@ -25,8 +25,7 @@
 package org.societies.android.platform.cismanager.test;
 
 import org.societies.android.api.cis.directory.ICisDirectory;
-import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal;
-import org.societies.android.platform.cismanager.container.TestServiceCISManagerLocal.LocalCISManagerBinder;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.platform.cismanager.container.TestServiceCisDirectoryLocal;
 import org.societies.android.platform.cismanager.container.TestServiceCisDirectoryLocal.LocalCisDirectoryBinder;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -137,22 +136,30 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDi
         public void onReceive(Context context, Intent intent) {
 	        Log.d(LOG_TAG, "Received action: " + intent.getAction());
 	
-	        if (intent.getAction().equals(ICisDirectory.FIND_ALL_CIS)) {
-	        	Parcelable[] objects = (Parcelable[])intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
-	        	assertNotNull(objects);
-	        	
-	        	for(Parcelable object: objects) {
-	        		CisAdvertisementRecord advert = (CisAdvertisementRecord) object;
-	        		Log.i(LOG_TAG, advert.getId());
+	        boolean notStarted = intent.getBooleanExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, false);
+        	if (notStarted)
+        		fail("'Service Not Started' returned from service");
+        	else {
+		        if (intent.getAction().equals(ICisDirectory.FIND_ALL_CIS)) {
+		        	Parcelable[] objects = (Parcelable[])intent.getParcelableArrayExtra(ICisDirectory.INTENT_RETURN_VALUE);
+		        	assertNotNull(objects);
+		        	for(Parcelable object: objects) {
+		        		CisAdvertisementRecord advert = (CisAdvertisementRecord) object;
+		        		Log.i(LOG_TAG, advert.getId());
+		        		Log.i(LOG_TAG, advert.getName());
+		        	}
+		        } 
+		        else if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID)) {
+		        	CisAdvertisementRecord advert = (CisAdvertisementRecord) intent.getParcelableExtra(ICisDirectory.INTENT_RETURN_VALUE);
+		        	assertNotNull(advert);
+		        	Log.i(LOG_TAG, advert.getId());
 	        		Log.i(LOG_TAG, advert.getName());
-	        	}
-                
-	        } else if (intent.getAction().equals(ICisDirectory.FIND_CIS_ID)) {
-	        	CisAdvertisementRecord advert = (CisAdvertisementRecord) intent.getParcelableExtra(ICisDirectory.INTENT_RETURN_VALUE);
-	        	assertNotNull(advert);
-	        	Log.i(LOG_TAG, advert.getId());
-        		Log.i(LOG_TAG, advert.getName());
-	        } 
+		        } 
+		        else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+		        	boolean started = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+		        	Log.d(LOG_TAG, "Service started: " + started);
+		        }
+        	}
 	        //signal that test has completed
     		TestSocietiesCisDirectory.this.testCompleted = true;
 	        TestSocietiesCisDirectory.this.testEndTime = System.currentTimeMillis();
@@ -170,6 +177,7 @@ public class TestSocietiesCisDirectory  extends ServiceTestCase<TestServiceCisDi
         intentFilter.addAction(ICisDirectory.FIND_ALL_CIS);
         intentFilter.addAction(ICisDirectory.FIND_CIS_ID);
         intentFilter.addAction(ICisDirectory.FILTER_CIS);
+        intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
         
         return intentFilter;
     }

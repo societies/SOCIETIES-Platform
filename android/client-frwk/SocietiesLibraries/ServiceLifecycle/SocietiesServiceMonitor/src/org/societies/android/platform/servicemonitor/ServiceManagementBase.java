@@ -101,13 +101,13 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
     public boolean startService() {
     	if (!connectedToComms) {
         	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+        	Log.d(LOG_TAG, "ServiceManagementBase startService binding to comms");
 	        this.commMgr.bindCommsService(new IMethodCallback() {	
 				@Override
 				public void returnAction(boolean resultFlag) {
 					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
 					if (resultFlag) {
-						connectedToComms = true;
+						ServiceManagementBase.this.connectedToComms = true;
 						//REGISTER NAMESPACES
 			        	commMgr.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
 							@Override
@@ -147,7 +147,7 @@ public class ServiceManagementBase implements IServiceDiscovery, IServiceControl
 				@Override
 				public void returnAction(boolean resultFlag) {
 					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
-					connectedToComms = false;
+					ServiceManagementBase.this.connectedToComms = false;
 					
 					commMgr.unbindCommsService();
 					//SEND INTENT WITH SERVICE STOPPED STATUS
