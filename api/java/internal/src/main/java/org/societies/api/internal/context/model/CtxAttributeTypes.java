@@ -50,10 +50,21 @@ org.societies.api.context.model.CtxAttributeTypes {
 	public static final String CRIST_MODEL = "crist_model";
 	
 	/**
+	 * The value of this attribute type contains the domain server of a CSS.
+	 * The attribute is associated with the {@link IndividualCtxEntity}
+	 * representing that particular CSS.
+	 * <p>
+     * Possible value types: {@link CtxAttributeValueType#STRING}.
+	 * 
+	 * @since 1.0
+	 */
+	public static final String CSS_DOMAIN_SERVER = "cssDomainServer";
+	
+	/**
 	 * The value of this attribute type determines the status of a
 	 * {@link CtxEntityTypes#CSS_NODE CSS_NODE} context entity.
 	 * <p>
-     * Possible value types: {@link CtxAttributeValueType.INTEGER}.
+     * Possible value types: {@link CtxAttributeValueType#INTEGER}.
 	 * <p>
      * Possible values: The ordinals of the enums defined in
      * {@link CSSManagerEnums.nodeStatus}.
