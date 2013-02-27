@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
@@ -66,6 +67,7 @@ public class AndroidUserFeedback {
 	private HashMap<String, ImplicitPopup> impPopups;
 	private IIdentity myCloudID;
 	private final Context androidContext;
+	public final static String RETURN_TO_CLOUD = "returnToCloud";
 
 	public AndroidUserFeedback(Context context) {
 		this.androidContext = context;
@@ -84,7 +86,7 @@ public class AndroidUserFeedback {
 	/*
 	 * This method returns null - String[] return type returned using Intents
 	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content) {
+	public ExpFeedbackResultBean getExplicitFB(String client, int type, ExpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for explicit feedback");
 		Log.d(LOG_TAG, "Content: "+content.getProposalText());
 		Log.d(LOG_TAG, "Options size:" +content.getOptions().length);
@@ -108,6 +110,7 @@ public class AndroidUserFeedback {
 		
 		processExpFeedbackRequestEvent(client, requestID, type, content.getProposalText(), optionsList);
 
+		
 		//send pubsub event to all user agents
 		/*		try {
 			Log.d(LOG_TAG, "Sending user feedback request event via pubsub");
@@ -122,7 +125,7 @@ public class AndroidUserFeedback {
 	}
 
 
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content) {
+	public ImpFeedbackResultBean getImplicitFB(String client, int type, ImpProposalContent content) {
 		Log.d(LOG_TAG, "Received request for implicit feedback");
 		Log.d(LOG_TAG, "Content: "+ content.getProposalText());
 
@@ -201,7 +204,7 @@ public class AndroidUserFeedback {
 				String expProposalText = feedbackBean.getProposalText();
 				ArrayList<String> optionsList = (ArrayList<String>) feedbackBean.getOptions();
 
-				processExpFeedbackRequestEvent("returnToCloud", expRequestID, expType, expProposalText, optionsList);
+				processExpFeedbackRequestEvent(this.RETURN_TO_CLOUD, expRequestID, expType, expProposalText, optionsList);
 				break;
 			case GET_IMPLICIT_FB:
 				String impRequestID = feedbackBean.getRequestId();
@@ -246,7 +249,7 @@ public class AndroidUserFeedback {
 			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.TYPE, type);
 			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT, proposalText);
 			ackNackIntent.putStringArrayListExtra(UserFeedbackActivityIntentExtra.OPTIONS, optionsList);
-			
+			ackNackIntent.putExtra(UserFeedbackActivityIntentExtra.INTENT_RETURN, IAndroidUserFeedback.GET_EXPLICITFB);
 			ackNackIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			this.androidContext.startActivity(ackNackIntent);
 			break;

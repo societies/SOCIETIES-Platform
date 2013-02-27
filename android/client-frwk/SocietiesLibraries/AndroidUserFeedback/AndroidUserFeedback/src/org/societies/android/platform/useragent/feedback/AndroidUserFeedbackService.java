@@ -71,10 +71,10 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback, IServiceManager{
+public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback{
 
 	private static final String LOG_TAG = AndroidUserFeedbackService.class.getName();
-	public static final String USER_FEEDBACK_EVENTS_ALL = "";
+	public static final String USER_FEEDBACK_EVENTS_ALL = "org.societies.android.api.internal.useragent";
 	
 	private static final String CLIENT_NAME = AndroidUserFeedbackService.class.getCanonicalName();
 	
@@ -184,14 +184,14 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 	/*
 	 * This method returns null - String[] return type returned using Intents
 	 */
-	public String[] getExplicitFB(String client, int type, ExpProposalContent content) {
+	public ExpFeedbackResultBean getExplicitFB(String client, int type, ExpProposalContent content) {
 		return userFeedback.getExplicitFB(client, type, content);
 	}
 
 	/*
 	 * This method returns null - Boolean return type returned using Intents
 	 */
-	public Boolean getImplicitFB(String client, int type, ImpProposalContent content) {
+	public ImpFeedbackResultBean getImplicitFB(String client, int type, ImpProposalContent content) {
 		return userFeedback.getImplicitFB(client, type, content);
 	}
 

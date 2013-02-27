@@ -83,17 +83,19 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 			CtxAttributeIdentifier communityAttrId) {
 
 		CtxAttribute ctxAttrReturn = null; 
-
+		//LOG.info("0 commCtxInfMgr :" +communityEntIdentifier +" ");
 		try {
 			ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
 			if (LOG.isDebugEnabled()) 	{
 				LOG.debug("communityEntIdentifier "+communityEntIdentifier.toString());
 				LOG.debug("communityAttrId "+communityAttrId.toString());
 			}
-
+			//LOG.info("1 commCtxInfMgr ctxAttrReturn:" +ctxAttrReturn);
 			ctxAttrReturn = this.communityContextEstimation.estimateCommunityCtx(communityEntIdentifier, communityAttrId);
 
+			//LOG.info("2 commCtxInfMgr ctxAttrReturn estimated :" +ctxAttrReturn);
 		} catch (InterruptedException e) {
+			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
+import org.jfree.util.Log;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectoryRemote;
@@ -213,8 +215,9 @@ public class CssManagerController {
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-//			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-//					.getIdentityName());
+			cmControllerLoginForm.setEntity(cssDetails.getProfile().getEntity());
+			Log.info("GET Entity Type is : " +cssDetails.getProfile().getEntity());
+			
 //			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
@@ -276,7 +279,7 @@ public class CssManagerController {
 		}
 
 		if (getCssLocalManager() == null) {
-			model.put("message", "Css ManagerService reference not avaiable");
+			model.put("message", "Css ManagerService reference not available");
 			model.put("cmLoginForm", cmLoginForm);
 			return new ModelAndView("pilotcssprofile", model);
 		}
@@ -287,7 +290,7 @@ public class CssManagerController {
 			allNodes.add(getCommManager().getIdManager().getThisNetworkNode());
 			model.put("allNodes", allNodes);
 		}
-
+		
 		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
 		cmControllerLoginForm.setCssAdId(cmLoginForm.getCssIdentity());
 
@@ -301,7 +304,8 @@ public class CssManagerController {
 		loginRecord.setEmailID(cmLoginForm.getEmailID());
 		loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
 //		loginRecord.setIdentityName(cmControllerLoginForm.getIdentityName());
-//		loginRecord.setImID(cmControllerLoginForm.getImID());
+		loginRecord.setEntity(cmLoginForm.getEntity());
+		Log.info("POST Entity Type is : " +cmLoginForm.getEntity());
 		loginRecord.setName(cmLoginForm.getName());
 		loginRecord.setSex(cmLoginForm.getSex());
 		loginRecord.setWorkplace(cmLoginForm.getWorkplace());
@@ -339,8 +343,8 @@ public class CssManagerController {
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-//			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-//					.getIdentityName());
+			cmControllerLoginForm.setEntity(cssDetails.getProfile()
+					.getEntity()); 
 //			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());

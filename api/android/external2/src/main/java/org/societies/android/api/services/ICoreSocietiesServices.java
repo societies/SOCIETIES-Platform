@@ -32,6 +32,9 @@ public interface ICoreSocietiesServices {
 	//Service intents for relevant services
 	final static String EVENTS_SERVICE_INTENT = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	final static String PERSONALISATION_SERVICE_INTENT = "org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote";
+	final static String CIS_DIRECTORY_SERVICE_INTENT = "org.societies.android.platform.cis.CisDirectoryRemote";
+	final static String CIS_MANAGER_SERVICE_INTENT = "org.societies.android.platform.cis.CisManagerRemote";
+	final static String CIS_SUBSCRIBED_SERVICE_INTENT = "org.societies.android.platform.cis.CisSubscribedRemote";
 
 	/**
 	 * 

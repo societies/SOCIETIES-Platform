@@ -33,6 +33,7 @@ import org.societies.api.css.FriendFilter;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -213,9 +214,10 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 //				cssProfile.setIdentityName("");
 //				cssProfile.setImID("");
 				cssProfile.setName("");
-//				cssProfile.setPassword("");
+				cssProfile.setPassword("");
 //				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+				cssProfile.setSex(CSSManagerEnums.entityType.Person.ordinal());
 //				cssProfile.setSocialURI("");
 				cssProfile.setWorkplace("");
 				cssProfile.setPosition("");
@@ -341,18 +343,19 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 					this.updateCssRegistry(cssRecord);
 					LOG.debug("Updating CSS with local database");
 
-					result.setProfile(cssRecord);
-					result.setResultStatus(true);
 
-					CssEvent event = new CssEvent();
-					event.setType(CSSManagerEnums.ADD_CSS_NODE);
-					event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-
-					this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 				} else {
-					LOG.error("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " has already logged in");
+					LOG.debug("CSS Node: " + profile.getCssNodes().get(0).getIdentity() + " was already logged in and is re-establishing connection");
 				}
+				//Send event
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.ADD_CSS_NODE);
+				event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
 
+				this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
 			} else {
 				LOG.error("CSS record does not exist");
 			}
@@ -467,7 +470,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 //				cssRecord.setSocialURI(profile.getSocialURI());
 				cssRecord.setSex(profile.getSex());
 				cssRecord.setHomeLocation(profile.getHomeLocation());
-//				cssRecord.setIdentityName(profile.getIdentityName());
+				cssRecord.setEntity(profile.getEntity());
 				cssRecord.setWorkplace(profile.getWorkplace());
 				cssRecord.setPosition(profile.getPosition());
 
@@ -1887,6 +1890,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext ownerCtxId: " +ownerCtxId);
 
 			String value;
+			List<CssNode> value1;
+			int value2;
 
 			// NAME
 			value = record.getName();
@@ -1899,42 +1904,80 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext EMAIL value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
-/*			
+			
 			// Entity
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ENTITY, value);
+			value2 = record.getEntity();
+			LOG.info("pushtoContext ENTITY value: " +value2);
+			if (value2 >= 0 && value2 <=1){
+				
+				if(value2 == CSSManagerEnums.entityType.Person.ordinal()){
+					value = "Person";
+					LOG.info("pushtoContext ENTITY value: " +value);
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
+				}
+				if(value2 == CSSManagerEnums.entityType.Organisation.ordinal()){
+					value = "Organisation";
+					LOG.info("pushtoContext ENTITY value: " +value);
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
+				}
+				
+			}
+				
 
-			// Forename
-			value = record.getEmailID();
+			// ForeName
+			value = record.getForeName();
+			LOG.info("pushtoContext FORENAME value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FORENAME, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME_FIRST, value);
 			
 			// Sex
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
-
+			value2 = record.getSex();
+			LOG.info("pushtoContext SEX value: " +value2);
+			//if (value2 != null && !value2.isEmpty()
+			if (value2 >= 0 && value2 <=2){
+							
+				if(value2 == CSSManagerEnums.genderType.Male.ordinal()){
+					value = "Male";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				if(value2 == CSSManagerEnums.genderType.Female.ordinal()){
+					value = "Female";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				if(value2 == CSSManagerEnums.genderType.Unspecified.ordinal()){
+					value = "Undefined";
+					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				}
+				
+			}
 			// CSS Identity
-			value = record.getEmailID();
+			value = record.getCssIdentity();
+			LOG.info("pushtoContext IDENTITY value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSIDENTITY, value);
-			
-			// CSS Nodes
-			value = record.getName();
-			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.CSSNODES, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ID, value);
 
 			// Workplace
-			value = record.getEmailID();
+			value = record.getWorkplace();
+			LOG.info("pushtoContext WORKPLACE value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORKPLACE, value);
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_WORK_CITY, value);
 			
 			// Position
-			value = record.getEmailID();
+			value = record.getPosition();
+			LOG.info("pushtoContext POSITION value: " +value);
 			if (value != null && !value.isEmpty())
-				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.POSITION, value);
-*/
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORK_POSITION, value);
+			
+			// CSS Nodes
+			value1 = record.getCssNodes();
+			if (record.getCssNodes() != null) {
+				for (CssNode cssNode : record.getCssNodes()) {
+					INetworkNode cssNodeId = (INetworkNode) commManager.getIdManager().fromJid(cssNode.getIdentity());
+					LOG.info("pushtoContext CSSNODES value: " +value1);
+					this.ctxBroker.createCssNode(cssNodeId);
+				}
+			}
+			
 
 		} catch (InvalidFormatException ife) {
 

@@ -45,14 +45,20 @@
 	
 	<!-- Rafik's Declarations start -->
 	
-	<bean name="PerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.PerformanceTestImpl">
+	<bean name="CisMgmtPerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.CisMgmtPerformanceTestImpl">
   		<property name="cisManager" ref="CisManager"/>
   		<property name="commManager" ref="commManager"/>
   		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+  	</bean>
+	
+	<bean name="CssMgmtPerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.CssMgmtPerformanceTestImpl">
   		<property name="cssManager" ref="CssManager"/>
   		<property name="cssDirectoryRemote" ref="CssDirectoryRemote"/>
-  		
+  		<property name="commManager" ref="commManager"/>
   	</bean>
+	
+	
+	
 	
 	<!-- Rafik's Declarations end -->
 	

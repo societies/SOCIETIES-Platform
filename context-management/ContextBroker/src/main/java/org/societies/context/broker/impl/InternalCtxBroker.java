@@ -65,7 +65,9 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -122,6 +124,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	/** The Comms Mgr service reference. */
 	@Autowired(required=true)
 	private ICommManager commMgr;
+	
+	/** The Comms Mgr Factory service reference. */
+	@Autowired(required=true)
+	private ICISCommunicationMgrFactory commMgrFactory;
 
 	/** The privacy logging facility. */
 	@Autowired(required=false)
@@ -290,7 +296,56 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createCssNode(org.societies.api.identity.INetworkNode)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntity> createCssNode(final INetworkNode cssNodeId)
+			throws CtxException {
+		
+		if (cssNodeId == null)
+			throw new NullPointerException("cssNodeId can't be null");
 
+		CtxEntity result = null;
+		try {
+			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
+			result = this.retrieveCssNode(cssNodeId).get();
+			if (result != null) {
+				LOG.info("Found CSS node context entity " + result);
+			} else {
+				final IIdentity cssId = this.commMgr.getIdManager().fromJid(cssNodeId.getBareJid());
+				final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
+				if (cssEnt == null)
+					throw new CtxBrokerException("The IndividualCtxEntity for CSS '" 
+							+ cssId + "' could not be found. Does node " + cssNodeId
+							+ " belong to a local CSS?");
+				final CtxAssociation ownsCssNodesAssoc;
+				if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+					ownsCssNodesAssoc = this.userCtxDBMgr.createAssociation(
+							CtxAssociationTypes.OWNS_CSS_NODES);
+				else
+					ownsCssNodesAssoc = (CtxAssociation) this.userCtxDBMgr.retrieve(
+							cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next());
+				ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
+				result = this.userCtxDBMgr.createEntity(CtxEntityTypes.CSS_NODE);
+				ownsCssNodesAssoc.addChildEntity(result.getId());
+				this.userCtxDBMgr.update(ownsCssNodesAssoc);
+				final CtxAttribute cssNodeIdAttr = this.userCtxDBMgr.createAttribute(
+						result.getId(), CtxAttributeTypes.ID);
+				cssNodeIdAttr.setStringValue(cssNodeId.toString());
+				this.userCtxDBMgr.update(cssNodeIdAttr);
+				LOG.info("Created CSS node context entity " + result.getId());
+			}
+
+		} catch (Exception e) {
+			throw new CtxBrokerException("Could not create CSS node context entity " + cssNodeId
+					+ ": " + e.getLocalizedMessage(), e);
+		}
+		
+		return new AsyncResult<CtxEntity>(result);
+	}
+	
 	@Override
 	@Async
 	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType,
@@ -331,10 +386,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				Set<CtxAttribute> ctxAttrSet = entity.getAttributes(ctxAttributeType);
 				for(CtxAttribute ctxAttr : ctxAttrSet){
-					//LOG.info("---- lookupEntities,  attr id " +ctxAttr.getId());
-
+					
 					if(CtxBrokerUtils.compareAttributeValues(ctxAttr,value)) {
-						//LOG.info("---- lookupEntities,  " +ctxAttr.getId());
 						entityList.add(entityId);
 					}
 				}
@@ -449,24 +502,16 @@ public class InternalCtxBroker implements ICtxBroker {
 			// TODO check if CIS is locally maintained or a remote call is necessary
 			// TODO cis monitor should have previously add specific type in inferable types list
 
-			attribute = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
-		//	LOG.info("0 estimateCommunityContext identifier:" +attribute.getId() +" attribute.getQuality()"+ attribute.getQuality().getLastUpdated());
+			if (enableInference){
 
-			if ((enableInference 
-					&& !CtxBrokerUtils.hasValue(attribute)) || 
-					(enableInference &&	this.userCtxInferenceMgr.isPoorQuality(attribute.getQuality()))){
-
-		//		LOG.info("1 estimateCommunityContext identifier:" +identifier);
-				// if community attribute has no  value initiate value estimation 
-	//			LOG.info("2 estimateCommunityContext has no value");
+				//LOG.info("1 estimateCommunityContext identifier:" +identifier);
 				CtxAttribute commAttrEstimated = this.communityCtxInferenceMgr.estimateCommunityContext(identifier.getScope(), identifier);
 
 				if(commAttrEstimated != null ){
-
-
+					
 					if(CtxBrokerUtils.hasValue(commAttrEstimated)) {
 						// persist in community db the estimated attribute and return it to requestor
-//						LOG.info("4 estimateCommunityContext persisting "+ commAttrEstimated.getId());
+						//LOG.info("4 estimateCommunityContext persisting "+ commAttrEstimated.getId());
 						try {
 							attribute = (CtxAttribute) this.update(commAttrEstimated).get();
 						} catch (InterruptedException e) {
@@ -476,11 +521,11 @@ public class InternalCtxBroker implements ICtxBroker {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-//						LOG.info("5 estimateCommunityContext persisted ");
+						//LOG.info("5 estimateCommunityContext persisted ");
 					}
 
 				}
-			}
+			} else attribute = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
 
 		} else 
 			throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
@@ -1463,19 +1508,19 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (targetID == null) targetID = this.getLocalIdentity();
 
 		CtxEntity entityResult = null;
-		//LOG.info("skata 1");
+		
 		// CSS case
 		if (IdentityType.CSS.equals(targetID.getType()) 
 				|| IdentityType.CSS_RICH.equals(targetID.getType())
 				|| IdentityType.CSS_LIGHT.equals(targetID.getType())) {
 
-			//LOG.info("skata 2");
+		
 			if (this.commMgr.getIdManager().isMine(targetID)) {
-				//LOG.info("skata 3 local ");
+		
 				entityResult = this.userCtxDBMgr.createEntity(type);
 
 			}else {
-				//LOG.info("skata 3 remote ");
+		
 				final CreateEntityCallback callback = new CreateEntityCallback();
 				this.ctxBrokerClient.createEntity(requestor, targetID, type, callback);
 
@@ -1491,14 +1536,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 			// CIS case
 		} else if (IdentityType.CIS.equals(targetID.getType())){
-			//LOG.info("skata 4 community " +targetID.toString() +" type "+type); 
-
+		
 			entityResult = this.communityCtxDBMgr.createEntity(targetID.toString(), type);
 			LOG.info("Community Context CREATE ENTITY performed with context ID:"+entityResult.getId()+" of type:"+entityResult.getType());
 
 		} 
-		//LOG.info("skata 5 "); 
-
+		
 		return new AsyncResult<CtxEntity>(entityResult);
 	}
 
@@ -1705,7 +1748,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			// local call
 			if (this.commMgr.getIdManager().isMine(target)) {
-				//LOG.info("lookup local call 1");
+				
 				List<CtxIdentifier> ctxIdListFromDb;
 				try {
 					ctxIdListFromDb = this.userCtxDBMgr.lookup(modelType, type);
@@ -1752,7 +1795,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					try {
 						callback.wait();
 						remoteCtxIdListResult = callback.getResult();
-						//LOG.info("lookup remote call 3" + callback.getResult());
+					
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
@@ -1764,15 +1807,10 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			LOG.info("skata 1 inside cis lookup, type:"+type);
+			
 			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
-			//.lookup(modelType, type);
 
-			LOG.info("skata 2 this.communityCtxDBMgr.lookupCommunityCtxEntity(type);:"+localCtxIdListResult);
-
-			LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
-
-
+			//LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
 
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
@@ -1795,7 +1833,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxModelObject> retrieve(Requestor requestor,
 			CtxIdentifier identifier) throws CtxException {
-
 
 		CtxModelObject objectResult = null ;
 
@@ -1823,8 +1860,13 @@ public class InternalCtxBroker implements ICtxBroker {
 			try {
 				// TODO check if CIS is locally maintained or a remote call is necessary
 				// TODO add access control (?)
-				objectResult = this.communityCtxDBMgr.retrieve(identifier);
-
+				
+				if(identifier.getModelType().equals(CtxModelType.ATTRIBUTE)){
+					CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) identifier;
+					objectResult = this.retrieveAttribute(attrId, true).get();
+				
+				} else 	objectResult = this.communityCtxDBMgr.retrieve(identifier);
+				
 			} catch (Exception e) {				
 				throw new CtxBrokerException(
 						"Platform context broker failed to retrieve context model object with id " 
@@ -1969,16 +2011,15 @@ public class InternalCtxBroker implements ICtxBroker {
 			}else{
 				//remote call
 				final UpdateCtxCallback callback = new UpdateCtxCallback();
-				LOG.info("update method remote call ctx object id:"+ctxModelObj.getId());
+				
 				ctxBrokerClient.update(requestor, ctxModelObj, callback);
-				//LOG.info("UpdateCtx remote call performed ");
-
+				
 				synchronized (callback) {
 					try {
-						//LOG.info("UpdateCtx remote call result received 1 ");
+				
 						callback.wait();
 						updatedObjectResult = callback.getResult();
-						//LOG.info("UpdateCtx remote call result received 2 " +updatedObject.getId().toString());
+				
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
@@ -2238,7 +2279,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			if (this.commMgr.getIdManager().isMine(target)) {
 
 				if(!requestor.equals(this.getLocalRequestor())){
-					LOG.info("Remove method, enforcing access control for requestor: "+requestor);
+				
 					this.ctxAccessController.checkPermission(requestor, target,
 							new CtxPermission(identifier, CtxPermission.DELETE));
 				}
@@ -2309,16 +2350,14 @@ public class InternalCtxBroker implements ICtxBroker {
 			// remote call
 		} else {
 
-			LOG.info("RetrieveIndividualEntCallback remote call");
 			RetrieveIndividualEntCallback callback = new RetrieveIndividualEntCallback();
-
 			ctxBrokerClient.retrieveIndividualEntityId(requestor, cssId, callback);
 			synchronized (callback) {
 				try {
-					LOG.info("RetrieveCtx remote call result received 1 ");
+	
 					callback.wait();
 					individualEntityIdResult = callback.getResult();
-					LOG.info("RetrieveIndividualEntCallback remote call result received 2 " +individualEntityIdResult.toString());
+			
 				} catch (InterruptedException e) {
 
 					throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
@@ -2347,19 +2386,19 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxEntityIdentifier communityEntityId = null;
 
-		// TODO find alternative
-		// ugly workaround: try local community db mgr, if null try remote call
-		//if (this.idMgr.isMine(cisId)) {
-
 		final CommunityCtxEntity communityEntity;
 		try {
-			communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId.toString());
-			if (communityEntity != null)
-				communityEntityId = communityEntity.getId();
-			else {
+			if (this.isLocalCisId(cisId)) {
+				// local call
+				if (LOG.isDebugEnabled())
+					LOG.debug("retrieveCommunityEntityId for CIS " + cisId + " local call");
+				communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId.toString());
+				if (communityEntity != null)
+					communityEntityId = communityEntity.getId();
+			} else {
 				// remote call
-				if (LOG.isInfoEnabled())
-					LOG.info("retrieveCommunityEntityId remote call");
+				if (LOG.isDebugEnabled())
+					LOG.debug("retrieveCommunityEntityId for CIS " + cisId + " remote call");
 				final RetrieveCommunityEntityIdCallback callback = 
 						new RetrieveCommunityEntityIdCallback();
 
@@ -2453,9 +2492,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				e.printStackTrace();
 			}
 
-		} else {
-			LOG.info("remote call");
-		}
+		} 
 
 		return new AsyncResult<Set<CtxBond>>(bondsSet);		
 	}
@@ -2567,8 +2604,21 @@ public class InternalCtxBroker implements ICtxBroker {
 			throws CtxException {
 
 		Requestor req = null;
-		//LOG.info("aaa createEntity  identity " + identity +" type "+type);
+	
 		return this.createEntity(req, identity, type);
 	}
-
+	
+	private boolean isLocalCisId(final IIdentity cisId) {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+		
+		boolean result = false;
+		if (this.commMgrFactory.getAllCISCommMgrs().get(cisId) != null)
+			result = true;
+		
+		return result;
+	}
 }

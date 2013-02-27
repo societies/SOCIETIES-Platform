@@ -38,9 +38,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -95,6 +93,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
         ret.connectPubSub(identity);
 
         feeds.add(ret);
+        persistNewFeed(ret);
         return ret;
     }
 
@@ -166,6 +165,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
 
     public void setPubSubClient(PubsubClient pubSubClient) {
         this.pubSubClient = pubSubClient;
+        try {
+            pubSubClient.addSimpleClasses(Collections
+                    .unmodifiableList(Arrays.asList("org.societies.api.schema.activity.MarshaledActivity")));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public PubsubClient getPubSubClient() {
@@ -184,6 +189,15 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid){
     	return new RemoteActivityFeed(iCommMgr,remoteCISid);
     }
-    
+    private boolean persistNewFeed(ActivityFeed activityFeed){
+        Session session = getSessionFactory().openSession();
+        try{
+            session.save(activityFeed);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 
 }

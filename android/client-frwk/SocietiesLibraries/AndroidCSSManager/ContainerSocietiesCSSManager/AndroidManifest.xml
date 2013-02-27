@@ -24,7 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <service android:name="org.societies.android.platform.cssmanager.LocalCssDirectoryService" />
         <service android:name="org.societies.android.platform.cssmanager.container.TestServiceCSSManagerLocal" />
+        <service
+        	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
+        	android:label="SocietiesEvents">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
+   			</intent-filter>
+        </service>
         
     </application>
 

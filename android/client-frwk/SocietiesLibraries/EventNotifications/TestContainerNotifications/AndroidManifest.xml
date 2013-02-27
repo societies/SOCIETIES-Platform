@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
         <service android:name="org.societies.android.platform.events.notifications.FriendsService" />
+        <service android:name="org.societies.android.platform.cssmanager.ServiceCSSManagerLocal" />
         
     </application>
 

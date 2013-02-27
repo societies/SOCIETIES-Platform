@@ -52,10 +52,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	
 	private ArrayList <String> allPlatformEvents = null; 
 
-	private String domainAuthorityDestination;
-//	private String cloudCommsDestination;
-//    private IIdentity cloudNodeIdentity;
-    private IIdentity domainNodeIdentity;
+	private String cloudNodeDestination;
+    private IIdentity cloudNodeIdentity;
     
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
@@ -83,8 +81,8 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	//tracks the events subscribed to Android Pubsub
     	this.subscribedToEvents = Collections.synchronizedMap(new HashMap<String, Integer>());
     	
-    	this.domainAuthorityDestination = null;
-        this.domainNodeIdentity = null;
+    	this.cloudNodeDestination = null;
+        this.cloudNodeIdentity = null;
 
 		//Create random id generator
 		this.randomGenerator = new Random(System.currentTimeMillis());
@@ -201,7 +199,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		Log.d(LOG_TAG, "Invocation of publishEvent for client: " + client);
 		
 		try {
-			PlatformEventsBase.this.pubsubClient.publisherPublish(this.domainNodeIdentity, 
+			PlatformEventsBase.this.pubsubClient.publisherPublish(this.cloudNodeIdentity, 
 						translateAndroidIntentToEvent(societiesIntent), 
 						Integer.toString(this.randomGenerator.nextInt()), 
 						eventPayload, new IMethodCallback() {
@@ -263,7 +261,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
 			
-	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.domainNodeIdentity); 
+	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.cloudNodeIdentity); 
 	    	subPubSub.execute(events);
 		}
 
@@ -307,7 +305,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (unSubscribedEvents.size() > 0) {
-			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client, this.domainNodeIdentity); 
+			   	SubscribeToPubsub subPubSub = new SubscribeToPubsub(returnIntent, client, this.cloudNodeIdentity); 
 		    	subPubSub.execute(unSubscribedEvents);
 			}
 		}
@@ -340,7 +338,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 			ArrayList<String> events = new ArrayList<String>();
 			events.add(intent);
-			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.domainNodeIdentity); 
+			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.cloudNodeIdentity); 
 			unsubPubSub.execute(events);
 		}
 		
@@ -384,7 +382,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
 			if (subscribedEvents.size() > 0) {
-				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client, this.domainNodeIdentity); 
+				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(returnIntent, client, this.cloudNodeIdentity); 
 				unsubPubSub.execute(subscribedEvents);
 			}
 		}
@@ -653,14 +651,14 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
      */
     private void assignConnectionParameters() {
     	Log.d(LOG_TAG, "assignConnectionParameters invoked");
-    	if (null == domainAuthorityDestination) {
+    	if (null == cloudNodeDestination) {
         	try {
-            	this.domainAuthorityDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
-        		Log.d(LOG_TAG, "Domain Authority Node: " + this.domainAuthorityDestination);
+            	this.cloudNodeDestination = this.ccm.getIdManager().getCloudNode().getJid();
+        		Log.d(LOG_TAG, "Domain Authority Node: " + this.cloudNodeDestination);
 
             	try {
-        			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainAuthorityDestination);
-        			Log.d(LOG_TAG, "Domain Authority identity: " + this.domainNodeIdentity);
+        			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudNodeDestination);
+        			Log.d(LOG_TAG, "Domain Authority identity: " + this.cloudNodeIdentity);
         			
         		} catch (InvalidFormatException e) {
         			Log.e(LOG_TAG, "Unable to get Domain Authority identity", e);

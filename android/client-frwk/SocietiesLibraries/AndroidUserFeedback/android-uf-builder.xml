@@ -41,6 +41,6 @@
 		<!--module>ContainerSocietiesAndroidEvents/container-clean.xml</module-->
 		<module>ContainerFeedback</module>
 		<module>TestAndroidUserFeedback</module>
-		<module>JUnitTestsFeedback</module>
+		<!-- <module>JUnitTestsFeedback</module> -->
 	</modules>
 </project>

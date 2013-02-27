@@ -42,12 +42,14 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
    			<artifactId>SocietiesPlatformEvents</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.societies.android.platform.cssmanager</groupId>
 			<artifactId>SocietiesCSSManager</artifactId>

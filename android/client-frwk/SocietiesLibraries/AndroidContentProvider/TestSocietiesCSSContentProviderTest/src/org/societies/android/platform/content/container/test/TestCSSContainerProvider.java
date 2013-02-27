@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.societies.android.api.contentproviders.CSSContentProvider;
 import org.societies.android.api.internal.cssmanager.CSSManagerEnums;
 import org.societies.android.platform.content.CssRecordDAO;
-import org.societies.android.platform.content.ProviderImplemenation;
+import org.societies.android.platform.content.ProviderImplementation;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
@@ -17,7 +17,7 @@ import android.test.mock.MockContentResolver;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
-public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemenation> {
+public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplementation> {
 	private final static String LOG_TAG = TestCSSContainerProvider.class.getName();
 
 	private static final String PROVIDER_AUTHORITY = "org.societies.android.platform.content.androidcssmanager";
@@ -55,7 +55,7 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 	CssRecordDAO cssDAO;
 	
 	public TestCSSContainerProvider() {
-		super(ProviderImplemenation.class, PROVIDER_AUTHORITY);
+		super(ProviderImplementation.class, PROVIDER_AUTHORITY);
 	}
 
 	protected void setUp() throws Exception {
@@ -240,20 +240,20 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		cssRecord.setArchiveCSSNodes(archivedNodes);
 		cssRecord.setCssNodes(currentNodes);
 		cssRecord.setCssIdentity(TEST_IDENTITY);
-		cssRecord.setCssHostingLocation(TEST_HOSTING_LOCATION);
+//		cssRecord.setCssHostingLocation(TEST_HOSTING_LOCATION);
 		cssRecord.setDomainServer(TEST_DOMAIN_SERVER);
 		cssRecord.setEmailID(TEST_EMAIL);
 		cssRecord.setEntity(CSSManagerEnums.entityType.Person.ordinal());
 		cssRecord.setForeName(TEST_FORENAME);
 		cssRecord.setHomeLocation(TEST_HOME_LOCATION);
-		cssRecord.setIdentityName(TEST_IDENTITY_NAME);
-		cssRecord.setImID(TEST_IM_ID);
+//		cssRecord.setIdentityName(TEST_IDENTITY_NAME);
+//		cssRecord.setImID(TEST_IM_ID);
 		cssRecord.setName(TEST_NAME);
 		cssRecord.setPassword(TEST_PASSWORD);
-		cssRecord.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+//		cssRecord.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		cssRecord.setSex(CSSManagerEnums.genderType.Male.ordinal());
-		cssRecord.setSocialURI(TEST_SOCIAL_URI);
-		cssRecord.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//		cssRecord.setSocialURI(TEST_SOCIAL_URI);
+//		cssRecord.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
 		
 		return cssRecord;
 	}

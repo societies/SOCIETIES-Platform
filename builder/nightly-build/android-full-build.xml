@@ -67,7 +67,7 @@
 		<module>../../android/client-frwk/SocietiesLibraries/AndroidCSSManager/SocietiesCSSManager</module>
 		<module>../../android/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../android/client-frwk/SocietiesLibraries/AndroidContentProvider/SocietiesContentProvider</module>
-		<module>../../android/client-frwk/SocietiesAndroidUtilities</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidUtilities/SocietiesAndroidUtilities</module>
 		<module>../../android/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../android/client-frwk/SocietiesLibraries/EventNotifications/SocietiesEventNotifications</module>
 		<module>../../android/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
