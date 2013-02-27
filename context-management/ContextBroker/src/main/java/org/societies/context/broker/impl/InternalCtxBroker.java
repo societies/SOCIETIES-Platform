@@ -65,6 +65,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
@@ -123,6 +124,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	/** The Comms Mgr service reference. */
 	@Autowired(required=true)
 	private ICommManager commMgr;
+	
+	/** The Comms Mgr Factory service reference. */
+	@Autowired(required=true)
+	private ICISCommunicationMgrFactory commMgrFactory;
 
 	/** The privacy logging facility. */
 	@Autowired(required=false)
@@ -2381,19 +2386,19 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxEntityIdentifier communityEntityId = null;
 
-		// TODO find alternative
-		// ugly workaround: try local community db mgr, if null try remote call
-		//if (this.idMgr.isMine(cisId)) {
-
 		final CommunityCtxEntity communityEntity;
 		try {
-			communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId.toString());
-			if (communityEntity != null)
-				communityEntityId = communityEntity.getId();
-			else {
+			if (this.isLocalCisId(cisId)) {
+				// local call
+				if (LOG.isDebugEnabled())
+					LOG.debug("retrieveCommunityEntityId for CIS " + cisId + " local call");
+				communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId.toString());
+				if (communityEntity != null)
+					communityEntityId = communityEntity.getId();
+			} else {
 				// remote call
-				if (LOG.isInfoEnabled())
-					LOG.info("retrieveCommunityEntityId remote call");
+				if (LOG.isDebugEnabled())
+					LOG.debug("retrieveCommunityEntityId for CIS " + cisId + " remote call");
 				final RetrieveCommunityEntityIdCallback callback = 
 						new RetrieveCommunityEntityIdCallback();
 
@@ -2602,5 +2607,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	
 		return this.createEntity(req, identity, type);
 	}
-
+	
+	private boolean isLocalCisId(final IIdentity cisId) {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+		
+		boolean result = false;
+		if (this.commMgrFactory.getAllCISCommMgrs().get(cisId) != null)
+			result = true;
+		
+		return result;
+	}
 }

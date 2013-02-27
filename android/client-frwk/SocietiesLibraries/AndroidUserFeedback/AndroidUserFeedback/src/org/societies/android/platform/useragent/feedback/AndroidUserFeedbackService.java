@@ -74,7 +74,7 @@ import android.util.Log;
 public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback{
 
 	private static final String LOG_TAG = AndroidUserFeedbackService.class.getName();
-	public static final String USER_FEEDBACK_EVENTS_ALL = "";
+	public static final String USER_FEEDBACK_EVENTS_ALL = "org.societies.android.api.internal.useragent";
 	
 	private static final String CLIENT_NAME = AndroidUserFeedbackService.class.getCanonicalName();
 	

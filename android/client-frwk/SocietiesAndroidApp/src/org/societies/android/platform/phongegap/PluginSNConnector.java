@@ -37,6 +37,7 @@ import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialTokenManager;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -260,8 +261,6 @@ public class PluginSNConnector extends Plugin {
 					//UNMARSHALL RETURN VALUES
 					String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
 					String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
-					//String strSN = intent.getStringExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
-					//Socialnetwork sn = Socialnetwork.valueOf(strSN);
 					Socialnetwork sn = intent.getParcelableExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
 							
 					PluginResult result = new PluginResult(PluginResult.Status.OK, expires);
@@ -291,11 +290,9 @@ public class PluginSNConnector extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ISocialData.INTENT_RETURN_KEY);
-					ConnectorBean connectors[] = (ConnectorBean[]) parcels;
-					//AConnectorBean connectors[] = new AConnectorBean[parcels.length];
-					//for (int i = 0; i < parcels.length; i++) {
-					//	connectors[i] = (AConnectorBean) parcels[i];
-					//}
+					ConnectorBean connectors[] = new ConnectorBean [parcels.length];
+					System.arraycopy(parcels, 0, connectors, 0, parcels.length);
+					
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertConnectorBeanToJSONArray(connectors));
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);

@@ -25,14 +25,24 @@
 
 package org.societies.android.platform.useragent.feedback.container.test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.events.IPlatformEventsCallback;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ExpProposalType;
+import org.societies.android.platform.events.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService.FeedbackContainerBinder;
+import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
+import org.societies.android.platform.useragent.feedback.model.UserFeedbackEventTopics;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,6 +63,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 
 
 	private Boolean receivedResult = false;
+	private EventsHelper eventsHelper;
 	
 	public TestUserFeedback() {
 		super(TestContainerFeedbackService.class);
@@ -69,8 +80,9 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			TestUserFeedback.this.receivedResult = true;
+			
 			assertNotNull(intent.getParcelableExtra(IAndroidUserFeedback.INTENT_RETURN_VALUE));
+			TestUserFeedback.this.receivedResult = true;
 			Log.d(LOG_TAG, "OnReceive finished");
 		}
 
@@ -104,6 +116,77 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		}
 		
 		Log.d(LOG_TAG, "Received result");
+	}
+	
+	@MediumTest
+	public void testGetExplicitFBTriggerFromCloud(){
+		Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
+		FeedbackContainerBinder binder = (FeedbackContainerBinder) bindService(userFeedbackIntent);
+		
+		IAndroidUserFeedback ufService = binder.getService();
+		
+		boolean started = ufService.startService();
+		
+		if (started){
+			Log.d(LOG_TAG, "Connecting to pubsub");
+			setupBroadcastReceiver();
+			Log.d(LOG_TAG, "Setup broadcast receiver");
+			eventsHelper = new EventsHelper(this.getContext());
+			Log.d(LOG_TAG, "new EventService");
+			eventsHelper.setUpService(new IMethodCallback() {
+				
+				@Override
+				public void returnAction(String result) {
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+					
+				}
+				
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+					if (resultFlag){
+						Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+						UserFeedbackBean bean = new UserFeedbackBean();
+						bean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+						List<String> options = new ArrayList<String>();
+						options.add("Yes");
+						options.add("No");
+						bean.setOptions(options);
+						bean.setProposalText("Click here to test user feedback notifications triggered by pubsub");
+						bean.setRequestId(UUID.randomUUID().toString());
+						bean.setType(ExpProposalType.ACKNACK);
+						try {
+							if (eventsHelper==null){
+								Log.d(LOG_TAG, "EventsHelper is null");
+							}else{
+								Log.d(LOG_TAG, "EventsHelper is NOT null");
+							}
+							eventsHelper.publishEvent(UserFeedbackEventTopics.REQUEST, bean, new IPlatformEventsCallback() {
+								
+								@Override
+								public void returnAction(int arg0) {
+									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+									
+								}
+								
+								@Override
+								public void returnAction(boolean arg0) {
+									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Published event");
+									
+								}
+							});
+						} catch (PlatformEventsHelperNotConnectedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							
+						}
+					}
+				}
+			});
+		}else{
+			android.test.AndroidTestCase.fail("Failed to startService(): "+IAndroidUserFeedback.class.getName());
+		}
+		
 	}
     /**
      * Create a broadcast receiver

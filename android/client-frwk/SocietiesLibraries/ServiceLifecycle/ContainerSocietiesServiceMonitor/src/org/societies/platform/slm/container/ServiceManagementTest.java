@@ -45,9 +45,7 @@ public class ServiceManagementTest extends Service {
     
     @Override
 	public void onCreate () {
-		this.binder = new LocalSLMBinder();
-		//inject reference to current service
-		this.binder.addouterClassreference(new ServiceManagementBase(this));
+		this.binder = new LocalSLMBinder(new ServiceManagementBase(this, false));
 		Log.d(LOG_TAG, "ServiceManagementTest service starting");
 	}
 
@@ -74,15 +72,16 @@ public class ServiceManagementTest extends Service {
 	 * any clients that have a Binder reference, indirectly hold the Service object reference.
 	 * This prevents a common Android Service memory leak.
 	 */
-	 public static class LocalSLMBinder extends Binder {
-		 private WeakReference<ServiceManagementBase> outerClassReference = null;
+	public static class LocalSLMBinder extends Binder {
+		private WeakReference<ServiceManagementBase> outerClassReference = null;
 		 
-		 public void addouterClassreference(ServiceManagementBase instance) {
-			 this.outerClassReference = new WeakReference<ServiceManagementBase>(instance);
-		 }
-		 
-		 public ServiceManagementBase getService() {
-            return outerClassReference.get();
-            }
-	 }
+		public LocalSLMBinder(ServiceManagementBase instance) {
+			super();
+			this.outerClassReference = new WeakReference<ServiceManagementBase>(instance);
+		}
+				 
+		public ServiceManagementBase getService() {
+			return outerClassReference.get();
+		}
+	}
 }
