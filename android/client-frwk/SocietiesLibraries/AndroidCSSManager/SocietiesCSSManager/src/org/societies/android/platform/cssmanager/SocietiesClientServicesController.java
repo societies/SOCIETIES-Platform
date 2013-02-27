@@ -41,7 +41,6 @@ import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
-import org.societies.android.platform.events.notifications.FriendsService;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.android.platform.socialdata.SocialData;
