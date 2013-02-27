@@ -26,6 +26,7 @@ package org.societies.webapp.integration.tests;
 
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
 import org.societies.webapp.integration.selenium.components.*;
@@ -75,6 +76,7 @@ public class TestProfileSettings extends SeleniumTest {
         volumeWorkOutcomeNode = new ProfileSettingsPage.TreeNode("volume 50", ProfileSettingsPage.TreeNodeType.OUTCOME, volumeWorkConditionNode);
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void userDetailsCorrect() {
         profileSettingsPage.verifyUsernameInTitle(USERNAME);
@@ -82,11 +84,13 @@ public class TestProfileSettings extends SeleniumTest {
                 "paddy.societies.local.macs.hw.ac.uk", "paddy.societies.local.macs.hw.ac.uk");
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void verifyTreeDisplayedCorrectly() {
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void openPopups_hitCancelButton_noChangesMade() {
         ProfileSettingsTreeContextMenu ctxMenu;
@@ -194,6 +198,7 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void addConditionAndOutcomeDialog_correctFieldsShown() {
         ProfileSettingsTreeContextMenu ctxMenu;
@@ -243,6 +248,7 @@ public class TestProfileSettings extends SeleniumTest {
 
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void editOutcome_editCondition_correctValuesUpdated() {
         ProfileSettingsTreeContextMenu ctxMenu;
@@ -293,6 +299,7 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void delete_deletesCorrectData() {
         ProfileSettingsTreeContextMenu ctxMenu;
@@ -351,6 +358,7 @@ public class TestProfileSettings extends SeleniumTest {
 
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void addEntirePreferenceTree() {
         ProfileSettingsPage.TreeNode beerStrengthNode, beerStrengthOutcomeNode;

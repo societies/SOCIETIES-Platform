@@ -26,6 +26,7 @@ package org.societies.webapp.integration.tests;
 
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
 import org.societies.webapp.integration.selenium.pages.IndexPage;
@@ -41,6 +42,7 @@ public class TestIndexPage extends SeleniumTest {
         indexPage = new IndexPage(getDriver());
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void loginSuccessfully() {
         indexPage.doLogin(USERNAME, PASSWORD);
