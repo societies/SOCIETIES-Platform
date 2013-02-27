@@ -130,6 +130,20 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="ctxAttributeBondBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxBondBean">
+        <xs:sequence>
+          <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean" minOccurs="0"/>
+          <xs:element name="maxValue" type="xs:string" minOccurs="0"/>
+          <xs:element name="minValue" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+
   <xs:complexType name="ctxHistoryAttributeBean">
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
@@ -152,13 +166,7 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="ctxBondOriginTypeBean">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="manuallySet"/>
-      <xs:enumeration value="discovered"/>
-      <xs:enumeration value="inherited"/>
-    </xs:restriction>
-  </xs:simpleType>
+
 
   <xs:simpleType name="ctxAttributeValueTypeBean">
     <xs:restriction base="xs:string">
@@ -179,6 +187,14 @@
     </xs:restriction>
   </xs:simpleType>
   
+  <xs:simpleType name="ctxBondOriginTypeBean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="manuallySet"/>
+      <xs:enumeration value="discovered"/>
+      <xs:enumeration value="inherited"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:complexType name="ctxUIElement">
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>
