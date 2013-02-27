@@ -479,7 +479,7 @@ public class SocietiesClientServicesController {
 //    		Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Personalisation Manager Service");
 //        	serviceIntent = new Intent(ICoreSocietiesServices.PERSONALISATION_SERVICE_INTENT);
 //        	SocietiesClientServicesController.this.context.bindService(serviceIntent, personalisationMgrConnection, Context.BIND_AUTO_CREATE);
-
+            
         	try {
         		//To prevent hanging this latch uses a timeout
         		SocietiesClientServicesController.this.servicesBinded.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -539,6 +539,13 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceControl.startService();
     		SocietiesClientServicesController.this.snsConnectorService.startService();
     		
+    		//START "STARTED SERVICES"
+        	//FRIENDS SERVICE
+            //Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, FriendsService.class);
+            //SocietiesClientServicesController.this.context.startService(intentFriends);
+            //USER AGENT SERVICE
+            //Intent intentUserAgent = new Intent(SocietiesClientServicesController.this.context, UserAgent.class);
+            //SocietiesClientServicesController.this.context.startService(intentUserAgent);
     		try {
 				SocietiesClientServicesController.this.servicesStarted.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
@@ -599,7 +606,13 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceDisco.stopService();
     		SocietiesClientServicesController.this.slmServiceControl.stopService();
     		SocietiesClientServicesController.this.snsConnectorService.stopService();
-   		
+    		//STOP "STARTED SERVICES"
+        	//FRIENDS SERVICE
+            //Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, FriendsService.class);
+            //SocietiesClientServicesController.this.context.stopService(intentFriends);
+            //USER AGENT SERVICE
+            //Intent intentUserAgent = new Intent(SocietiesClientServicesController.this.context, UserAgent.class);
+            //SocietiesClientServicesController.this.context.stopService(intentUserAgent);   		
     		try {
 				SocietiesClientServicesController.this.servicesStopped.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {

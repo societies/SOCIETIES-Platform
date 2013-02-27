@@ -274,8 +274,8 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 				Intent intent = new Intent(returnIntent);
 				
 				CssDirectoryBeanResult resultBean = (CssDirectoryBeanResult) retValue;
-				//CssAdvertisementRecord advertArray [] = CssAdvertisementRecord.getArray(resultBean.getResultCss());
-				CssAdvertisementRecord advertArray[] = (CssAdvertisementRecord[]) resultBean.getResultCss().toArray();
+				List<CssAdvertisementRecord> listRecords = resultBean.getResultCss();
+				CssAdvertisementRecord advertArray[] = resultBean.getResultCss().toArray(new CssAdvertisementRecord[listRecords.size()]);
 
 				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, true);
 				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY, advertArray);
