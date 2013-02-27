@@ -33,6 +33,7 @@ import org.societies.api.css.FriendFilter;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -216,6 +217,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				cssProfile.setPassword("");
 //				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+				cssProfile.setSex(CSSManagerEnums.entityType.Person.ordinal());
 //				cssProfile.setSocialURI("");
 				cssProfile.setWorkplace("");
 				cssProfile.setPosition("");
@@ -468,7 +470,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 //				cssRecord.setSocialURI(profile.getSocialURI());
 				cssRecord.setSex(profile.getSex());
 				cssRecord.setHomeLocation(profile.getHomeLocation());
-//				cssRecord.setIdentityName(profile.getIdentityName());
+				cssRecord.setEntity(profile.getEntity());
 				cssRecord.setWorkplace(profile.getWorkplace());
 				cssRecord.setPosition(profile.getPosition());
 
@@ -1906,18 +1908,16 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// Entity
 			value2 = record.getEntity();
 			LOG.info("pushtoContext ENTITY value: " +value2);
-			if (value2 <= 0 && value2 >=2){
+			if (value2 >= 0 && value2 <=1){
 				
-				if(value2 == 0){
+				if(value2 == CSSManagerEnums.entityType.Person.ordinal()){
 					value = "Person";
+					LOG.info("pushtoContext ENTITY value: " +value);
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
 				}
-				if(value2 == 1){
+				if(value2 == CSSManagerEnums.entityType.Organisation.ordinal()){
 					value = "Organisation";
-					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
-				}
-				if(value2 == 2){
-					value = "Undefined";
+					LOG.info("pushtoContext ENTITY value: " +value);
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.TYPE, value);
 				}
 				
@@ -1933,18 +1933,18 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// Sex
 			value2 = record.getSex();
 			LOG.info("pushtoContext SEX value: " +value2);
-			//if (value2 != null && !value2.isEmpty())
-			if (value2 <= 0 && value2 >=2){
+			//if (value2 != null && !value2.isEmpty()
+			if (value2 >= 0 && value2 <=2){
 							
-				if(value2 == 0){
+				if(value2 == CSSManagerEnums.genderType.Male.ordinal()){
 					value = "Male";
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
 				}
-				if(value2 == 1){
+				if(value2 == CSSManagerEnums.genderType.Female.ordinal()){
 					value = "Female";
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
 				}
-				if(value2 == 2){
+				if(value2 == CSSManagerEnums.genderType.Unspecified.ordinal()){
 					value = "Undefined";
 					updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
 				}
@@ -1972,9 +1972,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			value1 = record.getCssNodes();
 			if (record.getCssNodes() != null) {
 				for (CssNode cssNode : record.getCssNodes()) {
-					IIdentity cssNodeId = commManager.getIdManager().fromJid(cssNode.getIdentity());
+					INetworkNode cssNodeId = (INetworkNode) commManager.getIdManager().fromJid(cssNode.getIdentity());
 					LOG.info("pushtoContext CSSNODES value: " +value1);
-//					this.ctxBroker.createCssNode(ownerCtxId, cssNodeId);
+					this.ctxBroker.createCssNode(cssNodeId);
 				}
 			}
 			

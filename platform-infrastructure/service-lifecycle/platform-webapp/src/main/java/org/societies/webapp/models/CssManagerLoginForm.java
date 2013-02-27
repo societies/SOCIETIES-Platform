@@ -114,6 +114,7 @@ public class CssManagerLoginForm {
 	    private String socialURI;
 	    private String workplace;
 	    private String position;
+	    private int entity;
 	    /** Css Record Details end **/
 		
 	    
@@ -540,6 +541,7 @@ public class CssManagerLoginForm {
 		public void setName(String name) {
 			this.name = name;
 		}
+				
 		/**
 		 * @return the sex
 		 */
@@ -552,6 +554,20 @@ public class CssManagerLoginForm {
 		public void setSex(int sex) {
 			this.sex = sex;
 		}
+		
+		/**
+		 * @return the entity
+		 */
+		public int getEntity() {
+			return entity;
+		}
+		/**
+		 * @param entity the entity to entity
+		 */
+		public void setEntity(int entity) {
+			this.entity = entity;
+		}
+		
 		/**
 		 * @return the socialURI
 		 */
