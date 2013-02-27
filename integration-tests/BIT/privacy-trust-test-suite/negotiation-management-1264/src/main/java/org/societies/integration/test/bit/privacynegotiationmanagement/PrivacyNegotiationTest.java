@@ -31,6 +31,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,15 +40,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
@@ -87,12 +93,13 @@ public class PrivacyNegotiationTest {
 	private CtxAttribute statusAttribute;
 
 
+	
 
 	@Before
 	public void setUp() {
 		String testTitle = new String("setUp");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-
+		
 		// -- Verify dependency injection
 		if (!TestCase1264.isDepencyInjectionDone()) {
 			LOG.error("[#"+testCaseNumber+"] [Dependency Injection "+TestCase1264.class.getSimpleName()+" not ready] "+testTitle);
@@ -327,19 +334,41 @@ public class PrivacyNegotiationTest {
 
 	private void setupContext() {
 		userId = TestCase1264.commManager.getIdManager().getThisNetworkNode();
-		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
-		userCtxEntity = new IndividualCtxEntity(ctxId);
+		try {
+			userCtxEntity   = TestCase1264.ctxBroker.retrieveIndividualEntity(userId).get();
+			List<CtxIdentifier> lookupSymLocAttributes = TestCase1264.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			if (lookupSymLocAttributes.size()==0){
+				this.locationAttribute = TestCase1264.ctxBroker.createAttribute(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			}else{
+				this.locationAttribute = (CtxAttribute) TestCase1264.ctxBroker.retrieve(lookupSymLocAttributes.get(0)).get();
+			}
+			this.locationAttribute.setStringValue("home");
+			this.ctxLocationAttributeId = this.locationAttribute.getId();
+			TestCase1264.ctxBroker.update(locationAttribute);
+			
+			List<CtxIdentifier> list = TestCase1264.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS).get();
+			if (list.size()==0){
+				this.statusAttribute = TestCase1264.ctxBroker.createAttribute(userCtxEntity.getId(), CtxAttributeTypes.STATUS).get();
+			}else{
+				this.statusAttribute = (CtxAttribute) TestCase1264.ctxBroker.retrieve(list.get(0)).get();
+			}
+			
+			this.statusAttribute.setStringValue("busy");
+			this.ctxStatusAttributeId = this.statusAttribute.getId();
+			TestCase1264.ctxBroker.update(statusAttribute);
+			
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		ctxLocationAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
-		locationAttribute = new CtxAttribute(ctxLocationAttributeId);
-		locationAttribute.setStringValue("home");
-
-		ctxStatusAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.STATUS, new Long(1));
-		statusAttribute = new CtxAttribute(ctxStatusAttributeId);
-		statusAttribute.setStringValue("busy");
-
-		userCtxEntity.addAttribute(locationAttribute);
-		userCtxEntity.addAttribute(statusAttribute);
 	}
 
 	private void deleteContext() {
