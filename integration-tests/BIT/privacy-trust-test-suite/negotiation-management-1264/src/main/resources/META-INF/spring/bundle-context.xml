@@ -22,12 +22,13 @@
     <bean
         id="TestCase1264"
         class="org.societies.integration.test.bit.privacynegotiationmanagement.TestCase1264"
-        depends-on="CommManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager"
+        depends-on="CommManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager, ctxBroker"
         init-method="run">
         <property name="commManager" ref="CommManager" />
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager" />
         <property name="privacyAgreementManager" ref="PrivacyAgreementManager" />
         <property name="privacyPolicyNegotiationManager" ref="PrivacyPolicyNegotiationManager" />
+        <property name="ctxBroker" ref="ctxBroker"></property>
     </bean>
 
 </beans>
