@@ -56,7 +56,7 @@ public class CtxAttributeTypes {
      * <p>
      * Possible value types: {@link CtxAttributeValueType.STRING},{@link CtxAttributeValueType.INTEGER},{@link CtxAttributeValueType.DOUBLE}  
      *  
-     * @since 0.0.8  
+     * @since 0.0.8
      */
     public static final String AGE = "age";
     
@@ -387,7 +387,6 @@ public class CtxAttributeTypes {
      */
     public static final String OCCUPATION = "occupation";
     
-    
     /**
      * The string value of this attribute type contains information about the parameters of a service modeled as an entity (entity type: service_parameter).
      * <p>
@@ -396,6 +395,15 @@ public class CtxAttributeTypes {
      * @since 0.0.8
      */
     public static final String PARAMETER_NAME = "parameterName";
+    
+    /**
+     * The string value of this attribute type is used to store a password.
+     * <p>
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *     
+     * @since 1.0
+     */
+    public static final String PASSWORD = "password";
     
     /**
      * The comma separated string values of this attribute type contains information about the political views of an entity.
