@@ -307,15 +307,29 @@ public class CommManagerHelper {
 			Thread.currentThread().setContextClassLoader(oldCl);
 	}
 
-	public void dispatchIQError(IQ iq) { // TODO fix this
+	public void dispatchIQError(IQ iq) {
 		ClassLoader oldCl = null;
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
 			
-			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
-			String errorElementStr = ((Element)errorElement.elements().get(0)).getName(); // TODO assumes the stanza error comes first
-			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
+			// http://xmpp.org/rfcs/rfc6120.html#stanzas-error-syntax
+			Element errorElement = (Element)iq.getElement().elements().get(0);
+			if (iq.getElement().elements().size()>1) {
+				// handle [OPTIONAL to include sender XML here]
+				// TODO currently ignoring
+				errorElement = (Element)iq.getElement().elements().get(1);
+			}
+			// assumes the stanza error comes first in the error element as described the syntax
+			String errorElementStr = ((Element)errorElement.elements().get(0)).getName(); 
+			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_").toLowerCase());
 			XMPPError error = new XMPPError(se, null);
+			
+			// handle optional error fields: text and application error
+//			[<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'
+//		           xml:lang='langcode'>
+//		      OPTIONAL descriptive text
+//		    </text>]
+//		    [OPTIONAL application-specific condition element]
 			oldCl = clm.classLoaderMagicTemp(iq.getID());
 			if (errorElement.elements().size()>1)
 				error = parseApplicationError(se, errorElement.elements());
