@@ -149,7 +149,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 						
 					for(CtxEntityIdentifier comMemb:communityMembers){
 						IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> list = individualMember.getAttributes("TEMPERATURE");	
+						Set<CtxAttribute> list = individualMember.getAttributes(CtxAttributeTypes.TEMPERATURE.toString());	
 						
 						for (CtxAttribute ca:list){
 							inputValues.add(ca.getIntegerValue());
@@ -207,7 +207,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesInterests = individualMemeber.getAttributes("INTERESTS");
+						Set<CtxAttribute> setAttributesInterests = individualMemeber.getAttributes(CtxAttributeTypes.INTERESTS.toString());
 
 						for (CtxAttribute ca:setAttributesInterests){
 							stringInputValues.add(ca.getStringValue());
@@ -280,7 +280,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesBooks = individualMemeber.getAttributes("BOOKS");
+						Set<CtxAttribute> setAttributesBooks = individualMemeber.getAttributes(CtxAttributeTypes.BOOKS.toString());
 
 						for (CtxAttribute ca:setAttributesBooks){
 							stringInputValues.add(ca.getStringValue());
@@ -351,7 +351,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesMovies = individualMemeber.getAttributes("MOVIES");
+						Set<CtxAttribute> setAttributesMovies = individualMemeber.getAttributes(CtxAttributeTypes.MOVIES.toString());
 
 						for (CtxAttribute ca:setAttributesMovies){
 							stringInputValues.add(ca.getStringValue());
@@ -422,7 +422,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesLanguages = individualMemeber.getAttributes("LANGUAGES");
+						Set<CtxAttribute> setAttributesLanguages = individualMemeber.getAttributes(CtxAttributeTypes.LANGUAGES.toString());
 
 						for (CtxAttribute ca:setAttributesLanguages){
 							stringInputValues.add(ca.getStringValue());
@@ -493,7 +493,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesFavouriteQuotes = individualMemeber.getAttributes("FAVOURITE_QUOTES");
+						Set<CtxAttribute> setAttributesFavouriteQuotes = individualMemeber.getAttributes(CtxAttributeTypes.FAVOURITE_QUOTES.toString());
 
 						for (CtxAttribute ca:setAttributesFavouriteQuotes){
 							stringInputValues.add(ca.getStringValue());
@@ -562,7 +562,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
+					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES.toString());
 
 					for (CtxAttribute ca:setAttributesCoordinatesLocations){
 						stringLocationValues.add(ca.getStringValue());			
@@ -618,7 +618,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_SYMBOLIC");
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC.toString());
 
 					for (CtxAttribute ca:setAttributesSymbolicLocations){
 						stringLocationSymbolicValues.add(ca.getStringValue());			
