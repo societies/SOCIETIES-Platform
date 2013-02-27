@@ -163,6 +163,7 @@ public class RequestItemEditor extends JFrame implements ItemListener
 		     this.resourcePanel.add(this.resourceLabel);
 
 		     this.resourceTypeList = new JComboBox(getCtxAttributeTypesList());
+		     this.resourceTypeList.setEditable(true);
 		     gbcPanel2.gridx = 1;
 		     gbcPanel2.gridy = 1;
 		     gbcPanel2.gridwidth = 1;
