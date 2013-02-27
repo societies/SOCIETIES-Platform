@@ -25,25 +25,43 @@
 package org.societies.api.privacytrust.privacy.model.privacypolicy.constants;
 
 /**
- * @author Elizabeth
- *
- */
-
-/**
- * Please refer to {@value PrivacyConditionsConstantValues} for values. 
  * @author Eliza
  *
  */
-public enum ConditionConstants {
-	SHARE_WITH_3RD_PARTIES,
-	SHARE_WITH_CIS_MEMBERS_ONLY,
-	SHARE_WITH_CIS_OWNER_ONLY,
-	MAY_BE_INFERRED,
-	DATA_RETENTION_IN_SECONDS,
-	DATA_RETENTION_IN_MINUTES,
-	DATA_RETENTION_IN_HOURS,
-	RIGHT_TO_OPTOUT,
-	STORE_IN_SECURE_STORAGE,
-	RIGHT_TO_ACCESS_HELD_DATA,
-	RIGHT_TO_CORRECT_INCORRECT_DATA,
+public class PrivacyConditionsConstantValues {
+
+	private static final String[] hours = new String[]{"12","24","36","48", "60", "72", "84", "96"};
+	private static final String[] minutes = new String[]{"30","60","90","120","180","240","300","360","480","600"};
+	private static final String[] seconds = new String[]{"10","20","30","40","50","60","90","120","150","180","210",""};
+	private static final String[] boolValues = new String[]{"Yes", "No"};
+
+	
+	public static String[] getValues(ConditionConstants con){
+		switch (con){
+		case DATA_RETENTION_IN_HOURS:
+			return hours; 
+		case DATA_RETENTION_IN_MINUTES:
+			return minutes;
+		case DATA_RETENTION_IN_SECONDS:
+			return seconds;
+		case MAY_BE_INFERRED:
+			return boolValues;
+		case RIGHT_TO_ACCESS_HELD_DATA:
+			return boolValues;
+		case RIGHT_TO_CORRECT_INCORRECT_DATA:
+			return boolValues;
+		case RIGHT_TO_OPTOUT:
+			return boolValues;
+		case SHARE_WITH_3RD_PARTIES:
+			return boolValues;
+		case SHARE_WITH_CIS_MEMBERS_ONLY:
+			return boolValues;
+		case SHARE_WITH_CIS_OWNER_ONLY:
+			return boolValues;
+		case STORE_IN_SECURE_STORAGE:
+			return boolValues;
+		}
+		
+		return new String[]{};
+	}
 }

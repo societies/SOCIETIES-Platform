@@ -56,6 +56,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
 
 public class RequestPolicyGUI extends JPanel
 implements ActionListener, WindowListener
@@ -75,7 +76,7 @@ implements ActionListener, WindowListener
 	JTextField serviceIDTxtField;
 	JTextField dpiTxtField;
 	RequestItemEditor reqEditor;
-
+	
 	public static void main(String[] args)
 	{
 		try
@@ -102,8 +103,8 @@ implements ActionListener, WindowListener
 
 	public RequestPolicyGUI()
 	{
-		this.requestItems = new ArrayList();
-		setBorder(BorderFactory.createTitledBorder("Requestor information (optional)"));
+		this.requestItems = new ArrayList<RequestItem>();
+		setBorder(BorderFactory.createTitledBorder("RequestPolicy editor for 3p service developers"));
 		GridBagLayout gbBackPanel = new GridBagLayout();
 		GridBagConstraints gbcBackPanel = new GridBagConstraints();
 		setLayout(gbBackPanel);
@@ -204,7 +205,7 @@ implements ActionListener, WindowListener
 		GridBagConstraints gbcSubjectPanel = new GridBagConstraints();
 		this.subjectPanel.setLayout(gbSubjectPanel);
 
-		this.serviceIDLabel = new JLabel("Service Identifier or CIS Identity:");
+/*		this.serviceIDLabel = new JLabel("Service Identifier or CIS Identity:");
 		gbcSubjectPanel.gridx = 0;
 		gbcSubjectPanel.gridy = 0;
 		gbcSubjectPanel.gridwidth = 1;
@@ -260,7 +261,7 @@ implements ActionListener, WindowListener
 		gbcBackPanel.weighty = 0.0D;
 		gbcBackPanel.anchor = 18;
 		gbBackPanel.setConstraints(this.subjectPanel, gbcBackPanel);
-		add(this.subjectPanel);
+		add(this.subjectPanel);*/
 
 		JScrollPane scpBackPanel = new JScrollPane(this);
 	}
@@ -327,9 +328,10 @@ implements ActionListener, WindowListener
 				String title = "New Condition";
 				ConditionConstants condition = (ConditionConstants)JOptionPane.showInputDialog(this.reqEditor, message, title, 3, null, ConditionConstants.values(), ConditionConstants.DATA_RETENTION_IN_HOURS);
 				if (condition != null) {
+					String[] values = PrivacyConditionsConstantValues.getValues(condition);
 					System.out.println("Value: " + condition);
 					message = "Enter a value for " + condition.toString();
-					String value = (String)JOptionPane.showInputDialog(this.reqEditor, message, title, 3, null, null, "");
+					String value = (String)JOptionPane.showInputDialog(this.reqEditor, message, title, 3, null, values, "");
 					if (value != null) {
 						this.reqEditor.addCondition(condition, value, new Boolean(true));
 					}

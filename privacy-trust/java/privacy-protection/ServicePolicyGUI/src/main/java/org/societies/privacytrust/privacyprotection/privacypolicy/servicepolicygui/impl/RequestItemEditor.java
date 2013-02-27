@@ -459,6 +459,7 @@ public class RequestItemEditor extends JFrame implements ItemListener
 	}
 
 	public void itemStateChanged(ItemEvent e) {
+		System.out.println("pre - ResourceTypeList.isEditable()="+resourceTypeList.isEditable());
 		if (e.getStateChange()==ItemEvent.SELECTED){
 			String scheme = (String) e.getItem();
 			System.out.println("selected scheme: "+scheme);
@@ -488,8 +489,10 @@ public class RequestItemEditor extends JFrame implements ItemListener
 					this.resourceTypeList.addItem(deviceType);
 				}
 				this.resourceTypeList.setEditable(false);
+				
 			}
 		}
+		System.out.println("post - ResourceTypeList.isEditable()="+resourceTypeList.isEditable());
 		
 	}
 	
