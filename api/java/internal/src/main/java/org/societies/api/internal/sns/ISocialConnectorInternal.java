@@ -102,28 +102,30 @@ public interface ISocialConnectorInternal extends org.societies.api.sns.ISocialC
    
     
     /**
-     * Return the JSON object that contains user profile data
-     * @return JSONObject
+     * Return the JSON String that contains user profile data
+     * @return String to be parse as JSONObject
      */
     String getUserProfile();
    
     /**
-     * Provides the JSON Object with the list of friends 
+     * Provides the JSON String   with the list of friends 
      * @return JSON Object
      */
     String getUserFriends();
     
     /**
-     * Provides the JSON Object with the user Activity feed
-     * @return JSON Object
+     * Provides the String JSON  with the user Activity feed
+     * @return JSON String
      */
     String getUserActivities();
     
     /**
-     * Provides the JSON Object with the Groups subscribed by the user
-     * @return JSON Object
+     * Provides the JSON String with the Groups subscribed by the user
+     * @return JSON String
      */
     String getUserGroups();
+    
+    
     
     
     String getApiKey();

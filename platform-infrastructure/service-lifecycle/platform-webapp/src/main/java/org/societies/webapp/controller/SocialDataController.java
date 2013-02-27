@@ -767,6 +767,11 @@ public class SocialDataController {
 
 				ISocialConnectorInternal con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
 				error = "We are not able to create " + con.getConnectorName() + " connector!";
+				
+				
+				
+				
+				
 				socialdata.addSocialConnector(con);
 				content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
  						+ sdForm.getSnName() + " with token: "
@@ -808,5 +813,21 @@ public class SocialDataController {
 		}
 		return connLI;
 	}
+	
+	
+	
+	/********* GUI Layout *********/
+	
+	
+	private String profileImageHTML(String name, String imageURL){
+		return   "<div class='circle' " +
+				 " style=\"background-image: url('" + imageURL + "')\"> </div>";
+	}
+	
+	
+	
+	
+	
+	
 
 }

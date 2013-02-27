@@ -5,7 +5,7 @@ import org.societies.api.internal.sns.ISocialConnectorInternal;
 
 public class PersonConverterFactory{
 	
-	public static PersonConverter getPersonConverter(ISocialConnectorInternal connector){
+	public static IPersonConverter getPersonConverter(ISocialConnectorInternal connector){
 		if (ISocialConnectorInternal.FACEBOOK_CONN.equals(connector.getConnectorName())) 
 			return new PersonConverterFromFacebook();
 		else if (ISocialConnectorInternal.TWITTER_CONN.equals(connector.getConnectorName()))

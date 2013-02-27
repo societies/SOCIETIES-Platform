@@ -26,7 +26,11 @@ public class LinkedinConnector implements ISocialConnectorInternal {
 	private LinkedinToken 		token=null;
 	private Properties			parameters;
 
-	public static final String PROFILE_URL 			= "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,languages,skills,educations,date-of-birth,honors,associations,email-address,summary,public-profile-url,picture-url,specialties,industry,headline,formatted-name,maiden-name,patents,interests)";
+	public static final String PROFILE_URL 			= "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,languages,skills,educations," +
+													  "date-of-birth,honors,associations,email-address,summary,public-profile-url,picture-url," +
+													  "specialties,industry,headline,formatted-name,maiden-name,patents,interests)";
+	
+	
 	public static final String FRIENDS_URL 			= "http://api.linkedin.com/v1/people/~/connections";
 	public static final String GROUPS_URL 			= "http://api.linkedin.com/v1/people/~/group-memberships?membership-state=member";
 	public static final String ACTIVITIES_URL 		= "http://api.linkedin.com/v1/people/~/network/updates?scope=self";
@@ -60,15 +64,6 @@ public class LinkedinConnector implements ISocialConnectorInternal {
 		this.id				= this.name + "_" + UUID.randomUUID();
 		this.service 		= token.getAuthService();
 		this.access_token   = access_token;
-//		 Scanner in = new Scanner(System.in);
-//		 
-//		 System.out.println("=== LinkedIn's OAuth Workflow ===");
-//		 System.out.println();
-//		 
-//		 System.out.println("=== LinkedIn's OAuth Workflow ===");
-//		 System.out.println();
-
-		
 		
 	}
 	
@@ -101,13 +96,8 @@ public class LinkedinConnector implements ISocialConnectorInternal {
 		return name;
 	}
 	
-
-	
-	
 	public String getSocialData(String path)  {
-		
 		return "";
-
 	}
 	
 	
@@ -116,18 +106,16 @@ public class LinkedinConnector implements ISocialConnectorInternal {
 	public Map<String, String> requireAccessToken() {
 
 		HashMap<String, String > credential = new HashMap<String, String>();
-
-//		credential.put(AUTH_TOKEN, "");
-//		
 		return credential;
 	}
+
+	
 	public void disconnect() {
 		access_token="";
 	}
 
-	public void setMaxPostLimit(int postLimit) {
-		
-	}
+	public void setMaxPostLimit(int postLimit) {}
+	
 	
 	public void setParameter(String key, String value){
 		if (parameters == null){
@@ -136,11 +124,6 @@ public class LinkedinConnector implements ISocialConnectorInternal {
 		parameters.put(key, value);
 	}
 	
-	
-	
-	
-
-
 	public void resetParameters() {
 		parameters = new Properties();
 	}

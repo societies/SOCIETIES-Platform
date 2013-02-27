@@ -411,4 +411,14 @@ public class CtxAttributeTypes {
      */
     @Deprecated
     public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";   
+    
+    
+    /**
+     * The double value of this attribute type contains information about the weight of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}, {@link CtxAttributeValueType.DOUBLE}
+     * 
+     * @since 0.1.1
+     */
+    public static final String ORGANIZATION = "organization";
+    
 }

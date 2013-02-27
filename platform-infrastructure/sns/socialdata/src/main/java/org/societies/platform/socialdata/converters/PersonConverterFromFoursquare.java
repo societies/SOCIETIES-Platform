@@ -21,7 +21,7 @@ import org.apache.shindig.social.opensocial.model.Person.Gender;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PersonConverterFromFoursquare implements PersonConverter {
+public class PersonConverterFromFoursquare extends PersonConverter {
 
 	public static String STATUS_COUNT 	= "statuses_count";
 	public static String LANGUAGE		= "lang";
@@ -58,7 +58,8 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 	private JSONObject db = null;
 
 	public Person load(String data){
-
+		
+		this.rawData = data;
 		person = new PersonImpl();
 
 		try{

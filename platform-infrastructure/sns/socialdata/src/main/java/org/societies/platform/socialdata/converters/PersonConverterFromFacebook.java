@@ -27,7 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class PersonConverterFromFacebook implements PersonConverter{
+public class PersonConverterFromFacebook extends PersonConverter{
 	
 	public static String WORKS 			= "works";
 	public static String ACCOUNTS 		= "accounts";
@@ -61,8 +61,10 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	
 	
 	private JSONObject 	db;
-	private String     	rawData;
+
 	private Person 		person;
+	
+	
 	
 	public Person load(String  data){
 	
@@ -93,7 +95,9 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if (db.has(TURNONS))		person.setTurnOns(jarrayToList(db.getString(TURNONS)));
 			if (db.has(MUSIC))		    person.setMusic(jarrayToList(db.getString(MUSIC)));
 			if (db.has(INTERESTS))	    person.setInterests(jarrayToList(db.getString(INTERESTS)));
-			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));					
+			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));	
+			
+			
 			
 			setAccount();
 		}

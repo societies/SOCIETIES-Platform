@@ -2,11 +2,15 @@ package org.societies.platform.socialdata.service;
 
 import java.util.HashMap;
 
+import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnectorInternal;
 import org.societies.platform.socialdata.SocialData;
+import org.societies.platform.socialdata.converters.PersonConverterFactory;
+import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
+import org.societies.platform.socialdata.converters.PersonConverterFromLinkedin;
 
 
 
@@ -50,8 +54,9 @@ public class JsonToSocialDataService {
 		  
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnectorInternal.AUTH_TOKEN, access_token);
-		  
 		  ISocialConnectorInternal c = sd.createConnector(ISocialConnectorInternal.SocialNetwork.linkedin, pars);
+		 
+		  
 		  
 		 
 		  
@@ -75,10 +80,13 @@ public class JsonToSocialDataService {
 //			e.printStackTrace();
 //		}
 		  
+		  PersonConverterFromLinkedin aaa = new PersonConverterFromLinkedin();
+		  Person ppp = aaa.load(c.getUserProfile());
 		  
-		  String data = c.getUserActivities();
-		  logger.info("profile Data:"+data);
-		  System.out.println("data:"+data);
+		  System.out.println("::::"+c.getUserProfile());
+		  System.out.println("Person URL:"+ppp.getThumbnailUrl());
+		  
+		 // System.out.println("Person:"+p.toString());
 		  
 		  
 		  

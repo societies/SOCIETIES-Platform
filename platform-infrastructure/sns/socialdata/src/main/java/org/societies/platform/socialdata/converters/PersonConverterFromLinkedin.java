@@ -11,6 +11,7 @@ import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
+import org.apache.shindig.social.core.model.MediaLinkImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.OrganizationImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
@@ -18,6 +19,7 @@ import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
+import org.apache.shindig.social.opensocial.model.MediaLink;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Organization;
 import org.apache.shindig.social.opensocial.model.Person;
@@ -26,7 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PersonConverterFromLinkedin implements PersonConverter {
+public class PersonConverterFromLinkedin extends PersonConverter {
 
 	public static String STATUS_COUNT 	= "statuses_count";
 	public static String LANGUAGE		= "languages";
@@ -34,8 +36,7 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 	
 	public static String FIRST_NAME		= "firstName";
 	public static String LAST_NAME		= "lastName";
-	
-	
+
 	public static String SCREEN_NAME	= "screen_name";
 	public static String CREATED_AT 	= "created_at";
 	public static String LOCATION		= "location";
@@ -64,6 +65,7 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 
 	public Person load(String data){
 
+		this.rawData = data;
 		person = new PersonImpl();
 		this.rawData = data;
 
@@ -80,6 +82,11 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			providerObj.setUrl("www.linkedin.com");
 			providerObj.setId("linkedin.com");
 			providerObj.setDisplayName("Linkedin");
+			
+			if (db.has("picture-url")){
+				person.setThumbnailUrl(db.getString("picture-url"));
+			}
+			
 			
 			/// SET NAME
 			Name name = new NameImpl();
@@ -106,7 +113,7 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			
 			
 			if (db.has("summary")){
-				
+				person.setAboutMe(db.getString("summary"));
 			}
 			
 			if (db.has("skills")){
@@ -118,6 +125,7 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 					skills+=list.getJSONObject(i).getJSONObject("skill").getString("name");
 				}
 				person.setJobInterests(skills);
+				
 			}
 			
 			if (db.has("dateOfBirth")){
@@ -125,24 +133,21 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			}
 			
 			if (db.has("headline")){
-				
+				List<String> quotes = new ArrayList<String>();
+				quotes.add(db.getString("headline"));
+				person.setQuotes(quotes);
 			}
 			
 			if (db.has("honors")){
-				
+			
 			}
+			
+			
 			
 			if (db.has("specialties")){
 				
 			}
 			
-			if (db.has("pictureUrl")){
-				
-			}
-			
-			if (db.has("associations")){
-				
-			}
 			
 			if (db.has("educations")){
 				
@@ -174,7 +179,7 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 				person.setProfileUrl(db.getString("publicProfileUrl"));
 			}
 			
-			if (db.has("languages")) genLanguages();
+			if (db.has("languages")) person.setLanguagesSpoken(genLanguages());
 			
 			
 //			
@@ -190,9 +195,6 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			e.printStackTrace();
 		}
 
-//		setAccount();  // Set Twitter Account
-//		person.setLanguagesSpoken(genLanguages());
-//		//		System.out.println("profile:\n"+person.getTurnOns().toString());
 		return person;
 	}
 

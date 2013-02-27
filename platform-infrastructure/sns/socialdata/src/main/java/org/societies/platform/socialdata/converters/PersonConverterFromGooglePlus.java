@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * @author Edgar Domingues (PTIN)
  *
  */
-public class PersonConverterFromGooglePlus implements PersonConverter {
+public class PersonConverterFromGooglePlus extends PersonConverter {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(PersonConverterFromGooglePlus.class);
 
@@ -120,6 +120,8 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 	
 	@Override
 	public Person load(String data) {
+		
+		this.rawData=data;
 		Person person = new PersonImpl();
 		
 		try{

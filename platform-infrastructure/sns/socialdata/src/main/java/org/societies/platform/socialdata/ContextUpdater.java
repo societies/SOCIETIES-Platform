@@ -28,6 +28,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 
+
 public class ContextUpdater {
 
 	/** The logging facility. */
@@ -43,6 +44,8 @@ public class ContextUpdater {
 		this.cssId = cssId;
 		this.internalCtxBroker = internalCtxBroker;
 	}
+	
+	
 
 	public void updateCtxProfile(Person profile) {
 
@@ -62,6 +65,58 @@ public class ContextUpdater {
 			LOG.info("facebook entity updated with books data "+facebookEntity.getId());
 		}
 	}
+	
+	
+	
+	/**
+	 * Get the Social Network entity associated to my Account
+	 * 
+	 * @param  socialNetworkName
+	 * @return ctxEntity
+	 */
+	private CtxEntity getSociaNetworkEntity(String socialNetworkName){
+		
+		IndividualCtxEntity individualEntity ; 
+		CtxAssociation snsAssoc = null;
+		CtxEntity socialNetworkEntity = null;
+
+		try {
+			individualEntity = this.internalCtxBroker.retrieveIndividualEntity(this.cssId).get();
+			Set<CtxAssociationIdentifier> snsAssocSet = individualEntity.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
+
+			if(snsAssocSet.size()>0) { // YES there is at least one connector active
+				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(snsAssocSet);
+				for (CtxAssociationIdentifier ctxIdentifier : snsAssocList){
+					snsAssoc = (CtxAssociation) this.internalCtxBroker.retrieve(ctxIdentifier).get();
+					Set<CtxEntityIdentifier> snsEntitiesSet = snsAssoc.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
+					List<CtxEntityIdentifier> snsEntitiesList = new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
+					
+					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, socialNetworkName).get();
+					
+					//TODO: We assume there are no more than one CtxEntity per SN
+					if(snEntList.size()>0){
+						socialNetworkEntity = (CtxEntity) this.internalCtxBroker.retrieve(snEntList.get(0)).get();
+						return socialNetworkEntity;
+					}
+				}
+			}
+			
+			
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return socialNetworkEntity;
+
+	}
+	
 
 
 	private CtxEntity getFBCtxEntity(){
@@ -131,7 +186,6 @@ public class ContextUpdater {
 	private CtxEntity storeContextFB(String type, Serializable value){
 
 		CtxAttribute attribute = null;
-
 		CtxEntity facebook = null;
 		CtxEntity updatedFacebook = null;
 

@@ -9,6 +9,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies services - Social Data</title>
 <script type="text/javascript" src="js/socialdata.js"></script>
+<link href="css/socialdata.css" rel="stylesheet" type="text/css"  media="screen" />
+<!-- 
+
 <style>
 
 input.icon{
@@ -67,7 +70,7 @@ div#addConnector{
 
 
 </style>
-
+-->
 
 </head>
 

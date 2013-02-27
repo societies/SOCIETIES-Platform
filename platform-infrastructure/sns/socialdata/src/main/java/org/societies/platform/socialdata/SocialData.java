@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.ISOSignatureSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -28,6 +27,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.sns.ISocialConnectorInternal;
+import org.societies.api.internal.sns.ISocialConnectorInternal.SocialDataType;
 import org.societies.api.internal.sns.ISocialDataInternal;
 import org.societies.api.sns.ISocialConnector;
 import org.societies.api.sns.ISocialConnector.SocialNetwork;
@@ -42,7 +42,7 @@ import org.societies.platform.socialdata.converters.FriendsConverter;
 import org.societies.platform.socialdata.converters.FriendsConveterFactory;
 import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
-import org.societies.platform.socialdata.converters.PersonConverter;
+import org.societies.platform.socialdata.converters.IPersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
 import org.springframework.stereotype.Service;
 
@@ -61,9 +61,15 @@ public class SocialData implements ISocialDataInternal{
 	// css user is modeled as individualCtxEntity
 	private IndividualCtxEntity individualCtxEntity;
 	
+	
+	private STATE status = ISocialData.STATE.NEED_UPDATE;
+	
+	
+	HashMap <String,CtxAttributeIdentifier> connectorsInCtxBroker = new HashMap<String, CtxAttributeIdentifier>();
+	
 	/*
 	 * Platform services  
-	*/
+	 */
 	private ICtxBroker internalCtxBroker;
 	private ICommManager commsMgr;
 	private IIdentityManager identityMgr;
@@ -109,71 +115,83 @@ public class SocialData implements ISocialDataInternal{
 
 	public SocialData(){
 
+		logger.debug("****** SOCIAL DATA Bundle ********");
+		
+		
 		socialFriends 			= new HashMap<String, Object>();
 		socialGroups			= new HashMap<String, Object>();
 		socialProfiles			= new HashMap<String, Object>();
 		socialActivities		= new HashMap<String, Object>();
 
 		lastUpate				= new Date().getTime();
-		
 		logger.info("SocialData Bundle is started");
 		
+	
+	
 	}
 
-	HashMap <String,CtxAttributeIdentifier> connectorsInCtxBroker = new HashMap<String, CtxAttributeIdentifier>();
+	
 
-	 private void initSocialData(){
+	/**
+	 * Initialize Bundle
+	 */
+	private void initSocialData(){
 		
-		 /*
-		 	socialFriends 			= new HashMap<String, Object>();
-			socialGroups			= new HashMap<String, Object>();
-			socialProfiles			= new HashMap<String, Object>();
-			socialActivities		= new HashMap<String, Object>();
-
-			lastUpate				= new Date().getTime();
-	    	*/
-	    	
-
-	    	try  {
+		
+		logger.debug("****** SOCIAL DATA init...");
+		
+		
+		try  {
 
 	    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
 	    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
 	 	    		
-	    		logger.info("CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
+	    		logger.info(" SD -- CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
 	    	} 
 	    	catch (InvalidFormatException e) {
+	    		logger.error("Unable to get CssNodeId and Owner ... ",e);
 	    		e.printStackTrace();
 	    	}
-	    
+			
+			logger.info("****** SOCIAL DATA ready!");
+		
+			logger.debug("Get ContextBroker reference... ");
 	    	// store SNS data to context
 			this.ctxUpdater = new ContextUpdater(this.internalCtxBroker,this.cssOwnerId);
 	    	
 	    	
-	    	logger.info("SocialData Bundle is started");
 	    	
 	    	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	    	
+	    	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	    	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	    	
+			
+			logger.debug("CrxBroker connected. Restore SocialData status... ");
 	    	// Save data into the context
 			try {
-				logger.info(internalCtxBroker.toString());
 				
 				
+				logger.debug(internalCtxBroker.toString());
+			
 				individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-				logger.info("Indivudual Context Entity: " + individualCtxEntity.getId().toString());
-				
+				logger.info("SD: Indivudual Context Entity: " + individualCtxEntity.getId().toString());
 				
 				// Restore the connected connector
 				Set<CtxAttribute> connectors= individualCtxEntity.getAttributes(CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR);
+				
+				
 				if (connectors != null && !connectors.isEmpty()){
-					
+					logger.debug("CtxBroker has " + connectors.size() + "connectors");
 					restoreState = true;
+					
 					for(CtxAttribute ctxConn : connectors){
+						
+						
 						ConnectorBean connectorBlob;
 						try {
 							connectorBlob = (ConnectorBean) SerialisationHelper.deserialise(ctxConn.getBinaryValue(), this.getClass().getClassLoader());
-							logger.info("connector bean:"+connectorBlob);
+							logger.debug("### Connector:"+connectorBlob);
 							
 							HashMap<String, String> params = new HashMap<String, String>();
 							params.put(ISocialConnectorInternal.AUTH_TOKEN, connectorBlob.getToken());
@@ -182,19 +200,22 @@ public class SocialData implements ISocialDataInternal{
 							connectorsInCtxBroker.put(connectorBlob.getId(), ctxConn.getId());
 							this.addSocialConnector(createConnector(getSocialNetowkName(connectorBlob.getSnName()), params));
 							
-							logger.info("Restore Connector: "+connectorBlob.getId()+ " for "+connectorBlob.getSnName());
+							logger.debug("Restore Conn.id["+connectorBlob.getId()+ "] for "+connectorBlob.getSnName());
 							
 						} 
 						catch (Exception e) {
-							logger.error(e.getLocalizedMessage(), e);
-							
+							logger.error("Error while restoring connector :" +e.getLocalizedMessage(), e);
 						}
 						
-					updateSocialData();
+						
+						updateSocialData();
 						
 					}
 				}
-				else logger.warn("No SocialNetworkConnector stored in the Broker!");
+				else {
+					
+					logger.debug("CtxBroker doesn't contains Social Connectors");
+				}
 				
 			}
 			catch (CtxException e) {
@@ -208,6 +229,8 @@ public class SocialData implements ISocialDataInternal{
 				e.printStackTrace();
 			}
 			finally{
+				
+				logger.info("****** SOCIAL DATA ready!");
 				restoreState=false;
 			}
 
@@ -327,37 +350,49 @@ public class SocialData implements ISocialDataInternal{
 		return new ArrayList(socialProfiles.values());
 	}
 
+	
+	
+	Runnable updateDataFromConnectors =  new Runnable() {
+		public void run() {
+			logger.debug("*** Social data updating info from connectors .....");
+			
+			
+			socialActivities.clear();
+			socialFriends.clear();
+			socialGroups.clear();
+			socialProfiles.clear();
+			
+			Iterator<ISocialConnectorInternal>it = connectors.values().iterator();
+			
+			socialActivities = new HashMap<String, Object>();  // reset old Activities
+			while (it.hasNext()){
+				ISocialConnectorInternal connector = it.next();
+				
+				getActivities(connector);
+				updateProfile(connector);
+				updateGroups(connector);
+				updateFriends(connector);
+				/// UPDATE ALL DATA
+
+			}
+			status = ISocialData.STATE.DATA_AVAILABLE;
+			logger.debug("Social Data is available now");
+		}
+		
+	};
+	
+	
 
 	@Override
 	public void updateSocialData() {
-		
-		
-		socialActivities.clear();
-		socialFriends.clear();
-		socialGroups.clear();
-		socialProfiles.clear();
-		
-		Iterator<ISocialConnectorInternal>it = connectors.values().iterator();
-		
-		socialActivities = new HashMap<String, Object>();  // reset old Activities
-		while (it.hasNext()){
-			ISocialConnectorInternal connector = it.next();
-			
-			getActivities(connector);
-			updateProfile(connector);
-			updateGroups(connector);
-			updateFriends(connector);
-			/// UPDATE ALL DATA
-
-		}
-
-
-
+		status = ISocialData.STATE.DOWNLOADING;
+		new Thread(updateDataFromConnectors).start();
 		lastUpate = new Date().getTime();
-
-
 	}
 
+	
+	
+	
 
 
 	private void updateGroups(ISocialConnectorInternal connector) {
@@ -384,6 +419,9 @@ public class SocialData implements ISocialDataInternal{
 		ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
 		List<?> activities = parser.load(connector.getUserActivities());
 		socialActivities.put(connector.getID(), activities);
+		
+		
+		
 	}
 
 
@@ -409,7 +447,7 @@ public class SocialData implements ISocialDataInternal{
 
 	private void updateProfile(ISocialConnectorInternal connector) {
 		
-		PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
+		IPersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 		Person profile = parser.load(connector.getUserProfile());
 
 		
@@ -595,6 +633,12 @@ public class SocialData implements ISocialDataInternal{
 	@Override
 	public boolean isAvailable(org.societies.api.sns.ISocialConnector connector) {
 		return false;
+	}
+
+	@Override
+	public STATE getState() {
+		// TODO Auto-generated method stub
+		return status;
 	}
 
 

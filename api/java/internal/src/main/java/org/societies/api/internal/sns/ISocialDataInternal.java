@@ -32,7 +32,6 @@ public interface ISocialDataInternal extends org.societies.api.sns.ISocialData{
 	
 	
 	
-	
     /**
      * Add a new social connector to fetch data from a specific Social network
      * @param socialConnector Interface of the specific connector

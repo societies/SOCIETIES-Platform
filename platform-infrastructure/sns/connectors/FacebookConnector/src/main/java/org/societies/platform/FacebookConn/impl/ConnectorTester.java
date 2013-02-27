@@ -30,12 +30,14 @@ public class ConnectorTester {
 	 */
 	public static void main(String[] args) {
 		String access_token = "AAAFs43XOj3IBANAuFLLTycEWZCiHLvqN1BH9f4OGyhQbWJ2GZC7D57XbITHafLpisDjx0B9OtZCx3hhoxZANUNqOl8FK6tzchZAthmjTQVwZDZD";
+		
+		access_token= "AAAFs43XOj3IBAN8bEdMuZBiMVyMYlwAYtT5nxu432Man4tIwL1xitpiqLdTYz8cuaBdGsrb6mJAgxab20ZBZC4jFDtvWZC0Xp4jtmFYttAZDZD";
 		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token, "Societies User");
 		
 		
-		/*
+		
 		System.out.println("User Profile:"+connector.getUserProfile());
-		System.out.println("User Groups:"+connector.getUserGroups());
+		/*System.out.println("User Groups:"+connector.getUserGroups());
 		System.out.println("User Friends:"+connector.getUserFriends());
 		System.out.println("User Activies:"+connector.getUserActivities());	
 		*/
@@ -49,14 +51,14 @@ public class ConnectorTester {
 		
 		//connector.post("Test for societies");
 		
-		String value="{ \"checkin\": {"+
-		        "\"lat\": \"53.345149444145\","+
-		        "\"lon\": \"-6.2539714878708\","+
-		        "\"message\": \"Hello!!!!\","+
-		        "\"place\": \"173684349321759\"}"+
-		        "}";
-				
-				connector.post(value);
+//		String value="{ \"checkin\": {"+
+//		        "\"lat\": \"53.345149444145\","+
+//		        "\"lon\": \"-6.2539714878708\","+
+//		        "\"message\": \"Hello!!!!\","+
+//		        "\"place\": \"173684349321759\"}"+
+//		        "}";
+//				
+//				connector.post(value);
 				
 
 	}

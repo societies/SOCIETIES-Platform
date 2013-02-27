@@ -1,0 +1,72 @@
+/**
+	SOCIAL DATA STYLESHEET
+**/
+
+
+input.icon{
+	width:45px;
+}
+
+div.legend{
+	border: solid 2px;
+	background-color: grey;
+	color:white;
+	width:20%;
+	
+}
+
+.error {
+	color: #ff0000;
+}
+ 
+ .connectors{
+ 	border: solid black;
+	text-align: center;
+	
+ }
+.errorblock {
+	color: #000;
+	background-color: #ffEEEE;
+	border: 3px solid #ff0000;
+	padding: 8px;
+	margin: 16px;
+}
+
+div#container {
+	width: 90%;
+	border: 1px solid #000;
+	text-align: center;
+}
+div.split2 div {
+	float: left;
+	width: 50%;
+}
+
+div.split2 ul { list-style-type: none; }
+
+div.wide {
+	clear: left;
+}
+
+div#connectors ul { list-style-type: none; text-align:left; margin-left: 20%; }
+div#connectors img{width:20px;}
+
+div#addConnector{
+	visibility: hidden;
+}
+
+
+.circle {
+  display: block;
+  width: 150px;
+  height: 150px;
+  margin: 1em auto;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  -webkit-border-radius: 99em;
+  -moz-border-radius: 99em;
+  border-radius: 99em;
+  border: 5px solid #eee;
+  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.3);  
+}

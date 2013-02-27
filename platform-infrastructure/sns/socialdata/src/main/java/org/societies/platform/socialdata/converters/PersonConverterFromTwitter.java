@@ -20,7 +20,7 @@ import org.apache.shindig.social.opensocial.model.Person.Gender;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PersonConverterFromTwitter implements PersonConverter {
+public class PersonConverterFromTwitter extends PersonConverter {
 
 	public static String STATUS_COUNT 	= "statuses_count";
 	public static String LANGUAGE		= "lang";
@@ -48,7 +48,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	public static String TWEET_ID		= "id";
 
 
-	private String     rawData;
+
 	private JSONObject db;
 	private Person 	   person;
 
