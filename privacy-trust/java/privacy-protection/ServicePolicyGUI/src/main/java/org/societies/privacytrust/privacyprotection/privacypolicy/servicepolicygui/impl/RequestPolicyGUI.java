@@ -49,6 +49,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileFilter;
+
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -132,6 +134,7 @@ implements ActionListener, WindowListener
 
 		this.resourceTable = new JTable(this.model);
 		JScrollPane scpResourceTable = new JScrollPane(this.resourceTable);
+		
 		gbcResourcePanel.gridx = 0;
 		gbcResourcePanel.gridy = 0;
 		gbcResourcePanel.gridwidth = 1;
@@ -277,6 +280,21 @@ implements ActionListener, WindowListener
 				JOptionPane.showMessageDialog(this, "Add at least one resource ");
 			} else {
 				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setSelectedFile(new File("Privacy-policy.xml"));
+				fileChooser.setDialogTitle("Save your privacy folder inside the src/main/resources folder of your 3p service");
+				
+				fileChooser.setFileFilter(new FileFilter() {
+					
+					@Override
+					public String getDescription() {
+						return "XML files - .xml";
+					}
+					
+					@Override
+					public boolean accept(File f) {
+						return f.getName().endsWith(".xml");
+					}
+				});
 				int returnVal = fileChooser.showSaveDialog(this);
 				if (returnVal == 0) {
 					createPolicy(fileChooser.getSelectedFile());

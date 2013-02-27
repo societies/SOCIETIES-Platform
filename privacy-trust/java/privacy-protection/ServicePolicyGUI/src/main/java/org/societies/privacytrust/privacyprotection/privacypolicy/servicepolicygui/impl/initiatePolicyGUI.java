@@ -44,7 +44,13 @@ public class initiatePolicyGUI
 		    // If Nimbus is not available, you can set the GUI to another look and feel.
 		}*/
 
-		WebLookAndFeel.install();
+		//		WebLookAndFeel.install();
+		try {
+			
+		    UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 		RequestPolicyGUI gui = new RequestPolicyGUI();
 		GUIFrame frame = new GUIFrame(gui);
 		frame.setVisible(true);

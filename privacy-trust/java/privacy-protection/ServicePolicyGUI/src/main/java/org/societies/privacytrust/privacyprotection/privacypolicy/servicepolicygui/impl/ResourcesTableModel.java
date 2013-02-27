@@ -60,10 +60,10 @@ public class ResourcesTableModel extends AbstractTableModel
 
 	public boolean isCellEditable(int row, int col)
 	{
-		if ((col == 2) || (col == 1)) {
-			return false;
+		if (col==3) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public void setValueAt(Object value, int row, int col)
