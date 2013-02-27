@@ -60,7 +60,30 @@
 								<td><form:input path="sex"
 										value="${cmLoginForm.sex}" size="50" /> 
 								</td>
-								<td>TODO: Create dropdown!</td>
+								<td>0 = Male; 1 = Female; 2 = Undefined</td>
+							</tr>
+							
+							<tr>
+								<td>Workplace</td>
+								<td><form:input path="workplace"
+										value="${cmLoginForm.workplace}" size="50" /> 
+								</td>
+							</tr>
+							
+							<tr>
+								<td>Position</td>
+								<td><form:input path="position"
+										value="${cmLoginForm.position}" size="50" /> 
+								</td>
+							</tr>
+							<tr>
+							<tr>
+								<td>Entity</td>
+								<td><form:input path="entity"
+										value="${cmLoginForm.entity}" size="50" /> 
+								</td>
+								<td>0 = Person; 1 = Organisation</td>
+							</tr>
 							</tr>
 						</table>
 						<br/>

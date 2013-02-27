@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.internal.css.CSSManagerEnums;
 
 public class TestCssRecord {
 
@@ -74,41 +74,41 @@ public class TestCssRecord {
 //		cssProfile.getArchiveCSSNodes().add(cssNode_1);
 //		cssProfile.getArchiveCSSNodes().add(cssNode_2);
 		
-		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-		cssProfile.setCssUpTime(TEST_UPTIME);
+//		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+//		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+//		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+//		cssProfile.setCssUpTime(TEST_UPTIME);
 		cssProfile.setEmailID(TEST_EMAIL);
 		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		cssProfile.setForeName(TEST_FORENAME);
 		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
-		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
-		cssProfile.setImID(TEST_IM_ID);
+//		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+//		cssProfile.setImID(TEST_IM_ID);
 		cssProfile.setName(TEST_NAME);
-		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+//		cssProfile.setPassword(TEST_PASSWORD);
+//		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
-		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+//		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
 //		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
-		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
+//		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
 //		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
-		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
-		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
-		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
+//		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
+//		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
+//		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
 		assertEquals(TEST_EMAIL, cssProfile.getEmailID());
 		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), cssProfile.getEntity());
 		assertEquals(TEST_FORENAME, cssProfile.getForeName());
 		assertEquals(TEST_HOME_LOCATION, cssProfile.getHomeLocation());
-		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
-		assertEquals(TEST_IM_ID, cssProfile.getImID());
+//		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
+//		assertEquals(TEST_IM_ID, cssProfile.getImID());
 		assertEquals(TEST_NAME, cssProfile.getName());
 //		assertEquals(TEST_PASSWORD, cssProfile.password);
-		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
+//		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
-		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
+//		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
 	}
 
 }

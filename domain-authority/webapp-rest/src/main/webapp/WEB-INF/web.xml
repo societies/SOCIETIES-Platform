@@ -35,7 +35,13 @@
 
 	<servlet>
         <servlet-name>clientjar</servlet-name>
+<!--
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+-->
+<!--
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+-->
+        <servlet-class>org.societies.domainauthority.rest.server.ServiceClientJar</servlet-class>
 
 		<!--init-param>
 			<param-name>com.sun.jersey.config.feature.Redirect</param-name>

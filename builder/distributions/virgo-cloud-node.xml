@@ -43,13 +43,13 @@
 		<module>../../platform-infrastructure/service-lifecycle/service-discovery/</module>
 		<module>../../platform-infrastructure/service-lifecycle/service-control/</module>
 
-		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->	
+		<!-- Security and Dependability Mgmt: 2 bundles -->	
 		<module>../../platform-infrastructure/security/SecurityServices</module>
 		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
-		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- Activity Feed: 1 bundle -->
 		<module>../../common-modules/activityfeed</module>
+		<module>../../common-modules/activityfeedservice</module>
 
 
 		<!-- Directory Clients: 2 bundles (to be merged) -->
@@ -77,9 +77,8 @@
 		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../../platform-infrastructure/sns/LinkedinConn</module>
-		<module>../../platform-infrastructure/sns/socialdata</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
-		<module>../../platform-infrastructure/sns/SocialDataCommsMgr</module>
+		<module>../../platform-infrastructure/sns/socialdata</module>
 		
 		<!-- Context Management: 2 bundles -->
 		<module>../../context-management</module>

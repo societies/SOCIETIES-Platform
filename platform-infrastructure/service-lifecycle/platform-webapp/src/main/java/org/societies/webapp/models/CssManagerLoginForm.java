@@ -112,6 +112,9 @@ public class CssManagerLoginForm {
 	    private String name;
 	    private int sex;
 	    private String socialURI;
+	    private String workplace;
+	    private String position;
+	    private int entity;
 	    /** Css Record Details end **/
 		
 	    
@@ -538,6 +541,7 @@ public class CssManagerLoginForm {
 		public void setName(String name) {
 			this.name = name;
 		}
+				
 		/**
 		 * @return the sex
 		 */
@@ -550,6 +554,20 @@ public class CssManagerLoginForm {
 		public void setSex(int sex) {
 			this.sex = sex;
 		}
+		
+		/**
+		 * @return the entity
+		 */
+		public int getEntity() {
+			return entity;
+		}
+		/**
+		 * @param entity the entity to entity
+		 */
+		public void setEntity(int entity) {
+			this.entity = entity;
+		}
+		
 		/**
 		 * @return the socialURI
 		 */
@@ -671,8 +689,31 @@ public class CssManagerLoginForm {
 			this.cssAdUri = cssAdUri;
 		}
 
+		/**
+		 * @return the workplace
+		 */
+		public String getWorkplace() {
+			return workplace;
+		}
+		/**
+		 * @param workplace the workplace to set
+		 */
+		public void setWorkplace(String workplace) {
+			this.workplace = workplace;
+		}
 
-	
+		/**
+		 * @return the position
+		 */
+		public String getPosition() {
+			return position;
+		}
+		/**
+		 * @param position the position to set
+		 */
+		public void setPosition(String position) {
+			this.position = position;
+		}
 
 	    
 	    

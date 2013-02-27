@@ -274,6 +274,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
+			if(serviceBundle.getState() == Bundle.ACTIVE){
+				if(logger.isDebugEnabled())
+					logger.debug("Service is already started, no need to act!");
+				
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+
+			}
+			
 			//Before we start the bundle we prepare the entry on the hashmap
 			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
 			Long bundleId = new Long(serviceBundle.getBundleId());
@@ -400,6 +409,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 
+			if(serviceBundle.getState() != Bundle.ACTIVE){
+				if(logger.isDebugEnabled())
+					logger.debug("Service is not ACTIVE, so no need to stop it.");
+				
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+
+			}
 			
 			// Now we need to stop the bundle
 			if(logger.isDebugEnabled())

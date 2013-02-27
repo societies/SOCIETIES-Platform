@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.identity.Requestor;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 
 
 /**

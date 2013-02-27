@@ -44,16 +44,16 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -66,7 +66,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyAgreementManagerTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerTest.class.getName());
 	
 	public static int testCaseNumber = 0;
 	

@@ -24,18 +24,13 @@
  */
 package org.societies.android.api.internal.privacytrust;
 
-import java.util.Map;
-
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyBehaviourConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.PrivacyPolicyTypeConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
-import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
-
 
 /**
  * Interface exposed to Societies components in order to do actions relative
@@ -44,7 +39,18 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  * @author Olivier Maridat (Trialog)
  * @created 09-nov.-2011 16:45:29
  */
-public interface IPrivacyPolicyManager {
+public interface IPrivacyPolicyManager extends IServiceManager {
+	/*
+	 * Note from Olivier: someone add this to my code, but this is NOT USEFUL AT ALL! 
+	 */
+	public String methodsArray [] = {"getPrivacyPolicy(String client, RequestorBean owner)",
+		  	"updatePrivacyPolicy(String client, RequestPolicy privacyPolicy)",
+			"updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean owner)",
+			"deletePrivacyPolicy(String client, RequestorBean owner)",
+			"startService()",
+			"stopService()"
+		 };
+	
 	/**
 	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
 	 * Must be used in the listening IntentFilter
@@ -80,17 +86,6 @@ public interface IPrivacyPolicyManager {
 	 * @post The response is available in an Intent: {@link MethodType}::UPDATE_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY.
 	 */
 	public void updatePrivacyPolicy(String client, RequestPolicy privacyPolicy) throws PrivacyException;
-	
-	/**
-	 * Store or update a (CIS or 3P Service) privacy policy from an XML version of it.
-	 * 
-	 * @param client Client package name
-	 * @param privacyPolicy XML formatted string containing the privacy policy to store or update
-	 * @param owner Id of the CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean} owner of the privacy policy
-	 * @post The response is available in an Intent: {@link MethodType}::UPDATE_PRIVACY_POLICY. {@link IPrivacyPolicyManager}INTENT_RETURN_STATUS_KEY contains the status of the request to know if the operation succeed or not, and the meaning of an eventual failure is available in {@link IPrivacyPolicyManager}::INTENT_RETURN_STATUS_MSG_KEY.
-	 * @throws PrivacyException
-	 */
-	public void updatePrivacyPolicy(String client, String privacyPolicy, RequestorBean owner) throws PrivacyException;
 	
 	/**
 	 * Delete a CIS or 3P service privacy policy by the ID of the CIS or the 3P Service

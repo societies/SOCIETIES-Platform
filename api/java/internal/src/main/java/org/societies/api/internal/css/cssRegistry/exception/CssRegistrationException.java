@@ -25,7 +25,7 @@
 package org.societies.api.internal.css.cssRegistry.exception;
 
 /**
- * 
+ * @deprecated
  * @author Maria Mannion - Intel
  *
  */

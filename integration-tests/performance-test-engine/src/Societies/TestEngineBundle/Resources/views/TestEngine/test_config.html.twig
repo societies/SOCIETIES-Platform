@@ -1,0 +1,47 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+ 
+{% block title %}{{ parent() }} - Nodes{% endblock %}
+ 
+{% block body %}
+{{ parent() }}
+
+	<h4>
+		You are going to send a "{{ performance_test.testName }}" performance test to the following nodes:
+	</h4>
+	
+	<ul>
+		{% for item in node_ids_list %}
+	 		
+	 		<li> {{ item.nodeId }} </li>
+  		
+		{% endfor %}
+	</ul>
+
+	
+	<br/>
+	
+<div class="well">
+<h4>
+Test Parameters
+</h4>
+
+	<form method="post" action="send-test">	
+		{% for item in performanceTestParameters %}	 	
+	 		
+	 		<label class="required" for="{{ item.id }}" >{{ item.parameterName }}</label>
+	 		<textarea id="{{ item.id }}" name="{{ item.id }}" required="required" >{{ item.parameterValue  }}</textarea>	
+	 	<br/>
+		{% endfor %}
+		
+		<input value="send" type="submit" class="btn btn-primary" />
+	</form>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+

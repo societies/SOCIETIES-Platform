@@ -24,9 +24,11 @@
  */
 package org.societies.context.community.inference.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -51,27 +53,29 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityCtxInferenceMgr.class);
 
+	private final List<String> inferrableTypes = new CopyOnWriteArrayList<String>();
+
 	@Autowired(required=false)
 	private ICtxBroker internalCtxBroker;
-	
+
 	@Autowired(required=false)
 	private ICommunityCtxEstimationMgr communityContextEstimation;
-	
+
 	@Autowired(required=false)
 	private ICommManager commMgr;
-	
-	CommunityCtxInferenceMgr(){
-	
-		LOG.info(this.getClass() + "instantiated ");
-		
-		//this.internalCtxBroker = internalCtxBroker;
-		//LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
 
-		//this.commMgr = commMgr;
-		//LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
-	
-		//this.communityCtxEstimation = communityCtxEstimation; 
-		//LOG.info(this.getClass() + "communityCtxEstimation instantiated " +this.communityCtxEstimation);
+	CommunityCtxInferenceMgr(){
+
+		LOG.info(this.getClass() + "instantiated ");
+
+
+		//	this.internalCtxBroker = internalCtxBroker;
+		//	LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
+		//	this.commMgr = commMgr;
+		//	LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
+
+		//	this.communityCtxEstimation = communityCtxEstimation; 
+		//	LOG.info(this.getClass() + "communityCtxEstimation instantiated " +this.communityCtxEstimation);
 	}
 
 	@Override
@@ -79,14 +83,19 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 			CtxAttributeIdentifier communityAttrId) {
 
 		CtxAttribute ctxAttrReturn = null; 
-
+		//LOG.info("0 commCtxInfMgr :" +communityEntIdentifier +" ");
 		try {
 			ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
-			LOG.info("communityEntIdentifier "+communityEntIdentifier.toString());
-			LOG.info("communityAttrId "+communityAttrId.toString());
+			if (LOG.isDebugEnabled()) 	{
+				LOG.debug("communityEntIdentifier "+communityEntIdentifier.toString());
+				LOG.debug("communityAttrId "+communityAttrId.toString());
+			}
+			//LOG.info("1 commCtxInfMgr ctxAttrReturn:" +ctxAttrReturn);
 			ctxAttrReturn = this.communityContextEstimation.estimateCommunityCtx(communityEntIdentifier, communityAttrId);
-			
+
+			//LOG.info("2 commCtxInfMgr ctxAttrReturn estimated :" +ctxAttrReturn);
 		} catch (InterruptedException e) {
+			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {

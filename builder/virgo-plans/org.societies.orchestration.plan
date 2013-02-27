@@ -6,7 +6,7 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-    <artifact type="bundle" name="org.societies.orchestration.cssdatacollector"/>
+    <!-- <artifact type="bundle" name="org.societies.orchestration.cssdatacollector"/> -->
     <artifact type="bundle" name="org.societies.orchestration.cisdatacollector"/>
     <artifact type="bundle" name="org.societies.orchestration.cpa"/>    
 	

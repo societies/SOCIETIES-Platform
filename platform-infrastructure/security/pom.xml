@@ -21,7 +21,6 @@
 	<modules>
 		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>
-		<module>SecurityCommsMgr</module>
 		<module>../../domain-authority/webapp-rest</module>
 	</modules>
 

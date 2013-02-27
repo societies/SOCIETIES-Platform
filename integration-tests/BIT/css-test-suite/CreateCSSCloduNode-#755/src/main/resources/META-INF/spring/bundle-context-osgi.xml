@@ -13,7 +13,7 @@
                       	http://www.springframework.org/schema/osgi 
                       	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.management.ICSSLocalManager" />
+    <osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.ICSSInternalManager" />
     <osgi:reference id="cssRegistry" interface="org.societies.api.internal.css.cssRegistry.ICssRegistry" />
     
        

@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
 
 import org.societies.domainauthority.webapp.models.LoginForm;
@@ -58,24 +57,7 @@ public class LoginController {
 	@Autowired
 	private ICommManagerController commManagerControl;
 	@Autowired
-	ICISCommunicationMgrFactory ccmFactory;
-	@Autowired
 	DaRegistry daRegistry;
-	
-	/**
-	 * @return the ccmFactory
-	 */
-	public ICISCommunicationMgrFactory getCcmFactory() {
-		return ccmFactory;
-	}
-
-	/**
-	 * @param ccmFactory
-	 *            the ccmFactory to set
-	 */
-	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
-		this.ccmFactory = ccmFactory;
-	}
 
 	public ICommManager getCommManager() {
 		return commManager;
@@ -193,7 +175,7 @@ public class LoginController {
 		isAuthenticated = true;
 		// Now get the url details from the registry
 		String redirectUrl = new String();
-		redirectUrl = String.format("http://%s:%s/societies/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
+		redirectUrl = String.format("http://%s:%s/societies-test/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
 		model.put("webappurl", redirectUrl);
 
 		model.put("name", userName);

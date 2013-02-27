@@ -157,6 +157,14 @@ public class CssCtxMonitor extends EventListener {
 				|| EventTypes.CIS_SUBS.equals(event.geteventType())
 				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
 			
+			if (event.geteventSource() == null || event.geteventSource().length() == 0) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected non-null or non-empty event source of type IIdentity JID String"
+						+ " but was " + event.geteventSource());
+				return;
+			}
+			
 			if (!(event.geteventInfo() instanceof Community)) {
 
 				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
@@ -165,12 +173,14 @@ public class CssCtxMonitor extends EventListener {
 				return;
 			}
 
-			final Community cisRecord = (Community) event.geteventInfo();	
+			final Community cisRecord = (Community) event.geteventInfo();
 			if (EventTypes.CIS_CREATION.equals(event.geteventType())
 					|| EventTypes.CIS_SUBS.equals(event.geteventType()))
-				this.executorService.execute(new CssJoinedCisHandler(cisRecord.getCommunityJid()));
+				this.executorService.execute(new CssJoinedCisHandler(
+						event.geteventSource(), cisRecord.getCommunityJid()));
 			else //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
-				this.executorService.execute(new CssLeftCisHandler(cisRecord.getCommunityJid()));
+				this.executorService.execute(new CssLeftCisHandler(
+						event.geteventSource(), cisRecord.getCommunityJid()));
 			
 		} else {
 		
@@ -237,7 +247,7 @@ public class CssCtxMonitor extends EventListener {
 		private final String myCssIdStr;
 		private final String newFriendIdStr;
 		
-		private CssFriendedHandler(final String myCssIdStr,final String newFriendIdStr) {
+		private CssFriendedHandler(final String myCssIdStr, final String newFriendIdStr) {
 			
 			this.myCssIdStr = myCssIdStr;
 			this.newFriendIdStr = newFriendIdStr;
@@ -287,10 +297,13 @@ public class CssCtxMonitor extends EventListener {
 	
 	private class CssJoinedCisHandler implements Runnable {
 		
+		private final String myCssIdStr;
+		
 		private final String cisIdStr;
 		
-		private CssJoinedCisHandler(final String cisIdStr) {
+		private CssJoinedCisHandler(final String myCssIdStr, final String cisIdStr) {
 			
+			this.myCssIdStr = myCssIdStr;
 			this.cisIdStr = cisIdStr;
 		}
 		
@@ -301,19 +314,48 @@ public class CssCtxMonitor extends EventListener {
 		public void run() {
 
 			if (LOG.isInfoEnabled())
-				LOG.info("CSS joined CIS '" + cisIdStr + "'");
+				LOG.info("CSS '" + this.myCssIdStr + "' joined CIS '" + this.cisIdStr + "'");
 			
 			try {
-				// TODO find the right way (TM) to get my CSS ID?
 				final IIdentity myCssId = commMgr.getIdManager().fromJid(
-						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+						this.myCssIdStr);
 				final IndividualCtxEntity myCssEnt = 
 						ctxBroker.retrieveIndividualEntity(myCssId).get();
 
-				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
-				final CtxEntityIdentifier cisEntId =
+				final IIdentity cisId = commMgr.getIdManager().fromJid(this.cisIdStr);
+
+				///////////////////////////////////////////////////////////////
+				// The CommunityCtxEntity might not be available right after
+				// the CIS_CREATION event: 
+				// (1) check if it can be retrieved, otherwise
+				// (2) wait for its creation
+				///////////////////////////////////////////////////////////////
+
+				// (1) check if the CommunityCtxEntity has already been created
+				CtxEntityIdentifier cisEntId =
 						ctxBroker.retrieveCommunityEntityId(
 								new Requestor(myCssId), cisId).get();
+				// (2) if not available, wait until it's created
+				// TODO find better way (event-based?)
+				if (cisEntId == null) {
+					if (LOG.isDebugEnabled())
+						LOG.debug("Waiting for the CommunityCtxEntity of CIS '"
+								+ cisId + "' to be created");
+					int retries = 10;
+					while (retries > 0) {
+						Thread.sleep(500);
+						cisEntId = ctxBroker.retrieveCommunityEntityId(
+								new Requestor(myCssId), cisId).get();
+						retries--;
+						if (cisEntId != null)
+							break;
+					}
+				}
+				
+				if (cisEntId == null) {
+					LOG.error("CommunityCtxEntity of CIS '"	+ cisId + "' is not available!!");
+					return;
+				}
 				
 				final CtxAssociation isMemberOfAssoc;
 				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
@@ -328,7 +370,7 @@ public class CssCtxMonitor extends EventListener {
 
 			} catch (InvalidFormatException ife) {
 
-				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+				LOG.error("Invalid CSS/CIS IIdentity: " 
 						+ ife.getLocalizedMessage(), ife);
 			} catch (Exception e) {
 
@@ -340,10 +382,13 @@ public class CssCtxMonitor extends EventListener {
 	
 	private class CssLeftCisHandler implements Runnable {
 		
+		private final String cssIdStr;
+		
 		private final String cisIdStr;
 		
-		private CssLeftCisHandler(final String cisIdStr) {
+		private CssLeftCisHandler(final String cssIdStr, final String cisIdStr) {
 			
+			this.cssIdStr = cssIdStr;
 			this.cisIdStr = cisIdStr;
 		}
 		
@@ -354,12 +399,11 @@ public class CssCtxMonitor extends EventListener {
 		public void run() {
 
 			if (LOG.isInfoEnabled())
-				LOG.info("CSS left CIS '" + cisIdStr + "'");
+				LOG.info("CSS '" + this.cssIdStr + "' left CIS '" + this.cisIdStr + "'");
 			
 			try {
-				// TODO find the right way (TM) to get my CSS ID?
 				final IIdentity myCssId = commMgr.getIdManager().fromJid(
-						commMgr.getIdManager().getThisNetworkNode().getBareJid());
+						this.cssIdStr);
 				final IndividualCtxEntity myCssEnt = 
 						ctxBroker.retrieveIndividualEntity(myCssId).get();
 
@@ -380,7 +424,7 @@ public class CssCtxMonitor extends EventListener {
 
 			} catch (InvalidFormatException ife) {
 
-				LOG.error("Invalid CSS IIdentity found in CSS record: " 
+				LOG.error("Invalid CSS/CIS IIdentity: " 
 						+ ife.getLocalizedMessage(), ife);
 			} catch (Exception e) {
 

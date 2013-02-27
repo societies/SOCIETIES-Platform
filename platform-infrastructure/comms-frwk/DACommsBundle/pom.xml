@@ -31,7 +31,7 @@
 					</exclusion>
 				</exclusions>
 		</dependency>
-    	 
+		
     	<!-- Communication Components -->
     	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
@@ -61,6 +61,7 @@
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
+    						org.simpleframework.xml.stream,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>

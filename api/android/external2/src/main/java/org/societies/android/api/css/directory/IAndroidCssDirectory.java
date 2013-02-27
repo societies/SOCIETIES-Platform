@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.css.directory;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 /**
@@ -32,7 +33,7 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
  * @author aleckey
  *
  */
-public interface IAndroidCssDirectory {
+public interface IAndroidCssDirectory extends IServiceManager {
 
 	/**
 	 * IAndroidCssDirectory intents

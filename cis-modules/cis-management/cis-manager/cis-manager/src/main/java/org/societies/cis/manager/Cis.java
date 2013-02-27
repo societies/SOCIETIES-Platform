@@ -26,15 +26,43 @@
 package org.societies.cis.manager;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.PersistedActivityFeed;
+import org.societies.activity.client.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -45,36 +73,54 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.*;
+import org.societies.api.identity.DataIdentifierFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
-import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
-import org.societies.api.schema.activityfeed.*;
-import org.societies.api.schema.cis.community.*;
-import org.societies.api.schema.cis.manager.*;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
+import org.societies.api.schema.activityfeed.AddActivityResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
+import org.societies.api.schema.cis.community.AddMemberResponse;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.DeleteMemberResponse;
+import org.societies.api.schema.cis.community.GetInfoResponse;
+import org.societies.api.schema.cis.community.GetMembershipCriteriaResponse;
+import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.JoinResponse;
+import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.Qualification;
+import org.societies.api.schema.cis.community.SetInfoResponse;
+import org.societies.api.schema.cis.community.SetMembershipCriteriaResponse;
+import org.societies.api.schema.cis.community.WhoResponse;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.DeleteMemberNotification;
+import org.societies.api.schema.cis.manager.DeleteNotification;
+import org.societies.api.schema.cis.manager.Notification;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.cis.mgmtClient.CisManagerClient;
-import org.springframework.scheduling.annotation.AsyncResult;
-
-import javax.persistence.*;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.Future;
 
 //import org.societies.api.schema.cis.community.GetInfo;
 
@@ -115,6 +161,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.sessionFactory = sessionFactory;
 	}
 
+	
 
 
 	@Id
@@ -130,7 +177,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	//@OneToOne(cascade=CascadeType.ALL)
 	@Transient
-	public PersistedActivityFeed activityFeed = new PersistedActivityFeed();
+	public IActivityFeed activityFeed = null;
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
@@ -157,8 +204,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	@Transient
 	private IIdentity cisIdentity;
-	@Transient
-	private PubsubClient psc;
+	//@Transient
+	//private PubsubClient psc;
 	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
 	@JoinTable(
             name="org_societies_cis_manager_Cis_CisParticipant",
@@ -332,7 +379,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 
-	private void setActivityFeed(PersistedActivityFeed activityFeed) {
+	private void setActivityFeed(IActivityFeed activityFeed) {
 		this.activityFeed = activityFeed;
 	}
 
@@ -361,8 +408,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
 			,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
 			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
-			PubsubClient pubsubClient) {
-		
+			IActivityFeedManager iActivityFeedManager) {
+
 		this.privacyPolicyManager = privacyPolicyManager;
 		
 		this.description = description;
@@ -391,9 +438,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		    }
 		}
 
-//		m.setMinValue("Edinburgh");
-//		m.setMaxValue("Edinburgh");
-//		cisCriteria.add(m); // for test purposes only
+
 		
 		
 		LOG.debug("CIS editor created");
@@ -428,54 +473,41 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		cisRecord = new CisRecord(cisName, cisIdentity.getJid(),cssOwner);
 		
-		LOG.debug("CIS creating pub sub service");
-		
+		LOG.debug("getting a new activity feed");
 
-		this.psc = pubsubClient;
-		
-		LOG.debug("CIS pub sub service created");
+		activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cisIdentity.getJid());
 
 		
-		LOG.debug("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
 		//session = sessionFactory.openSession();
 		LOG.debug("activityFeed: "+activityFeed);
-		if(null != this.psc){
-			try {
-				LOG.debug("starting activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
-			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				LOG.debug("starting activ feed without pubsub");
-				e.printStackTrace();
-			} // this must be called just after the CisRecord has been set
-		}
-		else{
-			LOG.debug("pub sub is null");
-			activityFeed.startUp(sessionFactory,this.getCisId());
-		}
+
 		this.sessionFactory = sessionFactory;
         //activityFeed.setSessionFactory(this.sessionFactory);
 		this.persist(this);
 		
-		IActivity iActivity = new org.societies.activity.model.Activity();
+		IActivity iActivity = activityFeed.getEmptyIActivity();
 		iActivity.setActor(this.getOwnerId());
 		iActivity.setObject(cisIdentity.getJid());
-		iActivity.setPublished(System.currentTimeMillis()+"");
 		iActivity.setVerb("created");
 		
 		
-		activityFeed.addActivity(iActivity);
+
 		
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
+		
+
 		//activityFeed.getActivities("0 1339689547000");
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient,
-			IPrivacyDataManager	privacyDataManager){
-				
-		this.psc = pubsubClient;
+
+
+	
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager,
+			IPrivacyDataManager	privacyDataManager, IActivityFeedManager iActivityFeedManager){
+
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		this.privacyDataManager = privacyDataManager;
@@ -516,20 +548,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.buildCriteriaFromDb();
 		LOG.debug("done building criteria from db");
 		
+		// retrieve activity feed
+		this.activityFeed = iActivityFeedManager.getOrCreateFeed(this.getOwnerId(), cisIdentity.getJid());
 		
-		if(null != this.psc){
-			try {
-				LOG.debug("restoring activ feed with pubsub");
-				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
-			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				LOG.debug("restoring activ feed without pubsub");
-				e.printStackTrace();
-			} // this must be called just after the CisRecord has been set
-		}
-		else{
-			activityFeed.startUp(sessionFactory,this.getCisId());
-		}
+		
+//		if(null != this.psc){
+//			try {
+//				LOG.debug("restoring activ feed with pubsub");
+//				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(getOwnerId()));
+//			} catch (InvalidFormatException e) {
+//				// TODO Auto-generated catch block
+//				LOG.debug("restoring activ feed without pubsub");
+//				e.printStackTrace();
+//			} // this must be called just after the CisRecord has been set
+//		}
+//		else{
+//			activityFeed.startUp(sessionFactory,this.getCisId());
+//		}
 		//activityFeed.getActivities("0 1339689547000");
 	}
 	
@@ -619,14 +654,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 			this.updatePersisted(this);
 			
 			//activityFeed notification
-			IActivity iActivity = new org.societies.activity.model.Activity();
+			IActivity iActivity = this.activityFeed.getEmptyIActivity();
 			iActivity.setActor(jid);
 			iActivity.setObject(cisIdentity.getJid());
-			iActivity.setPublished(System.currentTimeMillis()+"");
 			iActivity.setVerb("joined");
 			
-			
-			activityFeed.addActivity(iActivity);
+			// TODO: perhaps, treat dummy return
+			activityFeed.addActivity(iActivity,new   ActivityFeedClient()) ;
 	
 			return true;
 		}else{
@@ -709,14 +743,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			
 			//activityFeed notification
-			IActivity iActivity = new org.societies.activity.model.Activity();
+			IActivity iActivity = activityFeed.getEmptyIActivity();
 			iActivity.setActor(jid);
 			iActivity.setObject(cisIdentity.getJid());
-			iActivity.setPublished(System.currentTimeMillis()+"");
 			iActivity.setVerb("left");
 			
 			
-			activityFeed.addActivity(iActivity);
+			activityFeed.addActivity(iActivity,new ActivityFeedClient());
 			
 			
 
@@ -1106,14 +1139,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
+				IActivity iActivity = activityFeed.getEmptyIActivity();
 				iActivity.setActor(c.getDeleteActivity().getMarshaledActivity().getActor());
 				iActivity.setObject(c.getDeleteActivity().getMarshaledActivity().getObject());
 				iActivity.setTarget(c.getDeleteActivity().getMarshaledActivity().getTarget());
-				iActivity.setPublished(c.getDeleteActivity().getMarshaledActivity().getPublished());
 				iActivity.setVerb(c.getDeleteActivity().getMarshaledActivity().getVerb());
 
-				r.setResult(activityFeed.deleteActivity(iActivity));
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.deleteActivity(iActivity,d);
+				
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getDeleteActivityResponse()){
+					r.setResult(m.getDeleteActivityResponse().isResult());
+				}else{
+					LOG.warn("no callback object after immediate call of delecte activity feed");
+					r.setResult(false);
+				}
 
 				result.setDeleteActivityResponse(r);		
 				return result;
@@ -1124,41 +1166,36 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// get Activities
 			if (c.getGetActivities() != null) {
-				LOG.info("get activities called");
+				LOG.debug("get activities called");
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				List<IActivity> iActivityList;
-				List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
+				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 				
+				
+				ActivityFeedClient d = new ActivityFeedClient();
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
-						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
+						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
 					else
-						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
+						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);										
 				//}
 				
-					LOG.debug("loacl query worked activities called");
-					this.activityFeed.iactivToMarshActvList(iActivityList, marshalledActivList);
-
-				/*	
-				Iterator<IActivity> it = iActivityList.iterator();
-				
-				while(it.hasNext()){
-					IActivity element = it.next();
-					org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
-					a.setActor(element.getActor());
-					a.setObject(a.getObject());
-					a.setPublished(a.getPublished());
-					a.setVerb(a.getVerb());
-					marshalledActivList.add(a);
-			     }
-				*/
-					LOG.info("finished the marshling");
-				r.setMarshaledActivity(marshalledActivList);
+					MarshaledActivityFeed m = d.getActivityFeed();
+					
+					if(null != m && null != m.getGetActivitiesResponse()){
+						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
+					}else{
+						LOG.warn("no callback object after immediate call of get activities");
+						// ill set an empty list
+						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
+					}
+					
+					
 				result.setGetActivitiesResponse(r);		
 				return result;
 
@@ -1175,16 +1212,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
+				IActivity iActivity = activityFeed.getEmptyIActivity();
 				iActivity.setActor(c.getAddActivity().getMarshaledActivity().getActor());
 				iActivity.setObject(c.getAddActivity().getMarshaledActivity().getObject());
 				iActivity.setTarget(c.getAddActivity().getMarshaledActivity().getTarget());
-				iActivity.setPublished(c.getAddActivity().getMarshaledActivity().getPublished());
 				iActivity.setVerb(c.getAddActivity().getMarshaledActivity().getVerb());
 
-				activityFeed.addActivity(iActivity);
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.addActivity(iActivity,d);
 				
-				r.setResult(true); //TODO. add a return on the activity feed method
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getAddActivityResponse()){
+					r.setResult(m.getAddActivityResponse().isResult());
+				}else{
+					LOG.warn("no callback object after immediate call of add activity");
+					r.setResult(false);
+				}
 				
 				
 				result.setAddActivityResponse(r);		
@@ -1205,8 +1249,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria(),d);
 				
-				r.setResult(activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria())); //TODO. add a return on the activity feed method
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getCleanUpActivityFeedResponse()){
+					r.setResult(m.getCleanUpActivityFeedResponse().getResult());
+				}else{
+					LOG.warn("no callback object after immediate call of clean up activity feed");
+					r.setResult(0);
+				}
 				
 				
 				result.setCleanUpActivityFeedResponse(r);		
@@ -1347,7 +1400,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Iterator<CisParticipant> it = s.iterator();
 
 		// deleting from DB
-		activityFeed.clear();
+		// the remove of the activityFeed will be done by the CIS MANAGER!!
 		activityFeed = null;
 		this.deletePersisted(this);
 		
@@ -1409,8 +1462,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("could not unregister CIS");
 		//TODO: possibly do something in case we cant close it
 		
-		//cisIdentity =null;
-		PubsubClient psc = null; // TODO: replace with proper way of destroying it
 
 		membersCss = null; 
 		
@@ -1687,6 +1738,27 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	} 
 
+	// internal callbacks
+	
+	
+	// callback class to be used for local activity methods only
+/*	class DummyActivitiesCall implements IActivityFeedCallback{
+		MarshaledActivityFeed feedResponse = null;;
+		public DummyActivitiesCall(){//IUserFeedback userFeedback){
+			super();
+			//this.userFeedback = userFeedback;
+		}
+		@Override
+		public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+			feedResponse = activityFeedObject;
+		}
+		
+		public MarshaledActivityFeed getFeedResponse(){
+			return feedResponse;
+		}
+	};*/
+	
+	
 	// subclass for local get list callbacks
 	/*private class GetListCallBack implements ICisManagerCallback{
 		public boolean done = false;

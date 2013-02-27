@@ -35,7 +35,7 @@ import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
 import org.societies.orchestration.cpa.impl.comparison.SimpleCounter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-@ContextConfiguration(locations = { "../../../../../CPAUnitTest-context.xml" })
+@ContextConfiguration(locations = { "classpath:CPAUnitTest-context.xml" })
 public class CPAUnitTest  extends AbstractTransactionalJUnit4SpringContextTests {
 	@Test
 	public void cpaTestPlaceHolder(){

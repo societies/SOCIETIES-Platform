@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.societies.android.platform.content.container"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="8" />
+
+    <!-- Required for Emma code coverage -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <provider 
+            android:authorities="org.societies.android.platform.content.androidcssmanager"
+            android:name="org.societies.android.platform.content.ProviderImplementation"
+            android:exported="true"
+            android:label="SocietiesCSSContentProvider"
+            >
+        </provider>
+        
+    </application>
+
+</manifest>

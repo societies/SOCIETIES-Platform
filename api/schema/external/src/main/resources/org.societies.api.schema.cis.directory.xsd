@@ -22,6 +22,8 @@ elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 					minOccurs="0" />	
 				<xs:element name="method" type="tns:methodType"
 					minOccurs="0" />
+				<xs:element name="idList" type="xs:string"
+					minOccurs="0"  maxOccurs="unbounded" />		
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -54,6 +56,7 @@ elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			<xs:enumeration value="findAllCisAdvertisementRecords" />
 			<xs:enumeration value="findForAllCis" />
 			<xs:enumeration value="searchByID" />
+			<xs:enumeration value="searchByIDS" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

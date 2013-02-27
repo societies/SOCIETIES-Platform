@@ -64,6 +64,7 @@
 		<module>../../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
 		<module>../../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
 		<module>../../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+		<module>../../platform-infrastructure/comms-frwk/CloudCommsUtils</module>
 		<module>../../platform-infrastructure/comms-frwk/CloudCommsBundle</module>
 		<module>../../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		

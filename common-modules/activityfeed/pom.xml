@@ -33,11 +33,11 @@
         <version>RELEASE</version>
     </parent>
     <groupId>org.societies</groupId>
-    <artifactId>activityfeed</artifactId>
+    <artifactId>activityfeed-client</artifactId>
     <description>common activityfeed bundle</description>
     <packaging>bundle</packaging>
     <version>${release.version}</version>
-    <name>ActivityFeed</name>
+    <name>Activity Feed Client</name>
     <developers>
         <developer>
             <id>bjornmm</id>
@@ -53,99 +53,28 @@
 
 
 
-    <dependencies>
+   	<dependencies>
+	    		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.spring-library</artifactId>
-            <type>libd</type>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>hibernate_classes</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>common-ext-libs</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	    
+	    <dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
 
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>socialdata</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.test</artifactId>
-            <version>3.0.5.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>facebook_connector</artifactId>
-            <version>${release.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>socialdata</artifactId>
-            <version>${release.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -157,12 +86,10 @@
                         <Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
                         <Embed-Transitive>false</Embed-Transitive>
                         <Export-Package>
-                            org.societies.activity,
-                            org.societies.activity.*,
-                            org.societies.activity.model,
-                            org.societies.activity.model.*
+                            org.societies.activity.client,
+                            org.societies.activity.client.*
                         </Export-Package>
-                        <Import-Package>org.hibernate.proxy;resolution:=optional,*;resolution:=optional</Import-Package>
+                        <Import-Package>*;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

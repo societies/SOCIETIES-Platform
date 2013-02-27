@@ -69,6 +69,13 @@ function countConnectors(){
   	 }
   }
   
+  function connectSN(sn){
+	   document.getElementById("method").value  = sn;
+	   document.sd.submit();
+	  	 
+  }
+  
+  
 
   function getToken(url, title){
      w = window.open(url, title, "width=600,height=400,resizeable,scrollbars");

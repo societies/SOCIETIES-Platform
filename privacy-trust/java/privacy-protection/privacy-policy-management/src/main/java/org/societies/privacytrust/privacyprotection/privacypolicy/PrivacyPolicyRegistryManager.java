@@ -56,8 +56,9 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestPolicyUtils;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
@@ -69,7 +70,7 @@ public class PrivacyPolicyRegistryManager {
 	private PrivacyPolicyRegistry policyRegistry;
 	private ICtxBroker ctxBroker;
 
-	private Logger logging = LoggerFactory.getLogger(this.getClass().getSimpleName());
+	private Logger LOG = LoggerFactory.getLogger(this.getClass().getName());
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
 
@@ -89,14 +90,15 @@ public class PrivacyPolicyRegistryManager {
 	public void addPolicy (Requestor requestor, RequestPolicy policy){
 		this.log("Request to add policy for : "+requestor.toString());
 		if (this.policyRegistry==null){
-			this.policyRegistry = new PrivacyPolicyRegistry();
+			LOG.debug("Registry empty: loading privacy policies");
+			this.loadPolicies();
 		}
 
 		// Global store
 		CtxIdentifier id = this.storePolicyToDB(requestor, policy);
 		this.policyRegistry.addPolicy(requestor,id);
 		this.storePolicies(); 
-		logging.info("*** addPolicy Stored");
+		LOG.info("*** addPolicy Stored");
 		//this.storePolicyToFile(policy);		
 	}
 
@@ -104,47 +106,50 @@ public class PrivacyPolicyRegistryManager {
 	 * method to retrieve the policy of a given service
 	 * @param requestor	the serviceid of the service for which the policy is for
 	 * @return	the policy document for that service 
+	 * @throws PrivacyException 
 	 */
-	public RequestPolicy getPolicy(Requestor requestor){
-		if (requestor==null){
-			this.log("Requestor obj is null");
-		}
-		if (this.policyRegistry==null){
-			this.log("registry empty. loading policies");
+	public RequestPolicy getPolicy(Requestor requestor) throws PrivacyException{
+		RequestPolicy policy = null;
+		// -- Loading
+		if (null == policyRegistry) {
+			LOG.debug("Registry empty: loading privacy policies");
 			this.loadPolicies();
 		}
-
-
-		CtxIdentifier id = this.policyRegistry.getPolicyStorageID(requestor);
-		if (id==null){
-			this.logging.warn("Requestor: "+requestor.toString()+" has not provided a privacy policy document");
-			return null;
-		}
-		CtxAttribute ctxAttr;
-		try {
-			ctxAttr = (CtxAttribute) ctxBroker.retrieve(id).get();
-			RequestPolicy policy = RequestPolicyUtils.toRequestPolicy((org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader()), idm);
+		
+		// -- Verification
+		if (null == requestor) {
+			LOG.error("Requestor obj is null");
 			return policy;
-		} catch (CtxException e) {
-			e.printStackTrace();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		return null;
+		if (null == idm) {
+			LOG.error("Identity manager obj is null");
+			return policy;
+		}
+
+		// -- Retrieve privacy policy
+		// Retrieve Context Id
+		CtxIdentifier id = this.policyRegistry.getPolicyStorageID(requestor);
+		if (null == id){
+			LOG.warn("Requestor: "+requestor.toString()+" has not provided a privacy policy document");
+			return policy;
+		}
+		// Retrieve in context
+		try {
+			CtxAttribute ctxAttr = (CtxAttribute) ctxBroker.retrieve(id).get();
+			if (null == ctxAttr) {
+				LOG.error("CtxAttr obj is null");
+				return policy;
+			}
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy tmpPolicy = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader());
+			if (null == tmpPolicy) {
+				LOG.error("Can't deserialize the retrieved privacy policy: "+ctxAttr.getBinaryValue().toString());
+				return policy;
+			}
+			policy = RequestPolicyUtils.toRequestPolicy(tmpPolicy, idm);
+		} catch (Exception e) {
+			throw new PrivacyException("Can't retrieve the privacy policy", e);
+		}
+		return policy;
 	}
 	/**
 	 * method to delete the policy of a given service
@@ -238,49 +243,18 @@ public class PrivacyPolicyRegistryManager {
 	private void loadPolicies(){
 		try {
 			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
-			if (null!=attrList){
-				if (attrList.size()>0){
+			if (null != attrList && !attrList.isEmpty()) {
 					CtxIdentifier identifier = attrList.get(0);
 					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 					this.policyRegistry = (PrivacyPolicyRegistry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
-					if (this.policyRegistry==null){
-						this.policyRegistry = new PrivacyPolicyRegistry();
-						//this.loadPoliciesFromFile();
-						this.log("No service privacy policies found in context DB, reading from file");
-					}else if (this.policyRegistry.isEmpty()){
-						//this.loadPoliciesFromFile();
-						this.log("No service policies loaded from context DB. Reading from file");
-					}
-					else{
-						this.log("Service privacy policies loaded from context DB");
-					}
-				}
-				else{
-					this.policyRegistry = new PrivacyPolicyRegistry();
-					this.log("No service privacy policies found in context DB, reading from file");
-					//this.loadPoliciesFromFile();
-				}
-			}else{
-				this.policyRegistry = new PrivacyPolicyRegistry();
-				this.log("No service privacy policies found in context DB, reading from file");
-				//this.loadPoliciesFromFile();
 			}
-		} catch (CtxException e) {
-			this.policyRegistry = new PrivacyPolicyRegistry();
-			this.log("No service privacy policies found in context DB, reading from file");
-			//this.loadPoliciesFromFile();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOG.warn("Error when retrieving privacy policies from context DB. Use empty registry.", e);
+		}
+		finally {
+			if (null == policyRegistry) {
+				this.policyRegistry = new PrivacyPolicyRegistry();
+			}
 		}
 
 	}
@@ -349,7 +323,7 @@ public class PrivacyPolicyRegistryManager {
 		}	
 	}
 	private void log(String message){
-		this.logging.info(message);
+		this.LOG.info(message);
 	}
 
 	private void storePolicyToFile(RequestPolicy policy){
@@ -364,9 +338,9 @@ public class PrivacyPolicyRegistryManager {
 			File directory = new File("./servicePrivacyPolicies/");
 			if (!directory.exists()){
 				boolean createdDir = directory.mkdir();
-				this.logging.debug("Created Directory "+directory.getCanonicalPath());
+				this.LOG.debug("Created Directory "+directory.getCanonicalPath());
 			}else{
-				this.logging.debug("Directory :"+directory.getCanonicalPath()+" already exists");
+				this.LOG.debug("Directory :"+directory.getCanonicalPath()+" already exists");
 			}
 			File file = new File("./servicePrivacyPolicies/"+requestorName+".xml");
 			FileWriter fWriter = new FileWriter(file);
@@ -374,7 +348,7 @@ public class PrivacyPolicyRegistryManager {
 			BufferedWriter out = new BufferedWriter(bWriter);
 			out.write(policy.toXMLString());
 			out.close();
-			this.logging.debug("Stored privacy policy to file");
+			this.LOG.debug("Stored privacy policy to file");
 		} catch (IOException ioe) {
 			log("Attempt to write service privacy policy to filesystem failed");
 			ioe.printStackTrace();

@@ -5,6 +5,7 @@ package org.societies.android.api.comms;
  *
  */
 public interface IMethodCallback {
+
 	/**
 	 * A generic method to receive the callback action
 	 * @param resultFlag

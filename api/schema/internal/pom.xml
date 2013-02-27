@@ -35,7 +35,7 @@
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
 			<version>2.6.9</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			<exclusions>
 				<!-- StAX is not available on Android -->
 				<exclusion>
@@ -57,7 +57,7 @@
 		    <groupId>org.societies.simple.converters</groupId>
 		    <artifactId>SimpleXMLConvertersBasic</artifactId>
 		    <version>${release.version}</version>
-		    <scope>compile</scope>
+		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
 

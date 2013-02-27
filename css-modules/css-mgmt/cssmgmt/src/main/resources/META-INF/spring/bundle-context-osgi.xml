@@ -11,16 +11,17 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
-	<osgi:service ref="CSSManager" interface="org.societies.api.internal.css.management.ICSSLocalManager" />
+	<osgi:service ref="CSSManager" interface="org.societies.api.internal.css.ICSSInternalManager" />
 	<osgi:reference id="CssRegistryBundle" interface="org.societies.api.internal.css.cssRegistry.ICssRegistry" />
-	<osgi:reference id="cssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" cardinality="0..1" />
+	<osgi:reference id="cssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" />
 	<osgi:reference id="serviceDiscoveryRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
-	<osgi:reference id="CSSManagerRemote" interface="org.societies.api.internal.css.management.ICSSRemoteManager" cardinality="0..1" />
+	<osgi:reference id="CSSManagerRemote" interface="org.societies.api.internal.css.management.ICSSRemoteManager" cardinality="0..1"/>
     <osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	<!-- <osgi:reference id="socialdata" interface="org.societies.platform.socialdata" /> -->
-	<osgi:reference id="socialData" interface="org.societies.api.internal.sns.ISocialData" cardinality="0..1" /> 
+	<osgi:reference id="socialData" interface="org.societies.api.internal.sns.ISocialData" /> 
 	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="ctxBroker" interface= "org.societies.api.internal.context.broker.ICtxBroker" />
 	
 	
 </beans>

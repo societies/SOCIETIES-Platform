@@ -26,8 +26,9 @@ package org.societies.android.privacytrust.datamanagement;
 
 import java.util.List;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.android.api.utilities.MissingClientPackageException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
@@ -43,15 +44,14 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.util.Log;
 
 
@@ -69,12 +69,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	public PrivacyDataManager(Context context)  {
 		this.context = context;
+		// Init tools
 		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 		privacyDataManagerRemote = new PrivacyDataManagerRemote(context);
 		intentSender = new PrivacyDataIntentSender(context);
 	}
 
 
+	@Override
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
@@ -160,6 +162,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 	}
 
+	@Override
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
@@ -288,6 +291,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 	}
 
+	@Override
 	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		//		if (null == requestor) {
@@ -304,6 +308,18 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		//		}
 
 		//		return dataWrapper.getDataId();
+	}
+	
+	@Override
+	public boolean startService() {
+		privacyDataManagerRemote.bindToComms();
+		return true;
+	}
+	
+	@Override
+	public boolean stopService() {
+		privacyDataManagerRemote.unbindFromComms();
+		return true;
 	}
 
 

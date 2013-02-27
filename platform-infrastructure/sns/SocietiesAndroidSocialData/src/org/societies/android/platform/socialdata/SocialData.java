@@ -28,10 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
@@ -55,17 +58,17 @@ import android.util.Log;
  *
  */
 public class SocialData extends Service implements ISocialData {
-
+	//LOGGING TAG
 	private static final String LOG_TAG = SocialData.class.getName();
 	
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("SocialdataMessageBean", "SocialdataResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("socialdataMessageBean", "socialdataResultBean");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/sns/socialdata");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.internal.schema.sns.socialdata");   
 
 	private IBinder binder = null;
-	
 	private ClientCommunicationMgr commMgr;
+	private boolean connectedToComms = false;
 
 	@Override
 	public void onCreate () {
@@ -74,11 +77,9 @@ public class SocialData extends Service implements ISocialData {
 		try {
 			//INSTANTIATE COMMS MANAGER
 			commMgr = new ClientCommunicationMgr(this, true);
-			commMgr.register(ELEMENT_NAMES, nullCallback);		
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception creating ClientCommunicationMgr instance.", e);
-        }  
-
+        }
 		Log.d(LOG_TAG, "SocialData service starting");
 	}
 
@@ -102,60 +103,162 @@ public class SocialData extends Service implements ISocialData {
 		return this.binder;
 	}
 	
-	//Service API
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>IServiceManager>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+			        	commMgr.register(ELEMENT_NAMES, NAME_SPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		SocialData.this.getBaseContext().sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		SocialData.this.getBaseContext().sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		SocialData.this.getBaseContext().sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "CisDirectoryBase stopService unregistering namespaces");
+        	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					commMgr.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		SocialData.this.getBaseContext().sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		SocialData.this.getBaseContext().sendBroadcast(intent);
+    	}
+    	return true;
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			SocialData.this.getBaseContext().sendBroadcast(intent);
+		}
+	}
 
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ISocialData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	public void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity) {
 		Log.d(LOG_TAG, "addSocialConnector");	
 		
-		//MESSAGE BEAN
-		SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
-
-		//COMMS STUFF
-		try {
-			IIdentity toId = commMgr.getIdManager().getCloudNode();	
-			Stanza stanza = new Stanza(toId);
-        
-        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
-        }
+		if (connectedToComms) {
+			//MESSAGE BEAN
+			SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
+			//COMMS STUFF
+			try {
+				IIdentity toId = commMgr.getIdManager().getCloudNode();	
+				Stanza stanza = new Stanza(toId);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, ADD_SOCIAL_CONNECTOR);
+	    }
 	}	
 	
 	public void removeSocialConnector(String client, String connectorId) {
 		Log.d(LOG_TAG, "removeSocialConnector");	
 		
-		//MESSAGE BEAN
-		SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
-
-		//COMMS STUFF
-		try {
-			IIdentity toId = commMgr.getIdManager().getCloudNode();	
-			Stanza stanza = new Stanza(toId);
-        
-        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
-        }
+		if (connectedToComms) {
+			//MESSAGE BEAN
+			SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
+			//COMMS STUFF
+			try {
+				IIdentity toId = commMgr.getIdManager().getCloudNode();	
+				Stanza stanza = new Stanza(toId);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, REMOVE_SOCIAL_CONNECTOR);
+	    }
 	}
 	
 	public void getSocialConnectors(String client) {
 		Log.d(LOG_TAG, "getSocialConnectors");	
 		
-		//MESSAGE BEAN
-		SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
-
-		//COMMS STUFF
-		try {
-			IIdentity toId = commMgr.getIdManager().getCloudNode();	
-			Stanza stanza = new Stanza(toId);
-        
-        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
-        }
+		if (connectedToComms) {
+			//MESSAGE BEAN
+			SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
+			//COMMS STUFF
+			try {
+				IIdentity toId = commMgr.getIdManager().getCloudNode();	
+				Stanza stanza = new Stanza(toId);
+	        
+	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
+				Log.d(LOG_TAG, "Sending stanza");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        }
+	    } else {
+	    	//NOT CONNECTED TO COMMS SERVICE
+	    	broadcastServiceNotStarted(client, GET_SOCIAL_CONNECTORS);
+	    }
 	}
 		
 	private ICommCallback createCallback(final Context context, final String action, final String client) {
@@ -186,7 +289,6 @@ public class SocialData extends Service implements ISocialData {
 						List<ConnectorBean> connectors =  resultBean.getConnectorsList().getConnectorBean();
 						ConnectorBean arrConnectors[] = connectors.toArray(new ConnectorBean[connectors.size()]);
 						intent.putExtra(INTENT_RETURN_KEY, arrConnectors);
-						//intent.putExtra(INTENT_RETURN_KEY, convertConnectorsListToAConnectorBeanArray(resultBean.getConnectorsList()));
 					}
 					else if(action.equals(REMOVE_SOCIAL_CONNECTOR)) {
 						intent.putExtra(INTENT_RETURN_KEY, true);
@@ -222,52 +324,5 @@ public class SocialData extends Service implements ISocialData {
 			
 		};
 	}
-	
-	/*
-	private AConnectorBean[] convertConnectorsListToAConnectorBeanArray(ConnectorsList connectorsList) { 
-	 
-		List<ConnectorBean> beans = connectorsList.getConnectorBean();
-		AConnectorBean[] connectorBeans = new AConnectorBean[beans.size()];
-		
-		for(int i=0; i<connectorBeans.length; i++) {			
-			connectorBeans[i] = new AConnectorBean(beans.get(i));			
-		}
-		
-		return connectorBeans;
-	}
-	*/
-	
-	private ICommCallback nullCallback = new ICommCallback() {
-
-		public List<String> getXMLNamespaces() {
-			return NAME_SPACES;
-		}
-
-		public List<String> getJavaPackages() {
-			return PACKAGES;
-		}
-
-		public void receiveResult(Stanza stanza, Object payload) {
-			Log.d(LOG_TAG, "receiveResult");
-		}
-
-		public void receiveError(Stanza stanza, XMPPError error) {
-			Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
-		}
-
-		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-			Log.d(LOG_TAG, "receiveInfo");
-		}
-
-		public void receiveItems(Stanza stanza, String node,
-				List<String> items) {
-			Log.d(LOG_TAG, "receiveItems");
-		}
-
-		public void receiveMessage(Stanza stanza, Object payload) {
-			Log.d(LOG_TAG, "receiveMessage");
-		}
-		
-	};
 
 }

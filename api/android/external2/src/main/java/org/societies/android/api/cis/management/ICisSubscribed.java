@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 import org.societies.api.schema.cis.community.Community;
@@ -35,7 +36,7 @@ import org.societies.api.schema.cis.community.Community;
  * @author Babak.Farshchian@sintef.no
  * Implemented by the CommunityManager APKLib service
  */
-public interface ICisSubscribed {
+public interface ICisSubscribed extends IServiceManager {
 	//CIS SUBSCRIBER INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
 	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
@@ -51,7 +52,9 @@ public interface ICisSubscribed {
 							 		"getActivityFeed(String client, String cisId)",
 							 		"addActivity(String client, String cisId, MarshaledActivity activity)",
 							 		"deleteActivity(String client, String cisId, MarshaledActivity activity)",
-							 		"cleanActivityFeed(String client, String cisId)"
+							 		"cleanActivityFeed(String client, String cisId)",
+									"startService()",
+									"stopService()"
 								};
 	
 	/**

@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 
 /**
  * @author Olivier Maridat (Trialog)

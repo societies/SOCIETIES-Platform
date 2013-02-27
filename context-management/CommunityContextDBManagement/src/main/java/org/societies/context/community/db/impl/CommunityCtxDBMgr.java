@@ -47,23 +47,24 @@ import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.community.db.impl.model.CommunityCtxEntityDAO;
+import org.societies.context.community.db.impl.model.CommunityCtxEntityBaseDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxModelDAOTranslator;
 import org.societies.context.community.db.impl.model.CommunityCtxModelObjectNumberDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAssociationDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxAttributeDAO;
+import org.societies.context.community.db.impl.model.CommunityCtxEntityDAO;
 import org.societies.context.community.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.community.db.impl.model.CommunityCtxQualityDAO;
 import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifierType;
@@ -97,10 +98,10 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
-	public CtxAttribute createCommunityAttribute(final CtxEntityIdentifier scope,
+	public CtxAttribute createAttribute(final CtxEntityIdentifier scope,
 			final String type) throws CtxException {
 	
 		if (scope == null)
@@ -108,9 +109,9 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final CommunityCtxEntityDAO entityDAO;
+		final CommunityCtxEntityBaseDAO entityDAO;
 		try {
-			entityDAO = this.retrieve(CommunityCtxEntityDAO.class, scope);
+			entityDAO = this.retrieve(CommunityCtxEntityBaseDAO.class, scope);
 		} catch (Exception e) {
 			throw new CommunityCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
@@ -157,10 +158,102 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 	
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityEntity(org.societies.api.identity.IIdentity)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createAssociation(java.lang.String, java.lang.String)
+	 */
+	public CtxAssociation createAssociation(final String cisId,
+			final String type) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("ownerId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
+				cisId, type, modelObjectNumber);
+		final CommunityCtxAssociationDAO associationDAO = new CommunityCtxAssociationDAO(id);
+
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try{
+			tx = session.beginTransaction();
+			session.save(associationDAO);
+			tx.commit();
+		}
+		catch (Exception e) {
+			if (tx != null)
+				tx.rollback();
+			throw new CommunityCtxDBMgrException("Could not create association of type '"
+					+ type + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+		
+		return (CtxAssociation) this.retrieve(id);
+	}
+	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createEntity(java.lang.String, java.lang.String)
+	 */
+	public CtxEntity createEntity(final String cisId,
+			final String type) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final Long modelObjectNumber = this.generateNextObjectNumber();
+		final CtxEntityIdentifier id = 
+				new CtxEntityIdentifier(cisId, type, modelObjectNumber);
+		final CommunityCtxEntityBaseDAO entityDAO = new CommunityCtxEntityBaseDAO(id);
+
+		final Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try{
+			tx = session.beginTransaction();
+			session.save(entityDAO);
+			tx.commit();
+		}
+		catch (Exception e) {
+			if (tx != null)
+				tx.rollback();
+			throw new CommunityCtxDBMgrException("Could not create entity of type '" 
+					+ type + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(id), 
+					new String[] {CtxChangeEventTopic.CREATED}, CtxEventScope.BROADCAST);
+		} else {
+			LOG.warn("Could not send context change event to topics '"
+					+ CtxChangeEventTopic.CREATED
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+		
+		return (CtxEntity) this.retrieve(id);
+	}
+	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#createCommunityEntity(java.lang.String)
 	 */
 	@Override
-	public CommunityCtxEntity createCommunityEntity(final IIdentity cisId)
+	public CommunityCtxEntity createCommunityEntity(final String cisId)
 			throws CtxException {
 		
 		if (cisId == null)
@@ -318,10 +411,10 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 	
 	/*
-	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieveCommunityEntity(org.societies.api.identity.IIdentity)
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieveCommunityEntity(java.lang.String)
 	 */
 	@Override
-	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
+	public CommunityCtxEntity retrieveCommunityEntity(final String cisId)
 			throws CtxException {
 
 		if (cisId == null)
@@ -332,7 +425,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		final Session session = sessionFactory.openSession();
 		try {
 			final Query query = session.getNamedQuery("getCommunityCtxEntityIdByOwnerId");
-			query.setParameter("ownerId", cisId.toString(), Hibernate.STRING);
+			query.setParameter("ownerId", cisId, Hibernate.STRING);
 			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
 			if (entityId != null)
 				entity = (CommunityCtxEntity) this.retrieve(entityId);
@@ -381,31 +474,51 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
         	switch (id.getModelType()) {
         	
         	case ENTITY:            	
-            	dao = this.retrieve(CommunityCtxEntityDAO.class, id);
+            	dao = this.retrieve(CommunityCtxEntityBaseDAO.class, id);
+            	if (dao == null)
+            		break;
             	final Session session = this.sessionFactory.openSession();
+            	Query query;
+            	//CtxAssociations where this entity is member of
+            	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
+
             	try { 
-            		// Retrieve all associations whose parent entity is this entity
-            		final Query query = session.getNamedQuery("getCommunityCtxAssociationsByParentEntityId");
-                	query.setParameter("parentEntId", ((CommunityCtxEntityDAO) dao).getId(),
-                			Hibernate.custom(CtxEntityIdentifierType.class));
-                	final List<CommunityCtxAssociationDAO> associations = query.list();
-                	
-                	final Set<CtxAssociationIdentifier> associationIds = new HashSet<CtxAssociationIdentifier>();
-                	// IS_MEMBER_OF association --> communities
-                	final Set<CtxEntityIdentifier> communityIds = new HashSet<CtxEntityIdentifier>();
-                	// HAS_MEMBERS association --> members
-                	final Set<CtxEntityIdentifier> memberIds = new HashSet<CtxEntityIdentifier>();
-                	
-            		for (final CommunityCtxAssociationDAO association : associations) {
-            			associationIds.add(association.getId());
-            			if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
-            				communityIds.addAll(association.getChildEntities());
-            			else if (CtxAssociationTypes.HAS_MEMBERS.equals(association.getId().getType()))
-            				memberIds.addAll(association.getChildEntities());
-            		}
-            		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
-            		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
-            		((CommunityCtxEntityDAO) dao).setAssociations(associationIds);
+            		if (dao instanceof CommunityCtxEntityDAO) {
+                		// Retrieve all associations whose parent entity is this entity
+                		query = session.getNamedQuery("getCommunityCtxAssociationsByParentEntityId");
+                    	query.setParameter("parentEntId", ((CommunityCtxEntityBaseDAO) dao).getId(),
+                    			Hibernate.custom(CtxEntityIdentifierType.class));
+                    	final List<CommunityCtxAssociationDAO> associations = query.list();
+
+                    	// IS_MEMBER_OF association --> communities
+                    	final Set<CtxEntityIdentifier> communityIds = new HashSet<CtxEntityIdentifier>();
+                    	// HAS_MEMBERS association --> members
+                    	final Set<CtxEntityIdentifier> memberIds = new HashSet<CtxEntityIdentifier>();
+
+                    	
+                		for (final CommunityCtxAssociationDAO association : associations) {
+                			associationIds.add(association.getId());
+                			if (CtxAssociationTypes.IS_MEMBER_OF.equals(association.getId().getType()))
+                				communityIds.addAll(association.getChildEntities());
+                			else if (CtxAssociationTypes.HAS_MEMBERS.equals(association.getId().getType()))
+                				memberIds.addAll(association.getChildEntities());
+                		}	            			
+                		((CommunityCtxEntityDAO) dao).setCommunities(communityIds);
+                		((CommunityCtxEntityDAO) dao).setMembers(memberIds);
+            		} else if (dao instanceof CommunityCtxEntityBaseDAO) {
+            			// Retrieve CtxAssociationIds where this entity is parent
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByParentEntityId");
+            			query.setParameter("parentEntId", ((CommunityCtxEntityBaseDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+            			// Retrieve CtxAssociationIds where this entity is child
+            			query = session.getNamedQuery("getCommunityCtxAssociationIdsByChildEntityId");
+            			query.setParameter("childEntId", ((CommunityCtxEntityBaseDAO) dao).getId(), 
+            					Hibernate.custom(CtxEntityIdentifierType.class));
+            			associationIds.addAll(query.list());
+
+            		} 
+            		((CommunityCtxEntityBaseDAO) dao).setAssociations(associationIds);
             					
             	} finally {
             		if (session != null)
@@ -464,7 +577,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
             switch (modelType) {
             
             case ENTITY:
-            	query = session.getNamedQuery("getCommunityCtxEntityIdsByType");
+            	query = session.getNamedQuery("getCommunityCtxEntityBaseIdsByType");
             	break;
             case ATTRIBUTE:
             	query = session.getNamedQuery("getCommunityCtxAttributeIdsByType");
@@ -491,6 +604,37 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		return foundList;
 	}
 	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#lookupCommunityCtxEntity(java.lang.String)
+	 */
+	@Override
+	public List<CtxIdentifier> lookupCommunityCtxEntity(String attrType)
+			throws CtxException {
+		
+		if (attrType == null)
+			throw new NullPointerException("attribute type can't be null");
+		
+		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		
+		final Session session = sessionFactory.openSession();
+        try {
+        	final Query query;
+        	
+           	query = session.getNamedQuery("getCommunityCtxEntityIdsByAttrType");
+           	query.setParameter("attrType", attrType, Hibernate.STRING);
+            foundList.addAll(query.list());
+            
+        } catch (Exception e) {
+        	throw new CommunityCtxDBMgrException("Could not lookup CommunityCtxEntity objects of type '" + attrType + "': "
+        			+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+        
+		return foundList;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <T extends CtxModelObjectDAO> T retrieve(
 			final Class<T> modelObjectClass,
@@ -509,49 +653,6 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		}
 			
 		return result;
-	}
-	
-	private CtxAssociation createAssociation(final String ownerId,
-			final String type) throws CtxException {
-		
-		if (ownerId == null)
-			throw new NullPointerException("ownerId can't be null");
-		if (type == null)
-			throw new NullPointerException("type can't be null");
-
-		final Long modelObjectNumber = this.generateNextObjectNumber();
-		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
-				ownerId, type, modelObjectNumber);
-		final CommunityCtxAssociationDAO associationDAO = new CommunityCtxAssociationDAO(id);
-
-		final Session session = sessionFactory.openSession();
-		Transaction tx = null;
-		try{
-			tx = session.beginTransaction();
-			session.save(associationDAO);
-			tx.commit();
-		}
-		catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
-			throw new CommunityCtxDBMgrException("Could not create association of type '"
-					+ type + "': " + e.getLocalizedMessage(), e);
-		} finally {
-			if (session != null)
-				session.close();
-		}
-
-		if (this.ctxEventMgr != null) {
-			this.ctxEventMgr.post(new CtxChangeEvent(id), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
-		} else {
-			LOG.warn("Could not send context change event to topics '" 
-					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
-					+ "ICtxEventMgr service is not available");
-		}
-		
-		return (CtxAssociation) this.retrieve(id);
 	}
 	
 	private Long generateNextObjectNumber() throws CommunityCtxDBMgrException {
@@ -577,4 +678,6 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		
 		return objectNumberDAO.getNextValue();
 	}
+
+
 }

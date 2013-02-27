@@ -54,6 +54,7 @@ import java.util.Map;
 public class ContentComparator implements ActorComparator {
 
     private SerialAnalyserController annieController;
+    private URL pluginURL;
     public ContentComparator(){
         try {
             initAnnie();
@@ -63,15 +64,17 @@ public class ContentComparator implements ActorComparator {
     }
     public void initAnnie() throws GateException {
         Out.prln("Initialising ANNIE...");
-        Gate.setPluginsHome(new File("./src/test/"));
+        Gate.setPluginsHome(new File("."));
         Gate.init();
         File gateHome = Gate.getGateHome();
-        File pluginsHome = new File("./src/test/resources/", "plugins");
-        try {
-            Gate.getCreoleRegister().registerDirectories(new File(pluginsHome, "/ANNIE").toURL());
-        } catch (MalformedURLException e) {
+        pluginURL =  ContentComparator.class.getClassLoader().getResource("plugins/ANNIE/");
+        File pluginsHome = new File(".", "plugins");
+/*        try {*/
+            Gate.getCreoleRegister().registerDirectories(pluginURL);
+            //Gate.getCreoleRegister().registerDirectories(new File(pluginsHome, "/ANNIE").toURL());
+/*        } catch (MalformedURLException e) {
             e.printStackTrace();
-        }
+        }*/
         Out.prln("...GATE initialised");
 
 

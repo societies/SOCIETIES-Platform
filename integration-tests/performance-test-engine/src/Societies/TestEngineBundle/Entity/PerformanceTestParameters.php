@@ -48,9 +48,16 @@ class PerformanceTestParameters
      * @ORM\Column(name="parameter_unit", type="string", length=255)
      */
     private $parameter_unit;
+    
+    /**
+     * @var string $parameter_value
+     *
+     * @ORM\Column(name="parameter_value", type="text")
+     */
+    private $parameter_value;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTest", inversedBy="performanceTestParameters")
+     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTest", inversedBy="performanceTestParameters", cascade={"persist"})
      *
      */
     private $performanceTest;
@@ -155,6 +162,29 @@ class PerformanceTestParameters
     public function getParameterUnit()
     {
         return $this->parameter_unit;
+    }
+
+    /**
+     * Set parameter_value
+     *
+     * @param string $parameterValue
+     * @return PerformanceTestParameters
+     */
+    public function setParameterValue($parameterValue)
+    {
+        $this->parameter_value = $parameterValue;
+    
+        return $this;
+    }
+
+    /**
+     * Get parameter_value
+     *
+     * @return string 
+     */
+    public function getParameterValue()
+    {
+        return $this->parameter_value;
     }
 
     /**

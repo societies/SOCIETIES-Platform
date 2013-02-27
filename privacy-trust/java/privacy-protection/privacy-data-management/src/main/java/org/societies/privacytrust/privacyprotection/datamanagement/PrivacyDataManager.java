@@ -37,6 +37,8 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.DataIdentifierUtil;
+import org.societies.api.identity.DataTypeFactory;
+import org.societies.api.identity.DataTypeUtil;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
@@ -46,18 +48,18 @@ import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ActionUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ConditionUtils;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
@@ -72,7 +74,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getName());
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
 
@@ -109,9 +111,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (!atLeast1MandatoryAction(actions)) {
 			throw new PrivacyException("[Parameters] At least one mandatory action is required, they can't be all optional.");
 		}
+		// Uncomment when data hiearchy will be ready :-)
+//		if (!(new DataTypeUtil().isLeaf(DataTypeFactory.getType(dataId)))) {
+//			throw new PrivacyException("[Parameters] Can't manage access control on data type "+DataTypeFactory.getType(dataId)+" (it is not a leaf in the data type hiearchy)");
+//		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
+		
 
 		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -254,7 +261,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 					if (null == cisMemberList) {
 						cisMemberList = retrieveCisMemberList(dataId.getOwnerId());
 					}
-				//  All requested actions are matching AND if this data is members only
+					//  All requested actions are matching AND if this data is members only
 					if (allRequestedActionsMatch && canBeSharedWithCisMembersOnly) {
 						LOG.info("[checkPermissionCisData] All requested items are matching (members only): PERMIT if necessary");
 						// Is it a CIS member?
@@ -313,7 +320,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 */
 	private List<ICisParticipant> retrieveCisMemberList(String cisId){
 		Set<ICisParticipant> ciMemberListIncome = cisManager.getOwnedCis(cisId).getMemberList();
-			return new ArrayList<ICisParticipant>(ciMemberListIncome);
+		return new ArrayList<ICisParticipant>(ciMemberListIncome);
 	}
 
 
@@ -328,6 +335,31 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permission;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, java.util.List, java.util.List)
+	 */
+	@Override
+	public List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
+		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
+		for(DataIdentifier dataId : dataIds) {
+			responseItemList.add(checkPermission(requestor, dataId, actions));
+		}
+		return responseItemList;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, java.util.List, org.societies.api.privacytrust.privacy.model.privacypolicy.Action)
+	 */
+	@Override
+	public List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException {
+		// List of actions
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		return checkPermission(requestor, dataIds, actions);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -353,6 +385,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return checkPermission(requestor, dataId, actions);
 	}
 
+	
 	/*
 	 * 
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)

@@ -78,14 +78,14 @@ public class CommunityCtxAttributeDAO extends CtxModelObjectDAO {
 	
 	@ManyToOne(
 			fetch = FetchType.EAGER,
-			targetEntity = CommunityCtxEntityDAO.class
+			targetEntity = CommunityCtxEntityBaseDAO.class
 	)
 	@JoinColumn(
 			name = "entity_id",
 			nullable = false,
 			updatable = false
 	)
-	private CommunityCtxEntityDAO entity;
+	private CommunityCtxEntityBaseDAO entity;
 	
 	/** The text value of this context attribute. */
 	@Column(name = "string_value", length = 255, nullable = true, updatable = true)
@@ -144,12 +144,12 @@ public class CommunityCtxAttributeDAO extends CtxModelObjectDAO {
 		return this.ctxId;
 	}
 	
-	public CommunityCtxEntityDAO getEntity() {
+	public CommunityCtxEntityBaseDAO getEntity() {
 		
 		return this.entity;
 	}
 	
-	public void setEntity(CommunityCtxEntityDAO entity) {
+	public void setEntity(CommunityCtxEntityBaseDAO entity) {
 		
 		if (!entity.getAttributes().contains(this))
 			entity.addAttribute(this);

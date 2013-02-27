@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -26,7 +26,6 @@ package org.societies.context.community.estimation.impl;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -123,7 +122,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		ArrayList<String> finalArrayStringList = new ArrayList<String>();
 
 		try {
-			retrievedType = (CtxAttribute) internalCtxBroker.retrieve(ctxAttributeIdentifier).get();
+			retrievedType = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
@@ -172,11 +171,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			double meanValue = cceNumMean(inputValues);
 
 			try {
-				CtxAttribute meanV = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.TEMPERATURE).get();
-				meanV.setDoubleValue(meanValue);
-				meanV.setValueType(CtxAttributeValueType.DOUBLE);
-				meanV = (CtxAttribute) this.internalCtxBroker.update(meanV).get();
-				result =meanV;
+				//CtxAttribute meanV = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.TEMPERATURE).get();
+				//retrievedType = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.TEMPERATURE).get();
+				//replaced meanV with the already existing retrievedType
+				retrievedType.setDoubleValue(meanValue);
+				retrievedType.setValueType(CtxAttributeValueType.DOUBLE);
+				retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+				result =retrievedType;
 				result.getDoubleValue();
 
 			} catch (InterruptedException e1) {
@@ -195,8 +196,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		{
 			ArrayList<String> stringInputValues = new ArrayList<String>();
 			ArrayList<String> individualsStrings = new ArrayList<String>();
-
-
 
 			try {
 				CommunityCtxEntity retrievedCommunity;
@@ -240,13 +239,18 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
 
 			try {
-				CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
-				interestsMode.setStringValue(modeStringValue.get(0).toString());
-				interestsMode.setValueType(CtxAttributeValueType.STRING);
-				interestsMode = (CtxAttribute) this.internalCtxBroker.update(interestsMode).get();
-				result =interestsMode;
-				result.getStringValue();
-				
+				//CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
+				//replaced interestsMode with retrievedType
+				if (modeStringValue.size()!=0){
+
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();
+
+				}
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -259,6 +263,418 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			}
 
 		}
+		
+		
+		if (retrievedType.getType().toString().equals("books")) 
+		{
+			ArrayList<String> stringInputValues = new ArrayList<String>();
+			ArrayList<String> individualsStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				try {
+					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+					for(CtxEntityIdentifier comMemb:communityMembers){
+
+						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> setAttributesBooks = individualMemeber.getAttributes("BOOKS");
+
+						for (CtxAttribute ca:setAttributesBooks){
+							stringInputValues.add(ca.getStringValue());
+						}
+					}
+
+					individualsStrings.addAll(stringInputValues);
+
+					for (String s:individualsStrings){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
+
+			try {
+				//CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
+				//replaced interestsMode with retrievedType
+				if (modeStringValue.size()!=0){
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();
+				}
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		
+		if (retrievedType.getType().toString().equals("movies")) 
+		{
+			ArrayList<String> stringInputValues = new ArrayList<String>();
+			ArrayList<String> individualsStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				try {
+					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+					for(CtxEntityIdentifier comMemb:communityMembers){
+
+						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> setAttributesMovies = individualMemeber.getAttributes("MOVIES");
+
+						for (CtxAttribute ca:setAttributesMovies){
+							stringInputValues.add(ca.getStringValue());
+						}
+					}
+
+					individualsStrings.addAll(stringInputValues);
+
+					for (String s:individualsStrings){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
+
+			try {
+				//CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
+				//replaced interestsMode with retrievedType
+				if (modeStringValue.size()!=0){
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();
+				}
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		
+		if (retrievedType.getType().toString().equals("languages")) 
+		{
+			ArrayList<String> stringInputValues = new ArrayList<String>();
+			ArrayList<String> individualsStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				try {
+					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+					for(CtxEntityIdentifier comMemb:communityMembers){
+
+						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> setAttributesLanguages = individualMemeber.getAttributes("LANGUAGES");
+
+						for (CtxAttribute ca:setAttributesLanguages){
+							stringInputValues.add(ca.getStringValue());
+						}
+					}
+
+					individualsStrings.addAll(stringInputValues);
+
+					for (String s:individualsStrings){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
+
+			try {
+				//CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
+				//replaced interestsMode with retrievedType
+				if (modeStringValue.size()!=0){
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();
+				}
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		
+		if (retrievedType.getType().toString().equals("favourite_quotes")) 
+		{
+			ArrayList<String> stringInputValues = new ArrayList<String>();
+			ArrayList<String> individualsStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				try {
+					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+					for(CtxEntityIdentifier comMemb:communityMembers){
+
+						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> setAttributesFavouriteQuotes = individualMemeber.getAttributes("FAVOURITE_QUOTES");
+
+						for (CtxAttribute ca:setAttributesFavouriteQuotes){
+							stringInputValues.add(ca.getStringValue());
+						}
+					}
+
+					individualsStrings.addAll(stringInputValues);
+
+					for (String s:individualsStrings){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
+
+			try {
+				//CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
+				//replaced interestsMode with retrievedType
+				if (modeStringValue.size()!=0){
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();
+				}
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		//***************************************************************************************
+		if (retrievedType.getType().toString().equals("location_coordinates")){
+			
+			ArrayList<String> stringLocationValues = new ArrayList<String>();
+			CommunityCtxEntity retrievedCommunity;
+
+			try {
+				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+
+					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
+
+					for (CtxAttribute ca:setAttributesCoordinatesLocations){
+						stringLocationValues.add(ca.getStringValue());			
+					}
+							
+				}
+				
+					String LocationsAsString = stringLocationValues.toString();
+					CommunityContextEstimation cce = new CommunityContextEstimation();
+					ArrayList<Point2D> points = CommunityContextEstimation.splitString(LocationsAsString);
+					ArrayList<Point2D> conHull = cce.cceGeomConvexHull(points);
+					
+					//CtxAttribute comLocationCoordinates = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_COORDINATES).get();
+					//replace comLocationCoordinates with retrievedType
+					if(conHull.size()!=0){
+						
+						retrievedType.setStringValue(conHull.toString());   
+						retrievedType.setValueType(CtxAttributeValueType.STRING);
+						retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType);
+						result = retrievedType;
+						result.getStringValue();
+						
+					}			
+					
+																	
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+		}
+		
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$	
+		
+		if (retrievedType.getType().toString().equals("location_symbolic")){
+
+			ArrayList<String> stringLocationSymbolicValues = new ArrayList<String>();
+			ArrayList<String> individualsLocationSymbolicStrings = new ArrayList<String>();
+
+			try {
+				CommunityCtxEntity retrievedCommunity;
+				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+
+					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_SYMBOLIC");
+
+					for (CtxAttribute ca:setAttributesSymbolicLocations){
+						stringLocationSymbolicValues.add(ca.getStringValue());			
+					}
+				}
+				
+				individualsLocationSymbolicStrings.addAll(stringLocationSymbolicValues);
+				
+				for (String s:individualsLocationSymbolicStrings){
+					String[] helper = s.split(",");
+					for (String s1:helper){
+						finalArrayStringList.add(s1);
+					}
+				}
+								
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList);
+			
+			try {
+				//CtxAttribute symbolicLocationMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+				//symbolicLocationMode.setStringValue(modeStringValue.get(0).toString());
+				if (modeStringValue != null) {
+					retrievedType.setStringValue(modeStringValue.get(0).toString());
+					retrievedType.setValueType(CtxAttributeValueType.STRING);
+					retrievedType = (CtxAttribute) this.internalCtxBroker.update(retrievedType).get();
+					result =retrievedType;
+					result.getStringValue();						
+				}
+				
+				
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		//****************************************************************************************
 
 		//Methods that can also be called
 		//double medianValue = cceNumMedian(inputValues);
@@ -336,22 +752,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 //
 //	}
 //		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		//the if statement ends here
 		return result;
 	}
 
@@ -677,7 +1077,30 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		return mode;
 	}
-
+	
+	//method for splitting the LOCATION string. Location should be in String representation of a pair of double  values
+	public static ArrayList<Point2D> splitString (String s){
+		
+		Point2D.Double p = new Point2D.Double();
+		double x=0.0;
+		double y=0.0;
+		int l = 0;
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		String[] splited_string = s.split(",");
+		
+		System.out.println("The size of splitted string is "+splited_string.length);
+		
+		for (int k = 0; k< splited_string.length -1; k++){
+			x = Double.parseDouble(splited_string[l]);
+			y = Double.parseDouble(splited_string[l+1]);
+			l=l+2;
+			p.setLocation(x, y);
+			points.add(p);
+			//returns the point with the coordinates			
+		}
+			return points;	
+				
+	}
 
 	//@Override
 	public void cceSpecial1() {

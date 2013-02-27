@@ -17,7 +17,7 @@
     <version>${version.comm}</version>
 
     <dependencies>
-    	<!-- Embedded Dependency -->
+    <!-- Embedded Dependency -->
    		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>whack</artifactId>
@@ -31,7 +31,6 @@
 					</exclusion>
 				</exclusions>
 		</dependency>
-    	 
     	<!-- Communication Components -->
     	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
@@ -54,6 +53,12 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
 			<artifactId>PubsubClient</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CloudCommsUtils</artifactId>
 			<version>${version.comm}</version>
 			<scope>compile</scope>
 		</dependency>

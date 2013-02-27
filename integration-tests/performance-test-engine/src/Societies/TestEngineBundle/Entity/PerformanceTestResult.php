@@ -30,45 +30,64 @@ class PerformanceTestResult
     /**
      * @var string $testStartDate
      *
-     * @ORM\Column(name="testStartDate", type="string", length=255)
+     * @ORM\Column(name="testStartDate", type="string", length=255, nullable=true)
      */
-    private $testStartDate;
+    private $testStartDate = null;
     
     /**
      * @var string $testEndDate
      *
-     * @ORM\Column(name="testEndDate", type="string", length=255)
+     * @ORM\Column(name="testEndDate", type="string", length=255, nullable=true)
      */
-    private $testEndDate;
+    private $testEndDate = null;
     
     /**
      * @var string $status
      *
-     * @ORM\Column(name="status", type="string", length=255)
+     * @ORM\Column(name="status", type="string", length=255 , nullable=true)
      */
-    private $status;
+    private $status = null;
     
     /**
      * @var string $message
      *
-     * @ORM\Column(name="message", type="text")
+     * @ORM\Column(name="message", type="text", nullable=true)
      */
-    private $message;
+    private $message = null;
+    
+    /**
+     * @var string $start_test_class_name
+     *
+     * @ORM\Column(name="start_test_class_name", type="string", length=255 , nullable=true)
+     */
+    private $start_test_class_name = null;
+    
+    /**
+     * @var string $end_test_class_name
+     *
+     * @ORM\Column(name="end_test_class_name", type="string", length=255 , nullable=true)
+     */
+    private $end_test_class_name = null;
+    
+    /**
+     * @var string $node_jid
+     *
+     * @ORM\Column(name="node_jid", type="string", length=255 , nullable=true)
+     */
+    private $node_jid = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\Nodes", inversedBy="performanceTestResults")
+     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\Nodes", inversedBy="performanceTestResults", cascade={"persist"})
      *
      */
     private $node;
     
     /**
-     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTest", inversedBy="performanceTestResults")
+     * @ORM\ManyToOne(targetEntity="Societies\TestEngineBundle\Entity\PerformanceTest", inversedBy="performanceTestResults", cascade={"persist"})
      *
      */
     private $performanceTest;
-    
-    
-    //TODO Here we can add other methods to do some process on the this entity parameteres
+
 
     /**
      * Get id
@@ -170,6 +189,75 @@ class PerformanceTestResult
     public function getMessage()
     {
         return $this->message;
+    }
+
+    /**
+     * Set start_test_class_name
+     *
+     * @param string $startTestClassName
+     * @return PerformanceTestResult
+     */
+    public function setStartTestClassName($startTestClassName)
+    {
+        $this->start_test_class_name = $startTestClassName;
+    
+        return $this;
+    }
+
+    /**
+     * Get start_test_class_name
+     *
+     * @return string 
+     */
+    public function getStartTestClassName()
+    {
+        return $this->start_test_class_name;
+    }
+
+    /**
+     * Set end_test_class_name
+     *
+     * @param string $endTestClassName
+     * @return PerformanceTestResult
+     */
+    public function setEndTestClassName($endTestClassName)
+    {
+        $this->end_test_class_name = $endTestClassName;
+    
+        return $this;
+    }
+
+    /**
+     * Get end_test_class_name
+     *
+     * @return string 
+     */
+    public function getEndTestClassName()
+    {
+        return $this->end_test_class_name;
+    }
+
+    /**
+     * Set node_jid
+     *
+     * @param string $nodeJid
+     * @return PerformanceTestResult
+     */
+    public function setNodeJid($nodeJid)
+    {
+        $this->node_jid = $nodeJid;
+    
+        return $this;
+    }
+
+    /**
+     * Get node_jid
+     *
+     * @return string 
+     */
+    public function getNodeJid()
+    {
+        return $this->node_jid;
     }
 
     /**

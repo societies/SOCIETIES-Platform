@@ -20,12 +20,13 @@
 		    <groupId>org.simpleframework</groupId>
 		    <artifactId>simple-xml</artifactId>
 		    <version>2.6.9</version>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<scope>provided</scope>
-			<version>RELEASE</version>
+			<version>${release.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

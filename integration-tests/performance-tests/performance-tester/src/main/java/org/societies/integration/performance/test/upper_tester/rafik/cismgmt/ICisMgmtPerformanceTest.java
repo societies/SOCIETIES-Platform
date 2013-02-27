@@ -38,10 +38,17 @@ public interface ICisMgmtPerformanceTest {
 	 * To join a given CIS defined by the the following parameters
 	 * 
 	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
-	 * @param cssOwnerId Represents the JID of the CSS that owns the CIS that we want to join
-	 * @param cisId Represents the JID of CIS that we want to join
-	 * @return
+	 * @param joinCisParameters an object containing parameters needed for this test  
+	 * 
 	 */
-	public void joinCisTest(PerformanceTestMgmtInfo performanceTestInfo, String cssOwnerId, String cisId);
+	public void joinCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, JoinCisParameters joinCisParameters);
+	
+	/**
+	 * To test the creation of a CIS with a privacy policy  
+	 * 
+	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
+	 * @param createCisParameters an object containing parameters needed for this test
+	 */
+	public void createCisTest(PerformanceTestMgmtInfo performanceTestMgmtInfo, CreateCisParameters createCisParameters);
 }
 

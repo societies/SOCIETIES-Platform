@@ -47,19 +47,20 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -153,7 +154,8 @@ public class PrivacyNegotiationTest {
 		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
-			TestCase1264.privacyPolicyNegotiationManager.negotiateCISPolicy(requestorCis);
+			TestCase1264.privacyPolicyNegotiationManager.negotiateCISPolicy(new NegotiationDetails(requestorCis, 0));
+			
 			LOG.info("[#"+testCaseNumber+"] "+testTitle+": CIS Privacy Policy Negotiation finished");
 			retrievedPrivacyAgreement = TestCase1264.privacyAgreementManager.getAgreement(requestorCis);
 		} catch (PrivacyException e) {
@@ -175,7 +177,7 @@ public class PrivacyNegotiationTest {
 		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
-			TestCase1264.privacyPolicyNegotiationManager.negotiateServicePolicy(requestorService);
+			TestCase1264.privacyPolicyNegotiationManager.negotiateServicePolicy(new NegotiationDetails(requestorService, 1));
 			LOG.info("[#"+testCaseNumber+"] "+testTitle+": CIS Privacy Policy Negotiation finished");
 			retrievedPrivacyAgreement = TestCase1264.privacyAgreementManager.getAgreement(requestorService);
 		} catch (PrivacyException e) {

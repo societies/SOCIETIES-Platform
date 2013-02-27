@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,12 +13,14 @@ import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
+import org.jfree.util.Log;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -51,7 +54,7 @@ public class CssManagerController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private ICSSLocalManager cssLocalManager;
+	private ICSSInternalManager cssLocalManager;
 	@Autowired
 	private ICommManager commManager;
 	@Autowired
@@ -90,11 +93,11 @@ public class CssManagerController {
 		this.commManagerControl = commManagerControl;
 	}
 
-	public ICSSLocalManager getCssLocalManager() {
+	public ICSSInternalManager getCssLocalManager() {
 		return cssLocalManager;
 	}
 
-	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
+	public void setCssLocalManager(ICSSInternalManager cssLocalManager) {
 		this.cssLocalManager = cssLocalManager;
 	}
 
@@ -204,19 +207,22 @@ public class CssManagerController {
 			}
 			cssDetails = loginResult.get();
 
-			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
-					.getCssHostingLocation());
-			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
-					.getDomainServer());
+//			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
+//					.getCssHostingLocation());
+//			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
+//					.getDomainServer());
 			cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-					.getIdentityName());
-			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+			cmControllerLoginForm.setEntity(cssDetails.getProfile().getEntity());
+			Log.info("GET Entity Type is : " +cssDetails.getProfile().getEntity());
+			
+//			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 			
 			// first get all the cssdirectory records
@@ -273,7 +279,7 @@ public class CssManagerController {
 		}
 
 		if (getCssLocalManager() == null) {
-			model.put("message", "Css ManagerService reference not avaiable");
+			model.put("message", "Css ManagerService reference not available");
 			model.put("cmLoginForm", cmLoginForm);
 			return new ModelAndView("pilotcssprofile", model);
 		}
@@ -284,7 +290,7 @@ public class CssManagerController {
 			allNodes.add(getCommManager().getIdManager().getThisNetworkNode());
 			model.put("allNodes", allNodes);
 		}
-
+		
 		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
 		cmControllerLoginForm.setCssAdId(cmLoginForm.getCssIdentity());
 
@@ -293,14 +299,17 @@ public class CssManagerController {
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmControllerLoginForm.getCssIdentity());
-		loginRecord.setCssHostingLocation(cmControllerLoginForm.getCssHostingLocation());
-		loginRecord.setDomainServer(cmControllerLoginForm.getDomainServer());
+//		loginRecord.setCssHostingLocation(cmControllerLoginForm.getCssHostingLocation());
+//		loginRecord.setDomainServer(cmControllerLoginForm.getDomainServer());
 		loginRecord.setEmailID(cmLoginForm.getEmailID());
 		loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
-		loginRecord.setIdentityName(cmControllerLoginForm.getIdentityName());
-		loginRecord.setImID(cmControllerLoginForm.getImID());
+//		loginRecord.setIdentityName(cmControllerLoginForm.getIdentityName());
+		loginRecord.setEntity(cmLoginForm.getEntity());
+		Log.info("POST Entity Type is : " +cmLoginForm.getEntity());
 		loginRecord.setName(cmLoginForm.getName());
 		loginRecord.setSex(cmLoginForm.getSex());
+		loginRecord.setWorkplace(cmLoginForm.getWorkplace());
+		loginRecord.setPosition(cmLoginForm.getPosition());
 
 		try {
 			getCssLocalManager().modifyCssRecord(loginRecord);
@@ -326,19 +335,21 @@ public class CssManagerController {
 			cmControllerLoginForm.setCssAdName(cmLoginForm.getCssAdName());
 			
 
-			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
-					.getCssHostingLocation());
-			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
-					.getDomainServer());
+//			cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile()
+//					.getCssHostingLocation());
+//			cmControllerLoginForm.setDomainServer(cssDetails.getProfile()
+//					.getDomainServer());
 			cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 					.getEmailID());
 			cmControllerLoginForm.setHomeLocation(cssDetails.getProfile()
 					.getHomeLocation());
-			cmControllerLoginForm.setIdentityName(cssDetails.getProfile()
-					.getIdentityName());
-			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+			cmControllerLoginForm.setEntity(cssDetails.getProfile()
+					.getEntity()); 
+//			cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
 			cmControllerLoginForm.setName(cssDetails.getProfile().getName());
 			cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+			cmControllerLoginForm.setWorkplace(cssDetails.getProfile().getWorkplace());
+			cmControllerLoginForm.setPosition(cssDetails.getProfile().getPosition());
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -433,18 +444,18 @@ public class CssManagerController {
 				} else {
 					cssDetails = loginResult.get();
 
-					cmControllerLoginForm.setCssHostingLocation(cssDetails
-							.getProfile().getCssHostingLocation());
-					cmControllerLoginForm.setDomainServer(cssDetails
-							.getProfile().getDomainServer());
+//					cmControllerLoginForm.setCssHostingLocation(cssDetails
+//							.getProfile().getCssHostingLocation());
+//					cmControllerLoginForm.setDomainServer(cssDetails
+//							.getProfile().getDomainServer());
 					cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 							.getEmailID());
 					cmControllerLoginForm.setHomeLocation(cssDetails
 							.getProfile().getHomeLocation());
-					cmControllerLoginForm.setIdentityName(cssDetails
-							.getProfile().getIdentityName());
-					cmControllerLoginForm.setImID(cssDetails.getProfile()
-							.getImID());
+//					cmControllerLoginForm.setIdentityName(cssDetails
+//							.getProfile().getIdentityName());
+//					cmControllerLoginForm.setImID(cssDetails.getProfile()
+//							.getImID());
 					cmControllerLoginForm.setName(cssDetails.getProfile()
 							.getName());
 					cmControllerLoginForm.setSex(cssDetails.getProfile()
@@ -973,17 +984,17 @@ public class CssManagerController {
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmLoginForm.getCssIdentity());
-		loginRecord.setPassword(cmLoginForm.getPassword());
+//		loginRecord.setPassword(cmLoginForm.getPassword());
 
 		if (cmLoginForm.getButtonLabel().contentEquals("Save")) {
 
-			loginRecord.setCssHostingLocation(cmLoginForm
-					.getCssHostingLocation());
-			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
+//			loginRecord.setCssHostingLocation(cmLoginForm
+//					.getCssHostingLocation());
+//			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
 			loginRecord.setEmailID(cmLoginForm.getEmailID());
 			loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
-			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
-			loginRecord.setImID(cmLoginForm.getImID());
+//			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
+//			loginRecord.setImID(cmLoginForm.getImID());
 			loginRecord.setName(cmLoginForm.getName());
 			loginRecord.setSex(cmLoginForm.getSex());
 		}
@@ -1065,18 +1076,18 @@ public class CssManagerController {
 
 					}
 
-					cmControllerLoginForm.setCssHostingLocation(cssDetails
-							.getProfile().getCssHostingLocation());
-					cmControllerLoginForm.setDomainServer(cssDetails
-							.getProfile().getDomainServer());
+//					cmControllerLoginForm.setCssHostingLocation(cssDetails
+//							.getProfile().getCssHostingLocation());
+//					cmControllerLoginForm.setDomainServer(cssDetails
+//							.getProfile().getDomainServer());
 					cmControllerLoginForm.setEmailID(cssDetails.getProfile()
 							.getEmailID());
 					cmControllerLoginForm.setHomeLocation(cssDetails
 							.getProfile().getHomeLocation());
-					cmControllerLoginForm.setIdentityName(cssDetails
-							.getProfile().getIdentityName());
-					cmControllerLoginForm.setImID(cssDetails.getProfile()
-							.getImID());
+//					cmControllerLoginForm.setIdentityName(cssDetails
+// 						.getProfile().getIdentityName());
+//					cmControllerLoginForm.setImID(cssDetails.getProfile()
+//							.getImID());
 					cmControllerLoginForm.setName(cssDetails.getProfile()
 							.getName());
 					cmControllerLoginForm.setSex(cssDetails.getProfile()
@@ -1571,24 +1582,27 @@ public class CssManagerController {
 
 	void setupEmptyCssRecord(CssRecord rec) {
 		rec.setCssIdentity("");
-		rec.setPassword("");
-		rec.setDomainServer("");
-		rec.setCssHostingLocation("");
-		rec.setCssInactivation("");
-		rec.setCssRegistration("");
-		rec.setCssUpTime(0);
-		rec.setDomainServer("");
+//		rec.setPassword("");
+//		rec.setDomainServer("");
+//		rec.setCssHostingLocation("");
+//		rec.setCssInactivation("");
+//		rec.setCssRegistration("");
+//		rec.setCssUpTime(0);
+//		rec.setDomainServer("");
 		rec.setEmailID("");
 		rec.setEntity(0);
 		rec.setForeName("");
 		rec.setHomeLocation("");
-		rec.setIdentityName("");
-		rec.setImID("");
+//		rec.setIdentityName("");
+//		rec.setImID("");
 		rec.setName("");
-		rec.setPresence(0);
+//		rec.setPresence(0);
 		rec.setSex(0);
-		rec.setSocialURI("");
-		rec.setStatus(0);
+//		rec.setSocialURI("");
+//		rec.setStatus(0);
+		rec.setWorkplace("");
+		rec.setPosition("");
+		
 
 		List<CssNode> cssNodes = rec.getCssNodes();
 		cssNodes = new ArrayList<CssNode>();

@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.RequestorBean;
 
 /**

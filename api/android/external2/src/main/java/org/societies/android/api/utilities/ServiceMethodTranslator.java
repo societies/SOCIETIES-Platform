@@ -64,8 +64,8 @@ public class ServiceMethodTranslator {
 	public static final String JAVA_PRIMITIVES_ARRAYS_CLASS_TYPE []    = {"[I", "[L", "[D", "[F", "[B", "[C", "[Z", "[S"};
 	public static final String ANDROID_PRIMITIVES_ARRAYS_CLASS_TYPE [] = {"[I", "[J", "[D", "[F", "[B", "[C", "[Z", "[S"};
 	public static final String JAVA_PRIMITIVE_ARRAYS [] = {"int[]", "long[]", "double[]", "float[]", "byte[]", "char[]", "boolean[]", "short[]"};
-	public static final String JAVA_LANG_CLASSES [] = {"String"};
-	public static final String JAVA_LANG_CLASSES_ARRAYS [] = {"String[]"};
+	public static final String JAVA_LANG_CLASSES [] = {"String", "Object"};
+	public static final String JAVA_LANG_CLASSES_ARRAYS [] = {"String[]", "Object[]"};
 	
 	private static final String LOG_TAG = ServiceMethodTranslator.class.getName();
 	/**

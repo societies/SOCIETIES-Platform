@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.societies.android.platform.cis"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+		<service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
+           <intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisDirectoryRemote" />
+   			</intent-filter>
+   		</service>
+		<service android:name="org.societies.android.platform.cis.CisManagerRemote" android:label="Cis Manager Remote" >
+			<intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisManagerRemote" />
+   			</intent-filter>
+   		</service>
+		<service android:name="org.societies.android.platform.cis.CisSubscribedRemote" android:label="Cis Subscribed Remote" >
+			<intent-filter>
+                <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
+   			</intent-filter>
+   		</service>
+    </application>
+
+</manifest>

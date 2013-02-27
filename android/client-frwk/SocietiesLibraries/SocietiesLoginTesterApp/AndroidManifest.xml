@@ -1,0 +1,106 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.societies.android.platform.pubsub.login"
+    android:versionCode="1"
+    android:versionName="1.0" 
+    android:debuggable="true">
+
+    <uses-sdk
+        android:minSdkVersion="8"/>
+    <supports-screens
+                android:largeScreens="true"
+                android:normalScreens="true"
+                android:smallScreens="true"
+                android:resizeable="true"
+                android:anyDensity="true"
+                />
+    <!-- Review these permissions and eliminate unwanted ones -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />   
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
+    <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
+    
+    <application
+        android:icon="@drawable/launcher_societies"
+        android:label="@string/app_name"
+        android:configChanges="orientation|keyboardHidden"> 
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation|keyboardHidden"> 
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        
+        <activity android:name=".MasterPreferences"
+			android:label="@string/app_name">
+		</activity>
+        
+        <activity android:name="org.societies.android.platform.pubsub.login.AboutActivity"
+			android:label="@string/app_name">
+		</activity>
+        
+        <!--activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" /-->
+        		
+	<!--service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
+	<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
+	<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" /-->
+
+         <service android:name="org.societies.android.platform.pubsub.login.ServiceCSSManagerLocal" />
+         <service android:name="org.societies.android.platform.pubsub.login.LocalCssDirectoryService" />
+
+        <!--service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
+        <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
+        <service android:name="org.societies.android.platform.socialdata.SocialData" />
+        <service android:name="org.societies.android.platform.cis.CommunityManagementLocal" />
+        <service android:name="org.societies.android.platform.cis.CisDirectoryLocal" />
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
+        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" /-->
+        <!--service
+        	android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
+        	android:label="SocietiesPersonalisation">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"></action>
+   			</intent-filter>
+        </service-->
+       <!--service
+        	android:name="org.societies.android.platform.events.ServicePlatformEventsLocal">
+        </service-->
+        <!--service
+        	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
+        	android:label="SocietiesEvents">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
+   			</intent-filter>
+        </service-->
+          <!-- this needs to be copied manually  -->
+    <!--provider
+        android:name="org.societies.android.platform.SocialProvider"
+        android:authorities="@string/provider_authority"
+        android:exported="true"
+        android:syncable="true"
+        android:enabled="true"
+        android:readPermission="org.societies.android.SocialProvider.READ"
+        android:writePermission="org.societies.android.SocialProvider.WRITE">
+    </provider-->
+        
+    </application>
+
+</manifest>

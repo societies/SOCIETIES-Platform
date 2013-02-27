@@ -60,13 +60,14 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyRegistryManager;
@@ -166,14 +167,15 @@ public class PrivacyPolicyRegistryTest {
 
 	@Test
 	public void testRegistryStoreRetrieve(){
-		registryMgr.addPolicy(requestorCis, cisPolicy);
-
-		RequestPolicy policy = registryMgr.getPolicy(requestorCis);
-
-		TestCase.assertNotNull("Null policy for requestorCis: "+requestorCis.getRequestorId().getJid()+" / "+((RequestorCis)requestorCis).getCisRequestorId().getJid(), policy);
-
-
+		RequestPolicy policy = null;
 		try {
+			registryMgr.addPolicy(requestorCis, cisPolicy);
+			
+			policy = registryMgr.getPolicy(requestorCis);
+
+			TestCase.assertNotNull("Null policy for requestorCis: "+requestorCis.getRequestorId().getJid()+" / "+((RequestorCis)requestorCis).getCisRequestorId().getJid(), policy);
+
+			
 			registryMgr.deletePolicy(requestorCis);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -187,23 +189,31 @@ public class PrivacyPolicyRegistryTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
 		}
 
-		policy = registryMgr.getPolicy(requestorCis);
-
-		TestCase.assertNull(policy);
-
-
-
-
-		registryMgr.addPolicy(requestorService, servicePolicy);
-
-		RequestPolicy policy2 = registryMgr.getPolicy(requestorService);
-		TestCase.assertNotNull("Null policy for requestorService: "+requestorService.getRequestorId().getJid()+" / "+((RequestorService)requestorService).getRequestorServiceId().getServiceInstanceIdentifier().toString(), policy2);
-
-
+		
 		try {
+			policy = registryMgr.getPolicy(requestorCis);
+
+			TestCase.assertNull(policy);
+
+
+
+
+			registryMgr.addPolicy(requestorService, servicePolicy);
+
+			RequestPolicy policy2 = registryMgr.getPolicy(requestorService);
+			TestCase.assertNotNull("Null policy for requestorService: "+requestorService.getRequestorId().getJid()+" / "+((RequestorService)requestorService).getRequestorServiceId().getServiceInstanceIdentifier().toString(), policy2);
+
+
 			registryMgr.deletePolicy(requestorService);
+			policy2 = registryMgr.getPolicy(requestorService);
+			TestCase.assertNull(policy2);
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -216,12 +226,11 @@ public class PrivacyPolicyRegistryTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
 		}
-
-		policy2 = registryMgr.getPolicy(requestorService);
-		TestCase.assertNull(policy2);
-
-
 	}
 
 

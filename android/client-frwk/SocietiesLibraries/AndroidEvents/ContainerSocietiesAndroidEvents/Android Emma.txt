@@ -1,0 +1,9 @@
+java -cp ${emmaDirectory}/emma.jar emma report -r html -in coverage.em,coverage.ec -sp ${project.source.folder} 
+java -cp $HOME/local/dev/emma/emma.jar emma report -r html -in target/emma/coverage.em,target/emma/coverage.ec -sp src 
+
+mvn -X clean compile android:emma
+
+adb shell ls -a data/data/org.societies.android.platform.events/files
+adb pull data/data/org.societies.android.platform.events/files/coverage.ec ../ContainerSocietiesAndroidEvents/target/emma/coverage.ec
+ 
+

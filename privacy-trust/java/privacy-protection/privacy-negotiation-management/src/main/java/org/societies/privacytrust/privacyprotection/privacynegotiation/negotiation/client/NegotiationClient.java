@@ -46,22 +46,22 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
@@ -70,6 +70,7 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManage
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data.DataHelper;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponseChecker;
@@ -103,6 +104,7 @@ public class NegotiationClient implements INegotiationClient {
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
 	private IUserFeedback userFeedback;
+	private NegotiationDetails details;
 	public NegotiationClient(INegotiationAgentRemote negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
 		this.negotiationAgentRemote = negotiationAgent;
 		this.policyMgr = privacyPolicyNegotiationManager;
@@ -142,7 +144,7 @@ public class NegotiationClient implements INegotiationClient {
 			this.logging.debug("Service requires these contextTypes\n"+str+"which don't exist");
 			this.userFeedback.showNotification("Error starting service\n Service requires these data types\n"+str+"which don't exist in your profile");
 			//JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
-			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
+			InternalEvent evt = this.createFailedNegotiationEvent();
 			try {
 				this.eventMgr.publishInternalEvent(evt);
 			} catch (EMSException e) {
@@ -190,7 +192,7 @@ public class NegotiationClient implements INegotiationClient {
 					+requestorStr+" did not accept your privacy terms & conditions");
 /*			JOptionPane.showMessageDialog(null, "Negotiation Status: "+NegotiationStatus.FAILED+"\n"
 					+"Provider did not accept my terms & conditions");*/
-			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
+			InternalEvent evt = this.createFailedNegotiationEvent();
 			try {
 				this.eventMgr.publishInternalEvent(evt);
 			} catch (EMSException e) {
@@ -227,7 +229,7 @@ public class NegotiationClient implements INegotiationClient {
 				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
 						+"did not match user response policy.\n"
 						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");
-				InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
+				InternalEvent evt = this.createFailedNegotiationEvent();
 				try {
 					this.eventMgr.publishInternalEvent(evt);
 				} catch (EMSException e) {
@@ -356,7 +358,7 @@ public class NegotiationClient implements INegotiationClient {
 			}
 		}else{
 			this.logging.debug("Provider DID NOT Acknowledge Agreement");
-			InternalEvent event = this.createFailedNegotiationEvent(requestor);
+			InternalEvent event = this.createFailedNegotiationEvent();
 			try {
 				this.logging.debug("Sending failed negotiation event");
 				this.eventMgr.publishInternalEvent(event);
@@ -372,13 +374,11 @@ public class NegotiationClient implements INegotiationClient {
 	
 	
 
-	/**
-	 * No need for this step. This should be removed and the negotiation step should commence in the startPrivacyPolicyNegotiation(RequestPolicy,S
-	 * @param requestor
-	 */
-	public void startNegotiation(Requestor requestor){
+	
+	private void startNegotiation(){
 		
-		this.logging.debug("Starting negotiation with: "+requestor.toString());
+		Requestor requestor = details.getRequestor();
+		this.logging.debug("Starting negotiation. NegotiationID: "+details.getNegotiationID()+" with: "+requestor.toString());
 		try {
 			this.receiveProviderPolicy(this.negotiationAgentRemote.getPolicy(requestor).get());
 		} catch (InterruptedException e) {
@@ -399,7 +399,7 @@ public class NegotiationClient implements INegotiationClient {
 	 * HELPER METHODS BELOW
 	 */
 
-	
+
 	private List<String> dataTypesExist(RequestPolicy policy){
 		List<String> notFoundContextTypes = new ArrayList<String>();
 		List<RequestItem> items = policy.getRequests();
@@ -408,19 +408,28 @@ public class NegotiationClient implements INegotiationClient {
 				String dataType = item.getResource().getDataType();
 
 				DataIdentifierScheme scheme = item.getResource().getScheme();
-				DataHelper helper = new DataHelper(ctxBroker, userIdentity);
-				if (!helper.dataTypeExists(item)){
-					notFoundContextTypes.add(dataType);
+				if (scheme.equals(DataIdentifierScheme.CONTEXT)){
+					DataHelper helper = new DataHelper(ctxBroker, userIdentity);
+					if (!helper.dataTypeExists(item)){
+						notFoundContextTypes.add(dataType);
+					}
+				}else if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.CIS)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.CSS)){
+					//TODO
+				}else if (scheme.equals(DataIdentifierScheme.DEVICE)){
+					//TODO
 				}
-				
 			}
 		}
 		return notFoundContextTypes;
 	}
 	
 	
-	private InternalEvent createFailedNegotiationEvent(Requestor requestor){
-		FailedNegotiationEvent event = new FailedNegotiationEvent(requestor);
+	private InternalEvent createFailedNegotiationEvent(){
+		FailedNegotiationEvent event = new FailedNegotiationEvent(details);
 		InternalEvent iEvent = new InternalEvent(EventTypes.FAILED_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
 		this.logging.debug("Failed negotiation Event: \n"+
 		"EventName: "+iEvent.geteventName()+
@@ -431,7 +440,7 @@ public class NegotiationClient implements INegotiationClient {
 	}
 
 	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) {
-		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL);
+		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL, details);
 		InternalEvent iEvent = new InternalEvent(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
 		this.logging.debug("Successfull negotiation Event: \n"+
 		"EventName: "+iEvent.geteventName()+
@@ -476,11 +485,12 @@ public class NegotiationClient implements INegotiationClient {
 
 
 	@Override
-	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy) {
-		this.logging.debug("Starting new negotiation with: "+requestor.toString());
+	public void startPrivacyPolicyNegotiation(NegotiationDetails details, RequestPolicy policy) {
+		this.details = details;
+		this.logging.debug("Starting new negotiation (id:"+details.getNegotiationID()+") with: "+details.getRequestor().toString());
 		if (policy==null){
 			this.logging.debug("RequestPolicy not provided, retrieving privacy policy from provider");
-			this.startNegotiation(requestor);
+			this.startNegotiation();
 		}else{
 			this.logging.debug("RequestPolicy provided, processing policy");
 			this.receiveProviderPolicy(policy);

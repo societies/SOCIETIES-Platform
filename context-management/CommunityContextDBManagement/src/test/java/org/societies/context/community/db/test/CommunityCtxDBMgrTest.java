@@ -28,10 +28,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,13 +40,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
@@ -75,35 +75,20 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING6 = "myCIS6.societies.local";
 	private static final String CIS_IIDENTITY_STRING7 = "myCIS7.societies.local";
 	private static final String CIS_IIDENTITY_STRING8 = "myCIS8.societies.local";
+	private static final String CIS_IIDENTITY_STRING9 = "myCIS9.societies.local";
+	private static final String CIS_IIDENTITY_STRING10 = "myCIS10.societies.local";
+	private static final String CIS_IIDENTITY_STRING11 = "myCIS11.societies.local";
+	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
+	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
 	@Autowired
 	private ICommunityCtxDBMgr communityDB;
-
-	private static IIdentity mockCisIdentity0 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity1 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity2 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity3 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity4 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity5 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity6 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity7 = mock(IIdentity.class);
-	private static IIdentity mockCisIdentity8 = mock(IIdentity.class);
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-
-		when(mockCisIdentity0.toString()).thenReturn(CIS_IIDENTITY_STRING0);
-		when(mockCisIdentity1.toString()).thenReturn(CIS_IIDENTITY_STRING1);
-		when(mockCisIdentity2.toString()).thenReturn(CIS_IIDENTITY_STRING2);
-		when(mockCisIdentity3.toString()).thenReturn(CIS_IIDENTITY_STRING3);
-		when(mockCisIdentity4.toString()).thenReturn(CIS_IIDENTITY_STRING4);
-		when(mockCisIdentity5.toString()).thenReturn(CIS_IIDENTITY_STRING5);
-		when(mockCisIdentity6.toString()).thenReturn(CIS_IIDENTITY_STRING6);
-		when(mockCisIdentity7.toString()).thenReturn(CIS_IIDENTITY_STRING7);
-		when(mockCisIdentity8.toString()).thenReturn(CIS_IIDENTITY_STRING8);
 	}
 
 	/**
@@ -131,33 +116,33 @@ public class CommunityCtxDBMgrTest {
 	public void testCreateCommunityEntity() throws CtxException {
 
 		final CommunityCtxEntity entity = 
-				this.communityDB.createCommunityEntity(mockCisIdentity0);
+				this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING0);
 
 		assertNotNull(entity);
 		assertNotNull(entity.getId());
-		assertEquals(mockCisIdentity0.toString(), entity.getOwnerId());
+		assertEquals(CIS_IIDENTITY_STRING0, entity.getOwnerId());
 		assertEquals(CtxModelType.ENTITY, entity.getModelType());
 		assertEquals(CtxEntityTypes.COMMUNITY, entity.getType());
 		assertNotNull(entity.getObjectNumber());
 		assertNotNull(entity.getLastModified());
 		assertNotNull(entity.getAttributes());
 		assertTrue(entity.getAttributes().isEmpty());
-		assertNotNull(entity.getAssociations());
-		assertEquals(2, entity.getAssociations().size());
+//		assertNotNull(entity.getAssociations());
+//		assertEquals(2, entity.getAssociations().size());
 	}
 
 	@Test
 	public void testCreateCommunityAttribute() throws CtxException {
 
 		final CommunityCtxEntity entity = 
-				this.communityDB.createCommunityEntity(mockCisIdentity1);
+				this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING1);
 		final CtxAttribute attribute = 
-				this.communityDB.createCommunityAttribute(entity.getId(), CtxAttributeTypes.NAME);
+				this.communityDB.createAttribute(entity.getId(), CtxAttributeTypes.NAME);
 
 		assertNotNull(attribute);
 		assertNotNull(attribute.getId());
 		assertEquals(entity.getId(), attribute.getScope());
-		assertEquals(mockCisIdentity1.toString(), attribute.getOwnerId());
+		assertEquals(CIS_IIDENTITY_STRING1, attribute.getOwnerId());
 		assertEquals(CtxModelType.ATTRIBUTE, attribute.getModelType());
 		assertEquals(CtxAttributeTypes.NAME, attribute.getType());
 		assertNotNull(attribute.getLastModified());
@@ -178,11 +163,30 @@ public class CommunityCtxDBMgrTest {
 	}
 
 	@Test
+	public void testCreateCtxEntity() throws CtxException {
+
+		final CtxEntity entity = 
+				this.communityDB.createEntity(CIS_IIDENTITY_STRING9, CtxEntityTypes.SERVICE);
+
+		assertNotNull(entity);
+		assertNotNull(entity.getId());
+		assertEquals(CIS_IIDENTITY_STRING9, entity.getOwnerId());
+		assertEquals(CtxModelType.ENTITY, entity.getModelType());
+		assertEquals(CtxEntityTypes.SERVICE, entity.getType());
+		assertNotNull(entity.getObjectNumber());
+		assertNotNull(entity.getLastModified());
+		assertNotNull(entity.getAttributes());
+		assertTrue(entity.getAttributes().isEmpty());
+		assertNotNull(entity.getAssociations());
+		assertTrue(entity.getAssociations().isEmpty());
+	}
+	
+	@Test
 	public void testUpdateCommunityAttribute() throws CtxException {
 
 		final CtxEntityIdentifier commEntityId = 
-				this.communityDB.createCommunityEntity(mockCisIdentity2).getId();
-		CtxAttribute attribute = this.communityDB.createCommunityAttribute(
+				this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING2).getId();
+		CtxAttribute attribute = this.communityDB.createAttribute(
 				commEntityId, CtxAttributeTypes.NAME);
 
 		attribute.setStringValue("Jane Do Fans");
@@ -203,7 +207,7 @@ public class CommunityCtxDBMgrTest {
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 		
-		CtxAttribute attribute2 = this.communityDB.createCommunityAttribute(
+		CtxAttribute attribute2 = this.communityDB.createAttribute(
 				commEntityId, CtxAttributeTypes.TEMPERATURE);
 		attribute2.setHistoryRecorded(true);
 		attribute2 = (CtxAttribute) this.communityDB.update(attribute2);
@@ -228,11 +232,59 @@ public class CommunityCtxDBMgrTest {
 	}
 	
 	@Test
+	public void testAssociations() throws CtxException {
+		
+		CtxAssociation association = this.communityDB.createAssociation(CIS_IIDENTITY_COMMUNITY_PARENT, CtxAssociationTypes.HAS_PARAMETERS);
+		
+		CommunityCtxEntity communityEntity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_COMMUNITY_PARENT);
+		CtxEntity entity = this.communityDB.createEntity(CIS_IIDENTITY_ENTITY_CHILD, CtxEntityTypes.PERSON);
+		
+		//set parent entity
+		final CtxEntityIdentifier parentEntityId = communityEntity.getId();
+		association.setParentEntity(parentEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertNotNull(association.getParentEntity());
+		assertEquals(parentEntityId, association.getParentEntity());
+		
+		//check association from the entity's side
+		communityEntity = (CommunityCtxEntity) this.communityDB.retrieve(parentEntityId);
+		assertTrue(communityEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, communityEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
+		
+		//add child entity
+		final CtxEntityIdentifier childEntityId = entity.getId();
+		association.addChildEntity(childEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertEquals(communityEntity.getId(), association.getParentEntity());
+		assertEquals(1, association.getChildEntities().size());
+		assertTrue(association.getChildEntities().contains(childEntityId));
+		
+		//check association from the entity's side
+		entity = (CtxEntity) this.communityDB.retrieve(childEntityId);
+		assertTrue(entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());
+
+		//add second child entity
+		final CtxEntityIdentifier childEntityId2 = this.communityDB.createEntity(CIS_IIDENTITY_COMMUNITY_PARENT, CtxEntityTypes.PERSON).getId();
+		association.addChildEntity(childEntityId2);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertEquals(communityEntity.getId(), association.getParentEntity());
+		assertEquals(2, association.getChildEntities().size());
+		assertTrue(association.getChildEntities().contains(childEntityId));
+		assertTrue(association.getChildEntities().contains(childEntityId2));
+		
+		//check association from the entity's side
+		entity = (CtxEntity) this.communityDB.retrieve(childEntityId2);
+		assertTrue(entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).contains(association.getId()));
+		assertEquals(1, entity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS).size());		
+	}
+	
+	@Test
 	public void testRetrieveCommunityEntity() throws CtxException {
 
 		final CommunityCtxEntity entity = 
-				this.communityDB.createCommunityEntity(mockCisIdentity3);
-		final CommunityCtxEntity entityFromDb = this.communityDB.retrieveCommunityEntity(mockCisIdentity3);
+				this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING3);
+		final CommunityCtxEntity entityFromDb = this.communityDB.retrieveCommunityEntity(CIS_IIDENTITY_STRING3);
 
 		assertNotNull(entityFromDb);
 		assertEquals(entity.getId(), entityFromDb.getId());
@@ -306,18 +358,42 @@ public class CommunityCtxDBMgrTest {
 	}*/
    
    @Test
+   public void testLookupCommunityCtxEntity() throws CtxException{
+	   
+	   System.out.println("---- testLookupCommunityCtxEntity");
+
+	   List<CtxIdentifier> ids;
+	   CommunityCtxEntity entity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING10);
+	   final CtxAttribute attribute = this.communityDB.createAttribute(entity.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   final CtxAttribute attribute2 = this.communityDB.createAttribute(entity.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
+	   
+	   CommunityCtxEntity entity2 = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING11);
+	   final CtxAttribute attribute3 = this.communityDB.createAttribute(entity2.getId(), CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   
+	   ids = communityDB.lookupCommunityCtxEntity(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
+	   assertTrue(ids.contains(entity.getId()));
+	   assertTrue(ids.contains(entity2.getId()));
+	   assertEquals(2, ids.size());
+	   
+	   ids = communityDB.lookupCommunityCtxEntity(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER);
+	   assertTrue(ids.contains(entity.getId()));
+	   assertEquals(1, ids.size());
+
+   }
+   
+   @Test
    public void testCommunityHierarchies() throws CtxException{
 
 	   CtxAssociation association;
 	   
 	   CommunityCtxEntity entity = 
-			   this.communityDB.createCommunityEntity(mockCisIdentity4);
+			   this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING4);
 	   assertTrue(entity.getCommunities().isEmpty());
 	   assertTrue(entity.getMembers().isEmpty());
 
 	   // Setup (parent) Super-community
 	   final CtxEntityIdentifier parentEntityId = 
-			   this.communityDB.createCommunityEntity(mockCisIdentity5).getId();
+			   this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING5).getId();
 	   association = (CtxAssociation) this.communityDB.retrieve(
 			   entity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next());
 	   association.addChildEntity(parentEntityId);
@@ -330,7 +406,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Setup another Super-community
 	   final CtxEntityIdentifier parentEntityId2 = 
-			   this.communityDB.createCommunityEntity(mockCisIdentity6).getId();
+			   this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING6).getId();
 	   association.addChildEntity(parentEntityId2);
 	   association = (CtxAssociation) this.communityDB.update(association);
 	   assertEquals(2, association.getChildEntities().size());
@@ -343,7 +419,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Add (child) sub-communities
 	   final CtxEntityIdentifier childEntityId = 
-			   this.communityDB.createCommunityEntity(mockCisIdentity7).getId();
+			   this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING7).getId();
 	   association = (CtxAssociation) this.communityDB.retrieve(
 			   entity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next());
 	   association.addChildEntity(childEntityId);
@@ -356,7 +432,7 @@ public class CommunityCtxDBMgrTest {
 	   assertTrue(entity.getMembers().contains(childEntityId));
 	   
 	   final CtxEntityIdentifier childEntityId2 = 
-			   this.communityDB.createCommunityEntity(mockCisIdentity8).getId();
+			   this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING8).getId();
 	   association.addChildEntity(childEntityId2);
 	   association = (CtxAssociation) this.communityDB.update(association);
 	   assertEquals(2, association.getChildEntities().size());

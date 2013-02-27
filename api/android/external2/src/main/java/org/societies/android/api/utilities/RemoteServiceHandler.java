@@ -39,6 +39,7 @@ public class RemoteServiceHandler extends Handler {
 	private static final String BUNDLE_ARRAY_GET_METHOD_SUFFIX = "Array";
 	private static final String BUNDLE_GET_PARCELABLE_METHOD = "getParcelable";
 	public static final String JAVA_ARRAY = "[]";
+	public static final String JAVA_OBJECT_CLASSNAME = "java.lang.Object";
 
 	private static final String LOG_TAG = RemoteServiceHandler.class.getName();
 	private Class <?> container;
@@ -138,6 +139,7 @@ public class RemoteServiceHandler extends Handler {
 
 	/**
 	 * Determine if a class implements the Parcelable interface
+	 * The Java Object is also treated as a being a Parcelable
 	 * 
 	 * @param clazz
 	 * @return boolean
@@ -146,11 +148,15 @@ public class RemoteServiceHandler extends Handler {
 		boolean retValue = false;
 
 		Class <?> interfaces[] = clazz.getInterfaces();
-		for (Class <?> interfaze : interfaces) {
-			Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
-			if (interfaze.getSimpleName().equals("Parcelable")) {
-				retValue = true;
-				break;
+		if (clazz.getName().equals(JAVA_OBJECT_CLASSNAME)) {
+			retValue = true;
+		} else {
+			for (Class <?> interfaze : interfaces) {
+				Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
+				if (interfaze.getSimpleName().equals("Parcelable")) {
+					retValue = true;
+					break;
+				}
 			}
 		}
 

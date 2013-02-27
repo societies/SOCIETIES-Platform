@@ -23,15 +23,8 @@
 	</osgi:service>
 
 	<!-- CIS CommMgr Factory Service -->
+	<!-- If Pubsub Service is not available, CIS factory is also not available
 	<osgi:service ref="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
-    
-	<!-- Load xc.properties -->
-	<osgi-compendium:cm-properties id="componentConfig" persistent-id="xc">
-    	<!-- Default values if none found -->
-    	<prop key="host">societies.local</prop>
-    	<prop key="subDomain">xcmanager.societies.local</prop>
-    	<prop key="secretKey">password.societies.local</prop>
-    	<prop key="daNode">admin.societies.local</prop>
-    </osgi-compendium:cm-properties>
+	-->
 	
 </beans>

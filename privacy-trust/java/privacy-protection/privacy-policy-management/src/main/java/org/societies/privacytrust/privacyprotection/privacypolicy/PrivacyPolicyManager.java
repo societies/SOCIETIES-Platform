@@ -47,10 +47,10 @@ import org.societies.api.context.CtxException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.privacytrust.privacyprotection.privacypolicy.reader.XMLPolicyReader;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
  * @date 5 déc. 2011
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getName());
 
 	ICommManager commManager;
 	ICtxBroker ctxBroker;
@@ -164,7 +164,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// Retrieve the privacy policy
 		RequestPolicy privacyPolicy = fromXMLString(privacyPolicyXml);
 		if (null == privacyPolicy) {
-			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
+			throw new PrivacyException("This XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
 		// Fill the requestor id
 		privacyPolicy.setRequestor(requestor);

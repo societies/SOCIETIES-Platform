@@ -73,9 +73,10 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.societies</groupId>
-            <artifactId>activityfeed</artifactId>
+            <artifactId>activityfeedservice</artifactId>
             <version>${version.cis}</version>
             <scope>provided</scope>
         </dependency>

@@ -70,6 +70,13 @@ public interface ICisDirectory {
 	Future<List<CisAdvertisementRecord>> searchByID(String cisID);
 	
 	/**
+	 * Description: Search method to search by  list of cisIDs for CIS Advertisements that return an array of CISAdvertisementRecords 
+	 * 
+	 * @return list of CisAdvertisementRecord from CIS directory
+	 */
+	Future<List<CisAdvertisementRecord>> searchByIDS(List<String> cisID);
+	
+	/**
 	 * Description: Register a CIS 
 	 * 
 	 * @param: CisAdevertisementRecord

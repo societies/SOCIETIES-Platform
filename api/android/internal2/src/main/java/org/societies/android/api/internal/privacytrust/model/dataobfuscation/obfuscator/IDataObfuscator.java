@@ -26,7 +26,7 @@ package org.societies.android.api.internal.privacytrust.model.dataobfuscation.ob
 
 import java.lang.reflect.Type;
 
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
 

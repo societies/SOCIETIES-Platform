@@ -30,23 +30,23 @@ import java.util.List;
 import org.societies.android.api.identity.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
-import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.platform.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
 import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;
 import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -191,7 +191,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 		((Button) findViewById(R.id.btnLaunchTestCheckPermission)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
 
-		clientCommManager = new ClientCommunicationMgr(this);
+		clientCommManager = new ClientCommunicationMgr(this.getApplicationContext(), true);
 		//		txtConnectivity.setText("Is connected? "+(clientCommManager.isConnected() ? "yes" : "no"));
 
 
@@ -215,7 +215,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 			getApplicationContext().unbindService(inProcessServiceConnection);
 		}
 		// -- Logout
-		clientCommManager.logout();
+//		clientCommManager.logout();
 	}
 
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {

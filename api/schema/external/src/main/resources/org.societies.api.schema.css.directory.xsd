@@ -36,7 +36,15 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+	
+	<xs:element name="cssFriendEvent">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cssAdvert" type="tns:cssAdvertisementRecord" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+ 	
 	<xs:simpleType name="methodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="addCssAdvertisementRecord" />

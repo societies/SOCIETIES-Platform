@@ -158,16 +158,35 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			//SERIALISE OBJECT
 			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
 			Class<?> c = elementToClass.get(elementID);
+			// TODO CLASSLOADING MAGIC DISABLED!
+//			ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+//			Thread.currentThread().setContextClassLoader(c.getClassLoader());
+			
 			Object bean = null;
-			try {
-				bean = serializer.read(c, eventBeanXML);
-			} catch (Exception e) {
-				LOG.error(e.getMessage(), e);
+			if (c==null) {
+				// when received xml was has not been binded print a warn and notify with raw XML
+				String[] keyArray = new String[elementToClass.keySet().size()];
+				keyArray = elementToClass.keySet().toArray(keyArray);
+				LOG.warn("No class found for namespace{element} '"+elementID+"', passing unmarshalled XML element... Registered entries are: "+Arrays.toString(keyArray));
+				bean = eventBean;
 			}
+			else {
+				// unmarshall item content
+				try {
+					bean = serializer.read(c, eventBeanXML);
+				} catch (Exception e) {
+					LOG.error(e.getMessage(), e);
+				}
+			}
+			
 			//POST EVENT
 			List<Subscriber> subscriberList = subscribers.get(sub);
 			for (Subscriber subscriber : subscriberList)
 				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
+			
+			// TODO multiple subscribers and classloaders
+			// TODO CLASSLOADING MAGIC DISABLED!
+//			Thread.currentThread().setContextClassLoader(oldCl);
 		}
 	}
 	// TODO subId
@@ -588,13 +607,18 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
-		for (String c : classList) {
-			Class<?> clazz = Class.forName(c);
-			Root rootAnnotation = clazz.getAnnotation(Root.class);
-			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
-			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try {
+			for (String c : classList) {
+				Class<?> clazz = cl.loadClass(c);
+				Root rootAnnotation = clazz.getAnnotation(Root.class);
+				Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+				if (rootAnnotation!=null && namespaceAnnotation!=null) {
+					elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+				}
 			}
+		} catch (ClassNotFoundException e) {
+			throw new ClassNotFoundException(e.getMessage()+" from classloader "+cl.toString()+": class being registered from a context that doesn't have access to it.", e);
 		}
 	}
 }

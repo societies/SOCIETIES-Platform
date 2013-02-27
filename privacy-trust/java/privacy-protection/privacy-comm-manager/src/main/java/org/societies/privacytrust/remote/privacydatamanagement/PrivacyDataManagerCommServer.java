@@ -46,17 +46,18 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ActionUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
+import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 
 
@@ -120,12 +121,12 @@ public class PrivacyDataManagerCommServer {
 	private boolean obfuscateData(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
 			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
-//			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, DataWrapperFactory.selectDataWrapper(dataId));
+			DataWrapper dataWrapper = bean.getDataWrapper();
+//			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, dataWrapper);
 			beanResult.setAckMessage("Sorry, the obfuscation is available, but not remotely yet.");
 			return false;
-		} catch (MalformedCtxIdentifierException e) {
-			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
+		} catch (Exception e) {
+			beanResult.setAckMessage("Error Exception: "+e.getMessage());
 			return false;
 		}
 //		catch (PrivacyException e) {

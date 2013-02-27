@@ -48,6 +48,21 @@ public class DataIdentifierUtil {
 		return str.toString();
 	}
 	
+	/**
+	 * Generate a URI: sheme:///type
+	 * @param scheme
+	 * @param dataType
+	 * @return
+	 */
+	public static String toUriString(DataIdentifierScheme scheme, String dataType)
+	{
+		StringBuilder str = new StringBuilder("");
+		str.append((scheme != null ? scheme.value()+"://" : "/"));
+		str.append("/");
+		str.append((dataType != null ? dataType+"/" : "/"));
+		return str.toString();
+	}
+	
 	public static DataIdentifier fromUri(String dataIdUri)
 	{
 		String[] uri = dataIdUri.split("://");
