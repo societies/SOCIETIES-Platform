@@ -83,7 +83,12 @@
 			<type>apklib</type>
 		    <artifactId>SocietiesServiceMonitor</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.societies.android.platform</groupId>
+			<artifactId>SocietiesAndroidSocialData</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
     </dependencies>
 
     <build>

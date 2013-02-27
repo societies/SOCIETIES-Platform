@@ -27,6 +27,7 @@ package org.societies.integration.test.bit.privacynegotiationmanagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
@@ -47,7 +48,7 @@ public class TestCase1264 extends IntegrationTestCase {
 	public static IPrivacyAgreementManager privacyAgreementManager;
 	public static IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
 	public static ICommManager commManager;
-
+	public static ICtxBroker ctxBroker;
 
 	public TestCase1264() {
 		// Call the super constructor
@@ -76,6 +77,12 @@ public class TestCase1264 extends IntegrationTestCase {
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
 	}
 
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		TestCase1264.ctxBroker = ctxBroker;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICtxBroker injected");
+	}
+
+
 	public static boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);
 	}
@@ -98,6 +105,11 @@ public class TestCase1264 extends IntegrationTestCase {
 		}
 		if (null == privacyPolicyNegotiationManager) {
 			LOG.info("[Dependency Injection] Missing IPrivacyPolicyNegotiationManager");
+			return false;
+		}
+		
+		if (null == ctxBroker){
+			LOG.info("[Dependency Injection] Missing ICtxBroker");
 			return false;
 		}
 		return true;
