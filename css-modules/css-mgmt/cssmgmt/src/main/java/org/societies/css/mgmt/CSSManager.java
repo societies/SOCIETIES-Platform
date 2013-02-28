@@ -25,6 +25,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -473,6 +474,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				cssRecord.setEntity(profile.getEntity());
 				cssRecord.setWorkplace(profile.getWorkplace());
 				cssRecord.setPosition(profile.getPosition());
+				cssRecord.setCssNodes(profile.getCssNodes());
 
 				LOG.info("modifyCssRecord cssRecord Entity: " +cssRecord.getEntity());
 				LOG.info("modifyCssRecord cssRecord Name : "  +cssRecord.getName());
@@ -481,6 +483,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				LOG.info("modifyCssRecord cssRecord CSSID : " +cssRecord.getCssIdentity());
 				LOG.info("modifyCssRecord cssRecord Workplace : " +cssRecord.getWorkplace());
 				LOG.info("modifyCssRecord cssRecord Position : " +cssRecord.getPosition());
+				
+				LOG.info("modifyCssRecord cssRecord CssNodes : " +cssRecord.getCssNodes());
 
 				// internal eventing
 
@@ -543,6 +547,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 		String identity = null;
 		int status = 0;
 		int type = 0;
+		String MAC = null;
+		String Interactable = null;
 		CssInterfaceResult result = new CssInterfaceResult();
 		LOG.info("CssRecord passed in: " +profile);
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
@@ -1969,14 +1975,86 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORK_POSITION, value);
 			
 			// CSS Nodes
-			value1 = record.getCssNodes();
-			if (record.getCssNodes() != null) {
-				for (CssNode cssNode : record.getCssNodes()) {
-					INetworkNode cssNodeId = (INetworkNode) commManager.getIdManager().fromJid(cssNode.getIdentity());
-					LOG.info("pushtoContext CSSNODES value: " +value1);
-					this.ctxBroker.createCssNode(cssNodeId);
-				}
+//			value1 = record.getCssNodes();
+//			if (record.getCssNodes() != null) {
+//				for (CssNode cssNode : record.getCssNodes()) {
+//					INetworkNode cssNodeId = (INetworkNode) commManager.getIdManager().fromJid(cssNode.getIdentity());
+//					LOG.info("pushtoContext CSSNODES value: " +value1);
+//					this.ctxBroker.createCssNode(cssNodeId);
+//				}
+//			}
+			
+			List<CssNode> cssNodes = new ArrayList<CssNode>();
+			cssNodes = record.getCssNodes();
+			LOG.info("pushtoContext CSSNODES value: " +cssNodes);
+			for (final CssNode cssNode : cssNodes) {
+
+			  // create INetworkNode instance from JID String representation
+			  final INetworkNode cssNodeJid = commManager.getIdManager().fromFullJid(cssNode.getIdentity());
+
+			  // the createCssNode covers the creation of the CtxAttributeTypes.ID of the CSS Node entity
+			  final CtxEntity cssNodeEnt = ctxBroker.createCssNode(cssNodeJid).get();
+
+			  // TODO Status
+			  value2 = cssNode.getStatus(); 
+				  
+			  if (value2 >= 0 && value2 <=2) {
+				  
+				  if(value2 == CSSManagerEnums.nodeStatus.Available.ordinal()){
+						value = "Available";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_STATUS, value);
+						LOG.info("pushtoContext CssNodeStatus value: " +value);
+					}
+					if(value2 == CSSManagerEnums.nodeStatus.Unavailable.ordinal()){
+						value = "Unavailable";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_STATUS, value);
+						LOG.info("pushtoContext CssNodeStatus value: " +value);
+					}
+					if(value2 == CSSManagerEnums.nodeStatus.Unavailable.ordinal()){
+						value = "Unavailable";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_STATUS, value);
+						LOG.info("pushtoContext CssNodeStatus value: " +value);
+					}
+			  }
+			   // updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_STATUS, value2);
+			  
+			  // TODO Type
+			  value2 = cssNode.getType();
+			  if (value2 >= 0 && value2 <=2) {
+				  
+				  if(value2 == CSSManagerEnums.nodeType.Android.ordinal()){
+						value = "Android";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_TYPE, value);
+						LOG.info("pushtoContext CssNodeType value: " +value);
+					}
+					if(value2 == CSSManagerEnums.nodeType.Cloud.ordinal()){
+						value = "Cloud";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_TYPE, value);
+						LOG.info("pushtoContext CssNodeType value: " +value);
+					}
+					if(value2 == CSSManagerEnums.nodeType.Rich.ordinal()){
+						value = "Rich";
+						updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_TYPE, value);
+						LOG.info("pushtoContext CssNodeType value: " +value);
+					}
+				  
+			  }
+				  
+			    //updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_TYPE, value);
+			  
+			  // MAC Address
+			  value = cssNode.getCssNodeMAC();
+			  if (value != null && !value.isEmpty())
+			    updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.MAC_ADDRESS, value);
+			  LOG.info("pushtoContext MAC Address value: " +value);
+
+			  // Interactable
+			  value = cssNode.getInteractable();
+			  if (value != null && !value.isEmpty())
+			    updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.IS_INTERACTABLE, value);
+			  LOG.info("pushtoContext Interactable value: " +value);
 			}
+
 			
 
 		} catch (InvalidFormatException ife) {
@@ -2012,5 +2090,17 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		attr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
 		this.ctxBroker.update(attr);
 	}
+	
+	private CtxAttribute retrieveCtxAttribute(CtxEntityIdentifier ownerCtxId, String type) throws Exception {
+
+		  if (LOG.isDebugEnabled())
+		    LOG.debug("Retrieving '" + type + "' attribute of entity " + ownerCtxId);
+		  final List<CtxIdentifier> ctxIds = ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
+		  
+		  if (!ctxIds.isEmpty())
+		    return (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
+		  else
+		    return null;
+		}
 
 }
