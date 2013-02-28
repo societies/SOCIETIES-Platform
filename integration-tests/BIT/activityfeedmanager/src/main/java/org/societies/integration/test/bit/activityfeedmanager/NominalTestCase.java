@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.cpa;
+package org.societies.integration.test.bit.activityfeedmanager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -65,9 +65,8 @@ public class NominalTestCase {
         cssId = TestCase10961.commManager.getIdManager().getThisNetworkNode().getJid();
         cssPassword = "password.societies.local";
         cisName = "CisTest";
-        cisDescription = "CIS to Test CIS Creation";
+        cisDescription = "CIS to Test ActivityFeedManager";
         cisType = "testCis";
-        cisMembershipCriteria = new Hashtable<String, MembershipCriteria>();
     }
 
     @After
@@ -78,16 +77,20 @@ public class NominalTestCase {
     //Write/Read to multiple activities feeds with the container and test that what is written for a cis can be read only for that cis.
     @Test
     public void testActivityFeedManager() {
+        LOG.info("[#"+testCaseNumber+"] creating cis1");
         Future<ICisOwned> cis1 = TestCase10961.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription);
+        LOG.info("[#"+testCaseNumber+"] creating cis2");
         Future<ICisOwned> cis2 = TestCase10961.cisManager.createCis(cisName+"2", cisType, cisMembershipCriteria, cisDescription);
 
         try {
+            LOG.info("[#"+testCaseNumber+"] inserting 1 activity into cis1");
             //inserting 1 activity into cis1
-            cis1.get().getActivityFeed().addActivity(makeMessage("heh","heh","nonsense","0"),new IActivityFeedCallback() {
+            cis1.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
                 @Override
                 public void receiveResult(MarshaledActivityFeed activityFeedObject) {
                 }
             });
+            LOG.info("[#"+testCaseNumber+"] checking that cis1 has one activity");
             //checking that cis1 has one activity
             cis1.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
                 @Override
@@ -95,6 +98,7 @@ public class NominalTestCase {
                     assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
                 }
             });
+            LOG.info("[#"+testCaseNumber+"] checking that cis2 has zero activities");
             //checking that cis2 has zero activities
             cis2.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
                 @Override
@@ -102,8 +106,9 @@ public class NominalTestCase {
                     assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==0);
                 }
             });
+            LOG.info("[#"+testCaseNumber+"] inserting two activities into cis2");
             //inserting two activities into cis2
-            cis2.get().getActivityFeed().addActivity(makeMessage("heh","heh","nonsense","0"),new IActivityFeedCallback() {
+            cis2.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
                 @Override
                 public void receiveResult(MarshaledActivityFeed activityFeedObject) {
                 }
@@ -113,6 +118,7 @@ public class NominalTestCase {
                 public void receiveResult(MarshaledActivityFeed activityFeedObject) {
                 }
             });
+            LOG.info("[#"+testCaseNumber+"] checking that cis1 still only has one activity");
             //checking that cis1 still only has one activity
             cis1.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
                 @Override
@@ -120,6 +126,7 @@ public class NominalTestCase {
                     assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
                 }
             });
+            LOG.info("[#"+testCaseNumber+"] checking that cis2 now has two activities");
             //checking that cis2 now has two activities
             cis2.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
                 @Override
@@ -132,7 +139,7 @@ public class NominalTestCase {
         } catch (ExecutionException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        LOG.info("cisIds.size(): "+cisIds.size());
+        LOG.info("[#"+testCaseNumber+"] has been run sucsessfully");
         assert(cisIds.size()==this.numCIS);
     }
 

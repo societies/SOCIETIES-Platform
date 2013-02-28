@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.societies.integration.test.bit.cpa;
+package org.societies.integration.test.bit.activityfeedmanager;
 
 /**
- * The test case 713 aims to test 3P service installation.
+ * The test case 10961: Testing ActivityFeedManager
  */
 
 import org.slf4j.Logger;
@@ -25,7 +25,6 @@ public class TestCase10961 extends IntegrationTestCase {
 	 */
 
 	public TestCase10961() {
-
 		super(10961, new Class[] {NominalTestCase.class});
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
