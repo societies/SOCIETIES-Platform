@@ -64,10 +64,10 @@ public class CtxAttributeBond extends CtxBond {
 	private CtxAttributeValueType valueType;
 	
 	/** The minimum value of the context attribute this bond refers to. */
-	private Serializable minValue;
+	private String minValue;
 
 	/** The maximum value of the context attribute this bond refers to. */
-	private Serializable maxValue;
+	private String maxValue;
 
 	/**
 	 * Constructs a CtxAttributeBond with the specified parameters.
@@ -111,7 +111,7 @@ public class CtxAttributeBond extends CtxBond {
 	 * 
 	 * @return the minimum value of the context attribute this bond refers to.
 	 */
-	public Serializable getMinValue() {
+	public String getMinValue() {
 		
 		return this.minValue;
 	}
@@ -122,7 +122,7 @@ public class CtxAttributeBond extends CtxBond {
 	 * @param minValue
 	 *            the minimum value of the context attribute to set for this bond.
 	 */
-	public void setMinValue(Serializable minValue) {
+	public void setMinValue(String minValue) {
 		
 		this.minValue = minValue;
 	}
@@ -132,7 +132,7 @@ public class CtxAttributeBond extends CtxBond {
 	 * 
 	 * @return the maximum value of the context attribute this bond refers to.
 	 */
-	public Serializable getMaxValue() {
+	public String getMaxValue() {
 		
 		return this.maxValue;
 	}
@@ -144,7 +144,7 @@ public class CtxAttributeBond extends CtxBond {
 	 *            the maximum value of the context attribute to set for this
 	 *            bond.
 	 */
-	public void setMaxValue(Serializable maxValue) {
+	public void String(String maxValue) {
 		
 		this.maxValue = maxValue;
 	}
