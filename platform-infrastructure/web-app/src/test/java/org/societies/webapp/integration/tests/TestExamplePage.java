@@ -22,55 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.webapp.integration.selenium.pages;
+package org.societies.webapp.integration.tests;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.societies.webapp.integration.selenium.SeleniumTest;
-import org.societies.webapp.integration.selenium.components.LoginDialog;
+import org.societies.webapp.integration.selenium.pages.ExamplePage;
+import org.societies.webapp.integration.selenium.pages.IndexPage;
 
-public class IndexPage extends BaseSocietiesPage {
-    private static final String NAV_ROOT = "//ul[@id='navigation']";
-    private static final String NAV_MY_ACCOUNT_MENU = NAV_ROOT + "/li/a[@href='myProfile.xhtml']";
-    private static final String NAV_PROFILE_SETTINGS_ITEM = NAV_ROOT + "/li/ul[@class='sub-menu']/li/a[text()='Profile Settings']";
+public class TestExamplePage extends SeleniumTest {
+    private static final String USERNAME = "paddy";
+    private static final String PASSWORD = "paddy";
 
-    public IndexPage(WebDriver driver) {
-        super(driver);
+    private ExamplePage examplePage;
+
+    @Before
+    public void setupTest() {
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
+
+        examplePage = indexPage.navigateToExamplePage();
     }
 
-    public void doLogin(String username, String password) {
-        LoginDialog dialog = new LoginDialog(getDriver());
-        dialog.doLogin(username, password);
+    @Test
+    public void ensureBasicHtmlWorks() {
 
-//        closeAllGrowls();
+        // click our button
+        examplePage.clickMessageButton();
+        // clicking the button doesn't actually do much, but at least we've verified that it's there
+
+        // send some text to the textbox
+        examplePage.setStringFieldValue("i am some text");
+
+        // verify that the textbox still contains the text
+        examplePage.verifyStringFieldValue("i am some text");
     }
-
-    public ProfileSettingsPage navigateToProfileSettings() {
-        openMenu(NAV_MY_ACCOUNT_MENU);
-
-        ProfileSettingsPage profileSettingsPage = new ProfileSettingsPage(getDriver());
-        return profileSettingsPage;
-    }
-
-    public ExamplePage navigateToExamplePage() {
-        // Unfortunately our "example" link doesn't actually exist
-        // openMenu(NAV_MY_ACCOUNT_MENU, NAV_PROFILE_SETTINGS_ITEM);
-
-        // so we have to cheat
-        getDriver().get(SeleniumTest.BASE_URL + "/example.xhtml");
-
-        ExamplePage examplePage = new ExamplePage(getDriver());
-        return examplePage;
-    }
-
-    private void openMenu(String menuXpath) {
-        WebElement menuHeader = waitUntilVisible(By.xpath(menuXpath));
-
-        moveMouseTo(menuHeader);
-
-        clickButton(By.xpath(NAV_PROFILE_SETTINGS_ITEM));
-    }
-
-
 }

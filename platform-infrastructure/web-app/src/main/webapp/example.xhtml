@@ -1,0 +1,22 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <p:commandButton value="Message!" actionListener="#{exampleController.showMeAMessage}"/>
+
+        <br/> <br/>
+
+        <p:outputLabel for="stringField">String field</p:outputLabel>
+        <p:inputText id="stringField" value="#{exampleController.stringProperty}"/>
+
+    </ui:define>
+</ui:composition>
+</html>
