@@ -40,6 +40,7 @@ import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.platform.css.friends.EventService;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
@@ -541,8 +542,8 @@ public class SocietiesClientServicesController {
     		
     		//START "STARTED SERVICES"
         	//FRIENDS SERVICE
-            //Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, FriendsService.class);
-            //SocietiesClientServicesController.this.context.startService(intentFriends);
+            Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, EventService.class);
+            SocietiesClientServicesController.this.context.startService(intentFriends);
             //USER AGENT SERVICE
             //Intent intentUserAgent = new Intent(SocietiesClientServicesController.this.context, UserAgent.class);
             //SocietiesClientServicesController.this.context.startService(intentUserAgent);
