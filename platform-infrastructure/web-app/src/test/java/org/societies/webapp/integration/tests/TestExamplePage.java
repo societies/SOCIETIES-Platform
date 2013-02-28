@@ -45,6 +45,7 @@ public class TestExamplePage extends SeleniumTest {
         examplePage = indexPage.navigateToExamplePage();
     }
 
+    @Ignore("not ready to use these during the nightly build yet")
     @Test
     public void ensureBasicHtmlWorks() {
 
