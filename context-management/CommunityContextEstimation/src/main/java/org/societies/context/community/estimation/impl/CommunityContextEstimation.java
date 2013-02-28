@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -1103,9 +1104,56 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 	//@Override
-	public void cceSpecial1() {
-		// TODO Auto-generated method stub
+	/*
+	 * @param an array list of strings
+	 * @return an array list of strings of type [abd, 57%, abc, 14%, cde, 28%]
+	 */
+	public ArrayList<String> cceStringPercentage(ArrayList<String> inputListOfStrings) {
+		Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
+		ArrayList<String> outputList = new ArrayList<String>();
+		ArrayList<String> arrayListWithStringPercent = new ArrayList<String>();
 		
+		int max=0;
+		for (int i=0; i<inputListOfStrings.size(); i++){
+			if (outputList.contains(inputListOfStrings.get(i))){
+				int elementCount = Integer.parseInt(frequencyMap.get(inputListOfStrings.get(i)).toString());
+				elementCount++;
+				frequencyMap.put(inputListOfStrings.get(i), elementCount);				
+				if (elementCount>max){
+					max=elementCount;
+				}
+			}
+			else
+			{
+				outputList.add(inputListOfStrings.get(i));
+				frequencyMap.put(inputListOfStrings.get(i), 1);
+			}	
+			int total=0;
+			Enumeration<String> e = frequencyMap.keys();
+			Iterator<Integer> it = frequencyMap.values().iterator();
+			
+			while (it.hasNext()){
+				Integer key = it.next();
+				total = total+key;
+			}
+			
+			Hashtable<String, Integer> hashTabletWithPercentage =  new Hashtable<String, Integer>();
+			
+			Enumeration<String> keys = frequencyMap.keys();
+			
+			while (keys.hasMoreElements()){
+				Object k = keys.nextElement();
+				System.out.println("Key = "+k+" Value = "+frequencyMap.get(k));
+				hashTabletWithPercentage.put(k.toString(), 100*frequencyMap.get(k)/total);
+				arrayListWithStringPercent.add(k.toString());
+				int help = 100*frequencyMap.get(k)/total;
+				arrayListWithStringPercent.add(String.valueOf(help)+"%");
+			}
+
+		}
+		
+		return arrayListWithStringPercent;
+	
 	}
 
 	//@Override
