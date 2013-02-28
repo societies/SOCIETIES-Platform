@@ -1871,19 +1871,19 @@ public class InternalCtxBroker implements ICtxBroker {
 					} else 	objectResult = this.communityCtxDBMgr.retrieve(identifier);
 
 				}else {
-					LOG.info("Remote call for CIS *********** "+target);
+					//LOG.info("Remote call for CIS *********** "+target);
 
 					final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-					LOG.info("retrieve CIS context object remote call identifier " +identifier.toString());
+					//LOG.info("retrieve CIS context object remote call identifier " +identifier.toString());
 					ctxBrokerClient.retrieve(requestor, identifier, callback); 
-					LOG.info("Retrieve CIS Ctx remote call performed ");
+					//LOG.info("Retrieve CIS Ctx remote call performed ");
 
 					synchronized (callback) {
 						try {
-							LOG.info("Retrieve CIS Ctx remote call result received 1 ");
+							//LOG.info("Retrieve CIS Ctx remote call result received 1 ");
 							callback.wait();
 							objectResult = callback.getResult();
-							LOG.info("Retrieve CIS Ctx remote call result received 2 objectResult  "+objectResult);
+							//LOG.info("Retrieve CIS Ctx remote call result received 2 objectResult  "+objectResult);
 						} catch (InterruptedException e) {
 							throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 						}
@@ -1947,7 +1947,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				long initTimestamp = System.nanoTime();
 
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-				LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
+				//LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
 				ctxBrokerClient.retrieve(requestor, identifier, callback); 
 				///LOG.info("RetrieveCtx remote call performed ");
 
@@ -1968,7 +1968,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						m.setPerformanceNameValue("Delay="+(delay));
 
 						PERF_LOG.trace(m.toString());
-						LOG.info("time needed for remote context retrieval :"+ delay);
+					//	LOG.info("time needed for remote context retrieval :"+ delay);
 
 					} catch (InterruptedException e) {
 
@@ -2015,7 +2015,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				if(!requestor.equals(this.getLocalRequestor())){
 
-					LOG.info("Update method, enforcing access control for requestor: "+requestor);
+					//LOG.info("Update method, enforcing access control for requestor: "+requestor);
 					this.ctxAccessController.checkPermission(requestor, target,	
 							new CtxPermission(ctxModelObj.getId(), CtxPermission.WRITE));
 				}

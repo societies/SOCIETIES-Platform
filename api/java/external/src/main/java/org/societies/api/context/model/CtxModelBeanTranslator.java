@@ -115,37 +115,37 @@ public final class CtxModelBeanTranslator {
 
 	public CommunityCtxEntityBean fromCommCtxEntity(CommunityCtxEntity commEntity) throws DatatypeConfigurationException {
 
-		LOG.info("fromCommCtxEntity skata 0 " + commEntity.getId());
+//		LOG.info("fromCommCtxEntity skata 0 " + commEntity.getId());
 		
 		CommunityCtxEntityBean bean = new CommunityCtxEntityBean();
 		bean.setId(fromCtxIdentifier(commEntity.getId()));
 		Date lastModifiedXML = commEntity.getLastModified();
 		bean.setLastModified(lastModifiedXML);
-		LOG.info("fromCommCtxEntity skata 1 " );
+	//	LOG.info("fromCommCtxEntity skata 1 " );
 		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
 		for (CtxAssociationIdentifier assoc : commEntity.getAssociations()) {
 			assocIdBeans.add((CtxAssociationIdentifierBean) fromCtxIdentifier(assoc));
 		}
 		bean.setAssociations(assocIdBeans);
-		LOG.info("fromCommCtxEntity skata 2 " );
+		//LOG.info("fromCommCtxEntity skata 2 " );
 		List<CtxAttributeBean> attrIdBeans = new ArrayList<CtxAttributeBean>();
 		for (CtxAttribute attr : commEntity.getAttributes()) {
 			attrIdBeans.add(fromCtxAttribute(attr));
 		}
 		bean.setAttributes(attrIdBeans);
-		LOG.info("fromCommCtxEntity skata 3 " );
+		//LOG.info("fromCommCtxEntity skata 3 " );
 		List<CtxEntityIdentifierBean> entIdBeansCommunities = new ArrayList<CtxEntityIdentifierBean>();
 		for(CtxEntityIdentifier entityId  :commEntity.getCommunities()){
 			entIdBeansCommunities.add(fromCtxEntityIdentifier(entityId));
 		}
 		bean.setCommunities(entIdBeansCommunities);
-		LOG.info("fromCommCtxEntity skata 4 " );
+		//LOG.info("fromCommCtxEntity skata 4 " );
 		List<CtxBondBean> bondBeansList = new ArrayList<CtxBondBean>();
 		for(CtxBond bond: commEntity.getBonds()){
 			bondBeansList.add(fromCtxBond(bond));
 		}
 		bean.setBonds(bondBeansList);		
-		LOG.info("fromCommCtxEntity skata last " );
+		//LOG.info("fromCommCtxEntity skata last " );
 		
 		return bean;
 	}
@@ -453,7 +453,7 @@ public final class CtxModelBeanTranslator {
 			LOG.debug("Creating CtxModelObject bean from instance " + object);
 
 		final CtxModelObjectBean bean;
-		LOG.info("fromCtxModelObject skata 1 " + object.getModelType());
+		//LOG.info("fromCtxModelObject skata 1 " + object.getModelType());
 		try {
 			if(object instanceof IndividualCtxEntity){
 				bean = this.fromIndiCtxEntity((IndividualCtxEntity) object);

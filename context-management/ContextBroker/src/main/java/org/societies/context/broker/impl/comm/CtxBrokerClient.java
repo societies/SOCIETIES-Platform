@@ -206,7 +206,7 @@ public class CtxBrokerClient implements ICommCallback {
 	public void retrieve(Requestor requestor, CtxIdentifier identifier,
 			ICtxCallback callback) throws CtxBrokerException  {
 		
-		LOG.info("Remote call retrieve CIS skata 1 *********** "+identifier.toString());
+		//LOG.info("Remote call retrieve CIS skata 1 *********** "+identifier.toString());
 		
 		IIdentity toIdentity = null;
 		try {
@@ -223,13 +223,13 @@ public class CtxBrokerClient implements ICommCallback {
 			
 			CtxIdentifierBean ctxIdBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
 			ctxBrokerRetrieveBean.setId(ctxIdBean);
-			LOG.info("Remote call retrieve CIS skata 2 *********** ");
+			//LOG.info("Remote call retrieve CIS skata 2 *********** ");
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			ctxBrokerRetrieveBean.setRequestor(requestorBean);
 
 			cbPacket.setRetrieve(ctxBrokerRetrieveBean);
 			
-			LOG.info("Remote call retrieve CIS skata 3 *********** ");
+		//	LOG.info("Remote call retrieve CIS skata 3 *********** ");
 			
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 
