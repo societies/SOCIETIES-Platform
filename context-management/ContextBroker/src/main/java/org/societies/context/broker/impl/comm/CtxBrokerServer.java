@@ -271,21 +271,28 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			LOG.info("RETRIEVE");
 			CtxModelBeanTranslator ctxBeanTranslator2 = CtxModelBeanTranslator.getInstance();
+			//LOG.info("********* skata 0 ");
 			try {
 				RequestorBean reqBeanRetrieve = cbPayload.getRetrieve().getRequestor();
 				Requestor requestorRetrieve = getRequestorFromBean(reqBeanRetrieve);
-
+				//LOG.info("********* skata 1 ");
+				
 				CtxIdentifierBean ctxIdentRetrieveBean = cbPayload.getRetrieve().getId();
 				CtxIdentifier ctxIdentifier = ctxBeanTranslator2.fromCtxIdentifierBean(ctxIdentRetrieveBean);
-
+				
+				//LOG.info("********* ctxIDentifier (this will be used for retrieval) : "+ ctxIdentifier.toString());
+				//LOG.info("********* ctxIDentifier model type "+ ctxIdentifier.getModelType());
+				
+//				LOG.info("********* ready to retrieve object in local db through a remote call ");
 				CtxModelObject retrievedObj = this.ctxbroker.retrieve(requestorRetrieve, ctxIdentifier).get();
-					LOG.info("it indi entity retrieved object? "+ retrievedObj.getId().toString());
+	//			LOG.info("community entity retrieved object? "+ retrievedObj.getId().toString());
 				// object retrieved locally 
 				// create response bean
 
 				CtxModelObjectBean ctxObjBean = ctxBeanTranslator2.fromCtxModelObject(retrievedObj);
+		//		LOG.info("********* skata 2 ctxObjBean translated "+ctxObjBean);
 				beanResponse.setRetrieveBeanResult(ctxObjBean);
-				//	LOG.info("retrieved object beanResponse.setCtxBrokerRetrieveBeanResult "+ beanResponse.getCtxBrokerRetrieveBeanResult().toString());
+			//	LOG.info("retrieved object beanResponse.getCtxBrokerRetrieveBeanResult "+ beanResponse.getRetrieveBeanResult().toString());
 
 			} catch (MalformedCtxIdentifierException e) {
 				// TODO Auto-generated catch block
@@ -441,7 +448,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				targetCss = this.identMgr.fromJid(targetCssString);
 
 				//	LOG.info("LOOKUP 1 :" +beanResponse);
-				CtxModelType modelType = ctxBeanTranslator.CtxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
+				CtxModelType modelType = ctxBeanTranslator.ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
 
 				//LOG.info("LOOKUP 2 modelType:" +modelType);
 
