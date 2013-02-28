@@ -1,6 +1,6 @@
 package org.societies.android.platform.css.friends;
 
-import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.platform.css.friends.FriendsManager.LocalFriendsManagerBinder;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
@@ -23,7 +23,7 @@ public class AcceptFriendActivity extends Activity {
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
 	private static final String LOG_TAG = AcceptFriendActivity.class.getName();
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsActivity";
-	private IAndroidCSSManager localCSSManager;
+	private IFriendsManager localFriendManager;
     private String targetCssID = "";
  
     /** CSSManager service connection */
@@ -37,9 +37,9 @@ public class AcceptFriendActivity extends Activity {
         	Log.d(LOG_TAG, "Connecting to LocalCSSManager service");
         	//get a local binder and service API
         	LocalFriendsManagerBinder binder = (LocalFriendsManagerBinder) service;
-            localCSSManager = (IAndroidCSSManager) binder.getService();
+            localFriendManager = (IFriendsManager) binder.getService();
             
-            localCSSManager.acceptFriendRequest(CLIENT_NAME, targetCssID);
+            localFriendManager.acceptFriendRequest(CLIENT_NAME, targetCssID);
             finish();
         }
     };
