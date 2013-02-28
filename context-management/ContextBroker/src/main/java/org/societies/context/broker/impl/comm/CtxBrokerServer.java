@@ -93,7 +93,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
 	
-	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION };
+	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION, EventTypes.CIS_RESTORE };
 
 	private ICommManager commManager;
 	
@@ -130,7 +130,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		// Register for new CISs
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
-		eventMgr.subscribeInternalEvent(new NewCisHandler(), EVENT_TYPES, null);
+		eventMgr.subscribeInternalEvent(new NewCisCommMgrHandler(), EVENT_TYPES, null);
 	}
 
 	// returns an object
@@ -542,7 +542,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		}
 	}
 
-	private class NewCisHandler extends EventListener {
+	private class NewCisCommMgrHandler extends EventListener {
 
 		/*
 		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
@@ -561,9 +561,10 @@ public class CtxBrokerServer implements IFeatureServer{
 		public void handleInternalEvent(InternalEvent event) {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Received internal " + event.geteventType() + " event: " + event);
+				LOG.debug("Received internal event: " + this.eventToString(event));
 			
-			if (EventTypes.CIS_CREATION.equals(event.geteventType())) {
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())
+					|| EventTypes.CIS_RESTORE.equals(event.geteventType())) {
 				
 				if (!(event.geteventInfo() instanceof Community)) {
 
@@ -595,8 +596,28 @@ public class CtxBrokerServer implements IFeatureServer{
 			} else {
 				
 				if (LOG.isWarnEnabled())
-					LOG.warn("Received unexpeted event of type '" + event.geteventType() + "'");
+					LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
 			}
+		}
+		
+		private String eventToString(final InternalEvent event) {
+			
+			final StringBuffer sb = new StringBuffer();
+			sb.append("[");
+			sb.append("name=");
+			sb.append(event.geteventName());
+			sb.append(",");
+			sb.append("type=");
+			sb.append(event.geteventType());
+			sb.append(",");
+			sb.append("source=");
+			sb.append(event.geteventSource());
+			sb.append(",");
+			sb.append("info=");
+			sb.append(event.geteventInfo());
+			sb.append("]");
+			
+			return sb.toString();
 		}
 	}
 }
