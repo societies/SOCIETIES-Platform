@@ -115,7 +115,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 
 	/** The event topics to create for local CSSs and CISs */
-	static final String[] EVENT_TOPICS = new String[] {
+	public static final String[] EVENT_TOPICS = new String[] {
 		CtxChangeEventTopic.CREATED,
 		CtxChangeEventTopic.UPDATED,
 		CtxChangeEventTopic.MODIFIED,
