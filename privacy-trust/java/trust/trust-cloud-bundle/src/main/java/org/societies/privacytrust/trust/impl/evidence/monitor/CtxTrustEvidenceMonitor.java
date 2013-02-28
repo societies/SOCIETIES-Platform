@@ -38,7 +38,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -269,16 +271,43 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				final Set<String> currentCommunities = new HashSet<String>();
 				for (final CtxEntityIdentifier cisCtxId : isMemberOf.getChildEntities()) {
 					final String communityId = cisCtxId.getOwnerId(); 
-					currentCommunities.add(communityId);
-					if (!communities.contains(communityId))
-							ctxBroker.registerForChanges(new CommunityHasMembersHandler(communityId), cisCtxId);
+					currentCommunities.add(communityId);/*
+					if (!communities.contains(communityId)) {
+						final CommunityCtxEntity cisEnt = 
+								(CommunityCtxEntity) ctxBroker.retrieve(cisCtxId).get();
+						if (cisEnt == null) {
+							LOG.error("Cannot register for membership changes of CIS '"
+									+ communityId + "': Failed to retrieve community context entity");
+							continue;
+						}
+						if (cisEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS).isEmpty()) {
+							LOG.error("Cannot register for membership changes of CIS '"
+									+ communityId + "': Failed to access HAS_MEMBERS association of community context entity "
+									+ cisEnt.getId());
+							continue;
+						}
+						final CtxAssociationIdentifier hasMembersId = 
+								cisEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
+
+						if (LOG.isDebugEnabled())
+							LOG.debug("Registering for membership changes of CIS '"
+									+ communityId + "' - monitoring HAS_MEMBERS association "
+									+ hasMembersId);
+						ctxBroker.registerForChanges(
+									new CommunityHasMembersHandler(communityId), hasMembersId);
+						// TODO
+					}*/
 				}
 				// find communities the user is no long member of
 				final Set<String> oldCommunities = new HashSet<String>(communities);
 				oldCommunities.removeAll(currentCommunities);
+				if (LOG.isDebugEnabled())
+					LOG.debug("CSS ctx Id " + isMemberOf.getParentEntity() + ", oldCommunities=" + oldCommunities);
 				// find new communities the user is member of
 				final Set<String> newCommunities = new HashSet<String>(currentCommunities);
 				newCommunities.removeAll(communities);
+				if (LOG.isDebugEnabled())
+					LOG.debug("CSS ctx Id " + isMemberOf.getParentEntity() + ", newCommunities=" + newCommunities);
 				// update communities the user is member of
 				communities.clear();
 				communities.addAll(currentCommunities);
@@ -358,7 +387,8 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				LOG.debug("Received MODIFIED event " + event);
 			
 			if (event.getId() == null) {
-				LOG.error("Could not handle MODIFIED event " + event);
+				LOG.error("Could not handle MODIFIED event " + event
+						+ ": event.getId can't be null");
 				return;
 			}
 			
