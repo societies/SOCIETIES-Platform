@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.TargetMatchConstants;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -102,75 +101,29 @@ public class Resource implements Serializable{
 	public String toXMLString(){
 		StringBuilder str = new StringBuilder("\n<Resource>");
 		if (this.dataId!=null){
-			str.append(this.iDToXMLString());
+			str.append(this.ctxIDToXMLString());
 		}
 		if (this.dataType!=null){
-			str.append(this.typeToXMLString());
+			str.append(this.ctxTypeToXMLString());
 		}
 		str.append("\n</Resource>");
 		return str.toString();
 	}
 	
-	private String iDToXMLString(){
-		//TODO: DataType only exists for Context. The other types don't have such an identifier. 
+	private String ctxIDToXMLString(){
 		StringBuilder str = new StringBuilder();
-		switch (this.dataId.getScheme()){
-		case CONTEXT:
-			
-			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-			"\n \t\t\tDataType=\""+CtxIdentifier.class.getName()+"\">");
+		str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
+		"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
 
-			str.append("\n\t\t<AttributeValue>");
-			str.append(dataId.getUri());
-			str.append("</AttributeValue>");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(dataId.getUri());
+		str.append("</AttributeValue>");
 
-			str.append("\n\t</Attribute>");
-			return str.toString();
-		case CIS:
-			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-			"\n \t\t\tDataType=\"CIS-DATA\">");
-
-			str.append("\n\t\t<AttributeValue>");
-			str.append(dataId.getUri());
-			str.append("</AttributeValue>");
-
-			str.append("\n\t</Attribute>");
-			return str.toString();
-		case ACTIVITY:
-			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-			"\n \t\t\tDataType=\"ACTIVITY-DATA\">");
-
-			str.append("\n\t\t<AttributeValue>");
-			str.append(dataId.getUri());
-			str.append("</AttributeValue>");
-
-			str.append("\n\t</Attribute>");
-			return str.toString();
-		case CSS:
-			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-			"\n \t\t\tDataType=\"CSS-DATA\">");
-
-			str.append("\n\t\t<AttributeValue>");
-			str.append(dataId.getUri());
-			str.append("</AttributeValue>");
-
-			str.append("\n\t</Attribute>");
-			return str.toString();
-		case DEVICE:
-			str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-			"\n \t\t\tDataType=\"DEVICE-METADATA\">");
-
-			str.append("\n\t\t<AttributeValue>");
-			str.append(dataId.getUri());
-			str.append("</AttributeValue>");
-
-			str.append("\n\t</Attribute>");
-			return str.toString();
-		}
-		return "";
+		str.append("\n\t</Attribute>");
+		return str.toString();
 	}
 	
-	private String typeToXMLString(){
+	private String ctxTypeToXMLString(){
 		StringBuilder str = new StringBuilder();
 //		if(scheme==null){
 //			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
