@@ -94,8 +94,7 @@ public class ActivityFeedManagerHostingTest {
     @Test
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
-        PrivacyPolicy privacyPolicy = new PrivacyPolicy();
-        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription);
+        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription,"<RequestPolicy></RequestPolicy>");
 
         try {
             //ICisOwned cisOwned = cis1.get();
