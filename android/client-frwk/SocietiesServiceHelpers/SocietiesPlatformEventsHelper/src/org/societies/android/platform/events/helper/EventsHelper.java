@@ -506,7 +506,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs or queues cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class MainReceiver extends BroadcastReceiver {
+    private class EventsHelperReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -581,7 +581,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
     private BroadcastReceiver setupBroadcastReceiver() {
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        this.receiver = new MainReceiver();
+        this.receiver = new EventsHelperReceiver();
         this.context.registerReceiver(this.receiver, createIntentFilter());    
         Log.d(LOG_TAG, "Register broadcast receiver");
 

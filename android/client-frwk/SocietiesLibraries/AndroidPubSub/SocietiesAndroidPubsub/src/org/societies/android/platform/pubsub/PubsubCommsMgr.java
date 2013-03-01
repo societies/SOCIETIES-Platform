@@ -41,6 +41,7 @@ public class PubsubCommsMgr {
 	private Random randomGenerator;
 	private PacketMarshaller marshaller = new PacketMarshaller();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
+    private static final boolean DEBUG_LOGGING = false;
 
 	private Context androidContext;
 	private Map<Long, ICommCallback> xmppCallbackMap;
@@ -62,7 +63,9 @@ public class PubsubCommsMgr {
 	public PubsubCommsMgr(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
-		Log.d(LOG_TAG, "Instantiate PubsubCommsMgr");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Instantiate PubsubCommsMgr");
+		};
 		this.androidContext = androidContext;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
@@ -86,7 +89,9 @@ public class PubsubCommsMgr {
 	 */
 	public void bindCommsService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
-		Log.d(LOG_TAG, "Bind to Android Comms Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Bind to Android Comms Service");
+		};
 		
 		this.setupBroadcastReceiver();
 
@@ -100,7 +105,9 @@ public class PubsubCommsMgr {
 	 * @return true if no more requests queued
 	 */
 	public boolean unbindCommsService() {
-		Log.d(LOG_TAG, "Unbind from Android Comms Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Unbind from Android Comms Service");
+		};
 		boolean retValue = false;
 		synchronized (this.methodCallbackMap) {
 			synchronized (this.xmppCallbackMap) {
@@ -109,8 +116,10 @@ public class PubsubCommsMgr {
 					unBindService();
 					retValue = true;
 				} else {
-					Log.d(LOG_TAG, "Methodcallback entries: " + this.methodCallbackMap.size());
-					Log.d(LOG_TAG, "XmppCallbackMap entries: " + this.xmppCallbackMap.size());
+					if (DEBUG_LOGGING) {
+						Log.d(LOG_TAG, "Methodcallback entries: " + this.methodCallbackMap.size());
+						Log.d(LOG_TAG, "XmppCallbackMap entries: " + this.xmppCallbackMap.size());
+					};
 				}
 			}
 		}
@@ -121,6 +130,9 @@ public class PubsubCommsMgr {
 	public void register(final List<String> elementNames, final ICommCallback callback) {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Register Element names");
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -128,8 +140,6 @@ public class PubsubCommsMgr {
 			//store callback in order to activate required methods
 			this.xmppCallbackMap.put(callbackID, callback);
 		}
-		
-		Log.d(LOG_TAG, "register element names");
 		
 //		for (String element : elementNames) {
 //			Log.d(LOG_TAG, "register element: " + element);
@@ -153,11 +163,13 @@ public class PubsubCommsMgr {
 			this.xmppCallbackMap.put(callbackID, callback);
 		}
 		
-		Log.d(LOG_TAG, "unregister element names");
-		
-//		for (String element : elementNames) {
-//			Log.d(LOG_TAG, "register element: " + element);
-//		}
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "unregister element names");
+			
+//			for (String element : elementNames) {
+//				Log.d(LOG_TAG, "register element: " + element);
+//			}
+		};
 
 		final List<String> namespaces = callback.getXMLNamespaces();
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
@@ -182,7 +194,9 @@ public class PubsubCommsMgr {
 		
 		try {
 			stanza.setFrom(getIdManager().getThisNetworkNode());
-			Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
+			};
 			String xml = marshaller.marshallIQ(stanza, type, payload);
 
 			sendIQ(xml, callbackID);
@@ -200,13 +214,17 @@ public class PubsubCommsMgr {
 	 * @throws InvalidFormatException
 	 */
 	public IIdentity getIdentity() throws InvalidFormatException {
-		Log.d(LOG_TAG, "getIdentity");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdentity");
+		};
 		
 		IIdentity returnIdentity = null;
 		
 		if (null != this.identityJID) {
-			Log.d(LOG_TAG, "getIdentity identity: " + this.identityJID);
-				returnIdentity =  IdentityManagerImpl.staticfromJid(this.identityJID);
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "getIdentity identity: " + this.identityJID);
+			};
+			returnIdentity =  IdentityManagerImpl.staticfromJid(this.identityJID);
 		}
 		return returnIdentity;
 	}
@@ -219,7 +237,9 @@ public class PubsubCommsMgr {
 	 * @throws InvalidFormatException 
 	 */
 	public IIdentityManager getIdManager() throws InvalidFormatException {
-		Log.d(LOG_TAG, "getIdManager");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdManager");
+		};
 		
 		if(null == this.idManager && null != this.domainAuthority && null != this.identityJID) {
 			this.idManager = createIdentityManager(this.identityJID, this.domainAuthority);
@@ -241,7 +261,9 @@ public class PubsubCommsMgr {
 //		Dbc.require("Node must be specified", null != node && node.length() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
 		
-		Log.d(LOG_TAG, "getItems for entity: " + entity + " and node " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getItems for entity: " + entity + " and node " + node);
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -263,7 +285,9 @@ public class PubsubCommsMgr {
 	}
 	
 	private String getIdentityJid(long callbackID) {
-		Log.d(LOG_TAG, "getIdentityJid");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdentityJid");
+		};
 		
 		InvokeGetIdentityJid invoke  = new InvokeGetIdentityJid(this.clientPackageName, callbackID);
 		invoke.execute();
@@ -272,7 +296,9 @@ public class PubsubCommsMgr {
 	}
 	
 	private String getDomainAuthorityNode(long callbackID) {
-		Log.d(LOG_TAG, "getDomainAuthorityNode");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getDomainAuthorityNode");
+		};
 
 		InvokeGetDomainAuthorityNode invoke  = new InvokeGetDomainAuthorityNode(this.clientPackageName, callbackID);
 		invoke.execute();
@@ -282,7 +308,9 @@ public class PubsubCommsMgr {
 
 	public boolean isConnected(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "isConnected");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "isConnected");
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -314,11 +342,15 @@ public class PubsubCommsMgr {
      * @return the created broadcast receiver
      */
     private BroadcastReceiver setupBroadcastReceiver() {
-        Log.d(LOG_TAG, "Set up broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Set up broadcast receiver");
+		};
         
-        this.receiver = new MainReceiver();
+        this.receiver = new PubsubCommsReceiver();
         this.androidContext.registerReceiver(this.receiver, createIntentFilter());    
-        Log.d(LOG_TAG, "Register broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Register broadcast receiver");
+		};
 
         return receiver;
     }
@@ -326,7 +358,9 @@ public class PubsubCommsMgr {
      * Unregister the broadcast receiver
      */
     private void teardownBroadcastReceiver() {
-        Log.d(LOG_TAG, "Tear down broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Tear down broadcast receiver");
+		};
     	this.androidContext.unregisterReceiver(this.receiver);
     }
 
@@ -336,12 +370,14 @@ public class PubsubCommsMgr {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class MainReceiver extends BroadcastReceiver {
+    private class PubsubCommsReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Received action: " + intent.getAction());
+				Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			};
 			long callbackId = intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0);
 
 			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
@@ -374,13 +410,6 @@ public class PubsubCommsMgr {
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
 						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
-//						try {
-//							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-//							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
-//							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
-//						} catch (Exception e) {
-//							Log.e(LOG_TAG, e.getMessage(), e);
-//						}
 					}
 				}
 
@@ -390,14 +419,6 @@ public class PubsubCommsMgr {
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
 						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
-
-//						try {
-//							Packet packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-//							Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
-//							callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
-//						} catch (Exception e) {
-//							Log.e(LOG_TAG, e.getMessage(), e);
-//						}
 					}
 				}
 				
@@ -408,16 +429,10 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						if (DEBUG_LOGGING) {
+							Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						};
 						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
-						//						Packet packet;
-//						try {
-//							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-//							Object payload = marshaller.unmarshallPayload(packet);
-//							callback.receiveResult(stanzaFromPacket(packet), payload);
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
@@ -425,17 +440,10 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						if (DEBUG_LOGGING) {
+							Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						};
 						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
-						
-//						Packet packet;
-//						try {
-//							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
-//							Object payload = marshaller.unmarshallPayload(packet);
-//							callback.receiveResult(stanzaFromPacket(packet), payload);
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
@@ -445,7 +453,9 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						if (DEBUG_LOGGING) {
+							Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						};
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
@@ -454,7 +464,9 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						if (DEBUG_LOGGING) {
+							Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+						};
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
 				}
@@ -487,7 +499,9 @@ public class PubsubCommsMgr {
     
     private void bindToServiceAfterLogin() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
+		};
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -495,7 +509,9 @@ public class PubsubCommsMgr {
      * Unbind from Android Comms service
      */
     private void unBindService() {
-    	Log.d(LOG_TAG, "Unbind from Societies Android Comms Service");
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Unbind from Societies Android Comms Service");
+		};
 		if (this.boundToService) {
         	this.androidContext.unbindService(serviceConnection);
 		}
@@ -508,13 +524,17 @@ public class PubsubCommsMgr {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
 			PubsubCommsMgr.this.boundToService = false;
-	    	Log.d(LOG_TAG, "Societies Android Comms Service disconnected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Comms Service disconnected");
+			};
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			PubsubCommsMgr.this.boundToService = true;
 			targetService = new Messenger(service);
-			Log.d(LOG_TAG, "Societies Android Comms Service connected");
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Societies Android Comms Service connected");
+			};
 			
 	    	//The Domain Authority and Identity must now be retrieved before any other calls
 			long callbackID = PubsubCommsMgr.this.randomGenerator.nextLong();
@@ -565,19 +585,24 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
     		
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -627,18 +652,24 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
     		
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -686,17 +717,25 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.xml);
-    		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.remoteCallID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -746,21 +785,30 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.entity);
-    		Log.d(LOCAL_LOG_TAG, "Entity: " + this.entity);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Entity: " + this.entity);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
+ 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -806,14 +854,20 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -860,15 +914,20 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -912,15 +971,20 @@ public class PubsubCommsMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);

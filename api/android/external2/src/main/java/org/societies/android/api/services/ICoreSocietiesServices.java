@@ -35,7 +35,7 @@ public interface ICoreSocietiesServices {
 	final static String CIS_DIRECTORY_SERVICE_INTENT = "org.societies.android.platform.cis.CisDirectoryRemote";
 	final static String CIS_MANAGER_SERVICE_INTENT = "org.societies.android.platform.cis.CisManagerRemote";
 	final static String CIS_SUBSCRIBED_SERVICE_INTENT = "org.societies.android.platform.cis.CisSubscribedRemote";
-
+	final static String COMMS_SERVICE_INTENT = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
 	/**
 	 * 
 	 * @param callback

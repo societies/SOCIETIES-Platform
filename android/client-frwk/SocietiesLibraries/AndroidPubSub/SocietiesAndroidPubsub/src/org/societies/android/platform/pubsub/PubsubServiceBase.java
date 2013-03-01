@@ -1,7 +1,6 @@
 package org.societies.android.platform.pubsub;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,9 +30,6 @@ import org.societies.android.api.comms.xmpp.StanzaError;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.pubsub.IPubsubService;
-import org.societies.android.api.pubsub.ISubscriber;
-import org.societies.android.api.pubsub.ISubscriberInternal;
-import org.societies.android.api.pubsub.Subscription;
 import org.societies.android.platform.androidutils.MarshallUtils;
 import org.societies.utilities.DBC.Dbc;
 import org.xml.sax.SAXException;
@@ -44,7 +40,8 @@ import android.util.Log;
 
 public class PubsubServiceBase implements IPubsubService {
 	private static final String LOG_TAG = PubsubServiceBase.class.getName();
-	
+    private static final boolean DEBUG_LOGGING = false;
+
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
 						   					"http://jabber.org/protocol/pubsub#errors",
@@ -65,18 +62,18 @@ public class PubsubServiceBase implements IPubsubService {
 	private PubsubCommsMgr pubsubClientMgr;
 	private Context androidContext;
 	private boolean restrictBroadcast;
-//	private Map<Subscription,List<ISubscriber>> subscribers;	
 	private Map<String, Integer> subscribedNodes;
 	
 	public PubsubServiceBase (Context androidContext, PubsubCommsMgr pubsubClientMgr, boolean restrictBroadcast) {
 		this.pubsubClientMgr = pubsubClientMgr;
 		this.androidContext = androidContext;
 		this.restrictBroadcast = restrictBroadcast;
-//		this.subscribers = new HashMap<Subscription, List<ISubscriber>>();
 		this.subscribedNodes = Collections.synchronizedMap(new HashMap<String, Integer>());
 		
-		Log.d(LOG_TAG, "Broadcast restricted : " + this.restrictBroadcast);
-		Log.d(LOG_TAG, "PubsubServiceBase object constructed");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Broadcast restricted : " + this.restrictBroadcast);
+			Log.d(LOG_TAG, "PubsubServiceBase object constructed");
+		};
 	}
 
 	@Override
@@ -168,26 +165,18 @@ public class PubsubServiceBase implements IPubsubService {
 			
 			@Override
 			public void receiveMessage(Stanza stanza, Object payload) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void receiveItems(Stanza stanza, String node, List<String> items) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void receiveError(Stanza stanza, XMPPError error) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
@@ -210,7 +199,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
 		
-		Log.d(LOG_TAG, "discoItems called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "discoItems called with domain authority: " + pubsubService + " and node: " + node);
+		};
 		
 		try {
 			this.pubsubClientMgr.getItems(convertStringToIdentity(pubsubService), node, new ICommCallback() {
@@ -269,7 +260,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
 		
-		Log.d(LOG_TAG, "ownerCreate called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "ownerCreate called with domain authority: " + pubsubService + " and node: " + node);
+		};
 
 		Stanza stanza = null;
 		try {
@@ -324,7 +317,6 @@ public class PubsubServiceBase implements IPubsubService {
 			e.printStackTrace();
 		}
 
-//		return waitForResponse(stanza.getId());
 		return false;
 	}
 
@@ -335,7 +327,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
 		
-		Log.d(LOG_TAG, "ownerDelete called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "ownerDelete called with domain authority: " + pubsubService + " and node: " + node);
+		};
 
 		Stanza stanza = null;
 		try {
@@ -365,23 +359,15 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public void receiveMessage(Stanza arg0, Object arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveError(Stanza arg0, XMPPError arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public List<String> getXMLNamespaces() {
@@ -406,7 +392,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubServiceJid && pubsubServiceJid.length() > 0);
 		
-		Log.d(LOG_TAG, "ownerPurgeItems called with domain authority: " + pubsubServiceJid + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "ownerPurgeItems called with domain authority: " + pubsubServiceJid + " and node: " + node);
+		};
 		
 		IIdentity pubsubService = null;
 		try {
@@ -437,23 +425,15 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public void receiveMessage(Stanza arg0, Object arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveError(Stanza arg0, XMPPError arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public List<String> getXMLNamespaces() {
@@ -480,13 +460,14 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub item ID", null != itemId && itemId.length() > 0);
 		Dbc.require("Pubsub event payload", null != item && item.length() > 0);
 		
-		Log.d(LOG_TAG, "publisherPublish called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "publisherPublish called with domain authority: " + pubsubService + " and node: " + node);
+		};
 
 		Stanza stanza = null;
 		try {
 			stanza = new Stanza(convertStringToIdentity(pubsubService));
 		} catch (XMPPError e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		Pubsub payload = new Pubsub();
@@ -525,23 +506,15 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public void receiveMessage(Stanza arg0, Object arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveError(Stanza arg0, XMPPError arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public List<String> getXMLNamespaces() {
@@ -567,7 +540,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubServiceJid && pubsubServiceJid.length() > 0);
 		
-		Log.d(LOG_TAG, "publisherDelete called with domain authority: " + pubsubServiceJid + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "publisherDelete called with domain authority: " + pubsubServiceJid + " and node: " + node);
+		};
 
 		IIdentity pubsubService = null;
 		try {
@@ -602,23 +577,15 @@ public class PubsubServiceBase implements IPubsubService {
 				}
 				
 				public void receiveMessage(Stanza arg0, Object arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public void receiveError(Stanza arg0, XMPPError arg1) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				public List<String> getXMLNamespaces() {
@@ -643,7 +610,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
 		
-		Log.d(LOG_TAG, "subscriberSubscribe called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "subscriberSubscribe called with domain authority: " + pubsubService + " and node: " + node);
+		};
 
 		try {
 			final IIdentity pubsubServiceIdentity;
@@ -722,7 +691,9 @@ public class PubsubServiceBase implements IPubsubService {
 		Dbc.require("Pubsub node must be supplied", null != node && node.length() > 0);
 		Dbc.require("Pubsub service must be specified", null != pubsubService && pubsubService.length() > 0);
 		
-		Log.d(LOG_TAG, "subscriberUnsubscribe called with domain authority: " + pubsubService + " and node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "subscriberUnsubscribe called with domain authority: " + pubsubService + " and node: " + node);
+		};
 
 		IIdentity pubsubServiceIdentity = null;
 		try {
@@ -755,23 +726,15 @@ public class PubsubServiceBase implements IPubsubService {
 							}
 							
 							public void receiveMessage(Stanza arg0, Object arg1) {
-								// TODO Auto-generated method stub
-								
 							}
 							
 							public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-								// TODO Auto-generated method stub
-								
 							}
 							
 							public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-								// TODO Auto-generated method stub
-								
 							}
 							
 							public void receiveError(Stanza arg0, XMPPError arg1) {
-								// TODO Auto-generated method stub
-								
 							}
 							
 							public List<String> getXMLNamespaces() {

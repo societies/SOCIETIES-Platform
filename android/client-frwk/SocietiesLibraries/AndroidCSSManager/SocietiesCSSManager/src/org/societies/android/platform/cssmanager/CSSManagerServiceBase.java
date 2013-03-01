@@ -117,11 +117,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	private boolean connectedToEvents;
 	private Messenger eventsMessenger;
 	private EventsHelper eventsHelper;
-	private SocietiesClientServicesController serviceController;
+	private SocietiesClientServicesController platformServicesController;
+	private SocietiesEssentialServicesController essentialServicesController;
 
-	
-//	private PubsubClientAndroid pubsubClient = null;
-	
 	private HashMap<String, ISubscriber> pubsubSubscribes = new HashMap<String, ISubscriber>();
 	
 	/**
@@ -142,8 +140,8 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		this.cssRecord = null;
 		this.ccm = ccm;
 		this.eventsHelper = null;
-		this.serviceController = new SocietiesClientServicesController(this.context);
-		
+		this.platformServicesController = new SocietiesClientServicesController(this.context);
+		this.essentialServicesController = new SocietiesEssentialServicesController(context);
 		Log.d(LOG_TAG, "CSSManagerServiceBase constructed");
 	}
 	
@@ -213,7 +211,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "startAppServices called with client: " + client);
 
-		this.serviceController.bindToServices(new IMethodCallback() {
+		this.essentialServicesController.bindToServices(new IMethodCallback() {
 			
 			@Override
 			public void returnAction(String result) {
@@ -222,7 +220,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			@Override
 			public void returnAction(boolean resultFlag) {
 				if (resultFlag) {
-					CSSManagerServiceBase.this.serviceController.startAllServices(new IMethodCallback() {
+					CSSManagerServiceBase.this.essentialServicesController.startAllServices(new IMethodCallback() {
 						
 						@Override
 						public void returnAction(String result) {
@@ -237,6 +235,31 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 								intent.setPackage(client);
 							}
 							CSSManagerServiceBase.this.context.sendBroadcast(intent);
+							
+							//Start remaining platform services. This operation will take place in parallel with the login
+							//to the CSSManager on Virgo
+							CSSManagerServiceBase.this.platformServicesController.bindToServices(new IMethodCallback() {
+								
+								@Override
+								public void returnAction(String result) {
+								}
+								
+								@Override
+								public void returnAction(boolean resultFlag) {
+									if (resultFlag) {
+										CSSManagerServiceBase.this.platformServicesController.startAllServices(new IMethodCallback() {
+											
+											@Override
+											public void returnAction(String result) {
+											}
+											
+											@Override
+											public void returnAction(boolean resultFlag) {
+											}
+										});
+									}
+								}
+							});
 						}
 					});
 				}
@@ -249,7 +272,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "stopAppServices called with client: " + client);
 
-		this.serviceController.stopAllServices(new IMethodCallback() {
+		this.essentialServicesController.stopAllServices(new IMethodCallback() {
 			
 			@Override
 			public void returnAction(String result) {
@@ -258,15 +281,28 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			@Override
 			public void returnAction(boolean resultFlag) {
 				if (resultFlag) {
-					CSSManagerServiceBase.this.serviceController.unbindFromServices();
-					
-					Intent intent  = new Intent(IAndroidCSSManager.STOP_APP_SERVICES);
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, resultFlag);
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
-					if (CSSManagerServiceBase.this.restrictBroadcast) {
-						intent.setPackage(client);
-					}
-					CSSManagerServiceBase.this.context.sendBroadcast(intent);
+					CSSManagerServiceBase.this.essentialServicesController.unbindFromServices();										
+					CSSManagerServiceBase.this.platformServicesController.stopAllServices(new IMethodCallback() {
+						
+						@Override
+						public void returnAction(String result) {
+						}
+						
+						@Override
+						public void returnAction(boolean resultFlag) {
+							if (resultFlag) {
+								CSSManagerServiceBase.this.platformServicesController.unbindFromServices();
+								
+								Intent intent  = new Intent(IAndroidCSSManager.STOP_APP_SERVICES);
+								intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+								intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+								if (CSSManagerServiceBase.this.restrictBroadcast) {
+									intent.setPackage(client);
+								}
+								CSSManagerServiceBase.this.context.sendBroadcast(intent);
+							}
+						}
+					});
 				}
 			}
 		});
