@@ -292,6 +292,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		doNothing().when(mockEventMgr).publishInternalEvent(any(org.societies.api.osgi.event.InternalEvent.class));
 		
 		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		doNothing().when(mockICisDirRemote1).deleteCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		
 			
 		

@@ -75,7 +75,9 @@ import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.broker.impl.CtxBroker;
+import org.societies.context.broker.impl.InternalCtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +95,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
 	
-	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION };
+	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION, EventTypes.CIS_RESTORE };
 
 	private ICommManager commManager;
 	
@@ -101,12 +103,15 @@ public class CtxBrokerServer implements IFeatureServer{
 
 	@Autowired(required=true)
 	private CtxBroker ctxbroker;
+	
+	/** The Context Event Mgmt service reference. TODO remove once pubsub persistence is enabled. */
+	private ICtxEventMgr ctxEventMgr;
 
 	private IIdentityManager identMgr = null;
 
 	@Autowired
 	public CtxBrokerServer(ICommManager commManager, 
-			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr)
+			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr, ICtxEventMgr ctxEventMgr)
 					throws Exception {
 		
 		if (LOG.isInfoEnabled())
@@ -114,6 +119,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		this.commManager = commManager;
 		this.identMgr = this.commManager.getIdManager();
 		this.commMgrFactory = commMgrFactory;
+		this.ctxEventMgr = ctxEventMgr;
 
 		// Register to CSS Comm Mgr
 		if (LOG.isInfoEnabled())
@@ -126,11 +132,15 @@ public class CtxBrokerServer implements IFeatureServer{
 				LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
 						+ entry.getKey() + "'");
 			entry.getValue().register(this);
+			if (LOG.isInfoEnabled())
+				LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
+						+ "' for CIS " + entry.getKey());
+			this.ctxEventMgr.createTopics(entry.getKey(), InternalCtxBroker.EVENT_TOPICS);
 		}
 		// Register for new CISs
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
-		eventMgr.subscribeInternalEvent(new NewCisHandler(), EVENT_TYPES, null);
+		eventMgr.subscribeInternalEvent(new NewCisCommMgrHandler(), EVENT_TYPES, null);
 	}
 
 	// returns an object
@@ -271,21 +281,28 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			LOG.info("RETRIEVE");
 			CtxModelBeanTranslator ctxBeanTranslator2 = CtxModelBeanTranslator.getInstance();
+			//LOG.info("********* skata 0 ");
 			try {
 				RequestorBean reqBeanRetrieve = cbPayload.getRetrieve().getRequestor();
 				Requestor requestorRetrieve = getRequestorFromBean(reqBeanRetrieve);
-
+				//LOG.info("********* skata 1 ");
+				
 				CtxIdentifierBean ctxIdentRetrieveBean = cbPayload.getRetrieve().getId();
 				CtxIdentifier ctxIdentifier = ctxBeanTranslator2.fromCtxIdentifierBean(ctxIdentRetrieveBean);
-
+				
+				//LOG.info("********* ctxIDentifier (this will be used for retrieval) : "+ ctxIdentifier.toString());
+				//LOG.info("********* ctxIDentifier model type "+ ctxIdentifier.getModelType());
+				
+//				LOG.info("********* ready to retrieve object in local db through a remote call ");
 				CtxModelObject retrievedObj = this.ctxbroker.retrieve(requestorRetrieve, ctxIdentifier).get();
-					LOG.info("it indi entity retrieved object? "+ retrievedObj.getId().toString());
+	//			LOG.info("community entity retrieved object? "+ retrievedObj.getId().toString());
 				// object retrieved locally 
 				// create response bean
 
 				CtxModelObjectBean ctxObjBean = ctxBeanTranslator2.fromCtxModelObject(retrievedObj);
+		//		LOG.info("********* skata 2 ctxObjBean translated "+ctxObjBean);
 				beanResponse.setRetrieveBeanResult(ctxObjBean);
-				//	LOG.info("retrieved object beanResponse.setCtxBrokerRetrieveBeanResult "+ beanResponse.getCtxBrokerRetrieveBeanResult().toString());
+			//	LOG.info("retrieved object beanResponse.getCtxBrokerRetrieveBeanResult "+ beanResponse.getRetrieveBeanResult().toString());
 
 			} catch (MalformedCtxIdentifierException e) {
 				// TODO Auto-generated catch block
@@ -441,7 +458,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				targetCss = this.identMgr.fromJid(targetCssString);
 
 				//	LOG.info("LOOKUP 1 :" +beanResponse);
-				CtxModelType modelType = ctxBeanTranslator.CtxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
+				CtxModelType modelType = ctxBeanTranslator.ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
 
 				//LOG.info("LOOKUP 2 modelType:" +modelType);
 
@@ -542,7 +559,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		}
 	}
 
-	private class NewCisHandler extends EventListener {
+	private class NewCisCommMgrHandler extends EventListener {
 
 		/*
 		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
@@ -561,9 +578,10 @@ public class CtxBrokerServer implements IFeatureServer{
 		public void handleInternalEvent(InternalEvent event) {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Received internal " + event.geteventType() + " event: " + event);
+				LOG.debug("Received internal event: " + this.eventToString(event));
 			
-			if (EventTypes.CIS_CREATION.equals(event.geteventType())) {
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())
+					|| EventTypes.CIS_RESTORE.equals(event.geteventType())) {
 				
 				if (!(event.geteventInfo() instanceof Community)) {
 
@@ -586,6 +604,12 @@ public class CtxBrokerServer implements IFeatureServer{
 						LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
 								+ cisId + "'");
 					cisCommMgr.register(CtxBrokerServer.this);
+					if (EventTypes.CIS_RESTORE.equals(event.geteventType())) {
+						if (LOG.isInfoEnabled())
+							LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
+									+ "' for CIS " + cisId);
+						ctxEventMgr.createTopics(cisId, InternalCtxBroker.EVENT_TOPICS);
+					}
 				
 				} catch (Exception e) {
 					LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 
@@ -595,8 +619,28 @@ public class CtxBrokerServer implements IFeatureServer{
 			} else {
 				
 				if (LOG.isWarnEnabled())
-					LOG.warn("Received unexpeted event of type '" + event.geteventType() + "'");
+					LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
 			}
+		}
+		
+		private String eventToString(final InternalEvent event) {
+			
+			final StringBuffer sb = new StringBuffer();
+			sb.append("[");
+			sb.append("name=");
+			sb.append(event.geteventName());
+			sb.append(",");
+			sb.append("type=");
+			sb.append(event.geteventType());
+			sb.append(",");
+			sb.append("source=");
+			sb.append(event.geteventSource());
+			sb.append(",");
+			sb.append("info=");
+			sb.append(event.geteventInfo());
+			sb.append("]");
+			
+			return sb.toString();
 		}
 	}
 }

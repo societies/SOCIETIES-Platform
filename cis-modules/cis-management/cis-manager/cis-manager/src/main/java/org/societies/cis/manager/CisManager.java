@@ -255,12 +255,29 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				session.close();
 		}
 		
+		
+		
 		Iterator<Cis> it = ownedCISs.iterator();
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, 
 					 this.privacyDataManager,this.iActivityFeedManager);
+			 // publish an internal event to notify the restore
+			if(this.getEventMgr() != null){
+				Community c = new Community();
+				element.fillCommmunityXMPPobj(c);
+				InternalEvent event = new InternalEvent(EventTypes.CIS_RESTORE, "restore of CIS", element.getCisId(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					LOG.error("error trying to internally publish CREATE event");
+					e.printStackTrace();
+					
+				}
+			}
+
+			 
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -397,12 +414,26 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// get community object for later eventing
 			Community c = new Community();
 			cis.fillCommmunityXMPPobj(c);
-						
+
+			// get CIS ad for later notification
+			CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
+			MembershipCrit m = new MembershipCrit();
+			cis.fillMembershipCritXMPPobj(m);
+			cisAd.setMembershipCrit(m);
+			cisAd.setName(cis.getName());
+			cisAd.setCssownerid(this.cisManagerId.getJid());
+			cisAd.setType(cis.getCisType());
+			cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
+
+			
 			ret = cis.deleteCIS();
 			ret = iActivityFeedManager.deleteFeed(this.cisManagerId.getJid(), cisJid);
 			ret = ret && getOwnedCISs().remove(cis);
 			
-			if(ret == true && this.getEventMgr() != null){ // if it works we also send an internal event
+			if(ret == true && this.getEventMgr() != null){ 
+				// if it works we also send an internal event and notify the CIS directory
+				
+				// sending internal event
 				InternalEvent event = new InternalEvent(EventTypes.CIS_DELETION, "deletion of CIS", this.cisManagerId.getBareJid(), c);
 				try {
 					this.getEventMgr().publishInternalEvent(event);
@@ -411,6 +442,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					e.printStackTrace();
 					LOG.error("error trying to internally publish CIS DELETE event");
 				}
+				
+				// notifying the directory
+				this.iCisDirRemote.deleteCisAdvertisementRecord(cisAd);
+				LOG.info("advertisement sent");
 				
 				// performance log of the delete
 				IPerformanceMessage perMess= new PerformanceMessage();

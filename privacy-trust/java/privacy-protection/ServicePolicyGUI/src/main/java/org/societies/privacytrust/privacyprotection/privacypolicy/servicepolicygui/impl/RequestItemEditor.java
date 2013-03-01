@@ -163,6 +163,7 @@ public class RequestItemEditor extends JFrame implements ItemListener
 		     this.resourcePanel.add(this.resourceLabel);
 
 		     this.resourceTypeList = new JComboBox(getCtxAttributeTypesList());
+		     this.resourceTypeList.setEditable(true);
 		     gbcPanel2.gridx = 1;
 		     gbcPanel2.gridy = 1;
 		     gbcPanel2.gridwidth = 1;
@@ -459,6 +460,7 @@ public class RequestItemEditor extends JFrame implements ItemListener
 	}
 
 	public void itemStateChanged(ItemEvent e) {
+		System.out.println("pre - ResourceTypeList.isEditable()="+resourceTypeList.isEditable());
 		if (e.getStateChange()==ItemEvent.SELECTED){
 			String scheme = (String) e.getItem();
 			System.out.println("selected scheme: "+scheme);
@@ -488,8 +490,10 @@ public class RequestItemEditor extends JFrame implements ItemListener
 					this.resourceTypeList.addItem(deviceType);
 				}
 				this.resourceTypeList.setEditable(false);
+				
 			}
 		}
+		System.out.println("post - ResourceTypeList.isEditable()="+resourceTypeList.isEditable());
 		
 	}
 	

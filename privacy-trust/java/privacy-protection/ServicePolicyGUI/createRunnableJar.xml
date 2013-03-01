@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project ServicePolicyGUI with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="C:/Users/Eliza/git/SOCIETIES-Platform/privacy-trust/java/privacy-protection/ServicePolicyGUI/exec jar/SocietiesPrivacyPolicyEditor.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="org.societies.privacytrust.privacyprotection.privacypolicy.servicepolicygui.impl.initiatePolicyGUI"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ societies-api-schema-0.5.jar societies-api-0.5.jar seaglasslookandfeel-0.2.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="C:/Users/Eliza/git/SOCIETIES-Platform/privacy-trust/java/privacy-protection/ServicePolicyGUI/target/classes"/>
+            <zipfileset dir="C:\Users\Eliza\.m2\repository\org\societies\api\schema\societies-api-schema\0.5" includes="societies-api-schema-0.5.jar"/>
+            <zipfileset dir="C:\Users\Eliza\.m2\repository\org\societies\api\external\societies-api\0.5" includes="societies-api-0.5.jar"/>
+            <zipfileset dir="C:\Users\Eliza\git\SOCIETIES-Platform\privacy-trust\java\privacy-protection\ServicePolicyGUI\lib" includes="seaglasslookandfeel-0.2.jar"/>
+        </jar>
+    </target>
+</project>

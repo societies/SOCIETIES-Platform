@@ -37,11 +37,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.schema.context.model.CommunityCtxEntityBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxAttributeBondBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeValueTypeBean;
+import org.societies.api.schema.context.model.CtxBondBean;
+import org.societies.api.schema.context.model.CtxBondOriginTypeBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
@@ -64,6 +68,160 @@ public final class CtxModelBeanTranslator {
 
 		return instance;
 	}
+
+
+	public CommunityCtxEntity fromCommCtxEntityBean(CommunityCtxEntityBean commEntityBean) throws DatatypeConfigurationException {
+		
+		CommunityCtxEntity commEntity = null;
+
+		try {
+			commEntity = new CommunityCtxEntity((CtxEntityIdentifier)fromCtxIdentifierBean(commEntityBean.getId()) );
+
+			commEntity.setLastModified(commEntityBean.getLastModified());
+			// Handle entity attributes
+			for (CtxAttributeBean attrBean : commEntityBean.getAttributes()){
+				commEntity.addAttribute(fromCtxAttributeBean(attrBean));
+			}
+
+			final Set<CtxAssociationIdentifier> assocIds = new HashSet<CtxAssociationIdentifier>();
+			for (CtxAssociationIdentifierBean assocIdBean : commEntityBean.getAssociations()){
+				assocIds.add((CtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
+			}
+			commEntity.setAssociations(assocIds);
+
+			Set<CtxEntityIdentifier> entIdCommunities = new HashSet<CtxEntityIdentifier>();
+			for(CtxEntityIdentifierBean entityIdBean  :commEntityBean.getCommunities()){
+				CtxEntityIdentifier entityId = new CtxEntityIdentifier(entityIdBean.toString());
+				entIdCommunities.add(entityId);
+			}		
+			commEntity.setCommunities(entIdCommunities);
+
+			for(CtxBondBean bondBean: commEntityBean.getBonds()){
+				commEntity.addBond(fromCtxBondBean(bondBean));
+			}
+
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return commEntity;
+	}
+
+
+
+
+
+
+	public CommunityCtxEntityBean fromCommCtxEntity(CommunityCtxEntity commEntity) throws DatatypeConfigurationException {
+
+//		LOG.info("fromCommCtxEntity skata 0 " + commEntity.getId());
+		
+		CommunityCtxEntityBean bean = new CommunityCtxEntityBean();
+		bean.setId(fromCtxIdentifier(commEntity.getId()));
+		Date lastModifiedXML = commEntity.getLastModified();
+		bean.setLastModified(lastModifiedXML);
+	//	LOG.info("fromCommCtxEntity skata 1 " );
+		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
+		for (CtxAssociationIdentifier assoc : commEntity.getAssociations()) {
+			assocIdBeans.add((CtxAssociationIdentifierBean) fromCtxIdentifier(assoc));
+		}
+		bean.setAssociations(assocIdBeans);
+		//LOG.info("fromCommCtxEntity skata 2 " );
+		List<CtxAttributeBean> attrIdBeans = new ArrayList<CtxAttributeBean>();
+		for (CtxAttribute attr : commEntity.getAttributes()) {
+			attrIdBeans.add(fromCtxAttribute(attr));
+		}
+		bean.setAttributes(attrIdBeans);
+		//LOG.info("fromCommCtxEntity skata 3 " );
+		List<CtxEntityIdentifierBean> entIdBeansCommunities = new ArrayList<CtxEntityIdentifierBean>();
+		for(CtxEntityIdentifier entityId  :commEntity.getCommunities()){
+			entIdBeansCommunities.add(fromCtxEntityIdentifier(entityId));
+		}
+		bean.setCommunities(entIdBeansCommunities);
+		//LOG.info("fromCommCtxEntity skata 4 " );
+		List<CtxBondBean> bondBeansList = new ArrayList<CtxBondBean>();
+		for(CtxBond bond: commEntity.getBonds()){
+			bondBeansList.add(fromCtxBond(bond));
+		}
+		bean.setBonds(bondBeansList);		
+		//LOG.info("fromCommCtxEntity skata last " );
+		
+		return bean;
+	}
+
+
+	private CtxBond fromCtxBondBean(CtxBondBean bondBean){
+
+		CtxAttributeBond bean = null;
+
+		if(bondBean.getModelType().equals(CtxModelType.ATTRIBUTE)){
+			bean = this.fromCtxAttributeBondBean((CtxAttributeBondBean)bondBean);
+		} else if (bondBean.getModelType().equals(CtxModelType.ASSOCIATION)){
+			//	bean = this.fromCtxAssociationBond((CtxAssociationBond)bond);
+		}
+
+		return bean;
+	}
+
+	private CtxBondBean fromCtxBond(CtxBond bond){
+
+		CtxAttributeBondBean bean = null;
+
+		if(bond.getModelType().equals(CtxModelType.ATTRIBUTE)){
+			bean = this.fromCtxAttributeBond((CtxAttributeBond)bond);
+		} else if (bond.getModelType().equals(CtxModelType.ASSOCIATION)){
+			//	bean = this.fromCtxAssociationBond((CtxAssociationBond)bond);
+		}
+
+		return bean;
+	}
+
+	/*
+	private CtxAssociationBondBean fromCtxAssociationBond(CtxAssociationBond attrBond){
+
+		CtxAssociationBondBean bean = new CtxAssociationBondBean();
+	}
+	 */
+
+	//TODO fix the following 
+
+	private CtxAttributeBond fromCtxAttributeBondBean(CtxAttributeBondBean attrBondBean){
+
+		CtxAttributeBond attrBond = null;
+		/*
+		CtxAttributeBond attrBond= new CtxAttributeBond();
+
+
+		attrBondBean.setMaxValue(attrBond.getMaxValue());
+		attrBondBean.setMinValue(attrBond.getMinValue());
+
+		CtxBondOriginType bondOriginType = attrBond.getOriginType();
+		attrBondBean.setOriginType(this.fromCtxBondOriginType(bondOriginType));
+		attrBondBean.setModelType(ctxModelTypeBeanFromCtxModelType(attrBond.getModelType()));
+		attrBondBean.setType(attrBond.getType());
+		attrBondBean.setValueType(fromCtxAttributeValueType(attrBond.getValueType()));
+		 */	
+		return attrBond;
+	}
+
+
+	private CtxAttributeBondBean fromCtxAttributeBond(CtxAttributeBond attrBond){
+
+		CtxAttributeBondBean attrBondBean = new CtxAttributeBondBean();
+
+		attrBondBean.setMaxValue(attrBond.getMaxValue());
+		attrBondBean.setMinValue(attrBond.getMinValue());
+
+		CtxBondOriginType bondOriginType = attrBond.getOriginType();
+		attrBondBean.setOriginType(this.fromCtxBondOriginType(bondOriginType));
+		attrBondBean.setModelType(ctxModelTypeBeanFromCtxModelType(attrBond.getModelType()));
+		attrBondBean.setType(attrBond.getType());
+		attrBondBean.setValueType(fromCtxAttributeValueType(attrBond.getValueType()));
+
+		return attrBondBean;
+	}
+
 
 	public IndividualCtxEntityBean fromIndiCtxEntity (IndividualCtxEntity indiEntity) throws DatatypeConfigurationException {
 
@@ -173,6 +331,7 @@ public final class CtxModelBeanTranslator {
 
 		return bean;
 	}
+
 
 
 	public CtxIdentifierBean fromCtxIdentifier(CtxIdentifier identifier) {
@@ -294,12 +453,14 @@ public final class CtxModelBeanTranslator {
 			LOG.debug("Creating CtxModelObject bean from instance " + object);
 
 		final CtxModelObjectBean bean;
+		//LOG.info("fromCtxModelObject skata 1 " + object.getModelType());
 		try {
 			if(object instanceof IndividualCtxEntity){
 				bean = this.fromIndiCtxEntity((IndividualCtxEntity) object);
-			}				
-			else if (object instanceof CtxEntity){
+			}else if (object instanceof CtxEntity){
 				bean = this.fromCtxEntity((CtxEntity) object);
+			}else if (object instanceof CommunityCtxEntity){
+				bean = this.fromCommCtxEntity((CommunityCtxEntity) object);
 			}else if (object instanceof CtxAttribute)
 				bean = this.fromCtxAttribute((CtxAttribute) object);
 			else if (object instanceof CtxAssociation)
@@ -324,6 +485,9 @@ public final class CtxModelBeanTranslator {
 		try {
 			if(bean instanceof IndividualCtxEntityBean)
 				object = this.fromIndiCtxEntityBean((IndividualCtxEntityBean) bean);
+			else if (bean instanceof CommunityCtxEntityBean)
+				object = this.fromCommCtxEntityBean((CommunityCtxEntityBean) bean);
+			//object = null;
 			else if (bean instanceof CtxEntityBean)
 				object = this.fromCtxEntityBean((CtxEntityBean) bean);
 			else if (bean instanceof CtxAttributeBean)
@@ -361,6 +525,46 @@ public final class CtxModelBeanTranslator {
 		return bean;
 	}
 
+
+	public CtxBondOriginTypeBean fromCtxBondOriginType(CtxBondOriginType originType) {
+
+		CtxBondOriginTypeBean result = null;
+
+		if(originType == null ) return null; 	
+
+		switch (originType) {
+		case MANUALLY_SET:  result = CtxBondOriginTypeBean.MANUALLY_SET;
+		break;
+		case INHERITED: result = CtxBondOriginTypeBean.INHERITED;
+		break;
+		case DISCOVERED: result = CtxBondOriginTypeBean.DISCOVERED;
+		break;
+		}
+
+		return result;	
+	}
+
+
+	public CtxBondOriginType fromCtxBondOriginTypeBean(CtxBondOriginTypeBean originType) {
+
+		CtxBondOriginType result = null;
+
+		if(originType == null ) return null; 	
+
+		switch (originType) {
+		case MANUALLY_SET:  result = CtxBondOriginType.MANUALLY_SET;
+		break;
+		case INHERITED: result = CtxBondOriginType.INHERITED;
+		break;
+		case DISCOVERED: result = CtxBondOriginType.DISCOVERED;
+		break;
+		}
+
+		return result;	
+	}
+
+
+
 	public CtxOriginTypeBean fromCtxOriginType(
 			CtxOriginType originType) {
 
@@ -388,126 +592,126 @@ public final class CtxModelBeanTranslator {
 			CtxOriginTypeBean originTypeBean) {
 
 		if (originTypeBean == null)	return null; 
-				
+
 		//if (originTypeBean != null)	result = CtxOriginType.valueOf(originTypeBean.toString());
 		CtxOriginType result = null;
-		
+
 		switch (originTypeBean) {
 		case MANUALLY_SET: result = CtxOriginType.MANUALLY_SET;
 		break;
-		
+
 		case INFERRED: result = CtxOriginType.INFERRED;
 		break;
-		
+
 		case INHERITED: result = CtxOriginType.INHERITED;
 		break;
-		
+
 		case SENSED: result = CtxOriginType.SENSED;
 		break;
 		}
-		
+
 		return result; 	
 	}
 
-	public CtxModelTypeBean CtxModelTypeBeanFromCtxModelType(
+	public CtxModelTypeBean ctxModelTypeBeanFromCtxModelType(
 			CtxModelType modelType) {
 
 		if (modelType == null)	return null;
-		
+
 		CtxModelTypeBean result = null;
-		
+
 		switch (modelType) {
-		
+
 		case ASSOCIATION : result = CtxModelTypeBean.ASSOCIATION;
 		break;
-		
+
 		case ATTRIBUTE : result = CtxModelTypeBean.ATTRIBUTE;
 		break;
-		
+
 		case ENTITY : result = CtxModelTypeBean.ENTITY;
 		break;
 		}
-	
+
 		return result;	
 	}
 
-	public CtxModelType CtxModelTypeFromCtxModelTypeBean(
+	public CtxModelType ctxModelTypeFromCtxModelTypeBean(
 			CtxModelTypeBean modelTypeBean) {
 
 		if (modelTypeBean == null)	return null;
-		
+
 		CtxModelType result = null;
-		
+
 		switch (modelTypeBean) {
-		
+
 		case ASSOCIATION : result = CtxModelType.ASSOCIATION;
 		break;
-		
+
 		case ATTRIBUTE : result = CtxModelType.ATTRIBUTE;
 		break;
-		
+
 		case ENTITY : result = CtxModelType.ENTITY;
 		break;
 		}
-	
+
 		return result;	
 	}
 
 	public CtxAttributeValueTypeBean fromCtxAttributeValueType(CtxAttributeValueType valueType) {
 
-		
+
 		if (valueType == null)	return null; 
-		
+
 		CtxAttributeValueTypeBean result = null;
-		
+
 		switch (valueType) {
 		case BINARY : result = CtxAttributeValueTypeBean.BINARY;
 		break;
-		
+
 		case DOUBLE: result = CtxAttributeValueTypeBean.DOUBLE;
 		break;
-		
+
 		case EMPTY : result = CtxAttributeValueTypeBean.EMPTY;
 		break;
-		
+
 		case INTEGER: result = CtxAttributeValueTypeBean.INTEGER;
 		break;
-		
+
 		case STRING : result = CtxAttributeValueTypeBean.STRING;
 		break;
 		}
-		
+
 		return result; 	
-	
+
 	}
 
 	public CtxAttributeValueType fromCtxAttributeValueTypeBean(CtxAttributeValueTypeBean valueTypeBean) {
 
-	if (valueTypeBean == null)	return null; 
-				
-	CtxAttributeValueType result = null;
-		
+		if (valueTypeBean == null)	return null; 
+
+		CtxAttributeValueType result = null;
+
 		switch (valueTypeBean) {
 		case BINARY : result = CtxAttributeValueType.BINARY;
 		break;
-		
+
 		case DOUBLE : result = CtxAttributeValueType.DOUBLE;
 		break;
-		
+
 		case EMPTY : result = CtxAttributeValueType.EMPTY;
 		break;
-		
+
 		case INTEGER: result = CtxAttributeValueType.INTEGER;
 		break;
-		
+
 		case STRING : result = CtxAttributeValueType.STRING;
 		break;
 		}
-	
+
 		return result;
 	}
 
-	
+
 	public XMLGregorianCalendar DateToXMLGregorianCalendar(Date myDate) throws DatatypeConfigurationException {
 
 		GregorianCalendar c = new GregorianCalendar();
