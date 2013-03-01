@@ -20,13 +20,13 @@
 		http://www.springframework.org/schema/tx/spring-tx.xsd" >
 
     <bean
-        id="TestCase1267"
-        class="org.societies.integration.test.bit.activityfeedct.TestCase109611"
-        depends-on="privacyPolicyManagerRemote, privacyAgreementManagerRemote, commManager"
+        id="TestCase109612"
+        class="org.societies.integration.test.bit.activityfeedct.TestCase109612"
+        depends-on="commManager,cisManager,cisDirectoryRemote"
         init-method="run">
         <property name="commManager" ref="commManager" />
-        <property name="privacyPolicyManagerRemote" ref="privacyPolicyManagerRemote" />
-        <property name="privacyAgreementManagerRemote" ref="privacyAgreementManagerRemote" />
+        <property name="cisManager" ref="cisManager"/>
+        <property name="cisDirectory" ref="cisDirectoryRemote" />
     </bean>
 
 </beans>

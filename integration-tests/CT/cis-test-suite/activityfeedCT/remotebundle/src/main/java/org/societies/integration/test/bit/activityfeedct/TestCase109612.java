@@ -32,38 +32,45 @@ package org.societies.integration.test.bit.activityfeedct;
  * @author Olivier Maridat (Trialog)
  *
  */
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyAgreementManagerRemote;
-import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.integration.test.IntegrationTestCase;
+
 
 public class TestCase109612 extends IntegrationTestCase {
     private static Logger LOG = LoggerFactory.getLogger(TestCase109612.class.getSimpleName());
 
     public static ICommManager commManager;
     public static ICisManager cisManager;
-
+    public static ICisDirectoryRemote cisDirectory;
 
 
     public TestCase109612() {
         // Call the super constructor
         // with test case number
         // and test case classes to run
-        super(109611, new Class[]{ActivityFeedManagerRemoteTest.class});
+        super(109612, new Class[]{ActivityFeedManagerRemoteTest.class});
         ActivityFeedManagerRemoteTest.testCaseNumber = this.testCaseNumber;
     }
-
 
     /* -- Dependency injection --- */
     public void setCommManager(ICommManager commManager) {
         this.commManager = commManager;
         LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
     }
-    public  void setCisManager(ICisManager cisManager) {
-        LOG.debug("#"+testCaseNumber+"] [DependencyInjection] ICisManager injected");
+    public void setCisManager(ICisManager cisManager) {
         this.cisManager = cisManager;
+        LOG.debug("#"+testCaseNumber+"] [DependencyInjection] ICisManager injected");
     }
+    public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
+        this.cisDirectory = cisDirectory;
+        LOG.debug("#"+testCaseNumber+"] [DependencyInjection] cisDirectory injected");
+    }
+
+
+
 }

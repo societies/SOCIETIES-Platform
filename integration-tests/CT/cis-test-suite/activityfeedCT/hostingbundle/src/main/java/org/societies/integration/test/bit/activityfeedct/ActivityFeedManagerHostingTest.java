@@ -84,59 +84,12 @@ public class ActivityFeedManagerHostingTest {
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
         Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription);
-        LOG.info("[#"+testCaseNumber+"] creating cis2");
-        Future<ICisOwned> cis2 = TestCase109611.cisManager.createCis(cisName+"2", cisType, cisMembershipCriteria, cisDescription);
-
         try {
             LOG.info("[#"+testCaseNumber+"] inserting 1 activity into cis1");
             //inserting 1 activity into cis1
             cis1.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
                 @Override
                 public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                }
-            });
-            LOG.info("[#"+testCaseNumber+"] checking that cis1 has one activity");
-            //checking that cis1 has one activity
-            cis1.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                    assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
-                }
-            });
-            LOG.info("[#"+testCaseNumber+"] checking that cis2 has zero activities");
-            //checking that cis2 has zero activities
-            cis2.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                    assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==0);
-                }
-            });
-            LOG.info("[#"+testCaseNumber+"] inserting two activities into cis2");
-            //inserting two activities into cis2
-            cis2.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                }
-            });
-            cis2.get().getActivityFeed().addActivity(makeMessage("heh","heh","nonsense","0"),new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                }
-            });
-            LOG.info("[#"+testCaseNumber+"] checking that cis1 still only has one activity");
-            //checking that cis1 still only has one activity
-            cis1.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                    assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
-                }
-            });
-            LOG.info("[#"+testCaseNumber+"] checking that cis2 now has two activities");
-            //checking that cis2 now has two activities
-            cis2.get().getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
-                @Override
-                public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                    assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==2);
                 }
             });
         } catch (InterruptedException e) {

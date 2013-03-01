@@ -24,450 +24,136 @@
  */
 package org.societies.integration.test.bit.activityfeedct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
-import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManagerCallback;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 
 /**
  * Test list:
- * 
+ *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class ActivityFeedManagerRemoteTest implements IPrivacyPolicyManagerListener {
-	private static Logger LOG = LoggerFactory.getLogger(ActivityFeedManagerRemoteTest.class.getSimpleName());
+public class ActivityFeedManagerRemoteTest {
+    private static Logger LOG = LoggerFactory.getLogger(ActivityFeedManagerRemoteTest.class.getSimpleName());
+    public static Integer testCaseNumber;
 
-	public static Integer testCaseNumber = 0;
-
-	private IIdentity targetedNode;
-	private RequestorCis requestorCis;
-	private RequestorService requestorService;
-	private RequestPolicy cisPolicy;
-	private RequestPolicy servicePolicy;
-
-	@Before
-	public void setUp() throws Exception {
-		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::setUp");
-		// Dependency injection not ready
-		if (!TestCase109612.isDepencyInjectionDone()) {
-			throw new PrivacyException("[#"+testCaseNumber+"] [Dependency Injection] ActivityFeedManagerRemoteTest not ready");
-		}
-		// Data
-		targetedNode = TestCase109612.commManager.getIdManager().getThisNetworkNode();
-		requestorCis = getRequestorCis();
-		requestorService = getRequestorService();
-		cisPolicy = getRequestPolicy(requestorCis);
-		servicePolicy = getRequestPolicy(requestorService);
-	}
+    private String privacyPolicyWithoutRequestor;
+    private String cssId;
+    private List<String> cisIds;
+    private String cssPassword;
+    private String cisName;
+    private String cisDescription;
+    private String cisType;
+    private int numCIS = 6;
+    private Hashtable<String, MembershipCriteria> cisMembershipCriteria;
 
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testGetCisPrivacyPolicyNonExisting() {
-		String testTitle = new String("testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy expectedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
-	}
+    @Before
+    public void setUp() {
+        LOG.info("[#"+testCaseNumber+"] setUp");
+        cisIds = new ArrayList<String>();
+        cssId = TestCase109612.commManager.getIdManager().getThisNetworkNode().getJid();
+        cssPassword = "password.societies.local";
+        cisName = "CisTest";
+        cisDescription = "CIS to Test ActivityFeedManager";
+        cisType = "testCis";
+    }
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	public void testGetCisPrivacyPolicy() {
-		String testTitle = new String("testGetCisPrivacyPolicy: add and retrieve the CIS privacy policy ("+requestorCis+") from "+targetedNode);
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
-			}
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
-			}
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
-			}
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertTrue(true);
-	}
+    @After
+    public void tearDown() {
+        LOG.info("[#"+testCaseNumber+"] tearDown");
+    }
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testGetServicePrivacyPolicyNonExisting() {
-		String testTitle = new String("testGetServicePrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy expectedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
-	}
+    //Write/Read to multiple activities feeds with the container and test that what is written for a cis can be read only for that cis.
+    @Test
+    public void testActivityFeedManager() {
+        LOG.info("[#" + testCaseNumber + "] creating cis1");
+        final CisAdvertisementRecord[] advertisementRecord = {null};
+        LOG.info("[#"+testCaseNumber+"] getting all CIS advertisements.");
+        TestCase109612.cisDirectory.findAllCisAdvertisementRecords(new ICisDirectoryCallback() {
+            @Override
+            public void getResult(List<CisAdvertisementRecord> cisAdvertisementRecords) {
+                advertisementRecord[0] = cisAdvertisementRecords.get(0);
+            }
+        });
+        assert ( advertisementRecord[0] != null);
+        if(advertisementRecord[0] != null)
+            LOG.info("[#"+testCaseNumber+"] found one advertisementRecord[0].getName(): " + advertisementRecord[0].getName());
+        final ArrayList<Community> communities = new ArrayList<Community>();
+        LOG.info("[#"+testCaseNumber+"] trying to join cis "+advertisementRecord[0].getName());
+        final String cisname = advertisementRecord[0].getName();
+        TestCase109612.cisManager.joinRemoteCIS(advertisementRecord[0],new ICisManagerCallback() {
+            @Override
+            public void receiveResult(CommunityMethods communityResultObject) {
+                communities.add(communityResultObject.getJoinResponse().getCommunity());
+            }
+        });
+        assert (communities.size() != 0);
+        assert (communities.get(0) != null);
+        LOG.info("[#"+testCaseNumber+"] joined community with jid: "+communities.get(0).getCommunityJid());
+        ICis cis1 = TestCase109612.cisManager.getCis(communities.get(0).getCommunityJid());
+        assert (cis1 != null);
+        //inserting 1 activity into cis1
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testGetServicePrivacyPolicy() {
-		String testTitle = new String("testGetServicePrivacyPolicy: add and retrieve a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(servicePolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
+        LOG.info("[#"+testCaseNumber+"] checking that cis1 has one activity");
+        cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
+            @Override
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 1)");
+                assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
+            }
+        });
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
-	 */
-	@Test
-	@Ignore
-	public void testUpdatesCisPrivacyPolicy() {
-		String testTitle = new String("testUpdatePrivacyPolicy: update the same privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy1 = null;
-		RequestPolicy privacyPolicy2 = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
-		assertEquals("Difference between same privacy policies", privacyPolicy1, privacyPolicy2);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
+        LOG.info("[#"+testCaseNumber+"] inserting another activity into cis1, then checking if cis1 has two activities..");
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
-	 */
-	@Test
-	@Ignore
-	public void testUpdatesCisPrivacyPolicies() {
-		String testTitle = new String("testUpdatePrivacyPolicy: update the same privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy1 = null;
-		RequestPolicy privacyPolicy2 = null;
-		RequestItem requestItem = new RequestItem(cisPolicy.getRequests().get(0).getResource(), cisPolicy.getRequests().get(0).getActions(), cisPolicy.getRequests().get(0).getConditions());
-		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		requestItems.add(requestItem);
-		RequestPolicy cisPolicy2 = new RequestPolicy(requestItems);
-		cisPolicy2.setRequestor(requestorCis);
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy2, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		assertEquals("Privacy policy not updated", cisPolicy2, privacyPolicy2);
-		assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
+        cis1.getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
+            @Override
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname );
+            }
+        });
+        cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
+            @Override
+            public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 2)");
+                assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==2);
+            }
+        });
+        LOG.info("[#"+testCaseNumber+"] has been run sucsessfully");
+        assert(cisIds.size()==this.numCIS);
+    }
 
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteServicePrivacyPolicyNotExisting() {
-		String testTitle = new String("testDeleteServicePrivacyPolicyNotExisting: delete a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNull("This privacy policy exists!", privacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
+    //util methods
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteCisPrivacyPolicyNotExisting() {
-		String testTitle = new String("testDeleteCisPrivacyPolicyNotExisting: delete a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNull("This privacy policy exists!", privacyPolicy);
-		if (null != privacyPolicy) {
-			LOG.info(privacyPolicy.toXMLString());
-		}
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
+    public Activity makeMessage(String user1, String user2, String message, String published){
+        Activity ret = new Activity();
+        ret.setActor(user1);
+        ret.setObject(message);
+        ret.setTarget(user2);
+        ret.setPublished(published);
+        return ret;
+    }
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteServicePrivacyPolicy() {
-		String testTitle = new String("testDeletePrivacyPolicy: add and retrieve and delete a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicyBefore = null;
-		RequestPolicy privacyPolicyAfter = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(servicePolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
-	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteCisPrivacyPolicy() {
-		String testTitle = new String("testDeleteCisPrivacyPolicy: add and retrieve and delete a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicyBefore = null;
-		RequestPolicy privacyPolicyAfter = null;
-		boolean deleteResult = false;
-		try {
-			TestCase109612.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase109612.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
-	}
-
-
-	
-	/* --- Tools --- */
-	private RequestPolicy getRequestPolicy(Requestor requestor) {
-		List<RequestItem> requestItems = getRequestItems();
-		RequestPolicy requestPolicy = new RequestPolicy(requestor, requestItems);
-		return requestPolicy;
-	}
-
-	private List<RequestItem> getRequestItems() {
-		List<RequestItem> items = new ArrayList<RequestItem>();
-		Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.READ));
-		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
-		items.add(rItem);
-		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_COORDINATES);
-		List<Condition> extendedConditions = new ArrayList<Condition>();
-		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"0"));
-		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "1"));
-		List<Action> extendedActions = new ArrayList<Action>();
-		extendedActions.add(new Action(ActionConstants.READ));
-		extendedActions.add(new Action(ActionConstants.CREATE));
-		extendedActions.add(new Action(ActionConstants.WRITE));
-		extendedActions.add(new Action(ActionConstants.DELETE));
-		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
-		items.add(someItem);
-		return items;
-	}
-
-	private RequestorService getRequestorService() throws InvalidFormatException{
-		IIdentity requestorId = TestCase109612.commManager.getIdManager().fromJid("olivier.societies.local");
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setServiceInstanceIdentifier("css://olivier@societies.local/HelloEarth");
-		try {
-			serviceId.setIdentifier(new URI("css://olivier@societies.local/HelloEarth"));
-		} catch (URISyntaxException e) {
-			LOG.error("Can't create the service ID", e);
-		}
-		return new RequestorService(requestorId, serviceId);
-	}
-
-	private RequestorCis getRequestorCis() throws InvalidFormatException{
-		IIdentity otherCssId = TestCase109612.commManager.getIdManager().fromJid("olivier.societies.local");
-		IIdentity cisId = TestCase109612.commManager.getIdManager().fromJid("cis-one.societies.local");
-		return new RequestorCis(otherCssId, cisId);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onPrivacyPolicyRetrieved(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	@Override
-	public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy) {
-		LOG.info("onPrivacyPolicyRetrieved: "+privacyPolicy.toXMLString());
-		if (null != privacyPolicy) {
-			LOG.info(privacyPolicy.toXMLString());
-		}
-		else {
-			LOG.error("*** Privacy Policy retrieved is null!");
-		}
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationSucceed(java.lang.String)
-	 */
-	@Override
-	public void onOperationSucceed(String msg) {
-		LOG.info("onOperationSucceed: "+msg);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationCancelled(java.lang.String)
-	 */
-	@Override
-	public void onOperationCancelled(String msg) {
-		LOG.info("onOperationCancelled: "+msg);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationAborted(java.lang.String, java.lang.Exception)
-	 */
-	@Override
-	public void onOperationAborted(String msg, Exception e) {
-		LOG.info("onOperationAborted: "+msg, e);
-	}
 }

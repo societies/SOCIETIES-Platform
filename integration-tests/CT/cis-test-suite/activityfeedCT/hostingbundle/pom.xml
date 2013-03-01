@@ -71,6 +71,22 @@
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
 		</dependency>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>activityfeedservice</artifactId>
+            <version>${version.cis}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>common-ext-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
