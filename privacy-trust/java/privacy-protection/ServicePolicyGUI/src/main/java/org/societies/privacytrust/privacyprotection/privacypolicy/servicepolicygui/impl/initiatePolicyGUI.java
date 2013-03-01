@@ -24,10 +24,33 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy.servicepolicygui.impl;
 
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
+import com.alee.laf.WebLookAndFeel;
+
 public class initiatePolicyGUI
 {
 	public static void main(String[] args)
 	{
+/*		try {
+		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		        if ("Nimbus".equals(info.getName())) {
+		            UIManager.setLookAndFeel(info.getClassName());
+		            break;
+		        }
+		    }
+		} catch (Exception e) {
+		    // If Nimbus is not available, you can set the GUI to another look and feel.
+		}*/
+
+		//		WebLookAndFeel.install();
+		try {
+			
+		    UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 		RequestPolicyGUI gui = new RequestPolicyGUI();
 		GUIFrame frame = new GUIFrame(gui);
 		frame.setVisible(true);

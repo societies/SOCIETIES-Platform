@@ -89,6 +89,12 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.css.friends</groupId>
+   			<artifactId>FriendsManager</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
     </dependencies>
 
     <build>

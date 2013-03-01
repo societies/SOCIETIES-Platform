@@ -45,19 +45,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        
         <activity android:name=".MasterPreferences"
 			android:label="@string/app_name">
 		</activity>
-        
         <activity android:name=".AboutActivity"
 			android:label="@string/app_name">
 		</activity>
         
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
-        <activity android:name="org.societies.android.platform.events.notifications.FriendsActivity" android:label="@string/title_activity_friends" />
+        <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
         		
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
@@ -67,7 +64,8 @@
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
-        <service android:name="org.societies.android.platform.events.notifications.FriendsService" />
+        <service android:name="org.societies.android.platform.css.friends.FriendsManager" />
+        <service android:name="org.societies.android.platform.css.friends.EventService" />
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
                 <action android:name="org.societies.android.platform.cis.CisDirectoryRemote" />

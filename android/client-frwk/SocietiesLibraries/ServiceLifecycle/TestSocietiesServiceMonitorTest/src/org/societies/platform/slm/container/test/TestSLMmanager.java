@@ -1,5 +1,7 @@
 package org.societies.platform.slm.container.test;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.platform.slm.container.ServiceManagementTest;
@@ -29,7 +31,7 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
 	
     private IServiceDiscovery serviceDisco;
     private long testStartTime, testEndTime;
-    
+    private CountDownLatch serviceDiscoConnected;
 	
     public TestSLMmanager() {
         super(ServiceManagementTest.class);
@@ -38,12 +40,15 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
+		serviceDiscoConnected = new CountDownLatch(1);
+		
         Intent commsIntent = new Intent(getContext(), ServiceManagementTest.class);
         LocalSLMBinder binder = (LocalSLMBinder) bindService(commsIntent);
         assertNotNull(binder);
         this.serviceDisco = (IServiceDiscovery) binder.getService();
         this.serviceDisco.startService();
-        Thread.sleep(DELAY);
+        
+        serviceDiscoConnected.await();
 	}
 
 	protected void tearDown() throws Exception {
@@ -141,6 +146,7 @@ public class TestSLMmanager extends ServiceTestCase<ServiceManagementTest> {
 	        else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
 	        	boolean started = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
 	        	Log.d(LOG_TAG, "Service started: " + started);
+	        	TestSLMmanager.this.serviceDiscoConnected.countDown();
 	        }
         }
     }
