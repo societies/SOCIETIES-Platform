@@ -35,12 +35,15 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.css.friends.EventService;
+import org.societies.android.platform.css.friends.FriendsManagerLocal;
+import org.societies.android.platform.css.friends.FriendsManagerLocal.LocalFriendsManagerBinder;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
@@ -69,7 +72,7 @@ public class SocietiesClientServicesController {
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	private final static int NUM_SERVICES = 12;
+	private final static int NUM_SERVICES = 13;
 	
 	private final static int EVENT_SERVICE 				= 0;
 	private final static int CIS_DIRECTORY_SERVICE 		= 1;
@@ -83,6 +86,7 @@ public class SocietiesClientServicesController {
 	private final static int SNS_SOCIAL_DATA_SERVICE 	= 9;
 	private final static int PERSONALISATION_SERVICE 	= 10;
 	private final static int SLM_SERVICE_DISCO_SERVICE 	= 11;
+	private final static int FRIENDS_MANAGER_SERVICE 	= 12;
 	
 	private Context context;
 	private CountDownLatch servicesBinded;
@@ -99,6 +103,7 @@ public class SocietiesClientServicesController {
 	private IServiceDiscovery slmServiceDisco;
 	private IServiceControl slmServiceControl;
 	private ISocialData snsConnectorService;
+	private IFriendsManager friendMgrService;
 	
 	public SocietiesClientServicesController(Context context) {
 		this.context = context;
@@ -397,6 +402,26 @@ public class SocietiesClientServicesController {
 		}
 	};
 	
+	private ServiceConnection friendsMgrConnection = new ServiceConnection() {
+		
+		public void onServiceDisconnected(ComponentName name) {
+			Log.d(LOG_TAG, "Disconnecting from Platform Friends Manager service");
+			SocietiesClientServicesController.this.connectedToServices[FRIENDS_MANAGER_SERVICE] = false;
+		}
+		
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			Log.d(LOG_TAG, "Connecting to Platform Friends Manager service");
+	
+			SocietiesClientServicesController.this.connectedToServices[FRIENDS_MANAGER_SERVICE] = true;
+	
+			//Get a local binder
+			LocalFriendsManagerBinder binder = (LocalFriendsManagerBinder) service;
+			//Retrieve the local service API
+			SocietiesClientServicesController.this.friendMgrService = (IFriendsManager) binder.getService();
+			SocietiesClientServicesController.this.servicesBinded.countDown();
+		}
+	};
+	
 //  private ServiceConnection ???Connection = new ServiceConnection() {
 //
 //      public void onServiceDisconnected(ComponentName name) {
@@ -477,6 +502,10 @@ public class SocietiesClientServicesController {
         	serviceIntent = new Intent(SocietiesClientServicesController.this.context, SocialData.class);
         	SocietiesClientServicesController.this.context.bindService(serviceIntent, snsSocialDataConnection, Context.BIND_AUTO_CREATE);
         	
+        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Friends Manager Service");
+        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, FriendsManagerLocal.class);
+        	SocietiesClientServicesController.this.context.bindService(serviceIntent, friendsMgrConnection, Context.BIND_AUTO_CREATE);
+        	
 //    		Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Personalisation Manager Service");
 //        	serviceIntent = new Intent(ICoreSocietiesServices.PERSONALISATION_SERVICE_INTENT);
 //        	SocietiesClientServicesController.this.context.bindService(serviceIntent, personalisationMgrConnection, Context.BIND_AUTO_CREATE);
@@ -539,6 +568,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceDisco.startService();
     		SocietiesClientServicesController.this.slmServiceControl.startService();
     		SocietiesClientServicesController.this.snsConnectorService.startService();
+    		SocietiesClientServicesController.this.friendMgrService.startService();
     		
     		//START "STARTED SERVICES"
         	//FRIENDS SERVICE
@@ -584,7 +614,7 @@ public class SocietiesClientServicesController {
     		
     		boolean retValue = true;
     		
-    		//Stop remote platform services
+    		//STOP REMOTE SERVICES
     		for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
     			if (null != SocietiesClientServicesController.this.allMessengers[i]) {
             		String targetMethod = IServiceManager.methodsArray[1];
@@ -602,15 +632,16 @@ public class SocietiesClientServicesController {
     			}
      		}
 
-    		//Stop local platform services
+    		//STOP LOCAL SERVICES
     		SocietiesClientServicesController.this.cssDirectoryService.stopService();
     		SocietiesClientServicesController.this.slmServiceDisco.stopService();
     		SocietiesClientServicesController.this.slmServiceControl.stopService();
     		SocietiesClientServicesController.this.snsConnectorService.stopService();
+    		SocietiesClientServicesController.this.friendMgrService.stopService();
     		//STOP "STARTED SERVICES"
         	//FRIENDS SERVICE
-            //Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, FriendsService.class);
-            //SocietiesClientServicesController.this.context.stopService(intentFriends);
+            Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, EventService.class);
+            SocietiesClientServicesController.this.context.stopService(intentFriends);
             //USER AGENT SERVICE
             //Intent intentUserAgent = new Intent(SocietiesClientServicesController.this.context, UserAgent.class);
             //SocietiesClientServicesController.this.context.stopService(intentUserAgent);   		
