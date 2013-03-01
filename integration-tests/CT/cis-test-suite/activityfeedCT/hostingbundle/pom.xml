@@ -87,7 +87,12 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
+            <version>0.4.1</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

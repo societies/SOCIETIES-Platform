@@ -35,12 +35,11 @@ import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -127,28 +126,5 @@ public class ActivityFeedManagerHostingTest {
         ret.setTarget(user2);
         ret.setPublished(published);
         return ret;
-    }
-    private List<RequestItem> createTestPrivacyPolicy() {
-        List<Action> actionsRw = new ArrayList<Action>();
-        actionsRw.add(new Action(ActionConstants.READ));
-        actionsRw.add(new Action(ActionConstants.WRITE, true));
-        List<Action> actionsR = new ArrayList<Action>();
-        actionsR.add(new Action(ActionConstants.READ));
-        List<Condition> conditionsMembersOnly = new ArrayList<Condition>();
-        conditionsMembersOnly.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
-        conditionsMembersOnly.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-        List<Condition> conditionsPublic = new ArrayList<Condition>();
-        conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
-        conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-        List<Condition> conditionsPrivate = new ArrayList<Condition>();
-        conditionsPrivate.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
-        conditionsPrivate.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-        conditionsPrivate.add(new Condition(ConditionConstants.MAY_BE_INFERRED, "1"));
-        List<RequestItem> requests = new ArrayList<RequestItem>();
-        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC), actionsRw, conditionsMembersOnly));
-        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.BIRTHDAY), actionsR, conditionsPublic));
-        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LAST_ACTION), actionsR, conditionsPrivate));
-        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CIS, "cis-member-list"), actionsRw, conditionsMembersOnly));
-        return requests;
     }
 }
