@@ -32,10 +32,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -84,7 +87,12 @@ public class ActivityFeedManagerHostingTest {
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
         Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription);
+
         try {
+            ICisOwned cisOwned = cis1.get();
+            CisAdvertisementRecord cisAdvertisementRecord = new CisAdvertisementRecord();
+            cisAdvertisementRecord.setName(cisOwned.getName()); cisAdvertisementRecord.setId(cisOwned.getCisId()); cisAdvertisementRecord.setCssownerid(cisOwned.getOwnerId());
+            TestCase109611.cisDirectory.addCisAdvertisementRecord(cisAdvertisementRecord);
             LOG.info("[#"+testCaseNumber+"] inserting 1 activity into cis1");
             //inserting 1 activity into cis1
             cis1.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {

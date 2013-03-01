@@ -12,6 +12,7 @@
         init-method="run">
         <property name="commManager" ref="commManager" />
         <property name="cisManager" ref="cisManager" />
+        <property name="cisDirectory" ref="cisDirectoryRemote" />
     </bean>
 
 </beans>

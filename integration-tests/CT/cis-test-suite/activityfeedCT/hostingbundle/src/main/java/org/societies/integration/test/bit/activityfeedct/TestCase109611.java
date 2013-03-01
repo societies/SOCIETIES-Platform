@@ -32,8 +32,10 @@ package org.societies.integration.test.bit.activityfeedct;
  * @author Olivier Maridat (Trialog)
  *
  */
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.integration.test.IntegrationTestCase;
@@ -43,7 +45,7 @@ public class TestCase109611 extends IntegrationTestCase {
 
 	public static ICommManager commManager;
     public static ICisManager cisManager;
-
+    public static ICisDirectoryRemote cisDirectory;
 
 
     public TestCase109611() {
@@ -63,5 +65,10 @@ public class TestCase109611 extends IntegrationTestCase {
     public  void setCisManager(ICisManager cisManager) {
         LOG.debug("#"+testCaseNumber+"] [DependencyInjection] ICisManager injected");
         this.cisManager = cisManager;
+    }
+
+    public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
+        LOG.debug("#"+testCaseNumber+"] [DependencyInjection] CisDirectory injected");
+        this.cisDirectory = cisDirectory;
     }
 }
