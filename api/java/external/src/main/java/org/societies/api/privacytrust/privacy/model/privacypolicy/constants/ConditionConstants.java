@@ -28,6 +28,12 @@ package org.societies.api.privacytrust.privacy.model.privacypolicy.constants;
  * @author Elizabeth
  *
  */
+
+/**
+ * Please refer to {@value PrivacyConditionsConstantValues} for values. 
+ * @author Eliza
+ *
+ */
 public enum ConditionConstants {
 	SHARE_WITH_3RD_PARTIES,
 	SHARE_WITH_CIS_MEMBERS_ONLY,

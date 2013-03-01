@@ -105,6 +105,10 @@ public class EventTypes {
 	/** CIS unsubscription */
 	public static final String CIS_UNSUBS = "org/societies/cis/unsubscription";	
 
+	/** CIS restore - for the case when a CIS is restored from the database */
+	public static final String CIS_RESTORE = "org/societies/cis/restore";	
+
+	
 	/** Published by the DisplayDriver service to notify when a display is available to use */
 	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
 
