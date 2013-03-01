@@ -42,6 +42,7 @@ import org.societies.api.cis.directory.ICisDirectoryCallback;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
@@ -97,11 +98,24 @@ public class ActivityFeedManagerRemoteTest {
                 advertisementRecord[0] = cisAdvertisementRecords.get(0);
             }
         });
+        int maxCounter = 10000,counter=0;
+        try {
+            while(advertisementRecord[0] == null) {
+                Thread.sleep(100);
+                counter += 100;
+                if (counter > maxCounter) {
+                    LOG.info("[#"+testCaseNumber+"] giving up waiting (10s) for response from findallcisadvertisements.., this test will fail.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         assert ( advertisementRecord[0] != null);
         if(advertisementRecord[0] != null)
             LOG.info("[#"+testCaseNumber+"] found one advertisementRecord[0].getName(): " + advertisementRecord[0].getName());
         final ArrayList<Community> communities = new ArrayList<Community>();
-        LOG.info("[#"+testCaseNumber+"] trying to join cis "+advertisementRecord[0].getName());
+        LOG.info("[#"+testCaseNumber+"] trying to join cis "+ advertisementRecord[0].getName());
         final String cisname = advertisementRecord[0].getName();
         TestCase109612.cisManager.joinRemoteCIS(advertisementRecord[0],new ICisManagerCallback() {
             @Override
@@ -109,6 +123,19 @@ public class ActivityFeedManagerRemoteTest {
                 communities.add(communityResultObject.getJoinResponse().getCommunity());
             }
         });
+        counter = 0;
+        try {
+            while(communities.size() < 1 ) {
+                Thread.sleep(100);
+                counter += 100;
+                if (counter > maxCounter)  {
+                    LOG.info("[#"+testCaseNumber+"] giving up waiting (10s) for response from joinRemoteCIS, this test will fail.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         assert (communities.size() != 0);
         assert (communities.get(0) != null);
         LOG.info("[#"+testCaseNumber+"] joined community with jid: "+communities.get(0).getCommunityJid());
@@ -117,30 +144,72 @@ public class ActivityFeedManagerRemoteTest {
         //inserting 1 activity into cis1
 
         LOG.info("[#"+testCaseNumber+"] checking that cis1 has one activity");
+        final ArrayList<MarshaledActivity> activities = new ArrayList<MarshaledActivity>();
         cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
                 LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 1)");
                 assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
+                activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0));
             }
         });
-
+        counter = 0;
+        try {
+            while(activities.size() > 0 ) {
+                Thread.sleep(100);
+                counter += 100;
+                if (counter > maxCounter)  {
+                    LOG.info("[#"+testCaseNumber+"] giving up waiting (10s) for response from getactivities, this test will fail.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         LOG.info("[#"+testCaseNumber+"] inserting another activity into cis1, then checking if cis1 has two activities..");
-
+        final Boolean[] done = {null};
         cis1.getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
+                done[0] = activityFeedObject.getAddActivityResponse().isResult();
                 LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname );
             }
         });
+        try {
+            while(done[0] != true ) {
+                Thread.sleep(100);
+                counter += 100;
+                if (counter > maxCounter)  {
+                    LOG.info("[#"+testCaseNumber+"] giving up waiting (10s) for response from addActivity, this test will fail.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        activities.clear();
         cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
                 LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 2)");
                 assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==2);
+                activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0));
+                activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(1));
             }
         });
-        LOG.info("[#"+testCaseNumber+"] has been run sucsessfully");
+        try {
+            while(activities.size() < 1) {
+                Thread.sleep(100);
+                counter += 100;
+                if (counter > maxCounter)  {
+                    LOG.info("[#"+testCaseNumber+"] giving up waiting (10s) for response from getActivities, this test will fail.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        LOG.info("[#"+testCaseNumber+"] has been run successfully");
         assert(cisIds.size()==this.numCIS);
     }
 

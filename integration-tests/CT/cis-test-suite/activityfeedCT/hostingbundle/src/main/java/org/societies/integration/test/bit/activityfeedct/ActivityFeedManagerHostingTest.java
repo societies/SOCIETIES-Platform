@@ -34,8 +34,16 @@ import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,13 +94,14 @@ public class ActivityFeedManagerHostingTest {
     @Test
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
+        PrivacyPolicy privacyPolicy = new PrivacyPolicy();
         Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription);
 
         try {
-            ICisOwned cisOwned = cis1.get();
-            CisAdvertisementRecord cisAdvertisementRecord = new CisAdvertisementRecord();
-            cisAdvertisementRecord.setName(cisOwned.getName()); cisAdvertisementRecord.setId(cisOwned.getCisId()); cisAdvertisementRecord.setCssownerid(cisOwned.getOwnerId());
-            TestCase109611.cisDirectory.addCisAdvertisementRecord(cisAdvertisementRecord);
+            //ICisOwned cisOwned = cis1.get();
+            //CisAdvertisementRecord cisAdvertisementRecord = new CisAdvertisementRecord();
+            //cisAdvertisementRecord.setName(cisOwned.getName()); cisAdvertisementRecord.setId(cisOwned.getCisId()); cisAdvertisementRecord.setCssownerid(cisOwned.getOwnerId());
+            //TestCase109611.cisDirectory.addCisAdvertisementRecord(cisAdvertisementRecord);
             LOG.info("[#"+testCaseNumber+"] inserting 1 activity into cis1");
             //inserting 1 activity into cis1
             cis1.get().getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
@@ -105,7 +114,7 @@ public class ActivityFeedManagerHostingTest {
         } catch (ExecutionException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        LOG.info("[#"+testCaseNumber+"] has been run sucsessfully");
+        LOG.info("[#"+testCaseNumber+"] has been run successfully");
         assert(cisIds.size()==this.numCIS);
     }
 
@@ -120,5 +129,27 @@ public class ActivityFeedManagerHostingTest {
         ret.setPublished(published);
         return ret;
     }
-
+    private List<RequestItem> createTestPrivacyPolicy() {
+        List<Action> actionsRw = new ArrayList<Action>();
+        actionsRw.add(new Action(ActionConstants.READ));
+        actionsRw.add(new Action(ActionConstants.WRITE, true));
+        List<Action> actionsR = new ArrayList<Action>();
+        actionsR.add(new Action(ActionConstants.READ));
+        List<Condition> conditionsMembersOnly = new ArrayList<Condition>();
+        conditionsMembersOnly.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
+        conditionsMembersOnly.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+        List<Condition> conditionsPublic = new ArrayList<Condition>();
+        conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+        conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+        List<Condition> conditionsPrivate = new ArrayList<Condition>();
+        conditionsPrivate.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
+        conditionsPrivate.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+        conditionsPrivate.add(new Condition(ConditionConstants.MAY_BE_INFERRED, "1"));
+        List<RequestItem> requests = new ArrayList<RequestItem>();
+        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC), actionsRw, conditionsMembersOnly));
+        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.BIRTHDAY), actionsR, conditionsPublic));
+        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LAST_ACTION), actionsR, conditionsPrivate));
+        requests.add(new RequestItem(new Resource(DataIdentifierScheme.CIS, "cis-member-list"), actionsRw, conditionsMembersOnly));
+        return requests;
+    }
 }
