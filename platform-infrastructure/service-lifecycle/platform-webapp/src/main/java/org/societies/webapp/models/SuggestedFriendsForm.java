@@ -6,6 +6,7 @@ private String method;
 private String friendId;
 
 
+
 		
 	public String getMethod() {
 		return method;

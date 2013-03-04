@@ -1,7 +1,7 @@
 package org.societies.android.platform.css.friends;
 
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
-import org.societies.android.platform.css.friends.FriendsManager.LocalFriendsManagerBinder;
+import org.societies.android.platform.css.friends.FriendsManagerLocal.LocalFriendsManagerBinder;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 import android.os.Bundle;
@@ -87,11 +87,12 @@ public class AcceptFriendActivity extends Activity {
 	public void onDestroy() {
 		Log.d(LOG_TAG, "FriendsActivity service terminating");
 		AcceptFriendActivity.this.getApplicationContext().unbindService(friendManagerConnection);
+		super.onDestroy();
 	}
     
     private void acceptFriendRequest(String requestId) {
     	//BIND TO CSS MANAGER AND SEND ACCEPT
-    	Intent cssManagerintent = new Intent(getApplicationContext(), FriendsManager.class);
+    	Intent cssManagerintent = new Intent(getApplicationContext(), FriendsManagerLocal.class);
     	this.getApplicationContext().bindService(cssManagerintent, friendManagerConnection, Context.BIND_AUTO_CREATE);
     }
 }

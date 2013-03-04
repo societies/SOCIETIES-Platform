@@ -11,6 +11,7 @@ import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.api.identity.IIdentity;
@@ -40,7 +41,6 @@ public class PubsubCommsMgr {
 	private String clientPackageName;
 	private Random randomGenerator;
 	private PacketMarshaller marshaller = new PacketMarshaller();
-    private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
     private static final boolean DEBUG_LOGGING = false;
 
 	private Context androidContext;
@@ -123,7 +123,6 @@ public class PubsubCommsMgr {
 				}
 			}
 		}
-		
 		return retValue;
 	}
 	
@@ -141,9 +140,11 @@ public class PubsubCommsMgr {
 			this.xmppCallbackMap.put(callbackID, callback);
 		}
 		
-//		for (String element : elementNames) {
-//			Log.d(LOG_TAG, "register element: " + element);
-//		}
+		if (DEBUG_LOGGING) {
+	//		for (String element : elementNames) {
+	//			Log.d(LOG_TAG, "register element: " + element);
+	//		}
+		};
 
 		final List<String> namespaces = callback.getXMLNamespaces();
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
@@ -498,7 +499,7 @@ public class PubsubCommsMgr {
     }
     
     private void bindToServiceAfterLogin() {
-    	Intent serviceIntent = new Intent(SERVICE_ACTION);
+    	Intent serviceIntent = new Intent(ICoreSocietiesServices.COMMS_SERVICE_INTENT);
 		if (DEBUG_LOGGING) {
 	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
 		};

@@ -26,6 +26,7 @@ import android.util.Log;
  * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid and the user XMPP_IDENTIFIER exists
  * 4. The user XMPP_NEW_IDENTIFIER must be removed prior to running the tests as the destroyMainIdentity
  *   method is not currently functioning.
+ * 5. The Societies Android Comms apk must be installed
  *
  */
 
@@ -737,7 +738,7 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 										
 										public void returnAction(boolean arg0) {
 										}
-									});
+									}, null);
 								} catch (XMPPError e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

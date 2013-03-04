@@ -62,6 +62,7 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Debug;
 import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
@@ -95,6 +96,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.serviceContext = serviceContext;
 		this.pubsubRegistered = false;
 		this.pubsubListener = null;
+		
+		//Android Profiling
+		Debug.startMethodTracing(this.getClass().getSimpleName());
 	}
 	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
@@ -135,8 +139,7 @@ public class AndroidCommsBase implements XMPPAgent {
 				
 				this.pubsubListener = new RegisterPacketListener(client, remoteCallId);
 				
-				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), 
-												new NamespaceFilter(namespaces)));
+				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), new NamespaceFilter(namespaces)));
 				this.pubsubRegistered = true;
 				if (DEBUG_LOGGING) {
 					Log.d(LOG_TAG, "Pubsub event listener registered");
@@ -210,6 +213,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			//Android Profiling
+			Debug.stopMethodTracing();
 		}
 
 		return false;
@@ -501,6 +507,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Create intent sent");
+			}
 			//Send intent
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
@@ -536,11 +545,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		try {
 			connect();
 			retValue = username + "/" + resource;
+			//Send intent
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
+
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
 			//Send intent
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
 		}
 		return null;
@@ -681,6 +692,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "connect");
 		};
+		
 		if(!connection.isConnected()) {
 			connection.connect();
 			connection.login(username, password, resource);

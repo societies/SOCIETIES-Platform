@@ -30,12 +30,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ExpProposalType;
 import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackService;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService.FeedbackContainerBinder;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
@@ -64,7 +66,8 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 
 	private Boolean receivedResult = false;
 	private EventsHelper eventsHelper;
-	
+	private boolean isEventsConnected = false;
+
 	public TestUserFeedback() {
 		super(TestContainerFeedbackService.class);
 		// TODO Auto-generated constructor stub
@@ -73,6 +76,28 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		this.receivedResult = false;
+		setupBroadcastReceiver();
+		//setup eventsHelper
+		eventsHelper = new EventsHelper(this.getContext());
+		eventsHelper.setUpService(new IMethodCallback() {
+
+
+
+			@Override
+			public void returnAction(String result) {
+				Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+
+			}
+
+			@Override
+			public void returnAction(boolean resultFlag) {
+				Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+				isEventsConnected=true;
+
+			}
+		});
+
 	}
 
 	private class UserFeedbackBroadcastReceiver extends BroadcastReceiver{
@@ -80,7 +105,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			
+
 			assertNotNull(intent.getParcelableExtra(IAndroidUserFeedback.INTENT_RETURN_VALUE));
 			TestUserFeedback.this.receivedResult = true;
 			Log.d(LOG_TAG, "OnReceive finished");
@@ -88,19 +113,19 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 
 	}
 
-	
+
 	@MediumTest
 	public void testGetExplicitFB() {
-		setupBroadcastReceiver();
+
 		Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
-		
+
 		FeedbackContainerBinder binder =  (FeedbackContainerBinder) bindService(userFeedbackIntent);
-		
-		
+
+
 		IAndroidUserFeedback ufService = (IAndroidUserFeedback) binder.getService();
 
-	
-		
+
+
 		ExpProposalContent proposal = new ExpProposalContent("Testing explicit proposal user feedback", new String[]{"Yes","No"});
 		ExpFeedbackResultBean bean = ufService.getExplicitFB(CLIENT_ID, ExpProposalType.ACKNACK, proposal);
 
@@ -108,117 +133,155 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 			try {
 				Log.d(LOG_TAG, "Not received result");
 				Thread.sleep(1000);
-				
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 		Log.d(LOG_TAG, "Received result");
 	}
-	
+
 	@MediumTest
 	public void testGetExplicitFBTriggerFromCloud(){
-		Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
+		/*Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
 		FeedbackContainerBinder binder = (FeedbackContainerBinder) bindService(userFeedbackIntent);
-		
-		IAndroidUserFeedback ufService = binder.getService();
-		
+
+		IAndroidUserFeedback ufService = binder.getService();*/
+
+		IAndroidUserFeedback ufService = new AndroidUserFeedbackService(getContext(), false);
 		boolean started = ufService.startService();
-		
+
 		if (started){
 			Log.d(LOG_TAG, "Connecting to pubsub");
-			setupBroadcastReceiver();
+
 			Log.d(LOG_TAG, "Setup broadcast receiver");
-			eventsHelper = new EventsHelper(this.getContext());
+
 			Log.d(LOG_TAG, "new EventService");
-			eventsHelper.setUpService(new IMethodCallback() {
+			if (isEventsConnected){
+
+				Log.d(LOG_TAG, "Connected to eventsManager");
+				subscribeToEvent();
+				publishEvent();
+
+
+			}else{
+				android.test.AndroidTestCase.fail("Failed to connect to : "+EventsHelper.class.getName());
+			}
+		}
+		else{
+			android.test.AndroidTestCase.fail("Failed to startService(): "+IAndroidUserFeedback.class.getName());
+		}
+
+
+		while (!this.receivedResult){
+			try {
+				Log.d(LOG_TAG, "Not received result");
+				Thread.sleep(1000);
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		Log.d(LOG_TAG, "Received result");
+	}
+
+
+	/**
+	 * Create a broadcast receiver
+	 * 
+	 */
+	private void setupBroadcastReceiver() {
+		BroadcastReceiver receiver = null;
+
+		Log.d(LOG_TAG, "Set up broadcast receiver");
+
+		receiver = new UserFeedbackBroadcastReceiver();
+		IntentFilter intentFilter = createTestIntentFilter();
+
+		getContext().registerReceiver(receiver, intentFilter); 
+
+		Log.d(LOG_TAG, "Registered broadcast receiver");
+
+	}
+
+
+	/**
+	 * Create a suitable intent filter
+	 * @return IntentFilter
+	 */
+	private IntentFilter createTestIntentFilter() {
+		//register broadcast receiver to receive SocietiesEvents return values 
+		IntentFilter intentFilter = new IntentFilter();
+
+		intentFilter.addAction(IAndroidUserFeedback.GET_IMPLICITFB);
+		intentFilter.addAction(IAndroidUserFeedback.GET_EXPLICITFB);
+		intentFilter.addAction(IAndroidUserFeedback.INTENT_RETURN_VALUE);
+
+		return intentFilter;
+	}
+
+
+	private void publishEvent(){
+		UserFeedbackBean bean = new UserFeedbackBean();
+		bean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+		List<String> options = new ArrayList<String>();
+		options.add("Yes");
+		options.add("No");
+		bean.setOptions(options);
+		bean.setProposalText("Click here to test user feedback notifications triggered by pubsub");
+		bean.setRequestId(UUID.randomUUID().toString());
+		bean.setType(ExpProposalType.ACKNACK);
+		try {
+			if (eventsHelper==null){
+				Log.d(LOG_TAG, "EventsHelper is null");
+			}else{
+				Log.d(LOG_TAG, "EventsHelper is NOT null");
+			}
+
+			eventsHelper.publishEvent(UserFeedbackEventTopics.REQUEST, bean, new IPlatformEventsCallback() {
+
+				@Override
+				public void returnAction(int arg0) {
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+
+				}
+
+				@Override
+				public void returnAction(boolean arg0) {
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Published event");
+
+				}
+			});
+		} catch (PlatformEventsHelperNotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
+	private void subscribeToEvent() {
+		try {
+			eventsHelper.subscribeToEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, new IPlatformEventsCallback() {
 				
 				@Override
-				public void returnAction(String result) {
+				public void returnAction(int arg0) {
 					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
 					
 				}
 				
 				@Override
-				public void returnAction(boolean resultFlag) {
-					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
-					if (resultFlag){
-						Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
-						UserFeedbackBean bean = new UserFeedbackBean();
-						bean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-						List<String> options = new ArrayList<String>();
-						options.add("Yes");
-						options.add("No");
-						bean.setOptions(options);
-						bean.setProposalText("Click here to test user feedback notifications triggered by pubsub");
-						bean.setRequestId(UUID.randomUUID().toString());
-						bean.setType(ExpProposalType.ACKNACK);
-						try {
-							if (eventsHelper==null){
-								Log.d(LOG_TAG, "EventsHelper is null");
-							}else{
-								Log.d(LOG_TAG, "EventsHelper is NOT null");
-							}
-							eventsHelper.publishEvent(UserFeedbackEventTopics.REQUEST, bean, new IPlatformEventsCallback() {
-								
-								@Override
-								public void returnAction(int arg0) {
-									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
-									
-								}
-								
-								@Override
-								public void returnAction(boolean arg0) {
-									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Published event");
-									
-								}
-							});
-						} catch (PlatformEventsHelperNotConnectedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							
-						}
-					}
+				public void returnAction(boolean arg0) {
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Subscribed to event");
 				}
 			});
-		}else{
-			android.test.AndroidTestCase.fail("Failed to startService(): "+IAndroidUserFeedback.class.getName());
+		} catch (PlatformEventsHelperNotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-	}
-    /**
-     * Create a broadcast receiver
-     * 
-     */
-    private void setupBroadcastReceiver() {
-    	BroadcastReceiver receiver = null;
-    	
-        Log.d(LOG_TAG, "Set up broadcast receiver");
-        
-        receiver = new UserFeedbackBroadcastReceiver();
-        IntentFilter intentFilter = createTestIntentFilter();
-        
-        getContext().registerReceiver(receiver, intentFilter); 
-        
-        Log.d(LOG_TAG, "Registered broadcast receiver");
 
-    }
-    
-	
-    /**
-     * Create a suitable intent filter
-     * @return IntentFilter
-     */
-    private IntentFilter createTestIntentFilter() {
-    	//register broadcast receiver to receive SocietiesEvents return values 
-        IntentFilter intentFilter = new IntentFilter();
-        
-        intentFilter.addAction(IAndroidUserFeedback.GET_IMPLICITFB);
-        intentFilter.addAction(IAndroidUserFeedback.GET_EXPLICITFB);
-        intentFilter.addAction(IAndroidUserFeedback.INTENT_RETURN_VALUE);
-        
-        return intentFilter;
-    }
+	}
 }

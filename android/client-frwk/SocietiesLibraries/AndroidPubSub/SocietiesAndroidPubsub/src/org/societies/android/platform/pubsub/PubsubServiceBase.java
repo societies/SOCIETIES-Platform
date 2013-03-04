@@ -78,12 +78,20 @@ public class PubsubServiceBase implements IPubsubService {
 
 	@Override
 	public boolean bindToAndroidComms(final String client, final long remoteCallID) {
+
+		//Send intent
+		final Intent intent = new Intent();
+		if (PubsubServiceBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+		intent.setAction(IPubsubService.BIND_TO_ANDROID_COMMS);
+		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false);
+		
 		this.pubsubClientMgr.bindCommsService(new IMethodCallback() {
 			
 			@Override
 			public void returnAction(String result) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
@@ -94,18 +102,8 @@ public class PubsubServiceBase implements IPubsubService {
 						@Override
 						public void receiveResult(Stanza stanza, Object payload) {
 							boolean result = (Boolean) payload;
-							if (result) {
-								//Send intent
-								Intent intent = new Intent();
-								if (PubsubServiceBase.this.restrictBroadcast) {
-									intent.setPackage(client);
-								}
-								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-								intent.setAction(IPubsubService.BIND_TO_ANDROID_COMMS);
-								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, result);
-								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-
-							}
+							intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, result);
+							PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 						}
 						
 						@Override
@@ -134,6 +132,8 @@ public class PubsubServiceBase implements IPubsubService {
 							return PACKAGES;
 						}
 					});
+				} else {
+					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 			}
 		});
@@ -142,25 +142,26 @@ public class PubsubServiceBase implements IPubsubService {
 
 	@Override
 	public boolean unBindFromAndroidComms(final String client, final long remoteCallID) {
+		//Send intent
+		final Intent intent = new Intent();
+		if (PubsubServiceBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+		intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
+		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false);
+		PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+
+		
 		this.pubsubClientMgr.unregister(ELEMENTS, new ICommCallback() {
 			
 			@Override
 			public void receiveResult(Stanza stanza, Object payload) {
 				boolean result = (Boolean) payload;
-				if (result) {
-					if (PubsubServiceBase.this.pubsubClientMgr.unbindCommsService()) {
-						//Send intent
-						Intent intent = new Intent();
-						if (PubsubServiceBase.this.restrictBroadcast) {
-							intent.setPackage(client);
-						}
-						intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-						intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
-						intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
-						PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-
-					}
+				if (result && PubsubServiceBase.this.pubsubClientMgr.unbindCommsService()) {
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
 				}
+				PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 			}
 			
 			@Override
@@ -464,76 +465,80 @@ public class PubsubServiceBase implements IPubsubService {
 			Log.d(LOG_TAG, "publisherPublish called with domain authority: " + pubsubService + " and node: " + node);
 		};
 
+		//Send intent
+		final Intent intent = new Intent();
+		if (PubsubServiceBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, "");
+		intent.setAction(IPubsubService.PUBLISHER_PUBLISH);
+
 		Stanza stanza = null;
 		try {
 			stanza = new Stanza(convertStringToIdentity(pubsubService));
-		} catch (XMPPError e1) {
-			e1.printStackTrace();
-		}
-		Pubsub payload = new Pubsub();
-		Publish publish = new Publish();
-		publish.setNode(node);
-		Item i = new Item();
-		if (itemId!=null)
-			i.setId(itemId);
+			
+			Pubsub payload = new Pubsub();
+			Publish publish = new Publish();
+			publish.setNode(node);
+			Item i = new Item();
 
-		try {
-			i.setAny(MarshallUtils.stringToElement(item));
+			if (itemId !=null) {
+				i.setId(itemId);
+				i.setAny(MarshallUtils.stringToElement(item));
+				
+				publish.setItem(i);
+				payload.setPublish(publish);
+				
+				this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+					
+					public void receiveResult(Stanza stanza, Object object) {
+						intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
+						PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+					}
+					
+					public void receiveMessage(Stanza arg0, Object arg1) {
+					}
+					
+					public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+					}
+					
+					public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+					}
+					
+					public void receiveError(Stanza arg0, XMPPError arg1) {
+					}
+					
+					public List<String> getXMLNamespaces() {
+						return NAMESPACES;
+					}
+					
+					public List<String> getJavaPackages() {
+						return PACKAGES;
+					}
+				});
+			} else {
+				PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+			}
+			
+		} catch (XMPPError e1) {
+			Log.e(LOG_TAG, "Unable to create stanza", e1);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+		} catch (CommunicationException e) {
+			Log.e(LOG_TAG, "CommunicationException when sending IQ", e);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 		} catch (SAXException e) {
 			Log.e(LOG_TAG, "SAXException when parsing string to XML Element", e);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "IOException when parsing string to XML Element", e);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 		} catch (ParserConfigurationException e) {
 			Log.e(LOG_TAG, "ParserConfigurationException when parsing string to XML Element", e);
-		}
-		
-		publish.setItem(i);
-		payload.setPublish(publish);
-		
-		try {
-			this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
-				
-				public void receiveResult(Stanza stanza, Object object) {
-					//Send intent
-					Intent intent = new Intent();
-					if (PubsubServiceBase.this.restrictBroadcast) {
-						intent.setPackage(client);
-					}
-					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-					intent.setAction(IPubsubService.PUBLISHER_PUBLISH);
-					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
-					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-				}
-				
-				public void receiveMessage(Stanza arg0, Object arg1) {
-				}
-				
-				public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-				}
-				
-				public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-				}
-				
-				public void receiveError(Stanza arg0, XMPPError arg1) {
-				}
-				
-				public List<String> getXMLNamespaces() {
-					return NAMESPACES;
-				}
-				
-				public List<String> getJavaPackages() {
-					return PACKAGES;
-				}
-			});
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+		} 
 		return null;
 	}
-
-
 
 	public boolean publisherDelete(final String client, String pubsubServiceJid, String node, String itemId, final long remoteCallID) {
 		Dbc.require("Client must be supplied", null != client && client.length() > 0);
@@ -614,6 +619,15 @@ public class PubsubServiceBase implements IPubsubService {
 			Log.d(LOG_TAG, "subscriberSubscribe called with domain authority: " + pubsubService + " and node: " + node);
 		};
 
+		//Send intent
+		final Intent intent = new Intent();
+		if (PubsubServiceBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+		intent.setAction(IPubsubService.SUBSCRIBER_SUBSCRIBE);
+		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, "");
+		
 		try {
 			final IIdentity pubsubServiceIdentity;
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
@@ -628,58 +642,51 @@ public class PubsubServiceBase implements IPubsubService {
 					sub.setNode(node);
 					payload.setSubscribe(sub);
 			
-					try {
-						this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
-							
-							public void receiveResult(Stanza arg0, Object response) {
-								//Send intent
-								Intent intent = new Intent();
-								if (PubsubServiceBase.this.restrictBroadcast) {
-									intent.setPackage(client);
-								}
-								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-								intent.setAction(IPubsubService.SUBSCRIBER_SUBSCRIBE);
-								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) response);
-								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-								//Add the node from the subscribed node store
+					this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+						
+						public void receiveResult(Stanza arg0, Object response) {
+							intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) response);
+							PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 
-								PubsubServiceBase.this.subscribedNodes.put(node, 1);
-							}
-							
-							public void receiveMessage(Stanza arg0, Object arg1) {
-							}
-							
-							public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-							}
-							
-							public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-							}
-							
-							public void receiveError(Stanza arg0, XMPPError arg1) {
-							}
-							
-							public List<String> getXMLNamespaces() {
-								return NAMESPACES;
-							}
-							
-							public List<String> getJavaPackages() {
-								return PACKAGES;
-							}
-						});
-					} catch (CommunicationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+							//Add the node from the subscribed node store
+							PubsubServiceBase.this.subscribedNodes.put(node, 1);
+						}
+						
+						public void receiveMessage(Stanza arg0, Object arg1) {
+						}
+						
+						public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+						}
+						
+						public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+						}
+						
+						public void receiveError(Stanza arg0, XMPPError arg1) {
+						}
+						
+						public List<String> getXMLNamespaces() {
+							return NAMESPACES;
+						}
+						
+						public List<String> getJavaPackages() {
+							return PACKAGES;
+						}
+					});
 				} else {
 					//Increment the number of subscribers to a particular node
 					Integer subscribedCount = PubsubServiceBase.this.subscribedNodes.get(node);
 					PubsubServiceBase.this.subscribedNodes.put(node, subscribedCount + 1);
+					
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, "Subscribed count increased");
+					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
-				
 			}
 		} catch (XMPPError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Log.e(LOG_TAG, "XMPP error", e1);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+		} catch (CommunicationException e) {
+			Log.e(LOG_TAG, "CommunicationException error", e);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 		}
 		return false;
 	}
@@ -695,6 +702,15 @@ public class PubsubServiceBase implements IPubsubService {
 			Log.d(LOG_TAG, "subscriberUnsubscribe called with domain authority: " + pubsubService + " and node: " + node);
 		};
 
+		//Send intent
+		final Intent intent = new Intent();
+		if (PubsubServiceBase.this.restrictBroadcast) {
+			intent.setPackage(client);
+		}
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
+		intent.setAction(IPubsubService.SUBSCRIBER_UNSUBSCRIBE);
+		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, "");
+
 		IIdentity pubsubServiceIdentity = null;
 		try {
 			pubsubServiceIdentity = convertStringToIdentity(pubsubService);
@@ -708,57 +724,51 @@ public class PubsubServiceBase implements IPubsubService {
 					unsub.setNode(node);
 					payload.setUnsubscribe(unsub);
 			
-					try {
-						this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+					this.pubsubClientMgr.sendIQ(stanza, IQ.Type.SET, payload, new ICommCallback() {
+						
+						public void receiveResult(Stanza stanza, Object object) {
+							intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
+							PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 							
-							public void receiveResult(Stanza stanza, Object object) {
-								//Send intent
-								Intent intent = new Intent();
-								if (PubsubServiceBase.this.restrictBroadcast) {
-									intent.setPackage(client);
-								}
-								intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
-								intent.setAction(IPubsubService.SUBSCRIBER_UNSUBSCRIBE);
-								intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, (String) object);
-								PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-								//Remove the node from the subscribed node store
-								PubsubServiceBase.this.subscribedNodes.remove(node);
-							}
-							
-							public void receiveMessage(Stanza arg0, Object arg1) {
-							}
-							
-							public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-							}
-							
-							public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-							}
-							
-							public void receiveError(Stanza arg0, XMPPError arg1) {
-							}
-							
-							public List<String> getXMLNamespaces() {
-								return NAMESPACES;
-							}
-							
-							public List<String> getJavaPackages() {
-								return PACKAGES;
-							}
-						});
-					} catch (CommunicationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
+							//Remove the node from the subscribed node store
+							PubsubServiceBase.this.subscribedNodes.remove(node);
+						}
+						
+						public void receiveMessage(Stanza arg0, Object arg1) {
+						}
+						
+						public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+						}
+						
+						public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+						}
+						
+						public void receiveError(Stanza arg0, XMPPError arg1) {
+						}
+						
+						public List<String> getXMLNamespaces() {
+							return NAMESPACES;
+						}
+						
+						public List<String> getJavaPackages() {
+							return PACKAGES;
+						}
+					});
 				} else {
 					//Decrement the number of subscribers to a particular node
 					Integer subscribedCount = PubsubServiceBase.this.subscribedNodes.get(node);
 					PubsubServiceBase.this.subscribedNodes.put(node, subscribedCount - 1);
+					
+					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, "Subscribed count decreased");
+					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 			}
 		} catch (XMPPError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Log.e(LOG_TAG, "XMPP error", e1);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
+		} catch (CommunicationException e) {
+			Log.e(LOG_TAG, "CommunicationException error", e);
+			PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 		}
 
 		return false;

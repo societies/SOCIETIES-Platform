@@ -163,9 +163,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 
@@ -207,9 +208,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
@@ -246,9 +248,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
@@ -289,9 +292,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 
@@ -333,9 +337,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
@@ -372,9 +377,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
@@ -419,9 +425,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return false;
@@ -458,9 +465,10 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != retrievedCallback) {
 					retrievedCallback.returnAction(false);
 				}
-				e.printStackTrace();
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
 			}
 		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
 			throw new PlatformEventsHelperNotConnectedException();
 		}
 		return 0;

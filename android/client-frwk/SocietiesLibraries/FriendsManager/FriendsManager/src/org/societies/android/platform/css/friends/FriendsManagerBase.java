@@ -47,15 +47,11 @@ import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.utilities.DBC.Dbc;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Binder;
-import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
-
 
 /**
  * Describe your class here...
@@ -63,9 +59,9 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class FriendsManager extends Service implements IFriendsManager {
+public class FriendsManagerBase implements IFriendsManager {
 	//Logging tag
-	private static final String LOG_TAG = FriendsManager.class.getName();
+	private static final String LOG_TAG = FriendsManagerBase.class.getName();
 
 	//XMPP Communication namespaces and associated entities
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
@@ -74,43 +70,22 @@ public class FriendsManager extends Service implements IFriendsManager {
     
     private ClientCommunicationMgr ccm;
     private boolean restrictBroadcast;
-    private Context context;
-    private IBinder binder = null;
+    private Context androidContext;
     private boolean connectedToComms = false;
-    private IIdentity cloudNodeIdentity = null;
+    //private IIdentity cloudNodeIdentity = null;
     
     //>>>>>>>>>>>>>>>>>>>>>>>>>SERVICE LIFECYCLE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    /**Constructor */
-    public FriendsManager(Context context, boolean restrictBroadcast) {
-    	this.context = context;
-		this.restrictBroadcast = restrictBroadcast;
-		this.ccm = new ClientCommunicationMgr(this, true);
+    /**Default Constructor */
+    public FriendsManagerBase(Context context) {
+    	this(context, true);
     }
     
-    @Override
-	public void onCreate () {
-    	Log.d(LOG_TAG, "FriendsManager service starting");
-    	this.binder = new LocalFriendsManagerBinder();	
-	}
-    
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "FriendsManager service terminating");
-	}
-
-	/**
-	 * Create Binder object for local service invocation
-	 */
-	 public class LocalFriendsManagerBinder extends Binder {
-		 public FriendsManager getService() {
-	            return FriendsManager.this;
-	        }
-	    }
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
-	}
+    /**Constructor */
+    public FriendsManagerBase(Context context, boolean restrictBroadcast) {
+    	this.androidContext = context;
+		this.restrictBroadcast = restrictBroadcast;
+		this.ccm = new ClientCommunicationMgr(context, true);
+    }
     
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>IServiceManager>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public boolean startService() {
@@ -131,7 +106,7 @@ public class FriendsManager extends Service implements IFriendsManager {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
-				        		FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+				        		FriendsManagerBase.this.androidContext.sendBroadcast(intent);
 							}
 							@Override
 							public void returnAction(String result) { }
@@ -139,7 +114,7 @@ public class FriendsManager extends Service implements IFriendsManager {
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
-			    		FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+			    		FriendsManagerBase.this.androidContext.sendBroadcast(intent);
 					}
 				}	
 				@Override
@@ -149,7 +124,7 @@ public class FriendsManager extends Service implements IFriendsManager {
     	else {
     		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
     		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
-    		FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+    		FriendsManagerBase.this.androidContext.sendBroadcast(intent);
     	}
 		return true;
     }
@@ -168,7 +143,7 @@ public class FriendsManager extends Service implements IFriendsManager {
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
-	        		FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+	        		FriendsManagerBase.this.androidContext.sendBroadcast(intent);
 				}	
 				@Override
 				public void returnAction(String result) { }
@@ -177,7 +152,7 @@ public class FriendsManager extends Service implements IFriendsManager {
     	else {
     		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
     		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
-    		FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+    		FriendsManagerBase.this.androidContext.sendBroadcast(intent);
     	}
     	return true;
     }
@@ -190,7 +165,7 @@ public class FriendsManager extends Service implements IFriendsManager {
 			Intent intent = new Intent(method);
 			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
 			intent.setPackage(client);
-			FriendsManager.this.getApplicationContext().sendBroadcast(intent);
+			FriendsManagerBase.this.androidContext.sendBroadcast(intent);
 		}
 	}
 	
@@ -202,11 +177,15 @@ public class FriendsManager extends Service implements IFriendsManager {
 
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setMethod(MethodType.GET_CSS_FRIENDS);
-		Stanza stanza = new Stanza(cloudNodeIdentity);
-		ICommCallback callback = new FriendsCallback(client, IAndroidCSSManager.GET_CSS_FRIENDS);
-        try {
+		try {
+			IIdentity cloudNodeIdentity = this.ccm.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNodeIdentity);
+			ICommCallback callback = new FriendsCallback(client, IAndroidCSSManager.GET_CSS_FRIENDS);
+
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
+		} catch (InvalidFormatException ife) {
+			Log.e(this.getClass().getName(), "Error retrieving the Cloud node identity", ife);
 		} catch (Exception e) {
 			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
         } 
@@ -220,11 +199,15 @@ public class FriendsManager extends Service implements IFriendsManager {
 
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setMethod(MethodType.SUGGESTED_FRIENDS);
-		Stanza stanza = new Stanza(cloudNodeIdentity);
-		ICommCallback callback = new FriendsCallback(client, IAndroidCSSManager.SUGGESTED_FRIENDS);
-        try {
+		try {
+			IIdentity cloudNodeIdentity = this.ccm.getIdManager().getCloudNode();
+			Stanza stanza = new Stanza(cloudNodeIdentity);
+			ICommCallback callback = new FriendsCallback(client, IAndroidCSSManager.SUGGESTED_FRIENDS);
+        
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
+		} catch (InvalidFormatException ife) {
+			Log.e(this.getClass().getName(), "Error retrieving the Cloud node identity", ife);
 		} catch (Exception e) {
 			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
         } 
@@ -290,10 +273,13 @@ public class FriendsManager extends Service implements IFriendsManager {
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setMethod(MethodType.GET_FRIEND_REQUESTS);
 			//COMMS CONFIG
-			ICommCallback discoCallback = new FriendsCallback(params[0], IAndroidCSSManager.GET_FRIEND_REQUESTS); 
-			Stanza stanza = new Stanza(cloudNodeIdentity);
-	        try {
+			ICommCallback discoCallback = new FriendsCallback(params[0], IAndroidCSSManager.GET_FRIEND_REQUESTS);
+			try {
+				IIdentity cloudNodeIdentity = FriendsManagerBase.this.ccm.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNodeIdentity);
 	        	ccm.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+	        } catch (InvalidFormatException ife) {
+				Log.e(this.getClass().getName(), "Error retrieving the Cloud node identity", ife);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
 	        }
@@ -332,10 +318,13 @@ public class FriendsManager extends Service implements IFriendsManager {
 				messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST_INTERNAL);
 				messageBean.setRequestStatus(CssRequestStatusType.ACCEPTED);	
 			}
-			//COMMS CONFIG
-			Stanza stanza = new Stanza(cloudNodeIdentity);
-	        try {
+			try {
+				//COMMS CONFIG
+				IIdentity cloudNodeIdentity = FriendsManagerBase.this.ccm.getIdManager().getCloudNode();
+				Stanza stanza = new Stanza(cloudNodeIdentity);
 	        	ccm.sendMessage(stanza, messageBean);
+			} catch (InvalidFormatException ife) {
+				Log.e(this.getClass().getName(), "Error retrieving the Cloud node identity", ife);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
 	        }
@@ -408,7 +397,7 @@ public class FriendsManager extends Service implements IFriendsManager {
 				if (restrictBroadcast) {
 					intent.setPackage(client);
 				}
-				FriendsManager.this.context.sendBroadcast(intent);
+				FriendsManagerBase.this.androidContext.sendBroadcast(intent);
 				Log.d(LOG_TAG, "FriendsManager Callback receiveResult sent return value: " + retValue);
 			}
 		}
