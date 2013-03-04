@@ -7,15 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
-import org.apache.shindig.social.core.model.NameImpl;
-import org.apache.shindig.social.core.model.PersonImpl;
-import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
-import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
