@@ -58,7 +58,7 @@ public class TestContainerFeedbackService extends Service{
 
 	public class FeedbackContainerBinder extends Binder {
 		public IAndroidUserFeedback getService() {
-			AndroidUserFeedbackService ufBase = new AndroidUserFeedbackService(getApplicationContext(),  true);
+			AndroidUserFeedbackService ufBase = new AndroidUserFeedbackService(getApplicationContext(),  false);
 			return ufBase;
 		}
 	}

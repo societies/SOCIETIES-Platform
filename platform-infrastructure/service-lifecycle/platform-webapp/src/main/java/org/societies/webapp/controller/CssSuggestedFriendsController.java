@@ -53,6 +53,20 @@ public class CssSuggestedFriendsController {
 	private ICommManager commManager;
 	@Autowired
 	private IServiceDiscovery sdService;
+	
+	
+	private FriendFilter friendfilter;
+	
+	
+	public FriendFilter getfriendfilter(){
+		return friendfilter ;
+	}
+	
+	public void setfriendfilter(FriendFilter filter){
+		LOG.info("set filter called with filter as : " +filter.getFilterFlag());
+		
+		this.friendfilter=friendfilter;
+	}
 
 	public IServiceDiscovery getSDService() {
 		return sdService;
@@ -128,9 +142,10 @@ public class CssSuggestedFriendsController {
 				res = "CSS Suggested Friends Result ";
 
 				//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
-				FriendFilter filter = new FriendFilter();
-				int filterFlag = 0x0000000000;
-				
+				//FriendFilter filter = new FriendFilter();
+				//int filterFlag = 0x0000000000;
+				FriendFilter filter = this.getfriendfilter();
+				int filterFlag = filter.getFilterFlag();
 				LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
 				filter.setFilterFlag(filterFlag);
 				LOG.info("SuggestedFriends Controller filter flag is: " +filter.getFilterFlag());
@@ -177,8 +192,8 @@ public class CssSuggestedFriendsController {
 			//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
 			FriendFilter filter = new FriendFilter();
 			Integer filterFlag = 0x00000001111;
-
-			filter.getFilterFlag();
+			filter = cssLocalManager.getFriendfilter();
+			filterFlag = filter.getFilterFlag();
 			filter.setFilterFlag(filterFlag );
 			LOG.info("SuggestedFriendsController called with filter: " +filter);
 			

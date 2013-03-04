@@ -832,6 +832,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	}
 	private ISocialData socialdata;
 
+	private FriendFilter filter;
+
 	//Spring injection
 
 	public ISocialData getSocialData() {
@@ -1926,8 +1928,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	}
     LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.values()); 
     LOG.info("@@@@@@@@@@@@@@@@@@ KeySet contains returns: " +commonFriends.keySet());
-    LOG.info("@@@@@@@@@@@@@@@@@@ entrySet contains returns: " +commonFriends.entrySet().iterator().next().getKey().getId());
-    LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.entrySet().iterator().next().getKey().getName()); 
+   //LOG.info("@@@@@@@@@@@@@@@@@@ entrySet contains returns: " +commonFriends.entrySet().iterator().next().getKey().getId());
+    //LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.entrySet().iterator().next().getKey().getName()); 
 	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (commonFriends);
 	}
 
@@ -2279,5 +2281,20 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		  else
 		    return null;
 		}
+
+	@Override
+	public FriendFilter getFriendfilter() {
+		LOG.info("CSS MANAGER get friendfilter called");
+
+		return filter;
+	}
+
+	@Override
+	public void setFriendfilter(FriendFilter filter) {
+		LOG.info("CSS MANAGER set friendfilter calledwith filt: " +filter.getFilterFlag());
+		this.filter = filter;
+		
+	}
+	
 
 }

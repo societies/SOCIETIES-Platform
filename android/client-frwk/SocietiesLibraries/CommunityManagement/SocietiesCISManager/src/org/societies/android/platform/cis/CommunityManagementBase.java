@@ -41,6 +41,8 @@ import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -63,6 +65,8 @@ import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 import android.content.Context;
 import android.content.Intent;
@@ -196,7 +200,21 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
 	public Community createCis(final String client, final String cisName, final String cisType, final String description, final MembershipCrit rules, final String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
-
+		String privacyPolicyXml = "<RequestPolicy />";
+		
+		PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
+		try {
+			policyType = PrivacyPolicyBehaviourConstants.fromValue(privacyPolicy);
+		}
+		catch (IllegalArgumentException ex) {}//IGNORE - DEFAULT TO MEMBERS_ONLY
+		
+		try {			
+			RequestPolicy policyObj = PrivacyPolicyUtil.inferCisPrivacyPolicy(policyType, rules);
+			privacyPolicyXml =  PrivacyPolicyUtil.toXmlString(policyObj);
+		} catch (PrivacyException pEx) {
+			pEx.printStackTrace();
+		}
+		
 		if (connectedToComms) {
 	        //COMMUNITY INFO
 			Community cisinfo = new Community();
@@ -207,7 +225,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			//ADD TO BEAN
 			Create create = new Create();
 			create.setCommunity(cisinfo);
-			create.setPrivacyPolicy(privacyPolicy);
+			create.setPrivacyPolicy(privacyPolicyXml);
 			//CREATE MESSAGE BEAN
 			CommunityManager messageBean = new CommunityManager();
 			messageBean.setCreate(create);
