@@ -75,7 +75,9 @@ import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.broker.impl.CtxBroker;
+import org.societies.context.broker.impl.InternalCtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -101,12 +103,15 @@ public class CtxBrokerServer implements IFeatureServer{
 
 	@Autowired(required=true)
 	private CtxBroker ctxbroker;
+	
+	/** The Context Event Mgmt service reference. TODO remove once pubsub persistence is enabled. */
+	private ICtxEventMgr ctxEventMgr;
 
 	private IIdentityManager identMgr = null;
 
 	@Autowired
 	public CtxBrokerServer(ICommManager commManager, 
-			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr)
+			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr, ICtxEventMgr ctxEventMgr)
 					throws Exception {
 		
 		if (LOG.isInfoEnabled())
@@ -114,6 +119,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		this.commManager = commManager;
 		this.identMgr = this.commManager.getIdManager();
 		this.commMgrFactory = commMgrFactory;
+		this.ctxEventMgr = ctxEventMgr;
 
 		// Register to CSS Comm Mgr
 		if (LOG.isInfoEnabled())
@@ -126,6 +132,10 @@ public class CtxBrokerServer implements IFeatureServer{
 				LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
 						+ entry.getKey() + "'");
 			entry.getValue().register(this);
+			if (LOG.isInfoEnabled())
+				LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
+						+ "' for CIS " + entry.getKey());
+			this.ctxEventMgr.createTopics(entry.getKey(), InternalCtxBroker.EVENT_TOPICS);
 		}
 		// Register for new CISs
 		if (LOG.isInfoEnabled())
@@ -594,6 +604,12 @@ public class CtxBrokerServer implements IFeatureServer{
 						LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
 								+ cisId + "'");
 					cisCommMgr.register(CtxBrokerServer.this);
+					if (EventTypes.CIS_RESTORE.equals(event.geteventType())) {
+						if (LOG.isInfoEnabled())
+							LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
+									+ "' for CIS " + cisId);
+						ctxEventMgr.createTopics(cisId, InternalCtxBroker.EVENT_TOPICS);
+					}
 				
 				} catch (Exception e) {
 					LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 

@@ -115,8 +115,7 @@ public class AndroidNotifier {
 		Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
 
 		// Create Notification
-		Notification notification = new Notification(R.drawable.ic_launcher,
-				  message, System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.launcher_societies, message, System.currentTimeMillis());
 		//apply notification flags
 		for (int i : this.notifierFlags) {
 			notification.flags |= i;
@@ -128,7 +127,7 @@ public class AndroidNotifier {
 		Intent notificationIntent = new Intent(this.context, clazz);
 		
 		PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-		notification.setLatestEventInfo(context, "CSSManager", message, contentIntent);
+		notification.setLatestEventInfo(context, "SOCIETIES", message, contentIntent);
 		this.notifyMgr.notify(notificationTag, 1, notification);
 	}
 
