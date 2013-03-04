@@ -34,7 +34,6 @@ import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
@@ -89,7 +88,8 @@ public class SocietiesClientServicesController {
 	private CountDownLatch servicesStarted;
 	private CountDownLatch servicesStopped;
 
-	private BroadcastReceiver receiver;
+	private BroadcastReceiver startupReceiver;
+	private BroadcastReceiver shutdownReceiver;
 	
 	private boolean connectedToServices[];
 	private ServiceConnection platformServiceConnections [];
@@ -107,6 +107,9 @@ public class SocietiesClientServicesController {
 		this.connectedToServices = new boolean[NUM_SERVICES];
 		allMessengers = new Messenger[NUM_SERVICES];
 		this.platformServiceConnections = new ServiceConnection[NUM_SERVICES];
+		this.startupReceiver = null;
+		this.shutdownReceiver = null;
+
 	}
 	
 	/**
@@ -116,7 +119,7 @@ public class SocietiesClientServicesController {
 	 */
 	public void bindToServices(IMethodCallback callback) {
 		//set up broadcast receiver for start/bind actions
-		setupBroadcastReceiver();
+		setupStartupBroadcastReceiver();
 
 		InvokeBindAllServices invoker = new InvokeBindAllServices(callback);
 		invoker.execute();
@@ -134,7 +137,7 @@ public class SocietiesClientServicesController {
 			}
 	   	}
 	   	//tear down broadcast receiver after stop/unbind actions
-	   	this.teardownBroadcastReceiver();
+	   	this.teardownBroadcastReceiver(this.shutdownReceiver);
 	}
 	/**
 	 * Start all Societies Client app services
@@ -150,7 +153,7 @@ public class SocietiesClientServicesController {
 	 */
 	public void stopAllServices(IMethodCallback callback) {
 		//set up broadcast receiver for stop/unbind actions
-		setupBroadcastReceiver();
+		setupShutdownBroadcastReceiver();
 
 		InvokeStopAllServices invoker = new InvokeStopAllServices(callback);
 		invoker.execute();
@@ -544,7 +547,7 @@ public class SocietiesClientServicesController {
 			} finally {
     			callback.returnAction(retValue);
     			//tear down broadcast receiver after initial bind/start actions
-    		   	SocietiesClientServicesController.this.teardownBroadcastReceiver();
+    		   	SocietiesClientServicesController.this.teardownBroadcastReceiver(SocietiesClientServicesController.this.startupReceiver);
     		}
 
     		return null;
@@ -624,7 +627,32 @@ public class SocietiesClientServicesController {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class PlatformServicesReceiver extends BroadcastReceiver {
+    private class PlatformServicesStartupReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+
+			if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+
+				//As each service starts decrement the latch
+	        	if (null != SocietiesClientServicesController.this.servicesStarted) {
+		        	Log.d(LOG_TAG, "Time to start service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
+					SocietiesClientServicesController.this.servicesStarted.countDown();
+	        	}
+				
+			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_EXCEPTION_INFO)) {
+				
+			} 
+		}
+    }
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications. 
+     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
+     * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
+     */
+    private class PlatformServicesShutdownReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -638,14 +666,6 @@ public class SocietiesClientServicesController {
 	        	}
 				
 				
-			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
-
-				//As each service starts decrement the latch
-	        	if (null != SocietiesClientServicesController.this.servicesStarted) {
-		        	Log.d(LOG_TAG, "Time to start service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
-					SocietiesClientServicesController.this.servicesStarted.countDown();
-	        	}
-				
 			} else if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_EXCEPTION_INFO)) {
 				
 			} 
@@ -653,25 +673,31 @@ public class SocietiesClientServicesController {
     }
     
     /**
-     * Create a broadcast receiver
-     * 
-     * @return the created broadcast receiver
+     * Create a services startup broadcast receiver
      */
-    private BroadcastReceiver setupBroadcastReceiver() {
-        Log.d(LOG_TAG, "Set up broadcast receiver");
+    private void setupStartupBroadcastReceiver() {
+        Log.d(LOG_TAG, "Set up startup broadcast receiver");
         
-        this.receiver = new PlatformServicesReceiver();
-        this.context.registerReceiver(this.receiver, createIntentFilter());    
+        this.startupReceiver = new PlatformServicesStartupReceiver();
+        this.context.registerReceiver(this.startupReceiver, createIntentFilter());    
         Log.d(LOG_TAG, "Register broadcast receiver");
-
-        return receiver;
+    }
+    /**
+     * Create a services shutdown broadcast receiver
+     */
+    private void setupShutdownBroadcastReceiver() {
+        Log.d(LOG_TAG, "Set up shutdown broadcast receiver");
+        
+        this.shutdownReceiver = new PlatformServicesShutdownReceiver();
+        this.context.registerReceiver(this.shutdownReceiver, createIntentFilter());    
+        Log.d(LOG_TAG, "Register broadcast receiver");
     }
     /**
      * Unregister the broadcast receiver
      */
-    private void teardownBroadcastReceiver() {
+    private void teardownBroadcastReceiver(BroadcastReceiver receiver) {
         Log.d(LOG_TAG, "Tear down broadcast receiver");
-    	this.context.unregisterReceiver(this.receiver);
+    	this.context.unregisterReceiver(receiver);
     }
 
 
