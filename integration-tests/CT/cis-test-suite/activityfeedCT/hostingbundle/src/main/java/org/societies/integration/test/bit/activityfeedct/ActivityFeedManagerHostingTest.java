@@ -37,6 +37,7 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.*;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
@@ -110,6 +111,10 @@ public class ActivityFeedManagerHostingTest {
         Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName, cisType, cisMembershipCriteria, cisDescription,privacyPolicy.toXMLString());//,"<RequestPolicy></RequestPolicy>");
 
         try {
+            RequestorCis requestor = getRequestorCis("admin.societies.local",cis1.get().getCisId());
+            privacyPolicy = this.getRequestPolicy(requestor);
+            TestCase109611.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
+            LOG.info("[#"+testCaseNumber+"#] setting new policy: "+privacyPolicy.toXMLString());
             //ICisOwned cisOwned = cis1.get();
             //CisAdvertisementRecord cisAdvertisementRecord = new CisAdvertisementRecord();
             //cisAdvertisementRecord.setName(cisOwned.getName()); cisAdvertisementRecord.setId(cisOwned.getCisId()); cisAdvertisementRecord.setCssownerid(cisOwned.getOwnerId());
@@ -124,6 +129,10 @@ public class ActivityFeedManagerHostingTest {
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ExecutionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (PrivacyException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         LOG.info("[#"+testCaseNumber+"] has been run successfully");
@@ -164,19 +173,23 @@ public class ActivityFeedManagerHostingTest {
         ret.setPublished(published);
         return ret;
     }
-
+    private RequestPolicy getRequestPolicy(Requestor requestor) {
+        List<RequestItem> requestItems = getRequestItems();
+        RequestPolicy requestPolicy = new RequestPolicy(requestor, requestItems);
+        return requestPolicy;
+    }
     private List<RequestItem> getRequestItems() {
         List<RequestItem> items = new ArrayList<RequestItem>();
         Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
         List<Condition> conditions = new ArrayList<Condition>();
-        conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
+        conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"YES"));
         List<Action> actions = new ArrayList<Action>();
         actions.add(new Action(ActionConstants.READ));
         RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
         items.add(rItem);
         Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
         List<Condition> extendedConditions = new ArrayList<Condition>();
-        extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
+        extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"YES"));
         extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
         List<Action> extendedActions = new ArrayList<Action>();
         extendedActions.add(new Action(ActionConstants.READ));
@@ -200,9 +213,9 @@ public class ActivityFeedManagerHostingTest {
         return new RequestorService(requestorId, serviceId);
     }
 
-    private RequestorCis getRequestorCis() throws InvalidFormatException{
-        IIdentity otherCssId = TestCase109611.commManager.getIdManager().fromJid("red.societies.local");
-        IIdentity cisId = TestCase109611.commManager.getIdManager().fromJid("cis-one.societies.local");
+    private RequestorCis getRequestorCis(String cssIdString, String cisIdString) throws InvalidFormatException{
+        IIdentity otherCssId = TestCase109611.commManager.getIdManager().fromJid(cssIdString);
+        IIdentity cisId = TestCase109611.commManager.getIdManager().fromJid(cisIdString);
         return new RequestorCis(otherCssId, cisId);
     }
 }

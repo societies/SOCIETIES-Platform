@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.integration.test.IntegrationTestCase;
 
 public class TestCase109611 extends IntegrationTestCase {
@@ -46,6 +47,7 @@ public class TestCase109611 extends IntegrationTestCase {
 	public static ICommManager commManager;
     public static ICisManager cisManager;
     public static ICisDirectoryRemote cisDirectory;
+    public static IPrivacyPolicyManager privacyPolicyManager;
 
 
     public TestCase109611() {
@@ -70,5 +72,10 @@ public class TestCase109611 extends IntegrationTestCase {
     public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
         LOG.debug("#"+testCaseNumber+"] [DependencyInjection] CisDirectory injected");
         this.cisDirectory = cisDirectory;
+    }
+
+    public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+        LOG.debug("#"+testCaseNumber+"] [DependencyInjection] IPrivacyPolicyManager injected");
+        this.privacyPolicyManager = privacyPolicyManager;
     }
 }
