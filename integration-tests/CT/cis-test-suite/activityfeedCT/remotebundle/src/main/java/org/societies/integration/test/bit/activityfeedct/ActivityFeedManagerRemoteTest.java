@@ -98,7 +98,7 @@ public class ActivityFeedManagerRemoteTest {
                 advertisementRecord[0] = cisAdvertisementRecords.get(0);
             }
         });
-        int maxCounter = 10000,counter=0;
+        int maxCounter = 100000,counter=0;
         try {
             while(advertisementRecord[0] == null) {
                 Thread.sleep(100);
@@ -115,9 +115,18 @@ public class ActivityFeedManagerRemoteTest {
         if(advertisementRecord[0] != null)
             LOG.info("[#"+testCaseNumber+"] found one advertisementRecord[0].getName(): " + advertisementRecord[0].getName());
         final ArrayList<Community> communities = new ArrayList<Community>();
-        LOG.info("[#"+testCaseNumber+"] trying to join cis "+ advertisementRecord[0].getName());
-        final String cisname = advertisementRecord[0].getName();
-        TestCase109612.cisManager.joinRemoteCIS(advertisementRecord[0],new ICisManagerCallback() {
+        CisAdvertisementRecord rightrecord = null;
+        if(advertisementRecord.length > 1){
+            for(CisAdvertisementRecord record : advertisementRecord)
+                if (record.getName().contentEquals(ActivityFeedManagerHostingTest.cisName))
+                    rightrecord = record;
+            assert (rightrecord != null); // if there is more than one cis, atleas one should be the one created in the hosting bundle
+        } else
+            rightrecord = advertisementRecord[0];
+        LOG.info("[#"+testCaseNumber+"] trying to join cis "+ rightrecord.getName());
+        final String cisname = rightrecord.getName();
+        long start = System.currentTimeMillis();
+        TestCase109612.cisManager.joinRemoteCIS(rightrecord,new ICisManagerCallback() {
             @Override
             public void receiveResult(CommunityMethods communityResultObject) {
                 communities.add(communityResultObject.getJoinResponse().getCommunity());
@@ -136,6 +145,7 @@ public class ActivityFeedManagerRemoteTest {
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        LOG.info("[#"+testCaseNumber+"] joined cis took " + (System.currentTimeMillis()-start) + " ms ");
         assert (communities.size() != 0);
         assert (communities.get(0) != null);
         LOG.info("[#"+testCaseNumber+"] joined community with jid: "+communities.get(0).getCommunityJid());

@@ -21,9 +21,9 @@
 	</developers>
 
 	<parent>
-	  <groupId>org.societies.integration.test.ct</groupId>
-	  <artifactId>ct-activityfeedmanager</artifactId> 
-	  <version>1.0.0-SNAPSHOT</version>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -86,11 +86,6 @@
             <artifactId>persistence-api</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <version>0.4.1</version>
         </dependency>
     </dependencies>
 

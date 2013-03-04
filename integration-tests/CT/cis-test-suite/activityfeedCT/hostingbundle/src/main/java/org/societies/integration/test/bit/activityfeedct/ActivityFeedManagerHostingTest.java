@@ -35,15 +35,20 @@ import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.identity.RequestorCis;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.*;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -66,7 +71,7 @@ public class ActivityFeedManagerHostingTest {
     private String cssId;
     private List<String> cisIds;
     private String cssPassword;
-    private String cisName;
+    public static String cisName;
     private String cisDescription;
     private String cisType;
     private int numCIS = 6;
@@ -93,7 +98,16 @@ public class ActivityFeedManagerHostingTest {
     @Test
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
-        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName+"1", cisType, cisMembershipCriteria, cisDescription,"<RequestPolicy></RequestPolicy>");
+        RequestPolicy privacyPolicy = null;
+        try {
+            privacyPolicy = getRequestPolicy();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (MalformedCtxIdentifierException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        LOG.info("[#"+testCaseNumber+"] creating cis with policy: "+privacyPolicy.toXMLString());
+        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName, cisType, cisMembershipCriteria, cisDescription,privacyPolicy.toXMLString());//,"<RequestPolicy></RequestPolicy>");
 
         try {
             //ICisOwned cisOwned = cis1.get();
@@ -118,7 +132,30 @@ public class ActivityFeedManagerHostingTest {
 
 
     //util methods
+/*    public RequestPolicy makePolicy(){
+        List<PrivacyConditionForm> conditionsCisMemberList = new ArrayList<PrivacyConditionForm>();
+        List<PrivacyConditionForm> conditionsCisMembershipCriteria = new ArrayList<PrivacyConditionForm>();
+        List<PrivacyConditionForm> conditionsCisCommunityContext = new ArrayList<PrivacyConditionForm>();
+        conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
+        conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
+        conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
 
+
+        conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
+        conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
+        conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
+    }*/
+    public RequestPolicy getRequestPolicy() throws InvalidFormatException, MalformedCtxIdentifierException {
+
+        // -- Requestor
+        RequestorCis requestor = null;
+        // -- Resources
+        List<RequestItem> requestItems = new ArrayList<RequestItem>();
+        //RequestItem item = new RequestItem(new Resource(DataTypeFactory.fromUri()))
+        RequestPolicy privacyPolicy = new RequestPolicy(requestItems);
+        privacyPolicy.setRequestor(requestor);
+        return privacyPolicy;
+    }
     public Activity makeMessage(String user1, String user2, String message, String published){
         Activity ret = new Activity();
         ret.setActor(user1);
@@ -126,5 +163,46 @@ public class ActivityFeedManagerHostingTest {
         ret.setTarget(user2);
         ret.setPublished(published);
         return ret;
+    }
+
+    private List<RequestItem> getRequestItems() {
+        List<RequestItem> items = new ArrayList<RequestItem>();
+        Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+        List<Condition> conditions = new ArrayList<Condition>();
+        conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
+        List<Action> actions = new ArrayList<Action>();
+        actions.add(new Action(ActionConstants.READ));
+        RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
+        items.add(rItem);
+        Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
+        List<Condition> extendedConditions = new ArrayList<Condition>();
+        extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
+        extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
+        List<Action> extendedActions = new ArrayList<Action>();
+        extendedActions.add(new Action(ActionConstants.READ));
+        extendedActions.add(new Action(ActionConstants.CREATE));
+        extendedActions.add(new Action(ActionConstants.WRITE));
+        extendedActions.add(new Action(ActionConstants.DELETE));
+        RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
+        items.add(someItem);
+        return items;
+    }
+
+    private RequestorService getRequestorService() throws InvalidFormatException{
+        IIdentity requestorId = TestCase109611.commManager.getIdManager().fromJid("red.societies.local");
+        ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+        serviceId.setServiceInstanceIdentifier("css://red@societies.local/HelloEarth");
+        try {
+            serviceId.setIdentifier(new URI("css://red@societies.local/HelloEarth"));
+        } catch (URISyntaxException e) {
+            LOG.error("Can't create the service ID", e);
+        }
+        return new RequestorService(requestorId, serviceId);
+    }
+
+    private RequestorCis getRequestorCis() throws InvalidFormatException{
+        IIdentity otherCssId = TestCase109611.commManager.getIdManager().fromJid("red.societies.local");
+        IIdentity cisId = TestCase109611.commManager.getIdManager().fromJid("cis-one.societies.local");
+        return new RequestorCis(otherCssId, cisId);
     }
 }

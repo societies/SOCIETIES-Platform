@@ -82,6 +82,11 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.societies.integration.test.ct</groupId>
+            <artifactId>ct-activityfeedmanager-hosting</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 	<build>
