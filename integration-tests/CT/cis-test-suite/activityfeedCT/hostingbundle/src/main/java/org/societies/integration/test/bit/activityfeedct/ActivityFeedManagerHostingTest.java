@@ -114,7 +114,7 @@ public class ActivityFeedManagerHostingTest {
             RequestorCis requestor = getRequestorCis("admin.societies.local",cis1.get().getCisId());
             privacyPolicy = this.getRequestPolicy(requestor);
             TestCase109611.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
-            LOG.info("[#"+testCaseNumber+"#] setting new policy: "+privacyPolicy.toXMLString());
+            LOG.info("[#"+testCaseNumber+"#] setting new policy: for the pair (admin.societies.local,"+cis1.get().getCisId()+") "+privacyPolicy.toXMLString());
             //ICisOwned cisOwned = cis1.get();
             //CisAdvertisementRecord cisAdvertisementRecord = new CisAdvertisementRecord();
             //cisAdvertisementRecord.setName(cisOwned.getName()); cisAdvertisementRecord.setId(cisOwned.getCisId()); cisAdvertisementRecord.setCssownerid(cisOwned.getOwnerId());
