@@ -251,15 +251,16 @@ public class PluginCISFunctions extends Plugin {
 					MembershipCrit membCrit = new MembershipCrit();
 					membCrit.setCriteria(criteriaList);
 					
-					//createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), membCrit, data.getString(5));
-	        		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//createCis(data.getString(0), data.getString(1), data.getString(2), data.getString(3), membCrit, data.getString(5)); position 0
+	        		Message outMessage = Message.obtain(null, 0, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 2), data.getString(2));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 3), data.getString(3));
-	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 3), membCrit);
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 3), data.getString(5));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 0);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 2), data.getString(2));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 3), data.getString(3));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(methodSignature, 4), membCrit);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 5), data.getString(5));
 	        		
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -270,11 +271,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 1))) {
 				try { // DELETE CIS
-					//deleteCis(data.getString(0), data.getString(1));
-	        		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//deleteCis(data.getString(0), data.getString(1)); position 1
+	        		Message outMessage = Message.obtain(null, 1, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 1);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -284,12 +286,13 @@ public class PluginCISFunctions extends Plugin {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 2))) {
-				try {// GET CIS LISTING
+				try {// GET CIS LISTING - position 2
 					//getCisList(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					Message outMessage = Message.obtain(null, 2, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 2);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -300,12 +303,13 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3))) {
 				try { //REMOVE PARTICIPANT FROM CIS
-					//removeMember(data.getString(0), data.getString(1), data.getString(2));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//removeMember(data.getString(0), data.getString(1), data.getString(2)); position 3
+					Message outMessage = Message.obtain(null, 3, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 2), data.getString(2));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 3);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 2), data.getString(2));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -316,11 +320,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 4))) {
 				try { //JOIN A CIS
-					//Join(data.getString(0), createCisAdvertFromJSON(data.getJSONObject(1)));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//Join(data.getString(0), createCisAdvertFromJSON(data.getJSONObject(1))); position 4
+					Message outMessage = Message.obtain(null, 4, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), createCisAdvertFromJSON(data.getJSONObject(1)));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 4);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), createCisAdvertFromJSON(data.getJSONObject(1)));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -331,11 +336,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 5))) {
 				try { //LEAVE A CIS
-					//Leave(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//Leave(data.getString(0), data.getString(1)); position 5
+					Message outMessage = Message.obtain(null, 5, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisManager.methodsArray, 5);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISManager.send(outMessage);
@@ -348,11 +354,12 @@ public class PluginCISFunctions extends Plugin {
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 0))) {
 				try { //GET MEMBERS LIST
-					//getMembers(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//getMembers(data.getString(0), data.getString(1)); position 0
+					Message outMessage = Message.obtain(null, 0, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisSubscribed.methodsArray, 0);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISsubscribe.send(outMessage);
@@ -363,11 +370,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 2))) {
 				try { //GET ACTIVITY FEED 
-					//getActivityFeed(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//getActivityFeed(data.getString(0), data.getString(1)); position 2
+					Message outMessage = Message.obtain(null, 2, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisSubscribed.methodsArray, 2);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISsubscribe.send(outMessage);
@@ -380,12 +388,13 @@ public class PluginCISFunctions extends Plugin {
 				try { //ADD AN ACTIVITY TO THE FEED
 					JSONObject jObj = data.getJSONObject(2);
 					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
-					//addActivity(data.getString(0), data.getString(1), activity);
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//addActivity(data.getString(0), data.getString(1), activity); position 3
+					Message outMessage = Message.obtain(null, 3, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
-	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), activity);
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisSubscribed.methodsArray, 3);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(methodSignature, 2), activity);
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISsubscribe.send(outMessage);
@@ -398,12 +407,13 @@ public class PluginCISFunctions extends Plugin {
 				try { //DELETE AN ACTIVITY FROM THE FEED
 					JSONObject jObj = data.getJSONObject(2);
 					MarshaledActivity activity = CreateActivityFromJSON(jObj); 
-					//deleteActivity(data.getString(0), data.getString(1), activity);
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//deleteActivity(data.getString(0), data.getString(1), activity); postition 4
+					Message outMessage = Message.obtain(null, 4, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
-	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(action, 1), activity);
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisSubscribed.methodsArray, 4);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
+	        		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(methodSignature, 2), activity);
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISsubscribe.send(outMessage);
@@ -414,11 +424,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 5))) {
 				try { //CLEAN UP THE ACTIVITY FEED
-					//cleanActivityFeed(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//cleanActivityFeed(data.getString(0), data.getString(1)); position 5
+					Message outMessage = Message.obtain(null, 5, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisSubscribed.methodsArray, 5);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISsubscribe.send(outMessage);
@@ -431,10 +442,11 @@ public class PluginCISFunctions extends Plugin {
 			//>>>>>>>>>  ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 0))) {
 				try { //findAllCisAdvertisementRecords
-					//findAllCisAdvertisementRecords(data.getString(0));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//findAllCisAdvertisementRecords(data.getString(0)); position 0
+					Message outMessage = Message.obtain(null, 0, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisDirectory.methodsArray, 0);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
 
 	        		outMessage.setData(outBundle);
 	    			messengerCISdir.send(outMessage);
@@ -445,11 +457,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 1))) {
 				try { //findForAllCis
-					//findForAllCis(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//findForAllCis(data.getString(0), data.getString(1)); position 1
+					Message outMessage = Message.obtain(null, 1, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisDirectory.methodsArray, 1);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	        		messengerCISdir.send(outMessage);
@@ -460,11 +473,12 @@ public class PluginCISFunctions extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, 2))) {
 				try { //searchByID
-					//searchByID(data.getString(0), data.getString(1));
-					Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisManager.methodsArray, action), 0, 0);
+					//searchByID(data.getString(0), data.getString(1)); position 2
+					Message outMessage = Message.obtain(null, 2, 0, 0);
 	        		Bundle outBundle = new Bundle();
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 0), data.getString(0));
-	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(action, 1), data.getString(1));
+	        		String methodSignature = ServiceMethodTranslator.getMethodSignature(ICisDirectory.methodsArray, 2);
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 0), data.getString(0));
+	        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(methodSignature, 1), data.getString(1));
 
 	        		outMessage.setData(outBundle);
 	        		messengerCISdir.send(outMessage);
