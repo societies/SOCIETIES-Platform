@@ -28,6 +28,8 @@ public abstract class BaseUser {
 	 
 	 public abstract String getLocationCoordinates();
 	 
+	 public abstract String getSkills();
+	 
 	 public abstract String getFriends();
 	 
 	 

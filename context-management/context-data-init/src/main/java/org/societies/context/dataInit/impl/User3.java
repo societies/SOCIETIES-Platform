@@ -1,41 +1,41 @@
 package org.societies.context.dataInit.impl;
 
-public class Jane extends BaseUser{
+public class User3 extends BaseUser{
 
 	@Override
 	public String getName() {
 		
-		return "Jane";
+		return "User3";
 	}
 
 	@Override
 	public String getSex() {
 		
-		return "female";
+		return "male";
 	}
 
 	@Override
 	public String getAge() {
 		
-		return "28";
+		return "18";
 	}
 
 	@Override
 	public String getLanguages() {
 		
-		return "english,french,greek";
+		return "english,chinese,japanese";
 	}
 
 	@Override
 	public String getInterests() {
 	
-		return "cooking,reading,music";
+		return "soccer,football,sports";
 	}
 
 	@Override
 	public String getMovies() {
 
-		return "batman,superman";
+		return ",ironman,superman";
 	}
 
 	@Override
@@ -47,25 +47,25 @@ public class Jane extends BaseUser{
 	@Override
 	public String getStatus() {
 		
-		return "free";
+		return "available";
 	}
 
 	@Override
 	public String getEmail() {
 		
-		return "john@societies.org";
+		return "";
 	}
 
 	@Override
 	public String getBirthday() {
 		
-		return "15/6/1981";
+		return "25/12/1979";
 	}
 
 	@Override
 	public String getPoliticalViews() {
 		
-		return "liberal";
+		return null;
 	}
 
 	@Override
@@ -91,8 +91,7 @@ public class Jane extends BaseUser{
 	 */
 	@Override
 	public String getSkills() {
-		// TODO Auto-generated method stub
-		return null;
+		return "disaster relief,google maps,translating";
 	}
 	
 }

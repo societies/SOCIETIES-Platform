@@ -1,11 +1,11 @@
 package org.societies.context.dataInit.impl;
 
-public class Jane extends BaseUser{
+public class User1 extends BaseUser{
 
 	@Override
 	public String getName() {
 		
-		return "Jane";
+		return "User1";
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class Jane extends BaseUser{
 	@Override
 	public String getEmail() {
 		
-		return "john@societies.org";
+		return "user1.societies.local@ict-societies.eu";
 	}
 
 	@Override
@@ -91,8 +91,7 @@ public class Jane extends BaseUser{
 	 */
 	@Override
 	public String getSkills() {
-		// TODO Auto-generated method stub
-		return null;
+		return "UNSARAG,translation,quadrotors";
 	}
 	
 }

@@ -64,7 +64,8 @@ import org.springframework.stereotype.Service;
 public class CtxDataInitiator {
 
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(CtxDataInitiator.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(CtxDataInitiator.class);
 
 	/** The internal BaseUser Broker service. */
 	private ICtxBroker ctxBroker;
@@ -73,14 +74,14 @@ public class CtxDataInitiator {
 	private ICommManager commMgr;
 
 	/** The Identity Mgr service. */
-	private IIdentityManager idMgr; 
+	private IIdentityManager idMgr;
 
 	private INetworkNode cssNodeId;
 	private IIdentity cssOwnerId;
 	private static CtxEntityIdentifier ownerCtxId;
 
-	@Autowired(required=true)
-	CtxDataInitiator(ICtxBroker ctxBroker,ICommManager commMgr) {
+	@Autowired(required = true)
+	CtxDataInitiator(ICtxBroker ctxBroker, ICommManager commMgr) {
 
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
@@ -90,19 +91,39 @@ public class CtxDataInitiator {
 
 		this.idMgr = commMgr.getIdManager();
 
-
 		this.cssOwnerId = this.getLocalIdentity();
 
 		try {
 
-			ownerCtxId = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get().getId();
+			ownerCtxId = this.ctxBroker
+					.retrieveIndividualEntity(this.cssOwnerId).get().getId();
 
-			if (ownerCtxId.getOwnerId().equals("john.societies.local")){
+			if (ownerCtxId.getOwnerId().equals("john.societies.local")) {
 				BaseUser john = new John();
 				addContext(john);
-			} else if (ownerCtxId.getOwnerId().equals("jane.societies.local")){
+			} else if (ownerCtxId.getOwnerId().equals("jane.societies.local")) {
 				BaseUser jane = new Jane();
 				addContext(jane);
+
+			} else if (ownerCtxId.getOwnerId().equals("user1.societies.local")) {
+				BaseUser user1 = new User1();
+				addContext(user1);
+
+			} else if (ownerCtxId.getOwnerId().equals("user2.societies.local")) {
+				BaseUser user2 = new User2();
+				addContext(user2);
+
+			} else if (ownerCtxId.getOwnerId().equals("user3.societies.local")) {
+				BaseUser user3 = new User3();
+				addContext(user3);
+
+			} else if (ownerCtxId.getOwnerId().equals("user4.societies.local")) {
+				BaseUser user4 = new User4();
+				addContext(user4);
+
+			} else if (ownerCtxId.getOwnerId().equals("user5.societies.local")) {
+				BaseUser user5 = new User5();
+				addContext(user5);
 			}
 
 		} catch (InterruptedException e) {
@@ -117,7 +138,6 @@ public class CtxDataInitiator {
 		}
 	}
 
-
 	private void addContext(BaseUser user) {
 
 		if (LOG.isInfoEnabled()) // TODO debug
@@ -130,98 +150,120 @@ public class CtxDataInitiator {
 			// AGE
 			value = user.getAge();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.AGE, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.AGE,
+						value);
 
 			// BIRTHDAY
 			value = user.getBirthday();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.BIRTHDAY, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.BIRTHDAY,
+						value);
 
 			// EMAIL
 			value = user.getEmail();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL,
+						value);
 
 			// FRIENDS
 			value = user.getFriends();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FRIENDS, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.FRIENDS,
+						value);
 
 			// INTERESTS
 			value = user.getInterests();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.INTERESTS, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.INTERESTS, value);
 
 			// LANGUAGES
 			value = user.getLanguages();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.LANGUAGES, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.LANGUAGES, value);
 
 			// LOCATION_COORDINATES
 			value = user.getLocationCoordinates();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.LOCATION_COORDINATES, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.LOCATION_COORDINATES, value);
 
 			// LOCATION_SYMBOLIC
 			value = user.getLocationSymbolic();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.LOCATION_SYMBOLIC, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.LOCATION_SYMBOLIC, value);
 
 			// MOVIES
 			value = user.getMovies();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.MOVIES, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.MOVIES,
+						value);
 
 			// NAME
 			value = user.getName();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME,
+						value);
 
 			// OCCUPATION
 			value = user.getOccupation();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.OCCUPATION, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.OCCUPATION, value);
 
 			// POLITICAL_VIEWS
 			value = user.getPoliticalViews();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.POLITICAL_VIEWS, value);
+				this.updateCtxAttribute(ownerCtxId,
+						CtxAttributeTypes.POLITICAL_VIEWS, value);
 
 			// SEX
 			value = user.getSex();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SEX,
+						value);
 
 			// STATUS
 			value = user.getStatus();
 			if (value != null && !value.isEmpty())
-				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.STATUS, value);
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.STATUS,
+						value);
 
+			// SKILLS
+			value = user.getSkills();
+			if (value != null && !value.isEmpty())
+				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SKILLS,
+						value);
 
 		} catch (Exception e) {
-			LOG.info("error when initializing context data: "+ e.getLocalizedMessage());
+			LOG.info("error when initializing context data: "
+					+ e.getLocalizedMessage());
 		}
 
 	}
 
-	private void updateCtxAttribute(CtxEntityIdentifier ownerCtxId, 
+	private void updateCtxAttribute(CtxEntityIdentifier ownerCtxId,
 			String type, String value) throws Exception {
 
 		if (LOG.isInfoEnabled()) // TODO debug
-			LOG.info("Updating '" + type + "' of entity " + ownerCtxId + " to '" + value + "'");
+			LOG.info("Updating '" + type + "' of entity " + ownerCtxId
+					+ " to '" + value + "'");
 
-		final List<CtxIdentifier> ctxIds = 
-				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
+		final List<CtxIdentifier> ctxIds = this.ctxBroker.lookup(ownerCtxId,
+				CtxModelType.ATTRIBUTE, type).get();
 		if (!ctxIds.isEmpty()) {
-			this.ctxBroker.updateAttribute((CtxAttributeIdentifier) ctxIds.get(0), value);
+			this.ctxBroker.updateAttribute(
+					(CtxAttributeIdentifier) ctxIds.get(0), value);
 		} else {
-			final CtxAttribute attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
+			final CtxAttribute attr = this.ctxBroker.createAttribute(
+					ownerCtxId, type).get();
 			this.ctxBroker.updateAttribute(attr.getId(), value);
 		}
 	}
 
-
-	private IIdentity getLocalIdentity()  {
+	private IIdentity getLocalIdentity() {
 
 		IIdentity cssOwnerId = null;
 		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
@@ -232,6 +274,6 @@ public class CtxDataInitiator {
 			e.printStackTrace();
 		}
 
-		return cssOwnerId;	
+		return cssOwnerId;
 	}
 }

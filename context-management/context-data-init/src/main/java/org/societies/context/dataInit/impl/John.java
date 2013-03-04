@@ -86,4 +86,13 @@ public class John extends BaseUser {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.context.dataInit.impl.BaseUser#getSkills()
+	 */
+	@Override
+	public String getSkills() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
