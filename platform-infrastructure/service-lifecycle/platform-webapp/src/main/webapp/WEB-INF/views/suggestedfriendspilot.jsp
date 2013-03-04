@@ -32,7 +32,8 @@
 <form id="friendReqForm" name="friendReqForm" method="post" action="suggestedfriendspilot.html">
 		<input type="hidden" name="friendId" id="friendId">
 		<input type="hidden" name="method" id="method">
-
+		
+		
 		<h4>Social Network Friends</h4>
 		<Table border="1">
 		<tr>

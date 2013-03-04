@@ -169,23 +169,23 @@ public class CssSuggestedFriendsController {
 
 		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
-
+		
 		String res = null;
 
 		try {
 
 			//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
 			FriendFilter filter = new FriendFilter();
-			Integer filterFlag = 0x00000000101;
+			Integer filterFlag = 0x00000001111;
 
+			filter.getFilterFlag();
 			filter.setFilterFlag(filterFlag );
 			LOG.info("SuggestedFriendsController called with filter: " +filter);
 			
 //			int filterFlag = 0x0000000000;
 			
 			LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
-			//filter.setFilterFlag(filterFlag);
-			LOG.info("SuggestedFriends Controller filter flag is: " +filter.getFilterFlag());
+			
 
 			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
 			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
@@ -253,8 +253,10 @@ public class CssSuggestedFriendsController {
 			}
 			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
 			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
+
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
+			
 
 		} catch (Exception e) {
 			res = "Oops!!!!<br/>";
