@@ -98,7 +98,7 @@ public class ActivityFeedManagerRemoteTest {
                 advertisementRecord[0] = cisAdvertisementRecords.get(0);
             }
         });
-        int maxCounter = 100000,counter=0;
+        int maxCounter = 20000,counter=0;
         try {
             while(advertisementRecord[0] == null) {
                 Thread.sleep(100);
@@ -181,15 +181,25 @@ public class ActivityFeedManagerRemoteTest {
         cis1.getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                if(activityFeedObject.getAddActivityResponse().isResult()!=null)
+                if(activityFeedObject.getAddActivityResponse().isResult()!=null) {
                     done[0] = new Boolean(activityFeedObject.getAddActivityResponse().isResult());
-                else
+                    LOG.info("done[0] not null");
+                } else {
                     done[0] = new Boolean(false);
-                LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname + " result: " + activityFeedObject.getAddActivityResponse().isResult() + " as string\""+activityFeedObject.getAddActivityResponse().toString()+"\"");
+                    LOG.info("done[0] null");
+                }
+                LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname + " result: "
+                        + activityFeedObject.getAddActivityResponse().isResult()
+                        + " done[0] = "+done[0]);
             }
         });
+        LOG.info("entering while loop to wait for done[0]");
         try {
-            while(!done[0]) {
+            while(done[0] == null || !done[0]) {
+                if(done[0]!=null)
+                    LOG.info("in while loop to wait for done[0]: " + done[0]);
+                else
+                    LOG.info("in while loop to wait for done[0] it is still null.. ");
                 Thread.sleep(100);
                 counter += 100;
                 if (counter > maxCounter)  {
