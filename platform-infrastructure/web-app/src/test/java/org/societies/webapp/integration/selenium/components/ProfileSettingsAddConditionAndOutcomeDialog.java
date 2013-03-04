@@ -8,6 +8,7 @@ public class ProfileSettingsAddConditionAndOutcomeDialog extends BasePageCompone
     private static final String SAVE_BTN_XPATH = "//*[@id='mainForm:addConditionAndOutcomeDialog']//*[contains(@class, 'ui-button-text') and starts-with(text(),'Save')]";
     private static final String CANCEL_BTN_XPATH = "//*[@id='mainForm:addConditionAndOutcomeDialog']//*[contains(@class, 'ui-button-text') and text()='Cancel']";
     private static final String NAME_FIELD_XPATH = "//*[@id='mainForm:addConditionName']";
+    private static final String NAME_FIELD_ID = "mainForm:addConditionName";
     private static final String OPERATOR_FIELD_ID = "mainForm:addConditionOperator";
     private static final String OPERATOR_FIELD_XPATH = "//*[@id='mainForm:']";
     private static final String VALUE_FIELD_XPATH = "//*[@id='mainForm:addConditionValue']";
@@ -31,7 +32,8 @@ public class ProfileSettingsAddConditionAndOutcomeDialog extends BasePageCompone
     }
 
     public ProfileSettingsAddConditionAndOutcomeDialog setName(String value) {
-        setFieldValue(value, By.xpath(NAME_FIELD_XPATH));
+        pickDropdownValue(value, NAME_FIELD_ID);
+//        setFieldValue(value, By.xpath(NAME_FIELD_XPATH));
         return this;
     }
 

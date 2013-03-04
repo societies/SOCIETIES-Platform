@@ -25,6 +25,7 @@
 package org.societies.webapp.integration.tests;
 
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -58,6 +59,19 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage = indexPage.navigateToProfileSettings();
 
         buildDefaultPreferenceTree();
+    }
+
+    @After
+    public void verifyPersistBetweenSessions() {
+        profileSettingsPage.clickSaveTreeButton();
+
+        getDriver().manage().deleteAllCookies();
+//        getDriver().close();
+        getDriver().get(BASE_URL);
+        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
+        profileSettingsPage = indexPage.navigateToProfileSettings();
+
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
     }
 
     private void buildDefaultPreferenceTree() {
@@ -365,6 +379,9 @@ public class TestProfileSettings extends SeleniumTest {
         ProfileSettingsPage.TreeNode afternoonConditionNode, afternoonOutcomeNode;
         ProfileSettingsPage.TreeNode locationHomeConditionNode, locationHomeOutcomeNode;
 
+        String beerStrength = "beerStrength_" + randomString(4);
+        String strong = "strong_" + randomString(4);
+
         profileSettingsPage.removeAllPreferences();
 
         preferenceTreeRoot.subNodes.clear();
@@ -373,60 +390,115 @@ public class TestProfileSettings extends SeleniumTest {
 
         profileSettingsPage.openContextMenuOnRootNode()
                 .clickAddPreference()
-                .setName("beerStrength")
+                .setName(beerStrength)
                 .clickSave();
 
-        beerStrengthNode = new ProfileSettingsPage.TreeNode("beerStrength",
+        beerStrengthNode = new ProfileSettingsPage.TreeNode(beerStrength,
                 ProfileSettingsPage.TreeNodeType.PREFERENCE,
                 preferenceTreeRoot);
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
-        profileSettingsPage.openContextMenuOnPreferenceNode(new int[]{0}, "beerStrength")
+        profileSettingsPage.openContextMenuOnPreferenceNode(new int[]{0}, beerStrength)
                 .clickAdd()
-                .setOutcomeValue("strong")
+                .setOutcomeValue(strong)
                 .clickSave();
 
-        beerStrengthOutcomeNode = new ProfileSettingsPage.TreeNode("strong",
+        beerStrengthOutcomeNode = new ProfileSettingsPage.TreeNode(strong,
                 ProfileSettingsPage.TreeNodeType.OUTCOME,
                 beerStrengthNode);
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
-        profileSettingsPage.openContextMenuOnOutcomeNode(new int[]{0,0}, "strong")
+        profileSettingsPage.openContextMenuOnOutcomeNode(new int[]{0, 0}, strong)
                 .clickAddBefore()
-                .setName("timeOfDay")
+                .setName("locationSymbolic")
                 .setOperator("equals")
-                .setConditionValue("afternoon")
+                .setConditionValue("home")
                 .clickSave();
 
         beerStrengthNode.subNodes.remove(beerStrengthOutcomeNode);
-        afternoonConditionNode = new ProfileSettingsPage.TreeNode("timeOfDay EQUALS afternoon",
+        afternoonConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
                 ProfileSettingsPage.TreeNodeType.CONDITION,
                 beerStrengthNode);
-        afternoonOutcomeNode = new ProfileSettingsPage.TreeNode("strong",
+        afternoonOutcomeNode = new ProfileSettingsPage.TreeNode(strong,
                 ProfileSettingsPage.TreeNodeType.OUTCOME,
                 afternoonConditionNode);
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
-        profileSettingsPage.openContextMenuOnConditionNode(new int[]{0,0}, "timeOfDay EQUALS afternoon")
-                .clickAddBefore()
-                .setName("locationSymbolic")
-                .setOperator("equals")
-                .setConditionValue("pub")
-                .clickSave();
-
-
-        beerStrengthNode.subNodes.remove(afternoonConditionNode);
-        locationHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
-                ProfileSettingsPage.TreeNodeType.CONDITION,
-                beerStrengthNode);
-        locationHomeConditionNode.subNodes.add(afternoonConditionNode);
-        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
-
-
+//        profileSettingsPage.openContextMenuOnConditionNode(new int[]{0, 0}, "timeOfDay EQUALS afternoon")
+//                .clickAddBefore()
+//                .setName("locationSymbolic")
+//                .setOperator("equals")
+//                .setConditionValue("pub")
+//                .clickSave();
+//
+//
+//        beerStrengthNode.subNodes.remove(afternoonConditionNode);
+//        locationHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
+//                ProfileSettingsPage.TreeNodeType.CONDITION,
+//                beerStrengthNode);
+//        locationHomeConditionNode.subNodes.add(afternoonConditionNode);
+//        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
     }
+
+    @Ignore("not ready to use these during the nightly build yet")
+    @Test
+    public void addPreferences_withNullService_andRfidService() {
+        profileSettingsPage.removeAllPreferences();
+
+        preferenceTreeRoot.subNodes.clear();
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        String beerStrength = "beerStrength_" + randomString(4);
+        String strong = "strong_" + randomString(4);
+        String nachoFlavour = "nachoFlavour_" + randomString(4);
+        String cheese = "cheese_" + randomString(4);
+
+        profileSettingsPage.openContextMenuOnRootNode()
+                .clickAddPreference()
+                .setName(beerStrength)
+                .setService("(none)")
+                .clickSave();
+
+        profileSettingsPage.openContextMenuOnPreferenceNode(new int[]{0}, beerStrength)
+                .clickAdd()
+                .setOutcomeValue(strong)
+                .clickSave();
+
+        ProfileSettingsPage.TreeNode beerStrengthNode = new ProfileSettingsPage.TreeNode(beerStrength,
+                ProfileSettingsPage.TreeNodeType.PREFERENCE,
+                preferenceTreeRoot);
+        ProfileSettingsPage.TreeNode beerStrengthOutcomeNode = new ProfileSettingsPage.TreeNode(strong,
+                ProfileSettingsPage.TreeNodeType.OUTCOME,
+                beerStrengthNode);
+
+        profileSettingsPage.clickSaveTreeButton();
+
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+        profileSettingsPage.openContextMenuOnRootNode()
+                .clickAddPreference()
+                .setName(nachoFlavour)
+                .setService("RFiD System")
+                .clickSave();
+        profileSettingsPage.openContextMenuOnPreferenceNode(new int[]{1}, nachoFlavour)
+                .clickAdd()
+                .setOutcomeValue(strong)
+                .clickSave();
+
+        ProfileSettingsPage.TreeNode nachosNode = new ProfileSettingsPage.TreeNode(nachoFlavour,
+                ProfileSettingsPage.TreeNodeType.PREFERENCE,
+                preferenceTreeRoot);
+        ProfileSettingsPage.TreeNode nachosOutcomeNode = new ProfileSettingsPage.TreeNode(cheese,
+                ProfileSettingsPage.TreeNodeType.OUTCOME,
+                nachosNode);
+
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+    }
+
 }
