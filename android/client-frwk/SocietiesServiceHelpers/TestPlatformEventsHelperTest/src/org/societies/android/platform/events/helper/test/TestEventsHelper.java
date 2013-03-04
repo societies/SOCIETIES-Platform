@@ -47,7 +47,7 @@ public class TestEventsHelper extends AndroidTestCase {
 
 		super.tearDown();
 	}
-//	@MediumTest
+	@MediumTest
 	public void testServiceConfiguration() throws Exception {
 		this.testCompleted = false;
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -292,7 +292,7 @@ public class TestEventsHelper extends AndroidTestCase {
 		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
 		assertTrue(this.testCompleted);
 	}
-//	@MediumTest
+	@MediumTest
 	public void testSubscribeToSomeEvents() throws Exception {
 		this.testCompleted = false;
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -380,7 +380,7 @@ public class TestEventsHelper extends AndroidTestCase {
 		assertTrue(this.testCompleted);
 	}
 	
-//	@MediumTest
+	@MediumTest
 	/**
 	 * Try using the service with setting it up
 	 * @throws Exception

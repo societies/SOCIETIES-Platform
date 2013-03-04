@@ -98,7 +98,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.pubsubListener = null;
 		
 		//Android Profiling
-		Debug.startMethodTracing(this.getClass().getSimpleName());
+//		Debug.startMethodTracing(this.getClass().getSimpleName());
 	}
 	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
@@ -215,7 +215,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
 			//Android Profiling
-			Debug.stopMethodTracing();
+//			Debug.stopMethodTracing();
 		}
 
 		return false;
@@ -508,7 +508,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
 			if (DEBUG_LOGGING) {
-				Log.d(LOG_TAG, "Create intent sent");
+				Log.d(LOG_TAG, "Create intent sent for: " + retValue);
 			}
 			//Send intent
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);

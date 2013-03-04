@@ -54,7 +54,7 @@ import android.util.Log;
 public class PubsubHelper implements IPubsubClient {
 	private static final String LOG_TAG = PubsubHelper.class.getName();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformPubsubRemote";
-    private static final boolean DEBUG_LOGGING = false;
+    private static final boolean DEBUG_LOGGING = true;
     
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",

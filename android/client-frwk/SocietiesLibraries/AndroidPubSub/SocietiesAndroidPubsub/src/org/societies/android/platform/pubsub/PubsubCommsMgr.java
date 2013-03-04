@@ -466,7 +466,7 @@ public class PubsubCommsMgr {
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
 						if (DEBUG_LOGGING) {
-							Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+							Log.d(LOG_TAG, "Received result unregister result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 						};
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 					}
@@ -658,9 +658,9 @@ public class PubsubCommsMgr {
     		};
 
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
-    		
+
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
-    		
+   		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
     		if (DEBUG_LOGGING) {
         		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);

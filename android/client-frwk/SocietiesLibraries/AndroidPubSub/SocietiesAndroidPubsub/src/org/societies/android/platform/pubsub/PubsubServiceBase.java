@@ -150,14 +150,15 @@ public class PubsubServiceBase implements IPubsubService {
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallID);
 		intent.setAction(IPubsubService.UNBIND_FROM_ANDROID_COMMS);
 		intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, false);
-		PubsubServiceBase.this.androidContext.sendBroadcast(intent);
-
 		
 		this.pubsubClientMgr.unregister(ELEMENTS, new ICommCallback() {
 			
 			@Override
 			public void receiveResult(Stanza stanza, Object payload) {
 				boolean result = (Boolean) payload;
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Unregister elements successful: " + result);
+				}
 				if (result && PubsubServiceBase.this.pubsubClientMgr.unbindCommsService()) {
 					intent.putExtra(IPubsubService.INTENT_RETURN_VALUE_KEY, true);
 				}

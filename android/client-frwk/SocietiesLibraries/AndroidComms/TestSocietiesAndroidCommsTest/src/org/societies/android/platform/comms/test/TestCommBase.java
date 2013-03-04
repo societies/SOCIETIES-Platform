@@ -36,6 +36,7 @@ import junit.framework.TestCase;
  * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid
  * 4. The user XMPP_NEW_IDENTIFIER must be removed prior to running the tests as the destroyMainIdentity
  *   method is not currently functioning.
+ * 5. Ensure that Android Profiling is not being used, i.e. comment out Debug calls
  *
  */
 public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {

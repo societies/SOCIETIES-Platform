@@ -24,7 +24,7 @@ public class TestEventsLocal extends ServiceTestCase <ServicePlatformEventsTest>
 	private static final String INTENT_FILTER = "org.societies.android.css.manager";
 	private static final int SLEEP_DELAY = 10000;
 	
-	private static final int ALL_EVENTS_COUNT = 13;
+	private static final int ALL_EVENTS_COUNT = 15;
 	
 	private boolean testCompleted;
 	private IAndroidSocietiesEvents eventService;

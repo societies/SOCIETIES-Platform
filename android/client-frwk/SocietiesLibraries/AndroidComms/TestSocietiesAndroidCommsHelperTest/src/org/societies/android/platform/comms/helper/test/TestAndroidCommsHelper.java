@@ -27,6 +27,7 @@ import android.util.Log;
  * 4. The user XMPP_NEW_IDENTIFIER must be removed prior to running the tests as the destroyMainIdentity
  *   method is not currently functioning.
  * 5. The Societies Android Comms apk must be installed
+ * 6. Ensure that Android Profiling is not being used, i.e. comment out Debug calls
  *
  */
 

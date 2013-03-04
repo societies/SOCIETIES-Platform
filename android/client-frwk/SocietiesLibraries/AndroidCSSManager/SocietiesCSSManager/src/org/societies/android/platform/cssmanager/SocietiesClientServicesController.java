@@ -73,21 +73,20 @@ public class SocietiesClientServicesController {
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	private final static int NUM_SERVICES = 13;
+	private final static int NUM_SERVICES = 12;
 	
-	private final static int EVENT_SERVICE 				= 0;
-	private final static int CIS_DIRECTORY_SERVICE 		= 1;
-	private final static int CIS_MANAGER_SERVICE 		= 2;
-	private final static int CIS_SUBSCRIBED_SERVICE 	= 3;
-	private final static int CSS_DIRECTORY_SERVICE 		= 4;
-	private final static int TRUST_SERVICE 				= 5;
-	private final static int SLM_SERVICE_CONTROL_SERVICE= 6;
-	private final static int PRIVACY_DATA_SERVICE 		= 7;
-	private final static int PRIVACY_POLICY_SERVICE 	= 8;
-	private final static int SNS_SOCIAL_DATA_SERVICE 	= 9;
-	private final static int PERSONALISATION_SERVICE 	= 10;
-	private final static int SLM_SERVICE_DISCO_SERVICE 	= 11;
-	private final static int FRIENDS_MANAGER_SERVICE 	= 12;
+	private final static int CIS_DIRECTORY_SERVICE 		= 0;
+	private final static int CIS_MANAGER_SERVICE 		= 1;
+	private final static int CIS_SUBSCRIBED_SERVICE 	= 2;
+	private final static int CSS_DIRECTORY_SERVICE 		= 3;
+	private final static int TRUST_SERVICE 				= 4;
+	private final static int SLM_SERVICE_CONTROL_SERVICE= 5;
+	private final static int PRIVACY_DATA_SERVICE 		= 6;
+	private final static int PRIVACY_POLICY_SERVICE 	= 7;
+	private final static int SNS_SOCIAL_DATA_SERVICE 	= 8;
+	private final static int PERSONALISATION_SERVICE 	= 9;
+	private final static int SLM_SERVICE_DISCO_SERVICE 	= 10;
+	private final static int FRIENDS_MANAGER_SERVICE 	= 11;
 	
 	private Context context;
 	private CountDownLatch servicesBinded;
@@ -325,27 +324,6 @@ public class SocietiesClientServicesController {
         }
     };
 
-	private ServiceConnection personalisationMgrConnection = new ServiceConnection() {
-		
-    	final static String SERVICE_NAME = "Platform Personalisation Manager";
-		public void onServiceDisconnected(ComponentName name) {
-	       	Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
-			SocietiesClientServicesController.this.connectedToServices[PERSONALISATION_SERVICE] = false;
-		}
-		
-		public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
-			
-			SocietiesClientServicesController.this.connectedToServices[PERSONALISATION_SERVICE] = true;
-			//get a remote binder
-			SocietiesClientServicesController.this.allMessengers[PERSONALISATION_SERVICE] = new Messenger(service);
-			      	
-			SocietiesClientServicesController.this.platformServiceConnections[PERSONALISATION_SERVICE] = this;
-			SocietiesClientServicesController.this.servicesBinded.countDown();
-        	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
-		}
-	};
-
     //Potential platform services
     private ServiceConnection trustConnection = new ServiceConnection() {
 
@@ -411,15 +389,16 @@ public class SocietiesClientServicesController {
         }
     };
     
-    
-	
+	private ServiceConnection personalisationMgrConnection = new ServiceConnection() {
+		
+    	final static String SERVICE_NAME = "Platform Personalisation Manager";
 		public void onServiceDisconnected(ComponentName name) {
-			Log.d(LOG_TAG, "Disconnecting from Platform Personalisation Manager service");
+	       	Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
 			SocietiesClientServicesController.this.connectedToServices[PERSONALISATION_SERVICE] = false;
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.d(LOG_TAG, "Connecting to Platform Personalisation Manager service");
+        	Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 			
 			SocietiesClientServicesController.this.connectedToServices[PERSONALISATION_SERVICE] = true;
 			//get a remote binder
@@ -427,9 +406,10 @@ public class SocietiesClientServicesController {
 			      	
 			SocietiesClientServicesController.this.platformServiceConnections[PERSONALISATION_SERVICE] = this;
 			SocietiesClientServicesController.this.servicesBinded.countDown();
+        	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
 		}
 	};
-	
+
 	private ServiceConnection friendsMgrConnection = new ServiceConnection() {
 		
 		public void onServiceDisconnected(ComponentName name) {
@@ -441,11 +421,12 @@ public class SocietiesClientServicesController {
 			Log.d(LOG_TAG, "Connecting to Platform Friends Manager service");
 	
 			SocietiesClientServicesController.this.connectedToServices[FRIENDS_MANAGER_SERVICE] = true;
-	
+				
 			//Get a local binder
 			LocalFriendsManagerBinder binder = (LocalFriendsManagerBinder) service;
 			//Retrieve the local service API
 			SocietiesClientServicesController.this.friendMgrService = (IFriendsManager) binder.getService();
+        	SocietiesClientServicesController.this.platformServiceConnections[FRIENDS_MANAGER_SERVICE] = this;
 			SocietiesClientServicesController.this.servicesBinded.countDown();
 		}
 	};

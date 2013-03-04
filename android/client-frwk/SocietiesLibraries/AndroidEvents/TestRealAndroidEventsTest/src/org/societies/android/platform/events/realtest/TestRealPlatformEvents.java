@@ -20,9 +20,8 @@ import android.util.Log;
 /**
  * Required for test
  * 1. Virgo and Openfire running and correctly configured.
- * 2. Societies Android Client app running and successfully logged in
- * 3. Does not test starting and stopping Pubsub service as this functionality
- *    is already performed in the Societies Android Client app
+ * 2. Societies Login tester app running and successfully logged in
+ * 
  *
  */
 public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsTest>  {
@@ -87,7 +86,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     	assertTrue(this.testCompleted);
     	
 	}
-//    @MediumTest
+    @MediumTest
 	public void testSubscribeToAllEvents() throws Exception {
 		this.endCondition = new CountDownLatch(1);
 
@@ -108,7 +107,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     	assertTrue(this.testCompleted);
     	
 	}
-//    @MediumTest
+    @MediumTest
 	public void testSubscribeToMultipleEvents() throws Exception {
 		this.endCondition = new CountDownLatch(1);
 		this.testCompleted = false;
