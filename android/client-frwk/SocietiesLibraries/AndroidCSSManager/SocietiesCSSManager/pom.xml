@@ -36,11 +36,6 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-        <!--dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency-->
         <dependency>
 		    <groupId>org.societies.android.platform.content</groupId>
 		    <artifactId>SocietiesCSSContentProvider</artifactId>
@@ -53,24 +48,12 @@
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
-        <!--dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		    <type>apklib</type>
-		</dependency-->
 		<dependency>
 		    <groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>   
-		<!--dependency>
-			<groupId>org.societies.android.platform.events</groupId>
-   			<artifactId>SocietiesPlatformEvents</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency-->   
 		<dependency>
 		    <groupId>org.societies.android.platform.events.helper</groupId>
    			<artifactId>SocietiesAndroidPlatformEventsHelper</artifactId>
@@ -92,6 +75,12 @@
 		<dependency>
 			<groupId>org.societies.android.platform.css.friends</groupId>
    			<artifactId>FriendsManager</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.useragent.feedback</groupId>
+   			<artifactId>AndroidUserFeedback</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>

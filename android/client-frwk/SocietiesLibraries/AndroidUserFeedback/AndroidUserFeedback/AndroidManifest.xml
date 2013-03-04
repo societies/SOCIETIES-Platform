@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".AndroidUserFeedbackService" >
+        <service android:name=".UserFeedbackLocal" >
         </service>
     </application>
 
