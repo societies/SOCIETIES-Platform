@@ -416,7 +416,7 @@ public class SocialData implements ISocialData{
 		
 		// store SNS data to context
 		try{
-			if(this.ctxUpdater != null ) this.ctxUpdater.updateCtxProfile(profile);	
+			if(this.ctxUpdater != null ) this.ctxUpdater.updateCtxProfile(connector);	
 		
 		} catch (Exception e) {
 			logger.info("context DB not updated");
