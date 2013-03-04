@@ -24,6 +24,8 @@
  */
 package org.societies.api.privacytrust.privacy.model.privacypolicy.constants;
 
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+
 /**
  * @author Eliza
  *

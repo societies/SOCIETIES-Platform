@@ -27,15 +27,71 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;/*
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;*/
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ActionUtils {
+
+	/**
+	 * Create a mandatory action
+	 * 
+	 * @param actionConstant
+	 * @return
+	 */
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant) {
+		return create(actionConstant, true);
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant, boolean optional) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action();
+		action.setActionConstant(actionConstant);
+		action.setOptional(optional);
+		return action;
+	}
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action){
+		StringBuilder sb = new StringBuilder();
+		if (null != action) {
+			sb.append("\n<Action>\n");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\""+action.getActionConstant().getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("\t<optional>"+action.isOptional()+"</optional>\n");
+			sb.append("</Action>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions){
+		StringBuilder sb = new StringBuilder();
+		if (null != actions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action : actions) {
+				sb.append(toXmlString(action));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action) o2;
+		return new EqualsBuilder()
+		.append(o1.getActionConstant().name(), rhs.getActionConstant().name())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
+	}
+	
+	/*
+
 	public static Action toAction(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionBean)
 	{
 		if (null == actionBean) {
@@ -101,7 +157,7 @@ public class ActionUtils {
 	 * @param intersection Will be filled with the intersection of the two list. It will works only if actions contains actionsToCheck
 	 * @return
 	 */
-	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
+/*	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
 		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
 			return false;
 		}
@@ -139,58 +195,7 @@ public class ActionUtils {
 			}
 		}
 		return result;
-	}
+	}*/
 	
-	/**
-	 * Create a mandatory action
-	 * 
-	 * @param actionConstant
-	 * @return
-	 */
-	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant) {
-		return create(actionConstant, true);
-	}
 	
-	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant, boolean optional) {
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action();
-		action.setActionConstant(actionConstant);
-		action.setOptional(optional);
-		return action;
-	}
-
-	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action){
-		StringBuilder sb = new StringBuilder();
-		if (null != action) {
-			sb.append("\n<Action>\n");
-			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\""+action.getActionConstant().getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue>"+action.getActionConstant().name()+"</AttributeValue>\n");
-			sb.append("\t</Attribute>\n");
-			sb.append("\t<optional>"+action.isOptional()+"</optional>\n");
-			sb.append("</Action>");
-		}
-		return sb.toString();
-	}
-
-	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions){
-		StringBuilder sb = new StringBuilder();
-		if (null != actions) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action : actions) {
-				sb.append(toXmlString(action));
-			}
-		}
-		return sb.toString();
-	}
-
-	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action) o2;
-		return new EqualsBuilder()
-		.append(o1.getActionConstant().name(), rhs.getActionConstant().name())
-		.append(o1.isOptional(), rhs.isOptional())
-		.isEquals();
-	}
 }

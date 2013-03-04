@@ -26,15 +26,13 @@ package org.societies.api.internal.privacytrust.privacyprotection.remote;
 
 import java.util.List;
 
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 
 /**
  * Interface exposed to Societies components in order to remotely manage access control over resources

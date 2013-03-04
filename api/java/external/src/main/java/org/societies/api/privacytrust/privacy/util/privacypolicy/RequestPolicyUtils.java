@@ -30,7 +30,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;*/
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -51,46 +51,6 @@ public class RequestPolicyUtils {
 		return requestPolicy;
 	}
 
-	public static RequestPolicy toRequestPolicy(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean, IIdentityManager identityManager) throws InvalidFormatException
-	{
-		if (null == requestPolicyBean) {
-			return null;
-		}
-		return new RequestPolicy(RequestorUtils.toRequestor(requestPolicyBean.getRequestor(), identityManager), RequestItemUtils.toRequestItems(requestPolicyBean.getRequestItems()));
-	}
-	public static List<RequestPolicy> toRequestPolicys(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> requestPolicyBeans, IIdentityManager identityManager) throws InvalidFormatException
-	{
-		if (null == requestPolicyBeans) {
-			return null;
-		}
-		List<RequestPolicy> requestPolicys = new ArrayList<RequestPolicy>();
-		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean : requestPolicyBeans) {
-			requestPolicys.add(RequestPolicyUtils.toRequestPolicy(requestPolicyBean, identityManager));
-		}
-		return requestPolicys;
-	}
-
-	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy toRequestPolicyBean(RequestPolicy requestPolicy)
-	{
-		if (null == requestPolicy) {
-			return null;
-		}
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy();
-		requestPolicyBean.setRequestor(RequestorUtils.toRequestorBean(requestPolicy.getRequestor()));
-		requestPolicyBean.setRequestItems(RequestItemUtils.toRequestItemBeans(requestPolicy.getRequests()));
-		return requestPolicyBean;
-	}
-	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> toRequestPolicyBeans(List<RequestPolicy> requestPolicys)
-	{
-		if (null == requestPolicys) {
-			return null;
-		}
-		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> requestPolicyBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy>();
-		for(RequestPolicy requestPolicy : requestPolicys) {
-			requestPolicyBeans.add(RequestPolicyUtils.toRequestPolicyBean(requestPolicy));
-		}
-		return requestPolicyBeans;
-	}
 
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicy){
 		StringBuilder sb = new StringBuilder();
@@ -165,4 +125,46 @@ public class RequestPolicyUtils {
 		}
 		return dataTypes;
 	}
+	
+	/*	public static RequestPolicy toRequestPolicy(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean, IIdentityManager identityManager) throws InvalidFormatException
+	{
+		if (null == requestPolicyBean) {
+			return null;
+		}
+		return new RequestPolicy(RequestorUtils.toRequestor(requestPolicyBean.getRequestor(), identityManager), RequestItemUtils.toRequestItems(requestPolicyBean.getRequestItems()));
+	}
+	public static List<RequestPolicy> toRequestPolicys(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> requestPolicyBeans, IIdentityManager identityManager) throws InvalidFormatException
+	{
+		if (null == requestPolicyBeans) {
+			return null;
+		}
+		List<RequestPolicy> requestPolicys = new ArrayList<RequestPolicy>();
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean : requestPolicyBeans) {
+			requestPolicys.add(RequestPolicyUtils.toRequestPolicy(requestPolicyBean, identityManager));
+		}
+		return requestPolicys;
+	}
+
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy toRequestPolicyBean(RequestPolicy requestPolicy)
+	{
+		if (null == requestPolicy) {
+			return null;
+		}
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy requestPolicyBean = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy();
+		requestPolicyBean.setRequestor(RequestorUtils.toRequestorBean(requestPolicy.getRequestor()));
+		requestPolicyBean.setRequestItems(RequestItemUtils.toRequestItemBeans(requestPolicy.getRequests()));
+		return requestPolicyBean;
+	}
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> toRequestPolicyBeans(List<RequestPolicy> requestPolicys)
+	{
+		if (null == requestPolicys) {
+			return null;
+		}
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> requestPolicyBeans = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy>();
+		for(RequestPolicy requestPolicy : requestPolicys) {
+			requestPolicyBeans.add(RequestPolicyUtils.toRequestPolicyBean(requestPolicy));
+		}
+		return requestPolicyBeans;
+	}
+*/
 }

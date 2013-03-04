@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;*/
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -45,7 +45,40 @@ public class ResponseItemUtils {
 		return responseItem;
 	}
 	
-	public static ResponseItem toResponseItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItemBean)
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItem) {
+			sb.append("\n<Response>\n");
+			sb.append(DecisionUtils.toXmlString(responseItem.getDecision()));
+			sb.append(RequestItemUtils.toXmlString(responseItem.getRequestItem()));
+			sb.append("</Response>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
+				sb.append(toXmlString(responseItem));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem) o2;
+		return new EqualsBuilder()
+		.append(o1.getDecision(), rhs.getDecision())
+		.append(o1.getRequestItem(), rhs.getRequestItem())
+		.isEquals();
+	}
+	/*	public static ResponseItem toResponseItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItemBean)
 	{
 		if (null == responseItemBean) {
 			return null;
@@ -87,38 +120,6 @@ public class ResponseItemUtils {
 		}
 		return responseItemBeans;
 	}
+*/
 
-	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem){
-		StringBuilder sb = new StringBuilder();
-		if (null != responseItem) {
-			sb.append("\n<Response>\n");
-			sb.append(DecisionUtils.toXmlString(responseItem.getDecision()));
-			sb.append(RequestItemUtils.toXmlString(responseItem.getRequestItem()));
-			sb.append("</Response>");
-		}
-		return sb.toString();
-	}
-
-	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
-		StringBuilder sb = new StringBuilder();
-		if (null != responseItems) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
-				sb.append(toXmlString(responseItem));
-			}
-		}
-		return sb.toString();
-	}
-
-	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem) o2;
-		return new EqualsBuilder()
-		.append(o1.getDecision(), rhs.getDecision())
-		.append(o1.getRequestItem(), rhs.getRequestItem())
-		.isEquals();
-	}
 }

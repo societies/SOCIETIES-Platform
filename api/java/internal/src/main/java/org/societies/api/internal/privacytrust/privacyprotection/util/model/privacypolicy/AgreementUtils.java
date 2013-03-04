@@ -40,7 +40,7 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUti
  * @author Olivier Maridat (Trialog)
  */
 public class AgreementUtils {
-	public static NegotiationAgreement toAgreement(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement agreementBean, IIdentityManager identityManager) throws InvalidFormatException
+/*	public static NegotiationAgreement toAgreement(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement agreementBean, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == agreementBean) {
 			return null;
@@ -93,5 +93,5 @@ public class AgreementUtils {
 			agreementBeans.add(AgreementUtils.toAgreementBean(agreement));
 		}
 		return agreementBeans;
-	}
+	}*/
 }

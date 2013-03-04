@@ -28,15 +28,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+*/
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class DecisionUtils {
 	
-	public static Decision toDecision(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decisionBean)
+
+	
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision){
+		StringBuilder sb = new StringBuilder();
+		if (null != decision) {
+			sb.append("\n<Decision>\n");
+			sb.append("\t<Attribute AttributeId=\"Decision\" DataType=\""+decision.getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue>"+decision.name()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("</Decision>");
+		}
+		return sb.toString();
+	}
+	
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision) o2;
+		return new EqualsBuilder()
+		.append(o1.name(), rhs.name())
+		.isEquals();
+	}
+	
+	/*	public static Decision toDecision(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decisionBean)
 	{
 		if (null == decisionBean) {
 			return null;
@@ -72,29 +98,5 @@ public class DecisionUtils {
 			decisionBeans.add(DecisionUtils.toDecisionBean(decision));
 		}
 		return decisionBeans;
-	}
-	
-	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision){
-		StringBuilder sb = new StringBuilder();
-		if (null != decision) {
-			sb.append("\n<Decision>\n");
-			sb.append("\t<Attribute AttributeId=\"Decision\" DataType=\""+decision.getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue>"+decision.name()+"</AttributeValue>\n");
-			sb.append("\t</Attribute>\n");
-			sb.append("</Decision>");
-		}
-		return sb.toString();
-	}
-	
-	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision) o2;
-		return new EqualsBuilder()
-		.append(o1.name(), rhs.name())
-		.isEquals();
-	}
+	}*/
 }

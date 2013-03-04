@@ -24,8 +24,10 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+*/
 
 /**
  * This interface defines a listener for an access control operation over a personal data.

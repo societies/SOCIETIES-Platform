@@ -28,21 +28,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
-
+*/
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ConditionUtils {
 	
-	/**
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
+		StringBuilder sb = new StringBuilder();
+		if (null != condition) {
+			sb.append("\n<Condition>\n");
+			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\""+condition.getConditionConstant().getClass().getName()+"\">\n");
+			sb.append("\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>\n");
+			sb.append("\t</Attribute>\n");
+			sb.append("\t<optional>"+condition.isOptional()+"</optional>\n");
+			sb.append("</Condition>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions){
+		StringBuilder sb = new StringBuilder();
+		if (null != conditions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+				sb.append(toXmlString(condition));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition) o2;
+		return new EqualsBuilder()
+		.append(o1.getConditionConstant().name(), rhs.getConditionConstant().name())
+		.append(o1.getValue(), rhs.getValue())
+		.append(o1.isOptional(), rhs.isOptional())
+		.isEquals();
+	}
+	
+	/*	*//**
 	 * Instantiate a mandatory condition
 	 * @param conditionConstant
 	 * @param value
 	 * @return
-	 */
+	 *//*
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionConstant, String value) {
 		return create(conditionConstant, value, true);
 	}
@@ -146,41 +184,5 @@ public class ConditionUtils {
 		}
 		return false;
 	}
-
-	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
-		StringBuilder sb = new StringBuilder();
-		if (null != condition) {
-			sb.append("\n<Condition>\n");
-			sb.append("\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\""+condition.getConditionConstant().getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue DataType=\""+condition.getConditionConstant().name()+"\">"+condition.getValue()+"</AttributeValue>\n");
-			sb.append("\t</Attribute>\n");
-			sb.append("\t<optional>"+condition.isOptional()+"</optional>\n");
-			sb.append("</Condition>");
-		}
-		return sb.toString();
-	}
-
-	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions){
-		StringBuilder sb = new StringBuilder();
-		if (null != conditions) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
-				sb.append(toXmlString(condition));
-			}
-		}
-		return sb.toString();
-	}
-
-	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition) o2;
-		return new EqualsBuilder()
-		.append(o1.getConditionConstant().name(), rhs.getConditionConstant().name())
-		.append(o1.getValue(), rhs.getValue())
-		.append(o1.isOptional(), rhs.isOptional())
-		.isEquals();
-	}
+*/
 }

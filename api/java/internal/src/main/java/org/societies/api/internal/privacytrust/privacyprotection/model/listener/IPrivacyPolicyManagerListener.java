@@ -24,8 +24,10 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
+/*import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+*/
 
 /**
  * This interface defines a listener for operations over privacy policies.

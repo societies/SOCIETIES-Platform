@@ -32,8 +32,9 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
@@ -48,7 +49,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy
 public class NegotiationAgreement implements IAgreement, Serializable {
 
 	private List<ResponseItem> items;
-	private Requestor requestor;
+	private RequestorBean requestor;
 	private IIdentity userId;
 	private IIdentity userPublicId;
 
@@ -90,7 +91,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 
-	public void setRequestor(Requestor requestor){
+	public void setRequestor(RequestorBean requestor){
 		this.requestor = requestor;
 	}
 	/*
@@ -113,7 +114,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 	@Override
-	public Requestor getRequestor() {
+	public RequestorBean getRequestor() {
 		// TODO Auto-generated method stub
 		return this.requestor;
 	}

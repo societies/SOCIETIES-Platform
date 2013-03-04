@@ -37,7 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  * @author Olivier Maridat (Trialog)
  */
 public class AgreementEnvelopeUtils {
-	public static AgreementEnvelope toAgreementEnvelope(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean, IIdentityManager identityManager) throws InvalidFormatException
+/*	public static AgreementEnvelope toAgreementEnvelope(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == agreementEnvelopeBean) {
 			return null;
@@ -80,5 +80,5 @@ public class AgreementEnvelopeUtils {
 			agreementEnvelopeBeans.add(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreementEnvelope));
 		}
 		return agreementEnvelopeBeans;
-	}
+	}*/
 }

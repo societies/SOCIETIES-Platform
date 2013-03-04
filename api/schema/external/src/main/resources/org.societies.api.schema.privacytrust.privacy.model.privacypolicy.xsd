@@ -150,5 +150,16 @@
 			<xs:enumeration value="rightToCorrectIncorrectData" />
 		</xs:restriction>
 	</xs:simpleType>
+	
+	
+	<xs:simpleType name="TargetMatchConstants">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="subject"></xs:enumeration>
+			<xs:enumeration value="resource"></xs:enumeration>
+			<xs:enumeration value="action"></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
 </xs:schema>
 
