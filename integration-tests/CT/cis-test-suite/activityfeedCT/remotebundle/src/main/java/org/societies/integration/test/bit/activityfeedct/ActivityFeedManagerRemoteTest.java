@@ -68,7 +68,7 @@ public class ActivityFeedManagerRemoteTest {
     private String cisType;
     private int numCIS = 6;
     private Hashtable<String, MembershipCriteria> cisMembershipCriteria;
-
+    private static final int defaultActs = 2; //created, joined.
 
     @Before
     public void setUp() {
@@ -158,8 +158,8 @@ public class ActivityFeedManagerRemoteTest {
         cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 1)");
-                assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==1);
+                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be "+(1+ActivityFeedManagerRemoteTest.defaultActs)+")");
+                assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==(1+ActivityFeedManagerRemoteTest.defaultActs));
                 activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0));
             }
         });
@@ -176,17 +176,20 @@ public class ActivityFeedManagerRemoteTest {
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        LOG.info("[#"+testCaseNumber+"] inserting another activity into cis1, then checking if cis1 has two activities..");
+        LOG.info("[#"+testCaseNumber+"] inserting another activity into cis1, then checking if cis1 has "+(2+ActivityFeedManagerRemoteTest.defaultActs)+" activities..");
         final Boolean[] done = {null};
         cis1.getActivityFeed().addActivity(makeMessage("heh", "heh", "nonsense", "0"), new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                done[0] = activityFeedObject.getAddActivityResponse().isResult();
-                LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname );
+                if(activityFeedObject.getAddActivityResponse().isResult()!=null)
+                    done[0] = new Boolean(activityFeedObject.getAddActivityResponse().isResult());
+                else
+                    done[0] = new Boolean(false);
+                LOG.info("[#"+testCaseNumber+"] added an activity to cis " + cisname + " result: " + activityFeedObject.getAddActivityResponse().isResult() + " as string\""+activityFeedObject.getAddActivityResponse().toString()+"\"");
             }
         });
         try {
-            while(done[0] != true ) {
+            while(!done[0]) {
                 Thread.sleep(100);
                 counter += 100;
                 if (counter > maxCounter)  {
@@ -201,7 +204,7 @@ public class ActivityFeedManagerRemoteTest {
         cis1.getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()),new IActivityFeedCallback() {
             @Override
             public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be 2)");
+                LOG.info("[#"+testCaseNumber+"] cis " + cisname + " had " + activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size() + " activities (should be "+(2+ActivityFeedManagerRemoteTest.defaultActs)+")");
                 assert (activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().size()==2);
                 activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(0));
                 activities.add(activityFeedObject.getGetActivitiesResponse().getMarshaledActivity().get(1));
@@ -219,8 +222,9 @@ public class ActivityFeedManagerRemoteTest {
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        assert (activities.size() == (2+ActivityFeedManagerRemoteTest.defaultActs));
         LOG.info("[#"+testCaseNumber+"] has been run successfully");
-        assert(cisIds.size()==this.numCIS);
+
     }
 
 

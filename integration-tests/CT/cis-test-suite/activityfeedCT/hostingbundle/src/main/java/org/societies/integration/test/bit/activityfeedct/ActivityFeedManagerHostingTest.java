@@ -99,20 +99,20 @@ public class ActivityFeedManagerHostingTest {
     @Test
     public void testActivityFeedManager() {
         LOG.info("[#"+testCaseNumber+"] creating cis1");
-        RequestPolicy privacyPolicy = null;
-        try {
+
+ /*       try {
             privacyPolicy = getRequestPolicy();
         } catch (InvalidFormatException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (MalformedCtxIdentifierException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        LOG.info("[#"+testCaseNumber+"] creating cis with policy: "+privacyPolicy.toXMLString());
-        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName, cisType, cisMembershipCriteria, cisDescription,privacyPolicy.toXMLString());//,"<RequestPolicy></RequestPolicy>");
+        }*/
+        //LOG.info("[#"+testCaseNumber+"] creating cis with policy: "+privacyPolicy.toXMLString());
+        Future<ICisOwned> cis1 = TestCase109611.cisManager.createCis(cisName, cisType, cisMembershipCriteria, cisDescription,"<RequestPolicy></RequestPolicy>");//,"<RequestPolicy></RequestPolicy>");
 
         try {
             RequestorCis requestor = getRequestorCis("admin.societies.local",cis1.get().getCisId());
-            privacyPolicy = this.getRequestPolicy(requestor);
+            RequestPolicy privacyPolicy = new RequestPolicy(requestor,new ArrayList<RequestItem>());
             TestCase109611.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
             LOG.info("[#"+testCaseNumber+"#] setting new policy: for the pair (admin.societies.local,"+cis1.get().getCisId()+") "+privacyPolicy.toXMLString());
             //ICisOwned cisOwned = cis1.get();
