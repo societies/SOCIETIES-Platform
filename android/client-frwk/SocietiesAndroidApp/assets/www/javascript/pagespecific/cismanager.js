@@ -59,31 +59,8 @@ var	SocietiesCISManagerService = {
                     "value2": "18",
                     "rank": "1"}],
              cisCriteriaEmpty = [],
-             cisDescription = jQuery("#cisDescOnCisCreate").val(),
-             privacyPolicy = "<RequestPolicy />";
-		//TODO: TEMP WORKAROUND TO CREATE MEMBERS ONLY PRIVACY POLICY
-		if ($("#selPrivacyPolicy").attr('value') == "shared")
-			privacyPolicy = "<RequestPolicy><Target><Resource>" +
-					"    <Attribute AttributeId=\"cis\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
-					"       <AttributeValue>cis-member-list</AttributeValue>" +
-					"    </Attribute>" +
-					"</Resource>" +
-					"<Action>" +
-					"    <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" +
-					"               DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
-					"        <AttributeValue>READ</AttributeValue>" +
-					"    </Attribute>" +
-					"<optional>false</optional>" +
-					"</Action>" +
-					"<Condition>" +
-					"    <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" +
-					"            DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
-					"        <AttributeValue DataType=\"SHARE_WITH_CIS_MEMBERS_ONLY\">1</AttributeValue>" +
-					"    </Attribute>" +
-					"<optional>false</optional>" +
-					"</Condition>" +
-					"<optional>false</optional>" +
-					"</Target></RequestPolicy>";
+             cisDescription = $("#cisDescOnCisCreate").val(),
+             privacyPolicy = $("select#selPrivacyPolicy").attr('value');
 		
 		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteriaEmpty, privacyPolicy);
 	},
