@@ -451,6 +451,7 @@ public class SocietiesClientServicesController {
 			LocalUserFeedbackBinder binder = (LocalUserFeedbackBinder) service;
 			//Retrieve the local service API
 			SocietiesClientServicesController.this.userFeedbackService = (IAndroidUserFeedback) binder.getService();
+        	SocietiesClientServicesController.this.platformServiceConnections[USER_FEEDBACK_SERVICE] = this;
 			SocietiesClientServicesController.this.servicesBinded.countDown();
 		}
 	};
