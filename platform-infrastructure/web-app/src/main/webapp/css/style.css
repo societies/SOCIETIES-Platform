@@ -822,7 +822,7 @@ h3.form_title {padding-top: 20px}
 h3.person_title {padding-top: 20px}
 
 /* Form ul----------------------- */
-#form_style_main ul {
+.form_style_main ul {
 	float: left;
 	list-style: none;
 	margin: 0;
@@ -832,14 +832,14 @@ h3.person_title {padding-top: 20px}
 	padding-bottom: 20px;
 }
 
-#form_style_main ul li {
+.form_style_main ul li {
 	margin: 10px 0;
 	list-style: none;
 	position: relative;
 	clear: both;
 }
 
-#form_style_main label {
+.form_style_main label {
 	width: 100px;
 	text-align: left;
 	font-weight: bold;
@@ -877,8 +877,8 @@ h3.person_title {padding-top: 20px}
 	text-decoration: none
 }
 /* IMPORTANT SIGNUP Form Input Styles----------------------- */
-#form_style_main input#smalltext,
-#form_style_main textarea {
+.form_style_main input#smalltext,
+.form_style_main textarea {
 	float: left;
 	padding: 8px;
 	border: 1px solid #d6d9dd;
@@ -890,14 +890,14 @@ h3.person_title {padding-top: 20px}
 	outline: none;
 }
 
-#form_style_main input#smalltext:focus,
-#form_style_main textarea:focus {
+.form_style_main input#smalltext:focus,
+.form_style_main textarea:focus {
 	border: 1px solid #777c82;
 }
-#form_style_main input#smalltext
+.form_style_main input#smalltext
  {width: 400px;}
 
-#form_style_main textarea {
+.form_style_main textarea {
 	width: 500px;
 	height: 150px;
 	resize: none;
@@ -1331,8 +1331,24 @@ div.option-group{
   margin-top:1.1em;
 }
 
-
 .logo-pos{
  float:left;
+}
+
+ul.social-network  {
+	float: left;
+	list-style: none;
+	margin: 0;
+	width: 100%;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+ul.social-network li {
+	margin: 10px 0;
+	padding : 20px;
+	list-style: none;
+	position: relative;
+	display:inline;
 }
 /* THE END */
