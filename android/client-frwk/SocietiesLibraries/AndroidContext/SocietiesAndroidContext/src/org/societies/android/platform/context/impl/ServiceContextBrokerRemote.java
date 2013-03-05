@@ -46,9 +46,11 @@ public class ServiceContextBrokerRemote extends Service{
 	
 	@Override
 	public void onCreate () {
-		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true);
+//		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true);
 		
-		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext(),  ccm, false);
+//		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext(),  ccm, false);
+
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext());
 		
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
 		Log.i(LOG_TAG, "ServiceContextBrokerRemote creation");

@@ -35,11 +35,13 @@ import org.societies.android.api.internal.context.IInternalCtxClient;
 //import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
+import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -91,55 +93,156 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 	//Logging tag
 	private static final String LOG_TAG = ContextBrokerBase.class.getName();
-	private final Context applicationContext;
-	private final ClientCommunicationMgr commMgr;
-	private final boolean restrictBroadcast;
+	private Context applicationContext;
+	private ClientCommunicationMgr commMgr;
+	private boolean connectedToComms = false;
+	private boolean restrictBroadcast;
 
-	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
+/*	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
 			boolean restrictBroadcast) {
 		this.applicationContext = applicationContext;
 		this.commMgr = commMgr;
 		this.restrictBroadcast = restrictBroadcast;
-	}
+	}*/
+    /**Default constructor*/
+    public ContextBrokerBase(Context applicationContext) {
+    	this(applicationContext, true);
+    }
+    
+    /**Parameterised constructor*/
+    public ContextBrokerBase(Context applicationContext, boolean restrictBroadcast) {
+    	Log.d(LOG_TAG, "Object created");
+    	
+    	this.applicationContext = applicationContext;    	
+		try {
+			//INSTANTIATE COMMS MANAGER
+			this.commMgr = new ClientCommunicationMgr(applicationContext, true);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage());
+        }
+    }
+
+    public boolean startService() {
+    	if (!connectedToComms) {
+        	//NOT CONNECTED TO COMMS SERVICE YET
+        	Log.d(LOG_TAG, "ContextBrokerBase startService binding to comms");
+	        this.commMgr.bindCommsService(new IMethodCallback() {	
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
+					if (resultFlag) {
+						connectedToComms = true;
+						//REGISTER NAMESPACES
+			        	commMgr.register(ELEMENT_NAMES, NAMESPACES, PACKAGES, new IMethodCallback() {
+							@Override
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
+								//SEND INTENT WITH SERVICE STARTED STATUS
+				        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+				        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+				        		ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
+							}
+							@Override
+							public void returnAction(String result) { }
+						});
+					} else {
+						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+			    		ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
+					}
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		applicationContext.sendBroadcast(intent);
+    	}
+		return true;
+    }
+    
+    public boolean stopService() {
+    	if (connectedToComms) {
+        	//UNREGISTER AND DISCONNECT FROM COMMS
+        	Log.d(LOG_TAG, "ContextBrokerBase stopService unregistering namespaces");
+        	commMgr.unregister(ELEMENT_NAMES, NAMESPACES, new IMethodCallback() {
+				@Override
+				public void returnAction(boolean resultFlag) {
+					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
+					connectedToComms = false;
+					
+					commMgr.unbindCommsService();
+					//SEND INTENT WITH SERVICE STOPPED STATUS
+	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+	        		ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
+				}	
+				@Override
+				public void returnAction(String result) { }
+			});
+        }
+    	else {
+    		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
+    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+    		applicationContext.sendBroadcast(intent);
+    	}
+    	return true;
+    }
+    
+    /**
+	 * @param client
+	 */
+	private void broadcastServiceNotStarted(String client, String method) {
+		if (client != null) {
+			Intent intent = new Intent(method);
+			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
+			intent.setPackage(client);
+			applicationContext.sendBroadcast(intent);
+		}
+	}	
+	
 
 	@Override
 	public CtxEntityBean createEntity(String client, RequestorBean requestor,
 			String targetCss, String type) throws CtxException {
 		Log.d(LOG_TAG, "CreateEntity called by client: " + client);
 		
-//		IIdentity toIdentity;
-//		toIdentity = targetCss;
-		
-		try {
-			IIdentityManager idm = this.commMgr.getIdManager();
-			IIdentity toIdentity = idm.fromJid(targetCss);
-
-			Stanza stanza = new Stanza(toIdentity);
-
-			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
-			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
+		if (connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
 	
-			CreateEntityBean ctxBrokerCreateEntityBean = new CreateEntityBean();
-	//		RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerCreateEntityBean.setRequestor(requestor);
-	//		ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
-			ctxBrokerCreateEntityBean.setTargetCss(targetCss);
-			ctxBrokerCreateEntityBean.setType(type);
-		
-			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
-
-			ICommCallback ctxBrokerCallback = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ENTITY); 
-
-//		try {
-//			commMgr.register(ELEMENT_NAMES, ctxBrokerCallback);
-			commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallback);
-			Log.d(LOG_TAG, "Sending stanza");
-		} catch (Exception e) {
-
-			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
-			//throw new CtxBrokerException("Could not create remote entity: "
-			//		+ e.getLocalizedMessage(), e);
-		} 
+	//			toIdentity = targetCss;
+				toIdentity = idm.fromJid(targetCss);
+				Stanza stanza = new Stanza(toIdentity);
+				
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
+	
+				CreateEntityBean ctxBrokerCreateEntityBean = new CreateEntityBean();
+	//			RequestorBean requestorBean = createRequestorBean(requestor);
+				ctxBrokerCreateEntityBean.setRequestor(requestor);
+				ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
+				ctxBrokerCreateEntityBean.setType(type);
+	
+				cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
+	
+	//			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+	
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, ICtxClient.CREATE_ENTITY);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, ICtxClient.CREATE_ENTITY);
+		}
 		return null;
 
 	}
@@ -367,9 +470,6 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					}
 				}
 				
-//				intent.setPackage(client);
-//				CtxClientBase.this.androidContext.sendBroadcast(intent);
-//				CtxClientBase.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
 

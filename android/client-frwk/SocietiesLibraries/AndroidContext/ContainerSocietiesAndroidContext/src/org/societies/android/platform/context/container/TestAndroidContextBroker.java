@@ -24,11 +24,13 @@
  */
 package org.societies.android.platform.context.container;
 
+import java.lang.ref.WeakReference;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-//import org.societies.android.api.personalisation.IPersonalisationManagerAndroid;
 import org.societies.android.api.context.ICtxClient;
-import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
+//import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
 import org.societies.android.platform.context.impl.ContextBrokerBase;
+import org.societies.android.platform.context.impl.ServiceContextBrokerRemote;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -54,7 +56,7 @@ public class TestAndroidContextBroker extends Service{
 
     @Override
 	public void onCreate () {
-		this.binder = new TestContextBrokerBinder();
+		this.binder = new TestContextBrokerBinder(new ContextBrokerBase(this, false));
 		Log.d(LOG_TAG, "TestAndroidContextBroker service starting");
 	}
 
@@ -63,19 +65,33 @@ public class TestAndroidContextBroker extends Service{
 		Log.d(LOG_TAG, "TestAndroidContextBroker service terminating");
 	}
 
-	/**Create Binder object for local service invocation */
-	public class TestContextBrokerBinder extends Binder {
-		public ICtxClient getService(){
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			ContextBrokerBase ctxBroker = new ContextBrokerBase(getApplicationContext(), ccm, false);
-			return ctxBroker;
+	public static class TestContextBrokerBinder extends Binder {
+		private WeakReference<ContextBrokerBase> outerClassReference = null;
+		
+		public TestContextBrokerBinder(ContextBrokerBase instance) {
+			this.outerClassReference = new WeakReference<ContextBrokerBase>(instance);
+		}
+		
+		public ContextBrokerBase getService() {
+			return outerClassReference.get();
 		}
 	}
+	/**Create Binder object for local service invocation */
+//	public class TestContextBrokerBinder extends Binder {
+//		public ICtxClient getService(){
+//			ClientCommunicationMgr ccm = createClientCommunicationMgr();
+//			ContextBrokerBase ctxBroker = new ContextBrokerBase(getApplicationContext(), createCCM(), false);
+//			return ctxBroker;
+//		}
+//	}
 	/**
 	 * Factory method to get instance of {@link ClientCommunicationMgr}
 	 * @return ClientCommunicationMgr
 	 */
-	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
-	}
+//	protected ClientCommunicationMgr createCCM() {
+//		return new ClientCommunicationMgr(this, true);
+//	}
+//	protected ClientCommunicationMgr createClientCommunicationMgr() {
+//		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
+//	}
 }

@@ -36,12 +36,13 @@ import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 import org.societies.android.api.context.CtxException;
+import org.societies.android.api.css.manager.IServiceManager;
 //import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.api.schema.identity.RequestorBean;
 
 
-public interface ICtxClient {
+public interface ICtxClient extends IServiceManager {
 	
 	//Intents
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxclient.ReturnValue";
@@ -70,7 +71,9 @@ public interface ICtxClient {
 			"retrieve(String client, final RequestorBean requestor, final CtxIdentifierBean identifier)",
 			"retrieveIndividualEntityId(String client, final RequestorBean requestor, final String cssId)",
 			"retrieveCommunityEntityId(String client, final RequestorBean requestor, final String cisId)",
-			"update(String client, final RequestorBean requestor, final CtxModelObjectBean object)"
+			"update(String client, final RequestorBean requestor, final CtxModelObjectBean object)",
+			"startService()",
+			"stopService()"
 	};
 
 	public CtxEntityBean createEntity(String client, final RequestorBean requestor, 
