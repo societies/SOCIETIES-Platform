@@ -84,6 +84,17 @@
         <p:inputText id="addPreferenceName" value="#{profileSettings.newPreferenceName}"
                      required="true" label="Preference name"/>
 
+        <h:outputLabel for="addPreferecneService" value="Service: "/>
+        <p:selectOneMenu value="#{profileSettings.newPreferenceService}" effect="fade" id="addPreferecneService">
+            <f:selectItem itemLabel="(none)"
+                          itemDescription="No service attachment"/>
+
+            <f:selectItems value="#{profileSettings.availableServices}"
+                           var="item"
+                           itemLabel="#{item.serviceName}"
+                           itemDescription="#{item.serviceCategory} :: #{item.serviceDescription} :: #{item.serviceStatus}"/>
+        </p:selectOneMenu>
+
         <f:facet name="footer">
             <p:commandButton value="Save" icon="ui-icon-check" style="margin:0"
                              actionListener="#{profileSettings.addPreference}"
@@ -113,9 +124,13 @@
 
         <h:outputLabel for="addConditionName" value="Condition name: *"
                        rendered="#{profileSettings.showAddCondition}"/>
-        <p:inputText id="addConditionName" value="#{profileSettings.conditionToAdd.name}"
-                     required="true" label="Condition name"
-                     rendered="#{profileSettings.showAddCondition}"/>
+        <p:selectOneMenu value="#{profileSettings.conditionToAdd.name}" effect="fade"
+                         id="addConditionName"
+                         rendered="#{profileSettings.showAddCondition}">
+
+            <f:selectItems value="#{profileSettings.availableCtxAttributeTypes}"/>
+        </p:selectOneMenu>
+
 
         <h:outputLabel for="addConditionOperator" value="Condition operator: *"
                        rendered="#{profileSettings.showAddCondition}"/>

@@ -7,8 +7,8 @@ import org.openqa.selenium.WebElement;
 
 public class ExamplePage extends BaseSocietiesPage {
 
-    public static final String MSG_BUTTON_XPATH = "//input[@value='Message']";
-    public static final String STRING_FIELD_XPATH = "//input[@id='stringField']";
+    public static final String MSG_BUTTON_XPATH = "//button//span[text()='Message!']";
+    public static final String STRING_FIELD_XPATH = "//input[@id='mainForm:stringField']";
 
     public ExamplePage(WebDriver driver) {
         super(driver);

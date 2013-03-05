@@ -55,6 +55,8 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
     private static final String CONDITION_NODE_BY_PARTIAL_INDEX = "//*[starts-with(@id,'mainForm:preferenceTree:%s') and contains(@id, ':lblNode_condition')]";
     private static final String OUTCOME_NODE_BY_PARTIAL_INDEX = "//*[starts-with(@id,'mainForm:preferenceTree:%s') and contains(@id, ':lblNode_outcome')]";
 
+    private static final String SAVE_TREE_BUTTON_XPATH = "//button[@id='mainForm:saveButton']";
+
     private static final String NODE_ID_SEPARATOR = "_";
 
     public enum TreeNodeType {PREFERENCE, CONDITION, ROOT, OUTCOME}
@@ -250,16 +252,23 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
     public void removeAllPreferences() {
 
-
         try {
             List<WebElement> preferenceNodes = waitUntilElementsFound(By.xpath(PREF_NODE_XPATH));
+            int lastCount = preferenceNodes.size();
 
             while (preferenceNodes.size() > 0) {
-                openContextMenuOnPreferenceNode(new int[]{0}, preferenceNodes.get(0).getText())
+                String nodeText = preferenceNodes.get(0).getText();
+                openContextMenuOnPreferenceNode(new int[]{0}, nodeText)
                         .clickDelete()
                         .clickOk();
 
                 preferenceNodes = waitUntilElementsFound(By.xpath(PREF_NODE_XPATH));
+
+                if (preferenceNodes.size() >= lastCount) {
+                    Assert.fail("Deleting node " + nodeText + " didn't work");
+                }
+
+                lastCount = preferenceNodes.size();
             }
         } catch (NoSuchElementException ex) {
             // do nothing - none are left
@@ -267,5 +276,8 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
 
     }
 
+    public void clickSaveTreeButton() {
+        clickButton(By.xpath(SAVE_TREE_BUTTON_XPATH));
+    }
 
 }

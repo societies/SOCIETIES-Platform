@@ -57,11 +57,13 @@
                 </p:tree>
                 <p:commandButton id="saveButton" actionListener="#{profileSettings.saveTreeChanges}"
                                  update="preferenceTree"
-                                 rendered="#{profileSettings.treeChangesMade}"
+                                 disabled="#{!profileSettings.treeChangesMade}"
+                                 process="@this"
                                  value="Save Changes"/>
                 <p:commandButton id="revertButton" actionListener="#{profileSettings.revertChanges}"
                                  update="preferenceTree"
-                                 rendered="#{profileSettings.treeChangesMade}"
+                                 disabled="#{!profileSettings.treeChangesMade}"
+                                 process="@this"
                                  value="Revert"/>
 
                 <div class="hr dotted clearfix"></div>

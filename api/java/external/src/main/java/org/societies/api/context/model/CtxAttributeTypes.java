@@ -568,4 +568,57 @@ public class CtxAttributeTypes {
      * @since 1.0
      */
     public static final String GROUP = "group";
+
+    /**
+     * All known types, as an array
+     */
+    public static final String[] ALL_TYPES = {
+            ABOUT,
+            ACTION,
+            AGE,
+            ADDRESS_HOME_CITY,
+            ADDRESS_HOME_COUNTRY,
+            ADDRESS_HOME_STREET_NAME,
+            ADDRESS_HOME_STREET_NUMBER,
+            ADDRESS_WORK_CITY,
+            ADDRESS_WORK_COUNTRY,
+            ADDRESS_WORK_STREET_NAME,
+            ADDRESS_WORK_STREET_NUMBER,
+            AFFILIATION,
+            BIRTHDAY,
+            BOOKS,
+            EMAIL,
+            FAVOURITE_QUOTES,
+            FRIENDS,
+            ID,
+            INTERESTS,
+            IS_INTERACTABLE,
+            LANGUAGES,
+            LAST_ACTION,
+            LOCATION_COORDINATES,
+            LOCATION_ID,
+            LOCATION_PARENT_ID,
+            LOCATION_PERSONAL_TAGS,
+            LOCATION_PUBLIC_TAGS,
+            LOCATION_SYMBOLIC,
+            LOCATION_TYPE,
+            MOVIES,
+            MAC_ADDRESS,
+            MUSIC,
+            NAME,
+            NAME_FIRST,
+            NAME_LAST,
+            OCCUPATION,
+            PARAMETER_NAME,
+            PASSWORD,
+            POLITICAL_VIEWS,
+            RELIGIOUS_VIEWS,
+            SEX,
+            STATUS,
+            SKILLS,
+            TEMPERATURE,
+            TYPE,
+            WEIGHT,
+            WORK_POSITION};
+
 }
