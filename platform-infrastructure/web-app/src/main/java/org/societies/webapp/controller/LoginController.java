@@ -92,12 +92,13 @@ public class LoginController extends BasePageController {
     }
 
     public String logoutAction() {
+        log.trace("logoutAction()");
+
         if (!isLoggedIn())
             return "false";
 
         String summary = "User " + getUsername() + " logged out";
         String detail = "User logged out";
-
 
 //        setLoggedIn(false);
 //        setUsername("");

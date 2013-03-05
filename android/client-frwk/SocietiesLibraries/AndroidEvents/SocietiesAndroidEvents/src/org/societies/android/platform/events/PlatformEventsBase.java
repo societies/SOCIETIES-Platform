@@ -116,7 +116,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 										PlatformEventsBase.this.configureForPubsub();
 										PlatformEventsBase.this.connectedToPubsub = true;
 									} catch (ClassNotFoundException e) {
-										e.printStackTrace();
+										Log.e(LOG_TAG, "Class Not found exception", e);
 										resultFlag = false;
 									} finally {
 										//Send intent
@@ -198,6 +198,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of publishEvent for client: " + client);
 		
+		final Intent returnIntent = new Intent(IAndroidSocietiesEvents.PUBLISH_EVENT);
+		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+		if (PlatformEventsBase.this.restrictBroadcast) {
+			returnIntent.setPackage(client);
+		}
+
 		try {
 			PlatformEventsBase.this.pubsubClient.publisherPublish(this.cloudNodeIdentity, 
 						translateAndroidIntentToEvent(societiesIntent), 
@@ -206,17 +212,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 				
 				@Override
 				public void returnAction(String result) {
-					Intent returnIntent = new Intent(IAndroidSocietiesEvents.PUBLISH_EVENT);
 	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
-
-	    			if (PlatformEventsBase.this.restrictBroadcast) {
-	        			returnIntent.setPackage(client);
-	    			}
-	    			
-	    			Log.d(LOG_TAG, "Publish event return result sent");
-
 	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
-
+	    			Log.d(LOG_TAG, "Publish event return result sent");
 				}
 				
 				@Override
@@ -224,12 +222,14 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 				}
 			});
 		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(LOG_TAG, "XMPPError", e);
+			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			Log.d(LOG_TAG, "Publish event return result sent");
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			Log.e(LOG_TAG, "Comunication Exception", e);
+			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			Log.d(LOG_TAG, "Publish event return result sent");
+		} 
 		return false;
 	}
 
@@ -254,7 +254,7 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		synchronized (this.subscribedToClientEvents) {
 			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 			
-			this.subscribedToClientEvents.put(this.generateClientEventKey(client, intent), intent);
+			this.subscribedToClientEvents.put(generateClientEventKey(client, intent), intent);
 
 			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 
@@ -479,6 +479,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be un-subscribed: " + events.size());
+    		
+			Intent returnIntent = new Intent(intentValue);
+			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+			if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(this.client);
+			}
 
     		try {
     			synchronized (PlatformEventsBase.this.subscribedToEvents) {
@@ -518,32 +524,23 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(event), numSubscriptions - 1);
 	               			//notify latch
 	               			endCondition.countDown();
-
         				}
        		    		//wait for latch to release
     		    		endCondition.await();
         			}
+	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
+		   			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+	    			Log.d(LOG_TAG, "UnSubscribeToPubsub return result sent");
     			}
-    			
-				Intent returnIntent = new Intent(intentValue);
-    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
 
-    			if (PlatformEventsBase.this.restrictBroadcast) {
-        			returnIntent.setPackage(this.client);
-    			}
-    			
-    			Log.d(LOG_TAG, "UnSubscribeToPubsub return result sent");
-
-    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
-    			
 			} catch (Exception e) {
     			this.resultStatus = false;
 				Log.e(LOG_TAG, "Unable to unsubscribe for Societies events", e);
+	   			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
 			}
     		return resultStatus;
     	}
     }
-
     
     /**
      * 
@@ -577,6 +574,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		
     		List<String> events = args[0];
     		Log.d(LOG_TAG, "Number of events to be subscribed: " + events.size());
+
+			Intent returnIntent = new Intent(intentValue);
+			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+			if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(this.client);
+			}
 
     		try {
     			
@@ -623,28 +626,18 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     		    		endCondition.await();
               		}
        			}
-       			
-    			Intent returnIntent = new Intent(intentValue);
     			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
-
-    			if (PlatformEventsBase.this.restrictBroadcast) {
-        			returnIntent.setPackage(this.client);
-    			}
-    			
-    			Log.d(LOG_TAG, "SubscribeToPubsub return result sent");
-
     			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+    			Log.d(LOG_TAG, "SubscribeToPubsub return result sent");
 
 			} catch (Exception e) {
     			this.resultStatus = false;
 				Log.e(LOG_TAG, "Unable to register for Societies events", e);
-
-			}
+    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+ 			}
     		return resultStatus;
     	}
     }
-
-    
 
     /**
      * Assign connection parameters (must happen after successful XMPP login)

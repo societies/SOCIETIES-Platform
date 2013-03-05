@@ -1,6 +1,5 @@
 package org.societies.platform.socialdata;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -45,7 +44,6 @@ import org.societies.platform.socialdata.converters.PersonConverterFactory;
 import org.springframework.stereotype.Service;
 
 import com.restfb.json.JsonObject;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 
 @Service
@@ -273,17 +271,29 @@ public class SocialData implements ISocialData{
 	@Override
 	public void removeSocialConnector(String connectorId) throws Exception{
 
+		
+		logger.debug("Removing ConnectorID "+connectorId + "...");
 		if (connectors.containsKey(connectorId)){
-			connectors.remove(connectorId);
+			ISocialConnector c = connectors.get(connectorId);
 			
 			if (connectorsInCtxBroker.containsKey(connectorId)){
+				logger.debug("Remove Connector Bean associated to this SocialNetwork");
 				internalCtxBroker.remove(connectorsInCtxBroker.get(connectorId));
 				connectorsInCtxBroker.remove(connectorId);
-				logger.info("Removed Connector ID:"+connectorId + " from CtxBroker");
 			}
+			else logger.warn("Unable to find the associated Bean stored into ctxBroker for SN:"+c.getConnectorName());
+		
+			if (ctxUpdater!=null) ctxUpdater.removeConnectorData(c);
+			logger.info("Removed Connector ID:"+connectorId + " from CtxBroker");
+			connectors.remove(connectorId);
+			logger.debug("Removed Connector ID:"+connectorId + " from CtxBroker");
 			
 		}
-		else throw new Exception("This connector not found");
+		else {
+				logger.info("Removed Connector ID:"+connectorId + " from CtxBroker");
+		}
+			
+
 
 	}
 
@@ -329,24 +339,38 @@ public class SocialData implements ISocialData{
 	@Override
 	public void updateSocialData() {
 		
+		logger.debug("Update Social data ...");
 		Iterator<ISocialConnector>it = connectors.values().iterator();
 		
 		socialActivities = new HashMap<String, Object>();  // reset old Activities
 		while (it.hasNext()){
-			ISocialConnector connector = it.next();
 			
+			
+			ISocialConnector connector = it.next();
+			logger.debug("Update " + connector.getConnectorName()  + " data...");
 			getActivities(connector);
 			updateProfile(connector);
 			updateGroups(connector);
 			updateFriends(connector);
-			/// UPDATE ALL DATA
-
+			
+			
 		}
 
 
-
+		logger.debug("Update Context Broker with Sodical data Info...");
+		// store SNS data to context
+		try{
+			if(this.ctxUpdater != null ) {
+				List<ISocialConnector> list = new ArrayList<ISocialConnector>();
+				list.addAll(connectors.values());
+				this.ctxUpdater.updateSocialData(list);
+			}
+		} catch (Exception e) {
+			logger.error("Context DB not updated due to "+e, e);
+		}
+		/// UPDATE ALL DATA
 		lastUpate = new Date().getTime();
-
+		logger.debug("Social data completed @"+ new Date(lastUpate).toGMTString());
 
 	}
 
@@ -401,6 +425,9 @@ public class SocialData implements ISocialData{
 
 	private void updateProfile(ISocialConnector connector) {
 		
+		
+		logger.debug("Update "+ connector.getConnectorName() + " profile ... ");
+		
 		PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 		Person profile = parser.load(connector.getUserProfile());
 
@@ -411,16 +438,12 @@ public class SocialData implements ISocialData{
 		}	
 		else {
 			// Send Notitication of NEW PROFILE?
+			logger.debug("Add a new Profile in the list");
 		}
 		socialProfiles.put(profile.getId(), profile);
+		logger.debug("Add a new Profile in the list");
 		
-		// store SNS data to context
-		try{
-			if(this.ctxUpdater != null ) this.ctxUpdater.updateCtxProfile(profile);	
 		
-		} catch (Exception e) {
-			logger.info("context DB not updated");
-		}
 		
 				
 	}

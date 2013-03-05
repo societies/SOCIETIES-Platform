@@ -1,17 +1,13 @@
 package org.societies.platform.socialdata.service;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.socialdata.SocialData;
-import org.societies.platform.socialdata.converters.ActivityConverterFromFacebook;
 import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
 
 

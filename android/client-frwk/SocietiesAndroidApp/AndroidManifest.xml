@@ -1,8 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.societies.android.platform.gui"
     android:versionCode="1"
-    android:versionName="1.0" 
-    android:debuggable="true">
+    android:versionName="1.0">
 
     <uses-sdk
         android:minSdkVersion="8"/>
@@ -56,7 +55,7 @@
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
-        		
+        <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
 		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
@@ -65,8 +64,10 @@
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
-        <service android:name="org.societies.android.platform.css.friends.FriendsManager" />
+        <service android:name="org.societies.android.platform.css.friends.FriendsManagerLocal" />
         <service android:name="org.societies.android.platform.css.friends.EventService" />
+        <service android:name="org.societies.android.platform.useragent.feedback.UserFeedbackLocal" />
+        <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
                 <action android:name="org.societies.android.platform.cis.CisDirectoryRemote" />

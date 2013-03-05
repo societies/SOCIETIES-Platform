@@ -28,7 +28,6 @@ package org.societies.android.platform.comms;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,13 +62,15 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Debug;
 import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
 	private static final String LOG_TAG = AndroidCommsBase.class.getName();
 	private static final long PUBSUB_EVENT_CALBACK_ID = -9999999999999L;
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
-	
+	private static final boolean DEBUG_LOGGING = false;
+
 	private XMPPConnection connection;
 	private String username, password, resource;
 	private int usingConnectionCounter = 0;
@@ -85,12 +86,19 @@ public class AndroidCommsBase implements XMPPAgent {
 
 	
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
-		Log.d(LOG_TAG, "Service Base Object created");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Service Base Object created");
+		};
 		this.restrictBroadcast = restrictBroadcast;
-		Log.d(LOG_TAG, "Restrict broadcasted intents: " + this.restrictBroadcast);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Restrict broadcasted intents: " + this.restrictBroadcast);
+		};
 		this.serviceContext = serviceContext;
 		this.pubsubRegistered = false;
 		this.pubsubListener = null;
+		
+		//Android Profiling
+//		Debug.startMethodTracing(this.getClass().getSimpleName());
 	}
 	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
@@ -98,13 +106,15 @@ public class AndroidCommsBase implements XMPPAgent {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.length > 0);
 		Dbc.require("Namespaces must be specified", null != namespaces && namespaces.length > 0);
 			
-		Log.d(LOG_TAG, "register");
-//		for (String element : elementNames) {
-//			Log.d(LOG_TAG, "register element name: " + element);
-//		}
-//		for (String namespace : namespaces) {
-//			Log.d(LOG_TAG, "register namespace: " + namespace);
-//		}
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "register for client: " + client);
+//			for (String element : elementNames) {
+//				Log.d(LOG_TAG, "register element name: " + element);
+//			}
+//			for (String namespace : namespaces) {
+//				Log.d(LOG_TAG, "register namespace: " + namespace);
+//			}
+		};
 		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
@@ -129,10 +139,11 @@ public class AndroidCommsBase implements XMPPAgent {
 				
 				this.pubsubListener = new RegisterPacketListener(client, remoteCallId);
 				
-				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), 
-												new NamespaceFilter(namespaces)));
+				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), new NamespaceFilter(namespaces)));
 				this.pubsubRegistered = true;
-				Log.d(LOG_TAG, "Pubsub event listener registered");
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Pubsub event listener registered");
+				};
 			}
 			intent.setAction(XMPPAgent.REGISTER_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
@@ -154,19 +165,22 @@ public class AndroidCommsBase implements XMPPAgent {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.length > 0);
 		Dbc.require("Namespaces must be specified", null != namespaces && namespaces.length > 0);
 
-		Log.d(LOG_TAG, "unregister");
-//		for (String element : elementNames) {
-//			Log.d(LOG_TAG, "unregister element name: " + element);
-//		}
-//		for (String namespace : namespaces) {
-//			Log.d(LOG_TAG, "unregister namespace: " + namespace);
-//		}
-		
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "unregister for client: " + client);
+//			for (String element : elementNames) {
+//				Log.d(LOG_TAG, "unregister element name: " + element);
+//			}
+//			for (String namespace : namespaces) {
+//				Log.d(LOG_TAG, "unregister namespace: " + namespace);
+//			}
+		};
 		
 		//remove Pubsub listener
 		if (this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
 			connection.removePacketListener(this.pubsubListener);
-			Log.d(LOG_TAG, "Pubsub event listener unregistered");
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Pubsub event listener unregistered");
+			};
 			this.pubsubRegistered = false;
 		}
 
@@ -199,6 +213,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			//Android Profiling
+//			Debug.stopMethodTracing();
 		}
 
 		return false;
@@ -206,7 +223,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	public boolean UnRegisterCommManager(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "UnRegisterCommManager");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "UnRegisterCommManager for client: " + client);
+		};
 		
 		boolean retValue = false;
 		
@@ -240,6 +259,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	public boolean sendMessage(String client, String messageXml, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("XML must be specified", null != messageXml && messageXml.length() > 0);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "sendMessage for client: " + client);
+		};
 		
 		//Send intent
 		Intent intent = new Intent();
@@ -250,8 +272,10 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		Packet formattedMessage = createPacketFromXml(messageXml);
 		
-		Log.d(LOG_TAG, "sendMessage xml message size: " + formattedMessage.toXML().length());
-		Log.d(LOG_TAG, "sendMessage xml message:" + createPacketFromXml(messageXml).toXML());
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "sendMessage xml message size: " + formattedMessage.toXML().length());
+			Log.d(LOG_TAG, "sendMessage xml message:" + createPacketFromXml(messageXml).toXML());
+		};
 		
 		try {
 			connect();	
@@ -277,7 +301,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	public boolean sendIQ(String client, String xml, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("XML must be specified", null != xml && xml.length() > 0);
-		Log.d(LOG_TAG, "sendIQ xml: " + xml);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "sendIQ xml: " + xml+ " for client: " + client);
+		};
 
 		try {
 			connect(); 
@@ -311,7 +337,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	public String getIdentity(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "getIdentity");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdentity for client: " + client);
+		};
 		
 		String retValue = null;
 		
@@ -325,7 +353,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			connect();			
 			retValue = connection.getUser();			
 			disconnect();			
-			Log.d(LOG_TAG, "getIdentity identity: " + retValue);
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "getIdentity identity: " + retValue);
+			};
 			
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
@@ -339,7 +369,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	public String getDomainAuthorityNode(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "getDomainAuthorityNode");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getDomainAuthorityNode for client: " + client);
+		};
 		
 		//Send intent
 		Intent intent = new Intent(GET_DOMAIN_AUTHORITY_NODE);
@@ -357,8 +389,10 @@ public class AndroidCommsBase implements XMPPAgent {
 	public String getItems(String client, String entity, String node, long remoteCallId) {		
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Entity must be specified", null != entity && entity.length() > 0);
-//		Dbc.require("Node must be specified", null != node && node.length() > 0);
-		Log.d(LOG_TAG, "getItems entity: " + entity);
+		Dbc.require("Node must be specified", null != node && node.length() > 0);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getItems entity: " + entity + " for client: " + client);
+		};
 		
 		String retValue = null;
 		
@@ -396,7 +430,9 @@ public class AndroidCommsBase implements XMPPAgent {
 
 	public boolean isConnected(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "isConnected ");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "isConnected for client: " + client);
+		};
 		
 		boolean retValue = false;
 		Intent intent = new Intent(IS_CONNECTED);
@@ -421,7 +457,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("Password must be specified", null != password && password.length() > 0);
-		Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password + " for client: " + client);
+		};
 
 		String retValue = null;
 		//Send intent
@@ -448,7 +486,9 @@ public class AndroidCommsBase implements XMPPAgent {
 				
 				createAccount(connection, identifier, password);
 				retValue = username(identifier, domain) + "/" + resource;
-				Log.d(LOG_TAG, "Created user JID: " + retValue);
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Created user JID: " + retValue);
+				};
 			}
 			else {
 				ConnectionConfiguration config = new ConnectionConfiguration(serverHost, port, serviceName);
@@ -459,12 +499,17 @@ public class AndroidCommsBase implements XMPPAgent {
 				
 				newIdConnection.disconnect();
 				retValue = username(identifier, serviceName) + "/" + resource;
-				Log.d(LOG_TAG, "Created user JID: " + retValue);
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Created user JID: " + retValue);
+				};
 			}
 			
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Create intent sent for: " + retValue);
+			}
 			//Send intent
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
@@ -480,7 +525,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("Password must be specified", null != password && password.length() > 0);
-		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host  + " for client: " + client);
+		};
 		
 		String retValue = null;
 		Intent intent = new Intent(LOGIN);
@@ -498,11 +545,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		try {
 			connect();
 			retValue = username + "/" + resource;
+			//Send intent
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
+
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
 			//Send intent
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
 		}
 		return null;
@@ -516,25 +565,12 @@ public class AndroidCommsBase implements XMPPAgent {
 		return null;
 	}	
 	
-//	public String loginFromConfig(String client) {
-//		Dbc.require("Client must be specified", null != client && client.length() > 0);
-//		Log.d(LOG_TAG, "loginFromConfig");
-//		
-//		if(isConnected(client))
-//			logout(client);
-////		loadDefaultConfig();
-//		try {
-//			connect();
-//			return username + "/" + resource;
-//		} catch (Exception e) {
-//			Log.e(LOG_TAG, e.getMessage(), e);
-//			return null;
-//		}
-//	}
 	
 	public boolean logout(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "logout");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "logout for client: " + client);
+		};
 		
 		boolean retValue = false;
 		Intent intent = new Intent(LOGOUT);
@@ -558,7 +594,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	
 	public boolean destroyMainIdentity(String client, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
-		Log.d(LOG_TAG, "destroyMainIdentity");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "destroyMainIdentity for client: " + client);
+		};
 		
 		//Send intent
 		Intent intent = new Intent(DESTROY_MAIN_IDENTITY);
@@ -588,7 +626,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		Dbc.require("Domain Authority Node must be specified", null != xmppDomainAuthorityNode && xmppDomainAuthorityNode.length() > 0);
 		Dbc.require("Port must be positive", xmppPort > 0);
 		Dbc.require("Resource must be specified", null != xmppResource && xmppResource.length() > 0);
-		Log.d(LOG_TAG, "configureAgent");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "configureAgent for client: " + client);
+		};
 		
 		this.setDomainAuthorityNode(client, xmppDomainAuthorityNode);
 		this.setPortNumber(client, xmppPort);
@@ -599,13 +639,17 @@ public class AndroidCommsBase implements XMPPAgent {
 		Intent intent = new Intent(CONFIGURE_AGENT);
 		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 		if (this.restrictBroadcast) {
-			Log.d(LOG_TAG, "Restrict broadcast to package: " + client);
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Restrict broadcast to package: " + client);
+			};
 			intent.setPackage(client);
 		}
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 
 		this.serviceContext.sendBroadcast(intent);
-		Log.d(LOG_TAG, "Return Value broadcast sent: " + intent.getAction());
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Return Value broadcast sent: " + intent.getAction());
+		};
 		
 		return false;
 	}
@@ -637,13 +681,18 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
 	private void removeProviders(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple) {
-		Log.d(LOG_TAG, "removeProviders");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "removeProviders");
+		}
 		ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
 		ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
 	}
 	
 	private void connect() throws XMPPException {		
-		Log.d(LOG_TAG, "connect");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "connect");
+		};
+		
 		if(!connection.isConnected()) {
 			connection.connect();
 			connection.login(username, password, resource);
@@ -652,14 +701,18 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
 	private void disconnect() {
-		Log.d(LOG_TAG, "disconnect");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "disconnect");
+		};
 		usingConnectionCounter--;
 		if(usingConnectionCounter == 0)
 			connection.disconnect();		
 	}
 	
 	private Packet createPacketFromXml(final String xml) {
-//		Log.d(LOG_TAG, "createPacketFromXml xml: " + xml);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "createPacketFromXml xml: " + xml);
+		};
 		return new Packet() {
 			@Override
 			public String toXML() {
@@ -669,7 +722,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
 	private boolean isDiscoItem(IQ iq) throws SAXException, IOException, ParserConfigurationException {
-		Log.d(LOG_TAG, "isDiscoItem");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "isDiscoItem");
+		};
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		Element element = factory.newDocumentBuilder().parse(new InputSource(new StringReader(iq.toXML()))).getDocumentElement();
@@ -714,7 +769,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
 	private void createAccount(Connection connection, String username, String password) throws XMPPException {
-		Log.d(LOG_TAG, "createAccount user: " + username + " password: " + password);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "createAccount user: " + username + " password: " + password);
+		};
 		
 		AccountManager accountMgr = connection.getAccountManager();
 		Map<String, String> attributes = new HashMap<String, String>();
@@ -724,7 +781,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
 	private String username(String identifier, String domain) {
-		Log.d(LOG_TAG, "username identifier: " + identifier + " domain: " + domain);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "username identifier: " + identifier + " domain: " + domain);
+		};
 		return identifier + "@" + domain;
 	}
 	
@@ -737,7 +796,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	 * @param host IP address of XMPP server (optional). If used, the DNS lookup to resolve the server is overridden.
 	 */
 	private void loadConfig(String server, String username, String password, String host) {
-		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password + " host: " + host);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password + " host: " + host);
+		};
 		
 		this.username = username;
 		this.password = password;
@@ -753,7 +814,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			connection.addPacketListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-//					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
+					if (DEBUG_LOGGING) {
+						Log.d(LOG_TAG, "Packet received: " + packet.toXML());
+					};
 				}
 				
 			}, new PacketFilter() {
@@ -765,7 +828,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			connection.addPacketSendingListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-//					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
+					if (DEBUG_LOGGING) {
+						Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
+					};
 				}
 				
 			}, new PacketFilter() {
@@ -827,7 +892,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALBACK_ID);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
-			Log.d(LOG_TAG, "Pubsub node intent sent: " + packet.toXML());
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Pubsub node intent sent: " + packet.toXML());
+			};
 		}			
 	}
 	

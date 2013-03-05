@@ -40,6 +40,10 @@ public class RemoteServiceHandler extends Handler {
 	private static final String BUNDLE_GET_PARCELABLE_METHOD = "getParcelable";
 	public static final String JAVA_ARRAY = "[]";
 	public static final String JAVA_OBJECT_CLASSNAME = "java.lang.Object";
+	
+	//It was originally possible to change the Android logging behaviour via an APK manifest. This 
+	//no longer happens and consequently flag required to control class's logging behaviour
+	private static final boolean DEBUG_LOGGING = false;
 
 	private static final String LOG_TAG = RemoteServiceHandler.class.getName();
 	private Class <?> container;
@@ -67,26 +71,36 @@ public class RemoteServiceHandler extends Handler {
 
 		if (targetMethod != null) {
 			try {
-				Log.d(LOG_TAG, "Target method: " + targetMethod);
+				if (DEBUG_LOGGING){
+					Log.d(LOG_TAG, "Target method: " + targetMethod);
+				};
 
 				Class <?> parameterClasses[] = ServiceMethodTranslator.getParameterClasses(targetMethod);
 				
 				for (Class <?> element : parameterClasses) {
-					Log.d(LOG_TAG,"Target method param types: " + element.getName());
+					if (DEBUG_LOGGING){
+						Log.d(LOG_TAG,"Target method param types: " + element.getName());
+					};
 				}
 
 				Method method = this.container.getMethod(ServiceMethodTranslator.getMethodName(this.methodsArray,message.what), parameterClasses);
 				
-				Log.d(LOG_TAG, "Found method: " + method.getName());
+				if (DEBUG_LOGGING){
+					Log.d(LOG_TAG, "Found method: " + method.getName());
+				};
 				try {
 					Object params[] = new Object[ServiceMethodTranslator
 							.getParameterNumber(targetMethod)];
-					Log.d(LOG_TAG, "Number of parameters: " + params.length);
+					if (DEBUG_LOGGING){
+						Log.d(LOG_TAG, "Number of parameters: " + params.length);
+					};
 
 					String paramTypeList[] = ServiceMethodTranslator.getMethodParameterTypesCapitalised(targetMethod);
 
 					for (String type : paramTypeList) {
-						Log.d(LOG_TAG, "Parameter type: " + type);
+						if (DEBUG_LOGGING){
+							Log.d(LOG_TAG, "Parameter type: " + type);
+						};
 					}
 
 					String paramNameList[] = ServiceMethodTranslator.getMethodParameterNames(targetMethod);
@@ -97,41 +111,51 @@ public class RemoteServiceHandler extends Handler {
 
 					for (int i = 0; i < paramTypeList.length; i++) {
 						Class <?> bundleParam[] = { String.class };
-						Log.d(LOG_TAG, "param list: " + paramNameList[i]);
+						if (DEBUG_LOGGING){
+							Log.d(LOG_TAG, "param list: " + paramNameList[i]);
+						};
 						Object bundleValue[] = { paramNameList[i] };
 
 						Method bundleMethod = null;
 
 						if (implementsParcelable(parameterClasses[i])) {
-							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an instance of Parcelable");
+							if (DEBUG_LOGGING){
+								Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an instance of Parcelable");
+							};
 							bundleMethod = Bundle.class.getMethod(BUNDLE_GET_PARCELABLE_METHOD, bundleParam);
 						} else if (parameterClasses[i].isArray()) {
-							Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an array");
+							if (DEBUG_LOGGING){
+								Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an array");
+							};
 							bundleMethod = Bundle.class.getMethod(createBundleArrayMethod(paramTypeList[i]), bundleParam);
 						} else {
 							bundleMethod = Bundle.class.getMethod(BUNDLE_GET_METHOD_PREFIX + paramTypeList[i], bundleParam);
 						}
-						Log.d(LOG_TAG,"Method invoked: " + bundleMethod.getName());
+						if (DEBUG_LOGGING){
+							Log.d(LOG_TAG,"Method invoked: " + bundleMethod.getName());
+						};
 
 						params[i] = bundleMethod.invoke(bundle, bundleValue);
-						Log.d(LOG_TAG, "parameter i = " + i + " value: " + params[i]);
+						if (DEBUG_LOGGING){
+							Log.d(LOG_TAG, "parameter i = " + i + " value: " + params[i]);
+						};
 					}
 					method.invoke((this.container.cast(this.containerObject)) , params);
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
+					Log.e(LOG_TAG, "Illegal arguement", e);
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
+					Log.e(LOG_TAG, "Illegal access", e);
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
+					Log.e(LOG_TAG, "Method invocation exception", e);
 					e.printStackTrace();
 				}
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
+				Log.e(LOG_TAG, "Security exception", e);
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
+				Log.e(LOG_TAG, "No such method", e);
 				e.printStackTrace();
 			}
 		}
@@ -152,7 +176,9 @@ public class RemoteServiceHandler extends Handler {
 			retValue = true;
 		} else {
 			for (Class <?> interfaze : interfaces) {
-				Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
+				if (DEBUG_LOGGING){
+					Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
+				};
 				if (interfaze.getSimpleName().equals("Parcelable")) {
 					retValue = true;
 					break;
@@ -179,5 +205,3 @@ public class RemoteServiceHandler extends Handler {
 		return method.toString();
 	}
 }
-
-

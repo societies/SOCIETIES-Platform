@@ -115,7 +115,7 @@ public class ContextController {
 	 */
 	private List<String> getTypesList(Class name) {
 		logger.info("Extracting parmas from: " + name.getCanonicalName());
-		Field[] 	fields = name.getDeclaredFields();
+		 Field[] 	fields = name.getDeclaredFields();
 		 List<String> results = new ArrayList<String>();
 		 for (Field field: fields){
 //			 if (field.isEnumConstant()){
@@ -137,7 +137,7 @@ public class ContextController {
 				}
 			 
 			 
-			 //logger.info("add fields "+field.getName());
+			 logger.info("add fields "+field.getName());
 		 }
 		 
 		 logger.info(" Return " + results.size() + "elements");
@@ -195,7 +195,7 @@ public class ContextController {
 	private List<CtxUIElement> getAllCtxEntityData() {
 		
 		List<CtxUIElement> results  = new ArrayList<CtxUIElement>();
-        
+		
 		for (String type: getTypesList(CtxEntityTypes.class)){
         	results.addAll(lookup(CtxModelType.ENTITY.toString() , type));
         }

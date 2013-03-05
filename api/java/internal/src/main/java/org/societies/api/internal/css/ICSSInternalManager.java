@@ -27,6 +27,7 @@ package org.societies.api.internal.css;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.api.css.FriendFilter;
 import org.societies.api.css.ICSSManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -284,6 +285,15 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<List<Service>> findAllCssServiceDetails(
 			List<CssAdvertisementRecord> listCssAds);
+	
+	public void setFriendfilter(FriendFilter filter);
+	
+	/**
+	 * Returns the current Node Type i.e. "CSS_CLOUD", "CSS_RICH" or "CSS_LIGHT"
+	 * 
+	 * @return Future<String>
+	 */
+	public FriendFilter getFriendfilter();
 
 	
 	// No implementation of the following methods

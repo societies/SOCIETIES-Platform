@@ -8,20 +8,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.shindig.social.core.model.AccountImpl;
-import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
-import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

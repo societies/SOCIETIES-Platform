@@ -1,0 +1,73 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <div class="hr grid_12 clearfix"></div>
+        <!-- Left Column -->
+        <section id="left_col" class="grid_8">
+            <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+            <section>
+                <h4 class="form_title">Help</h4>
+
+                <div class="hr dotted clearfix"></div>
+                <h6>Subheading</h6>
+
+                <p>Proin at eros non eros adipiscing mollis. Donec semper turpis sed diam. Sed consequat ligula nec tortor. Integer eget sem. Ut vitae enim eu est vehicula gravida. Morbi ipsum ipsum, porta nec, tempor id, auctor vitae, purus. Pellentesque neque. Nulla luctus erat vitae libero. Integer nec enim. Phasellus aliquam enim et tortor.</p>
+                <!-- Unordered -->
+                <h6>Topics:</h6>
+                <ul>
+                    <li>List item example</li>
+                    <li>List item example
+                        <ul>
+                            <li>Sub list item example</li>
+                            <li>Sub list item example</li>
+                        </ul>
+                    </li>
+                    <li><a class="tooltip" href="#" title="">List item example</a></li>
+                </ul>
+                <div class="hr dotted clearfix"></div>
+            </section>
+        </section>
+        <!-- Right Column / Sidebar -->
+        <aside id="sidebar_right" class="grid_4">
+            <div class="sidebar_top_BG"></div>
+            <div class="hr dotted clearfix"></div>
+            <section>
+                <header>
+                    <h3>Help Topics</h3>
+                </header>
+                <ul class="sidebar">
+                    <li><a href="">Nav Item 1</a></li>
+                    <li><a href="">Nav Item 2</a></li>
+                    <li><a href="">Nav Item 3</a></li>
+                    <li><a href="">Nav Item 4</a></li>
+                    <li><a href="">Nav Item 5</a></li>
+                </ul>
+            </section>
+            <section>
+                <header>
+                    <h3>Other Heading</h3>
+                </header>
+                <div class="hr dotted clearfix"></div>
+                <ul class="contact_data">
+                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                </ul>
+                <ul class="contact_data">
+                    <li>Links - <a href="#">Link 1</a></li>
+                    <li>Links - <a href="#">Link 2</a></li>
+                </ul>
+            </section>
+            <div class="hr dotted clearfix"></div>
+            <div class="sidebar_bottom_BG"></div>
+        </aside>
+        <div class="hr grid_12 clearfix"></div>
+    </ui:define>
+</ui:composition>
+</html>

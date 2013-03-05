@@ -499,4 +499,126 @@ public class CtxAttributeTypes {
      */
     @Deprecated
     public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";   
+    
+    
+    /**
+     * This attribute type contains information about the food preferences of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String FOOD = "food";
+    
+    /**
+     * This attribute type contains information about the profile image url of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String PROFILE_IMAGE_URL = "profile_image_url";
+    
+    /**
+     * This attribute type contains information about the jobs interests of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String JOBS_INTERESTS = "job_interensts";
+    
+    
+    /**
+     * This attribute type contains information about the turnson of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String TURNSON = "turnson";
+    
+    
+    /**
+     * This attribute type contains information about the turnson of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String ACTIVITIES = "activities";
+    
+    
+    /**
+     * This attribute type contains information about the turnson of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String PHONES = "phones";
+    
+    /**
+     * This attribute type contains information about the username of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String USERNAME = "username";
+    
+    
+    /**
+     * This attribute type contains information about the group is folowing  of an entity.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String GROUP = "group";
+
+    /**
+     * All known types, as an array
+     */
+    public static final String[] ALL_TYPES = {
+            ABOUT,
+            ACTION,
+            AGE,
+            ADDRESS_HOME_CITY,
+            ADDRESS_HOME_COUNTRY,
+            ADDRESS_HOME_STREET_NAME,
+            ADDRESS_HOME_STREET_NUMBER,
+            ADDRESS_WORK_CITY,
+            ADDRESS_WORK_COUNTRY,
+            ADDRESS_WORK_STREET_NAME,
+            ADDRESS_WORK_STREET_NUMBER,
+            AFFILIATION,
+            BIRTHDAY,
+            BOOKS,
+            EMAIL,
+            FAVOURITE_QUOTES,
+            FRIENDS,
+            ID,
+            INTERESTS,
+            IS_INTERACTABLE,
+            LANGUAGES,
+            LAST_ACTION,
+            LOCATION_COORDINATES,
+            LOCATION_ID,
+            LOCATION_PARENT_ID,
+            LOCATION_PERSONAL_TAGS,
+            LOCATION_PUBLIC_TAGS,
+            LOCATION_SYMBOLIC,
+            LOCATION_TYPE,
+            MOVIES,
+            MAC_ADDRESS,
+            MUSIC,
+            NAME,
+            NAME_FIRST,
+            NAME_LAST,
+            OCCUPATION,
+            PARAMETER_NAME,
+            PASSWORD,
+            POLITICAL_VIEWS,
+            RELIGIOUS_VIEWS,
+            SEX,
+            STATUS,
+            SKILLS,
+            TEMPERATURE,
+            TYPE,
+            WEIGHT,
+            WORK_POSITION};
+
 }
