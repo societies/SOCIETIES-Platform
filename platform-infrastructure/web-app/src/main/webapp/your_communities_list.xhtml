@@ -1,0 +1,81 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <div class="hr grid_12 clearfix"></div>
+        <section class="grid_12">
+            <section>
+                <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+            </section>
+            <div class="websearchbar">
+                <div class="websearchtitle">
+                    <h4 class="form_title">Your Communities</h4>
+                </div>
+                <div class="groupsearch">
+                    <form action="" class="websearch-form frame nobtn rsmall">
+                        <input type="text" name="search" class="websearch-input"
+                               placeholder="Search for Communities..."/>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <!-- Left Column -->
+        <article id="left_col" class="grid_8">
+            <section class="itemlist">
+                <header>
+                </header>
+                <a href="#" onclick="doAjaxGetMyCommunities();">Refresh My Communities</a>
+                <ul class="keyinfolist" id="mycis">
+                    <li> Temp Note: To be loaded on document load but for now, select Refresh My Communities above to populate</li>
+                </ul>
+
+                <div class="hr clearfix"></div>
+            </section>
+        </article>
+        <!-- Right Column / Sidebar -->
+        <aside id="sidebar_right" class="grid_4">
+            <div class="sidebar_top_BG"></div>
+            <div class="hr dotted clearfix"></div>
+            <section>
+                <header>
+                    <h3>Suggested Communities...</h3>
+                </header>
+                <a href="#" onclick="doAjaxGetSuggestedCommunities();">Refresh Suggested Communities</a>
+                <ul class="sidebar" id="mysuggestedcis">
+                    <li> Temp Note: To be loaded on document load but for now, select Refresh Suggested Communities above to populate</li>
+                </ul>
+            </section>
+            <section>
+                <header>
+                    <h3>Other Activity</h3>
+                </header>
+                <div class="hr dotted clearfix"></div>
+                <ul class="contact_data">
+                    <li>
+                        <figure class="gravatar">
+                            <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48"/>
+                        </figure>
+                        <strong>Community Name</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.
+                    </li>
+                </ul>
+                <ul class="contact_data">
+                    <li>Other Link - <a href="#">Link 1</a></li>
+                    <li>Other Link - <a href="#">Link 2</a></li>
+                    <li>Other Link - <a href="#">Link 3</a></li>
+                </ul>
+            </section>
+            <div class="hr dotted clearfix"></div>
+            <div class="sidebar_bottom_BG"></div>
+        </aside>
+        <div class="hr grid_12 clearfix"></div>
+
+    </ui:define>
+</ui:composition>
+</html>

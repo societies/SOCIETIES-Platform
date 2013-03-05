@@ -32,6 +32,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.*;
@@ -48,6 +50,31 @@ import java.util.concurrent.Future;
 @SessionScoped // JSF
 public class ProfileSettingsController extends BasePageController {
 
+    private class PreferenceDetailsComparator implements Comparator<PreferenceDetails> {
+        @Override
+        public int compare(PreferenceDetails o1, PreferenceDetails o2) {
+            if (o1 == null && o2 == null)
+                return 0;
+
+            if (o1 == null)
+                return -1;
+
+            if (o2 == null)
+                return 1;
+
+            if (o1.getPreferenceName() == null && o2.getPreferenceName() == null)
+                return 0;
+
+            if (o1.getPreferenceName() == null)
+                return -1;
+
+            if (o2.getPreferenceName() == null)
+                return 1;
+
+            return o1.getPreferenceName().compareTo(o2.getPreferenceName());
+        }
+    }
+
     public static final String OUTCOME_NODE = "outcome";
     public static final String CONDITION_NODE = "condition";
     public static final String PREFERENCE_NODE = "preference";
@@ -61,6 +88,10 @@ public class ProfileSettingsController extends BasePageController {
     @ManagedProperty(value = "#{internalCtxBroker}")
     private ICtxBroker internalCtxBroker;
 
+    @ManagedProperty(value = "#{serviceDiscovery}")
+    private IServiceDiscovery serviceDiscovery;
+
+    // this is not a JSF managed property - it's contained within userPreferenceConditionMonitor
     private IUserPreferenceManagement userPreferenceManagement;
 
     private boolean treeChangesMade = false;
@@ -81,12 +112,12 @@ public class ProfileSettingsController extends BasePageController {
     private final Map<IPreferenceOutcome, IPreference> outcomeToPreferenceMap = new HashMap<IPreferenceOutcome, IPreference>();
     private final Map<PreferenceDetails, IPreference> pdToPreferenceMap = new HashMap<PreferenceDetails, IPreference>();
     private final Map<PreferenceDetails, IPreferenceTreeModel> pdToPreferenceTreeModelMap = new HashMap<PreferenceDetails, IPreferenceTreeModel>();
+    private Service newPreferenceService;
+    private List<Service> availableServices;
 
 
     public ProfileSettingsController() {
         log.info("ProfileSettingsController ctor");
-
-        loadPreferenceTreeData();
     }
 
     /* Spring/JSF dependency Getters and Setters */
@@ -107,7 +138,14 @@ public class ProfileSettingsController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserPreferenceConditionMonitor(IUserPreferenceConditionMonitor userPreferenceConditionMonitor) {
+        if (userPreferenceConditionMonitor == null)
+            log.error("setUserPreferenceConditionMonitor() = null");
+        else
+            log.trace("setUserPreferenceConditionMonitor() = " + userPreferenceConditionMonitor.toString());
+
         this.userPreferenceConditionMonitor = userPreferenceConditionMonitor;
+
+        loadPreferenceTreeData();
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -130,6 +168,16 @@ public class ProfileSettingsController extends BasePageController {
         this.internalCtxBroker = internalCtxBroker;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public IServiceDiscovery getServiceDiscovery() {
+        return serviceDiscovery;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+        this.serviceDiscovery = serviceDiscovery;
+    }
+
     /* Web app Getters and Setters */
     public TreeNode getPreferencesRootNode() {
 //        log.trace("getPreferencesRootNode()");
@@ -149,6 +197,7 @@ public class ProfileSettingsController extends BasePageController {
         return selectedTreeNode;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public PreferenceDetails getSelectedPreference() {
         return selectedPreference;
     }
@@ -173,12 +222,42 @@ public class ProfileSettingsController extends BasePageController {
         return OperatorConstants.values().clone();
     }
 
+    public String[] getAvailableCtxAttributeTypes() {
+        return CtxAttributeTypes.ALL_TYPES;
+    }
+
     public void setNewPreferenceName(String newPreferenceName) {
         this.newPreferenceName = newPreferenceName;
     }
 
     public String getNewPreferenceName() {
         return newPreferenceName;
+    }
+
+    public void setNewPreferenceService(Service newPreferenceService) {
+        this.newPreferenceService = newPreferenceService;
+    }
+
+    public Service getNewPreferenceService() {
+        return newPreferenceService;
+    }
+
+    // this method may be called a few times in the same request
+    public synchronized List<Service> getAvailableServices() {
+        if (availableServices == null) {
+            try {
+                availableServices = serviceDiscovery.getServices(userService.getIdentity()).get();
+
+            } catch (Exception e) {
+                addGlobalMessage("Error loading services list", e.getMessage(), FacesMessage.SEVERITY_ERROR);
+                log.error("Error loading services list", e);
+
+                // ensure we don't get the error again
+                availableServices = new ArrayList<Service>();
+            }
+        }
+
+        return availableServices;
     }
 
     public boolean isShowAddCondition() {
@@ -223,7 +302,7 @@ public class ProfileSettingsController extends BasePageController {
 
             IPreferenceCondition condition = (IPreferenceCondition) node.getData();
             PreferenceDetails preferenceDetails = conditionToPDMap.get(condition);
-            IPreference preference = conditionToPreferenceMap.get(condition);
+//            IPreference preference = conditionToPreferenceMap.get(condition);
 
             if (condition.getoperator() == null) {
                 addGlobalMessage("Condition NOT updated for " + preferenceDetails.getPreferenceName(),
@@ -291,10 +370,12 @@ public class ProfileSettingsController extends BasePageController {
 
             userPreferenceManagement.deletePreference(userService.getIdentity(), preferenceDetails);
 
+            pdToPreferenceTreeModelMap.remove(preferenceDetails);
+            pdToPreferenceMap.remove(preferenceDetails);
+
             addGlobalMessage("Preference " + preferenceDetails.getPreferenceName() + " removed",
                     "The preference, including all conditions and outcomes, has been removed",
                     FacesMessage.SEVERITY_INFO);
-//            log.trace("Preference " + preferenceDetails.getPreferenceName() + " removed");
 
         } else if (node.getData() instanceof IPreferenceCondition) {
 
@@ -306,8 +387,6 @@ public class ProfileSettingsController extends BasePageController {
             IPreference parent = (IPreference) preference.getParent();
             // remove the preference from its parent
             parent.remove(preference);
-
-            // TODO: remove child nodes?
 
 //            userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
 
@@ -327,8 +406,6 @@ public class ProfileSettingsController extends BasePageController {
             IPreference parent = (IPreference) preference.getParent();
             // remove the preference from its parent
             parent.remove(preference);
-
-            // TODO: remove child nodes?
 
 //            userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
 
@@ -364,6 +441,12 @@ public class ProfileSettingsController extends BasePageController {
 
         PreferenceDetails preferenceDetails = new PreferenceDetails();
         preferenceDetails.setPreferenceName(prefName);
+
+        if (getNewPreferenceService() != null) {
+            preferenceDetails.setServiceID(getNewPreferenceService().getServiceIdentifier());
+//            preferenceDetails.setServiceType(getNewPreferenceService().getServiceType());
+        }
+
         PreferenceTreeNode outcomeNode = new PreferenceTreeNode();
         outcomeNode.setUserObject(outcome);
 
@@ -372,11 +455,13 @@ public class ProfileSettingsController extends BasePageController {
         PreferenceTreeModel model = new PreferenceTreeModel(preferenceNode);
 
         pdToPreferenceTreeModelMap.put(preferenceDetails, model);
+        pdToPreferenceMap.put(preferenceDetails, preferenceNode);
 //        populatePreferenceNode(preferenceDetails, model);
 
         setNewPreferenceName("");
+        setNewPreferenceService(null);
 
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, outcomeNode);
+        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, outcomeNode);
 
         addGlobalMessage("Preference added", "The preference " + prefName + " was added", FacesMessage.SEVERITY_INFO);
 //        log.trace("The preference " + prefName + " was added");
@@ -435,9 +520,9 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        log.debug("preferenceDetails=" + preferenceDetails.toString());
-        log.debug("selectedObject=" + selectedObject.toString());
-        log.debug("parentObject=" + parentObject.toString());
+//        log.debug("preferenceDetails=" + preferenceDetails.toString());
+//        log.debug("selectedObject=" + selectedObject.toString());
+//        log.debug("parentObject=" + parentObject.toString());
 
         log.trace("Creating objects...");
         IPreference newConditionPreference = new PreferenceTreeNode();
@@ -445,19 +530,23 @@ public class ProfileSettingsController extends BasePageController {
 
 
         // Retrieve a context attribute with a string value
-        String ctxAttributeType = CtxAttributeTypes.LOCATION_SYMBOLIC;
+        // TODO: need to pick CtxAttributeType from a list
+        String ctxAttributeType = newCondition.getname();
 
         try {
             Future<List<CtxIdentifier>> idsFuture = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, ctxAttributeType);
             List<CtxIdentifier> ids = idsFuture.get();
 
-            log.debug("Identifiers for " + ctxAttributeType + ":...");
-            for (CtxIdentifier id : ids) {
-                log.debug(id.toString());
+            if (ids.size() == 0) {
+                log.error("no identifiers found for '" + ctxAttributeType + "'");
+            } else {
+                log.debug("Identifiers for " + ctxAttributeType + ":...");
+                for (CtxIdentifier id : ids) {
+                    log.debug(id.toString());
+                }
+
+                newCondition.setCtxIdentifier((CtxAttributeIdentifier) ids.get(0));
             }
-
-            newCondition.setCtxIdentifier((CtxAttributeIdentifier) ids.get(0));
-
 
         } catch (Exception e) {
             log.error("ExecutionException", e);
@@ -491,13 +580,13 @@ public class ProfileSettingsController extends BasePageController {
         }
 
 
-        try {
-            log.debug("parentPreferenceObject=" + parentObject.toString());
-            log.debug("selectedPreferenceObject=" + selectedObject.toString());
-            log.debug("newConditionPreference=" + newConditionPreference.toString());
-        } catch (Exception ex) {
-            log.warn("Error toStringing()", ex);
-        }
+//        try {
+//            log.debug("parentPreferenceObject=" + parentObject.toString());
+//            log.debug("selectedPreferenceObject=" + selectedObject.toString());
+//            log.debug("newConditionPreference=" + newConditionPreference.toString());
+//        } catch (Exception ex) {
+//            log.warn("Error toStringing()", ex);
+//        }
 
         log.trace("Storing...");
         conditionToPDMap.put(newCondition, preferenceDetails);
@@ -571,6 +660,7 @@ public class ProfileSettingsController extends BasePageController {
 
 
         // Retrieve a context attribute with a string value
+        // TODO: need to pick CtxAttributeType from a list
         String ctxAttributeType = CtxAttributeTypes.LOCATION_SYMBOLIC;
 
         try {
@@ -702,7 +792,10 @@ public class ProfileSettingsController extends BasePageController {
 
         for (PreferenceDetails pd : preferenceDetailsSet) {
             log.debug("Storing preference: " + pd.getPreferenceName());
-            log.trace(pd.toString());
+
+            IPreferenceTreeModel model = pdToPreferenceTreeModelMap.get(pd);
+            log.trace(model.toString());
+
             userPreferenceManagement.storePreference(userService.getIdentity(), pd, pdToPreferenceMap.get(pd));
         }
 
@@ -719,29 +812,15 @@ public class ProfileSettingsController extends BasePageController {
         this.selectedOutcome = null;
         this.selectedPreference = null;
 
-        if (getSelectedTreeNode() == null) {
-//            super.addGlobalMessage("No node selected", "No node selected", FacesMessage.SEVERITY_WARN);
+        if (getSelectedTreeNode() == null)
+            return;
 
-        } else if (PREFERENCE_NODE.equals(getSelectedTreeNode().getType())) {
-            PreferenceDetails preferenceDetails = (PreferenceDetails) getSelectedTreeNode().getData();
-//            log.debug("setting preference to edit: " + preferenceDetails);
-            this.selectedPreference = preferenceDetails;
-
-//            super.addGlobalMessage(preferenceDetails.getPreferenceName(), "Selected edit on preference", FacesMessage.SEVERITY_INFO);
+        if (PREFERENCE_NODE.equals(getSelectedTreeNode().getType())) {
+            this.selectedPreference = (PreferenceDetails) getSelectedTreeNode().getData();
         } else if (CONDITION_NODE.equals(getSelectedTreeNode().getType())) {
-            IPreferenceCondition condition = (IPreferenceCondition) getSelectedTreeNode().getData();
-//            log.debug("setting condition to edit: " + condition);
-            this.selectedCondition = condition;
-
-//            super.addGlobalMessage(condition.getname(), "Selected edit on condition", FacesMessage.SEVERITY_INFO);
+            this.selectedCondition = (IPreferenceCondition) getSelectedTreeNode().getData();
         } else if (OUTCOME_NODE.equals(getSelectedTreeNode().getType())) {
-            IPreferenceOutcome outcome = (IPreferenceOutcome) getSelectedTreeNode().getData();
-//            log.debug("setting outcome to edit: " + outcome);
-            this.selectedOutcome = outcome;
-
-//            super.addGlobalMessage(outcome.getparameterName(), "Selected edit on outcome", FacesMessage.SEVERITY_INFO);
-        } else {
-//            super.addGlobalMessage("No node selected", "You've probably tried to edit the root node. Well done. You win a gold star", FacesMessage.SEVERITY_WARN);
+            this.selectedOutcome = (IPreferenceOutcome) getSelectedTreeNode().getData();
         }
     }
 
@@ -800,36 +879,20 @@ public class ProfileSettingsController extends BasePageController {
         }
 
         // sort the preferences by name
-        Collections.sort(detailsList, new Comparator<PreferenceDetails>() {
-            @Override
-            public int compare(PreferenceDetails o1, PreferenceDetails o2) {
-                if (o1 == null && o2 == null)
-                    return 0;
+        Collections.sort(detailsList, new PreferenceDetailsComparator());
 
-                if (o1 == null)
-                    return -1;
-
-                if (o2 == null)
-                    return 1;
-
-                if (o1.getPreferenceName() == null && o2.getPreferenceName() == null)
-                    return 0;
-
-                if (o1.getPreferenceName() == null)
-                    return -1;
-
-                if (o2.getPreferenceName() == null)
-                    return 1;
-
-                return o1.getPreferenceName().compareTo(o2.getPreferenceName());
-            }
-        });
-
+        log.trace("Loaded " + detailsList.size() + " preferences");
         for (PreferenceDetails preferenceDetails : detailsList) {
-            IPreferenceTreeModel preferenceTreeModel =
-                    userPreferenceManagement.getModel(userService.getIdentity(), preferenceDetails);
+            try {
+                IPreferenceTreeModel preferenceTreeModel =
+                        userPreferenceManagement.getModel(userService.getIdentity(), preferenceDetails);
 
-            pdToPreferenceTreeModelMap.put(preferenceDetails, preferenceTreeModel);
+                log.trace(" - Loaded preference " + preferenceDetails.getPreferenceName());
+
+                pdToPreferenceTreeModelMap.put(preferenceDetails, preferenceTreeModel);
+            } catch (Exception ex) {
+                log.error("Error loading preference tree model for " + preferenceDetails.getPreferenceName(), ex);
+            }
         }
     }
 

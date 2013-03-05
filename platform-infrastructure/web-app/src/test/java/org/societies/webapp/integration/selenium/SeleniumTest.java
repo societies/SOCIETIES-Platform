@@ -33,10 +33,13 @@ import org.societies.webapp.integration.selenium.pages.IndexPage;
 import org.societies.webapp.integration.selenium.rules.BrowserControlRule;
 import org.societies.webapp.integration.selenium.rules.SqlScriptRule;
 
+import java.util.Random;
+
 public abstract class SeleniumTest {
     public static final String BASE_URL = "http://localhost:8080/societies/";
     public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
-//    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
+    //    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
+    public static final char[] RANDOM_STRING_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345789".toCharArray();
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
     private WebDriver driver;
@@ -65,4 +68,17 @@ public abstract class SeleniumTest {
 
         return indexPage;
     }
+
+    public String randomString(int length) {
+        Random rnd = new Random();
+
+        StringBuilder bld = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            bld.append(RANDOM_STRING_CHARS[rnd.nextInt(RANDOM_STRING_CHARS.length)]);
+        }
+
+        return bld.toString();
+    }
+
 }

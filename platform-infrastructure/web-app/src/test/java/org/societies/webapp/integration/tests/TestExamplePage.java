@@ -49,12 +49,12 @@ public class TestExamplePage extends SeleniumTest {
     @Test
     public void ensureBasicHtmlWorks() {
 
+        // send some text to the textbox
+        examplePage.setStringFieldValue("i am some text");
+
         // click our button
         examplePage.clickMessageButton();
         // clicking the button doesn't actually do much, but at least we've verified that it's there
-
-        // send some text to the textbox
-        examplePage.setStringFieldValue("i am some text");
 
         // verify that the textbox still contains the text
         examplePage.verifyStringFieldValue("i am some text");

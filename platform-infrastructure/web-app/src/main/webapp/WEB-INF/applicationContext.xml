@@ -11,7 +11,7 @@
     <osgi:reference id="userPreferenceConditionMonitor"
                     interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
 
-    <osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
+    <osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
 
     <!--TODO : Should not be using cardinality 0..1, this needs to be updated but since privacy api changed and IPrivacyPolicyManagerRemote
     no longer available, not just cardinality that needs to be changed, code does too. So leaving this for now, as that bundle deploys -->
@@ -22,5 +22,8 @@
                     interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote"
                     cardinality="0..1"/>
 
+    <!--Required for service discovery-->
+    <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"
+                    cardinality="0..1"/>
 
 </beans>
