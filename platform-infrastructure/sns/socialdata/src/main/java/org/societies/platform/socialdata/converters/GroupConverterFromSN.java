@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.Group;
-import org.json.JSONObject;
 
 public class GroupConverterFromSN implements GroupConverter {
 

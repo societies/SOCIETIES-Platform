@@ -20,7 +20,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.SocialData;
 import org.societies.platform.socialdata.model.ActionLink;
 
 public class ActivityConverterFromFacebook implements ActivityConverter {

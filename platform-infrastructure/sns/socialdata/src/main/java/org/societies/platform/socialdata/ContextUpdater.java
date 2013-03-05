@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,15 +28,12 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.sns.ISocialConnector;
-
 import org.societies.platform.socialdata.converters.FriendsConverter;
 import org.societies.platform.socialdata.converters.FriendsConveterFactory;
 import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
-
-import org.apache.shindig.social.opensocial.model.Group;
 
 public class ContextUpdater {
 
@@ -47,19 +45,41 @@ public class ContextUpdater {
 	String snName;
 	
 	CtxEntity socialNetworkEntity = null;
-	
+	List<ISocialConnector> connectors = new ArrayList<ISocialConnector>();
 
 	public ContextUpdater(ICtxBroker internalCtxBroker, IIdentity cssId) {
-		// LOG.info("updating user profile in context: broker service:"+internalCtxBroker);
+		
+		LOG.debug("updating user profile in context: broker service:"+internalCtxBroker);
 		this.cssId = cssId;
 		this.internalCtxBroker = internalCtxBroker;
-
+		
 	}
 
+	
+	Runnable updateCtxProfileThread = new Runnable() {
+		
+		@Override
+		public void run() {
+
+			LOG.debug(" Updating CtxBroker - Updater thread started ....");
+			for (ISocialConnector connector : connectors)
+				updateCtxProfile(connector);
+					
+		    LOG.debug("CtxBroker Updated - Updater thread is over.");
+		}
+	};
+	
+	public void updateSocialData(List<ISocialConnector> connectors){
+		this.connectors = connectors;
+		new Thread(updateCtxProfileThread).start();
+	}
 	
 
 	public void updateCtxProfile(ISocialConnector connector) {
 
+
+		LOG.debug(" Updating profile data for " + connector.getConnectorName());
+		
 		this.snName = connector.getConnectorName();
 		this.socialNetworkEntity = this.getSnCtxEntity();
 		
@@ -72,18 +92,24 @@ public class ContextUpdater {
 		updateStringFieldIfExist(profile.getAboutMe(), CtxAttributeTypes.ABOUT);		
 		updateStringFieldIfExist(profile.getProfileUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);		
 		updateStringFieldIfExist(profile.getDisplayName(), CtxAttributeTypes.NAME);
-		updateStringFieldIfExist(profile.getName().getGivenName(),  CtxAttributeTypes.NAME_FIRST);
-		updateStringFieldIfExist(profile.getName().getFamilyName(), CtxAttributeTypes.NAME_LAST);
-//		updateStringFieldIfExist(profile.getPhoneNumbers(), CtxAttributeTypes.PHONES);
+		
+		if (profile.getName()!=null){
+			updateStringFieldIfExist(profile.getName().getGivenName(),  CtxAttributeTypes.NAME_FIRST);
+			updateStringFieldIfExist(profile.getName().getFamilyName(), CtxAttributeTypes.NAME_LAST);
+		}
+		//		updateStringFieldIfExist(profile.getPhoneNumbers(), CtxAttributeTypes.PHONES);
 		updateStringFieldIfExist(profile.getPoliticalViews(), CtxAttributeTypes.POLITICAL_VIEWS);
 		updateStringFieldIfExist(profile.getPreferredUsername(), CtxAttributeTypes.USERNAME);	
 		updateStringFieldIfExist(profile.getThumbnailUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);
 		updateStringFieldIfExist(profile.getRelationshipStatus(), CtxAttributeTypes.STATUS);
 		updateStringFieldIfExist(profile.getReligion(), CtxAttributeTypes.RELIGIOUS_VIEWS);
+		
 		if (profile.getGender()!=null)
-		updateStringFieldIfExist(profile.getGender().name(), CtxAttributeTypes.SEX);
-		updateStringFieldIfExist(profile.getBirthday().toGMTString(), CtxAttributeTypes.BIRTHDAY);
-		updateStringFieldIfExist(profile.getCurrentLocation().getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			updateStringFieldIfExist(profile.getGender().name(), CtxAttributeTypes.SEX);
+		if (profile.getBirthday()!=null)
+			updateStringFieldIfExist(profile.getBirthday().toGMTString(), CtxAttributeTypes.BIRTHDAY);
+		if (profile.getCurrentLocation()!=null)
+			updateStringFieldIfExist(profile.getCurrentLocation().getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 		
 
 		updateStringFieldIfExist(profile.getBooks(), 			 CtxAttributeTypes.BOOKS);
@@ -96,12 +122,16 @@ public class ContextUpdater {
 		updateStringFieldIfExist(profile.getActivities(), 		 CtxAttributeTypes.ACTIVITIES);		
 //		updateStringFieldIfExist(profile.getEmails(), 		 	 CtxAttributeTypes.EMAIL);	
 	
+		
+		LOG.debug(" Updating Friends List ...");
 		// Add Friends List
 		
 		FriendsConverter friendsParser = FriendsConveterFactory.getPersonConverter(connector);
-		List<Person> friends= friendsParser.load(connector.getUserProfile());
+		List<Person> friends= friendsParser.load(connector.getUserFriends());
 	    storeFriendsIntoContextBroker(friends);
 	    
+	    
+	    LOG.debug(" Updating Groups list ...");
 	    // Add Group List
 	    GroupConverter groupConverter = GroupConveterFactory.getPersonConverter(connector);
 	    List<Group> groups = groupConverter.load(connector.getUserGroups());
@@ -110,17 +140,19 @@ public class ContextUpdater {
 	
 	
 	
-	private void updateStringFieldIfExist(String value, String type){
-		try{
-		if (value != null) {
-			LOG.info("update "+ type + " data" + value);
-			storeSocialDataIntoContextBroker(type, value);
-			LOG.info(snName + " entity updated with "+ type + " data "+ socialNetworkEntity.getId());
+	private void updateStringFieldIfExist(String value, String type) {
+		try {
+			if (value != null) {
+				LOG.info("update " + type + " data" + value);
+				storeSocialDataIntoContextBroker(type, value);
+				LOG.info(snName + " entity updated with " + type + " data "+ socialNetworkEntity.getId());
+			}
+			else LOG.debug(type + " value is NULL");
+		} 
+		catch (Exception ex) {
+			LOG.error("Unable to store :" + type + " -> " + value + " because "+ ex, ex);
 		}
-		}catch(Exception ex ){
-			LOG.error("Unable to store :" + type + " -> "+value + " because "+ex, ex); 
-		}
-		
+
 	}
 	
 	private void updateStringFieldIfExist(List<String> listOfvalues, String type){
@@ -129,6 +161,7 @@ public class ContextUpdater {
 			String value = updateListData(listOfvalues);
 			updateStringFieldIfExist(value, type);
 		}
+		else LOG.debug(type + " value is NULL");
 	}
 	
 	
@@ -254,6 +287,9 @@ public class ContextUpdater {
 	
 	
 	
+	
+	
+	
 	private CtxEntity storeFriendsIntoContextBroker(List<Person> friends) {
 
 		CtxAttribute attribute = null;
@@ -268,13 +304,54 @@ public class ContextUpdater {
 					this.internalCtxBroker.remove(ctxID);
 				}
 				
+				
+				attribute = this.internalCtxBroker.createAttribute( socialNetworkEntity.getId(), CtxAttributeTypes.FRIENDS).get();
+				attribute = setAttrValueType(attribute, CtxAttributeTypes.FRIENDS, friends.size() + " " +snName + " friends");
+				attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
+				
 				for(Person friend : friends){	
 			
-					String value = friend.getDisplayName();
-					LOG.info("Insert Frind:" + value +"+  to user profile");
-					attribute = this.internalCtxBroker.createAttribute( socialNetworkEntity.getId(), CtxAttributeTypes.FRIENDS).get();
-					attribute = setAttrValueType(attribute, CtxAttributeTypes.FRIENDS, value);
-					attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
+					String name = "";
+					
+					if (friend.getAccounts() != null) {
+						if (friend.getAccounts().size() > 0) {
+							name += friend.getAccounts().get(0).getDomain() + ",";
+						}
+					}
+					name += friend.getId()+ ",";
+					
+					// First just the name
+					name ="";
+					try {
+						if (friend.getName() != null) {
+							if (friend.getName().getFormatted() != null)
+								name += friend.getName().getFormatted();
+							else {
+								if (friend.getName().getFamilyName() != null)
+									name += friend.getName().getFamilyName();
+								if (friend.getName().getGivenName() != null) {
+									if (name.length() > 0)
+										name += " ";
+									name += friend.getName().getGivenName();
+								}
+							}
+						}
+							
+						LOG.info("Insert Frind:" + name +"+  to user profile");
+							
+						attribute = this.internalCtxBroker.createAttribute( socialNetworkEntity.getId(), CtxAttributeTypes.FRIENDS).get();
+						attribute = setAttrValueType(attribute, CtxAttributeTypes.FRIENDS, name);
+						attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
+					    
+					
+					}
+						
+					catch (Exception ex){
+						LOG.error("Unable to find a name for this friend", ex);
+					}
+						
+					
+				
 				}
 
 				socialNetworkEntity = (CtxEntity) this.internalCtxBroker.update( socialNetworkEntity).get();
@@ -312,7 +389,7 @@ public class ContextUpdater {
 				
 				for(Group group : groups){	
 			
-					String value = group.getTitle();
+					String value = group.getDescription();
 					LOG.info("Insert Group:" + value +"+  to user profile");
 					attribute = this.internalCtxBroker.createAttribute( socialNetworkEntity.getId(), CtxAttributeTypes.GROUP).get();
 					attribute = setAttrValueType(attribute, CtxAttributeTypes.GROUP, value);
@@ -384,6 +461,63 @@ public class ContextUpdater {
 		} else
 			throw new IllegalArgumentException(value + ": Invalid value type");
 
+	}
+	
+	
+	public void removeConnectorData(ISocialConnector connector) {
+		IndividualCtxEntity individualEntity;
+		CtxAssociation snsAssoc = null;
+		CtxEntity socialNetwork = null;
+
+		
+		LOG.debug("Removing data for" + connector.getConnectorName()+ " social Network...");
+		try {
+			individualEntity = this.internalCtxBroker.retrieveIndividualEntity(this.cssId).get();
+			Set<CtxAssociationIdentifier> snsAssocSet = individualEntity
+					.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
+			LOG.debug("There are " + snsAssocSet.size()+ " associations with SocialNetworks");
+
+			if (snsAssocSet.size() > 0) {
+
+				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(
+						snsAssocSet);
+				for (CtxAssociationIdentifier assocID : snsAssocList) {
+					snsAssoc = (CtxAssociation) this.internalCtxBroker
+							.retrieve(assocID).get();
+					Set<CtxEntityIdentifier> snsEntitiesSet = snsAssoc
+							.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
+					List<CtxEntityIdentifier> snsEntitiesList = new ArrayList<CtxEntityIdentifier>(
+							snsEntitiesSet);
+
+					LOG.debug("lookup SN association" + snName);
+					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
+							.lookupEntities(snsEntitiesList,
+									CtxAttributeTypes.NAME,
+									connector.getConnectorName()).get();
+
+					if (snEntList.size() > 0) {
+						socialNetwork = (CtxEntity) this.internalCtxBroker
+								.retrieve(snEntList.get(0)).get();
+						this.internalCtxBroker.remove(socialNetwork.getId());
+						this.internalCtxBroker.remove(assocID);
+						LOG.debug("All data about " + connector.getConnectorName()+ " has been removed.");
+					}
+				}
+
+			}
+			return;
+		} catch (InterruptedException e) {
+			LOG.error("Error "+e,e);
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			LOG.error("Error "+e,e);
+			e.printStackTrace();
+		} catch (CtxException e) {
+			LOG.error("Error "+e,e);
+			e.printStackTrace();
+		}
+		
+		LOG.error("An unexpected has broken cleaning data of " + connector.getConnectorName());
 	}
 
 }
