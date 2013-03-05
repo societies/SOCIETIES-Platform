@@ -32,7 +32,6 @@ import org.societies.android.api.context.ICtxClient;
 import org.societies.android.platform.context.container.TestAndroidContextBroker;
 import org.societies.android.platform.context.container.TestAndroidContextBroker.TestContextBrokerBinder;
 import org.societies.android.platform.context.impl.ContextBrokerBase;
-import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.content.BroadcastReceiver;
@@ -70,7 +69,8 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
+		//remove them for the second way
         Intent commsIntent = new Intent(getContext(), TestAndroidContextBroker.class);
         TestContextBrokerBinder binder = (TestContextBrokerBinder) bindService(commsIntent);
         assertNotNull(binder);
@@ -80,6 +80,7 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	}
 	
 	protected void tearDown() throws Exception {
+		//Remove them for the second way
 		Thread.sleep(TEST_END_DELAY);
         //ensure that service is shutdown to test if service leakage occurs
         shutdownService();

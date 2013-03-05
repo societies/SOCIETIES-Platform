@@ -89,18 +89,20 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	private boolean connectedToComms = false;
 	private boolean restrictBroadcast;
 
-/*	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
+	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
 			boolean restrictBroadcast) {
 		this.applicationContext = applicationContext;
 		this.commMgr = commMgr;
 		this.restrictBroadcast = restrictBroadcast;
-	}*/
-    /**Default constructor*/
+	}
+
+	/*the other way */
+	//Default constructor
     public ContextBrokerBase(Context applicationContext) {
     	this(applicationContext, true);
     }
     
-    /**Parameterised constructor*/
+    //Parameterised constructor
     public ContextBrokerBase(Context applicationContext, boolean restrictBroadcast) {
     	Log.d(LOG_TAG, "Object created");
     	
@@ -194,6 +196,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 		}
 	}	
 	
+// END of the other way	
 
 	@Override
 	public CtxEntityBean createEntity(String client, RequestorBean requestor,

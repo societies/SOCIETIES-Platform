@@ -95,7 +95,7 @@
 					<testCoverage>true</testCoverage>
 					<testCreateReport>true</testCreateReport>
 					<testTestSize>medium</testTestSize>
-					<testCoverageFile>/data/data/org.societies.android.platform.personalisation.container/files/coverage.ec</testCoverageFile>
+					<testCoverageFile>/data/data/org.societies.android.platform.context.container/files/coverage.ec</testCoverageFile>
 					<!--test> <coverage>true</coverage> <createReport>true</createReport> 
 						<testSize>medium</testSize> </test -->
 				</configuration>
@@ -109,7 +109,7 @@
 							<goal>pull</goal>
 						</goals>
 						<configuration>
-							<pullSource>/data/data/org.societies.android.platform.personalisation.container/files/coverage.ec</pullSource>
+							<pullSource>/data/data/org.societies.android.platform.context.container/files/coverage.ec</pullSource>
 							<pullDestination>${tested.project.dir}/target/emma/coverage.ec</pullDestination>
 						</configuration>
 					</execution>

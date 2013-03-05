@@ -44,6 +44,7 @@ public class ServiceContextBrokerRemote extends Service{
 	private static final String LOG_TAG = ServiceContextBrokerRemote.class.getName();
 	private Messenger inMessenger;
 	
+/* one way 	*/
 	@Override
 	public void onCreate () {
 //		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true);
@@ -55,6 +56,22 @@ public class ServiceContextBrokerRemote extends Service{
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
 		Log.i(LOG_TAG, "ServiceContextBrokerRemote creation");
 	}
+
+	
+	/* other way 
+	
+	@Override
+	public void onCreate () {
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this, createClientCommunicationMgr(), false);
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
+		Log.i(LOG_TAG, "ServicePlatformEventsRemote creation");
+	}
+	
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(this, true); 
+	}*/
+	// END of second way 
 	
 	@Override
 	public IBinder onBind(Intent arg0) {

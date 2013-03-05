@@ -54,17 +54,26 @@ public class TestAndroidContextBroker extends Service{
 		return binder;
 	}
 
+	/* ONE WAY */
     @Override
 	public void onCreate () {
 		this.binder = new TestContextBrokerBinder(new ContextBrokerBase(this, false));
 		Log.d(LOG_TAG, "TestAndroidContextBroker service starting");
 	}
+	
+	/*THE OTHER WAY
+    @Override
+	public void onCreate () {
+		this.binder = new TestContextBrokerBinder();
+		Log.d(LOG_TAG, "TestAndroidContextBroker service starting");
+	}*/
 
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "TestAndroidContextBroker service terminating");
 	}
 
+	/*ONE WAY */
 	public static class TestContextBrokerBinder extends Binder {
 		private WeakReference<ContextBrokerBase> outerClassReference = null;
 		
@@ -76,21 +85,21 @@ public class TestAndroidContextBroker extends Service{
 			return outerClassReference.get();
 		}
 	}
-	/**Create Binder object for local service invocation */
-//	public class TestContextBrokerBinder extends Binder {
-//		public ICtxClient getService(){
+	
+	
+	/*THE OTHER WAY
+	//Create Binder object for local service invocation 
+	public class TestContextBrokerBinder extends Binder {
+		public ICtxClient getService(){
 //			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-//			ContextBrokerBase ctxBroker = new ContextBrokerBase(getApplicationContext(), createCCM(), false);
-//			return ctxBroker;
-//		}
-//	}
-	/**
-	 * Factory method to get instance of {@link ClientCommunicationMgr}
-	 * @return ClientCommunicationMgr
-	 */
-//	protected ClientCommunicationMgr createCCM() {
-//		return new ClientCommunicationMgr(this, true);
-//	}
+			ContextBrokerBase ctxBroker = new ContextBrokerBase(TestAndroidContextBroker.this, createCCM(), false);
+			return ctxBroker;
+		}
+	}
+
+	protected ClientCommunicationMgr createCCM() {
+		return new ClientCommunicationMgr(this, true);
+	}*/
 //	protected ClientCommunicationMgr createClientCommunicationMgr() {
 //		return new MockClientCommunicationMgr(getApplicationContext(), "emma", "societies.local");
 //	}
