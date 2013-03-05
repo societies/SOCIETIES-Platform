@@ -2,9 +2,12 @@ package org.societies.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.validation.Valid;
@@ -50,6 +53,20 @@ public class CssSuggestedFriendsController {
 	private ICommManager commManager;
 	@Autowired
 	private IServiceDiscovery sdService;
+	
+	
+	private FriendFilter friendfilter;
+	
+	
+	public FriendFilter getfriendfilter(){
+		return friendfilter ;
+	}
+	
+	public void setfriendfilter(FriendFilter filter){
+		LOG.info("set filter called with filter as : " +filter.getFilterFlag());
+		
+		this.friendfilter=friendfilter;
+	}
 
 	public IServiceDiscovery getSDService() {
 		return sdService;
@@ -125,11 +142,13 @@ public class CssSuggestedFriendsController {
 				res = "CSS Suggested Friends Result ";
 
 				//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
-				FriendFilter filter = new FriendFilter();
-				int filterFlag = 0x0000001111;
-
-				filter.setFilterFlag(filterFlag );
-
+				//FriendFilter filter = new FriendFilter();
+				//int filterFlag = 0x0000000000;
+				FriendFilter filter = this.getfriendfilter();
+				int filterFlag = filter.getFilterFlag();
+				LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
+				filter.setFilterFlag(filterFlag);
+				LOG.info("SuggestedFriends Controller filter flag is: " +filter.getFilterFlag());
 				Future<HashMap<IIdentity, Integer>> asynchcssfriends = getCssLocalManager()
 						.getSuggestedFriends(filter); //suggestedFriends();
 
@@ -165,22 +184,28 @@ public class CssSuggestedFriendsController {
 
 		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
-
+		
 		String res = null;
 
 		try {
 
 			//set the friend filter to return ALL until we switch over to the new webapp which should have a filter switch tp set correctly
 			FriendFilter filter = new FriendFilter();
-			Integer filterFlag = 0x0000001111;
-
+			Integer filterFlag = 0x00000001111;
+			filter = cssLocalManager.getFriendfilter();
+			filterFlag = filter.getFilterFlag();
 			filter.setFilterFlag(filterFlag );
 			LOG.info("SuggestedFriendsController called with filter: " +filter);
+			
+//			int filterFlag = 0x0000000000;
+			
+			LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
+			
 
 			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
 			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 
-			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends);
+			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends +" Size is: " +snsSuggestedFriends.size());
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -222,14 +247,19 @@ public class CssSuggestedFriendsController {
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
 						boolean bAlreadySuggested = false;
-/*						for (int snsIndex = 0; snsIndex < snsSuggestedFriends.size(); snsIndex++) {
-							if (snsSuggestedFriends.get(snsIndex).getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId()))
-							{
+						
+						for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
+							
+							if(entry.getKey().getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId())){	
 								bAlreadySuggested = true;
-								snsFriends.add(allcssDetails.get(index));
+								if(snsFriends.contains(entry.getKey())){
+									LOG.info("Already added NOT adding again");
+								}else {
+									snsFriends.add(allcssDetails.get(index));
+								}
 							}
-						}*/
-
+							
+						}
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));
 						}
@@ -238,8 +268,10 @@ public class CssSuggestedFriendsController {
 			}
 			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
 			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
+
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
+			
 
 		} catch (Exception e) {
 			res = "Oops!!!!<br/>";

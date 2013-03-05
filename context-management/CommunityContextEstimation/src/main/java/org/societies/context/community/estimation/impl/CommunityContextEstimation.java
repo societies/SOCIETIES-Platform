@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -149,7 +150,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 						
 					for(CtxEntityIdentifier comMemb:communityMembers){
 						IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> list = individualMember.getAttributes("TEMPERATURE");	
+						Set<CtxAttribute> list = individualMember.getAttributes(CtxAttributeTypes.TEMPERATURE.toString());	
 						
 						for (CtxAttribute ca:list){
 							inputValues.add(ca.getIntegerValue());
@@ -207,7 +208,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesInterests = individualMemeber.getAttributes("INTERESTS");
+						Set<CtxAttribute> setAttributesInterests = individualMemeber.getAttributes(CtxAttributeTypes.INTERESTS.toString());
 
 						for (CtxAttribute ca:setAttributesInterests){
 							stringInputValues.add(ca.getStringValue());
@@ -280,7 +281,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesBooks = individualMemeber.getAttributes("BOOKS");
+						Set<CtxAttribute> setAttributesBooks = individualMemeber.getAttributes(CtxAttributeTypes.BOOKS.toString());
 
 						for (CtxAttribute ca:setAttributesBooks){
 							stringInputValues.add(ca.getStringValue());
@@ -351,7 +352,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesMovies = individualMemeber.getAttributes("MOVIES");
+						Set<CtxAttribute> setAttributesMovies = individualMemeber.getAttributes(CtxAttributeTypes.MOVIES.toString());
 
 						for (CtxAttribute ca:setAttributesMovies){
 							stringInputValues.add(ca.getStringValue());
@@ -422,7 +423,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesLanguages = individualMemeber.getAttributes("LANGUAGES");
+						Set<CtxAttribute> setAttributesLanguages = individualMemeber.getAttributes(CtxAttributeTypes.LANGUAGES.toString());
 
 						for (CtxAttribute ca:setAttributesLanguages){
 							stringInputValues.add(ca.getStringValue());
@@ -493,7 +494,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 					for(CtxEntityIdentifier comMemb:communityMembers){
 
 						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-						Set<CtxAttribute> setAttributesFavouriteQuotes = individualMemeber.getAttributes("FAVOURITE_QUOTES");
+						Set<CtxAttribute> setAttributesFavouriteQuotes = individualMemeber.getAttributes(CtxAttributeTypes.FAVOURITE_QUOTES.toString());
 
 						for (CtxAttribute ca:setAttributesFavouriteQuotes){
 							stringInputValues.add(ca.getStringValue());
@@ -562,7 +563,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes("LOCATION_COORDINATES");
+					Set<CtxAttribute> setAttributesCoordinatesLocations = individualMemeber.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES.toString());
 
 					for (CtxAttribute ca:setAttributesCoordinatesLocations){
 						stringLocationValues.add(ca.getStringValue());			
@@ -618,7 +619,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				for(CtxEntityIdentifier comMemb:communityMembers){
 
 					IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes("LOCATION_SYMBOLIC");
+					Set<CtxAttribute> setAttributesSymbolicLocations = individualMemeber.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC.toString());
 
 					for (CtxAttribute ca:setAttributesSymbolicLocations){
 						stringLocationSymbolicValues.add(ca.getStringValue());			
@@ -1103,9 +1104,56 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 	//@Override
-	public void cceSpecial1() {
-		// TODO Auto-generated method stub
+	/*
+	 * @param an array list of strings
+	 * @return an array list of strings of type [abd, 57%, abc, 14%, cde, 28%]
+	 */
+	public ArrayList<String> cceStringPercentage(ArrayList<String> inputListOfStrings) {
+		Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
+		ArrayList<String> outputList = new ArrayList<String>();
+		ArrayList<String> arrayListWithStringPercent = new ArrayList<String>();
 		
+		int max=0;
+		for (int i=0; i<inputListOfStrings.size(); i++){
+			if (outputList.contains(inputListOfStrings.get(i))){
+				int elementCount = Integer.parseInt(frequencyMap.get(inputListOfStrings.get(i)).toString());
+				elementCount++;
+				frequencyMap.put(inputListOfStrings.get(i), elementCount);				
+				if (elementCount>max){
+					max=elementCount;
+				}
+			}
+			else
+			{
+				outputList.add(inputListOfStrings.get(i));
+				frequencyMap.put(inputListOfStrings.get(i), 1);
+			}	
+			int total=0;
+			Enumeration<String> e = frequencyMap.keys();
+			Iterator<Integer> it = frequencyMap.values().iterator();
+			
+			while (it.hasNext()){
+				Integer key = it.next();
+				total = total+key;
+			}
+			
+			Hashtable<String, Integer> hashTabletWithPercentage =  new Hashtable<String, Integer>();
+			
+			Enumeration<String> keys = frequencyMap.keys();
+			
+			while (keys.hasMoreElements()){
+				Object k = keys.nextElement();
+				System.out.println("Key = "+k+" Value = "+frequencyMap.get(k));
+				hashTabletWithPercentage.put(k.toString(), 100*frequencyMap.get(k)/total);
+				arrayListWithStringPercent.add(k.toString());
+				int help = 100*frequencyMap.get(k)/total;
+				arrayListWithStringPercent.add(String.valueOf(help)+"%");
+			}
+
+		}
+		
+		return arrayListWithStringPercent;
+	
 	}
 
 	//@Override

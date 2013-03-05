@@ -154,7 +154,7 @@ public class PreferenceStorer {
 	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel iptm, String key){
 		try{
 			iptm.setLastModifiedDate(new Date());
-			Future<List<CtxIdentifier>> futureCtxIDs = broker.lookup(/*userId,*/ CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
+			Future<List<CtxIdentifier>> futureCtxIDs = broker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
 				this.logging.debug("Preference Entity doesn't exist");
@@ -294,7 +294,7 @@ public class PreferenceStorer {
 	
 	public void storeRegistry(IIdentity userId, Registry registry){
 		try {
-			List<CtxIdentifier> attrList = (broker.lookup(/*userId, */CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY)).get();
+			List<CtxIdentifier> attrList = (broker.lookup(CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY)).get();
 			
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
@@ -306,7 +306,8 @@ public class PreferenceStorer {
 				}else{
 					this.logging.debug("PreferenceRegistry not found in DB for userId:. Creating new registry");
 					
-					Future<IndividualCtxEntity> futurePerson = broker.retrieveCssOperator();
+					Future<IndividualCtxEntity> futurePerson = broker.retrieveIndividualEntity(userId);
+					
 					CtxEntity person = (CtxEntity) futurePerson.get();
 					CtxAttribute attr = (broker.createAttribute(person.getId(), CtxModelTypes.PREFERENCE_REGISTRY)).get();
 					

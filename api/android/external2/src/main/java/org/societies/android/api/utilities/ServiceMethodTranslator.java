@@ -68,6 +68,10 @@ public class ServiceMethodTranslator {
 	public static final String JAVA_LANG_CLASSES_ARRAYS [] = {"String[]", "Object[]"};
 	
 	private static final String LOG_TAG = ServiceMethodTranslator.class.getName();
+	//It was originally possible to change the Android logging behaviour via an APK manifest. This 
+	//no longer happens and consequently flag required to control class's logging behaviour
+	private static final boolean DEBUG_LOGGING = false;
+
 	/**
 	 * Determine whether a method signature exists and if it does what is its
 	 * index number.
@@ -364,7 +368,9 @@ public class ServiceMethodTranslator {
 		Class paramClasses [] = new Class [paramTypes.length];
 		for (int i = 0; i < paramTypes.length; i++) {
 			try {
-				Log.d(LOG_TAG, "Parameter type: " + paramTypes[i]);
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Parameter type: " + paramTypes[i]);
+				};
 				
 				if (arrayContains(JAVA_PRIMITIVE_ARRAYS, paramTypes[i])) {
 					paramClasses[i] = getPrimitiveClassArray(paramTypes[i]);

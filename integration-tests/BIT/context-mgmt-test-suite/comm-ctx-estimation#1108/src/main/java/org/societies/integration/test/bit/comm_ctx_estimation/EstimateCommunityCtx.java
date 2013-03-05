@@ -35,7 +35,7 @@ public class EstimateCommunityCtx {
 
 	private static Logger LOG = LoggerFactory.getLogger(EstimateCommunityCtx.class);
 
-	private IIdentity cssIDJane; 
+	private IIdentity cssIDJane;
 	private IIdentity cssIDJohn;
 
 	// run test in jane's container
@@ -68,42 +68,41 @@ public class EstimateCommunityCtx {
 		//LOG.info("cisManager service"+ Test1108.getCisManager());
 
 
-
 		try {
 			this.cssIDJane =  this.commManager.getIdManager().fromJid(targetJane);
 			this.cssIDJohn =  this.commManager.getIdManager().fromJid(targetJohn);
-			
+
 			// jane's interests 
 			LOG.info("jane's identity : " + this.cssIDJane.toString());
 			//CtxEntityIdentifier janeEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDJane).get();
-			
+
 			CtxAttribute interestsJanes = updateIndividualAttribute(this.cssIDJane, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
 			assertEquals(interestsJanes.getType(), CtxAttributeTypes.INTERESTS);
 			LOG.info("jane's interests created : " + interestsJanes.getId());
-			
+
 			CtxAttribute locationJane = updateIndividualAttribute(this.cssIDJane, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
 			assertEquals(locationJane.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			LOG.info("jane's location created : " + locationJane.getId());
-			
+
 			// john's interest (remote comm will be initiated)
 			LOG.info("john's identity : " + this.cssIDJohn.toString());
-			
+
 			CtxAttribute interestsJohn =  updateIndividualAttribute(this.cssIDJohn,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
 			assertEquals(interestsJohn.getType(), CtxAttributeTypes.INTERESTS);
 			LOG.info("johns's interest created : " + interestsJohn.getId());
-						
+
 			CtxAttribute locationJohn  = updateIndividualAttribute(this.cssIDJohn,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
 			assertEquals(locationJohn.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			LOG.info("johns's location created : " + locationJohn.getId());
-			
-			
+
+
 			// create CIS
 			IIdentity cisID = this.createCIS();
 			// at this point a community Entity should be created in janes container
 			// at this point an association should be created in janes container
 			LOG.info("wait until community entity and attributes are created for cisID"+ cisID  );
 			Thread.sleep(40000);
-
+			
 			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.ctxBroker.retrieveCommunityEntityId(cisID).get();
 			LOG.info("ctxCommunityEntity id : " + ctxCommunityEntityIdentifier.toString());
 			CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
@@ -119,15 +118,15 @@ public class EstimateCommunityCtx {
 			LOG.info("ctxCommunityEntity members comAssocIdSet : " + comAssocIdSet);
 			LOG.info("ctxCommunityEntity members comAssocIdSet size : " + comAssocIdSet.size());
 
-			CtxAssociation hasMembersAssoc = null;
+			CtxAssociation hasMembersAssoc = null;	
 
-			if(comAssocIdSet != null  ){
+			if(comAssocIdSet != null ){
 				for(CtxAssociationIdentifier assocID : comAssocIdSet){
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.retrieve(assocID).get();	
 					LOG.info("hasMembersAssoc getChildEntities: " + hasMembersAssoc.getChildEntities());
 					LOG.info("hasMembersAssoc size: " + hasMembersAssoc.getChildEntities().size());
 					LOG.info("hasMembersAssoc getParentEntity: " + hasMembersAssoc.getParentEntity());
-					
+
 					CtxEntityIdentifier johnEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDJohn).get();
 					hasMembersAssoc.addChildEntity(johnEntityID);
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get();
@@ -135,17 +134,18 @@ public class EstimateCommunityCtx {
 			}
 
 			CommunityCtxEntity communityEntityUpdated = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
-			LOG.info("Updated ctxCommunityEntity  : " + communityEntityUpdated.getMembers());
+			LOG.info("Updated ctxCommunityEntity : " + communityEntityUpdated.getMembers());
 			LOG.info("Updated ctxCommunityEntity members : " + communityEntityUpdated.getMembers());
 
 			// the upper lines will be removed with code adding a css member to the cis
 			// a community now exists with two members jane (local) and john (remote)
-
 			String interestValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
-			assertEquals("cinema", interestValue);			
-			
-		//	String locationSymbolicValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-		//	assertEquals("zoneA", locationSymbolicValue);
+			assertEquals("cinema", interestValue);	
+
+			// String locationSymbolicValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			// assertEquals("zoneA", locationSymbolicValue);
+
+
 
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
@@ -161,6 +161,7 @@ public class EstimateCommunityCtx {
 			e.printStackTrace();
 		}
 
+	
 	}
 	
 
@@ -245,32 +246,31 @@ public class EstimateCommunityCtx {
 
 
 
+protected IIdentity createCIS() {
 
-	protected  IIdentity createCIS() {
+IIdentity cisID = null;
+try {
+Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+LOG.info("*** trying to create cis:");
+ICisOwned cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+LOG.info("*** cis created: "+cisOwned.getCisId());
 
-		IIdentity cisID = null;
-		try {
-			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
-			LOG.info("*** trying to create cis:");
-			ICisOwned cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
-			LOG.info("*** cis created: "+cisOwned.getCisId());
+LOG.info("*** cisOwned " +cisOwned);
+LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+String cisIDString = cisOwned.getCisId();
 
-			LOG.info("*** cisOwned " +cisOwned);
-			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-			String cisIDString  = cisOwned.getCisId();
+cisID = this.commManager.getIdManager().fromJid(cisIDString);
 
-			cisID = this.commManager.getIdManager().fromJid(cisIDString);
+} catch (InterruptedException e) {
+e.printStackTrace();
+} catch (ExecutionException e) {
+e.printStackTrace();
+} catch (InvalidFormatException e) {
+// TODO Auto-generated catch block
+e.printStackTrace();
+}
 
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-
-		return cisID;
-	}
+return cisID;
+}
 
 }

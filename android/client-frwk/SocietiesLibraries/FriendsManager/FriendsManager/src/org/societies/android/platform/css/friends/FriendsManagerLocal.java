@@ -22,37 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.CSM.main.java.Models;
+package org.societies.android.platform.css.friends;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.ref.WeakReference;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-public class Models {
+/**
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
+ */
+public class FriendsManagerLocal extends Service {
+	//Logging tag
+	private static final String LOG_TAG = FriendsManagerLocal.class.getName();
+    private IBinder binder = null;
 
-	private ArrayList<Model> modelList;
-	
-	public Models(){
-		modelList = new ArrayList<Model>();
+    @Override
+	public void onCreate () {
+    	Log.d(LOG_TAG, "FriendsManagerLocal service starting");
+    	this.binder = new LocalFriendsManagerBinder(new FriendsManagerBase(this.getApplicationContext()));
 	}
-	
-	public ArrayList<Model> getModels(){
-		//
+    
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "FriendsManagerLocal service terminating");
+	}
 
-		return modelList;
+	/**Create Binder object for local service invocation */
+	public class LocalFriendsManagerBinder extends Binder {
+		private WeakReference<FriendsManagerBase> outerClassReference = null;
 		
-	}
-	
-	public void addModel(Model newModel){
-		modelList.add(newModel);
-	}
-	
-	public HashMap<String, String> getModelNames(){
-		HashMap<String, String> tmp = new HashMap<String, String>();
-		for (Model m : modelList){
-			tmp.put(m.getName(), m.getName());
+		public LocalFriendsManagerBinder(FriendsManagerBase instance) {
+			outerClassReference = new WeakReference<FriendsManagerBase>(instance);
 		}
-		return tmp; 
+		
+		public FriendsManagerBase getService() {
+			return outerClassReference.get();
+		}
 	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}	
 }

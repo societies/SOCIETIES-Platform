@@ -54,6 +54,7 @@ import android.util.Log;
 public class PubsubHelper implements IPubsubClient {
 	private static final String LOG_TAG = PubsubHelper.class.getName();
     private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformPubsubRemote";
+    private static final boolean DEBUG_LOGGING = true;
     
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
@@ -91,7 +92,9 @@ public class PubsubHelper implements IPubsubClient {
 	public PubsubHelper(Context androidContext) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
-		Log.d(LOG_TAG, "Instantiate PubsubHelper");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Instantiate PubsubHelper");
+		};
 		this.androidContext = androidContext;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
@@ -122,7 +125,9 @@ public class PubsubHelper implements IPubsubClient {
 	 */
 	public boolean bindPubsubService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
-		Log.d(LOG_TAG, "Bind to Android Pubsub Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Bind to Android Pubsub Service");
+		};
 		this.setupBroadcastReceiver();
 
 		this.bindCallback = bindCallback;
@@ -136,7 +141,9 @@ public class PubsubHelper implements IPubsubClient {
 	 * @return true if no more requests queued
 	 */
 	public boolean unbindCommsService(IMethodCallback bindCallback) {
-		Log.d(LOG_TAG, "Unbind from Android Pubsub Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Unbind from Android Pubsub Service");
+		};
 		this.bindCallback = bindCallback;
 
 		synchronized (PubsubHelper.this.methodCallbackMap) {
@@ -152,18 +159,26 @@ public class PubsubHelper implements IPubsubClient {
 	@Override
 	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException {
 		Dbc.require("Class list must have at least one class", null != classList && classList.size() > 0);
-		Log.d(LOG_TAG, "addSimpleClasses called");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "addSimpleClasses called");
+		};
 		
 		for (String c : classList) {
-			Log.d(LOG_TAG, "Adding Simple Class: " + c);
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Adding Simple Class: " + c);
+			};
 			
 			Class<?> clazz = Class.forName(c);
-			Log.d(LOG_TAG, "clazz: " + clazz.getName());
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "clazz: " + clazz.getName());
+			};
 			
 			Root rootAnnotation = clazz.getAnnotation(Root.class);
 			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
 			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				Log.d(LOG_TAG, "Adding Simple Class: " + c + " key: " + "{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name());
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Adding Simple Class: " + c + " key: " + "{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name());
+				};
 				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
 			}
 		}
@@ -181,7 +196,9 @@ public class PubsubHelper implements IPubsubClient {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
 		Dbc.require("Method callback cannot be null", null != callback);
-		Log.d(LOG_TAG, "ownerCreate called for node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "ownerCreate called for node: " + node);
+		};
 
 		final String pubsubServiceJid = pubsubServiceID.getJid();
 
@@ -198,7 +215,9 @@ public class PubsubHelper implements IPubsubClient {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
 		Dbc.require("Method callback cannot be null", null != callback);
-		Log.d(LOG_TAG, "ownerDelete called for node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "ownerDelete called for node: " + node);
+		};
 
 		final String pubsubServiceJid = pubsubServiceID.getJid();
 		synchronized (this.methodCallbackMap) {
@@ -257,7 +276,9 @@ public class PubsubHelper implements IPubsubClient {
 		Dbc.require("Pubsub event identity must be specified", null != itemID && itemID.length() > 0);
 		Dbc.require("Pubsub event payload must be specified", null != payload);
 		Dbc.require("Method callback cannot be null", null != callback);
-		Log.d(LOG_TAG, "publisherPublish called for node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "publisherPublish called for node: " + node);
+		};
 
 		final String pubsubServiceJid = pubsubServiceID.getJid();
 		synchronized (this.methodCallbackMap) {
@@ -270,7 +291,9 @@ public class PubsubHelper implements IPubsubClient {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                     this.serializer.write(payload, os);
                     itemXml = os.toString();
-                    Log.d(LOG_TAG, "Serialised event payload: " + itemXml);
+                    if (DEBUG_LOGGING) {
+                        Log.d(LOG_TAG, "Serialised event payload: " + itemXml);
+                    };
             } catch (TransformerException e) {
                     throw new CommunicationException(e.getMessage(), e);
             } catch (ParserConfigurationException e) {
@@ -305,7 +328,9 @@ public class PubsubHelper implements IPubsubClient {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
-		Log.d(LOG_TAG, "subscriberSubscribe called for node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "subscriberSubscribe called for node: " + node);
+		};
 		
 		final String pubsubServiceJid = pubsubServiceID.getJid();
 		synchronized (this.methodCallbackMap) {
@@ -322,7 +347,9 @@ public class PubsubHelper implements IPubsubClient {
 		Dbc.require("Pubsub identity cannot be null", null != pubsubServiceID);
 		Dbc.require("Pubsub node must be specified", null != node && node.length() > 0);
 		Dbc.require("Method callback cannot be null", null != methodCallback);
-		Log.d(LOG_TAG, "subscriberUnsubscribe called for node: " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "subscriberUnsubscribe called for node: " + node);
+		};
 		
 		final String pubsubServiceJid = pubsubServiceID.getJid();
 		synchronized (this.methodCallbackMap) {
@@ -351,18 +378,26 @@ public class PubsubHelper implements IPubsubClient {
 		    org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)xmppObject).getItems();
 		    
 		    String node = items.getNode();
-		    Log.d(LOG_TAG, "Node of event is: " + node);
-		    Log.d(LOG_TAG, "Number of items: " + items.getItem().size());
+			if (DEBUG_LOGGING) {
+			    Log.d(LOG_TAG, "Node of event is: " + node);
+			    Log.d(LOG_TAG, "Number of items: " + items.getItem().size());
+			};
 		    
 		    org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 		    
-		    Log.d(LOG_TAG, "ID: " + i.getId());
+			if (DEBUG_LOGGING) {
+			    Log.d(LOG_TAG, "ID: " + i.getId());
+			};
 		    
 	        String xmlPayload = MarshallUtils.nodeToString((Element)i.getAny());
-	        Log.d(LOG_TAG, "Event XML: " + xmlPayload);
+			if (DEBUG_LOGGING) {
+		        Log.d(LOG_TAG, "Event XML: " + xmlPayload);
+			};
 	        
             Class<?> c = elementToClass.get(getElementIdentifier(xmlPayload));
-            Log.d(LOG_TAG, "Class: " + c.getName());
+    		if (DEBUG_LOGGING) {
+                Log.d(LOG_TAG, "Class: " + c.getName());
+    		};
             Object bean = serializer.read(c, new ByteArrayInputStream(xmlPayload.getBytes()));
 	        returnValue = new PubsubNodePayload(bean, i.getId(), node);
 
@@ -379,7 +414,9 @@ public class PubsubHelper implements IPubsubClient {
                 endIndex = nsStr.indexOf("'");
         nsStr = nsStr.substring(0,endIndex);
         
-        Log.d(LOG_TAG, "Element identifier: " + "{"+nsStr+"}"+elementName);
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Element identifier: " + "{"+nsStr+"}"+elementName);
+		};
         return "{"+nsStr+"}"+elementName;
 }
 
@@ -389,7 +426,9 @@ public class PubsubHelper implements IPubsubClient {
 	 */
     private void bindToPubsubService() {
     	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Pubsub Service");
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Bind to Societies Android Pubsub Service");
+		};
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -397,7 +436,9 @@ public class PubsubHelper implements IPubsubClient {
      * Unbind from remote Android Pubsub service
      */
     private void unBindService() {
-    	Log.d(LOG_TAG, "Unbind from Societies Android Pubsub Service");
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Unbind from Societies Android Pubsub Service");
+		};
 		if (this.boundToService) {
         	this.androidContext.unbindService(serviceConnection);
 		}
@@ -410,21 +451,23 @@ public class PubsubHelper implements IPubsubClient {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
 			PubsubHelper.this.boundToService = false;
-	    	Log.d(LOG_TAG, "Societies Android Pubsub Service disconnected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Pubsub Service disconnected");
+			};
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			PubsubHelper.this.boundToService = true;
 			targetService = new Messenger(service);
-	    	Log.d(LOG_TAG, "Societies Android Pubsub Service connected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Pubsub Service connected");
+			};
 			synchronized (PubsubHelper.this.methodCallbackMap) {
 				long remoteCallID = PubsubHelper.this.randomGenerator.nextLong();
 				PubsubHelper.this.methodCallbackMap.put(remoteCallID, null);
 				InvokeBindToAndroidComms invoker = new InvokeBindToAndroidComms(PubsubHelper.this.clientPackageName, remoteCallID);
 				invoker.execute();
 			}
-
-//	    	PubsubHelper.this.bindCallback.returnAction(true);
 		}
 	};
 
@@ -435,11 +478,15 @@ public class PubsubHelper implements IPubsubClient {
      * @return the created broadcast receiver
      */
     private BroadcastReceiver setupBroadcastReceiver() {
-        Log.d(LOG_TAG, "Set up broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Set up broadcast receiver");
+		};
         
-        this.receiver = new MainReceiver();
+        this.receiver = new PubsubHelperReceiver();
         this.androidContext.registerReceiver(this.receiver, createTestIntentFilter());    
-        Log.d(LOG_TAG, "Register broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Register broadcast receiver");
+		};
 
         return receiver;
     }
@@ -447,7 +494,9 @@ public class PubsubHelper implements IPubsubClient {
      * Unregister the broadcast receiver
      */
     private void teardownBroadcastReceiver() {
-        Log.d(LOG_TAG, "Tear down broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Tear down broadcast receiver");
+		};
     	this.androidContext.unregisterReceiver(this.receiver);
     }
     
@@ -457,12 +506,14 @@ public class PubsubHelper implements IPubsubClient {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class MainReceiver extends BroadcastReceiver {
+    private class PubsubHelperReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Received action: " + intent.getAction());
+				Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			};
 			long callbackId = intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0);
 
 			if (intent.getAction().equals(IPubsubService.BIND_TO_ANDROID_COMMS)) {
@@ -478,8 +529,10 @@ public class PubsubHelper implements IPubsubClient {
 							PubsubHelper.this.teardownBroadcastReceiver();
 							unBindService();
 						} else {
-							Log.d(LOG_TAG, "Methodcallback entries: " + PubsubHelper.this.methodCallbackMap.size());
-							Log.d(LOG_TAG, "XmppCallbackMap entries: " + PubsubHelper.this.xmppCallbackMap.size());
+							if (DEBUG_LOGGING) {
+								Log.d(LOG_TAG, "Methodcallback entries: " + PubsubHelper.this.methodCallbackMap.size());
+								Log.d(LOG_TAG, "XmppCallbackMap entries: " + PubsubHelper.this.xmppCallbackMap.size());
+							};
 						}
 					}
 
@@ -577,7 +630,9 @@ public class PubsubHelper implements IPubsubClient {
 
     	protected Void doInBackground(Void... args) {
 
-    		Log.d(LOCAL_LOG_TAG, "Executing InvokeBindToAndroidComms");
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Executing InvokeBindToAndroidComms");
+    		};
     		String targetMethod = IPubsubService.methodsArray[8];
     		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IPubsubService.methodsArray, targetMethod), 0, 0);
     		Bundle outBundle = new Bundle();
@@ -586,14 +641,20 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -640,15 +701,20 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
     		try {
 				PubsubHelper.this.targetService.send(outMessage);
@@ -700,21 +766,30 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
-    		
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		};
+     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
     		try {
 				PubsubHelper.this.targetService.send(outMessage);
@@ -764,20 +839,30 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		};
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -828,21 +913,30 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		};
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
     		try {
 				PubsubHelper.this.targetService.send(outMessage);
@@ -892,21 +986,30 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		};
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
     		try {
 				PubsubHelper.this.targetService.send(outMessage);
@@ -960,27 +1063,40 @@ public class PubsubHelper implements IPubsubClient {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.pubsubServiceJid);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub service JID: " + this.pubsubServiceJid);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub node: " + this.node);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.eventID);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub event ID: " + this.eventID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub event ID: " + this.eventID);
+    		};
     		
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.payload);
-    		Log.d(LOCAL_LOG_TAG, "Pubsub event payload: " + this.payload);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Pubsub event payload: " + this.payload);
+    		};
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Pubsub Service: " + targetMethod);
+    		};
 
     		try {
 				PubsubHelper.this.targetService.send(outMessage);
