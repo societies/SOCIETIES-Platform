@@ -15,6 +15,7 @@
 	  <tr><td><b>Friends</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/friendspilot.html">My Friends</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/suggestedfriendspilot.html">Suggested Friends</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/friendfilter1.html">Social Friends Filter</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Communities</b></td></tr>

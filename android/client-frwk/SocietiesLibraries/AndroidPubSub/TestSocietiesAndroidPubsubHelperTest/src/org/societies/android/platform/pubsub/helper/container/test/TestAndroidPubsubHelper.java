@@ -191,13 +191,13 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 				assertTrue(resultFlag);
 				if (resultFlag) {
 					try {
-						helper.subscriberSubscribe(new TestIdentity(), ADD_CSS_NODE, new TestSubscriber(), new IMethodCallback() {
+						helper.subscriberSubscribe(new TestIdentity(), ADD_CSS_NODE, new IMethodCallback() {
 							
 							@Override
 							public void returnAction(String result) {
 								try {
 									assertNotNull(result);
-									helper.subscriberUnsubscribe(new TestIdentity(), ADD_CSS_NODE, new TestSubscriber(), new IMethodCallback() {
+									helper.subscriberUnsubscribe(new TestIdentity(), ADD_CSS_NODE, new IMethodCallback() {
 										
 										@Override
 										public void returnAction(String result) {
@@ -277,7 +277,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						public void returnAction(String result) {
 							assertNotNull(result);
 							try {
-								helper.subscriberSubscribe(new TestIdentity(), TEST_PUBSUB_NODE_2, new TestSubscriber(), new IMethodCallback() {
+								helper.subscriberSubscribe(new TestIdentity(), TEST_PUBSUB_NODE_2, new IMethodCallback() {
 									
 									@Override
 									public void returnAction(boolean result) {
@@ -295,7 +295,7 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 													assertNotNull(result);
 													try {
 														
-														helper.subscriberUnsubscribe(new TestIdentity(), TEST_PUBSUB_NODE_2, new SendEventSubscriber(), new IMethodCallback() {
+														helper.subscriberUnsubscribe(new TestIdentity(), TEST_PUBSUB_NODE_2, new IMethodCallback() {
 															
 															@Override
 															public void returnAction(boolean result) {
@@ -447,17 +447,4 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 		}
 	}
 	
-	private class SendEventSubscriber implements ISubscriber {
-		
-		@Override
-		public void pubsubEvent(IIdentity pubsubServiceID, String node, String itemId, Object item) {
-			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event Node: " + node);
-			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event ID: " + itemId);
-			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event Payload : " + item.getClass().getName());
-			
-			CssEvent event = (CssEvent) item;
-			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event description: " + event.getDescription());
-			Log.d(TestAndroidPubsubHelper.LOG_TAG, "Event type: " + event.getType());
-		}
-	}
 }

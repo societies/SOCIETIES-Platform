@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.android.api.comms.xmpp.Stanza;
@@ -41,8 +42,8 @@ import android.util.Log;
 public class ClientCommunicationMgr {
 	
 	private static final String LOG_TAG = ClientCommunicationMgr.class.getName();
-    private static final String SERVICE_ACTION = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
-	private boolean boundToService;
+	private static final boolean DEBUG_LOGGING = false;
+ 	private boolean boundToService;
 	private Messenger targetService = null;
 	private String clientPackageName;
 	private Random randomGenerator;
@@ -69,7 +70,9 @@ public class ClientCommunicationMgr {
 	public ClientCommunicationMgr(Context androidContext, boolean loginCompleted) {
 		Dbc.require("Android context must be supplied", null != androidContext);
 		
-		Log.d(LOG_TAG, "Instantiate ClientCommunicationMgr");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Instantiate ClientCommunicationMgr");
+		};
 		this.androidContext = androidContext;
 		
 		this.clientPackageName = this.androidContext.getApplicationContext().getPackageName();
@@ -100,7 +103,9 @@ public class ClientCommunicationMgr {
 	 */
 	public void bindCommsService(IMethodCallback bindCallback) {
 		Dbc.require("Service Bind Callback cannot be null", null != bindCallback);
-		Log.d(LOG_TAG, "Bind to Android Comms Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Bind to Android Comms Service");
+		};
 		
 		this.setupBroadcastReceiver();
 
@@ -119,7 +124,9 @@ public class ClientCommunicationMgr {
 	 * @return true if no more requests queued
 	 */
 	public boolean unbindCommsService() {
-		Log.d(LOG_TAG, "Unbind from Android Comms Service");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Unbind from Android Comms Service");
+		};
 		boolean retValue = false;
 		synchronized (this.methodCallbackMap) {
 			synchronized (this.xmppCallbackMap) {
@@ -128,8 +135,10 @@ public class ClientCommunicationMgr {
 					unBindService();
 					retValue = true;
 				} else {
-					Log.d(LOG_TAG, "Methodcallback entries: " + this.methodCallbackMap.size());
-					Log.d(LOG_TAG, "XmppCallbackMap entries: " + this.xmppCallbackMap.size());
+					if (DEBUG_LOGGING) {
+						Log.d(LOG_TAG, "Methodcallback entries: " + this.methodCallbackMap.size());
+						Log.d(LOG_TAG, "XmppCallbackMap entries: " + this.xmppCallbackMap.size());
+					};
 				}
 			}
 		}
@@ -141,7 +150,9 @@ public class ClientCommunicationMgr {
 		Dbc.require("Message Beans must be specified", null != namespaces && namespaces.size() > 0);
 		Dbc.require("Message Beans must be specified", null != packages && packages.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
-		Log.d(LOG_TAG, "Register XMPP data namespace attributes");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Register XMPP data namespace attributes");
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -165,7 +176,9 @@ public class ClientCommunicationMgr {
 	public void unregister(final List<String> elementNames, final List<String> namespaces, final IMethodCallback callback) {
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.size() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
-		Log.d(LOG_TAG, "unregister");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "unregister");
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -173,9 +186,11 @@ public class ClientCommunicationMgr {
 			//store callback in order to activate required methods
 			this.methodCallbackMap.put(callbackID, callback);
 		}
-		for (String element : elementNames) {
+		if (DEBUG_LOGGING) {
+//			for (String element : elementNames) {
 //			Log.d(LOG_TAG, "unregister element: " + element);
-		}
+//		}
+		};
 				
 		InvokeUnRegister invoke = new InvokeUnRegister(this.clientPackageName, elementNames, namespaces, callbackID);
 		invoke.execute();
@@ -184,7 +199,9 @@ public class ClientCommunicationMgr {
 	
 	public boolean UnRegisterCommManager(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "UnRegisterCommManager");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "UnRegisterCommManager");
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -211,7 +228,9 @@ public class ClientCommunicationMgr {
 		Dbc.require("Stanza must be specified", null != stanza);
 		Dbc.require("Type must be specified", null != type);
 		Dbc.require("Payload must be specified", null != payload);
-		Log.d(LOG_TAG, "Send Message");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Send Message");
+		};
 		
 		try {
 		stanza.setFrom(getIdManager().getThisNetworkNode());
@@ -226,12 +245,16 @@ public class ClientCommunicationMgr {
 	public void sendMessage(Stanza stanza, Object payload) throws CommunicationException {
 		Dbc.require("Stanza must be specified", null != stanza);
 		Dbc.require("Payload must be specified", null != payload);
-		Log.d(LOG_TAG, "Send Message");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Send Message");
+		};
 
 		try {
 			stanza.setFrom(getIdManager().getThisNetworkNode());
 			
-			Log.d(LOG_TAG, "sendMessage stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "sendMessage stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+			};
 			
 			sendMessage(stanza, Message.Type.normal, payload);
 		} catch (Exception e) {
@@ -254,7 +277,9 @@ public class ClientCommunicationMgr {
 		
 		try {
 			stanza.setFrom(getIdManager().getThisNetworkNode());
-			Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
+			};
 			String xml = marshaller.marshallIQ(stanza, type, payload);
 
 			sendIQ(xml, callbackID);
@@ -272,13 +297,17 @@ public class ClientCommunicationMgr {
 	 * @throws InvalidFormatException
 	 */
 	public IIdentity getIdentity() throws InvalidFormatException {
-		Log.d(LOG_TAG, "getIdentity");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdentity");
+		};
 		
 		IIdentity returnIdentity = null;
 		
 		if (null != this.identityJID) {
-			Log.d(LOG_TAG, "getIdentity identity: " + this.identityJID);
-				returnIdentity =  IdentityManagerImpl.staticfromJid(this.identityJID);
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "getIdentity identity: " + this.identityJID);
+			};
+			returnIdentity =  IdentityManagerImpl.staticfromJid(this.identityJID);
 		}
 		return returnIdentity;
 	}
@@ -291,7 +320,9 @@ public class ClientCommunicationMgr {
 	 * @throws InvalidFormatException 
 	 */
 	public IIdentityManager getIdManager() throws InvalidFormatException {
-		Log.d(LOG_TAG, "getIdManager");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdManager");
+		};
 		
 		if(null == this.idManager && null != this.domainAuthority && null != this.identityJID) {
 			this.idManager = createIdentityManager(this.identityJID, this.domainAuthority);
@@ -313,7 +344,9 @@ public class ClientCommunicationMgr {
 //		Dbc.require("Node must be specified", null != node && node.length() > 0);
 		Dbc.require("Callback object must be supplied", null != callback);
 		
-		Log.d(LOG_TAG, "getItems for entity: " + entity + " and node " + node);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getItems for entity: " + entity + " and node " + node);
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -345,7 +378,9 @@ public class ClientCommunicationMgr {
 	
 	
 	private String getIdentityJid(long callbackID) {
-		Log.d(LOG_TAG, "getIdentityJid");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getIdentityJid");
+		};
 		
 		InvokeGetIdentityJid invoke  = new InvokeGetIdentityJid(this.clientPackageName, callbackID);
 		invoke.execute();
@@ -354,7 +389,9 @@ public class ClientCommunicationMgr {
 	}
 	
 	private String getDomainAuthorityNode(long callbackID) {
-		Log.d(LOG_TAG, "getDomainAuthorityNode");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "getDomainAuthorityNode");
+		};
 
 		InvokeGetDomainAuthorityNode invoke  = new InvokeGetDomainAuthorityNode(this.clientPackageName, callbackID);
 		invoke.execute();
@@ -364,7 +401,9 @@ public class ClientCommunicationMgr {
 
 	public boolean isConnected(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "isConnected");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "isConnected");
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -386,7 +425,9 @@ public class ClientCommunicationMgr {
 		Dbc.require("User password must be specified", null != password && password.length() > 0);
 		Dbc.require("Method callback object must be specified", null != callback);
 		
-		Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password + " host: " + host);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password + " host: " + host);
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -429,7 +470,9 @@ public class ClientCommunicationMgr {
 		Dbc.require("Domain must be specified", null != domain && domain.length() > 0);
 		Dbc.require("User password must be specified", null != password && password.length() > 0);
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "login domain: " + domain + " identifier: " + identifier + " password: " + password);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "login domain: " + domain + " identifier: " + identifier + " password: " + password);
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -447,7 +490,9 @@ public class ClientCommunicationMgr {
 	
 	public boolean logout(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "logout");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "logout");
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -464,7 +509,9 @@ public class ClientCommunicationMgr {
 	
 	public boolean destroyMainIdentity(IMethodCallback callback) {
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "destroyMainIdentity");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "destroyMainIdentity");
+		};
 
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -484,7 +531,9 @@ public class ClientCommunicationMgr {
 		Dbc.require("XMPP Port must be greater than zero", xmppPort > 0);
 		Dbc.require("JID resource must be specified", null != resource && resource.length() > 0);
 		Dbc.require("Method callback object must be specified", null != callback);
-		Log.d(LOG_TAG, "configureAgent");
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "configureAgent");
+		};
 		
 		long callbackID = this.randomGenerator.nextLong();
 
@@ -513,11 +562,15 @@ public class ClientCommunicationMgr {
      * @return the created broadcast receiver
      */
     private BroadcastReceiver setupBroadcastReceiver() {
-        Log.d(LOG_TAG, "Set up broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Set up broadcast receiver");
+		};
         
-        this.receiver = new MainReceiver();
+        this.receiver = new CCSMgrMainReceiver();
         this.androidContext.registerReceiver(this.receiver, createTestIntentFilter());    
-        Log.d(LOG_TAG, "Register broadcast receiver");
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Register broadcast receiver");
+		};
 
         return receiver;
     }
@@ -525,7 +578,9 @@ public class ClientCommunicationMgr {
      * Unregister the broadcast receiver
      */
     private void teardownBroadcastReceiver() {
-        Log.d(LOG_TAG, "Tear down broadcast receiver");
+		if (DEBUG_LOGGING) {
+		       Log.d(LOG_TAG, "Tear down broadcast receiver");
+		};
     	this.androidContext.unregisterReceiver(this.receiver);
     }
 
@@ -535,12 +590,14 @@ public class ClientCommunicationMgr {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class MainReceiver extends BroadcastReceiver {
+    private class CCSMgrMainReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Received action: " + intent.getAction());
+				Log.d(LOG_TAG, "Received action CALL_ID_KEY: " + intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0));
+			};
 			long callbackId = intent.getLongExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, 0);
 
 			if (intent.getAction().equals(XMPPAgent.IS_CONNECTED)) {
@@ -669,7 +726,9 @@ public class ClientCommunicationMgr {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
-						Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						if (DEBUG_LOGGING) {
+							Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+						};
 						Packet packet;
 						try {
 							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
@@ -745,14 +804,18 @@ public class ClientCommunicationMgr {
     }
     
     private void bindToServiceAfterLogin() {
-    	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
+    	Intent serviceIntent = new Intent(ICoreSocietiesServices.COMMS_SERVICE_INTENT);
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
+		};
     	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void bindToServiceBeforeLogin() {
-    	Intent serviceIntent = new Intent(SERVICE_ACTION);
-    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service before Login");
+    	Intent serviceIntent = new Intent(ICoreSocietiesServices.COMMS_SERVICE_INTENT);
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service before Login");
+		};
     	this.androidContext.bindService(serviceIntent, serviceConnectionLogin, Context.BIND_AUTO_CREATE);
     }
 
@@ -760,7 +823,9 @@ public class ClientCommunicationMgr {
      * Unbind from Android Comms service
      */
     private void unBindService() {
-    	Log.d(LOG_TAG, "Unbind from Societies Android Comms Service");
+		if (DEBUG_LOGGING) {
+	    	Log.d(LOG_TAG, "Unbind from Societies Android Comms Service");
+		};
     	if (this.loginCompleted) {
     		if (this.boundToService) {
             	this.androidContext.unbindService(serviceConnection);
@@ -779,13 +844,17 @@ public class ClientCommunicationMgr {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
 			ClientCommunicationMgr.this.boundToService = false;
-	    	Log.d(LOG_TAG, "Societies Android Comms Service disconnected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Comms Service disconnected");
+			};
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			ClientCommunicationMgr.this.boundToService = true;
 			targetService = new Messenger(service);
-	    	Log.d(LOG_TAG, "Societies Android Comms Service connected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Comms Service connected");
+			};
 	    	//The Domain Authority and Identity must now be retrieved before any other calls
 			long callbackID = ClientCommunicationMgr.this.randomGenerator.nextLong();
 
@@ -804,13 +873,17 @@ public class ClientCommunicationMgr {
 	private ServiceConnection serviceConnectionLogin = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
 			ClientCommunicationMgr.this.boundToService = false;
-	    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) disconnected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) disconnected");
+			};
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			ClientCommunicationMgr.this.boundToService = true;
 			targetService = new Messenger(service);
-	    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) connected");
+			if (DEBUG_LOGGING) {
+		    	Log.d(LOG_TAG, "Societies Android Comms Service (Login) connected");
+			};
 	    	ClientCommunicationMgr.this.bindCallback.returnAction(true);
 		}
 	};
@@ -851,19 +924,24 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
     		
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -912,19 +990,24 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.elementNames.toArray(new String[0]));
     		
     		outBundle.putStringArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.nameSpaces.toArray(new String[0]));
     		
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteID);
+    		};
     		
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -968,15 +1051,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote Caller identity: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote Caller identity: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1021,14 +1109,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.xml);
-    		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -1076,18 +1170,25 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.xml);
-    		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Message: " + this.xml);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.remoteCallID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallID);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1136,21 +1237,30 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.entity);
-    		Log.d(LOCAL_LOG_TAG, "Entity: " + this.entity);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Entity: " + this.entity);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.node);
-    		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Node: " + this.node);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1196,15 +1306,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1250,15 +1365,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1303,15 +1423,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1364,27 +1489,40 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
+ 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.identifier);
-    		Log.d(LOCAL_LOG_TAG, "Identifer: " + this.identifier);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Identifer: " + this.identifier);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.domain);
-    		Log.d(LOCAL_LOG_TAG, "Domain: " + this.domain);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Domain: " + this.domain);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.password);
-    		Log.d(LOCAL_LOG_TAG, "Password: " + this.password);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Password: " + this.password);
+    		};
 
     		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.host);
-    		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1441,26 +1579,40 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.identifier);
-    		Log.d(LOCAL_LOG_TAG, "Identifer: " + this.identifier);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Identifer: " + this.identifier);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.domain);
-    		Log.d(LOCAL_LOG_TAG, "Domain: " + this.domain);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Domain: " + this.domain);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.password);
-    		Log.d(LOCAL_LOG_TAG, "Password: " + this.password);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Password: " + this.password);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.host);
-    		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Host: " + this.host);
+    		};
 
        		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -1505,15 +1657,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
        		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
-
+    		if (DEBUG_LOGGING) {
+    	   		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
+ 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
-
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1557,14 +1714,20 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
        		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
 
     		try {
@@ -1617,26 +1780,40 @@ public class ClientCommunicationMgr {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
-    		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.domainAuthorityNode);
-    		Log.d(LOCAL_LOG_TAG, "Domain Authority: " + this.domainAuthorityNode);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Domain Authority: " + this.domainAuthorityNode);
+    		};
 
     		outBundle.putInt(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), this.xmppPort);
-    		Log.d(LOCAL_LOG_TAG, "XMPP Port: " + this.xmppPort);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "XMPP Port: " + this.xmppPort);
+    		};
 
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), this.resource);
-    		Log.d(LOCAL_LOG_TAG, "JID Resource: " + this.resource);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "JID Resource: " + this.resource);
+    		};
 
     		outBundle.putBoolean(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), this.debug);
-    		Log.d(LOCAL_LOG_TAG, "Debug Flag: " + this.debug);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Debug Flag: " + this.debug);
+    		};
 
        		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 5), this.callbackID);
-    		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.callbackID);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.callbackID);
+    		};
 
     		outMessage.setData(outBundle);
 
-    		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		if (DEBUG_LOGGING) {
+        		Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+    		};
 
     		try {
 				targetService.send(outMessage);
@@ -1654,7 +1831,9 @@ public class ClientCommunicationMgr {
      * @return
      */
 	private Stanza stanzaFromPacket(Packet packet) {
-		Log.d(LOG_TAG, "stanzaFromPacket packet: " + packet.getPacketID());
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "stanzaFromPacket packet: " + packet.getPacketID());
+		};
 		try {
 			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
 			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());

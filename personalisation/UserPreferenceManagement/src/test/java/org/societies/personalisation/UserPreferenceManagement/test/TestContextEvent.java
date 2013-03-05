@@ -176,7 +176,7 @@ public class TestContextEvent  {
 	
 	private void setupPreference(PreferenceDetails details, String value, String otherValue){
 		IPreferenceOutcome outcome = new PreferenceOutcome(details.getServiceID(), details.getServiceType(), details.getPreferenceName(), value);
-		IPreferenceCondition condition = new ContextPreferenceCondition(locationAttribute.getId(), OperatorConstants.EQUALS, "home", "location");
+		IPreferenceCondition condition = new ContextPreferenceCondition(locationAttribute.getId(), OperatorConstants.EQUALS, "home", locationAttribute.getType());
 		IPreferenceOutcome defaultOutcome = new PreferenceOutcome(details.getServiceID(), details.getServiceType(), details.getPreferenceName(), otherValue);
 		
 		preference = new PreferenceTreeNode();
