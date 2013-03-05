@@ -15,23 +15,18 @@
                                            title="Close Window"
                                            alt="Close"/></a>
             <fieldset class="textbox">
-                <label class="username">
-                    <span>Username</span>
-                </label>
+                <label class="username">Username </label>
                 <h:inputText id="username" path="username" placeholder="Username" width="100%"
                              value="#{loginController.loginDialogUsername}"/>
-                <label class="password">
-                    <span>Password</span>
-                </label>
+                <label class="password">Password </label>
                 <h:inputSecret id="password" path="password" placeholder="Password" width="100%"
                                value="#{loginController.loginDialogPassword}"/>
 
                 <h:commandButton class="submit button"
-                                 actionListener="#{loginController.loginButtonAction()}">Sign in</h:commandButton>
+                                 actionListener="#{loginController.loginButtonAction()}"
+                                 value="Sign in"/>
 
-                <p>Don't have a login?
-                    <a class="" href="new_account.xhtml">Sign Up</a>
-                </p>
+                <p>Don't have a login? <a class="" href="new_account.xhtml">Sign Up</a></p>
             </fieldset>
         </div>
     </ui:fragment>

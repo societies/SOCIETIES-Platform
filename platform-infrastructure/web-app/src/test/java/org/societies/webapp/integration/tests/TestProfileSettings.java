@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openqa.selenium.WebElement;
 import org.societies.webapp.integration.selenium.SeleniumTest;
 import org.societies.webapp.integration.selenium.components.*;
 import org.societies.webapp.integration.selenium.pages.IndexPage;

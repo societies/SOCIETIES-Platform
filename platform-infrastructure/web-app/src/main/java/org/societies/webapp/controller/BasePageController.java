@@ -19,10 +19,16 @@ public abstract class BasePageController implements Serializable {
         FacesMessage message = new FacesMessage(severity, summary, detail);
         FacesContext.getCurrentInstance().addMessage(component, message);
 
-        if (log.isTraceEnabled())
-            log.trace("MESSAGE:" + severity.toString()
-                    + (component != null ? ":" + component : ":GLOBAL")
-                    + " [" + summary + "] " + detail);
+        String logMsg = "MESSAGE:" + severity.toString()
+                + (component != null ? ":" + component : ":GLOBAL")
+                + " [" + summary + "] " + detail;
+
+        if (severity == FacesMessage.SEVERITY_ERROR)
+            log.error(logMsg);
+        else if (severity == FacesMessage.SEVERITY_WARN)
+            log.warn(logMsg);
+        else
+            log.trace(logMsg);
 
     }
 }
