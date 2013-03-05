@@ -350,13 +350,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 								new Requestor(myCssId), newFriendId).get();
 				
 				final CtxAssociation isFriendsWithAssoc;
-				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).isEmpty())
+				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).isEmpty()) {
 					isFriendsWithAssoc = ctxBroker.createAssociation(
 							new Requestor(myCssId), myCssId, CtxAssociationTypes.IS_FRIENDS_WITH).get();
-				else
+					isFriendsWithAssoc.setParentEntity(myCssEnt.getId());
+				} else {
 					isFriendsWithAssoc = (CtxAssociation) ctxBroker.retrieve(
 							myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().next()).get();
-				isFriendsWithAssoc.setParentEntity(myCssEnt.getId());
+				}
 				isFriendsWithAssoc.addChildEntity(newFriendEntId);
 				ctxBroker.update(isFriendsWithAssoc);
 
@@ -415,13 +416,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				}
 				
 				final CtxAssociation isMemberOfAssoc;
-				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
+				if (myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
 					isMemberOfAssoc = ctxBroker.createAssociation(
 							new Requestor(myCssId), myCssId, CtxAssociationTypes.IS_MEMBER_OF).get();
-				else
+					isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+				} else {
 					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
-				isMemberOfAssoc.setParentEntity(myCssEnt.getId());
+				}
 				isMemberOfAssoc.addChildEntity(cisEntId);
 				ctxBroker.update(isMemberOfAssoc);
 
@@ -484,7 +486,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					
 					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							myCssEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
-					isMemberOfAssoc.setParentEntity(myCssEnt.getId());
 					isMemberOfAssoc.removeChildEntity(cisEntId);
 					ctxBroker.update(isMemberOfAssoc);
 				}
@@ -720,13 +721,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				
 				// (4) Update community owner ctx entity IS_MEMBER_OF association
 				final CtxAssociation isMemberOfAssoc;
-				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
 					isMemberOfAssoc = ctxBroker.createAssociation(
 							new Requestor(cisOwnerId), cisOwnerId, CtxAssociationTypes.IS_MEMBER_OF).get();
-				else
+					isMemberOfAssoc.setParentEntity(cisOwnerEntity.getId());
+				} else {
 					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
-				isMemberOfAssoc.setParentEntity(cisOwnerEntity.getId());
+				}
 				isMemberOfAssoc.addChildEntity(cisEntity.getId());
 				ctxBroker.update(isMemberOfAssoc);
 				
