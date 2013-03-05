@@ -25,50 +25,30 @@
 
 package org.societies.android.platform.useragent.feedback;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.lang.ref.WeakReference;
 
 import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
-import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.events.helper.EventsHelper;
-import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
-import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
-import org.societies.android.platform.useragent.feedback.guis.ExplicitPopup;
-import org.societies.android.platform.useragent.feedback.guis.ImplicitPopup;
-import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
-import org.societies.android.platform.useragent.feedback.model.UserFeedbackEventTopics;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
-import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 public class AndroidUserFeedbackService extends Service implements IAndroidUserFeedback{
@@ -101,20 +81,26 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 
 	@Override
 	public void onCreate () {
-		this.binder = new LocalBinder();
+		this.binder = new LocalBinder(new AndroidUserFeedbackService(this.getApplicationContext()));
 		this.clientCommsMgr = new ClientCommunicationMgr(getApplicationContext(), true);
-		Log.d(LOG_TAG, "Friends service starting");
+		Log.d(LOG_TAG, "UserFeedback service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "Friends service terminating");
+		Log.d(LOG_TAG, "UserFeedback service terminating");
 	}
 
 	/**Create Binder object for local service invocation */
 	public class LocalBinder extends Binder {
+		private WeakReference<AndroidUserFeedbackService> outerClassReference = null;
+		
+		public LocalBinder(AndroidUserFeedbackService instance) {
+			outerClassReference = new WeakReference<AndroidUserFeedbackService>(instance);
+		}
+		
 		public AndroidUserFeedbackService getService() {
-			return AndroidUserFeedbackService.this;
+			return outerClassReference.get();
 		}
 	}
 
@@ -141,7 +127,6 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			AndroidUserFeedbackService.this.userFeedback.processEventReceived(context, intent);
-	
 		}
 	}
 
@@ -159,26 +144,19 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_SHOW_NOTIFICATION_EVENT);
 		return intentFilter;
 	}
+	
+	/**Default Constructor */
+	public AndroidUserFeedbackService(Context androidContext){
+		this(androidContext, true);
+	}
+	
+	/**Parameterised Constructor */
 	public AndroidUserFeedbackService(Context androidContext, boolean restrictBroadcast){
 		this.androidContext = androidContext;
 		this.userFeedback = new AndroidUserFeedback(androidContext);
 		//check with Alec that login has been completed
 		this.clientCommsMgr = new ClientCommunicationMgr(androidContext, true);
-
 		this.restrictBroadcast = restrictBroadcast;
-
-		//register for events from user feedback pubsub node
-/*		try {
-			Log.d(LOG_TAG, "Registering for user feedback pubsub node");
-			//eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.REQUEST, this);
-			//eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
-			//eventMgrService.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
-			Log.d(LOG_TAG, "Pubsub registration complete!");
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	/*

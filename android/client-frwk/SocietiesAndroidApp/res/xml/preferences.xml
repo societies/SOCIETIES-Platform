@@ -21,7 +21,7 @@
 		    <EditTextPreference 
    		    	android:title="XMPP Server IP address" 
    		    	android:key="daServerIP" 
-   		    	android:defaultValue="societies.local" 
+   		    	android:defaultValue="" 
    		    	android:summary="IP address of XMPP Server (optional)"/>
 		   	<EditTextPreference 
    		    	android:title="Domain Authority Node" 

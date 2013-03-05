@@ -10,7 +10,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
-        <service android:name ="org.societies.android.platform.css.friends.FriendsManager" />
+        <service android:name ="org.societies.android.platform.css.friends.FriendsManagerLocal" />
         <service android:name ="org.societies.android.platform.css.friends.EventService" />
     </application>
 

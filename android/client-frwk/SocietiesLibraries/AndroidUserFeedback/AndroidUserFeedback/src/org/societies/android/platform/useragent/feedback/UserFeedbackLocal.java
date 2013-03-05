@@ -22,37 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.CSM.main.java.Models;
+package org.societies.android.platform.useragent.feedback;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.ref.WeakReference;
 
-public class Models {
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-	private ArrayList<Model> modelList;
+/**
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
+ */
+public class UserFeedbackLocal  extends Service {
+
+	private static final String LOG_TAG = UserFeedbackLocal.class.getName();
+	private IBinder binder = null;
 	
-	public Models(){
-		modelList = new ArrayList<Model>();
+	@Override
+	public void onCreate () {
+		Log.d(LOG_TAG, "UserFeedback service starting");
+		this.binder = new LocalUserFeedbackBinder(new UserFeedbackBase(this.getApplicationContext()));
 	}
-	
-	public ArrayList<Model> getModels(){
-		//
 
-		return modelList;
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "UserFeedback service terminating");
+	}
+
+	/**Create Binder object for local service invocation */
+	public class LocalUserFeedbackBinder extends Binder {
+		private WeakReference<UserFeedbackBase> outerClassReference = null;
 		
-	}
-	
-	public void addModel(Model newModel){
-		modelList.add(newModel);
-	}
-	
-	public HashMap<String, String> getModelNames(){
-		HashMap<String, String> tmp = new HashMap<String, String>();
-		for (Model m : modelList){
-			tmp.put(m.getName(), m.getName());
+		public LocalUserFeedbackBinder(UserFeedbackBase instance) {
+			outerClassReference = new WeakReference<UserFeedbackBase>(instance);
 		}
-		return tmp; 
+		
+		public UserFeedbackBase getService() {
+			return outerClassReference.get();
+		}
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return this.binder;
 	}
 }
+
