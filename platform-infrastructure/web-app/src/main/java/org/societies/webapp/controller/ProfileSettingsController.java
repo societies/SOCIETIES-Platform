@@ -222,8 +222,32 @@ public class ProfileSettingsController extends BasePageController {
         return OperatorConstants.values().clone();
     }
 
+    private String[] availableCtxAttributeTypes;
+
     public String[] getAvailableCtxAttributeTypes() {
-        return CtxAttributeTypes.ALL_TYPES;
+
+        if (availableCtxAttributeTypes == null) {
+            String[] allTypes = CtxAttributeTypes.ALL_TYPES;
+            ArrayList<String> availableTypes = new ArrayList<String>();
+
+            for (String ctxAttributeType : allTypes) {
+                try {
+                    Future<List<CtxIdentifier>> idsFuture = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, ctxAttributeType);
+                    List<CtxIdentifier> ids = idsFuture.get();
+
+                    for (CtxIdentifier id : ids) {
+                        availableTypes.add(id.getType());
+                    }
+
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+            availableCtxAttributeTypes = availableTypes.toArray(new String[availableTypes.size()]);
+        }
+
+        return availableCtxAttributeTypes;
     }
 
     public void setNewPreferenceName(String newPreferenceName) {
@@ -431,43 +455,47 @@ public class ProfileSettingsController extends BasePageController {
         treeChangesMade = true;
 
         String prefName = getNewPreferenceName(); // set from the GUI
+        Service prefService = getNewPreferenceService(); // set from the GUI
+        setNewPreferenceName("");
+        setNewPreferenceService(null);
 
+        // validation
         if (prefName == null || "".equals(prefName)) {
             addGlobalMessage("Preference NOT added", "The preference name cannot be empty", FacesMessage.SEVERITY_WARN);
             return;
         }
 
-        PreferenceOutcome outcome = new PreferenceOutcome(null, "", prefName, "default");
 
-        PreferenceDetails preferenceDetails = new PreferenceDetails();
-        preferenceDetails.setPreferenceName(prefName);
-
-        if (getNewPreferenceService() != null) {
-            preferenceDetails.setServiceID(getNewPreferenceService().getServiceIdentifier());
-//            preferenceDetails.setServiceType(getNewPreferenceService().getServiceType());
-        }
-
-        PreferenceTreeNode outcomeNode = new PreferenceTreeNode();
-        outcomeNode.setUserObject(outcome);
-
+        PreferenceDetails preferenceDetails = new PreferenceDetails(
+                prefService != null ? prefService.getServiceType().value() : "",
+                prefService != null ? prefService.getServiceIdentifier() : null,
+                prefName
+        );
         IPreference preferenceNode = new PreferenceTreeNode();
         preferenceNode.setUserObject(preferenceDetails);
         PreferenceTreeModel model = new PreferenceTreeModel(preferenceNode);
 
+
+        PreferenceOutcome outcome = new PreferenceOutcome(
+                prefService != null ? prefService.getServiceIdentifier() : null,
+                prefService != null ? prefService.getServiceType().value() : "",
+                prefName,
+                "default"
+        );
+        PreferenceTreeNode outcomeNode = new PreferenceTreeNode(outcome);
+
+
+        // store
+        log.trace("Storing locally...");
         pdToPreferenceTreeModelMap.put(preferenceDetails, model);
         pdToPreferenceMap.put(preferenceDetails, preferenceNode);
-//        populatePreferenceNode(preferenceDetails, model);
+//        log.trace("Storing to UPM...");
+//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, outcomeNode);
 
-        setNewPreferenceName("");
-        setNewPreferenceService(null);
-
-        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, outcomeNode);
-
+        // notify user
         addGlobalMessage("Preference added", "The preference " + prefName + " was added", FacesMessage.SEVERITY_INFO);
-//        log.trace("The preference " + prefName + " was added");
 
-        // clears all stored data and forces it to be reloaded from the UserPrefManagement service
-//        clearData();
+        // clear down
         preferencesRootNode = null; // force redraw of the tree
     }
 
@@ -500,108 +528,42 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        // validate
-        if (newCondition.getname() == null || newCondition.getname().equals("")
-                || newCondition.getoperator() == null
-                || newCondition.getvalue() == null || newCondition.getvalue().equals("")) {
-            addGlobalMessage("Add condition after " + parentObject.getUserObject().toString(),
-                    "Value(s) null - something has gone wrong",
-                    FacesMessage.SEVERITY_ERROR);
-            log.error("Value(s) null - something has gone wrong");
-            return;
-        }
-
-
         if (parentObject == null) {
-            addGlobalMessage("Add outcome for " + preferenceDetails.getPreferenceName(),
-                    "conditionPref was null - something has gone wrong",
+            addGlobalMessage("Add condition for " + preferenceDetails.getPreferenceName(),
+                    "parentObject was null - something has gone wrong",
                     FacesMessage.SEVERITY_ERROR);
-            log.error("conditionPref was null, cannot save new outcome");
+            log.error("parentObject was null, cannot save new condition");
             return;
         }
-
-//        log.debug("preferenceDetails=" + preferenceDetails.toString());
-//        log.debug("selectedObject=" + selectedObject.toString());
-//        log.debug("parentObject=" + parentObject.toString());
 
         log.trace("Creating objects...");
-        IPreference newConditionPreference = new PreferenceTreeNode();
-        newConditionPreference.setUserObject(newCondition);
-
-
-        // Retrieve a context attribute with a string value
-        // TODO: need to pick CtxAttributeType from a list
-        String ctxAttributeType = newCondition.getname();
-
-        try {
-            Future<List<CtxIdentifier>> idsFuture = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, ctxAttributeType);
-            List<CtxIdentifier> ids = idsFuture.get();
-
-            if (ids.size() == 0) {
-                log.error("no identifiers found for '" + ctxAttributeType + "'");
-            } else {
-                log.debug("Identifiers for " + ctxAttributeType + ":...");
-                for (CtxIdentifier id : ids) {
-                    log.debug(id.toString());
-                }
-
-                newCondition.setCtxIdentifier((CtxAttributeIdentifier) ids.get(0));
-            }
-
-        } catch (Exception e) {
-            log.error("ExecutionException", e);
-
-            addGlobalMessage("Error saving condition",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
+        IPreference newConditionPreference = createCondition(preferenceDetails, newCondition);
+        if (newConditionPreference == null)
             return;
-        }
 
 
+        log.trace("Storing...");
         if ("before".equals(addConditionMode)) {
-            log.trace("Adding BEFORE");
             // This condition goes BEFORE the selected object, and AFTER the selected object's parent
-            parentObject.remove(selectedObject);
+            log.trace("Adding BEFORE");
+//            parentObject.remove(selectedObject);
+            selectedObject.removeFromParent();
+
             parentObject.add(newConditionPreference);
             newConditionPreference.add(selectedObject);
 
         } else if ("after".equals(addConditionMode)) {
-            log.trace("Adding AFTER");
             // this condition goes AFTER the selected object
-//            Enumeration<IPreference> selectedNodeChildren = newConditionPreference.postorderEnumeration();
-//            while (selectedNodeChildren.hasMoreElements()) {
-//                IPreference child = selectedNodeChildren.nextElement();
-//
-//                newConditionPreference.add(child);
-//                selectedPreferenceObject.remove(child);
-//            }
+            log.trace("Adding AFTER");
 
             selectedObject.add(newConditionPreference);
         }
 
-
-//        try {
-//            log.debug("parentPreferenceObject=" + parentObject.toString());
-//            log.debug("selectedPreferenceObject=" + selectedObject.toString());
-//            log.debug("newConditionPreference=" + newConditionPreference.toString());
-//        } catch (Exception ex) {
-//            log.warn("Error toStringing()", ex);
-//        }
-
-        log.trace("Storing...");
-        conditionToPDMap.put(newCondition, preferenceDetails);
-        conditionToPreferenceMap.put(newCondition, newConditionPreference);
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, parentObject);
-
-
         String fmt = "%s %s %s";
-        addGlobalMessage("Outcome added for " + preferenceDetails.getPreferenceName(),
+        addGlobalMessage("Condition added for " + preferenceDetails.getPreferenceName(),
                 String.format(fmt, newCondition.getname(), newCondition.getoperator(), newCondition.getvalue()),
                 FacesMessage.SEVERITY_INFO);
-//        log.trace("Outcome added for " + preferenceDetails.getPreferenceName());
 
-        // clears all stored data and forces it to be reloaded from the UserPrefManagement service
-//        clearData();
         preferencesRootNode = null; // force redraw of the tree
     }
 
@@ -615,7 +577,6 @@ public class ProfileSettingsController extends BasePageController {
         PreferenceOutcome newOutcome = outcomeToAdd;
         conditionToAdd = new ContextPreferenceCondition(null, OperatorConstants.EQUALS, "", "");
         outcomeToAdd = new PreferenceOutcome(null, "", "", "");
-
 
         if (selectedCondition != null) {
             preferenceDetails = conditionToPDMap.get(selectedCondition);
@@ -635,80 +596,32 @@ public class ProfileSettingsController extends BasePageController {
 
         if (selectedPreferenceObject == null) {
             addGlobalMessage("Add outcome for " + preferenceDetails.getPreferenceName(),
-                    "conditionPref was null - something has gone wrong",
+                    "selectedPreferenceObject was null - something has gone wrong",
                     FacesMessage.SEVERITY_ERROR);
-            log.error("conditionPref was null, cannot save new outcome");
+            log.error("selectedPreferenceObject was null, cannot save new outcome");
             return;
         }
-
-        // validate
-        if (newCondition.getname() == null || newCondition.getname().equals("")
-                || newCondition.getoperator() == null
-                || newCondition.getvalue() == null || newCondition.getvalue().equals("")) {
-
-            addGlobalMessage("Add condition after " + selectedPreferenceObject.getUserObject().toString(),
-                    "Value(s) null - something has gone wrong",
-                    FacesMessage.SEVERITY_ERROR);
-            log.error("Value(s) null - something has gone wrong");
-            return;
-        }
-
 
         log.trace("Creating objects...");
-        IPreference newConditionPreference = new PreferenceTreeNode();
-        newConditionPreference.setUserObject(newCondition);
-
-
-        // Retrieve a context attribute with a string value
-        // TODO: need to pick CtxAttributeType from a list
-        String ctxAttributeType = CtxAttributeTypes.LOCATION_SYMBOLIC;
-
-        try {
-            Future<List<CtxIdentifier>> idsFuture = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, ctxAttributeType);
-            List<CtxIdentifier> ids = idsFuture.get();
-
-            log.debug("Identifiers for " + ctxAttributeType + ":...");
-            for (CtxIdentifier id : ids) {
-                log.debug(id.toString());
-            }
-
-            newCondition.setCtxIdentifier((CtxAttributeIdentifier) ids.get(0));
-
-
-        } catch (Exception e) {
-            log.error("ExecutionException", e);
-
-            addGlobalMessage("Error saving condition",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
+        IPreference newConditionPreference = createCondition(preferenceDetails, newCondition);
+        if (newConditionPreference == null)
             return;
-        }
 
+        IPreference newOutcomePreference = createOutcome(preferenceDetails, newOutcome);
+        if (newOutcomePreference == null)
+            return;
 
-        log.trace("Adding...");
-        // and the outcome comes after the new preference
-        IPreference newOutcomePreference = new PreferenceTreeNode();
-        newOutcomePreference.setUserObject(newOutcome);
+        log.trace("Storing locally...");
+        // the outcome goes AFTER the new condition object
         newConditionPreference.add(newOutcomePreference);
-
-
         // this condition goes AFTER the selected object
         selectedPreferenceObject.add(newConditionPreference);
-
-        log.trace("Storing...");
-        conditionToPDMap.put(newCondition, preferenceDetails);
-        conditionToPreferenceMap.put(newCondition, newConditionPreference);
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, selectedPreferenceObject);
-
 
         String fmt = "%s %s %s => %s";
         addGlobalMessage("Outcome and condition added for " + preferenceDetails.getPreferenceName(),
                 String.format(fmt, newCondition.getname(), newCondition.getoperator(), newCondition.getvalue(), newOutcome.getvalue()),
                 FacesMessage.SEVERITY_INFO);
-//        log.trace("Outcome and condition added for " + preferenceDetails.getPreferenceName());
 
-        // clears all stored data and forces it to be reloaded from the UserPrefManagement service
-//        clearData();
         preferencesRootNode = null; // force redraw of the tree
     }
 
@@ -746,43 +659,109 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        // validate
-        if (newOutcome.getvalue() == null || newOutcome.getvalue().equals("")) {
-            addGlobalMessage("Add outcome for " + preferenceDetails.getPreferenceName(),
-                    "Operator was null - something has gone wrong",
+
+        IPreference newOutcomePreference = createOutcome(preferenceDetails, newOutcome);
+        if (newOutcomePreference == null) {
+            addGlobalMessage("Add outcome failed",
+                    "newOutcomePreference was null - something has gone wrong",
                     FacesMessage.SEVERITY_ERROR);
-            log.error("Operator was null, cannot save new outcome");
+            log.error("newOutcomePreference was null, cannot save new outcome");
             return;
         }
 
-        if (parentPreferenceObject == null) {
-            addGlobalMessage("Add outcome for " + preferenceDetails.getPreferenceName(),
-                    "conditionPref was null - something has gone wrong",
-                    FacesMessage.SEVERITY_ERROR);
-            log.error("conditionPref was null, cannot save new outcome");
-            return;
-        }
-
-        IPreference newOutcomePreference = new PreferenceTreeNode();
         newOutcomePreference.setUserObject(newOutcome);
         parentPreferenceObject.add(newOutcomePreference);
-
-        outcomeToPDMap.put(newOutcome, preferenceDetails);
-        outcomeToPreferenceMap.put(newOutcome, newOutcomePreference);
-
-//        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, parentPreferenceObject);
 
         String fmt = "%s = %s (q=%s, p=%s)";
         String msg = String.format(fmt, newOutcome.getparameterName(), newOutcome.getvalue(), newOutcome.getQualityofPreference(), newOutcome.getConfidenceLevel());
         addGlobalMessage("Outcome added for " + preferenceDetails.getPreferenceName(),
                 msg,
                 FacesMessage.SEVERITY_INFO);
-//        if (log.isTraceEnabled())
-//            log.trace("Outcome added for " + preferenceDetails.getPreferenceName() + ": " + msg);
 
-        // clears all stored data and forces it to be reloaded from the UserPrefManagement service
-//        clearData();
         preferencesRootNode = null; // force redraw of the tree
+    }
+
+    private IPreference createCondition(PreferenceDetails preferenceDetails, ContextPreferenceCondition newCondition) {
+        log.trace("createCondition()");
+        treeChangesMade = true;
+
+        // validate
+        if (newCondition.getname() == null || newCondition.getname().equals("")
+                || newCondition.getoperator() == null
+                || newCondition.getvalue() == null || newCondition.getvalue().equals("")) {
+
+            addGlobalMessage("Add condition",
+                    "Value(s) null - something has gone wrong",
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Value(s) null - something has gone wrong");
+            return null;
+        }
+
+        // Retrieve a context attribute with a string value
+        String ctxAttributeType = newCondition.getname();
+
+        try {
+            Future<List<CtxIdentifier>> idsFuture = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, ctxAttributeType);
+            List<CtxIdentifier> ids = idsFuture.get();
+
+            if (ids.size() == 0) {
+                addGlobalMessage("Crate condition failed",
+                        "no identifiers found for '" + ctxAttributeType + "'",
+                        FacesMessage.SEVERITY_ERROR);
+
+                log.error("no identifiers found for '" + ctxAttributeType + "'");
+                return null;
+            } else {
+                log.debug("Identifiers for " + ctxAttributeType + ":...");
+                for (CtxIdentifier id : ids) {
+                    log.debug(id.toString());
+                }
+
+                newCondition.setCtxIdentifier((CtxAttributeIdentifier) ids.get(0));
+            }
+
+        } catch (Exception e) {
+            log.error("ExecutionException", e);
+
+            addGlobalMessage("Error saving condition",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            return null;
+        }
+
+        log.trace("Creating objects...");
+        IPreference newConditionPreference = new PreferenceTreeNode(newCondition);
+
+        log.trace("Storing locally...");
+        conditionToPDMap.put(newCondition, preferenceDetails);
+        conditionToPreferenceMap.put(newCondition, newConditionPreference);
+
+        return newConditionPreference;
+    }
+
+    private IPreference createOutcome(PreferenceDetails preferenceDetails, PreferenceOutcome newOutcome) {
+        log.trace("createOutcome()");
+        treeChangesMade = true;
+
+        IPreference parentPreferenceObject;
+
+        // validate
+        if (newOutcome.getvalue() == null || newOutcome.getvalue().equals("")) {
+            addGlobalMessage("Add outcome for " + preferenceDetails.getPreferenceName(),
+                    "Operator was null - something has gone wrong",
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Operator was null, cannot save new outcome");
+            return null;
+        }
+
+        log.trace("Creating objects...");
+        IPreference newOutcomePreference = new PreferenceTreeNode(newOutcome);
+
+        log.trace("Storing locally...");
+        outcomeToPDMap.put(newOutcome, preferenceDetails);
+        outcomeToPreferenceMap.put(newOutcome, newOutcomePreference);
+
+        return newOutcomePreference;
     }
 
 
@@ -800,6 +779,7 @@ public class ProfileSettingsController extends BasePageController {
         }
 
         loadPreferenceTreeData();
+        log.trace("end saveTreeChanges()");
     }
 
     public void revertChanges() {
@@ -897,6 +877,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private void populatePreferencesRootNode() {
+        log.trace("populatePreferencesRootNode()");
         preferencesRootNode = new DefaultTreeNode("Preferences", null);
         preferencesRootNode.setExpanded(true);
 
@@ -971,7 +952,9 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private void processSubnodes(IPreference preference, TreeNode node, PreferenceDetails preferenceDetails) {
+
         Enumeration<IPreference> e = preference.postorderEnumeration();
+
 
         List<IPreference> conditions = new ArrayList<IPreference>();
         List<IPreference> outcomes = new ArrayList<IPreference>();
@@ -979,6 +962,8 @@ public class ProfileSettingsController extends BasePageController {
         while (e.hasMoreElements()) {
             IPreference ele = e.nextElement();
             if (ele == preference) continue;
+            if (preference.getLevel() != ele.getLevel() - 1) continue;
+
             if (ele.isBranch()) {
                 // this is a CONDITION
                 conditions.add(ele);
