@@ -50,7 +50,7 @@ public interface ICisManager extends IServiceManager {
 							 		"deleteCis(String client, String cisId)",
 							 		"getCisList(String client, String query)",
 							 		"removeMember(String client, String cisId, String memberJid)",
-							 		"Join(String client, String cisId)",
+							 		"Join(String client, org.societies.api.schema.cis.directory.CisAdvertisementRecord targetCis)",
 							 		"Leave(String client, String cisId)",
 									"startService()",
 									"stopService()"
