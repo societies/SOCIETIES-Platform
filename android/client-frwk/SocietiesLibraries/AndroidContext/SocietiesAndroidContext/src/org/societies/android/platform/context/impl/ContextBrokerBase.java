@@ -472,7 +472,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 		public void receiveError(Stanza stanza, XMPPError error) {
 
-			Log.d(LOG_TAG, "CtxClient Callback receiveError: " + error.getMessage());
+			Log.d(LOG_TAG, "CtxClient Callback receiveError: " + error.getApplicationError());
 		}
 
 		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
