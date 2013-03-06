@@ -181,7 +181,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 			throws TrustEventMgrException {
 		
 		final TrustUpdateEventInfo eventInfo = new TrustUpdateEventInfo(
-				event.getOldValue(), event.getOldValue()); 
+				event.getOldValue(), event.getNewValue()); 
 		
 		for (int i = 0; i < topics.length; ++i) {
 			
