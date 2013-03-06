@@ -11,11 +11,20 @@
 <h:head>
     <h:outputStylesheet library="css" name="style.css"/>
     <h:outputStylesheet library="css" name="dialog.css"/>
+    <h:outputStylesheet library="css" name="widget.css"/>
+    <h:outputStylesheet library="css" name="slider.css"/>
+    <h:outputStylesheet library="css" name="notification.css"/>
+    
     <!--h:outputScript library="js" name="jquery-v1.8.1.js"/-->
 
     <!-- Menu -->
     <h:outputScript library="js" name="webmenu_nav.js"/>
     <h:outputScript library="js" name="webpopup.js"/>
+    <h:outputScript library="js" name="jquery.ui.core.js"/>
+    <h:outputScript library="js" name="jquery.ui.widget.js"/>
+    <h:outputScript library="js" name="jquery.ui.slider.js"/>
+    <h:outputScript library="js" name="notification.js"/>
+    
     <!-- ToDo , move -->
     <h:outputScript library="js" name="cisajax.js"/>
 
@@ -46,6 +55,12 @@
                     <!-- MENU -->
                     <ui:include src="../includes/menu.xhtml"/>
                     <!-- END MENU -->
+                    <div id="notification-box" class="notification-popup">
+						<a href="#" class="close"><img src="images/close_pop.png" class="btn_close" title="Close Window" alt="Close" /></a>
+						<form id="notification-form" method="post" class="notify" action="#">
+							<div class="notifications"/>
+						</form>
+					</div>
                     <div class="clear"></div>
                 </header>
 

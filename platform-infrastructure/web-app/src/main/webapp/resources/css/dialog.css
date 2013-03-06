@@ -8,7 +8,7 @@
 	z-index: 999;
 }
 
-.login-popup{
+.login-popup {
 	display:none;
 	background: #333;
 	padding: 10px; 	
@@ -36,7 +36,7 @@ fieldset {
 	border:none; 
 }
 
-form.signin .textbox label { 
+form.signin .textbox label{ 
 	display:block; 
 	padding-bottom:7px; 
 }
@@ -45,7 +45,7 @@ form.signin .textbox span {
 	display:block;
 }
 
-form.signin p, form.signin span { 
+form.signin p, form.signin span{ 
 	color:#999; 
 	font-size:12px; 
 	line-height: 28px;
