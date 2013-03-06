@@ -95,12 +95,21 @@
    			</intent-filter>
         </service>
         <service
+        	android:name="org.societies.android.platform.context.impl.ServiceContextBrokerRemote"
+        	android:label="SocietiesContext">
+           <intent-filter>
+                <action android:name="org.societies.android.platform.context.impl.ServiceContextBrokerRemote"></action>
+   			</intent-filter>
+        </service>
+        <service
         	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
         	android:label="SocietiesEvents">
            <intent-filter>
                 <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
    			</intent-filter>
         </service>
+
+        
         <provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:name="org.societies.android.platform.content.ProviderImplementation"

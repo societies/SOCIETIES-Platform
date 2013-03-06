@@ -225,8 +225,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	
 	//			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 	
+				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, ICtxClient.CREATE_ENTITY);
-				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "after Callback");
+				this.commMgr.sendIQ(stanza, IQ.Type.SET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "sending stanza");
 			
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
