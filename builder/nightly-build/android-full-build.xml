@@ -75,7 +75,7 @@
 		<!-- Not building
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
 		<!-- Client Framework Service Helpers -->
-		<module>../../android/client-frwk/SocietiesServiceHelpers/SocietiesPlatformEventsHelper</module>
+		<module>../../android/client-frwk/SocietiesServiceHelpers/CoreServicesHelpers/pom.xml</module>
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
