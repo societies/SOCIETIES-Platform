@@ -39,7 +39,7 @@
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	   <tr><td><b>Account</b></td></tr>
-	  <tr><td align="right"><a href="http://localhost:8080/domain-authority/">Log Out</a></td></tr>
+	  <tr><td align="right"><a href="http://localhost:8080/societies-platform/">Log Out</a></td></tr>
 
 	  <!-- SPACERS -->	  
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>

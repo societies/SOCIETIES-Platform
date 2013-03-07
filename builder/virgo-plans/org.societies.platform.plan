@@ -1,43 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan name="org.societies.platform" version="0.3.0" scoped="false" atomic="false"
-        xmlns="http://www.eclipse.org/virgo/schema/plan"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="
+<plan name="org.societies.platform" version="0.3.0" scoped="false"
+	atomic="false" xmlns="http://www.eclipse.org/virgo/schema/plan"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
 		        http://www.eclipse.org/virgo/schema/plan 
 		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
-	
-	<!-- Deprecated since fix to issue #1588
-	<artifact type="configuration" name="xc"/>
-	-->
-	
-	<artifact type="plan" name="org.societies.css.commfrwk"/>
-	
-	<artifact type="plan" name="org.societies.common.modules"/>
-	
-	<artifact type="plan" name="org.societies.activityfeed"/>
-	
-	<artifact type="plan" name="org.societies.security"/>
-	
-	<artifact type="plan" name="org.societies.privacy.and.trust"/>
-	
-	<artifact type="plan" name="org.societies.css.devicemgmt"/>
-	
-	<artifact type="plan" name="org.societies.context.management"/>
-	
-	<artifact type="plan" name="org.societies.css.management"/>
-	
-	<artifact type="plan" name="org.societies.cis.management"/>
-	
-	<artifact type="plan" name="org.societies.service-lifecycle"/>
-	
-	<artifact type="plan" name="org.societies.sns"/>
 
-	<artifact type="plan" name="org.societies.useragent"/>
-	
-	<artifact type="plan" name="org.societies.personalisation"/>
+	<artifact type="plan" name="org.societies.css.commfrwk" />
 
-	<artifact type="plan" name="org.societies.orchestration"/>
+	<artifact type="plan" name="org.societies.common.modules" />
 
-	<artifact type="plan" name="org.societies.webapp"/>
+	<artifact type="plan" name="org.societies.activityfeed" />
 
+	<artifact type="plan" name="org.societies.security" />
+
+	<artifact type="plan" name="org.societies.privacy.and.trust" />
+
+	<artifact type="plan" name="org.societies.css.devicemgmt" />
+
+	<artifact type="plan" name="org.societies.context.management" />
+
+	<artifact type="plan" name="org.societies.css.management" />
+
+	<artifact type="plan" name="org.societies.cis.management" />
+
+	<artifact type="plan" name="org.societies.service-lifecycle" />
+
+	<artifact type="plan" name="org.societies.sns" />
+
+	<artifact type="plan" name="org.societies.useragent" />
+
+	<artifact type="plan" name="org.societies.personalisation" />
+
+	<artifact type="plan" name="org.societies.webapp" />
 </plan>

@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan name="org.societies.domain-authority" version="0.3.0" scoped="false" atomic="false" 
-        xmlns="http://www.eclipse.org/virgo/schema/plan" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xsi:schemaLocation=" 
+<plan name="org.societies.domain-authority" version="0.3.0" scoped="false"
+	atomic="false" xmlns="http://www.eclipse.org/virgo/schema/plan"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" 
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
+	<!-- Communication framework -->
+	<!--artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/ -->
+	<artifact type="bundle" name="org.societies.comm.DACommsBundle" />
 
-	<!-- Deprecated since fix to issue #1588
-	<artifact type="configuration" name="xc"/>
-	-->
+	<!-- Data source bundle -->
+	<artifact type="bundle" name="org.societies.data-source" />
 
-    	<!-- Communication framework -->
-    	<!--artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/-->
-    	<artifact type="bundle" name="org.societies.comm.DACommsBundle"/>
-    	
-    	<!-- Data source bundle -->
-		<artifact type="bundle" name="org.societies.data-source"/>
-		
-		<!-- CSS / CIS Directory -->
-		<artifact type="bundle" name="org.societies.css.CssDirectory"/>
-		<artifact type="bundle" name="org.societies.cis.CisDirectory"/>
-		
-		<!-- Group Manager -->
-		<artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
+	<!-- CSS / CIS Directory -->
+	<artifact type="bundle" name="org.societies.css.CssDirectory" />
+	<artifact type="bundle" name="org.societies.cis.CisDirectory" />
 
-		<!--Domain Authoity Registry -->
-		<artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
-		
-		<!--Domain Authoity WebApps -->
-		<artifact type="bundle" name="org.societies.security.secur-services"/>
-		<artifact type="bundle" name="DomainAuthorityRest"/>
-		<artifact type="bundle" name="DomainAuthorityWebApp"/>
+	<!-- Group Manager -->
+	<artifact type="bundle"
+		name="org.societies.domain-authority.DomainAuthorityGroupManager" />
+
+	<!--Domain Authoity Registry -->
+	<artifact type="bundle"
+		name="org.societies.domain-authority.DomainAuthorityRegistry" />
+
+	<!--Domain Authoity WebApps -->
+	<artifact type="bundle" name="org.societies.security.secur-services" />
+	<artifact type="bundle" name="DomainAuthorityRest" />
+	<artifact type="bundle" name="DomainAuthorityWebApp" />
 
 </plan>

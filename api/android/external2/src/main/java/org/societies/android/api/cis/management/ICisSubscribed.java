@@ -50,8 +50,8 @@ public interface ICisSubscribed extends IServiceManager {
 	public String methodsArray[] = {"getMembers(String client, String cisId)",
 							 		"getCisInformation(String client, String cisId)",
 							 		"getActivityFeed(String client, String cisId)",
-							 		"addActivity(String client, String cisId, MarshaledActivity activity)",
-							 		"deleteActivity(String client, String cisId, MarshaledActivity activity)",
+							 		"addActivity(String client, String cisId, org.societies.api.schema.activity.MarshaledActivity activity)",
+							 		"deleteActivity(String client, String cisId, org.societies.api.schema.activity.MarshaledActivity activity)",
 							 		"cleanActivityFeed(String client, String cisId)",
 									"startService()",
 									"stopService()"

@@ -53,11 +53,9 @@ import android.util.Log;
  */
 public class UserFeedbackBase implements IAndroidUserFeedback {
 	private static final String LOG_TAG = UserFeedbackBase.class.getName();
-	public static final String USER_FEEDBACK_EVENTS_ALL = "org.societies.android.api.internal.useragent";
+	public static final String USER_FEEDBACK_EVENTS_ALL = "org.societies.useragent.feedback.event"; // previously: "org.societies.android.api.internal.useragent";
 	
 	private Context androidContext;
-
-	
 	private IIdentity myCloudID;
 	private boolean isCommsConnected;
 	private boolean restrictBroadcast;
@@ -99,10 +97,10 @@ public class UserFeedbackBase implements IAndroidUserFeedback {
 		//register broadcast receiver to receive SocietiesEvents return values 
 		IntentFilter intentFilter = new IntentFilter();
 		//UserFeedback events
-		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT);
-		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT);
-		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_EVENT);
-		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_SHOW_NOTIFICATION_EVENT);
+		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT); //USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT);
+		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT); //USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT);
+		intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_INTENT); 	        //USER_FEEDBACK_REQUEST_EVENT);
+		//intentFilter.addAction(IAndroidSocietiesEvents.USER_FEEDBACK_SHOW_NOTIFICATION_INTENT); //USER_FEEDBACK_SHOW_NOTIFICATION_EVENT);
 		return intentFilter;
 	}
 	
@@ -193,7 +191,7 @@ public class UserFeedbackBase implements IAndroidUserFeedback {
 									Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
 									try {
 										//subscribing to all user feedback events. 
-										UserFeedbackBase.this.eventsHelper.subscribeToEvents(AndroidUserFeedbackService.USER_FEEDBACK_EVENTS_ALL, new IPlatformEventsCallback() {
+										UserFeedbackBase.this.eventsHelper.subscribeToEvents(USER_FEEDBACK_EVENTS_ALL, new IPlatformEventsCallback() {
 											
 											@Override
 											public void returnAction(int result) {	
