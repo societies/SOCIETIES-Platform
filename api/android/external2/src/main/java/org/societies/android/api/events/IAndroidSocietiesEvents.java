@@ -57,7 +57,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE"; 
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
 	final static String USER_FEEDBACK_REQUEST_INTENT 		   = "org.societies.useragent.feedback.event.REQUEST"; 
-	final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
+	//final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
 	
 	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
@@ -75,8 +75,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
 										 USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT,
 										 USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT,
-										 USER_FEEDBACK_REQUEST_INTENT,
-										 USER_FEEDBACK_SHOW_NOTIFICATION_INTENT
+										 USER_FEEDBACK_REQUEST_INTENT
+										 //USER_FEEDBACK_SHOW_NOTIFICATION_INTENT
 										 };
 	
 	/**
@@ -103,7 +103,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
 	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
 	final static String USER_FEEDBACK_REQUEST_EVENT = "org/societies/useragent/feedback/event/REQUEST"; 
-	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 
+	//final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 
 	
 	//N.B. Must be in same order as societiesAndroidIntents array to allow successful translation
 	//N.B. These events must be created at Virgo container start-up
@@ -120,8 +120,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
 										 USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT,
 										 USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT,
-										 USER_FEEDBACK_REQUEST_EVENT,
-										 USER_FEEDBACK_SHOW_NOTIFICATION_EVENT
+										 USER_FEEDBACK_REQUEST_EVENT
+										 //USER_FEEDBACK_SHOW_NOTIFICATION_EVENT
 										 };
 
 	//Array of interface method signatures
@@ -143,7 +143,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
-	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
+	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
 	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS};
 	
