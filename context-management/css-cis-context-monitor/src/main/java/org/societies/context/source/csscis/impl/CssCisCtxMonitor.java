@@ -254,10 +254,10 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		final String cssIdStr = ((MarshaledActivity) item).getActor();
 		final String cisIdStr = ((MarshaledActivity) item).getObject();
 		final String verb = ((MarshaledActivity) item).getVerb();
-		if (verb.equals(VERB_CSS_JOINED)) {
+		if (VERB_CSS_JOINED.equals(verb)) {
 			this.executorService.execute(
 					new CssJoinedMyCisHandler(cssIdStr, cisIdStr));
-		} else if (verb.equals(VERB_CSS_LEFT)) {
+		} else if (VERB_CSS_LEFT.equals(verb)) {
 			this.executorService.execute(
 					new CssLeftMyCisHandler(cssIdStr, cisIdStr));
 		} else {
