@@ -64,6 +64,7 @@
 		<module>../../BIT/css-test-suite/CSS-Devices/use-devices/get_data_from_device#899</module>
 		<module>../../BIT/css-test-suite/RetrieveContextAs3PService#861</module>
 		<module>../../BIT/ico-test-suite/CPA#1096</module>
+		<module>../../BIT/activityfeedmanager</module>
 <!--		<module>../../BIT/ico-test-suite/CSSDataCollector#1093</module> -->
 		<module>../../BIT/proactive-personalisation-test-suite/Ctx-Personalisation#751</module>
 		<module>../../BIT/proactive-personalisation-test-suite/monitor-services#747</module>
@@ -73,6 +74,7 @@
 
 		<!-- CT Tests -->
 		<module>../../CT/privacy-trust-test-suite</module>
+		<module>../../CT/cis-test-suite/activityfeedCT</module>
 		<module>../../CT/cis-services-test-suite/cis-share-service-739</module>
 		<module>../../CT/css-services-test-suite/discover-services-728</module>
 		<module>../../CT/css-services-test-suite/servlifecycle-976</module>

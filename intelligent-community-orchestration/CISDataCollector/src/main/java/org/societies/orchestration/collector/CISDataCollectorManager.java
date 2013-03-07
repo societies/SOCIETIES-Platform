@@ -56,7 +56,7 @@ public class CISDataCollectorManager extends EventListener implements ICisDataCo
         List<ICisOwned> cisOwnedList = getCisManager().getListOfOwnedCis();
         for(ICisOwned cis : cisOwnedList)
             collectors.put(cis.getCisId(),new CISDataCollector(cis));
-        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_CREATION},null);
+        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_DELETION},null);
     }
     public void destroy(){
 
