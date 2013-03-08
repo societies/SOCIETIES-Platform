@@ -340,7 +340,7 @@ public class CommsServer implements IFeatureServer {
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
 				//this.cssManager.acceptCssFriendRequest(request);
-				this.cssManager.handleInternalFriendRequest(receivedID, bean.getRequestStatus());
+				this.cssManager.handleInternalFriendRequest(targetcssId, bean.getRequestStatus());
 			break;
 			case ACCEPT_CSS_FRIEND_REQUEST:
 				receivedID = stanza.getFrom();
