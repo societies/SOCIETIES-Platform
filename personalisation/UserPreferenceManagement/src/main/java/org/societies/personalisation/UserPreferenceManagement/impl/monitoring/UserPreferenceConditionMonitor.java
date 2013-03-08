@@ -38,7 +38,14 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
@@ -50,6 +57,7 @@ import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45L
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
+import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -58,7 +66,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Eliza
  *
  */
-public class UserPreferenceConditionMonitor implements IUserPreferenceConditionMonitor{
+public class UserPreferenceConditionMonitor extends EventListener implements IUserPreferenceConditionMonitor{
 	
 	private MonitoringTable mt;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -129,34 +137,24 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
-		logging.debug(this.getClass().toString()+": INITIALISED");
+		
 		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
-
+		this.subscribeForStaticUIMEvents();
+		logging.debug(this.getClass().toString()+": INITIALISED");
 	}
 	
-	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoMgr/*, UserPreferenceManagement prefMgr*/){
-		if (getPersoMgr()==null){
-			logging.debug(this.getClass().toString()+": found PersonalisationManager");
-		}else{
-			logging.debug(this.getClass().toString()+": PersonalisationManager NOT FOUND");
-		}
-		setPersoMgr(persoMgr);
-		
-		if (getCtxBroker() == null){
-			logging.debug(this.getClass().toString()+": found ctxBroker");
-		}else{
-			logging.debug(this.getClass().toString()+": CtxBroker NOT FOUND");
-		}
-		this.setCtxBroker(broker);
-		
-		
-		this.prefMgr = new UserPreferenceManagement( this.getCtxBroker());
-		mt = new MonitoringTable();
-		registered = new ArrayList<CtxAttributeIdentifier>();
-		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 
-		logging.debug(this.getClass().toString()+": INITIALISED");
+	private void subscribeForStaticUIMEvents() {
+        String eventFilter = "(&" +
+                "(" + CSSEventConstants.EVENT_NAME + "=staticaction)" +
+                "(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
+                ")";
+        this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_STATIC_ACTION}, eventFilter);
+        this.logging.debug("Subscribed to " + EventTypes.UIM_STATIC_ACTION + " events");
+		
 	}
+
+
 	/**
 	 * 
 	 * @param ownerId
@@ -303,6 +301,40 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	@Override
 	public UserPreferenceManagement getPreferenceManager() {
 		return prefMgr;
+	}
+
+
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void handleInternalEvent(InternalEvent internalEvent) {
+		UIMEvent uimEvent = (UIMEvent) internalEvent.geteventInfo();
+		Action action = (Action) uimEvent.getAction();
+		PreferenceDetails details = new PreferenceDetails();
+		
+		PreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue(), action.isImplementable(), action.isProactive(), action.isContextDependent());
+		
+			details.setServiceID(action.getServiceID());
+		
+		
+			details.setServiceType(action.getServiceType());
+			outcome.setServiceType(action.getServiceType());
+		
+		
+		details.setPreferenceName(action.getparameterName());
+		outcome.setparameterName(action.getparameterName());
+		outcome.setvalue(action.getvalue());
+		
+		PreferenceTreeNode preference = new PreferenceTreeNode(outcome);
+		
+		
+		this.prefMgr.storePreference(uimEvent.getUserId(), details, preference);
+		
 	}
 
 	
