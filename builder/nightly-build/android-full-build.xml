@@ -79,7 +79,7 @@
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
-		<module>../../platform-infrastructure/sns/SocialDataComms</module>
+		<module>../../platform-infrastructure/sns/SocialDataComms/android-pom.xml</module>
 		<module>../../platform-infrastructure/sns/SocietiesAndroidSocialData</module>
 
 		<!-- Android User Agent -->
