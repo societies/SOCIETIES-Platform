@@ -52,21 +52,52 @@ public class Action implements IAction, Serializable{
 	private ServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private ArrayList<String> types;
-	
+	private final boolean implementable;
+	private final boolean contextDependent;
+	private final boolean proactive;
 
+	/**
+	 * Not to be used by 3p services
+	 */
 	public Action(){
 		this.serviceID = null;
 		this.serviceType = "not_initialised";
 		this.parameterName = "not_initialised";
 		this.value = "not_initialised";
+		this.implementable = false;
+		this.contextDependent = false;
+		this.proactive = false;
 	}
 
+	/**
+	 * 
+	 * By default, implementable, contextDependent and Proactive are set to true
+	 * @param serviceID		the id of the 3p service
+	 * @param serviceType	the type of service
+	 * @param parameterName	the name of the parameter
+	 * @param value			the value of the parameter
+	 * 
+	 */
 	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
 		this.serviceID = serviceID;
 		this.serviceType = serviceType;
 		this.parameterName = parameterName;
 		this.value = value;
+		this.implementable = true;
+		this.contextDependent = true;
+		this.proactive = true;
 	}
+	
+	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value, boolean implementable, boolean contextDependent, boolean proactive){
+		this.serviceID = serviceID;
+		this.serviceType = serviceType;
+		this.parameterName = parameterName;
+		this.value = value;
+		this.implementable = implementable;
+		this.contextDependent = contextDependent;
+		this.proactive = proactive;
+	}
+	
 	
 	public String getvalue(){
 		return value;
@@ -217,6 +248,18 @@ public class Action implements IAction, Serializable{
 	public void setServiceTypes(List<String> sTypes) {
 		this.types = (ArrayList<String>) sTypes;
 		
+	}
+
+	public boolean isImplementable() {
+		return implementable;
+	}
+
+	public boolean isContextDependent() {
+		return contextDependent;
+	}
+
+	public boolean isProactive() {
+		return proactive;
 	}
 
 
