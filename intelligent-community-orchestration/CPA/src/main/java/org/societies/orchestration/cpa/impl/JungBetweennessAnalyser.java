@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
+import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 
 public class JungBetweennessAnalyser implements GraphAnalyser {
 	private int numEdgesToRemove;
@@ -46,8 +47,9 @@ public class JungBetweennessAnalyser implements GraphAnalyser {
 		
 		EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge> clusterer =
 				new EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge>(numEdgesToRemoveNow);
-		Set<Set<SocialGraphVertex>> clusterSet = clusterer.transform(sg.toJung());
-		List<SocialGraphEdge> edges = clusterer.getEdgesRemoved();
+        UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> undirectedSparseGraph = sg.toJung();
+        Set<Set<SocialGraphVertex>> clusterSet = clusterer.transform(undirectedSparseGraph);
+		//List<SocialGraphEdge> edges = clusterer.getEdgesRemoved();
 		return clusterSet;
 	}
 

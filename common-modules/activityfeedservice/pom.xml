@@ -149,7 +149,12 @@
             <artifactId>powermock-core</artifactId>
             <version>1.4.12</version>
         </dependency>
-
+        <dependency>
+            <groupid>javax.persistence</groupid>
+            <artifactid>persistence-api</artifactid>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
