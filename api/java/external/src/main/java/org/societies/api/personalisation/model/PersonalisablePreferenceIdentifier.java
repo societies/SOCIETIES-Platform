@@ -49,16 +49,16 @@ public class PersonalisablePreferenceIdentifier implements Serializable {
         }
     }
 
-    public static PersonalisablePreferenceIdentifier stringPreference(String preferenceName, int maxStringChars) {
-        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(preferenceName, DataType.STRING);
+    public static PersonalisablePreferenceIdentifier stringPreference(IActionConsumer actionConsumer, String preferenceName, int maxStringChars) {
+        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(actionConsumer, preferenceName, DataType.STRING);
 
         pref.maxStringChars = maxStringChars;
 
         return pref;
     }
 
-    public static PersonalisablePreferenceIdentifier intPreference(String preferenceName, int min, int max) {
-        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(preferenceName, DataType.INTEGER);
+    public static PersonalisablePreferenceIdentifier intPreference(IActionConsumer actionConsumer, String preferenceName, int min, int max) {
+        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(actionConsumer, preferenceName, DataType.INTEGER);
 
         pref.minNumericValue = min;
         pref.maxNumericValue = max;
@@ -66,8 +66,8 @@ public class PersonalisablePreferenceIdentifier implements Serializable {
         return pref;
     }
 
-    public static PersonalisablePreferenceIdentifier doublePreference(String preferenceName, double min, double max) {
-        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(preferenceName, DataType.DOUBLE);
+    public static PersonalisablePreferenceIdentifier doublePreference(IActionConsumer actionConsumer, String preferenceName, double min, double max) {
+        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(actionConsumer, preferenceName, DataType.DOUBLE);
 
         pref.minNumericValue = min;
         pref.maxNumericValue = max;
@@ -75,20 +75,21 @@ public class PersonalisablePreferenceIdentifier implements Serializable {
         return pref;
     }
 
-    public static PersonalisablePreferenceIdentifier boolPreference(String preferenceName) {
-        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(preferenceName, DataType.BOOLEAN);
+    public static PersonalisablePreferenceIdentifier boolPreference(IActionConsumer actionConsumer, String preferenceName) {
+        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(actionConsumer, preferenceName, DataType.BOOLEAN);
 
         return pref;
     }
 
-    public static PersonalisablePreferenceIdentifier enumPreference(String preferenceName, String[] possibleValues) {
-        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(preferenceName, DataType.ENUM);
+    public static PersonalisablePreferenceIdentifier enumPreference(IActionConsumer actionConsumer, String preferenceName, String[] possibleValues) {
+        PersonalisablePreferenceIdentifier pref = new PersonalisablePreferenceIdentifier(actionConsumer, preferenceName, DataType.ENUM);
 
         pref.listValues = possibleValues;
 
         return pref;
     }
 
+    private IActionConsumer actionConsumer;
     private String preferenceName;
     private DataType dataType;
     private double minNumericValue;
@@ -97,9 +98,14 @@ public class PersonalisablePreferenceIdentifier implements Serializable {
     private String[] listValues;
 
     // NB: This
-    private PersonalisablePreferenceIdentifier(String preferenceName, DataType dataType) {
+    private PersonalisablePreferenceIdentifier(IActionConsumer actionConsumer, String preferenceName, DataType dataType) {
+        this.actionConsumer = actionConsumer;
         this.preferenceName = preferenceName;
         this.dataType = dataType;
+    }
+
+    public IActionConsumer getActionConsumer() {
+        return actionConsumer;
     }
 
     public String getPreferenceName() {
@@ -126,4 +132,27 @@ public class PersonalisablePreferenceIdentifier implements Serializable {
         return listValues;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        // equals() and hashCode() rely on the actionConsumer and preferenceName only
+
+        if (this == o) return true;
+        if (!(o instanceof PersonalisablePreferenceIdentifier)) return false;
+
+        PersonalisablePreferenceIdentifier that = (PersonalisablePreferenceIdentifier) o;
+
+        if (!actionConsumer.equals(that.actionConsumer)) return false;
+        if (!preferenceName.equals(that.preferenceName)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        // equals() and hashCode() rely on the actionConsumer and preferenceName only
+
+        int result = actionConsumer.hashCode();
+        result = 31 * result + preferenceName.hashCode();
+        return result;
+    }
 }
