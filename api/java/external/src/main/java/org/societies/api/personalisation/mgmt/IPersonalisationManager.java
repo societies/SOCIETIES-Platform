@@ -26,11 +26,14 @@
 package org.societies.api.personalisation.mgmt;
 
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -77,4 +80,18 @@ public interface IPersonalisationManager {
 	 */
 	public Future<IAction> getPreference(Requestor requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 
+    /**
+     * Allows any service to register itself as a personalisable service with this personalisation manager. The PM will then
+     * maintain a list of preferences which can be personalised.
+     *
+     * @see IActionConsumer.getPersonalisablePreferences()
+     *
+     * @param service The service to be personalised
+     */
+    public void registerPersonalisableService(IActionConsumer service);
+
+    /**
+     * Returns a list of preferences which have been collected from registered personalisable services
+     */
+    public List<PersonalisablePreferenceIdentifier> getKnownPersonalisablePreferences();
 }
