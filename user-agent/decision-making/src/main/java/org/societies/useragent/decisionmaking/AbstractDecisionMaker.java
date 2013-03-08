@@ -37,10 +37,11 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.useragent.conflict.*;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.slf4j.*;
-
 
 public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	IConflictResolutionManager manager;
@@ -66,58 +67,72 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
 		// TODO Auto-generated method stub
-		HashSet<IOutcome> conflicts=new HashSet<IOutcome>();
+		HashSet<IOutcome> conflicts = new HashSet<IOutcome>();
 		logging.debug("start resolving DM");
-		if(intents.size()==0){
-			for(IOutcome action:preferences){
+		if (intents.size() == 0) {
+			for (IOutcome action : preferences) {
 				this.implementIAction(action);
 			}
 			return;
 		}
-		if(preferences.size()==0){
-			for(IOutcome action:intents){
+		if (preferences.size() == 0) {
+			for (IOutcome action : intents) {
 				this.implementIAction(action);
 			}
 			return;
 		}
 		for (IOutcome intent : intents) {
-			IOutcome action=intent;
-			//unresolved preference ioutcomes
+			IOutcome action = intent;
+			// unresolved preference ioutcomes
 			for (IOutcome preference : preferences) {
 				ConflictType conflict = detectConflict(intent, preference);
 				if (conflict == ConflictType.PREFERNCE_INTENT_NOT_MATCH) {
-					action = manager.resolveConflict(action,preference);
-					if(action ==null){
+					action = manager.resolveConflict(action, preference);
+					if (action == null) {
 						conflicts.add(preference);
 					}
-				}else if (conflict==ConflictType.UNKNOWN_CONFLICT){
-					/*handler the unknown work*/
+				} else if (conflict == ConflictType.UNKNOWN_CONFLICT) {
+					/* handler the unknown work */
 				}
 			}
-			if(conflicts.size()==0){//no unresolved conflicts
+			if (conflicts.size() == 0) {// no unresolved conflicts
 				logging.debug("no unresolved conflicts");
 				this.implementIAction(action);
-			}else{
-				List<String> options=new ArrayList<String>();
+			} else {
+				List<String> options = new ArrayList<String>();
 				options.add(intent.toString());
-				for(IOutcome conf:conflicts)
-				options.add(conf.toString());
+				for (IOutcome conf : conflicts)
+					options.add(conf.toString());
 				logging.debug("Call Feedback Manager");
-				ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
+				ExpProposalContent epc = new ExpProposalContent(
+						"Conflict Detected!",
 						options.toArray(new String[options.size()]));
 				List<String> reply;
 				try {
-					reply = feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc).get();
-					new DecisionMakingCallback(this,intent,conflicts).handleExpFeedback(reply);
+					reply = feedbackHandler.getExplicitFB(
+							ExpProposalType.RADIOLIST, epc).get();
+					new DecisionMakingCallback(this, intent, conflicts)
+							.handleExpFeedback(reply);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}//, 
-					//	new DecisionMakingCallback(this,intent,conflicts));
+				}// ,
+					// new DecisionMakingCallback(this,intent,conflicts));
 			}
 			conflicts.clear();
 		}
 		logging.debug("after resolving DM");
+	}
+
+	protected boolean getImplictUserFeedback(String content) {
+		try {
+			ImpProposalContent ic = new ImpProposalContent(content, 30);
+			return feedbackHandler.getImplicitFB(ImpProposalType.TIMED_ABORT,
+					ic).get();
+		} catch (Exception e) {
+			System.err.println(e);
+			return false;
+		}
 	}
 
 	protected abstract ConflictType detectConflict(IOutcome intent,
