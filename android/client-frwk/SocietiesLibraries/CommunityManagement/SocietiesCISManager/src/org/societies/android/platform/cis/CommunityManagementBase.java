@@ -350,7 +350,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
+	/* @see org.societies.android.api.cis.management.ICisManager#Join(java.lang.String, java.lang.String, java.util.List)*/
 	public String Join(final String client, final CisAdvertisementRecord targetCis) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
@@ -381,7 +381,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		return null;
 	}
 	
-	/* @see org.societies.android.api.cis.management.ICisSubscribed#Leave(java.lang.String, java.lang.String)*/
+	/* @see org.societies.android.api.cis.management.ICisManager#Leave(java.lang.String, java.lang.String)*/
 	public String Leave(final String client, final String cisId) {
 		Log.d(LOG_TAG, "Leave CIS called by client: " + client);
 
