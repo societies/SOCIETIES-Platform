@@ -35,6 +35,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceConditionExtractor;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceEvaluator;
@@ -47,10 +49,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 
 
@@ -61,6 +60,10 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
     private Hashtable<IPreferenceOutcome, List<CtxIdentifier>> outcomeConditionListTable;
     private ICtxBroker ctxBroker;
     //private IIdentity userId;
+
+    // Personalisable preferences from registered services
+    private final Map<IActionConsumer, Set<PersonalisablePreferenceIdentifier>> actionConsumerPreferenceMap = new HashMap<IActionConsumer, Set<PersonalisablePreferenceIdentifier>>();
+    private final Set<PersonalisablePreferenceIdentifier> aggregateActionConsumerPreferences = new HashSet<PersonalisablePreferenceIdentifier>();
 
     public UserPreferenceManagement(ICtxBroker broker) {
 
@@ -252,9 +255,9 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
     public IPreferenceOutcome getPreference(IIdentity requestor, IIdentity owner, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
         // TODO: Need to use the AccessControl to request permission to personalise service
         return this.getPreference(requestor, serviceType, serviceID, preferenceName);
-		
+
 		/*IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
-		PrefEvaluator pEvaluator = new PrefEvaluator(this.contextCache);
+        PrefEvaluator pEvaluator = new PrefEvaluator(this.contextCache);
 		if (model!=null){
 			Hashtable<IPreferenceOutcome, List<ICtxIdentifier>> evaluationResult = pEvaluator.evaluatePreference(model.getRootPreference());
 			Enumeration<IPreferenceOutcome> e = evaluationResult.keys();
@@ -311,7 +314,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
     }
 
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.pm.prefmgr.api.platform.IPreferenceHandler#getConditions(org.personalsmartspace.sre.api.pss3p.IIdentity, org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceOutcome)
+     * @see org.personalsmartspace.pm.prefmgr.api.platform.IPreferenceHandler#getConditions(org.personalsmartspace.sre.api.pss3p.IIdentity, org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceOutcome)
 	 */
 
     public List<CtxIdentifier> getConditions(IIdentity dpi,
@@ -389,4 +392,31 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
         return new AsyncResult<IOutcome>(this.getPreference(ownerId, "", serviceId, preferenceName));
     }
 
+    @Override
+    public void registerPersonalisableService(IActionConsumer actionConsumer, PersonalisablePreferenceIdentifier preference) {
+        if (actionConsumer == null)
+            throw new IllegalArgumentException("actionConsumer cannot be null");
+        if (preference == null)
+            throw new IllegalArgumentException("preference cannot be null");
+
+        // add to actionConsumerPreferenceMap and aggregateActionConsumerPreferences
+
+        Set<PersonalisablePreferenceIdentifier> consumerSet;
+        if (actionConsumerPreferenceMap.containsKey(actionConsumer))
+            consumerSet = actionConsumerPreferenceMap.get(actionConsumer);
+        else {
+            consumerSet = new HashSet<PersonalisablePreferenceIdentifier>();
+            actionConsumerPreferenceMap.put(actionConsumer, consumerSet);
+        }
+
+        aggregateActionConsumerPreferences.add(preference);
+        consumerSet.add(preference);
+    }
+
+
+    @Override
+    public List<PersonalisablePreferenceIdentifier> getKnownPersonalisablePreferences() {
+        // clone the list so it can't be messed with
+        return new ArrayList<PersonalisablePreferenceIdentifier>(aggregateActionConsumerPreferences);
+    }
 }

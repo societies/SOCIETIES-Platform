@@ -41,7 +41,6 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.*;
-import org.societies.api.osgi.event.EventListener;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
@@ -60,7 +59,10 @@ import org.societies.personalisation.preference.api.UserPreferenceConditionMonit
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -89,11 +91,6 @@ public class PersonalisationManager extends EventListener implements IPersonalis
     private int prefMgrConfidenceLevel;
     private int cauiConfidenceLevel;
     private int cristConfidenceLevel;
-
-    // Personalisable preferences from registered services
-    private final Map<IActionConsumer, List<PersonalisablePreferenceIdentifier>> actionConsumerPreferenceMap = new HashMap<IActionConsumer, List<PersonalisablePreferenceIdentifier>>();
-    private final List<PersonalisablePreferenceIdentifier> aggregateActionConsumerPreferences = new ArrayList<PersonalisablePreferenceIdentifier>();
-
 
     public PersonalisationManager() {
         this.dianneList = new ArrayList<CtxAttributeIdentifier>();
@@ -498,15 +495,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
             throw new IllegalArgumentException("actionConsumer.getPersonalisablePreferences() must return a list of personalisable preferences");
         }
 
-        this.actionConsumerPreferenceMap.put(actionConsumer,  preferenceIdentifiers);
-        this.aggregateActionConsumerPreferences.addAll(preferenceIdentifiers);
-    }
+        for (PersonalisablePreferenceIdentifier pref : preferenceIdentifiers) {
+            this.pcm.getPreferenceManager().registerPersonalisableService(actionConsumer, pref);
+        }
 
-
-    @Override
-    public List<PersonalisablePreferenceIdentifier> getKnownPersonalisablePreferences() {
-        // clone the list so it can't be messed with
-        return new ArrayList<PersonalisablePreferenceIdentifier>(aggregateActionConsumerPreferences);
     }
 
     /*
@@ -717,7 +709,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
         this.logging.debug("Processing preferences after receiving context event");
         List<IOutcome> results = new ArrayList<IOutcome>();
         /*
-		 * List<IPreferenceOutcome> pcmResults = new
+         * List<IPreferenceOutcome> pcmResults = new
 		 * ArrayList<IPreferenceOutcome>(); List<IDIANNEOutcome> dianneResults =
 		 * new ArrayList<IDIANNEOutcome>();
 		 */
