@@ -65,6 +65,7 @@ import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
@@ -89,7 +90,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 														    	  "http://societies.org/api/schema/activityfeed",
 																  "http://societies.org/api/schema/cis/community");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.cis.manager",
-													    	   "org.societies.api.schema.marshaledactivityfeed",
+													    	   "org.societies.api.schema.activityfeed",
 															   "org.societies.api.schema.cis.community");
     private ClientCommunicationMgr commMgr;
     private Context androidContext;
@@ -614,6 +615,13 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		if (connectedToComms) {
 			//CREATE LIST INFO
 			org.societies.api.schema.cis.community.WhoRequest listing = new org.societies.api.schema.cis.community.WhoRequest();
+			RequestorBean requestor = new RequestorBean();
+			try {
+				requestor.setRequestorId(commMgr.getIdManager().getCloudNode().getBareJid());
+			} catch (InvalidFormatException e2) {
+				e2.printStackTrace();
+			}
+			listing.setRequestor(requestor);
 			//CREATE MESSAGE BEAN
 			CommunityMethods messageBean = new CommunityMethods();
 			messageBean.setWhoRequest(listing);
@@ -623,13 +631,12 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			IIdentity toID = null;
 			try { 
 				toID = commMgr.getIdManager().fromJid(cisId);
-			} catch (InvalidFormatException e1) {
-				e1.printStackTrace();
-			}		
-			Stanza stanza = new Stanza(toID);
-	        try {
+				Stanza stanza = new Stanza(toID);
+
 	        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, cisCallback);
 				Log.d(LOG_TAG, "Sending stanza");
+	        } catch (InvalidFormatException e1) {
+				e1.printStackTrace();
 	        } catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
