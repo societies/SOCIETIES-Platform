@@ -113,7 +113,9 @@ public class ProfileSettingsController extends BasePageController {
     private final Map<PreferenceDetails, IPreference> pdToPreferenceMap = new HashMap<PreferenceDetails, IPreference>();
     private final Map<PreferenceDetails, IPreferenceTreeModel> pdToPreferenceTreeModelMap = new HashMap<PreferenceDetails, IPreferenceTreeModel>();
     private Service newPreferenceService;
+
     private List<Service> availableServices;
+    private String[] availableCtxAttributeTypes;
 
 
     public ProfileSettingsController() {
@@ -222,7 +224,6 @@ public class ProfileSettingsController extends BasePageController {
         return OperatorConstants.values().clone();
     }
 
-    private String[] availableCtxAttributeTypes;
 
     public String[] getAvailableCtxAttributeTypes() {
 
