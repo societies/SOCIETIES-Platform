@@ -84,7 +84,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	private static final String LOG_TAG = CommunityManagementBase.class.getName();
 	
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed", "listResponse");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "marshaledActivityFeed", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
 														    	  "http://societies.org/api/schema/activityfeed",
 																  "http://societies.org/api/schema/cis/community");
