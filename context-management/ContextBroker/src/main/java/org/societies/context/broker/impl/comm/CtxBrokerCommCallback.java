@@ -86,18 +86,20 @@ public class CtxBrokerCommCallback implements ICommCallback {
 		if (LOG.isDebugEnabled())
 			LOG.debug("receiveResult: stanza=" + returnStanza + ", msgBean=" + msgBean);
 		
-		if (!(msgBean instanceof CtxBrokerResponseBean)) {
-			LOG.error("Could not handle result bean: Unexpected type: " 
-					+ ((msgBean != null) ? msgBean.getClass() : "null"));
-			return;
-		}
-		
 		final ICtxCallback callbackClient = this.getRequestingClient(returnStanza.getId());
 		if (callbackClient == null) {
 			LOG.error("Could not handle result bean: No callback client found for stanza with id: " 
 					+ returnStanza.getId());
 			return;
 		}
+		
+		if (!(msgBean instanceof CtxBrokerResponseBean)) {
+			callbackClient.onException(new CtxBrokerException(
+					"Could not handle result bean: Unexpected type: "
+					+ ((msgBean != null) ? msgBean.getClass() : "null")));
+			return;
+		}
+		
 		final CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
 		final BrokerMethodBean method = payload.getMethod();
 		try {
@@ -105,10 +107,11 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			
 			case CREATE_ENTITY:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult CREATE ENTITY");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: CREATE ENTITY");
 				if (payload.getCreateEntityBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getCreateEntityBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getCreateEntityBeanResult() is null"));
 					return;
 				}
 				final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
@@ -119,10 +122,11 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			
 			case CREATE_ATTRIBUTE:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult CREATE ATTRIBUTE");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: CREATE ATTRIBUTE");
 				if (payload.getCreateAttributeBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null"));
 					return;
 				}
 				final CtxAttributeBean attrBean = payload.getCreateAttributeBeanResult();
@@ -133,10 +137,11 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				
 			case CREATE_ASSOCIATION:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult CREATE ASSOCIATION");
+				if (LOG.isDebugEnabled())
+					LOG.debug("inside receiveResult CREATE ASSOCIATION");
 				if (payload.getCreateAssociationBeanResult() == null ) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null"));
 					return;
 				}
 				final CtxAssociationBean assocBean = payload.getCreateAssociationBeanResult();
@@ -148,23 +153,26 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			case RETRIEVE:
 				
 				if (LOG.isDebugEnabled())
-					LOG.debug("receiveResult for RETRIEVE");
+					LOG.debug("receiveResult: RETRIEVE");
 				if (payload.getRetrieveBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null"));
 					return;
 				}
 				final CtxModelObjectBean objectBean = payload.getRetrieveBeanResult();
-				final CtxModelObject object = CtxModelBeanTranslator.getInstance().fromCtxModelObjectBean(objectBean);
+				final CtxModelObject object = (objectBean != null) 
+						? CtxModelBeanTranslator.getInstance().fromCtxModelObjectBean(objectBean) : null;
 				callbackClient.onRetrieveCtx(object);
 				
 				break;
 				
 			case UPDATE:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult UPDATE");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: UPDATE");
 				if (payload.getUpdateBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getUpdateBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getUpdateBeanResult() is null"));
 					return;
 				}
 				final CtxModelObjectBean updatedObjectBean = payload.getUpdateBeanResult();
@@ -175,10 +183,11 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				
 			case RETRIEVE_INDIVIDUAL_ENTITY_ID:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult RetrieveIndividualEntity");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: RetrieveIndividualEntity");
 				if (payload.getRetrieveIndividualEntityIdBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRetrieveIndividualEntityIdBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRetrieveIndividualEntityIdBeanResult() is null"));
 					return;
 				}
 				final CtxEntityIdentifierBean individualEntIdBean = 
@@ -189,16 +198,18 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					callbackClient.onRetrievedEntityId(
 							(CtxEntityIdentifier) individualEntId);
 				else 
-					LOG.error ("Returned ctxIdentifier is not a CtxEntityIdentifier");
+					callbackClient.onException(new CtxBrokerException(
+							"Returned ctxIdentifier is not a CtxEntityIdentifier"));
 				
 				break;
 
 			case RETRIEVE_COMMUNITY_ENTITY_ID:
 
 				if (LOG.isDebugEnabled())
-					LOG.debug("receiveResult: method=RETRIEVE_COMMUNITY_ENTITY_ID");
+					LOG.debug("receiveResult: RETRIEVE_COMMUNITY_ENTITY_ID");
 				if(payload.getRetrieveCommunityEntityIdBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null"));
 					return;
 				}
 				final CtxEntityIdentifierBean communityEntityIdBean = 
@@ -209,16 +220,18 @@ public class CtxBrokerCommCallback implements ICommCallback {
 					callbackClient.onRetrievedEntityId(
 							(CtxEntityIdentifier) communityEntityId);
 				else 
-					LOG.error ("Returned ctxIdentifier is not a CtxEntityIdentifier");
+					callbackClient.onException(new CtxBrokerException(
+							"Returned ctxIdentifier is not a CtxEntityIdentifier"));
 				
 				break;
 			
 			case REMOVE:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult REMOVE");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: REMOVE");
 				if (payload.getRemoveBeanResult() == null) {
-					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRemoveBeanResult() is null");
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRemoveBeanResult() is null"));
 					return;
 				}
 				final CtxModelObjectBean removedObjectBean = payload.getRemoveBeanResult();
@@ -231,8 +244,8 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				
 			case LOOKUP:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult LOOKUP");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: LOOKUP");
 				if (payload.getCtxBrokerLookupBeanResult() == null) {
 					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getCtxBrokerLookupBeanResult() is null");
 					return;
@@ -249,13 +262,15 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			 
 			default:
 			
-				LOG.error("Could not handle result bean: Unsupported method: " + method);
+				callbackClient.onException(new CtxBrokerException(
+						"Could not handle result bean: Unsupported method: " + method));
 			}
 			
 		} catch (Exception e) {
 
-			LOG.error("Could not handle result bean " + msgBean + ": "
-					+ e.getLocalizedMessage(), e);
+			callbackClient.onException(new CtxBrokerException(
+					"Could not handle result bean " + msgBean + " for method "
+					+ method + ": "	+ e.getLocalizedMessage(), e));
 		}		
 	}
 
