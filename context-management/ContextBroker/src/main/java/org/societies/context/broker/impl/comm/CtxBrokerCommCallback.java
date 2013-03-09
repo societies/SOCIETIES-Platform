@@ -25,7 +25,6 @@
 package org.societies.context.broker.impl.comm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +33,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -52,6 +54,7 @@ import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.context.broker.api.CtxBrokerException;
 
 public class CtxBrokerCommCallback implements ICommCallback {
 
@@ -73,12 +76,15 @@ public class CtxBrokerCommCallback implements ICommCallback {
 
 	//synch issue?
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 
 		//CHECK WHICH END SERVICE IS SENDING THE MESSAGE
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("receiveResult: stanza=" + returnStanza + ", msgBean=" + msgBean);
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: stanza=" + returnStanza + ", msgBean=" + msgBean);
 		
 		if (!(msgBean instanceof CtxBrokerResponseBean)) {
 			LOG.error("Could not handle result bean: Unexpected type: " 
@@ -141,8 +147,8 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				
 			case RETRIEVE:
 				
-				if (LOG.isInfoEnabled())
-					LOG.info("inside receiveResult RETRIEVE");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult for RETRIEVE");
 				if (payload.getRetrieveBeanResult() == null) {
 					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null");
 					return;
@@ -189,8 +195,8 @@ public class CtxBrokerCommCallback implements ICommCallback {
 
 			case RETRIEVE_COMMUNITY_ENTITY_ID:
 
-				if (LOG.isInfoEnabled()) // TODO DEBUG
-					LOG.info("receiveResult: method=RETRIEVE_COMMUNITY_ENTITY_ID");
+				if (LOG.isDebugEnabled())
+					LOG.debug("receiveResult: method=RETRIEVE_COMMUNITY_ENTITY_ID");
 				if(payload.getRetrieveCommunityEntityIdBeanResult() == null) {
 					LOG.error("Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null");
 					return;
@@ -253,40 +259,78 @@ public class CtxBrokerCommCallback implements ICommCallback {
 		}		
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces()
+	 */
 	@Override
 	public List<String> getXMLNamespaces() {
 
 		return NAMESPACES;
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
+	 */
 	@Override
 	public List<String> getJavaPackages() {
 
 		return PACKAGES;
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)
+	 */
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received error: stanza=" + stanza + ", error=" + error);
+		if (stanza.getId() == null) {
+			LOG.error("Received error with null stanza id");
+			return;
+		}
+		final ICtxCallback callbackClient = this.getRequestingClient(stanza.getId());
+		if (callbackClient == null) {
+			LOG.error("Received error with stanza id '" + stanza.getId()
+					+ "' but no matching callback was found");
+			return;
+		}
+		final String message = error.getGenericText();
+		final CtxException exception;
+		if (StanzaError.not_authorized.toString().equalsIgnoreCase(error.getStanzaErrorString()))
+			exception = new CtxAccessControlException(message);
+		else
+			exception = new CtxBrokerException(message);
+		callbackClient.onException(exception);
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveInfo(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.api.comm.xmpp.datatypes.XMPPInfo)
+	 */
+	@Override
+	public void receiveInfo(Stanza stanza, String arg1, XMPPInfo info) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received info: stanza=" + stanza + ", info=" + info);
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
 	@Override
-	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void receiveItems(Stanza stanza, String node, List<String> items) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void receiveMessage(Stanza stanza, Object payload) {
-		// TODO Auto-generated method stub
-
+	public void receiveMessage(Stanza stanza, Object object) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received message: stanza=" + stanza + ", object=" + object);
 	}
 
 	void addRequestingClient(String id, ICtxCallback callback) {
@@ -297,5 +341,12 @@ public class CtxBrokerCommCallback implements ICommCallback {
 	private ICtxCallback getRequestingClient(String requestID) {
 	
 		return this.ctxClients.remove(requestID);
+	}
+	
+	public static void main (String args[]) {
+		
+		System.out.println(StanzaError.not_authorized.toString());
+		System.out.println(StanzaError.not_authorized.name());
+		System.out.println(StanzaError.valueOf("not_authorized"));
 	}
 }

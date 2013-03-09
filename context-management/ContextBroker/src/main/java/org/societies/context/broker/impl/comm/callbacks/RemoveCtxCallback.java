@@ -34,7 +34,6 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.context.broker.impl.comm.ICtxCallback;
 
 /**
  * Describe your class here...
@@ -42,12 +41,17 @@ import org.societies.context.broker.impl.comm.ICtxCallback;
  * @author 
  * @since 0.4.1
  */
-public class RemoveCtxCallback implements ICtxCallback {
+public class RemoveCtxCallback extends CtxCallback {
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(RemoveCtxCallback.class);
 	
-	private CtxModelObject result; 
+	private CtxModelObject result;
+	
+	public CtxModelObject getResult() {
+		
+		return this.result;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onCreatedEntity(org.societies.api.context.model.CtxEntity)
@@ -109,13 +113,12 @@ public class RemoveCtxCallback implements ICtxCallback {
 	@Override
 	public void onRemovedModelObject(CtxModelObject ctxObj) {
 		
-		LOG.info("onRemovedModelObject retObject " +ctxObj);
-
+		if (LOG.isDebugEnabled())
+			LOG.debug("onRemovedModelObject retObject " + ctxObj);
 		this.result = ctxObj;
 		synchronized (this) {	            
 			notifyAll();	        
 		}
-		LOG.info("onRemovedModelObject, notify all done");
 	}
 
 	/* (non-Javadoc)
@@ -125,10 +128,5 @@ public class RemoveCtxCallback implements ICtxCallback {
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
 		// TODO Auto-generated method stub
 
-	}
-	
-	public CtxModelObject getResult() {
-		
-		return this.result;
 	}
 }
