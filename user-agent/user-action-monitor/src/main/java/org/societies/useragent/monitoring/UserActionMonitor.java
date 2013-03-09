@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
@@ -89,23 +88,30 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			interactableSet = true;
 		}
 
-		//save action in context - IIdentity (Person) > ServiceId > paramName
-		//create new entities and attributes if necessary
-		ctxComm.updateHistory(owner, action);
-
 		//update UID if this device is interactable
 		if(interactable){  
 			ctxComm.updateUID(owner, myDeviceID);
 		}
 
-		//send local event
-		UIMEvent payload = new UIMEvent(owner, action);
-		InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
-		try {
-			eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			e.printStackTrace();
+		
+		if (action.isContextDependent()){
+		//save action in context - IIdentity (Person) > ServiceId > paramName
+		//create new entities and attributes if necessary
+			ctxComm.updateHistory(owner, action);
+			//send local event
+			UIMEvent payload = new UIMEvent(owner, action);
+			InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
+			try {
+				eventMgr.publishInternalEvent(event);
+			} catch (EMSException e) {
+				e.printStackTrace();
+			}			
+		}else{
+			UIMEvent payload = new UIMEvent(owner, action);
+			InternalEvent event = new InternalEvent(EventTypes.UIM_STATIC_ACTION, "newaction", "org/societies/useragent/monitoring", payload);
 		}
+
+
 	}
 
 
