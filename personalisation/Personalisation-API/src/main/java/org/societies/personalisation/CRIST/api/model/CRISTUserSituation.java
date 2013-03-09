@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -42,7 +43,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 28-Nov-2011 18:40:57
  */
-public class CRISTUserSituation implements ICRISTUserSituation {
+public class CRISTUserSituation extends Action implements ICRISTUserSituation {
 
 	/**
 	 * 
