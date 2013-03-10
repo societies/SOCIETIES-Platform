@@ -32,6 +32,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +47,11 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
@@ -66,11 +70,16 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CtxTrustEvidenceMonitor.class);
 	
+	/** The time to wait between registration attempts for membership changes (in seconds) */
+	private static final long WAIT = 60l;
+	
 	@Autowired(required=true)
 	private ITrustEvidenceCollector trustEvidenceCollector;
 	
 	@Autowired(required=false)
 	private ICtxBroker ctxBroker;
+	
+	private ICommManager commMgr;
 	
 	private final IIdentity ownerId;
 	
@@ -78,8 +87,13 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	
 	private final Set<String> communities = new CopyOnWriteArraySet<String>();
 	
+	private final Set<String> unmonitoredCommunities = new CopyOnWriteArraySet<String>();
+	
 	/** The executor service. */
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	/** The scheduled executor service. */
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	@Autowired
 	CtxTrustEvidenceMonitor(ITrustNodeMgr trustNodeMgr, ICommManager commMgr) throws Exception {
@@ -87,6 +101,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
 		
+		this.commMgr = commMgr;
 		final String ownerIdStr = commMgr.getIdManager().getThisNetworkNode().getBareJid();
 		this.ownerId = commMgr.getIdManager().fromJid(ownerIdStr);
 	}
@@ -201,41 +216,14 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				friends.clear();
 				friends.addAll(currentFriends);
 				
-				for (final String oldFriend : oldFriends) {
-					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							isFriendsWith.getParentEntity().getOwnerId());
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CSS, 
-							oldFriend);
-					final TrustEvidenceType type = TrustEvidenceType.UNFRIENDED_USER;
-					final Date ts = isFriendsWith.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId=" + objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
-				}
+				final String userId = isFriendsWith.getParentEntity().getOwnerId();
+				final Date ts = isFriendsWith.getLastModified();
+				
+				for (final String oldFriend : oldFriends)
+					addFriendshipEvidence(userId, oldFriend, TrustEvidenceType.UNFRIENDED_USER, ts);
 
-				for (final String newFriend : newFriends) {
-					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							isFriendsWith.getParentEntity().getOwnerId());
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CSS, 
-							newFriend);
-					final TrustEvidenceType type = TrustEvidenceType.FRIENDED_USER;
-					final Date ts = isFriendsWith.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId=" + objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
-				}
+				for (final String newFriend : newFriends)
+					addFriendshipEvidence(userId, newFriend, TrustEvidenceType.FRIENDED_USER, ts);
 						
 			} catch (Exception e) {
 				
@@ -271,32 +259,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				final Set<String> currentCommunities = new HashSet<String>();
 				for (final CtxEntityIdentifier cisCtxId : isMemberOf.getChildEntities()) {
 					final String communityId = cisCtxId.getOwnerId(); 
-					currentCommunities.add(communityId);/*
-					if (!communities.contains(communityId)) {
-						final CommunityCtxEntity cisEnt = 
-								(CommunityCtxEntity) ctxBroker.retrieve(cisCtxId).get();
-						if (cisEnt == null) {
-							LOG.error("Cannot register for membership changes of CIS '"
-									+ communityId + "': Failed to retrieve community context entity");
-							continue;
-						}
-						if (cisEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS).isEmpty()) {
-							LOG.error("Cannot register for membership changes of CIS '"
-									+ communityId + "': Failed to access HAS_MEMBERS association of community context entity "
-									+ cisEnt.getId());
-							continue;
-						}
-						final CtxAssociationIdentifier hasMembersId = 
-								cisEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
-
-						if (LOG.isDebugEnabled())
-							LOG.debug("Registering for membership changes of CIS '"
-									+ communityId + "' - monitoring HAS_MEMBERS association "
-									+ hasMembersId);
-						ctxBroker.registerForChanges(
-									new CommunityHasMembersHandler(communityId), hasMembersId);
-						// TODO
-					}*/
+					currentCommunities.add(communityId);
 				}
 				// find communities the user is no long member of
 				final Set<String> oldCommunities = new HashSet<String>(communities);
@@ -312,40 +275,17 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				communities.clear();
 				communities.addAll(currentCommunities);
 				
-				for (final String oldCommunity : oldCommunities) {
+				final String memberId = isMemberOf.getParentEntity().getOwnerId(); 
+				final Date ts = isMemberOf.getLastModified();
+				
+				for (final String oldCommunity : oldCommunities)
+					addMembershipEvidence(memberId, oldCommunity, 
+							TrustEvidenceType.LEFT_COMMUNITY, ts);
 					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							isMemberOf.getParentEntity().getOwnerId());
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CIS, 
-							oldCommunity);
-					final TrustEvidenceType type = TrustEvidenceType.LEFT_COMMUNITY;
-					final Date ts = isMemberOf.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId="	+ objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
-				}
-
 				for (final String newCommunity : newCommunities) {
-					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							isMemberOf.getParentEntity().getOwnerId());
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CIS, 
-							newCommunity);
-					final TrustEvidenceType type = TrustEvidenceType.JOINED_COMMUNITY;
-					final Date ts = isMemberOf.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId="	+ objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
+					addMembershipEvidence(memberId, newCommunity, 
+							TrustEvidenceType.JOINED_COMMUNITY, ts);
+					unmonitoredCommunities.add(newCommunity);
 				}
 						
 			} catch (Exception e) {
@@ -365,6 +305,12 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			
 			this.communityId = communityId;
 			this.members.add(ownerId.toString());
+		}
+		
+		private CommunityHasMembersHandler(final String communityId, final Set<String> members) {
+			
+			this.communityId = communityId;
+			this.members.addAll(members);
 		}
 
 		/*
@@ -413,41 +359,13 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				this.members.clear();
 				this.members.addAll(currentMembers);
 				
-				for (final String oldMember : oldMembers) {
-					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							oldMember);
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CIS, 
-							this.communityId);
-					final TrustEvidenceType type = TrustEvidenceType.LEFT_COMMUNITY;
-					final Date ts = hasMembers.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId="	+ objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
-				}
-
-				for (final String newMember : newMembers) {
-					
-					final TrustedEntityId subjectId = new TrustedEntityId(
-							TrustedEntityType.CSS,
-							newMember);
-					final TrustedEntityId objectId = new TrustedEntityId(
-							TrustedEntityType.CIS, 
-							this.communityId);
-					final TrustEvidenceType type = TrustEvidenceType.JOINED_COMMUNITY;
-					final Date ts = hasMembers.getLastModified();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding direct trust evidence: subjectId="
-								+ subjectId + ", objectId="	+ objectId 
-								+ ", type=" + type + ", ts=" + ts);
-					trustEvidenceCollector.addDirectEvidence(
-							subjectId, objectId, type, ts, null);
-				}
+				final Date ts = hasMembers.getLastModified();
+				
+				for (final String oldMember : oldMembers)
+					addMembershipEvidence(oldMember, this.communityId, TrustEvidenceType.LEFT_COMMUNITY, ts);
+				
+				for (final String newMember : newMembers)
+					addMembershipEvidence(newMember, this.communityId, TrustEvidenceType.JOINED_COMMUNITY, ts);
 						
 			} catch (Exception e) {
 				
@@ -477,6 +395,33 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		}	
 	}
 	
+	/**
+	 * Runs in the background to perform various maintenance tasks.
+	 */
+	private class MaintenanceDaemon implements Runnable {
+
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+
+			if (LOG.isDebugEnabled())
+				LOG.debug("Communities to register for membership changes: " + unmonitoredCommunities);
+			for (final String communityId : new HashSet<String>(unmonitoredCommunities)) {
+
+				try {
+					registerForMembershipChanges(communityId);
+					unmonitoredCommunities.remove(communityId);
+				} catch (Exception e) {
+					LOG.warn("Failed to register for membership changes of CIS '" + communityId 
+							+ "': " + e.getLocalizedMessage() + ". Will re-attempt to register in "
+							+ WAIT + " seconds...");
+				}
+			} // for each communityId ends
+		}
+	}
+	
 	private class Initialiser implements Callable<Void> {
 		
 		/*
@@ -493,9 +438,11 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				
 				final CtxAssociation isFriendsWith = (CtxAssociation) 
 						ctxBroker.retrieve(ownerEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().next()).get();
-				for (final CtxEntityIdentifier friendEntId : isFriendsWith.childEntities)
+				for (final CtxEntityIdentifier friendEntId : isFriendsWith.getChildEntities())
 					friends.add(friendEntId.getOwnerId());
 			}
+			if (LOG.isDebugEnabled())
+				LOG.debug("friends=" + friends);
 			// init communitites set
 			if (LOG.isInfoEnabled())
 				LOG.info("Acquiring communities of CSS '" + ownerId + "'");
@@ -503,9 +450,17 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 
 				final CtxAssociation isMemberOf = (CtxAssociation) 
 						ctxBroker.retrieve(ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
-				for (final CtxEntityIdentifier friendEntId : isMemberOf.childEntities)
-					communities.add(friendEntId.getOwnerId());
+				for (final CtxEntityIdentifier communityEntId : isMemberOf.getChildEntities()) {
+					communities.add(communityEntId.getOwnerId());
+					unmonitoredCommunities.add(communityEntId.getOwnerId());
+				}
 			}
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("communities=" + communities);
+				LOG.debug("unmonitoredCommunities=" + unmonitoredCommunities);
+			}
+			scheduler.scheduleWithFixedDelay(new MaintenanceDaemon(),
+					WAIT, WAIT, TimeUnit.SECONDS);
 		
 			if (LOG.isInfoEnabled())
 				LOG.info("Registering for context changes related to CSS '"
@@ -514,5 +469,96 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			
 			return null;
 		}
+	}
+	
+	private void addFriendshipEvidence(final String userId, 
+			final String friendId, final TrustEvidenceType type,
+			final Date ts) throws TrustException {
+		
+		if (!TrustEvidenceType.FRIENDED_USER.equals(type) 
+				&& !TrustEvidenceType.UNFRIENDED_USER.equals(type))
+			throw new IllegalArgumentException("Illegal evidence type " + type);
+		
+		final TrustedEntityId subjectId = new TrustedEntityId(
+				TrustedEntityType.CSS,
+				userId);
+		final TrustedEntityId objectId = new TrustedEntityId(
+				TrustedEntityType.CSS, 
+				friendId);
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding direct trust evidence: subjectId="
+					+ subjectId + ", objectId="	+ objectId 
+					+ ", type=" + type + ", ts=" + ts);
+		trustEvidenceCollector.addDirectEvidence(
+				subjectId, objectId, type, ts, null);
+	}
+	
+	private void addMembershipEvidence(final String memberId, 
+			final String communityId, final TrustEvidenceType type,
+			final Date ts) throws TrustException {
+		
+		if (!TrustEvidenceType.JOINED_COMMUNITY.equals(type) 
+				&& !TrustEvidenceType.LEFT_COMMUNITY.equals(type))
+			throw new IllegalArgumentException("Illegal evidence type " + type);
+		
+		final TrustedEntityId subjectId = new TrustedEntityId(
+				TrustedEntityType.CSS,
+				memberId);
+		final TrustedEntityId objectId = new TrustedEntityId(
+				TrustedEntityType.CIS, 
+				communityId);
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding direct trust evidence: subjectId="
+					+ subjectId + ", objectId="	+ objectId 
+					+ ", type=" + type + ", ts=" + ts);
+		trustEvidenceCollector.addDirectEvidence(
+				subjectId, objectId, type, ts, null);
+	}
+	
+	private void registerForMembershipChanges(final String communityId) throws Exception {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving community context entity identifier of CIS '" + communityId + "'");
+		final CtxEntityIdentifier communityEntId = ctxBroker.retrieveCommunityEntityId(
+				new Requestor(ownerId), commMgr.getIdManager().fromJid(communityId)).get();
+		if (communityEntId == null) {
+			LOG.error("Failed to register for membership changes of CIS '" + communityId
+					+ "': Community context entity identifier is null");
+			return;
+		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving community context entity identified as " + communityEntId);
+		final CommunityCtxEntity communityEnt = 
+				(CommunityCtxEntity) ctxBroker.retrieve(communityEntId).get();
+		if (communityEnt == null) {
+			LOG.error("Failed to register for membership changes of CIS '" + communityEntId.getOwnerId()
+					+ "': Community context entity is null");
+			return;
+		}
+		CtxAssociationIdentifier hasMembersId = null;
+		final Set<String> members = new HashSet<String>();
+		for (final CtxAssociationIdentifier foundHasMembersId : communityEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS)) {
+			final CtxAssociation foundHasMembers =
+					(CtxAssociation) ctxBroker.retrieve(foundHasMembersId).get();
+			if (foundHasMembers != null && communityEntId.equals(foundHasMembers.getParentEntity())) {
+				hasMembersId = foundHasMembersId;
+				for (final CtxEntityIdentifier memberId : foundHasMembers.getChildEntities())
+					members.add(memberId.getOwnerId());
+				break;
+			}
+		}
+		if (hasMembersId == null) {
+			LOG.error("Failed to register for membership changes of CIS '" + communityEntId.getOwnerId()
+					+ "': HAS_MEMBERS association not found");
+			return;
+		}
+		if (LOG.isInfoEnabled())
+			LOG.info("Registering for membership changes of CIS '" + communityEntId.getOwnerId() + "'");
+		if (LOG.isDebugEnabled())
+			LOG.debug("hasMembersId=" + hasMembersId + ", members=" + members);
+		ctxBroker.registerForChanges(new CommunityHasMembersHandler(
+				communityEntId.getOwnerId(), members), hasMembersId);
 	}
 }
