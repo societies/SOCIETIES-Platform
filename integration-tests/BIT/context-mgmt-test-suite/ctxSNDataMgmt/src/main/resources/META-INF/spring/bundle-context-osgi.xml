@@ -25,4 +25,9 @@
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>
 	
+	<osgi:reference id="socialData"
+		interface="org.societies.api.internal.sns.ISocialData">
+	</osgi:reference>
+	
+	
 </beans>

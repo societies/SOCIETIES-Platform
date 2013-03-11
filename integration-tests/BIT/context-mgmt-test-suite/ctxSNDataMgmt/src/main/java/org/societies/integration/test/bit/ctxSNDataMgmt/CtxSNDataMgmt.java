@@ -27,6 +27,7 @@ package org.societies.integration.test.bit.ctxSNDataMgmt;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.internal.sns.ISocialData;
 import org.societies.integration.test.IntegrationTestCase;
 
 
@@ -41,7 +42,7 @@ public class CtxSNDataMgmt extends IntegrationTestCase{
 	
 	public static ICtxBroker ctxBroker;
 	public static ICommManager commManager;
-
+	private static ISocialData socialData ;
 	
 	
 	public CtxSNDataMgmt(){
@@ -49,12 +50,16 @@ public class CtxSNDataMgmt extends IntegrationTestCase{
 	}
 
 	/**
-	 * @return the ctxBroker
+	 * @return the socialData
 	 */
+	public static ISocialData getSocialData() {
+		return socialData;
+	}
+
 	public static ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
-
+	
 	/**
 	 * @param ctxBroker the ctxBroker to set
 	 */
@@ -62,6 +67,12 @@ public class CtxSNDataMgmt extends IntegrationTestCase{
 		CtxSNDataMgmt.ctxBroker = ctxBroker;
 
 	}
+	
+	public  void setSocialData(ISocialData socialData) {
+		CtxSNDataMgmt.socialData = socialData;
+
+	}
+
 	
 	/**
 	 * @return the commMgr
