@@ -79,7 +79,19 @@ public final class TrustModelBeanTranslator {
 		if (trustedEntityType == null)
 			throw new NullPointerException("trustedEntityType can't be null");
 		
-		return TrustedEntityTypeBean.valueOf(trustedEntityType.toString());	
+		switch (trustedEntityType) {
+		case CSS:
+			return TrustedEntityTypeBean.CSS;
+		case CIS:
+			return TrustedEntityTypeBean.CIS;
+		case SVC:
+			return TrustedEntityTypeBean.SVC;
+		case LGC:
+			return TrustedEntityTypeBean.LGC;
+		default:
+			throw new IllegalArgumentException("'" + trustedEntityType 
+					+ "': Unsupported trusted entity type");
+		}
 	}
 	
 	public TrustedEntityType fromTrustedEntityTypeBean(TrustedEntityTypeBean trustedEntityTypeBean) {
@@ -87,7 +99,19 @@ public final class TrustModelBeanTranslator {
 		if (trustedEntityTypeBean == null)
 			throw new NullPointerException("trustedEntityTypeBean can't be null");
 		
-		return TrustedEntityType.valueOf(trustedEntityTypeBean.toString());	
+		switch (trustedEntityTypeBean) {
+		case CSS:
+			return TrustedEntityType.CSS;
+		case CIS:
+			return TrustedEntityType.CIS;
+		case SVC:
+			return TrustedEntityType.SVC;
+		case LGC:
+			return TrustedEntityType.LGC;
+		default:
+			throw new IllegalArgumentException("'" + trustedEntityTypeBean 
+					+ "': Unsupported trusted entity type");
+		}	
 	}
 	
 	/*
