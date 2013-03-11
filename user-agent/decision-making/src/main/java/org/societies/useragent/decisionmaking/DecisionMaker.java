@@ -166,9 +166,16 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 						+ consumer.getServiceIdentifier()
 								.getServiceInstanceIdentifier() + " with: "
 						+ action.getServiceID().getServiceInstanceIdentifier());
-				if (ServiceModelUtils.compare(consumer.getServiceIdentifier(),action.getServiceID())){
-					consumer.setIAction(this.entityID, action);
-					logging.debug("Service has been matched. IAction has been sent to the service");
+				if (ServiceModelUtils.compare(consumer.getServiceIdentifier(),
+						action.getServiceID())) {
+					String cImp = "Service:" + consumer.getServiceIdentifier()
+							+ " Action:"+action;
+					if (getImplictUserFeedback(cImp)) {
+						consumer.setIAction(this.entityID, action);
+						logging.debug("Service has been matched. IAction has been sent to the service");
+					} else {
+						logging.debug("Service has been matched. But user refuses to act");
+					}
 					found = true;
 				}
 			}

@@ -31,6 +31,9 @@
     <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
     <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
     
+    <!-- Traceview permission-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
     <application
         android:icon="@drawable/launcher_societies"
         android:label="@string/app_name"

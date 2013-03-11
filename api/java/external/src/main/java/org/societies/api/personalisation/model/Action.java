@@ -52,21 +52,52 @@ public class Action implements IAction, Serializable{
 	private ServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private ArrayList<String> types;
-	
+	private final boolean implementable;
+	private final boolean contextDependent;
+	private final boolean proactive;
 
+	/**
+	 * Not to be used by 3p services
+	 */
 	public Action(){
 		this.serviceID = null;
 		this.serviceType = "not_initialised";
 		this.parameterName = "not_initialised";
 		this.value = "not_initialised";
+		this.implementable = false;
+		this.contextDependent = false;
+		this.proactive = false;
 	}
 
+	/**
+	 * 
+	 * By default, implementable, contextDependent and Proactive are set to true
+	 * @param serviceID		the id of the 3p service
+	 * @param serviceType	the type of service
+	 * @param parameterName	the name of the parameter
+	 * @param value			the value of the parameter
+	 * 
+	 */
 	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
 		this.serviceID = serviceID;
 		this.serviceType = serviceType;
 		this.parameterName = parameterName;
 		this.value = value;
+		this.implementable = true;
+		this.contextDependent = true;
+		this.proactive = true;
 	}
+	
+	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value, boolean implementable, boolean contextDependent, boolean proactive){
+		this.serviceID = serviceID;
+		this.serviceType = serviceType;
+		this.parameterName = parameterName;
+		this.value = value;
+		this.implementable = implementable;
+		this.contextDependent = contextDependent;
+		this.proactive = proactive;
+	}
+	
 	
 	public String getvalue(){
 		return value;
@@ -217,6 +248,39 @@ public class Action implements IAction, Serializable{
 	public void setServiceTypes(List<String> sTypes) {
 		this.types = (ArrayList<String>) sTypes;
 		
+	}
+
+	/**
+	 * Indicates if this action can be implemented or is only used as a conditional action for 
+	 * triggering User Intent sequences. These types of actions are created by the UAM and represent 
+	 * actions such as joined/left CIS, started/stopped service etc. Other such functions of the 
+	 * platform may be added in the future
+	 * @return	true if the action can be implemented, false if not. 
+	 */
+	public boolean isImplementable() {
+		return implementable;
+	}
+
+	/**
+	 * Indicates whether this action should be implemented proactively (by the DecisionMaker) or not. 
+	 * The user will have the ability to make this change manually using the preference GUI (T6.5 webapp Profile Settings).
+	 * 3p services can also indicate if this action should be implemented when they create actions and send them to 
+	 * the UAM component.  
+	 * @return	true if the action should be proactively implemented, false if not. 
+	 */
+	public boolean isContextDependent() {
+		return contextDependent;
+	}
+	
+	/**
+	 * Indicates whether this action should be learnt or stored as a static preference. 3p services can create 
+	 * static preferences (such as configuration settings) that do not depend on changing context. The UAM makes sure not to 
+	 * store this action in the context history and avoid learning on this.  
+	 * @return	true if the action should be context dependent, false if it shouldn't. Note that this will not return false 
+	 * if the action does not currently have context conditions attached but was created as contextDependent 
+	 */
+	public boolean isProactive() {
+		return proactive;
 	}
 
 

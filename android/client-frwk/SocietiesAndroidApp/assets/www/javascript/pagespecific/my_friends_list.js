@@ -251,6 +251,10 @@ $(document).on('pageinit', '#friends-landing', function(event) {
 		}
 	});
 
+	$('#search-friends').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#search-friends');
+	});
+	
 	$("form#formCSSDirSearch").submit(function(e) {
 		var search = $("#search-friends").val();
 		if (search != "Search Friends" && search != "") 

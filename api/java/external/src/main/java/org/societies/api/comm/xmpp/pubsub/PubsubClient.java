@@ -122,7 +122,7 @@ public interface PubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public List<Element> subscriberRetrieveLast(IIdentity pubsubService, String node, String subId) throws XMPPError, CommunicationException;
+	public List<Object> subscriberRetrieveLast(IIdentity pubsubService, String node, String subId) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Subscriber retrieve specific.
@@ -135,7 +135,7 @@ public interface PubsubClient {
 	 * @throws XMPPError the XMPP error
 	 * @throws CommunicationException the communication exception
 	 */
-	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService, String node, String subId, List<String> itemIdList) throws XMPPError, CommunicationException;
+	public List<Object> subscriberRetrieveSpecific(IIdentity pubsubService, String node, String subId, List<String> itemIdList) throws XMPPError, CommunicationException;
 	
 	/**
 	 * Publishes an event for this identity, on this node of unique itemID and content of item.

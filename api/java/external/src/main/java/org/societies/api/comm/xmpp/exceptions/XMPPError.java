@@ -79,6 +79,7 @@ public class XMPPError extends Exception {
 	 * @param genericText the generic text
 	 */
 	public XMPPError(StanzaError stanzaError, String genericText) {
+		super(stanzaError+": "+genericText);
 		this.stanzaError = stanzaError;
 		this.genericText = genericText;
 	}
@@ -91,9 +92,9 @@ public class XMPPError extends Exception {
 	 * @param applicationError the application error
 	 */
 	public XMPPError(StanzaError stanzaError, String stanzaErrorText, Object applicationError) {
+		super(stanzaError+": "+stanzaErrorText);
 		this.applicationError = applicationError;
 		this.stanzaError = stanzaError;
-		this.genericText = genericText;
 		if (stanzaError.hasText() && stanzaErrorText!=null) {
 			this.stanzaErrorText = stanzaErrorText+"\n</"+stanzaError.toString()+">\n";
 			byte[] b1 = this.stanzaErrorText.getBytes();

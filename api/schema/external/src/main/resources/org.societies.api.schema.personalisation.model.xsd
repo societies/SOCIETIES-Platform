@@ -17,6 +17,9 @@ xmlns="http://societies.org/api/schema/personalisation/model"
 			<xs:element name="serviceType" type="xs:string"/>
 			<xs:element name="serviceID" type="tns:serviceResourceIdentifier"></xs:element>
 			<xs:element name="value" type="xs:string"></xs:element>
+			<xs:element name="implementable" type="xs:boolean" />
+			<xs:element name="proactive" type="xs:boolean" />
+			<xs:element name="contextDependent" type="xs:boolean" />
 		</xs:sequence>
 	</xs:complexType>
   

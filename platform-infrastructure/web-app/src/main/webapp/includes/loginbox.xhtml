@@ -26,8 +26,9 @@
                 <h:inputSecret id="password" path="password" placeholder="Password" width="100%"
                                value="#{loginController.loginDialogPassword}"/>
 
-                <h:commandButton class="submit button"
-                                 actionListener="#{loginController.loginButtonAction()}">Sign in</h:commandButton>
+                <h:commandButton value="Sign in"
+                                 class="submit button"
+                                 actionListener="#{loginController.loginButtonAction()}"/>
 
                 <p>Don't have a login?
                     <a class="" href="new_account.xhtml">Sign Up</a>

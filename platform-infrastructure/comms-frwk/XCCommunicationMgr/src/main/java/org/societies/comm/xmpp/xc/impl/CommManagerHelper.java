@@ -353,8 +353,9 @@ public class CommManagerHelper {
 		for (Object o: list) {
 			if (o instanceof Element) {
 				Element e = (Element) o;
-				if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
-					text = e.getText();
+				if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL)) {
+					if (e.getName().equals("text"))
+						text = e.getText();
 				} else {
 					Class<?> c = getClass(e.getNamespaceURI(),e.getName());
 					
@@ -417,7 +418,15 @@ public class CommManagerHelper {
 
 	private Class<?> getClass(String namespace, String name) throws ClassNotFoundException, UnavailableException {
 		String packageStr = getPackage(namespace);  
-		String beanName = name.substring(0,1).toUpperCase() + name.substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+		String beanName = name.substring(0,1).toUpperCase() + name.substring(1);
+		
+		// TODO issue rasing
+		try {
+			clm.currentNewClassloader.loadClass(packageStr + "." + beanName);
+		} catch (ClassNotFoundException e) {
+			LOG.warn("### ClassLoader '"+clm.currentNewClassloader.toString()+"' could not load Class '"+packageStr + "." + beanName+"' ###",e);
+		}
+		
 		return Thread.currentThread().getContextClassLoader().loadClass(packageStr + "." + beanName);
 	}
 
@@ -473,7 +482,7 @@ public class CommManagerHelper {
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			iqCommCallbacks.put(iq.getID(), callback);
-			clm.addTempClassloader(iq.getID());
+			clm.addTempClassloader(iq.getID(),payload); // or use the callback?
 			return iq;
 		} catch (ClassNotFoundException e) {
 			throw new CommunicationException("ClassNotFoundException for class "+payload.getClass().toString(), e);

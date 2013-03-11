@@ -36,6 +36,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -158,10 +159,16 @@ public class RequestPolicyUtils {
 		// -- Retrieve data type list
 		dataTypes = new ArrayList<String>();
 		for(RequestItem requestItem : privacyPolicy.getRequestItems()) {
-			DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
+		/*	DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
 			if (dataId.getScheme().name().equals(schemeFilter.name())) {
 				dataTypes.add(dataId.getType());
 			}
+			*/
+			Resource resource = requestItem.getResource();
+			   DataIdentifierScheme scheme = resource.getScheme(); 
+			   if (scheme.equals(DataIdentifierScheme.CONTEXT)){
+			    dataTypes.add(resource.getDataType());
+			   }	
 		}
 		return dataTypes;
 	}

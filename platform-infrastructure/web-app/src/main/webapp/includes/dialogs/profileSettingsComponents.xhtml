@@ -81,8 +81,11 @@
         </f:facet>
 
         <h:outputLabel for="addPreferenceName" value="Preference name: *"/>
-        <p:inputText id="addPreferenceName" value="#{profileSettings.newPreferenceName}"
-                     required="true" label="Preference name"/>
+        <p:selectOneMenu effect="fold" editable="true" required="true" label="Preference name"
+                         id="addPreferenceName" value="#{profileSettings.newPreferenceName}">
+            <f:selectItems value="#{profileSettings.availablePreferenceNames}"/>
+        </p:selectOneMenu>
+
 
         <h:outputLabel for="addPreferecneService" value="Service: "/>
         <p:selectOneMenu value="#{profileSettings.newPreferenceService}" effect="fade" id="addPreferecneService">
