@@ -31,9 +31,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
@@ -270,5 +272,47 @@ public class TrustModelBeanTranslatorTest {
 		assertNotNull(teid);
 		assertEquals(svcTeid.getEntityType(), teid.getEntityType());
 		assertEquals(svcTeid.getEntityId(), teid.getEntityId());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator#fromTrustEvidenceType(TrustEvidenceType)}.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testFromTrustEvidenceType() throws Exception {
+		
+		assertEquals(TrustEvidenceTypeBean.USED_SERVICE, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.USED_SERVICE));
+		assertEquals(TrustEvidenceTypeBean.FRIENDED_USER, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.FRIENDED_USER));
+		assertEquals(TrustEvidenceTypeBean.UNFRIENDED_USER, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.UNFRIENDED_USER));
+		assertEquals(TrustEvidenceTypeBean.JOINED_COMMUNITY, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.JOINED_COMMUNITY));
+		assertEquals(TrustEvidenceTypeBean.LEFT_COMMUNITY, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.LEFT_COMMUNITY));
+		assertEquals(TrustEvidenceTypeBean.RATED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.RATED));
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator#fromTrustEvidenceTypeBean(TrustEvidenceTypeBean)}.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testFromTrustEvidenceTypeBean() throws Exception {
+		
+		assertEquals(TrustEvidenceType.USED_SERVICE, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.USED_SERVICE));
+		assertEquals(TrustEvidenceType.FRIENDED_USER, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.FRIENDED_USER));
+		assertEquals(TrustEvidenceType.UNFRIENDED_USER, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.UNFRIENDED_USER));
+		assertEquals(TrustEvidenceType.JOINED_COMMUNITY, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.JOINED_COMMUNITY));
+		assertEquals(TrustEvidenceType.LEFT_COMMUNITY, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.LEFT_COMMUNITY));
+		assertEquals(TrustEvidenceType.RATED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.RATED));
 	}
 }

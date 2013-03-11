@@ -24,8 +24,10 @@
  */
 package org.societies.api.privacytrust.trust.model;
 
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
@@ -110,7 +112,55 @@ public final class TrustModelBeanTranslator {
 			return TrustedEntityType.LGC;
 		default:
 			throw new IllegalArgumentException("'" + trustedEntityTypeBean 
-					+ "': Unsupported trusted entity type");
+					+ "': Unsupported trusted entity type bean");
+		}	
+	}
+	
+	public TrustEvidenceTypeBean fromTrustEvidenceType(TrustEvidenceType trustEvidenceType) {
+		
+		if (trustEvidenceType == null)
+			throw new NullPointerException("trustEvidenceType can't be null");
+		
+		switch (trustEvidenceType) {
+		case USED_SERVICE:
+			return TrustEvidenceTypeBean.USED_SERVICE;
+		case FRIENDED_USER:
+			return TrustEvidenceTypeBean.FRIENDED_USER;
+		case UNFRIENDED_USER:
+			return TrustEvidenceTypeBean.UNFRIENDED_USER;
+		case JOINED_COMMUNITY:
+			return TrustEvidenceTypeBean.JOINED_COMMUNITY;
+		case LEFT_COMMUNITY:
+			return TrustEvidenceTypeBean.LEFT_COMMUNITY;
+		case RATED:
+			return TrustEvidenceTypeBean.RATED;
+		default:
+			throw new IllegalArgumentException("'" + trustEvidenceType 
+					+ "': Unsupported trust evidence type");
+		}
+	}
+	
+	public TrustEvidenceType fromTrustEvidenceTypeBean(TrustEvidenceTypeBean trustEvidenceTypeBean) {
+		
+		if (trustEvidenceTypeBean == null)
+			throw new NullPointerException("trustEvidenceTypeBean can't be null");
+		
+		switch (trustEvidenceTypeBean) {
+		case USED_SERVICE:
+			return TrustEvidenceType.USED_SERVICE;
+		case FRIENDED_USER:
+			return TrustEvidenceType.FRIENDED_USER;
+		case UNFRIENDED_USER:
+			return TrustEvidenceType.UNFRIENDED_USER;
+		case JOINED_COMMUNITY:
+			return TrustEvidenceType.JOINED_COMMUNITY;
+		case LEFT_COMMUNITY:
+			return TrustEvidenceType.LEFT_COMMUNITY;
+		case RATED:
+			return TrustEvidenceType.RATED;
+		default:
+			throw new IllegalArgumentException("'" + trustEvidenceTypeBean 
+					+ "': Unsupported trust evidence type bean");
 		}	
 	}
 	
