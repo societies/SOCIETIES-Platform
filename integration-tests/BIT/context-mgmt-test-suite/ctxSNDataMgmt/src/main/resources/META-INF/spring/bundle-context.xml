@@ -28,7 +28,7 @@
 
 <!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
 	
-	<bean id="TestCase1337" class="org.societies.integration.test.bit.ctx_3pBroker.Test1337" init-method="run">
+	<bean id="CtxSNDataMgmt" class="org.societies.integration.test.bit.ctxSNDataMgmt.CtxSNDataMgmt" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="commManager" ref="commManager" />
 		 

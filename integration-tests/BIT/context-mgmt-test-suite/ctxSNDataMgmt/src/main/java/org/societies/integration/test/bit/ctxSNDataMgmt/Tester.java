@@ -139,26 +139,55 @@ public class Tester {
 
 		LOG.info("*** Starting examples...");
 
-		
+
 		// TODO createRemoteEntity();
 		this.createFakeSNData();
+		this.retrieveSNData();
 	}
 
 
-	/*
-	 * this will be substituted by real fb data
-	 */
-	private void createFakeSNData(){
-	
-		
+	private void retrieveSNData(){
+
+
 		CtxEntityIdentifier cssOwnerEntityId;
+
 		try {
 			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
 			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
 			CtxEntity individualEntity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, cssOwnerEntityId).get();
-			CtxAssociation assoc = null;
-			
-		
+
+			LOG.info("*** individualEntity " + individualEntity.getId());
+			///LOG.info("*** individualEntity " + individualEntity.get);
+
+			List<CtxEntityIdentifier> snEntIDList = this.externalCtxBroker.lookupEntities(this.requestorService, this.cssOwnerId, CtxEntityTypes.SOCIAL_NETWORK, CtxAttributeTypes.TYPE, "facebook", "facebook").get();
+			LOG.info("*** individualEntity snEntIDList " + snEntIDList);
+
+
+			if(!snEntIDList.isEmpty()){
+				CtxEntity facebookEntity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntIDList.get(0)).get();
+
+				LOG.info("facebook entity retrieved "+facebookEntity);
+
+				Set<CtxAttribute> attrBooksSet = facebookEntity.getAttributes(CtxAttributeTypes.BOOKS);
+
+				if(!attrBooksSet.isEmpty()) {
+
+					for(CtxAttribute attrBooks: attrBooksSet){
+						LOG.info("facebook attribute books retrieved "+attrBooks.getStringValue());	
+					}
+
+				}
+
+				Set<CtxAttribute> attrNameSet = facebookEntity.getAttributes(CtxAttributeTypes.NAME);
+				if(!attrNameSet.isEmpty()) {
+					for(CtxAttribute attrName: attrNameSet){
+						LOG.info("facebook attribute name retrieved "+attrName.getStringValue());	
+					}
+
+				}
+
+			}				
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -169,75 +198,110 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+	/*
+	 * 
+	 * this will be substituted by real fb data
+	 */
+	private void createFakeSNData(){
+
+
+		CtxEntityIdentifier cssOwnerEntityId;
+		try {
+			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
+			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
+			CtxEntity individualEntity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, cssOwnerEntityId).get();
+			CtxAssociation assoc = null;
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+
 
 	private CtxEntity getSnCtxEntity() {
 
 		IndividualCtxEntity individualEntity;
 		CtxEntityIdentifier individualEntityId;
-		
+
 		CtxAssociation snsAssoc = null;
 		CtxEntity socialNetwork = null;
-		
+
 		//fake sn name
 		String snName = "FACEBOOK";
 		//this.snName = connector.getConnectorName();
-		
+
 		try {
 			individualEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
 
 			individualEntity = (IndividualCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, individualEntityId).get();
-			
+
 			Set<CtxAssociationIdentifier> snsAssocSet = individualEntity.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
 			LOG.debug("There are "+ snsAssocSet.size() + " associations with SocialNetworks");
-			
+
 			if (snsAssocSet.size() > 0) {
-				
+
 				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(snsAssocSet);
 				for(CtxAssociationIdentifier assocID : snsAssocList ){
 					snsAssoc = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, assocID).get();
 					Set<CtxEntityIdentifier>  snsEntitiesSet 	= snsAssoc.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
 					List<CtxEntityIdentifier> snsEntitiesList 	= new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
-				
+
 					LOG.debug("lookup SN association" + snName);
 					List<CtxEntityIdentifier> snEntList 		= this.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
-				
+
 					if (snEntList.size() > 0) {
 						socialNetwork = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntList.get(0)).get();
 						return socialNetwork;
 					}
 				}
-			
+
 			}
 			//if (snsAssocSet.size() == 0) {
 
-				snsAssoc = this.externalCtxBroker.createAssociation(this.requestorService,this.cssOwnerId , CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
-				LOG.info("snsAssoc created ");
-				
-				List<CtxEntityIdentifier> snEntitiesList = this.externalCtxBroker.lookupEntities(this.requestorService,this.cssOwnerId ,CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.NAME, snName, snName).get();
+			snsAssoc = this.externalCtxBroker.createAssociation(this.requestorService,this.cssOwnerId , CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
+			LOG.info("snsAssoc created ");
 
-				if (snEntitiesList.size() == 0) {
-					socialNetwork = this.externalCtxBroker.createEntity(this.requestorService,this.cssOwnerId, CtxEntityTypes.SOCIAL_NETWORK).get();
-					LOG.info("SOCIAL_NETWORK entity created "+socialNetwork.getId());
-					CtxAttribute snsNameAttr = this.externalCtxBroker.createAttribute(this.requestorService, socialNetwork.getId(), CtxAttributeTypes.NAME).get();
-					snsNameAttr.setStringValue(snName);
-					this.externalCtxBroker.update(this.requestorService, snsNameAttr);
+			List<CtxEntityIdentifier> snEntitiesList = this.externalCtxBroker.lookupEntities(this.requestorService,this.cssOwnerId ,CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.NAME, snName, snName).get();
 
-				}
-				
-				else
-					socialNetwork = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntitiesList.get(0)).get();
+			if (snEntitiesList.size() == 0) {
+				socialNetwork = this.externalCtxBroker.createEntity(this.requestorService,this.cssOwnerId, CtxEntityTypes.SOCIAL_NETWORK).get();
+				LOG.info("SOCIAL_NETWORK entity created "+socialNetwork.getId());
+				CtxAttribute snsNameAttr = this.externalCtxBroker.createAttribute(this.requestorService, socialNetwork.getId(), CtxAttributeTypes.NAME).get();
+				snsNameAttr.setStringValue(snName);
+				this.externalCtxBroker.update(this.requestorService, snsNameAttr);
 
-					snsAssoc.addChildEntity(socialNetwork.getId());
-					snsAssoc.addChildEntity(individualEntity.getId());
-					snsAssoc.setParentEntity(individualEntity.getId());
-					snsAssoc = (CtxAssociation) this.externalCtxBroker.update(this.requestorService,snsAssoc).get();
-					this.externalCtxBroker.update(this.requestorService, individualEntity);
+			}
+
+			else
+				socialNetwork = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntitiesList.get(0)).get();
+
+			snsAssoc.addChildEntity(socialNetwork.getId());
+			snsAssoc.addChildEntity(individualEntity.getId());
+			snsAssoc.setParentEntity(individualEntity.getId());
+			snsAssoc = (CtxAssociation) this.externalCtxBroker.update(this.requestorService,snsAssoc).get();
+			this.externalCtxBroker.update(this.requestorService, individualEntity);
 			//}
 
 		} catch (InterruptedException e) {
@@ -254,11 +318,9 @@ public class Tester {
 		return socialNetwork;
 	}
 
-	
-	
-	
+
 	/*
-	
+
 	public void updateCtxProfile() {
 
 
@@ -266,20 +328,20 @@ public class Tester {
 
 		CtxEntityIdentifier cssOwnerEntityId;
 		cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-		
+
 		//this.snName = connector.getConnectorName();
 		CtxEntity socialNetworkEntity = this.getSnCtxEntity();
-		
-		
+
+
 		// Update Simple Profile
 	//	PersonConverter parser   = PersonConverterFactory.getPersonConverter(connector);
 //		Person profile			 = parser.load(connector.getUserProfile());
-		
+
 //		updateStringFieldIfExists(snName, CtxAttributeTypes.TYPE);
 		updateStringFieldIfExist(profile.getAboutMe(), CtxAttributeTypes.ABOUT);		
 		updateStringFieldIfExist(profile.getProfileUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);		
 		updateStringFieldIfExist(profile.getDisplayName(), CtxAttributeTypes.NAME);
-		
+
 		if (profile.getName()!=null){
 			updateStringFieldIfExist(profile.getName().getGivenName(),  CtxAttributeTypes.NAME_FIRST);
 			updateStringFieldIfExist(profile.getName().getFamilyName(), CtxAttributeTypes.NAME_LAST);
@@ -290,14 +352,14 @@ public class Tester {
 		updateStringFieldIfExist(profile.getThumbnailUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);
 		updateStringFieldIfExist(profile.getRelationshipStatus(), CtxAttributeTypes.STATUS);
 		updateStringFieldIfExist(profile.getReligion(), CtxAttributeTypes.RELIGIOUS_VIEWS);
-		
+
 		if (profile.getGender()!=null)
 			updateStringFieldIfExist(profile.getGender().name(), CtxAttributeTypes.SEX);
 		if (profile.getBirthday()!=null)
 			updateStringFieldIfExist(profile.getBirthday().toGMTString(), CtxAttributeTypes.BIRTHDAY);
 		if (profile.getCurrentLocation()!=null)
 			updateStringFieldIfExist(profile.getCurrentLocation().getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-		
+
 
 		updateStringFieldIfExist(profile.getBooks(), 			 CtxAttributeTypes.BOOKS);
 		updateStringFieldIfExist(profile.getMusic(),  			 CtxAttributeTypes.MUSIC);
@@ -308,31 +370,31 @@ public class Tester {
 		updateStringFieldIfExist(profile.getTurnOns(),  		 CtxAttributeTypes.TURNSON);
 		updateStringFieldIfExist(profile.getActivities(), 		 CtxAttributeTypes.ACTIVITIES);		
 //		updateStringFieldIfExist(profile.getEmails(), 		 	 CtxAttributeTypes.EMAIL);	
-	
-		
+
+
 		LOG.debug(" Updating Friends List ...");
 		// Add Friends List
-		
+
 		FriendsConverter friendsParser = FriendsConveterFactory.getPersonConverter(connector);
 		List<Person> friends= friendsParser.load(connector.getUserFriends());
 	    storeFriendsIntoContextBroker(friends);
-	    
-	    
+
+
 	    LOG.debug(" Updating Groups list ...");
 	    // Add Group List
 	    GroupConverter groupConverter = GroupConveterFactory.getPersonConverter(connector);
 	    List<Group> groups = groupConverter.load(connector.getUserGroups());
 	    storeGroupsIntoContextBroker(groups);
 	}
-	*/
-	
-	
+	 */
+
+
 	private void updateStringFieldIfExist(String value, String type) {
 		try {
 			if (value != null) {
 				LOG.info("update " + type + " data" + value);
 				//storeSocialDataIntoContextBroker(type, value);
-			//	LOG.info(snName + " entity updated with " + type + " data "+ socialNetworkEntity.getId());
+				//	LOG.info(snName + " entity updated with " + type + " data "+ socialNetworkEntity.getId());
 			}
 			else LOG.debug(type + " value is NULL");
 		} 
@@ -341,210 +403,17 @@ public class Tester {
 		}
 
 	}
-	
+
 	private void updateStringFieldIfExist(List<String> listOfvalues, String type){
-		 
-		 if (listOfvalues != null) {
-		//	String value = updateListData(listOfvalues);
-		//	updateStringFieldIfExist(value, type);
+
+		if (listOfvalues != null) {
+			//	String value = updateListData(listOfvalues);
+			//	updateStringFieldIfExist(value, type);
 		}
 		else LOG.debug(type + " value is NULL");
 	}
-	
-
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private void updateOperatorAttributeLocation(){
-		LOG.info("*** updateOperatorAttributes : updates an existing  Location attribute");
-
-		CtxEntityIdentifier cssOwnerEntityId;
-		try {
-			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-
-			List<CtxIdentifier> listAttrIds =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-
-			if(listAttrIds.size() == 0){
-				//create location attribute
-				LOG.info("location attribute doesn't exist ... creating");
-				this.externalCtxBroker.createAttribute(this.requestorService, cssOwnerEntityId, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			}
-
-			List<CtxIdentifier> listAttrIds2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			LOG.info("location attribute identifiers "+listAttrIds2);
-
-			CtxAttributeIdentifier locationAttributeId = null;
-
-			//the test will run correct for only one location attribute
-			if(listAttrIds2.size() == 1){
-				locationAttributeId = (CtxAttributeIdentifier) listAttrIds2.get(0);  
-				CtxAttribute locationAttributeRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved.getId());
-				String locationSymbolicValue  = locationAttributeRetrieved.getStringValue();
-				LOG.info("locationAttributeRetrieved value (should be null) :" + locationSymbolicValue);
-
-				locationAttributeRetrieved.setStringValue("ATHENS");
-				LOG.info("value set...."+locationAttributeRetrieved.getStringValue()+" trying to update location attribute :" +locationAttributeRetrieved.getId());
-				this.externalCtxBroker.update(this.requestorService, locationAttributeRetrieved );				
-				LOG.info("update successfull");
-			}	
-
-			LOG.info("retrieve location attribute based on existing identifier:"+ locationAttributeId);
-			CtxAttribute locationAttributeWithValue = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-			LOG.info("locationAttributeWithValue value :" + locationAttributeWithValue.getStringValue());
-
-			LOG.info("retrieve location attribute based on lookup ids ************* ");
-			List<CtxIdentifier> listAttrIds3 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			LOG.info("retrieve location attribute based on lookup ids"+listAttrIds3);
-			if(listAttrIds3.size() == 1){
-				CtxAttributeIdentifier locationAttributeId3 = (CtxAttributeIdentifier) listAttrIds3.get(0); 
-				CtxAttribute locationAttributeRetrieved3 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId3).get();
-				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved3.getId());
-				String locationSymbolicValue  = locationAttributeRetrieved3.getStringValue();
-				LOG.info("locationAttributeRetrieved value :" + locationSymbolicValue);
-			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	private void createOperatorAttributeBirthday(){
-
-		LOG.info("createOperatorAttributeBirthday");
-		try {
-			CtxEntityIdentifier cssOwnerEntityId = 
-					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
-
-			LOG.info("*** lookup for birthday attribute ");
-			List<CtxIdentifier> listAttrBDays =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
-			LOG.info("this list should be zero :" + listAttrBDays); 
-
-			//create attribute birthday
-			LOG.info("*** create attribute birthday ");
-			CtxAttribute ctxAttrBirthday = this.externalCtxBroker.createAttribute(this.requestorService, cssOwnerEntityId, CtxAttributeTypes.BIRTHDAY).get(); 
-
-			CtxAttributeIdentifier bDayId = ctxAttrBirthday.getId();
 
 
-			LOG.info("*** set value of attribute birthday and update");
-			ctxAttrBirthday.setStringValue("today"); 
-			ctxAttrBirthday.setValueType(CtxAttributeValueType.STRING);
-
-			this.externalCtxBroker.update(this.requestorService, ctxAttrBirthday).get();
-
-			LOG.info("*** lookup for birthday attribute 2 (after creation-update)");
-			List<CtxIdentifier> listAttrBDays2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
-			LOG.info("should not be zero listAttrBDays :" + listAttrBDays2); 
-
-
-			CtxAttribute ctxAttrBirthdayRetrieved1 = null;
-			CtxAttribute ctxAttrBirthdayRetrieved2 = null;
-			LOG.info("*** retrieve birthday attribute from db ");
-
-			//this one works
-			ctxAttrBirthdayRetrieved1 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, bDayId).get();
-			LOG.info("withoutLookup ctxAttrBirthdayRetrieved:" + ctxAttrBirthdayRetrieved1.getId());
-			String ctxAttrBirthdayRetrievedValue  = ctxAttrBirthdayRetrieved1.getStringValue();
-			LOG.info("withoutLookup ctxAttrBirthdayRetrieved value :" + ctxAttrBirthdayRetrievedValue);
-			assertEquals("today",ctxAttrBirthdayRetrievedValue);
-			//try this one
-			if(listAttrBDays2.size()>0){
-				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) listAttrBDays2.get(0);
-				ctxAttrBirthdayRetrieved2 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,attrId ).get();	
-			}
-
-
-			LOG.info("after lookup ctxAttrBirthdayRetrieved:" + ctxAttrBirthdayRetrieved2.getId());
-			String ctxAttrBirthdayRetrievedValue2  = ctxAttrBirthdayRetrieved2.getStringValue();
-			LOG.info("ctxAttrBirthdayRetrieved value :" + ctxAttrBirthdayRetrievedValue2);
-			assertEquals("today",ctxAttrBirthdayRetrievedValue2);
-		} catch (Exception e) {
-
-			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
-		}	
-	}
-
-			
-	
-	/*
-	 * private void lookupRetrieveLocationAttributeValue(){
-		List<CtxIdentifier> listAttrIds2;
-		try {
-			listAttrIds2 = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-			if(listAttrIds2.size() > 0){
-				CtxAttributeIdentifier locationAttributeId = (CtxAttributeIdentifier) listAttrIds2.get(0);  
-				CtxAttribute locationAttributeRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved.getId());
-				String locationSymbolicValue  = locationAttributeRetrieved.getStringValue();
-				LOG.info("locationAttributeRetrieved value :" + locationSymbolicValue);
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-	}
-	 */
-	
-	
-	
 	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
 
 		List<CtxEntityIdentifier> entityList = new ArrayList<CtxEntityIdentifier>(); 
@@ -573,7 +442,7 @@ public class Tester {
 
 		return new AsyncResult<List<CtxEntityIdentifier>>(entityList);
 	}
-	
+
 	public static Boolean compareAttributeValues(CtxAttribute attribute, Serializable value){
 
 		Boolean areEqual = false;
@@ -609,6 +478,6 @@ public class Tester {
 		}
 		return areEqual;
 	}
-	
-	
+
+
 }
