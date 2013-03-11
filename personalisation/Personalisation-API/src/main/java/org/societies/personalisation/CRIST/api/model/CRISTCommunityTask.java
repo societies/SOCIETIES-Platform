@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -43,7 +44,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 28-Nov-2011 20:56:52
  */
-public class CRISTCommunityTask implements ICRISTCommunityTask {
+public class CRISTCommunityTask extends Action implements ICRISTCommunityTask {
 
 	/**
 	 * 

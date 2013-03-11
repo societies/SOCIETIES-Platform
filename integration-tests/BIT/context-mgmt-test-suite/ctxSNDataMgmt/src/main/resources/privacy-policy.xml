@@ -1,0 +1,38 @@
+<RequestPolicy>
+<Target>
+<Resource>
+	<Attribute AttributeId="contextType"
+			DataType="http://www.w3.org/2001/XMLSchema#string">
+		<AttributeValue>locationSymbolic</AttributeValue>
+	</Attribute>
+</Resource>
+<Action>
+	<Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+			DataType="org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants">
+		<AttributeValue>WRITE</AttributeValue>
+	</Attribute>
+<optional>false</optional>
+</Action>
+<Action>
+	<Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+			DataType="org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants">
+		<AttributeValue>READ</AttributeValue>
+	</Attribute>
+<optional>false</optional>
+</Action>
+<Action>
+	<Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+			DataType="org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants">
+		<AttributeValue>CREATE</AttributeValue>
+	</Attribute>
+<optional>false</optional>
+</Action>
+<Action>
+	<Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+			DataType="org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants">
+		<AttributeValue>DELETE</AttributeValue>
+	</Attribute>
+<optional>false</optional>
+</Action>
+<optional>false</optional>
+</Target></RequestPolicy>
