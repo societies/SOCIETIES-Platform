@@ -43,14 +43,18 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
@@ -139,7 +143,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received MODIFIED event " + event);
 		
-		if (CtxAssociationTypes.IS_FRIENDS_WITH.equals(event.getId().getType()))
+		if (CtxAttributeTypes.LAST_ACTION.equals(event.getId().getType()))
+			this.executorService.execute(new UserLastActionHandler(event.getId()));
+		else if (CtxAssociationTypes.IS_FRIENDS_WITH.equals(event.getId().getType()))
 			this.executorService.execute(new UserIsFriendsWithHandler(event.getId()));
 		else if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType()))
 			this.executorService.execute(new UserIsMemberOfHandler(event.getId()));
@@ -183,6 +189,50 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	void unbindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props) {
 		
 		LOG.info("Unbinding service reference " + ctxBroker);
+	}
+	
+	private class UserLastActionHandler implements Runnable {
+
+		private final CtxIdentifier ctxId;
+		
+		private UserLastActionHandler(CtxIdentifier ctxId) {
+			
+			this.ctxId = ctxId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final CtxAttribute lastActionAttr = (CtxAttribute) ctxBroker.retrieve(ctxId).get();
+				if (lastActionAttr == null) {
+					LOG.error("Could not handle CSS last action: "
+							+ "Could not retrieve '" + this.ctxId + "'");
+					return;
+				}
+				if (lastActionAttr.getBinaryValue() == null) {
+					LOG.error("Could not handle CSS last action: "
+							+ "LAST_ACTION attribute value is null");
+					return;
+				}
+				final IAction lastAction = (IAction) SerialisationHelper.deserialise(
+						lastActionAttr.getBinaryValue(), this.getClass().getClassLoader());
+				if (LOG.isDebugEnabled())
+					LOG.debug("lastAction=" + lastAction);
+				final String userId = lastActionAttr.getId().getOwnerId();
+				final String serviceId = lastAction.getServiceID().getIdentifier().toString();
+				final Date ts = lastActionAttr.getLastModified();
+				addServiceEvidence(userId, serviceId, ts);
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CSS last action: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
 	}
 	
 	private class UserIsFriendsWithHandler implements Runnable {
@@ -473,6 +523,25 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			
 			return null;
 		}
+	}
+	
+	private void addServiceEvidence(final String userId, 
+			final String serviceId,	final Date ts) throws TrustException {
+		
+		final TrustedEntityId subjectId = new TrustedEntityId(
+				TrustedEntityType.CSS,
+				userId);
+		final TrustedEntityId objectId = new TrustedEntityId(
+				TrustedEntityType.SVC, 
+				serviceId);
+		
+		final TrustEvidenceType type = TrustEvidenceType.USED_SERVICE;
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding direct trust evidence: subjectId="
+					+ subjectId + ", objectId="	+ objectId 
+					+ ", type=" + type + ", ts=" + ts);
+		trustEvidenceCollector.addDirectEvidence(
+				subjectId, objectId, type, ts, null);
 	}
 	
 	private void addFriendshipEvidence(final String userId, 
