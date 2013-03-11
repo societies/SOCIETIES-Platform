@@ -33,6 +33,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.css.BitCompareUtil;
 import org.societies.api.css.FriendFilter;
+import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -1898,24 +1899,10 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	@Override
 	public void sendCSSFriendRequest(IIdentity identity, RequestorService service) {
 		//PUBLISH PUBSUB EVENT FOR THIS RECEIVED FRIEND REQUEST
-		CssAdvertisementRecord advert = new CssAdvertisementRecord();
-		advert.setId(identity.getBareJid());
-		advert.setName("TBD");
-
-		CssFriendEvent payload = new CssFriendEvent();
-		payload.setCssAdvert(advert);
-
-		try {
-			String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
-			LOG.debug("Published friend request received event for: " + identity.getBareJid() + ". Status: " + status);
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-
+		LOG.debug("Publishing friend request received event for: " + identity.getBareJid());
+				
 		//SAVE TO DATABASE
-		String targetCSSid = identity.toString();		
+		String targetCSSid = identity.toString();
 		CssRequest request = new CssRequest();
 		//request.setCssIdentity(targetCSSid);
 		request.setCssIdentity(service.getRequestorId().toString());
@@ -1942,37 +1929,33 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				cssManagerRemote.updateCssFriendRequest(request);
 			}	
 		}
+		//GENERATE PUBSUB EVENT
+		List<String> idList = new ArrayList<String>();
+		idList.add(identity.getBareJid());
+		cssDirectoryRemote.searchByID(idList, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> records) {
+				CssFriendEvent payload = new CssFriendEvent();
+				payload.setCssAdvert( records.get(0));
 
+				try {
+					String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
+					LOG.debug("Published Event Status: " + status);
+				} catch (XMPPError e) {
+					e.printStackTrace();
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	@Override
 	public void handleExternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
-
-		if (statusType.equals(CssRequestStatusType.ACCEPTED)) {
-			//PUBLISH PUBSUB EVENT FOR THIS NEW FRIEND
-			CssAdvertisementRecord advert = new CssAdvertisementRecord();
-			advert.setId(identity.getBareJid());
-			advert.setName("TBD");
-			CssFriendEvent payload = new CssFriendEvent();
-			payload.setCssAdvert(advert);
-
-			try {
-				String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
-				LOG.debug("Published friend accepted event for: " + identity.getBareJid() + ". Status: " + status);
-			} catch (XMPPError e) {
-				e.printStackTrace();
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
-		}
-		
 		//identity is who the request has come FROM
 		CssRequest request = new CssRequest();
-
 		request.setCssIdentity(identity.toString());
 		request.setRequestStatus(statusType);
-
-
 		LOG.info("handleExternalFriendRequest called : ");
 		LOG.info("Request from identity: " +identity);
 		LOG.info("Request  status: " +statusType);
@@ -1984,40 +1967,64 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		LOG.info("updateCssFriendRequest and we're back : " );
 		// If this was initiated locally then inform remote css
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
-		if (request.getOrigin() == CssRequestOrigin.LOCAL)
-		{
-
+		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
 			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
 			// otherwise send message to remote css
-
 			LOG.info("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
-				//called updateCssFriendRequest on remote
-				request.setOrigin(CssRequestOrigin.REMOTE);
-				cssManagerRemote.updateCssRequest(request);
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			cssManagerRemote.updateCssRequest(request);
 		}
+		
+		//PUBLISH PUBSUB EVENT FOR THIS NEW FRIEND
+		if (statusType.equals(CssRequestStatusType.ACCEPTED)) {
+			//GENERATE PUBSUB EVENT
+			List<String> idList = new ArrayList<String>();
+			idList.add(identity.getBareJid());
+			cssDirectoryRemote.searchByID(idList, new ICssDirectoryCallback() {
+				@Override
+				public void getResult(List<CssAdvertisementRecord> records) {
+					CssFriendEvent payload = new CssFriendEvent();
+					payload.setCssAdvert( records.get(0));
+
+					try {
+						String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
+						LOG.debug("Published Event Status: " + status);
+					} catch (XMPPError e) {
+						e.printStackTrace();
+					} catch (CommunicationException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}	
 	}
 
 	@Override
 	public void handleInternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
+		CssRequest pendingFR = new CssRequest();
+		pendingFR.setCssIdentity(identity.toString());
+		pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
+		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
+		acceptCssFriendRequest(pendingFR);
+		
 		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
-		CssRequest request = new CssRequest();
-
-		request.setCssIdentity(identity.toString());
-		LOG.info("handleInternalFriendRequest called : ");
-		LOG.info("Request from identity: " +identity);
-		LOG.info("Request  status: " +statusType);
-		try {
-			cssRegistry.updateCssFriendRequestRecord(request);
-			//cssRegistry.updateCssFriendRequestRecord(request);
-			cssRegistry.updateCssRequestRecord(request);
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//CssRequest request = new CssRequest();
+		//request.setCssIdentity(identity.toString());
+		//LOG.info("handleInternalFriendRequest called : ");
+		//LOG.info("Request from identity: " +identity);
+		//LOG.info("Request  status: " +statusType);
+		//try {
+		//	cssRegistry.updateCssFriendRequestRecord(request);
+		//	//cssRegistry.updateCssFriendRequestRecord(request);
+		//	cssRegistry.updateCssRequestRecord(request);
+		//} catch (CssRegistrationException e) {
+		//	// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
 	}
 
 	public void pushtoContext(CssRecord record) {
