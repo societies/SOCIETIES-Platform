@@ -34,7 +34,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -145,19 +147,12 @@ public class Tester {
 		LOG.info("*** Starting examples...");
 
 
-		// TODO createRemoteEntity();
-		this.connectToSN();
-	
-		try {
-			Thread.sleep(9000);
-			
-			this.retrieveSNData();
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+		// the following call will automatically add a fb connector 
+		// not working yet, need to add the connector via web app
+		//this.connectToSN();
 		
+		// the following call will retrieve sn data stored as context
+		this.retrieveSNData();
 		
 		
 	}
@@ -218,6 +213,9 @@ public class Tester {
 
 	}
 
+	
+	
+	/*
 	private void connectToSN(){
 
 		LOG.info("Connect to jane societies fake fb account");
@@ -230,6 +228,91 @@ public class Tester {
 
 		ISocialConnector c = this.socialData.createConnector(ISocialConnector.SocialNetwork.Facebook, pars);
 		LOG.info("connector added " + c);
+		
+		String error = "";
+		
+		ISocialConnector con = this.socialData.createConnector(
+			      getSocialNetowkName(sdForm.getSnName()), params);
+			    error = "We are not able to create " + con.getConnectorName()
+			      + " connector!";
+			    this.socialData.addSocialConnector(con);
+
+			    content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
+			      + sdForm.getSnName() + " with token: "
+			      + sdForm.getToken() + "<br>";
+			    model.put("sdForm", sdForm);
+
+			    Iterator<ISocialConnector> it = this.socialData.getSocialConnectors().iterator();
+			    String connLI = "";
+
+			    while (it.hasNext()) {
+			     ISocialConnector conn = it.next();
+
+			     connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+			       + conn.getConnectorName()
+			       + " <a href=\"#\" onclick=\"disconnect('"
+			       + conn.getID()
+			       + "');\">Click here to disconnect</a></li>";
+
+			    }
+
+			    this.socialData.updateSocialData(); // this is required to read all
+			            // the SN Data.... (can take a
+			            // while).
+		
 	}
 
+	*/
+	
+	/*
+	@RequestMapping(value = "/socialdata.html", method = RequestMethod.GET)
+	public ModelAndView SocialDataForm() {
+
+		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		// //ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
+		SocialDataForm sdForm = new SocialDataForm();
+		model.put("sdForm", sdForm);
+
+		Iterator<ISocialConnector> it = socialdata.getSocialConnectors()
+				.iterator();
+		String connLI = "";
+
+		while (it.hasNext()) {
+			ISocialConnector conn = it.next();
+			connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+					+ conn.getConnectorName()
+					+ " <a href=\"#\" onclick=\"disconnect('" + conn.getID()
+					+ "');\">Click here to disconnect</a></li>";
+
+		}
+
+		model.put("lastupdate", lastUpdate);
+		model.put("connectors", connLI);
+		return new ModelAndView("socialdata", model);
+	}
+
+	*/
+	
+	/*
+	private String getSNIcon(ISocialConnector conn) {
+		try {
+			if (conn.getConnectorName().equalsIgnoreCase("facebook"))
+				return "images/Facebook.png";
+			else if (conn.getConnectorName().equalsIgnoreCase("twitter"))
+				return "images/Twitter.jpg";
+			else if (conn.getConnectorName().equalsIgnoreCase("linkedin"))
+				return "images/Linkedin.png";
+			else if (conn.getConnectorName().equalsIgnoreCase("foursquare"))
+				return "images/Foursquare.png";
+			else
+				return "images/social_network.png";
+		} catch (Exception ex) {
+		}
+		return "images/social_network.png";
+
+	}
+*/
+	
 }
