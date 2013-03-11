@@ -189,8 +189,8 @@ public class ContextUpdater {
 					List<CtxEntityIdentifier> snsEntitiesList 	= new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
 				
 					LOG.debug("lookup SN association" + snName);
-					List<CtxEntityIdentifier> snEntList 		= this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
-				
+					List<CtxEntityIdentifier> snEntList 		= this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.TYPE, snName).get();
+					//List<CtxEntityIdentifier> snEntList 		= this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
 					if (snEntList.size() > 0) {
 						socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(snEntList.get(0)).get();
 						return socialNetwork;
@@ -203,12 +203,14 @@ public class ContextUpdater {
 				snsAssoc = this.internalCtxBroker.createAssociation(CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
 				LOG.info("snsAssoc created ");
 				
-				List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.NAME, snName, snName).get();
-
+				List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.TYPE, snName, snName).get();
+				//List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.NAME, snName, snName).get();
+				
 				if (snEntitiesList.size() == 0) {
 					socialNetwork = this.internalCtxBroker.createEntity(CtxEntityTypes.SOCIAL_NETWORK).get();
 					LOG.info("SOCIAL_NETWORK entity created "+socialNetwork.getId());
-					CtxAttribute snsNameAttr = this.internalCtxBroker.createAttribute(socialNetwork.getId(), CtxAttributeTypes.NAME).get();
+					CtxAttribute snsNameAttr = this.internalCtxBroker.createAttribute(socialNetwork.getId(), CtxAttributeTypes.TYPE).get();
+					//CtxAttribute snsNameAttr = this.internalCtxBroker.createAttribute(socialNetwork.getId(), CtxAttributeTypes.NAME).get();
 					snsNameAttr.setStringValue(snName);
 					this.internalCtxBroker.update(snsNameAttr);
 
@@ -492,9 +494,15 @@ public class ContextUpdater {
 					LOG.debug("lookup SN association" + snName);
 					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
 							.lookupEntities(snsEntitiesList,
-									CtxAttributeTypes.NAME,
+									CtxAttributeTypes.TYPE,
 									connector.getConnectorName()).get();
 
+//					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
+//							.lookupEntities(snsEntitiesList,
+//									CtxAttributeTypes.NAME,
+//									connector.getConnectorName()).get();
+
+					
 					if (snEntList.size() > 0) {
 						socialNetwork = (CtxEntity) this.internalCtxBroker
 								.retrieve(snEntList.get(0)).get();

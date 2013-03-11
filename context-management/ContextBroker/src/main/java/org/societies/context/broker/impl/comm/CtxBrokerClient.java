@@ -206,7 +206,8 @@ public class CtxBrokerClient implements ICommCallback {
 	public void retrieve(Requestor requestor, CtxIdentifier identifier,
 			ICtxCallback callback) throws CtxBrokerException  {
 		
-		//LOG.info("Remote call retrieve CIS skata 1 *********** "+identifier.toString());
+		if (LOG.isDebugEnabled())
+			LOG.debug("Remote retrieve: requestor=" + requestor + ", identifier=" + identifier);
 		
 		IIdentity toIdentity = null;
 		try {
@@ -219,17 +220,14 @@ public class CtxBrokerClient implements ICommCallback {
 			RetrieveBean ctxBrokerRetrieveBean = new RetrieveBean();
 			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 			
-			// add the signatures of the method
+			// add the method params
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			ctxBrokerRetrieveBean.setRequestor(requestorBean);
 			
 			CtxIdentifierBean ctxIdBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
 			ctxBrokerRetrieveBean.setId(ctxIdBean);
-			//LOG.info("Remote call retrieve CIS skata 2 *********** ");
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerRetrieveBean.setRequestor(requestorBean);
 
 			cbPacket.setRetrieve(ctxBrokerRetrieveBean);
-			
-		//	LOG.info("Remote call retrieve CIS skata 3 *********** ");
 			
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 
@@ -456,43 +454,70 @@ public class CtxBrokerClient implements ICommCallback {
 		}
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
+	 */
 	@Override
 	public List<String> getJavaPackages() {
+		
 		return PACKAGES;
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces()
+	 */
 	@Override
 	public List<String> getXMLNamespaces() {
+		
 		return NAMESPACES;
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)
+	 */
 	@Override
-	public void receiveError(Stanza arg0, XMPPError arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveError(Stanza stanza, XMPPError error) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received error: stanza=" + stanza + ", error=" + error);
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveInfo(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.api.comm.xmpp.datatypes.XMPPInfo)
+	 */
 	@Override
-	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-		// TODO Auto-generated method stub
-
+	public void receiveInfo(Stanza stanza, String arg1, XMPPInfo info) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received info: stanza=" + stanza + ", info=" + info);
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
 	@Override
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveMessage(Stanza stanza, Object object) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received message: stanza=" + stanza + ", object=" + object);
 	}
 
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveResult(Stanza stanza, Object result) {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received result: stanza=" + stanza + ", result=" + result);
 	}
 }

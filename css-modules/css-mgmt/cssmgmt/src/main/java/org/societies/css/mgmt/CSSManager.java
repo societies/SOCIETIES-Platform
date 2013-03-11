@@ -1645,7 +1645,10 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 	ISocialData socialData = null;
 
+	
 	Integer filt = filter.getFilterFlag();
+	LOG.info("Friends filter contains: " +filt);
+	
 	final int facebook   = 0x0000000001;
 	final int twitter   =  0x0000000010;
 	final int linkedin   = 0x0000000100;
@@ -1653,23 +1656,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	final int googleplus = 0x0000010000;
 	
 	boolean flag = BitCompareUtil.isFacebookFlagged(filt);
-	LOG.info("Facebook filter is: " +flag);
+	
 	flag = BitCompareUtil.isTwitterFlagged(filt);
-	LOG.info("twitter filter is: " +flag);
+	
 	flag = BitCompareUtil.isLinkedinFlagged(filt);
-	LOG.info("linkedin filter is: " +flag);
+	
 	flag = BitCompareUtil.isFoursquareFlagged(filt);
-	LOG.info("foursquare filter is: " +flag);
 	flag = BitCompareUtil.isGooglePlusFlagged(filt);
-	LOG.info("googleplus filter is: " +flag);
-	
-	
-	LOG.info("Friends filter contains: " +filt);
-	LOG.info("Facebook filter contains: " +facebook);
-	LOG.info("twitter filter contains: " +twitter);
-	LOG.info("linkedin filter contains: " +linkedin);
-	LOG.info("foursquare filter contains: " +foursquare);
-	LOG.info("googleplus filter contains: " +googleplus);
 	
 	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
 	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
@@ -1684,11 +1677,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	HashMap<CssAdvertisementRecord, Integer> commonFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
-	LOG.info("MyId contains " +MyId);
-
-	LOG.info("CSSManager getFriends method called ");
-
-	LOG.info("Contacting CSS Directory to get list of CSSs");
+	
 
 	// first get all the cssdirectory records
 	CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -1697,22 +1686,15 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	recordList = callback.getResultList();
 
 	for (CssAdvertisementRecord cssAdd : recordList) {
-		LOG.info("Comparing Id contains " +cssAdd.getId());
+		
 		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 			LOG.info("This is my OWN ID not adding it");
 		}else {
 			cssFriends.add((cssAdd));
 		}
 
-		LOG.info("cssAdd.getName contains " +cssAdd.getName());
-		LOG.info("cssFriends contains " +cssFriends +" entries");
+		
 	}
-
-	LOG.info("cssFriends contains " +cssFriends);
-	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
-
-	LOG.info("Contacting SN Connector to get list");
-	LOG.info("getSocialData() returns " +getSocialData());
 
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
@@ -1721,14 +1703,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	while (it.hasNext()){
 	  ISocialConnector conn = it.next();
   	  
-	LOG.info("SocialNetwork connector contains " +conn.getConnectorName());
 
 	//socialdata.updateSocialData();
 	}
 	//it.next().getConnectorName();
 	String domain ="";
 	snFriends = (List<Person>) socialdata.getSocialPeople();
-	LOG.info("snFriends size is :" +snFriends.size());
+
     Iterator<Person> itt = snFriends.iterator();
     int index =1;
     while(itt.hasNext()){
@@ -1743,33 +1724,29 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     				
     				
     				if(domain.equalsIgnoreCase("facebook.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Facebook Filter");
 						filter.setFilterFlag(facebook);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
 	    				facebookFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("twitter.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Twitter Filter");
+    					
 						filter.setFilterFlag(twitter);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				twitterFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("linkedin.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Linkedin Filter");
+    					
 						filter.setFilterFlag(linkedin);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
 	    				linkedinFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("foursquare.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting foursquare Filter");
+    					
 						filter.setFilterFlag(foursquare);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				foursquareFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("googleplus.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting googleplus Filter");
 						filter.setFilterFlag(googleplus);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				googleplusFriends.add(name);    				
     				}
     				
@@ -1780,7 +1757,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     				if(p.getName().getGivenName()!=null){
     					if (name.length()>0)  name+=" ";
     					name +=p.getName().getGivenName();
-    					LOG.info(index +" Friends:" +name);
+    					
     					socialFriends.add(name);
     				}
     					  
@@ -1795,34 +1772,25 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     
     //compare the lists to create
     
-    LOG.info("CSS Friends List contains " +cssFriends.size() +" entries");
-    LOG.info("Social Friends List contains " +socialFriends.size() +" entries");
-    LOG.info("common Friends List contains " +commonFriends.size() +" entries");
-    
-    LOG.info("Facebook Friends List contains " +facebookFriends.size() +" entries");
-    LOG.info("Twitter Friends List contains " +twitterFriends.size() +" entries");
-    LOG.info("LinkedIn Friends List contains " +linkedinFriends.size() +" entries");
-    LOG.info("FourSquare Friends List contains " +foursquareFriends.size() +" entries");
-    LOG.info("GooglePlus Friends List contains " +googleplusFriends.size() +" entries");
     
     flag = BitCompareUtil.isFacebookFlagged(filt);
    
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends FACEBOOK iterator List contains " +friend.getName());
+        	
         	boolean contains = facebookFriends.contains(friend.getName());
         	
-        	LOG.info("facebookfriends contains is : " +contains +" and the value is: " +friend.getName());	
+        	
             if (facebookFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            			
             	}else {
-            		LOG.info("Adding this friend to the facebook list:" +friend);
+            		
             		commonFriends.put(friend, filt);            		
             	}
             	
             }	
-            LOG.info("This friend is not in the filter not adding to the facebook list:" +friend.getName() +friend.getId());
+           
         }
     	flag = false;
     }
@@ -1830,12 +1798,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isTwitterFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends TWITTER iterator List contains " +friend);
+        	
             if (twitterFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
-            		LOG.info("Adding this friend to the twitter list:" +friend);
+            		
             		commonFriends.put(friend, filt);
             	}
             	
@@ -1848,13 +1816,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isLinkedinFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends iterator List contains " +friend);
+        
             if (linkedinFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
             		commonFriends.put(friend, filt);
-            		LOG.info("Adding this friend to the linkedin list:" +friend);
+            		
             	}
             	
             }
@@ -1866,13 +1834,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isFoursquareFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends iterator List contains " +friend);
+        	
             if (foursquareFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
             		commonFriends.put(friend, filt);
-            		LOG.info("Adding this friend to the foursquare list:" +friend);
+            		
             	}
             	
             }
@@ -1885,13 +1853,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
              if(flag){
             	 for (CssAdvertisementRecord friend : cssFriends) {
-                 	LOG.info("CSS Friends iterator List contains " +friend);
+                 	
                      if (googleplusFriends.contains(friend.getName())) {
                      	if (commonFriends.containsValue(friend)){
-                     		LOG.info("This friend is already added to the list:" +friend);	
+                     		
                      	}else {
                      		commonFriends.put(friend, filt);
-                     		LOG.info("Adding this friend to the googleplus list:" +friend);	
+                     		
                      	}
                      	
                      }
@@ -1903,7 +1871,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
              
 
     //compare the two lists
-    LOG.info("Compare the two lists to generate a common Friends list");
+   
     int i = 1;
    // for (int index =0; index < cssFriends.size(); index++)
    // {
@@ -1920,16 +1888,10 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
        // i++;
     }
 */    //}
-    LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
+    
 	//return commonFriends;
     
-    for(Entry<CssAdvertisementRecord, Integer> entry : commonFriends.entrySet()){
-		LOG.info("@@@@@@@@@@@@@@@@ CommonFriends entry:  "+entry.getKey().getId() + " = " + entry.getKey().getName());
-	}
-    LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.values()); 
-    LOG.info("@@@@@@@@@@@@@@@@@@ KeySet contains returns: " +commonFriends.keySet());
-   //LOG.info("@@@@@@@@@@@@@@@@@@ entrySet contains returns: " +commonFriends.entrySet().iterator().next().getKey().getId());
-    //LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.entrySet().iterator().next().getKey().getName()); 
+    
 	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (commonFriends);
 	}
 

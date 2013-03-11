@@ -90,8 +90,6 @@
       <xs:element name="updateFrequency" type="xs:double" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-
-
   
   <xs:complexType name="communityMemberCtxEntityBean" abstract="true">
     <xs:complexContent>
@@ -142,8 +140,6 @@
     </xs:complexContent>
   </xs:complexType>
 
-
-
   <xs:complexType name="ctxHistoryAttributeBean">
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
@@ -165,8 +161,6 @@
       <xs:enumeration value="association"/>
     </xs:restriction>
   </xs:simpleType>
-
-
 
   <xs:simpleType name="ctxAttributeValueTypeBean">
     <xs:restriction base="xs:string">
@@ -206,6 +200,5 @@
       <xs:element name="value"    type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-
   
 </xs:schema>

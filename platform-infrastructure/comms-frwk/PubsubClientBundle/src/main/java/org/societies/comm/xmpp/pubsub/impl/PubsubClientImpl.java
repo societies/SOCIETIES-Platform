@@ -149,35 +149,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 			
-			//CONVERT THE .getAny() OBJECT TO XML
-			ElementNSImpl eventBean =  (ElementNSImpl) i.getAny();
-			DOMImplementationLS domImplLS = (DOMImplementationLS) eventBean.getOwnerDocument().getImplementation(); 
-			LSSerializer domSerializer = domImplLS.createLSSerializer(); 
-			String eventBeanXML = domSerializer.writeToString(eventBean); 
-			
-			//SERIALISE OBJECT
-			String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
-			Class<?> c = elementToClass.get(elementID);
-			// TODO CLASSLOADING MAGIC DISABLED!
-//			ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-//			Thread.currentThread().setContextClassLoader(c.getClassLoader());
-			
-			Object bean = null;
-			if (c==null) {
-				// when received xml was has not been binded print a warn and notify with raw XML
-				String[] keyArray = new String[elementToClass.keySet().size()];
-				keyArray = elementToClass.keySet().toArray(keyArray);
-				LOG.warn("No class found for namespace{element} '"+elementID+"', passing unmarshalled XML element... Registered entries are: "+Arrays.toString(keyArray));
-				bean = eventBean;
-			}
-			else {
-				// unmarshall item content
-				try {
-					bean = serializer.read(c, eventBeanXML);
-				} catch (Exception e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
+			Object bean = unmarshallBean((ElementNSImpl) i.getAny());
 			
 			//POST EVENT
 			List<Subscriber> subscriberList = subscribers.get(sub);
@@ -203,6 +175,40 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 //	</message>
 
 	
+	private Object unmarshallBean(ElementNSImpl eventBean) {
+		Object bean = null;
+		
+		//CONVERT THE .getAny() OBJECT TO XML
+		DOMImplementationLS domImplLS = (DOMImplementationLS) eventBean.getOwnerDocument().getImplementation(); 
+		LSSerializer domSerializer = domImplLS.createLSSerializer(); 
+		String eventBeanXML = domSerializer.writeToString(eventBean); 
+		
+		//SERIALISE OBJECT
+		String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
+		Class<?> c = elementToClass.get(elementID);
+		// TODO CLASSLOADING MAGIC DISABLED!
+//		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+//		Thread.currentThread().setContextClassLoader(c.getClassLoader());
+		
+		if (c==null) {
+			// when received xml was has not been binded print a warn and notify with raw XML
+			String[] keyArray = new String[elementToClass.keySet().size()];
+			keyArray = elementToClass.keySet().toArray(keyArray);
+			LOG.warn("No class found for namespace{element} '"+elementID+"', passing unmarshalled XML element... Registered entries are: "+Arrays.toString(keyArray));
+			bean = eventBean;
+		}
+		else {
+			// unmarshall item content
+			try {
+				bean = serializer.read(c, eventBeanXML);
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+		
+		return bean;
+	}
+
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
 		synchronized (responses) {
@@ -344,7 +350,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 
 	@Override
-	public List<Element> subscriberRetrieveLast(IIdentity pubsubService,
+	public List<Object> subscriberRetrieveLast(IIdentity pubsubService,
 			String node, String subId) throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -358,15 +364,15 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Object response = blockingIQ(stanza, payload);
 		
 		List<Item> itemList = ((Pubsub)response).getItems().getItem();
-		List<Element> returnList = new ArrayList<Element>();
+		List<Object> returnList = new ArrayList<Object>();
 		for (Item i : itemList)
-			returnList.add((Element) i.getAny());
+			returnList.add(unmarshallBean((ElementNSImpl) i.getAny()));
 		
 		return returnList;
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService,
+	public List<Object> subscriberRetrieveSpecific(IIdentity pubsubService,
 			String node, String subId, List<String> itemIdList)
 			throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
@@ -387,9 +393,9 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Object response = blockingIQ(stanza, payload);
 		
 		List<Item> itemList = ((Pubsub)response).getItems().getItem();
-		List<Element> returnList = new ArrayList<Element>();
+		List<Object> returnList = new ArrayList<Object>();
 		for (Item i : itemList)
-			returnList.add((Element) i.getAny());
+			returnList.add(unmarshallBean((ElementNSImpl) i.getAny()));
 		
 		return returnList;
 	}

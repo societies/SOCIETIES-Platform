@@ -145,6 +145,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 		
+		if (!associationDAO.getEventTopics().isEmpty()) {
+			final CtxChangeEvent event = new CtxChangeEvent(associationDAO.getId());
+			final String[] eventTopics = associationDAO.getEventTopics().toArray(new String[0]);
+			final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "'");
+			if (this.ctxEventMgr != null)
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
+			else
+				LOG.error("Could not send context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ "ICtxEventMgr service is not available");
+		}
+		
 		return (CtxAssociation) this.retrieve(id);
 	}
 	
@@ -194,6 +211,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			if (session != null)
 				session.close();
 		}
+		
+		if (!attributeDAO.getEventTopics().isEmpty()) {
+			final CtxChangeEvent event = new CtxChangeEvent(attributeDAO.getId());
+			final String[] eventTopics = attributeDAO.getEventTopics().toArray(new String[0]);
+			final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "'");
+			if (this.ctxEventMgr != null)
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
+			else
+				LOG.error("Could not send context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ "ICtxEventMgr service is not available");
+		}
 
 		return (CtxAttribute) this.retrieve(id);
 	}
@@ -224,6 +258,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
+		}
+		
+		if (!entityDAO.getEventTopics().isEmpty()) {
+			final CtxChangeEvent event = new CtxChangeEvent(entityDAO.getId());
+			final String[] eventTopics = entityDAO.getEventTopics().toArray(new String[0]);
+			final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "'");
+			if (this.ctxEventMgr != null)
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
+			else
+				LOG.error("Could not send context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ "ICtxEventMgr service is not available");
 		}
 		
 		return (CtxEntity) this.retrieve(id);
@@ -267,6 +318,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxAssociation isMemberOfAssoc = this.createAssociation(CtxAssociationTypes.IS_MEMBER_OF);
 		isMemberOfAssoc.setParentEntity(id);
 		this.update(isMemberOfAssoc);
+		
+		if (!entityDAO.getEventTopics().isEmpty()) {
+			final CtxChangeEvent event = new CtxChangeEvent(entityDAO.getId());
+			final String[] eventTopics = entityDAO.getEventTopics().toArray(new String[0]);
+			final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "'");
+			if (this.ctxEventMgr != null)
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
+			else
+				LOG.error("Could not send context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ "ICtxEventMgr service is not available");
+		}
 		
 		return (IndividualCtxEntity) this.retrieve(id);
 	}
@@ -435,8 +503,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
+		CtxModelObjectDAO dao = CtxModelDAOTranslator.getInstance().fromCtxModelObject(result);
 		try{
-			final CtxModelObjectDAO dao = CtxModelDAOTranslator.getInstance().fromCtxModelObject(result);
 			tx = session.beginTransaction();
 			session.delete(dao);
 			session.flush();
@@ -450,6 +518,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		} finally {
 			if (session != null)
 				session.close();
+		}
+		
+		if (!dao.getEventTopics().isEmpty()) {
+			final CtxChangeEvent event = new CtxChangeEvent(dao.getId());
+			final String[] eventTopics = dao.getEventTopics().toArray(new String[0]);
+			final CtxEventScope eventScope = CtxEventScope.BROADCAST;
+			if (LOG.isDebugEnabled())
+				LOG.debug("Sending context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "'");
+			if (this.ctxEventMgr != null)
+				this.ctxEventMgr.post(event, eventTopics, eventScope);
+			else
+				LOG.error("Could not send context change event " + event
+						+ " to topics '" + Arrays.toString(eventTopics) 
+						+ "' with scope '" + eventScope + "': "
+						+ "ICtxEventMgr service is not available");
 		}
 		
 		return result;
@@ -559,11 +644,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
+		CtxModelObjectDAO modelObjectDAO = CtxModelDAOTranslator.getInstance().fromCtxModelObject(modelObject);
 		try {	
-			final CtxModelObjectDAO modelObjectDAO = 
-					CtxModelDAOTranslator.getInstance().fromCtxModelObject(modelObject);
 			tx = session.beginTransaction();
-			session.merge(modelObjectDAO);
+			modelObjectDAO = (CtxModelObjectDAO) session.merge(modelObjectDAO);
 			session.flush();
 			tx.commit();
 		} catch (Exception e) {
@@ -576,8 +660,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 				session.close();
 		}
 		
-		final CtxChangeEvent event = new CtxChangeEvent(modelObject.getId());
-		final String[] eventTopics = new String[] { CtxChangeEventTopic.UPDATED };
+		final CtxChangeEvent event = new CtxChangeEvent(modelObjectDAO.getId());
+		modelObjectDAO.getEventTopics().add(CtxChangeEventTopic.UPDATED);
+		final String[] eventTopics = modelObjectDAO.getEventTopics().toArray(new String[0]);
 		final CtxEventScope eventScope = CtxEventScope.BROADCAST;
 		if (LOG.isDebugEnabled())
 			LOG.debug("Sending context change event " + event
@@ -606,11 +691,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			final Criteria criteria = session.createCriteria(modelObjectClass)
 					.add(Restrictions.eq("ctxId", ctxId));
 			result = (T) criteria.uniqueResult();
-			if (result!= null) {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Refreshing cached context model object " + result.getId());
-				session.refresh(result);
-			}
 		} finally {
 			if (session != null)
 				session.close();

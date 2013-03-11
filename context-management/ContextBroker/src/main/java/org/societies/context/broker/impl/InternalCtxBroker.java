@@ -1856,34 +1856,36 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// target is a CIS 
 		if (IdentityType.CIS.equals(target.getType())) {
-			//LOG.info("target is a CIS " +target.getJid());
-
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("target is a CIS " + target);
 			try {
-				// TODO check if CIS is locally maintained or a remote call is necessary
 				if (this.isLocalCisId(target)){
 
 					// TODO add access control (?)
-
+					if (LOG.isDebugEnabled())
+						LOG.debug("local retrieve for CIS " + target);
 					if(identifier.getModelType().equals(CtxModelType.ATTRIBUTE)){
 						CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) identifier;
 						objectResult = this.retrieveAttribute(attrId, true).get();
 
 					} else 	objectResult = this.communityCtxDBMgr.retrieve(identifier);
 
-				}else {
-					//LOG.info("Remote call for CIS *********** "+target);
-
+				} else {
+					
+					if (LOG.isDebugEnabled())
+						LOG.debug("remote retrieve for CIS " + target);
 					final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-					//LOG.info("retrieve CIS context object remote call identifier " +identifier.toString());
 					ctxBrokerClient.retrieve(requestor, identifier, callback); 
-					//LOG.info("Retrieve CIS Ctx remote call performed ");
 
 					synchronized (callback) {
 						try {
-							//LOG.info("Retrieve CIS Ctx remote call result received 1 ");
 							callback.wait();
-							objectResult = callback.getResult();
-							//LOG.info("Retrieve CIS Ctx remote call result received 2 objectResult  "+objectResult);
+							if (callback.getException() == null)
+								objectResult = callback.getResult();
+							else 
+								throw callback.getException();
+						
 						} catch (InterruptedException e) {
 							throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 						}
@@ -1947,17 +1949,16 @@ public class InternalCtxBroker implements ICtxBroker {
 				long initTimestamp = System.nanoTime();
 
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-				//LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
 				ctxBrokerClient.retrieve(requestor, identifier, callback); 
-				///LOG.info("RetrieveCtx remote call performed ");
 
 				synchronized (callback) {
 					try {
-						//LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
-						objectResult = callback.getResult();
+						if (callback.getException() == null)
+							objectResult = callback.getResult();
+						else 
+							throw callback.getException();
 
-						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
 						IPerformanceMessage m = new PerformanceMessage();
 						m.setTestContext("ContextBroker_Delay_RemoteContextRetrieval");
 						m.setSourceComponent(this.getClass()+"");
@@ -1968,7 +1969,6 @@ public class InternalCtxBroker implements ICtxBroker {
 						m.setPerformanceNameValue("Delay="+(delay));
 
 						PERF_LOG.trace(m.toString());
-					//	LOG.info("time needed for remote context retrieval :"+ delay);
 
 					} catch (InterruptedException e) {
 
@@ -2429,7 +2429,10 @@ public class InternalCtxBroker implements ICtxBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						communityEntityId = callback.getResult();
+						if (callback.getException() == null)
+							communityEntityId = callback.getResult();
+						else
+							throw callback.getException();
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for response");
@@ -2439,7 +2442,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		} catch (CtxException ce) {
 
 			throw new CtxBrokerException(
-					"Could not retrieve community CtxEntityIdentifier from Community Context DB Mgr: "
+					"Could not retrieve community CtxEntityIdentifier: "
 							+ ce.getLocalizedMessage(), ce);
 		}
 

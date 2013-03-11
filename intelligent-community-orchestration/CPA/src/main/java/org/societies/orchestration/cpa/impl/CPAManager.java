@@ -33,6 +33,7 @@ import org.societies.api.schema.cis.community.Community;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,11 +42,11 @@ import java.util.List;
  * Time: 13:51
  */
 public class CPAManager extends EventListener implements ICPA {
-    private HashMap<String, CPA> cpaMap;
+    private ConcurrentHashMap<String, CPA> cpaMap;
     private ICisDataCollector collector;
     private IEventMgr eventMgr;
     public CPAManager(){
-        cpaMap=new HashMap<String, CPA>();
+        cpaMap= new ConcurrentHashMap<String, CPA>();
     }
 
     public void newCis(String cisId) {
@@ -60,7 +61,7 @@ public class CPAManager extends EventListener implements ICPA {
         if(!cpaMap.containsKey(cisId)) return;
     }
     public void init(){
-        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_CREATION},null);
+        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_DELETION},null);
     }
     public void destroy(){
 

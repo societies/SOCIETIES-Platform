@@ -19,6 +19,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -91,8 +92,10 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			idm = new IdentityManagerImpl(subDomain, daNode);
 			thisIdentity = idm.getThisNetworkNode();
 			
-			probePresence();
-			log.info("Connected to '"+host+"' as '"+subDomain+"'!");
+			if (thisIdentity.getType()==IdentityType.CSS || thisIdentity.getType()==IdentityType.CSS_RICH)
+				probePresence();
+			
+			log.info("Connected "+thisIdentity.getType().toString()+" '"+subDomain+"' to domain '"+host+"'!");
 		} catch (ComponentException e) {
 			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();

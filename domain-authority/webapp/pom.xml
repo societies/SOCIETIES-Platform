@@ -231,8 +231,8 @@
 							javax.validation,*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
-						<Webapp-Context>domain-authority</Webapp-Context>
-						<Web-ContextPath>domain-authority</Web-ContextPath>
+						<Webapp-Context>societies-platform</Webapp-Context>
+						<Web-ContextPath>societies-platform</Web-ContextPath>
 					</instructions>
 				</configuration>
 			</plugin>

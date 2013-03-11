@@ -75,6 +75,8 @@ public class EventTypes {
 	
 	/** Used by User Agent Montior to publish event relating to use actions. */
 	public static final String UIM_EVENT = "org/societies/useragent/monitoring/newaction";
+	public static final String UIM_STATIC_ACTION = "org/societies/useragent/monitoring/staticaction";
+			
 	
 	/** Used to notify peers of a failed negotiation */
 	public static final String FAILED_NEGOTIATION_EVENT = "org/societies/privacyprotection/negotiation/failednegotiation";

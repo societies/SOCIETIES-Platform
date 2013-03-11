@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+  <!-- definitions using elements of the osgi namespace can be included
+       in this file. There is no requirement to keep these definitions
+       in a separate file if you do not want to. The rationale for 
+       keeping these definitions separate is to facilitate integration
+       testing of the bundle outside of an OSGi container -->
+    
+    <osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />   
+	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
+	<osgi:reference id="internalTrustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector" cardinality="1..1" />
+
+</beans>

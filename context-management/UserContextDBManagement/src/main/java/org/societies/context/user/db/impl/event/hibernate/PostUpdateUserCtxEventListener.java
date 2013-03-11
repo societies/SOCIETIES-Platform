@@ -24,19 +24,12 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import java.util.Arrays;
-
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.context.api.event.CtxChangeEventTopic;
-import org.societies.context.api.event.CtxEventScope;
-import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,14 +45,6 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateUserCtxEventListener.class);
-	
-	private static final String[] EVENT_TOPICS = new String[] { CtxChangeEventTopic.MODIFIED };
-	
-	private static final CtxEventScope EVENT_SCOPE = CtxEventScope.BROADCAST;
-	
-	/** The Context Event Mgmt service reference. */
-	@Autowired(required=true)
-	private ICtxEventMgr ctxEventMgr;
 	
 	PostUpdateUserCtxEventListener() {
 		
@@ -80,18 +65,7 @@ public class PostUpdateUserCtxEventListener implements PostUpdateEventListener {
 		if (!(event.getEntity() instanceof CtxModelObjectDAO))
 			return;
 		
-		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-		final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(ctxId); 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Sending context change event " + ctxChangeEvent
-					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' with scope '" + EVENT_SCOPE + "'");
-		if (this.ctxEventMgr != null)
-			this.ctxEventMgr.post(ctxChangeEvent, EVENT_TOPICS, EVENT_SCOPE);
-		else
-			LOG.error("Could not send context change event '" + ctxChangeEvent
-					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' with scope '" + EVENT_SCOPE + "': "
-					+ "ICtxEventMgr service is not available");
+		final CtxModelObjectDAO ctxModelObject = (CtxModelObjectDAO) event.getEntity();
+		ctxModelObject.getEventTopics().add(CtxChangeEventTopic.MODIFIED);
 	}
 }

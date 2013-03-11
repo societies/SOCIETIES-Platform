@@ -30,7 +30,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * This class is used to uniquely identify trusted individuals, communities,
@@ -86,35 +87,37 @@ public class TrustedEntityId implements Serializable {
 	private volatile URI urn; // The only serialisable field
 
 	/**
-	 * Constructs a <code>TrustedEntityId</code> with the specified trustor id,
-	 * entity type and trustee id.
+	 * Constructs a <code>TrustedEntityId</code> URN from the specified type
+	 * and unique identifier of the referenced entity.
 	 * 
-	 * @param trustorId
-	 *            the String representation of the unique identifier of the
-	 *            trustor
 	 * @param entityType
-	 *            the trusted entity type
-	 * @param trusteeId
+	 *            the type of the trusted entity, i.e. {@link TrustedEntityType#CSS CSS},
+	 *            {@link TrustedEntityType#CIS CIS}, {@link TrustedEntityType#SVC service},
+	 *            or {@link TrustedEntityType#LGC legacy}. 
+	 * @param entityId
 	 *            the String representation of the unique identifier of the
-	 *            trustee
-	 *        
+	 *            entity
 	 * @throws MalformedTrustedEntityIdException 
 	 *             if the URN of this identifier cannot be created
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
 	 */
 	public TrustedEntityId(final TrustedEntityType entityType,
 			final String entityId) throws MalformedTrustedEntityIdException {
 		
+		if (entityType == null)
+			throw new NullPointerException("entityType can't be null");
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
+		
 		this.entityType = entityType;
 		this.entityId = entityId;
 		try {
-			this.urn = URI.create(URI_SCHEME 
-					+ URN_DELIM
-					+ URN_NID
-					+ URN_DELIM  
-					+ entityType
-					+ URN_DELIM
-					+ entityId);
-		} catch (IllegalArgumentException iae) {
+			this.urn = new URI(URI_SCHEME,
+					URN_NID	+ URN_DELIM	+ entityType + URN_DELIM 
+					+ URLEncoder.encode(entityId, "UTF-8"),
+					null);
+		} catch (Exception iae) {
 			throw new MalformedTrustedEntityIdException(
 					"Could not create trusted entity identifier URN", iae);
 		}
@@ -154,11 +157,13 @@ public class TrustedEntityId implements Serializable {
 	 * @throws MalformedTrustedEntityIdException
 	 *            if the specified TrustedEntityId string representation is
 	 *            malformed.
+	 * @throws NullPointerException
+	 *             if <code>str</code> is <code>null</code>
 	 * @since 0.0.5
 	 */
 	public TrustedEntityId(String str) throws MalformedTrustedEntityIdException {
 		
-		this.parseString(str);
+		this.parse(str);
 	}
 	
 	/**
@@ -202,7 +207,7 @@ public class TrustedEntityId implements Serializable {
 	 * Returns a String representation of this identifier. The format of the
 	 * returned String is as follows: 
      * <pre>
-     * urn:teid:trustorId:entityType:trusteeId
+     * urn:teid:entityType:entityId
      * </pre>
      * 
      * The returned String representation can be used to re-create the
@@ -286,7 +291,7 @@ public class TrustedEntityId implements Serializable {
 	
     	is.defaultReadObject();     // Reads the urn field only
     	try {
-    		this.parseUrn(this.urn);
+    		this.parse(this.urn);
     	} catch (MalformedTrustedEntityIdException mteide) {
     		IOException ioe = new InvalidObjectException("Invalid trusted entity identifier");
     		ioe.initCause(mteide);
@@ -294,7 +299,7 @@ public class TrustedEntityId implements Serializable {
     	}
     }
     
-    private void parseUrn(URI input) throws MalformedTrustedEntityIdException {
+    private void parse(URI input) throws MalformedTrustedEntityIdException {
     	
     	final String scheme = input.getScheme();
     	if (scheme == null)
@@ -327,19 +332,24 @@ public class TrustedEntityId implements Serializable {
     						: ": '" + parts[1] + "': Invalid trusted entity type"), iae);
 		}   
     	
-		this.entityId = parts[2];
-		if (this.entityId.length() == 0)
+    	if (parts[2].length() == 0)
 			throw new MalformedTrustedEntityIdException("'" + input + "'" 
 					+ ": Entity identifier cannot be empty");
+    	try {
+    		this.entityId = URLDecoder.decode(parts[2], "UTF-8");
+    	} catch (Exception e) {
+    		throw new MalformedTrustedEntityIdException("'" + input + "'" 
+    				+ ": '" + parts[2] + "' Malformed entity identifier: " + e.getLocalizedMessage());
+    	}
     }
     
-    private void parseString(String input) throws MalformedTrustedEntityIdException {
+    private void parse(String input) throws MalformedTrustedEntityIdException {
     	
     	try {
 			this.urn = new URI(input);
-			this.parseUrn(this.urn);
-		} catch (URISyntaxException use) {
-			throw new MalformedTrustedEntityIdException("'" + input + "'", use);
+			this.parse(this.urn);
+		} catch (Exception e) {
+			throw new MalformedTrustedEntityIdException("'" + input + "'", e);
 		}
     }
 }

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>android-parent</artifactId>
+        <version>RELEASE</version>
+   </parent>
+
+   <groupId>org.societies.android.remote.helper.container</groupId>
+   <artifactId>ContainerSocietiesAndroidRemoteHelpers</artifactId>
+   <name>ContainerAndroidRemoteHelpers</name>
+   <version>${release.version}</version>
+   <packaging>apk</packaging>
+
+   <developers>
+      <developer>
+		 <name>WP4 Client Framework Team</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
+
+	<dependencies>    
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+		</dependency>
+		<dependency>
+		   <groupId>org.societies.android.remote.helper</groupId>
+		   <artifactId>SocietiesAndroidRemoteHelpers</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>   
+      
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+          <plugins>
+              <plugin>
+                  <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                  <artifactId>android-maven-plugin</artifactId>
+
+				  <configuration>
+				      <emulator>
+						  <avd>Nexus403</avd>
+						  <wait>60000</wait>
+						  <options>-no-skin</options>
+				      </emulator>
+                      <!-- emma start -->
+					    <emmaEnable>true</emmaEnable>
+					    <emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
+					    <emmaOutputMetaFile>${project.basedir}/target/emma/coverage.em</emmaOutputMetaFile>
+				      <!--emma>
+                          <enable>true</enable>
+                          <classFolders>${project.basedir}/target/classes</classFolders>
+                          <outputMetaFile>${project.basedir}/target/emma/coverage.em</outputMetaFile>
+                      </emma-->
+                      <!-- emma stop -->
+                      <dex>
+                          <noLocals>true</noLocals>
+                          <!--  must be set for emma -->
+                      </dex>
+                  </configuration>
+                  <executions>
+			    	<!--execution>
+				        <id>startEmulator</id>
+				        <phase>initialize</phase>
+				        <goals>
+				            <goal>emulator-start</goal>
+				        </goals>
+			    	</execution-->
+			    	<!--execution>
+				        <id>stopEmulator</id>
+				        <phase>initialize</phase>
+				        <goals>
+				            <goal>emulator-stop</goal>
+				        </goals>
+			    	</execution-->
+			    	
+				</executions>
+				  
+                  <extensions>true</extensions>
+              </plugin>
+          </plugins>
+
+    </build>
+
+</project>

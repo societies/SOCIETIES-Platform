@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -44,7 +45,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 28-Nov-2011 21:08:55
  */
-public class CRISTCommunitySituation implements ICRISTCommunitySituation {
+public class CRISTCommunitySituation extends Action implements ICRISTCommunitySituation {
 
 	/**
 	 * 
@@ -210,6 +211,24 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	public void setServiceTypes(List<String> types) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public boolean isContextDependent() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isImplementable() {
+		// TODO Auto-generated method stub
+		return super.isImplementable();
+	}
+
+	@Override
+	public boolean isProactive() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
