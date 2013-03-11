@@ -59,7 +59,7 @@ import android.util.Log;
  */
 public class EventsHelper implements IAndroidSocietiesEventsHelper {
 	private final static String LOG_TAG = EventsHelper.class.getName();
-	private final static int NUM_METHODS = 10;
+	private final static int NUM_METHODS = 11;
 	private final static int ILLEGAL_VALUE = -999999;
 	
 	//Class method enum. Ensure that it remains up to date. Order does not matter. 
@@ -71,7 +71,9 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
     	unSubscribeFromEvents,
     	unSubscribeFromAllEvents,
     	publishEvent,
-    	getNumSubscribedNodes
+    	getNumSubscribedNodes,
+    	createPubsubNode,
+    	deletePubsubNode
     }
 
 	private Context context;
@@ -104,6 +106,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 
 	@Override
 	public boolean setUpService(IMethodCallback callback) {
+		Dbc.require("Callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "setUpService");
 		
 		if (!this.connectedToEvents) {
@@ -118,6 +121,7 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 
 	@Override
 	public boolean tearDownService(IMethodCallback callback) {
+		Dbc.require("Callback object must be specified", null != callback);
 		Log.d(LOG_TAG, "tearDownService");
 		if (this.connectedToEvents) {
 			this.teardownBroadcastReceiver();
@@ -474,6 +478,102 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 		return 0;
 	}
 
+	@Override
+	public boolean createEvent(String pubsubNode, String societiesIntent, IPlatformEventsCallback callback)
+			throws PlatformEventsHelperNotConnectedException {
+		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+		Dbc.require("Societies intent must be specified", null != societiesIntent && societiesIntent.length() > 0);
+		Dbc.require("Callback class must be specified", null != callback);
+		Log.d(LOG_TAG, "createEvent called");
+
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.createPubsubNode.ordinal());
+			this.methodQueues[classMethods.createPubsubNode.ordinal()].add(callback);
+
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[10];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), pubsubNode);
+			Log.d(LOG_TAG, "Pubsub Node: " + pubsubNode);
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), societiesIntent);
+			Log.d(LOG_TAG, "Societies Intent: " + societiesIntent);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.createPubsubNode.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
+			}
+		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
+			throw new PlatformEventsHelperNotConnectedException();
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean deleteEvent(String pubsubNode, IPlatformEventsCallback callback)
+			throws PlatformEventsHelperNotConnectedException {
+		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+		Dbc.require("Callback class must be specified", null != callback);
+		Log.d(LOG_TAG, "deleteEvent called");
+
+		if (this.connectedToEvents) {
+			//add callback class to method queue tail
+			initialiseQueue(classMethods.deletePubsubNode.ordinal());
+			this.methodQueues[classMethods.deletePubsubNode.ordinal()].add(callback);
+
+			//Select target method and create message to convey remote invocation
+	   		String targetMethod = IAndroidSocietiesEvents.methodsArray[11];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IAndroidSocietiesEvents.methodsArray, targetMethod), 0, 0);
+
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), pubsubNode);
+			Log.d(LOG_TAG, "Pubsub Node: " + pubsubNode);
+			
+	   		outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				
+				//Retrieve callback and signal failure
+				IPlatformEventsCallback retrievedCallback = this.methodQueues[classMethods.deletePubsubNode.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.returnAction(false);
+				}
+				Log.e(LOG_TAG, "Cannot send remote method invocation", e);
+			}
+		} else {
+			Log.d(LOG_TAG, "Not connected to Pubsub service");
+			throw new PlatformEventsHelperNotConnectedException();
+		}
+
+		return false;
+	}
+
 	
     /**
      * Events service connection
@@ -524,14 +624,22 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToAllEvents.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvent.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 
@@ -539,42 +647,88 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
 				if (null != EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.subscribeToEvents.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_ALL_EVENTS)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromAllEvents.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvent.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.unSubscribeFromEvents.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.PUBLISH_EVENT)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.publishEvent.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS)) {
 				if (null != EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()]) {
 					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
 					if (null != retrievedCallback) {
-						retrievedCallback.returnAction(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE));
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE));
+						}
+					}
+				}
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.CREATE_EVENT)) {
+				if (null != EventsHelper.this.methodQueues[classMethods.createPubsubNode.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+					if (null != retrievedCallback) {
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
+					}
+				}
+			} else if (intent.getAction().equals(IAndroidSocietiesEvents.DELETE_EVENT)) {
+				if (null != EventsHelper.this.methodQueues[classMethods.deletePubsubNode.ordinal()]) {
+					IPlatformEventsCallback retrievedCallback = EventsHelper.this.methodQueues[classMethods.getNumSubscribedNodes.ordinal()].poll();
+					if (null != retrievedCallback) {
+						if (intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
+							retrievedCallback.returnException(intent.getIntExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						} else {
+							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+						}
 					}
 				}
 			} 
@@ -619,6 +773,8 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
         intentFilter.addAction(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS);
         intentFilter.addAction(IAndroidSocietiesEvents.PUBLISH_EVENT);
         intentFilter.addAction(IAndroidSocietiesEvents.NUM_EVENT_LISTENERS);
+        intentFilter.addAction(IAndroidSocietiesEvents.CREATE_EVENT);
+        intentFilter.addAction(IAndroidSocietiesEvents.DELETE_EVENT);
         
         return intentFilter;
     }
@@ -633,4 +789,4 @@ public class EventsHelper implements IAndroidSocietiesEventsHelper {
     		this.methodQueues[index] = new ConcurrentLinkedQueue<IPlatformEventsCallback>();
     	}
     }
-}
+ }
