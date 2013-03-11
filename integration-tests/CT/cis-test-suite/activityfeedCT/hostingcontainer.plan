@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.integration.test.bit.activityfeedct.policy-management-remote-1266.plan"
+	version="3.0.0" scoped="false" atomic="false"
+	xmlns="http://www.eclipse.org/virgo/schema/plan" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/virgo/schema/plan 
+						http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- Common -->
+	<artifact type="bundle" name="org.societies.comm.CommonLibraries" />
+	<artifact type="bundle" name="org.societies.data-source" />
+
+	<!-- Comm -->
+	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr" />
+	<artifact type="bundle"
+		name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle" />
+	<artifact type="bundle"
+		name="org.societies.comm.xmpp.pubsub.PubsubClientBundle" />
+	<artifact type="bundle" name="org.societies.comm.event.mgmt" />
+
+	<!-- Privacy & Trust -->
+	<artifact type="bundle" name="org.societies.privacytrust.trust"/>
+	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
+	<!--<artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanager" />-->
+	
+	<!-- Device Management (needed by Context) -->
+	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr" />
+	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	
+	<!-- Context (needed by Privacy & Trust) -->
+	<artifact type="bundle"
+		name="org.societies.context-management.context-event-mgmt" />
+	<artifact type="bundle"
+		name="org.societies.context-management.user-context-db-mgmt" />
+	<artifact type="bundle"
+		name="org.societies.context-management.user-context-history-mgmt" />
+	<artifact type="bundle"
+		name="org.societies.context-management.user-context-inference-mgmt" />	
+	<artifact type="bundle"
+		name="org.societies.context-management.context-broker" />
+	<artifact type="bundle"
+		name="org.societies.context-management.context-source-mgmt"/>
+	<artifact type="bundle"
+		name="org.societies.context-management.community-context-db-mgmt"/>
+
+</plan>

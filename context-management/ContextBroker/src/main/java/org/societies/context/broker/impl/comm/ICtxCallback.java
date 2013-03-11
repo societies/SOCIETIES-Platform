@@ -21,12 +21,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.context.broker.impl.comm;
-
 
 import java.util.List;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -34,9 +33,25 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 
-
 public interface ICtxCallback {
-
+	
+	/**
+	 * Returns the exception associated with this callback. The method
+	 * returns <code>null</code> if there is no exception.
+	 * 
+	 * @return the exception associated with this callback.
+	 * @since 1.1
+	 */
+	public CtxException getException();
+	
+	/**
+	 * Associates an exception with this callback.
+	 * 
+	 * @param exception the exception to associate with this callback.
+	 * @since 1.1
+	 */
+	public void onException(CtxException exception);
+	
 	public void onCreatedEntity(CtxEntity retObject);
 	
 	public void onCreatedAttribute(CtxAttribute retObject);

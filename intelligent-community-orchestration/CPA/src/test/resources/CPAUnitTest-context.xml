@@ -25,16 +25,14 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
-		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+
+
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
-	xmlns:tx="http://www.springframework.org/schema/tx">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx">
 
     	<bean id="CPAPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -42,7 +40,6 @@
 		<property name="locations">
 			<list>
 			 	<value>classpath:/derby_database.properties</value>
-				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
 			</list>
 		</property>	
 	</bean>
@@ -73,10 +70,6 @@
 
 		<property name="hibernateProperties">
 			<props>
-				<!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-				<prop key="hibernate.jdbc.batch_size">0</prop> 
-				-->
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
@@ -90,22 +83,9 @@
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	 
-  <!-- regular spring configuration file defining the beans for this
-       bundle. We've kept the osgi definitions in a separate 
-       configuration file so that this file can easily be used
-       for integration testing outside of an OSGi environment -->
+
     <context:annotation-config />
     <tx:annotation-driven />
-<!--   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPA"
-   init-method="init">
-    <property name="linkedCss" ref="IIdentity"></property>
-    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property>
-    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property>
-    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property>
-    <property name="commManager" ref="ICommManager"></property>
-    <property name="deviceManager" ref="IDeviceManager"></property>
-   </bean>-->
    
    <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 
    depends-on="" init-method="init">

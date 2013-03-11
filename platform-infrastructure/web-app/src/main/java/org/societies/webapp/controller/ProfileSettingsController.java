@@ -33,6 +33,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
@@ -225,6 +226,25 @@ public class ProfileSettingsController extends BasePageController {
     public String[] getAvailableCtxAttributeTypes() {
         return CtxAttributeTypes.ALL_TYPES;
     }
+
+    private String[] availablePreferenceNames;
+
+    public String[] getAvailablePreferenceNames() {
+        if (availablePreferenceNames == null) {
+            List<PersonalisablePreferenceIdentifier> knownPersonalisablePreferences = userPreferenceManagement.getKnownPersonalisablePreferences();
+            List<String> names = new ArrayList<String>();
+
+            for (PersonalisablePreferenceIdentifier pref : knownPersonalisablePreferences) {
+                names.add(pref.getPreferenceName());
+            }
+
+            availablePreferenceNames = names.toArray(new String[names.size()]);
+            log.trace("Found " + availablePreferenceNames.length + " preference names: " + Arrays.toString(availablePreferenceNames));
+        }
+
+        return availablePreferenceNames;
+    }
+
 
     public void setNewPreferenceName(String newPreferenceName) {
         this.newPreferenceName = newPreferenceName;
