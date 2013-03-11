@@ -56,6 +56,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
+import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +76,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	
 	@Autowired(required=true)
 	private ITrustEvidenceCollector trustEvidenceCollector;
+	
+	@Autowired(required=true)
+	private ITrustEvidenceRepository trustEvidenceRepository; 
 	
 	@Autowired(required=false)
 	private ICtxBroker ctxBroker;
@@ -544,8 +548,17 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 					(CtxAssociation) ctxBroker.retrieve(foundHasMembersId).get();
 			if (foundHasMembers != null && communityEntId.equals(foundHasMembers.getParentEntity())) {
 				hasMembersId = foundHasMembersId;
-				for (final CtxEntityIdentifier memberId : foundHasMembers.getChildEntities())
-					members.add(memberId.getOwnerId());
+				for (final CtxEntityIdentifier memberEntId : foundHasMembers.getChildEntities()) {
+					final String memberId = memberEntId.getOwnerId();
+					if (LOG.isDebugEnabled())
+						LOG.debug("Checking existing evidence about '" + memberId + "' being member of community '" + communityId + "'");
+					if (trustEvidenceRepository.retrieveDirectEvidence(
+							new TrustedEntityId(TrustedEntityType.CSS, memberId), 
+							new TrustedEntityId(TrustedEntityType.CIS, communityId),
+							TrustEvidenceType.JOINED_COMMUNITY, null, null).isEmpty())
+						addMembershipEvidence(memberId, communityId, TrustEvidenceType.JOINED_COMMUNITY, new Date());
+					members.add(memberId);
+				}
 				break;
 			}
 		}
