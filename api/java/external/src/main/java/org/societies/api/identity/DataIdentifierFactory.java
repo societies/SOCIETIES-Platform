@@ -92,6 +92,6 @@ public class DataIdentifierFactory {
 		dataId.setScheme(scheme);
 		dataId.setType(dataType);
 		dataId.setUri(DataIdentifierUtil.toUriString(scheme, dataType));
-		return null;
+		return dataId;
 	}
 }

@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.eclipse.jetty.util.log.Log;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -36,7 +38,6 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -152,23 +153,21 @@ public class RequestPolicyUtils {
 	public static List<String> getDataTypes(DataIdentifierScheme schemeFilter, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
 		List<String> dataTypes = null;
 		// -- Empty privacy policy
-		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0) {
+		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0 || null == schemeFilter) {
 			return dataTypes;
 		}
 
 		// -- Retrieve data type list
 		dataTypes = new ArrayList<String>();
 		for(RequestItem requestItem : privacyPolicy.getRequestItems()) {
-		/*	DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
-			if (dataId.getScheme().name().equals(schemeFilter.name())) {
-				dataTypes.add(dataId.getType());
+			try {
+				DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
+				if (schemeFilter.name().equals(dataId.getScheme().name())) {
+					dataTypes.add(dataId.getType());
+				}
+			} catch (MalformedCtxIdentifierException e) {
+				Log.debug("Too bad: can't retrieve the data identifier. Privacy policy must be badly formatted.", e);
 			}
-			*/
-			Resource resource = requestItem.getResource();
-			   DataIdentifierScheme scheme = resource.getScheme(); 
-			   if (scheme.equals(DataIdentifierScheme.CONTEXT)){
-			    dataTypes.add(resource.getDataType());
-			   }	
 		}
 		return dataTypes;
 	}
