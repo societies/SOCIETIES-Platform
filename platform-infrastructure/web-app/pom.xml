@@ -232,6 +232,17 @@
             <artifactId>primefaces</artifactId>
             <version>3.5</version>
         </dependency>
+        <!-- needed for PrimeFaces push -->
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-compat-tomcat7</artifactId>
+            <version>1.0.9</version>
+        </dependency>
 
         <!-- Java EE6 dependencies -->
         <dependency>
@@ -524,7 +535,11 @@
                             org.springframework.web.jsf.el,
                             org.springframework.osgi.config,
                             com.sun.faces.vendor,
-							<!-- spring DM -->
+                            <!-- PrimeFaces push -->
+                            org.atmosphere.cpr,
+                            org.apache.catalina,
+                            org.apache.catalina.comet,
+                            <!-- spring DM -->
 							org.springframework.beans.factory.config,
 							org.springframework.osgi.web.context.support,
 							org.springframework.web.context.request,
@@ -615,7 +630,19 @@
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                            <type>war</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+                <executions>
 					<execution>
 						<id>copy-installed</id>
 						<phase>install</phase>
@@ -689,27 +716,25 @@
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.atmosphere</groupId>
+                                    <artifactId>atmosphere-runtime</artifactId>
+                                    <version>1.0.9</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.atmosphere</groupId>
+                                    <artifactId>atmosphere-compat-tomcat7</artifactId>
+                                    <version>1.0.9</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<type>war</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
