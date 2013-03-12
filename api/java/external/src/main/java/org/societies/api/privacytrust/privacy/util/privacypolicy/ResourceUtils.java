@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierFactory;
-import org.societies.api.identity.DataTypeFactory;
+import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataTypeFactory;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.identity.DataIdentifier;

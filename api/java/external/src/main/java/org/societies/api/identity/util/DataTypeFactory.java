@@ -22,58 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.identity;
+package org.societies.api.identity.util;
 
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * Utility method that helps manipulating DataIdentifier objects
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class DataIdentifierUtil {
+public class DataTypeFactory {
 	/**
-	 * Generate a URI: sheme://ownerId/type
-	 * @param dataId
-	 * @return
+	 * Create the relevant data type using a correct URI
+	 *
+	 * @param dataIdUri URI format sheme://ownerId/type
+	 * @return the relevant DataIdentifier type instance
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		return str.toString();
-	}
-	
-	/**
-	 * Generate a URI: sheme:///type
-	 * @param scheme
-	 * @param dataType
-	 * @return
-	 */
-	public static String toUriString(DataIdentifierScheme scheme, String dataType)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((scheme != null ? scheme.value()+"://" : "/"));
-		str.append("/");
-		str.append((dataType != null ? dataType+"/" : "/"));
-		return str.toString();
-	}
-	
-	public static DataIdentifier fromUri(String dataIdUri)
-	{
+	public static DataIdentifier fromUri(String dataIdUri) {
 		String[] uri = dataIdUri.split("://");
+		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+
 		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
+		dataId.setScheme(scheme);
 		String path = uri[1];
-		int pos = 0, end = 0;
+		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
 			dataId.setOwnerId(path.substring(pos, end));
 		}
-		dataId.setType(path.substring(end+1, path.length()));
+		endType = path.length();
+		if (path.endsWith("/") && endType > 1) {
+			endType--;
+		}
+		dataId.setType(path.substring(end+1, endType));
+		dataId.setUri(dataIdUri);
 		return dataId;
+	}
+	
+	/**
+	 * Retrieve the type of a DataIdentifier for sure: from its URI or its type field
+	 * @param dataId
+	 * @return Data type
+	 */
+	public static String getType(DataIdentifier dataId) {
+		if (null != dataId.getType()) {
+			return dataId.getType();
+		}
+		return fromUri(dataId.getUri()).getType();
 	}
 }

@@ -32,6 +32,7 @@ import org.eclipse.jetty.util.log.Log;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -166,7 +167,8 @@ public class RequestPolicyUtils {
 					dataTypes.add(dataId.getType());
 				}
 			} catch (MalformedCtxIdentifierException e) {
-				Log.debug("Too bad: can't retrieve the data identifier. Privacy policy must be badly formatted.", e);
+				// "Too bad: can't retrieve the data identifier. Privacy policy must be badly formatted.", e);
+				return dataTypes;
 			}
 		}
 		return dataTypes;

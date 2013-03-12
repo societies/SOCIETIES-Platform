@@ -42,7 +42,7 @@ import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -209,8 +209,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		catch (IllegalArgumentException ex) {}//IGNORE - DEFAULT TO MEMBERS_ONLY
 		
 		try {			
-			RequestPolicy policyObj = PrivacyPolicyUtil.inferCisPrivacyPolicy(policyType, rules);
-			privacyPolicyXml =  PrivacyPolicyUtil.toXmlString(policyObj);
+			RequestPolicy policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, rules);
+			privacyPolicyXml =  PrivacyPolicyUtils.toXmlString(policyObj);
 		} catch (PrivacyException pEx) {
 			pEx.printStackTrace();
 		}

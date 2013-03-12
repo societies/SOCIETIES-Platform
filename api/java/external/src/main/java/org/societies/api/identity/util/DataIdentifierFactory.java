@@ -22,10 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.api.identity.util;
 
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -91,7 +92,7 @@ public class DataIdentifierFactory {
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
 		dataId.setType(dataType);
-		dataId.setUri(DataIdentifierUtil.toUriString(scheme, dataType));
+		dataId.setUri(DataIdentifierUtils.toUriString(scheme, dataType));
 		return dataId;
 	}
 }

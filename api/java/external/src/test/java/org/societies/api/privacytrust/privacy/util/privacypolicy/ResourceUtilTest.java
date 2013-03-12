@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierUtil;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -72,7 +72,7 @@ public class ResourceUtilTest {
 
 		// -- CIS data: uri
 		try {
-			actualDataId = ResourceUtils.getDataIdentifier(ResourceUtils.create(DataIdentifierUtil.toUriString(DataIdentifierScheme.CIS, typeCisMemberList)));
+			actualDataId = ResourceUtils.getDataIdentifier(ResourceUtils.create(DataIdentifierUtils.toUriString(DataIdentifierScheme.CIS, typeCisMemberList)));
 			assertNotNull("Data id should not be null", actualDataId);
 			assertEquals("Data id should be equals to: "+DataIdentifierScheme.CIS.name(), DataIdentifierScheme.CIS.name(), actualDataId.getScheme().name());
 			assertNotNull("Data id scheme should not be null", actualDataId.getScheme());
