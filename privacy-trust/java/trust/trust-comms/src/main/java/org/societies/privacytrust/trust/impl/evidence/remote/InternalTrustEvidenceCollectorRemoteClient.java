@@ -29,10 +29,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +40,6 @@ import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.A
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
@@ -109,8 +104,7 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 		
 		if (LOG.isDebugEnabled()) 
 			LOG.debug("Adding direct trust evidence with subjectId '" + subjectId
-					+ "' and objectId '" + objectId + "'");
-		
+					+ "' and objectId '" + objectId + "'");	
 		try {
 			final IIdentity toIdentity = 
 					this.commManager.getIdManager().getCloudNode(); 
@@ -120,20 +114,16 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 			
 			final AddDirectEvidenceRequestBean addEvidenceBean = new AddDirectEvidenceRequestBean();
 			// 1. subjectId
-			addEvidenceBean.setSubjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId));
+			addEvidenceBean.setSubjectId(TrustModelBeanTranslator.getInstance().
+					fromTrustedEntityId(subjectId));
 			// 2. subjectId
-			addEvidenceBean.setObjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId));
+			addEvidenceBean.setObjectId(TrustModelBeanTranslator.getInstance().
+					fromTrustedEntityId(objectId));
 			// 3. type
-			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
+			addEvidenceBean.setType(TrustModelBeanTranslator.getInstance().
+					fromTrustEvidenceType(type));
 			// 4. timestamp
-			// TODO Uncomment once #1310 is resolved
-			//final GregorianCalendar gregCal = new GregorianCalendar();
-			//gregCal.setTime(timestamp);
-			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
-			Date now = new Date();
-			addEvidenceBean.setTimestamp(now);
+			addEvidenceBean.setTimestamp(timestamp);
 			// 5. info
 			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
@@ -151,13 +141,6 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 					+ subjectId + "' and objectId '" + objectId 
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
-		/** TODO Uncomment once #1310 is resolved
-		} catch (DatatypeConfigurationException dce) {
-			
-			throw new TrustEvidenceCollectorCommsException(
-					"Could not add direct trust evidence with subjectId '" 
-					+ subjectId + "' and objectId '" + objectId 
-					+ "': " + dce.getLocalizedMessage(), dce);*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(
@@ -195,7 +178,6 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 		if (LOG.isDebugEnabled()) 
 			LOG.debug("Adding indirect trust evidence with subjectId '"	
 					+ subjectId + "' and objectId '" + objectId	+ "'");
-		
 		try {
 			final IIdentity toIdentity = 
 					this.commManager.getIdManager().getCloudNode(); 
@@ -205,19 +187,16 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 			
 			final AddIndirectEvidenceRequestBean addEvidenceBean = new AddIndirectEvidenceRequestBean();
 			// 1. subjectId
-			addEvidenceBean.setSubjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(subjectId));
+			addEvidenceBean.setSubjectId(TrustModelBeanTranslator.getInstance().
+					fromTrustedEntityId(subjectId));
 			// 2. objectId
-			addEvidenceBean.setObjectId(
-					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(objectId));
+			addEvidenceBean.setObjectId(TrustModelBeanTranslator.getInstance().
+					fromTrustedEntityId(objectId));
 			// 3. type
-			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
+			addEvidenceBean.setType(TrustModelBeanTranslator.getInstance().
+					fromTrustEvidenceType(type));
 			// 4. timestamp
-			//final GregorianCalendar gregCal = new GregorianCalendar();
-			//gregCal.setTime(timestamp);
-			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
-			Date now = new Date();
-			addEvidenceBean.setTimestamp(now);
+			addEvidenceBean.setTimestamp(timestamp);
 			// 5. info
 			if (info != null)
 				addEvidenceBean.setInfo(serialise(info));
@@ -238,13 +217,6 @@ public class InternalTrustEvidenceCollectorRemoteClient implements
 					+ subjectId + "' and objectId '" + objectId	
 					+ "': " + ce.getLocalizedMessage(), ce);
 			
-		//} catch (DatatypeConfigurationException dce) {
-		/** Removed as dce does not exist	
-			throw new TrustEvidenceCollectorCommsException(
-					"Could not add indirect trust evidence with subjectId '"	
-					+ subjectId + "' and objectId '" + objectId	
-					+ "': " + dce.getLocalizedMessage(), dce);
-			*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommsException(

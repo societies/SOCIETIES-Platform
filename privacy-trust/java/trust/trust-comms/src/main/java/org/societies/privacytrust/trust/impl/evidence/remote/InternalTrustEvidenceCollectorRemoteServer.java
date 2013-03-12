@@ -115,9 +115,8 @@ public class InternalTrustEvidenceCollectorRemoteServer implements IFeatureServe
 		final TrustEvidenceCollectorRequestBean requestBean = (TrustEvidenceCollectorRequestBean) bean;
 		final TrustEvidenceCollectorResponseBean responseBean = new TrustEvidenceCollectorResponseBean();
 		
-		// TODO Change to debug once tested
-		if (LOG.isInfoEnabled())
-			LOG.info("getQuery(stanza=" + this.stanzaToString(stanza)
+		if (LOG.isDebugEnabled())
+			LOG.debug("getQuery(stanza=" + this.stanzaToString(stanza)
 					+ ",methodName=" + requestBean.getMethodName() + ")");
 		
 		if (MethodName.ADD_DIRECT_EVIDENCE.equals(requestBean.getMethodName())) {
@@ -137,13 +136,10 @@ public class InternalTrustEvidenceCollectorRemoteServer implements IFeatureServe
 				final TrustedEntityId objectId = TrustModelBeanTranslator.getInstance().
 						fromTrustedEntityIdBean(addEvidenceRequestBean.getObjectId());
 				// 3. type
-				final TrustEvidenceType type = TrustEvidenceType.valueOf(
-						addEvidenceRequestBean.getType().toString());
+				final TrustEvidenceType type = TrustModelBeanTranslator.getInstance().
+						fromTrustEvidenceTypeBean(addEvidenceRequestBean.getType());
 				// 4. timestamp
-				// TODO Uncomment once #1310 is resolved
-				//final Date timestamp = addEvidenceRequestBean.
-				//		getTimestamp().toGregorianCalendar().getTime();
-				final Date timestamp = new Date();
+				final Date timestamp = addEvidenceRequestBean.getTimestamp();
 				// 5. info
 				final Serializable info;
 				if (addEvidenceRequestBean.getInfo() != null)
@@ -151,12 +147,10 @@ public class InternalTrustEvidenceCollectorRemoteServer implements IFeatureServe
 				else
 					info = null;
 				
-				// TODO Change to debug once tested
-				if (LOG.isInfoEnabled())
-					LOG.info("addDirectTrustEvidence(subjectId=" + subjectId
+				if (LOG.isDebugEnabled())
+					LOG.debug("addDirectTrustEvidence(subjectId=" + subjectId
 							+ ",objectId=" + objectId + ",type=" + type 
 							+ ",timestamp=" + timestamp	+ ",info=" + info + ")");
-				
 				this.internalTrustEvidenceCollector.addDirectEvidence(subjectId,
 						objectId, type, timestamp, info);
 				
@@ -200,10 +194,9 @@ public class InternalTrustEvidenceCollectorRemoteServer implements IFeatureServe
 				final TrustedEntityId objectId = TrustModelBeanTranslator.getInstance().
 						fromTrustedEntityIdBean(addEvidenceRequestBean.getObjectId());
 				// 3. type
-				final TrustEvidenceType type = TrustEvidenceType.valueOf(
-						addEvidenceRequestBean.getType().toString());
+				final TrustEvidenceType type = TrustModelBeanTranslator.getInstance().
+						fromTrustEvidenceTypeBean(addEvidenceRequestBean.getType());
 				// 4. timestamp
-				//final Date timestamp = addEvidenceRequestBean.getTimestamp().toGregorianCalendar().getTime();
 				final Date timestamp = addEvidenceRequestBean.getTimestamp();
 				// 5. info
 				final Serializable info;
@@ -214,13 +207,12 @@ public class InternalTrustEvidenceCollectorRemoteServer implements IFeatureServe
 				// 6. sourceId
 				final TrustedEntityId sourceId = TrustModelBeanTranslator.getInstance().
 						fromTrustedEntityIdBean(addEvidenceRequestBean.getSourceId());
-				
+	
 				if (LOG.isDebugEnabled())
 					LOG.debug("addIndirectTrustEvidence(subjectId=" + subjectId
 							+ ",objectId=" + objectId + ",type=" + type 
 							+ ",timestamp="	+ timestamp	+ ",info=" + info 
-							+ ",sourceId" + sourceId + ")");
-				
+							+ ",sourceId" + sourceId + ")");				
 				this.internalTrustEvidenceCollector.addIndirectEvidence(subjectId, 
 						objectId, type, timestamp, info, sourceId);
 				

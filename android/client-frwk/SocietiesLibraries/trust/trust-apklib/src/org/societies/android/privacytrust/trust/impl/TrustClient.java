@@ -45,12 +45,12 @@ import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.android.api.privacytrust.trust.TrustException;
+import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
-import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
 import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Service;
