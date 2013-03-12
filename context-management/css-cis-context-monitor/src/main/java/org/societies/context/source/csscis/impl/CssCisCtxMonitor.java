@@ -27,7 +27,9 @@ package org.societies.context.source.csscis.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,6 +58,7 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
@@ -64,7 +67,7 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -84,9 +87,13 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CssCisCtxMonitor.class);
 
-	private static final String[] INTERNAL_EVENT_TYPES = { EventTypes.CIS_SUBS,
+	private static final String[] INTERNAL_EVENT_TYPES = { 
+		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_SUBS,
 		EventTypes.CIS_UNSUBS, EventTypes.CIS_CREATION,	
 		EventTypes.CIS_DELETION, EventTypes.CIS_RESTORE };
+	
+	private static final String[] EXTERNAL_EVENT_TYPES = { 
+		CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT };
 
 	private static final String VERB_CSS_JOINED = "joined";
 	private static final String VERB_CSS_LEFT = "left";
@@ -120,6 +127,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		if (LOG.isInfoEnabled())
 			LOG.info("Registering for internal events '" + Arrays.asList(INTERNAL_EVENT_TYPES) + "'");
 		this.eventMgr.subscribeInternalEvent(this, INTERNAL_EVENT_TYPES, null);
+		new Thread(new PubsubEventSubscriber()).start();
 	}
 
 	/*
@@ -141,7 +149,31 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received internal event: " + eventToString(event));
 
-		if (EventTypes.CIS_SUBS.equals(event.geteventType())
+		if (EventTypes.CSS_FRIENDED_EVENT.equals(event.geteventType())) {
+			
+			if (event.geteventSource() == null 
+					|| event.geteventSource().length() == 0) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected non-null or non-empty event source of type IIdentity JID String"
+						+ " but was " + event.geteventSource());
+				return;
+			}
+			
+			if (!(event.geteventInfo() instanceof String)
+					|| ((String) event.geteventInfo()).length() == 0) {
+
+				LOG.error("Could not handle internal " + event.geteventType() + " event: " 
+						+ "Expected non-null or non-empty event info of type IIdentity JID String"
+						+ " but was " + event.geteventInfo());
+				return;
+			}
+			
+			final String myCssIdStr = event.geteventSource();
+			final String newFriendIdStr = (String) event.geteventInfo();
+			this.executorService.execute(new CssFriendedHandler(myCssIdStr, newFriendIdStr));
+			
+		} else if (EventTypes.CIS_SUBS.equals(event.geteventType())
 				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
 
 			if (event.geteventSource() == null || event.geteventSource().length() == 0) {
@@ -215,7 +247,21 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received pubsub event: " + item);
 
-		if (item instanceof MarshaledActivity) {
+		if (item instanceof CssFriendEvent) {
+			
+			final String myCssIdStr = pubsubService.getBareJid();
+			final String newFriendIdStr = ((CssFriendEvent) item).getCssAdvert().getId();
+			if (newFriendIdStr == null || newFriendIdStr.length() == 0) {
+				LOG.error("Could not handle external 'CssFriendEvent' event: " 
+						+ "Expected non-empty friend JID but was "
+						+ newFriendIdStr);
+				return;
+			}
+			
+			this.executorService.execute(new CssFriendedHandler(myCssIdStr,
+					newFriendIdStr));
+			
+		} else if (item instanceof MarshaledActivity) {
 
 			final String cssIdStr = ((MarshaledActivity) item).getActor();
 			final String cisIdStr = ((MarshaledActivity) item).getObject();
@@ -237,7 +283,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private class CssFriendedHandler implements Runnable {
 
 		private final String myCssIdStr;
@@ -277,8 +322,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					isFriendsWithAssoc = (CtxAssociation) ctxBroker.retrieve(
 							myCssEnt.getAssociations(CtxAssociationTypes.IS_FRIENDS_WITH).iterator().next()).get();
 				}
-				isFriendsWithAssoc.addChildEntity(newFriendEntId);
-				ctxBroker.update(isFriendsWithAssoc);
+				if (!isFriendsWithAssoc.getChildEntities().contains(newFriendEntId)) {
+					isFriendsWithAssoc.addChildEntity(newFriendEntId);
+					ctxBroker.update(isFriendsWithAssoc);
+				} else {
+					LOG.warn("IS_FRIENDS_WITH context association '" + isFriendsWithAssoc.getId() 
+							+ "' already contains the individual entity id of CSS '" + newFriendIdStr + "'"
+							+ " - Nothing to do");
+				}
 
 			} catch (InvalidFormatException ife) {
 
@@ -745,7 +796,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		}
 	}
 
-
 	private List<String> getPrivPolicyAttributeTypes(IIdentity ownerJid, IIdentity cisId){
 
 		List<String> results = new ArrayList<String>();
@@ -786,7 +836,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		return results;
 	}
 
-
 	private String eventToString(final InternalEvent event) {
 
 		final StringBuffer sb = new StringBuffer();
@@ -805,5 +854,47 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		sb.append("]");
 
 		return sb.toString();
+	}
+	
+	private class PubsubEventSubscriber implements Runnable {
+
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final IIdentity pubsubId = commMgr.getIdManager().getThisNetworkNode();
+				final Set<String> topicsToRegister = 
+						new HashSet<String>(Arrays.asList(EXTERNAL_EVENT_TYPES));
+				while (!topicsToRegister.isEmpty()) {
+					
+					if (LOG.isDebugEnabled())
+						LOG.debug("Pubsub events to register for '" + topicsToRegister + "'");
+					final List<String> existingTopics = pubsubClient.discoItems(pubsubId, null);
+					for (final String topic : EXTERNAL_EVENT_TYPES) {
+						if (existingTopics.contains(topic)) {
+							if (LOG.isInfoEnabled())
+								LOG.info("Registering for pubsub event '" + topic + "'"
+										+ " under pubsub id " + pubsubId);
+							pubsubClient.subscriberSubscribe(pubsubId, topic, CssCisCtxMonitor.this);
+							topicsToRegister.remove(topic);
+						}
+					}
+					if (!topicsToRegister.isEmpty()) {
+						if (LOG.isWarnEnabled())
+							LOG.warn("Pubsub topics '" + topicsToRegister + "' were not available -"
+									+ " Sleeping for 15 seconds until next pubsub node discovery...");
+						Thread.sleep(15000);
+					}
+				} 
+				if (LOG.isDebugEnabled())
+					LOG.debug("Registered for all pubsub events");
+			} catch (Exception e) {
+				LOG.error("Could not register for pubsub events '" + Arrays.asList(EXTERNAL_EVENT_TYPES) 
+						+ "':" + e.getLocalizedMessage(), e);
+			}
+		}
 	}
 }
