@@ -4,11 +4,11 @@ Change log since R0.5:
 - Multi-container distribution: 
 	- configured for 2 users containers 
     - user1 run 'fullcontainer' plan, user2 runs 'usercontainer' plan
+    - Multi user configuration only works on Windows. Single user container is supported for both Windows and Linux.
 - Openfire domain changed from ‘societies.local’ to ‘ict-societies.eu’
     - requires Openfire properties to be updated
 - removed 'xc.properties' and merged properties into 'org.societies.platform.properties'
 - Web context of Test Webapp changed to http://localhost:8080/societies-platform/
-- Linux startup configuration included
 
 Platform Features in Release 0.6:
 
