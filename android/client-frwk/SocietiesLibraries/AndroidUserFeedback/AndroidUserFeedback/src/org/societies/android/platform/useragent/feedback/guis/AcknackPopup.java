@@ -36,7 +36,7 @@ import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.AndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
