@@ -385,6 +385,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 									});
 								}
 							}
+							@Override
+							public void returnException(int exception) {
+							}
 						});
 					} catch (PlatformEventsHelperNotConnectedException e) {
 						Log.e(LOG_TAG, e.getMessage(), e);
@@ -453,6 +456,9 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 							}
 						});
 					}
+				}
+				@Override
+				public void returnException(int exception) {
 				}
 			});
 		} catch (PlatformEventsHelperNotConnectedException e) {

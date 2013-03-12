@@ -203,7 +203,9 @@ public class UserFeedbackBase implements IAndroidUserFeedback {
 												if (resultFlag){
 													Log.d(LOG_TAG, "resultFlag true - Subscribed to "+AndroidUserFeedbackService.USER_FEEDBACK_EVENTS_ALL+" events");
 												}
-												
+											}
+											@Override
+											public void returnException(int exception) {
 											}
 										});
 									} catch (PlatformEventsHelperNotConnectedException e) {

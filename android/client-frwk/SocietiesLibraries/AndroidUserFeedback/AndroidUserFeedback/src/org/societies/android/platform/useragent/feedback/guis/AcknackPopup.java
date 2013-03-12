@@ -165,18 +165,18 @@ public class AcknackPopup extends Activity{
 			bean.setRequestId(requestID);			
 			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {				
 				@Override				
-				public void returnAction(int result) {					
-					// TODO Auto-generated method stub				
+				public void returnAction(int result) {
 					}				
 				@Override				
-				public void returnAction(boolean resultFlag) {					
-					// TODO Auto-generated method stub				
-					}			
-				});		
-			} catch (PlatformEventsHelperNotConnectedException e) {			
-				// TODO Auto-generated catch block			
-				e.printStackTrace();		
-				}	
-		}
+				public void returnAction(boolean resultFlag) {									
+					}
+				@Override
+				public void returnException(int exception) {
+				}			
+			});
+		} catch (PlatformEventsHelperNotConnectedException e) {
+			e.printStackTrace();		
+		}	
+	}
 
 }
