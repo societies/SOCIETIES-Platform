@@ -37,7 +37,8 @@
     <application
         android:icon="@drawable/launcher_societies"
         android:label="@string/app_name"
-        android:configChanges="orientation|keyboardHidden"> 
+        android:configChanges="orientation|keyboardHidden"
+        android:debuggable="true"> 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
