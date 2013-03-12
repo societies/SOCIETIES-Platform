@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataTypeFactory;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.util.DataTypeFactory;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;

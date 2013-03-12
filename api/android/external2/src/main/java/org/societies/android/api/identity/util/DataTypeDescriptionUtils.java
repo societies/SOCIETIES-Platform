@@ -22,11 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.android.api.identity.util;
 
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
 
 /**
@@ -34,7 +31,7 @@ import org.societies.api.schema.identity.DataTypeDescription;
  * 
  * @author Olivier Maridat (Trialog)
  */
-public class DataTypeDescriptionUtil {
+public class DataTypeDescriptionUtils {
 
 	/**
 	 * Create a data type description without friendly name: a computed one will be used
@@ -106,14 +103,13 @@ public class DataTypeDescriptionUtil {
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
 		DataTypeDescription rhs = (DataTypeDescription) o2;
-		return new EqualsBuilder()
-		.append(o1.getName(), rhs.getName())
-		.append(o1.getFriendlyName(), rhs.getFriendlyName())
-		.append(o1.getFriendlyDescription(), rhs.getFriendlyDescription())
-		.isEquals();
+		return (o1.getName().equals(rhs.getName())
+				&& o1.getFriendlyName().equals(rhs.getFriendlyName())
+				&& o1.getFriendlyDescription().equals(rhs.getFriendlyDescription())
+				);
 	}
 	
 	public static String computeFriendlyName(String dataTypeIdentifier) {
-		return WordUtils.capitalizeFully(dataTypeIdentifier, new char[]{'_'}).replaceAll("_", " ");
+		return dataTypeIdentifier.replaceAll("_", " ");
 	}
 }

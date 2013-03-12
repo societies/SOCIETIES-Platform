@@ -22,8 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.android.api.identity.util;
 
+import org.societies.android.api.identity.SimpleDataIdentifier;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -33,42 +35,38 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class DataIdentifierUtil {
+public class DataIdentifierFactory {
 	/**
-	 * Generate a URI: sheme://ownerId/type
-	 * @param dataId
-	 * @return
+	 * Create the relevant DataIdentifier extension using a correct URI
+	 *
+	 * @param dataIdUri URI format sheme://ownerId/type
+	 * @return the relevant DataIdentifier instance
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		return str.toString();
-	}
-	
-	/**
-	 * Generate a URI: sheme:///type
-	 * @param scheme
-	 * @param dataType
-	 * @return
-	 */
-	public static String toUriString(DataIdentifierScheme scheme, String dataType)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((scheme != null ? scheme.value()+"://" : "/"));
-		str.append("/");
-		str.append((dataType != null ? dataType+"/" : "/"));
-		return str.toString();
-	}
-
-	@Deprecated
-	public static DataIdentifier fromUri(String dataIdUri)
+	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
 		String[] uri = dataIdUri.split("://");
+		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+
+//		// Context
+//		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {
+//			return CtxIdentifierFactory.getInstance().fromString(dataIdUri);
+//		}
+		//		// CIS
+		//		if (DataIdentifierScheme.CIS.equals(scheme)) {
+		//			
+		//		}
+		//		// DEVICE
+		//		if (DataIdentifierScheme.DEVICE.equals(scheme)) {
+		//			
+		//		}
+		//		// ACTIVITY
+		//		if (DataIdentifierScheme.ACTIVITY.equals(scheme)) {
+		//			
+		//		}
+		// Default SimpleDataIdentifier
 		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
+		dataId.setScheme(scheme);
 		String path = uri[1];
 		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
@@ -79,6 +77,21 @@ public class DataIdentifierUtil {
 			endType--;
 		}
 		dataId.setType(path.substring(end+1, endType));
+		return dataId;
+	}
+
+	/**
+	 * Generate a simple DataIdentifier from schema and type
+	 * 
+	 * @param scheme
+	 * @param dataType
+	 * @return
+	 */
+	public static DataIdentifier fromType(DataIdentifierScheme scheme, String dataType) {
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(scheme);
+		dataId.setType(dataType);
+		dataId.setUri(DataIdentifierUtils.toUriString(scheme, dataType));
 		return dataId;
 	}
 }

@@ -27,6 +27,8 @@ package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.android.api.identity.util.RequestorUtils;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -129,9 +131,14 @@ public class RequestPolicyUtils {
 		// -- Retrieve data type list
 		dataTypes = new ArrayList<String>();
 		for(RequestItem requestItem : privacyPolicy.getRequestItems()) {
-			DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
-			if (dataId.getScheme().name().equals(schemeFilter.name())) {
-				dataTypes.add(dataId.getType());
+			try {
+				DataIdentifier dataId = ResourceUtils.getDataIdentifier(requestItem.getResource());
+				if (schemeFilter.name().equals(dataId.getScheme().name())) {
+					dataTypes.add(dataId.getType());
+				}
+			} catch (MalformedCtxIdentifierException e) {
+				// Too bad: can't retrieve the data identifier. Privacy policy must be badly formatted."
+				return dataTypes;
 			}
 		}
 		return dataTypes;

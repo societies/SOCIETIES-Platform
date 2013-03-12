@@ -41,7 +41,7 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.identity.DataIdentifier;
