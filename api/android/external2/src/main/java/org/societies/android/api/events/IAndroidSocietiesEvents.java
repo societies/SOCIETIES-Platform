@@ -143,9 +143,11 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
-	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String USER_FEEDBACK_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
+	static final String USER_FEEDBACK_IMP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_RES_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS, USER_FEEDBACK_IMP_RES_EVENT_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	

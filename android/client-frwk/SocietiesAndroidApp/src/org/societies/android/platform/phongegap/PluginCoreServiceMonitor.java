@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
@@ -41,7 +42,6 @@ import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
-import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -437,14 +437,18 @@ public class PluginCoreServiceMonitor extends Plugin {
 				if (methodCallbackId != null) {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
-					Service services[] = new Service[parcels.length];
-					System.arraycopy(parcels, 0, services, 0, parcels.length);
-					
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
+					boolean notStarted = intent.getBooleanExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, false);
+					PluginResult result;
+					if (notStarted) {
+						result = new PluginResult(PluginResult.Status.ERROR, "Service Not Started");
+					} else {
+						Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
+						Service services[] = new Service[parcels.length];
+						System.arraycopy(parcels, 0, services, 0, parcels.length);
+						result = new PluginResult(PluginResult.Status.OK, convertServiceToJSONArray(services));
+					}
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
-					
 					//remove callback ID for given method invocation
 					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
 
