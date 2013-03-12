@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -189,7 +190,7 @@ public class EventService extends Service {
 				Log.d(LOG_TAG, "Frient Request accepted event");
 				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 				String description = eventPayload.getCssAdvert().getName() + " accepted your friend request";
-				addNotification(description, "Friend Request Accepted", eventPayload.getCssAdvert());
+				addNotificationAccept(description, "Friend Request Accepted", eventPayload.getCssAdvert());
 			}
 		}
     }
@@ -257,4 +258,20 @@ public class EventService extends Service {
 		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class, intent);
 	}
 
+    private void addNotificationAccept(String description, String eventType, CssAdvertisementRecord advert) {
+    	//CREATE ANDROID NOTIFICATION
+		int notifierflags [] = new int [1];
+		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
+		
+		//CREATE INTENT FOR LAUNCHING ACTIVITY
+		//Intent intent = new Intent();
+		//PackageManager manager = getPackageManager();
+		//intent = manager.getLaunchIntentForPackage("org.societies.android.platform.gui");
+		//intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		///intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
+		//intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		
+		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class);
+    }
 }
