@@ -35,6 +35,27 @@
 
         <p:growl id="messages" showDetail="true" sticky="true" autoUpdate="true"/>
 
+        <!-- used to listen for responses if there is a privacy policy negotiation request -->
+        <p:socket onMessage="handlePnb" channel="/pnb"/>
+
+        <!-- used to open the notification bar for a privacy policy negotiation request -->
+        <script type="text/javascript">
+            function handlePnb() {
+                pnb.show();
+            }
+        </script>
+
+        <!-- notification bar for a privacy policy negotiation request -->
+        <p:notificationBar id="pnb" position="bottom" effect="slide" widgetVar="pnb"
+                           styleClass="bottom">
+            The privacy policy negotatiator wants your attention! Mosey on over
+            <a href="privacy/privacy_policy_negotiation.xhtml">here</a>.
+            <p:commandLink value="(ignore)"
+                           actionListener="#{ppNegotiation.cancelNegotiation}"
+                           onclick="pnb.hide();"/>
+        </p:notificationBar>
+
+
         <div id="wrapper" class="clearfix">
             <div id="container" class="container_12 clearfix">
                 <!-- Header -->
