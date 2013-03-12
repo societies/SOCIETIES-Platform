@@ -58,7 +58,7 @@ var	SocietiesCISListService = {
 		for (i  = 0; i < data.length; i++) {
 			var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ', ' + bAdmin + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 							 '<h2>' + data[i].communityName + '</h2>' + 
-							 '<p>' + data[i].communityType + '</p>' + 
+							 '<p>' + data[i].description + '</p>' + 
 							 '</a></li>';
 			$('ul#CommunitiesListDiv').append(tableEntry);
 		}
@@ -75,7 +75,7 @@ var	SocietiesCISListService = {
 			var markup = "<h1>" + communityObj.communityName + "</h1>" + 
 						 "<p>Type: " + communityObj.communityType + "</p>" + 
 						 "<p>" + communityObj.description + "</p>" + 
-						 "<p>Owner: " + communityObj.ownerJid + "</p>";
+						 "<p>Admin: " + communityObj.ownerJid + "</p>";
 			//INJECT
 			$("#community_profile_info").html( markup );
 			
