@@ -33,6 +33,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
@@ -40,7 +41,6 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.privacytrust.remote.PrivacyCommClientCallback;
 /**
  * Comms Client that initiates the remote communication

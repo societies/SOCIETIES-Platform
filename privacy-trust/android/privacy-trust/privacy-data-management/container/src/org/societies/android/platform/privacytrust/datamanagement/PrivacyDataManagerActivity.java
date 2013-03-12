@@ -27,7 +27,7 @@ package org.societies.android.platform.privacytrust.datamanagement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.identity.DataIdentifierFactory;
+import org.societies.android.api.identity.util.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;

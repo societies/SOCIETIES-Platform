@@ -24,6 +24,7 @@
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <type>apklib</type>
 		    <version>${version.comm}</version>
 		</dependency>
 		<dependency>

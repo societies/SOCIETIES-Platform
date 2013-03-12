@@ -193,9 +193,15 @@ public class AndroidUserFeedback {
 		}
 
 		//if the event is a request for feedback, pop up the appropriate feedback GUI
-		else if (intent.getAction().equals(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_EVENT)){
-			Log.d(LOG_TAG, IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_EVENT+" received: ");
+		else if (intent.getAction().equals(IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_INTENT)){
+			Log.d(LOG_TAG, IAndroidSocietiesEvents.USER_FEEDBACK_REQUEST_INTENT+" received: ");
 			UserFeedbackBean feedbackBean = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+			//TEMP WORKAROUND
+			String text = feedbackBean.getProposalText();
+			text = text.replace(']', '>');
+			text = text.replace('[', '<');
+			feedbackBean.setProposalText(text);
+			//
 			Log.d(LOG_TAG, "Feedback type: "+feedbackBean.getType()+", method: "+feedbackBean.getMethod()+",  proposalText: "+feedbackBean.getProposalText());
 			switch(feedbackBean.getMethod()){
 			case GET_EXPLICIT_FB:

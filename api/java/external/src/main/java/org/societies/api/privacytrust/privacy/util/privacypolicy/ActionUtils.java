@@ -140,7 +140,21 @@ public class ActionUtils {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * Create a list of mandatory actions
+	 * 
+	 * @param actionConstants Array of actions
+	 * @return List of mandatory actions
+	 */
+	public static List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> createList(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants... actionConstants) {
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action>();
+		for (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant : actionConstants) {
+			actions.add(create(actionConstant, true));
+		}
+		return actions;
+	}
+
 	/**
 	 * Create a mandatory action
 	 * 
@@ -150,7 +164,7 @@ public class ActionUtils {
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant) {
 		return create(actionConstant, true);
 	}
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants actionConstant, boolean optional) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action();
 		action.setActionConstant(actionConstant);

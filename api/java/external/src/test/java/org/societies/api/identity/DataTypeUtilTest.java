@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.identity.util.DataTypeUtils;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -44,13 +45,13 @@ public class DataTypeUtilTest {
 
 	@Test
 	public void testLoad() {
-		DataTypeUtil dataTypeUtil = new DataTypeUtil();
+		DataTypeUtils dataTypeUtil = new DataTypeUtils();
 		assertTrue("Should be true", dataTypeUtil.isLeaf(CtxAttributeTypes.ADDRESS_HOME_CITY));
 	}
 	
 	@Test
 	public void testIsLeaf() {
-		DataTypeUtil dataTypeUtil = new DataTypeUtil();
+		DataTypeUtils dataTypeUtil = new DataTypeUtils();
 		assertTrue("NAME_FIRST should be a leaf", dataTypeUtil.isLeaf(CtxAttributeTypes.NAME_FIRST));
 		assertTrue("ACTION should be a leaf", dataTypeUtil.isLeaf(CtxAttributeTypes.ACTION));
 		assertFalse("NAME should not be a leaf", dataTypeUtil.isLeaf(CtxAttributeTypes.NAME));
@@ -59,7 +60,7 @@ public class DataTypeUtilTest {
 	
 	@Test
 	public void testIsRoot() {
-		DataTypeUtil dataTypeUtil = new DataTypeUtil();
+		DataTypeUtils dataTypeUtil = new DataTypeUtils();
 		assertFalse("NAME_FIRST should not be a root", dataTypeUtil.isRoot(CtxAttributeTypes.NAME_FIRST));
 		assertTrue("ACTION should be a root", dataTypeUtil.isRoot(CtxAttributeTypes.ACTION));
 		assertTrue("NAME should not be a root", dataTypeUtil.isRoot(CtxAttributeTypes.NAME));
@@ -68,7 +69,7 @@ public class DataTypeUtilTest {
 	
 	@Test
 	public void testGetParent() {
-		DataTypeUtil dataTypeUtil = new DataTypeUtil();
+		DataTypeUtils dataTypeUtil = new DataTypeUtils();
 		assertEquals("NAME_FIRST parent should be NAME", CtxAttributeTypes.NAME, dataTypeUtil.getParent(CtxAttributeTypes.NAME_FIRST));
 		assertNull("ACTION should not have parent", dataTypeUtil.getParent(CtxAttributeTypes.ACTION));
 		assertNull("NAME should not have parent", dataTypeUtil.getParent(CtxAttributeTypes.NAME));
@@ -77,7 +78,7 @@ public class DataTypeUtilTest {
 	
 	@Test
 	public void testGetChildren() {
-		DataTypeUtil dataTypeUtil = new DataTypeUtil();
+		DataTypeUtils dataTypeUtil = new DataTypeUtils();
 		assertNull("NAME_FIRST should not have children", dataTypeUtil.getChildren(CtxAttributeTypes.NAME_FIRST));
 		assertNull("ACTION should not have children", dataTypeUtil.getChildren(CtxAttributeTypes.ACTION));
 		assertNull("UnknownType should not have children", dataTypeUtil.getChildren("UnknownType"));
