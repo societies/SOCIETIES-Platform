@@ -60,7 +60,7 @@ import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.androidutils.AppPreferences;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.content.CssRecordDAO;
-import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.android.platform.androidutils.EntityRegularExpressions;
 import android.app.Notification;
 import android.content.Context;
