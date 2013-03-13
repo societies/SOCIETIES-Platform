@@ -83,8 +83,6 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING12 = "myCIS12.societies.local";
 	private static final String CIS_IIDENTITY_STRING13 = "myCIS13.societies.local";
 	private static final String CIS_IIDENTITY_STRING14 = "myCIS14.societies.local";
-	private static final String CIS_IIDENTITY_STRING15 = "myCIS15.societies.local";
-	private static final String CIS_IIDENTITY_STRING16 = "myCIS16.societies.local";
 	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
 	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
@@ -366,8 +364,8 @@ public class CommunityCtxDBMgrTest {
    
 	
 	@Test
-	public void testLookup() throws CtxException{
-		System.out.println("---- testLookup");
+	public void testLookupSetOfTypes() throws CtxException{
+		System.out.println("---- testLookupSetOfTypes");
 		   
 		Set<CtxIdentifier> ids;
 	    

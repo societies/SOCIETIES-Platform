@@ -124,8 +124,9 @@ public interface ICommunityCtxDBMgr {
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
-	 * Looks up all CtxModelObjects for the specified type.
+	 * Looks up all CtxModelObjects for the specified set of types and for the specified ownerId.
 	 * 
+	 * @param ownerId
 	 * @param type
 	 */
 	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types) throws CtxException;
