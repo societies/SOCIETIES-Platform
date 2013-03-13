@@ -3,7 +3,11 @@ package org.societies.integration.test.bit.feedback.privacy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,8 +21,6 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.osgi.event.EventTypes;
@@ -44,18 +46,33 @@ public class Tester implements Subscriber{
 	private IIdentity userID;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"));
+	private boolean receivedResult = false;
+	
+	private ResponsePolicy receivedPolicy;
+	public Tester() {
+		logging.debug("Tester constructor");
+	}
 	@Before
 	public void setUp(){
+		logging.debug("Setting up Tester");
 		this.pubsub = TestFeedback.getPubsub();
 		this.idMgr = TestFeedback.getIdMgr();
 		this.userID = this.idMgr.getThisNetworkNode();
+		logging.debug("Finished setting up tester");
 	}
 	
 	@Test
-	public void TestPubSubEvent() throws XMPPError, CommunicationException{
+	public void TestPubSubEvent() throws XMPPError, CommunicationException, ClassNotFoundException{
 		logging.debug("starting testPubSubEvent");
-		this.pubsub.subscriberSubscribe(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION, this);
 		
+		this.pubsub.addSimpleClasses(EVENT_SCHEMA_CLASSES);
+		this.pubsub.ownerCreate(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION);
+		this.pubsub.ownerCreate(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE);
+		this.pubsub.subscriberSubscribe(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION, this);
+		this.pubsub.subscriberSubscribe(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, this);
 		UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
 		
 		NegotiationDetailsBean detailsBean = new NegotiationDetailsBean();
@@ -66,6 +83,17 @@ public class Tester implements Subscriber{
 		event.setResponsePolicy(getResponsePolicy());
 		this.pubsub.publisherPublish(this.userID, EventTypes.UF_PRIVACY_NEGOTIATION, null, event);
 		logging.debug("Finished testPubSubEvent");
+		
+		while (!receivedResult){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Assert.assertNotNull(this.receivedPolicy);
 	}
 	
 	private ResponsePolicy getResponsePolicy() {
@@ -195,6 +223,11 @@ public class Tester implements Subscriber{
 	public void pubsubEvent(IIdentity pubsubService, String node,
 			String itemId, Object item) {
 		logging.debug("Received pubsub event");
+		this.receivedResult = true;
+		
+		Assert.assertTrue(item instanceof UserFeedbackPrivacyNegotiationEvent);
+		UserFeedbackPrivacyNegotiationEvent event = (UserFeedbackPrivacyNegotiationEvent) item;
+		this.receivedPolicy = event.getResponsePolicy();
 		
 	}
 }

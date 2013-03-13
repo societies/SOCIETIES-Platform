@@ -31,7 +31,8 @@ import java.util.concurrent.Future;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
-
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 /**
  * 
  * @author S.Gallacher@hw.ac.uk
@@ -50,4 +51,6 @@ public interface IUserFeedback
 	public void submitExplicitResponse(String id, List<String> result);
 	
 	public void submitImplicitResponse(String id, Boolean result);
+	
+	public void getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
 }

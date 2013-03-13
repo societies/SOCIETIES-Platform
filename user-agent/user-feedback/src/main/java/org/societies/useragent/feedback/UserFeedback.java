@@ -42,12 +42,14 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
@@ -658,5 +660,12 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 	public void setUaRemote(IUserAgentRemoteMgr uaRemote){
 		this.uaRemote = uaRemote;
+	}
+
+	@Override
+	public void getPrivacyNegotiationFB(ResponsePolicy policy,
+			NegotiationDetailsBean details) {
+		// TODO Auto-generated method stub
+		
 	}
 }

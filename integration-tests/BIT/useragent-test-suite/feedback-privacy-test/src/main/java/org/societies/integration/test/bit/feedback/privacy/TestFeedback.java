@@ -24,6 +24,8 @@
  */
 package org.societies.integration.test.bit.feedback.privacy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
@@ -40,9 +42,11 @@ public class TestFeedback extends IntegrationTestCase{
 
 	private static PubsubClient pubsub;
 	private static ICommManager commsMgr;
-	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	public TestFeedback() {
 		super(1926, new Class[]{Tester.class});
+		logging.debug("Starting testFeedback");
 		
 	}
 

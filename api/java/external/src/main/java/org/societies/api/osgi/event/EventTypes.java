@@ -114,6 +114,6 @@ public class EventTypes {
 	/** Published by the DisplayDriver service to notify when a display is available to use */
 	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
 
-    public static final String UF_PRIVACY_NEGOTIATION = "org/societies/useragent/feedback/privacy";
+    public static final String UF_PRIVACY_NEGOTIATION = "org/societies/useragent/feedback/privacyNegotiation";
     public static final String UF_PRIVACY_NEGOTIATION_RESPONSE = "org/societies/useragent/feedback/privacyNegotiationResponse";
 }
