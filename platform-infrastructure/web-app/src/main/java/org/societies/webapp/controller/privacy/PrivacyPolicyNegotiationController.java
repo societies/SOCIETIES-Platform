@@ -11,6 +11,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.UserService;
 
@@ -28,6 +29,9 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
+            if (log.isTraceEnabled())
+                log.trace("registerForEvents()");
+
             if (getPubsubClient() == null) {
                 log.error("PubSubClient was null, cannot register for events");
                 return;
@@ -44,7 +48,9 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
                 addGlobalMessage("Error subscribing to pubsub notifications",
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
-                log.error("Error subscribing to pubsub notifications", e);
+                log.error("Error subscribing to pubsub notifications (id="
+                        + getUserService().getIdentity()
+                        + " event=" + EventTypes.UF_PRIVACY_NEGOTIATION, e);
             }
         }
 
@@ -88,6 +94,23 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         }
     }
 
+    private class LoginListener implements ILoginListener {
+
+        @Override
+        public void userLoggedIn() {
+            if (log.isTraceEnabled())
+                log.trace("userLoggedIn()");
+
+            pubSubListener.registerForEvents();
+        }
+
+        @Override
+        public void userLoggedOut() {
+            if (log.isTraceEnabled())
+                log.trace("userLoggedOut()");
+        }
+    }
+
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
 
@@ -96,6 +119,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     private final Queue<UserFeedbackPrivacyNegotiationEvent> negotiationEventQueue = new LinkedList<UserFeedbackPrivacyNegotiationEvent>();
     private final PubSubListener pubSubListener = new PubSubListener();
+    private final LoginListener loginListener = new LoginListener();
 
     public PrivacyPolicyNegotiationController() {
         log.trace("PrivacyPolicyNegotiationController ctor()");
@@ -108,11 +132,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     @SuppressWarnings("UnusedDeclaration")
     public void setPubsubClient(PubsubClient pubsubClient) {
         this.pubsubClient = pubsubClient;
-
-        if (userService != null && pubsubClient != null)
-            pubSubListener.registerForEvents();
     }
-
 
     public UserService getUserService() {
         return userService;
@@ -120,10 +140,15 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-        this.userService = userService;
+        if (log.isTraceEnabled())
+            log.trace("setUserService() = " + userService);
 
-        if (userService != null && pubsubClient != null)
-            pubSubListener.registerForEvents();
+        if (this.userService != null) {
+            this.userService.removeLoginListener(loginListener);
+        }
+
+        this.userService = userService;
+        this.userService.addLoginListener(loginListener);
     }
 
     public Decision[] getDecisionOptions() {

@@ -126,7 +126,7 @@ public class MainController {
 		
 		//TODO Do check
 		if (getOpenfireLoginService().doLogin(loginForm.getUsername(), loginForm.getPassword()) != null)
-			getUserService().setUserLoggedIn(true);
+			getUserService().login();
 		
 //		if (getUserService().getUserjid() == null)
 //			return new ModelAndView("index", model); //TODO : return error string

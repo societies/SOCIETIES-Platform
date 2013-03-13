@@ -8,6 +8,7 @@ import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyN
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
+import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.UserService;
 
@@ -25,6 +26,9 @@ public class PrivacyPolicyTestController extends BasePageController {
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
+            if (log.isTraceEnabled())
+                log.trace("registerForEvents()");
+
             if (getPubsubClient() == null) {
                 log.error("PubSubClient was null, cannot register for events");
                 return;
@@ -40,7 +44,9 @@ public class PrivacyPolicyTestController extends BasePageController {
                 addGlobalMessage("Error subscribing to pubsub notifications",
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
-                log.error("Error subscribing to pubsub notifications", e);
+                log.error("Error subscribing to pubsub notifications (id="
+                        + getUserService().getIdentity()
+                        + " event=" + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, e);
             }
         }
 
@@ -74,6 +80,23 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     }
 
+    private class LoginListener implements ILoginListener {
+
+        @Override
+        public void userLoggedIn() {
+            if (log.isTraceEnabled())
+                log.trace("userLoggedIn()");
+
+            pubSubListener.registerForEvents();
+        }
+
+        @Override
+        public void userLoggedOut() {
+            if (log.isTraceEnabled())
+                log.trace("userLoggedOut()");
+        }
+    }
+
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
 
@@ -81,6 +104,7 @@ public class PrivacyPolicyTestController extends BasePageController {
     private UserService userService;
 
     private final PubSubListener pubSubListener = new PubSubListener();
+    private final LoginListener loginListener = new LoginListener();
 
     public PrivacyPolicyTestController() {
         log.trace("PrivacyPolicyTestController ctor()");
@@ -93,9 +117,6 @@ public class PrivacyPolicyTestController extends BasePageController {
     @SuppressWarnings("UnusedDeclaration")
     public void setPubsubClient(PubsubClient pubsubClient) {
         this.pubsubClient = pubsubClient;
-
-        if (userService != null && pubsubClient != null)
-            pubSubListener.registerForEvents();
     }
 
     public UserService getUserService() {
@@ -104,10 +125,15 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-        this.userService = userService;
+        if (log.isTraceEnabled())
+            log.trace("setUserService() = " + userService);
 
-        if (userService != null && pubsubClient != null)
-            pubSubListener.registerForEvents();
+        if (this.userService != null) {
+            this.userService.removeLoginListener(loginListener);
+        }
+
+        this.userService = userService;
+        this.userService.addLoginListener(loginListener);
     }
 
     public void sendEvent() {
