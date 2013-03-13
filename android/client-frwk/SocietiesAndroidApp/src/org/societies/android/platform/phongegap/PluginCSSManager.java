@@ -659,18 +659,13 @@ public class PluginCSSManager extends Plugin {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
 			if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
+				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Login successful", Toast.LENGTH_SHORT).show();
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-				//Create Android Notification
-				//int notifierflags [] = new int [1];
-				//notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-				//AndroidNotifier notifier = new AndroidNotifier(PluginCSSManager.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
-				//notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
-				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Login successful", Toast.LENGTH_SHORT).show();
 
 			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
@@ -738,6 +733,7 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 			} else if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
+				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Starting services...", Toast.LENGTH_SHORT).show();
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 21);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
