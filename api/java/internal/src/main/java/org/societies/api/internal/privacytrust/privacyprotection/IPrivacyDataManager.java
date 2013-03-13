@@ -31,10 +31,12 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
  * Interface exposed to Societies components in order to manage access control over resources
@@ -108,6 +110,8 @@ public interface IPrivacyDataManager {
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to launch the obfuscation)
 	 * @throws PrivacyException if parameters are not correct (especially the data wrapper), or if the privacy layer is not ready
 	 */
+	public Future<DataWrapper> obfuscateData(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
+	@Deprecated
 	public Future<IDataWrapper> obfuscateData(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException;
 	@Deprecated
 	public Future<IDataWrapper> obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;
@@ -121,6 +125,7 @@ public interface IPrivacyDataManager {
 	 * @return otherwise id of the non-obfuscated data (the one that as been passed in the dataWrapper field)
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
+	@Deprecated
 	public IDataWrapper hasObfuscatedVersion(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException;
 	@Deprecated
 	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;

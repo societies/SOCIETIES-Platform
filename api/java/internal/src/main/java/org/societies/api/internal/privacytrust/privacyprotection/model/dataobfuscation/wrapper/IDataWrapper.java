@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 import org.societies.api.schema.identity.DataIdentifier;
 
 /**
@@ -35,7 +36,7 @@ import org.societies.api.schema.identity.DataIdentifier;
  * @author Olivier Maridat (Trialog)
  * @date 18 oct. 2011
  */
-public interface IDataWrapper<E> {
+public interface IDataWrapper<E extends IObfuscable> {
 	/**
 	 * @return Id of the data to be obfuscated
 	 */

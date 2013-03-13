@@ -22,51 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacy.util.dataobfuscation;
+package org.societies.api.internal.privacytrust.privacy.model.dataobfuscation;
+
+import java.util.HashMap;
 
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
 
 /**
- * Utilities to instantiate DataWrapper for data obfuscation
- * @state skeleton 
- * @author olivierm
- * @date 14 oct. 2011
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public class DataWrapperFactory {
-	// -- CONTEXT ATTRIBUTE
-
-
-	// -- GEOLOCATION
-	/**
-	 * To get a LocationCoordinatesWrapper
-	 * The persistence is disabled by default, the obfuscated geolocation will not
-	 * be stored after obfuscation.
-	 * @param latitude Latitude
-	 * @param longitude Longitude
-	 * @param accuracy Accuracy in meters
-	 * @return A LocationCoordinatesWrapper
-	 */
-	public static DataWrapper getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
-		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
-		LocationCoordinates data = LocationCoordinatesUtils.create(latitude, longitude, accuracy);
-		return DataWrapperUtils.create(dataType, data);
-	}
-
-	// -- NAME
-	/**
-	 * To get a NameWrapper
-	 * The persistence is disabled by default, the obfuscated name will not
-	 * @param firstName
-	 * @param lastName
-	 * @return the NameWrapper
-	 */
-	public static DataWrapper getNameWrapper(String firstName, String lastName) {
-		String dataType = CtxAttributeTypes.NAME;
-		Name data = NameUtils.create(firstName, lastName);
-		return DataWrapperUtils.create(dataType, data);
+public class ActivityObfuscatorInfo extends ObfuscatorInfo {
+	public ActivityObfuscatorInfo() {
+		obfuscable = true;
+		persistable = false;
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		nbOfObfuscationLevelStep = 1;
+		obfuscableDataType = CtxAttributeTypes.ACTION;
+		obfuscationExamples = new HashMap<Double, String>();
+		obfuscationExamples.put(0.0, "\"Emma has joined HWU Group\" will not change");
+//		obfuscationExamples.put(0.5, "\"Bad mood\" will become \"Absent\"");
+//		obfuscationExamples.put(1.0, "\"Bad mood\" will become \"Not there\"");
 	}
 }

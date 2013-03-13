@@ -24,49 +24,53 @@
  */
 package org.societies.api.internal.privacytrust.privacy.util.dataobfuscation;
 
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
-
 
 /**
- * Utilities to instantiate DataWrapper for data obfuscation
- * @state skeleton 
- * @author olivierm
- * @date 14 oct. 2011
+ * 
+ *
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public class DataWrapperFactory {
-	// -- CONTEXT ATTRIBUTE
+public class LocationCoordinatesUtils {
 
-
-	// -- GEOLOCATION
-	/**
-	 * To get a LocationCoordinatesWrapper
-	 * The persistence is disabled by default, the obfuscated geolocation will not
-	 * be stored after obfuscation.
-	 * @param latitude Latitude
-	 * @param longitude Longitude
-	 * @param accuracy Accuracy in meters
-	 * @return A LocationCoordinatesWrapper
-	 */
-	public static DataWrapper getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
-		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
-		LocationCoordinates data = LocationCoordinatesUtils.create(latitude, longitude, accuracy);
-		return DataWrapperUtils.create(dataType, data);
+	public static LocationCoordinates create(double latitude, double longitude, double accuracy) {
+		LocationCoordinates data = new LocationCoordinates();
+		data.setLatitude(latitude);
+		data.setLongitude(longitude);
+		data.setAccuracy(accuracy);
+		return data;
 	}
 
-	// -- NAME
-	/**
-	 * To get a NameWrapper
-	 * The persistence is disabled by default, the obfuscated name will not
-	 * @param firstName
-	 * @param lastName
-	 * @return the NameWrapper
-	 */
-	public static DataWrapper getNameWrapper(String firstName, String lastName) {
-		String dataType = CtxAttributeTypes.NAME;
-		Name data = NameUtils.create(firstName, lastName);
-		return DataWrapperUtils.create(dataType, data);
+	public static String toXmlString(LocationCoordinates data) {
+		return "<geolocation>\n" +
+				"\t<latitude>" + data.getLatitude() + "</latitude>\n" +
+				"\t<longitude>" + data.getLongitude()+ "</longitude>\n" +
+				"\t<horizontalAccuracy>" + data.getAccuracy() + "</horizontalAccuracy>\n" +
+				"</geolocation>";
+	}
+	public static String toJsonString(LocationCoordinates data) {
+		return "{\n" +
+				"\"latitude\": \""+data.getLatitude()+"\",\n" +
+				"\"longitude\": \""+data.getLongitude()+"\",\n" +
+				"\"horizontalAccuracy\": \""+data.getAccuracy()+"\"\n" +
+				"}";
+	}
+
+	public boolean equals(LocationCoordinates origin, Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (origin == obj) { return true; }
+		if (origin.getClass() != obj.getClass()) { return false; }
+		// -- Verify obj type
+		if (obj instanceof LocationCoordinates) {
+			LocationCoordinates other = (LocationCoordinates) obj;
+			return (origin.getLatitude() == other.getLatitude()
+					&& origin.getLongitude() == other.getLongitude()
+					&& origin.getAccuracy() == other.getAccuracy()
+					);
+		}
+		return false;
 	}
 }

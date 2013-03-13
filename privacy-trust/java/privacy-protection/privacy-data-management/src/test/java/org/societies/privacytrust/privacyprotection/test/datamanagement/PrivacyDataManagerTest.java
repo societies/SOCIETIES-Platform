@@ -50,10 +50,12 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
@@ -61,6 +63,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
 import org.societies.util.commonmock.MockIdentity;
@@ -334,14 +337,13 @@ public class PrivacyDataManagerTest {
 	public void testObfuscateData() {
 		String testTitle = new String("testObfuscateData");
 		LOG.info("[TEST] "+testTitle);
-		IDataWrapper<Name> wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
-		wrapper.setDataId(dataId);
-		IDataWrapper<Name> obfuscatedDataWrapper = null;
+		DataWrapper wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
 			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, wrapper);
+			RequestorBean requestor = RequestorUtils.create(requestorId.getJid());
+			Future<DataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, wrapper);
 			obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle+": "+e.getMessage()+"\n", e);
@@ -417,11 +419,11 @@ public class PrivacyDataManagerTest {
 		LOG.info("[TEST] "+testTitle);
 
 		String ownerId = "owner@domain.com";
-		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
-		String dataId2 = "context://owner@domain.com/locationSymbolic";
-		String dataId3 = "context:///locationSymbolic/";
-		String dataId4 = "context:///locationSymbolic";
-		String dataId5 = "context:///";
+		String dataId1 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/locationSymbolic/";
+		String dataId2 = DataIdentifierScheme.CONTEXT+"://owner@domain.com/locationSymbolic";
+		String dataId3 = DataIdentifierScheme.CONTEXT+":///locationSymbolic/";
+		String dataId4 = DataIdentifierScheme.CONTEXT+":///locationSymbolic";
+		String dataId5 = DataIdentifierScheme.CONTEXT+":///";
 		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;

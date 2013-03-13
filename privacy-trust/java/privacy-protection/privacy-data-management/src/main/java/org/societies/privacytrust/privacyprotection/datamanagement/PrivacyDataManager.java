@@ -41,14 +41,14 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.util.DataIdentifierUtils;
-import org.societies.api.identity.util.DataTypeFactory;
-import org.societies.api.identity.util.DataTypeUtils;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -61,7 +61,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
@@ -112,13 +112,13 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new PrivacyException("[Parameters] At least one mandatory action is required, they can't be all optional.");
 		}
 		// Uncomment when data hiearchy will be ready :-)
-//		if (!(new DataTypeUtil().isLeaf(DataTypeFactory.getType(dataId)))) {
-//			throw new PrivacyException("[Parameters] Can't manage access control on data type "+DataTypeFactory.getType(dataId)+" (it is not a leaf in the data type hiearchy)");
-//		}
+		//		if (!(new DataTypeUtil().isLeaf(DataTypeFactory.getType(dataId)))) {
+		//			throw new PrivacyException("[Parameters] Can't manage access control on data type "+DataTypeFactory.getType(dataId)+" (it is not a leaf in the data type hiearchy)");
+		//		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
-		
+
 
 		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -385,14 +385,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return checkPermission(requestor, dataId, actions);
 	}
 
-	
+
 	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper)
 	 */
 	@Async
 	@Override
-	public Future<IDataWrapper> obfuscateData(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
+	public Future<DataWrapper> obfuscateData(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
@@ -400,15 +400,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == dataWrapper || null == dataWrapper.getData()) {
 			throw new PrivacyException("Not enought information: data missing");
 		}
-		if (null == dataWrapper.getDataId()) {
-			throw new PrivacyException("Not enought information: data id missing. At least the data type is expected");
+		if (null == dataWrapper.getDataType()) {
+			throw new PrivacyException("Not enought information: data type missing.");
 		}
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
 		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
+		DObfOutcome dataObfuscationPreferences;
+		try {
+			dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataWrapper.getDataType());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException("Can't retrieve obfuscation level from privacy preferences. Requestor badly formatted.", e);
+		}
 		double obfuscationLevel = 1;
 		if (null != dataObfuscationPreferences) {
 			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
@@ -432,16 +437,28 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		PERF_LOG.trace(m.toString());
 		// - If no obfuscation is required: return directly the wrapped data
 		if (obfuscationLevel >= 1) {
-			return new AsyncResult<IDataWrapper>(dataWrapper);
+			return new AsyncResult<DataWrapper>(dataWrapper);
 		}
 
 		// -- Obfuscate the data
-		IDataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
-		return new AsyncResult<IDataWrapper>(obfuscatedDataWrapper);
+		DataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
+		return new AsyncResult<DataWrapper>(obfuscatedDataWrapper);
+	}
+	@Async
+	@Override
+	public Future<IDataWrapper> obfuscateData(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
+		Future<DataWrapper> obfuscatedDataWrapper = obfuscateData(RequestorUtils.toRequestorBean(requestor), DataWrapperUtils.toDataWrapperBean(dataWrapper));
+		try {
+			return new AsyncResult<IDataWrapper>(DataWrapperUtils.toDataWrapper(obfuscatedDataWrapper.get()));
+		} catch (InterruptedException e) {
+			throw new PrivacyException(e);
+		} catch (ExecutionException e) {
+			throw new PrivacyException(e);
+		}
 	}
 	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@Async
 	@Override
@@ -450,10 +467,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	}
 
 	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
-	@Override
 	public IDataWrapper hasObfuscatedVersion(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
@@ -556,6 +572,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (level == 0 || level == 2) {
 			if (null == dataObfuscationManager) {
 				LOG.info("[Dependency Injection] Missing DataObfuscationManager");
+				return false;
+			}
+			if (null == commManager) {
+				LOG.info("[Dependency Injection] Missing CommManager");
+				return false;
+			}
+			if (null == commManager.getIdManager()) {
+				LOG.info("[Dependency Injection] Missing IdManager");
 				return false;
 			}
 		}

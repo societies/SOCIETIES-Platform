@@ -43,12 +43,12 @@ import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.Uno
  * @author Olivier Maridat (Trialog)
  * @date 12 mar. 2013
  */
-public class DataObfuscationUtil {
+public class DataObfuscationUtils {
 	private static Map<String, ObfuscatorInfo> mappingDataType2ObfuscatorInfo;
 	private static UnobfuscableInfo unobfuscatableInfo;
 	private static boolean loaded = false;
 
-	public DataObfuscationUtil() {
+	public DataObfuscationUtils() {
 		if (!loaded) {
 			// Load unobfuscable data type info
 			unobfuscatableInfo = new UnobfuscableInfo();

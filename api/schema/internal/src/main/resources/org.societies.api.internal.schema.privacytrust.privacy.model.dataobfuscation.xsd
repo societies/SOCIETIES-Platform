@@ -15,9 +15,8 @@
 
 	<xs:complexType name="dataWrapper">
 		<xs:sequence>
-			<xs:element name="dataId" type="ns1:dataIdentifier" minOccurs="0" />
-			<xs:element name="dataType" type="xs:string" minOccurs="0" />
-			<xs:element name="data" type="tns:iObfuscable" minOccurs="0" />
+			<xs:element name="dataType" type="xs:string" />
+			<xs:element name="data" type="tns:iObfuscable" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -39,6 +38,24 @@
 				<xs:sequence>
 					<xs:element name="firstName" type="xs:string" minOccurs="0" />
 					<xs:element name="lastName" type="xs:string" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="activity">
+		<xs:complexContent>
+			<xs:extension base="tns:iObfuscable">
+				<xs:sequence>
+					<xs:element name='actor' type='xs:string' />
+					<xs:element name="published" type="xs:string" />
+					<xs:element name="verb" type="xs:string" minOccurs='0'
+						maxOccurs='1' />
+					<xs:element name="object" type="xs:string" minOccurs='0'
+						maxOccurs='1' />
+					<xs:element name="target" type="xs:string" minOccurs='0'
+						maxOccurs='1' />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

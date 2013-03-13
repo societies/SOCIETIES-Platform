@@ -33,8 +33,9 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.LocationCoordinatesUtils;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
@@ -67,8 +68,8 @@ public class DataObfuscationManagerTest {
     @Parameters({ "1.0", "0.5", "0.1" })
 	public void testObfuscateData(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateData("+obfuscationLevel+")");
-		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
-		IDataWrapper<LocationCoordinates> obfuscatedDataWrapper = null;
+		DataWrapper locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(locationCoordinatesWrapper, obfuscationLevel);
 		} catch (PrivacyException e) {
@@ -76,16 +77,18 @@ public class DataObfuscationManagerTest {
 			fail("testObfuscateData(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
-		LOG.info("### Orginal location:\n"+locationCoordinatesWrapper.getData().toJSONString());
-		LOG.info("### Obfuscated location:\n"+obfuscatedDataWrapper.getData().toJSONString());
+		LocationCoordinates locationData = ((LocationCoordinates)locationCoordinatesWrapper.getData());
+		LocationCoordinates obfuscatedLocationData = ((LocationCoordinates)locationCoordinatesWrapper.getData());
+//		LOG.info("### Orginal location:\n"+LocationCoordinatesUtils.toJsonString(locationData));
+//		LOG.info("### Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedLocationData));
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		if (1 == obfuscationLevel) {
 			assertEquals("Data obfuscated more than 1", obfuscatedDataWrapper, locationCoordinatesWrapper);
 		}
 		else {
-			assertTrue("Data obfuscated to "+obfuscationLevel+", but result has same latitude, longitude and accuracy", (obfuscatedDataWrapper.getData().getLatitude() != locationCoordinatesWrapper.getData().getLatitude())
-						|| (obfuscatedDataWrapper.getData().getLongitude() != locationCoordinatesWrapper.getData().getLongitude())
-						|| (obfuscatedDataWrapper.getData().getAccuracy() != locationCoordinatesWrapper.getData().getAccuracy()));
+			assertTrue("Data obfuscated to "+obfuscationLevel+", but result has same latitude, longitude and accuracy", (obfuscatedLocationData.getLatitude() != locationData.getLatitude())
+						|| (obfuscatedLocationData.getLongitude() != locationData.getLongitude())
+						|| (obfuscatedLocationData.getAccuracy() != locationData.getAccuracy()));
 		}
 	}
 	
@@ -93,8 +96,8 @@ public class DataObfuscationManagerTest {
 	@Parameters({ "-1", "2.5" })
 	public void testObfuscateDataOutOfBound(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateDataOutOfBound("+obfuscationLevel+")");
-		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
-		IDataWrapper<LocationCoordinates> obfuscatedDataWrapper = null;
+		DataWrapper locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(locationCoordinatesWrapper, obfuscationLevel);
 		} catch (PrivacyException e) {
@@ -102,16 +105,19 @@ public class DataObfuscationManagerTest {
 			fail("testObfuscateDataOutOfBound(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
-		LOG.info("### Orginal location:\n"+locationCoordinatesWrapper.getData().toJSONString());
-		LOG.info("### Obfuscated location:\n"+obfuscatedDataWrapper.getData().toJSONString());
+		LocationCoordinates locationData = ((LocationCoordinates)locationCoordinatesWrapper.getData());
+		LocationCoordinates obfuscatedLocationData = ((LocationCoordinates)locationCoordinatesWrapper.getData());
+//		LOG.info("### Orginal location:\n"+LocationCoordinatesUtils.toJsonString(locationData));
+//		LOG.info("### Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedLocationData));
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		if (obfuscationLevel >= 1) {
 			assertEquals("Data obfuscated more than 1", obfuscatedDataWrapper, locationCoordinatesWrapper);
 		}
 		else {
-			assertTrue("Data obfuscated to "+obfuscationLevel+", but result has same latitude, longitude and accuracy", (obfuscatedDataWrapper.getData().getLatitude() != locationCoordinatesWrapper.getData().getLatitude())
-					|| (obfuscatedDataWrapper.getData().getLongitude() != locationCoordinatesWrapper.getData().getLongitude())
-					|| (obfuscatedDataWrapper.getData().getAccuracy() != locationCoordinatesWrapper.getData().getAccuracy()));
+			assertTrue("Data obfuscated to "+obfuscationLevel+", but result has same latitude, longitude and accuracy",
+					(obfuscatedLocationData.getLatitude() != locationData.getLatitude())
+					|| (obfuscatedLocationData.getLongitude() != locationData.getLongitude())
+					|| (obfuscatedLocationData.getAccuracy() != locationData.getAccuracy()));
 		}
 	}
 }

@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 
 /**
  * Temperature
@@ -32,7 +33,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author olivierm
  *
  */
-public class Temperature {
+public class Temperature extends IObfuscable {
 	private double degree;
 	private String degreeString;
 	private boolean resultIsString;

@@ -29,10 +29,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.LocationCoordinatesObfuscatorInfo;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperUtils;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
@@ -44,13 +45,9 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.u
  * @author Olivier Maridat (Trialog)
  *
  */
-public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<LocationCoordinates>> {
+public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordinates> {
 	private static Logger LOG = LoggerFactory.getLogger(LocationCoordinatesObfuscator.class.getSimpleName());
 
-	/**
-	 * Copy of the data to obfuscate
-	 */
-	public LocationCoordinates geolocation;
 	/**
 	 * Radius enlargement operation id
 	 */
@@ -89,11 +86,9 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 	/**
 	 * @param data
 	 */
-	public LocationCoordinatesObfuscator(IDataWrapper<LocationCoordinates> data) {
-		super(data);
-		obfuscationLevelType = ObfuscationLevelType.CONTINUOUS;
-		dataType = LocationCoordinates.class;
-		geolocation = data.getData();
+	public LocationCoordinatesObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new LocationCoordinatesObfuscatorInfo();
 	}
 
 	/*
@@ -101,7 +96,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override
-	public IDataWrapper<LocationCoordinates> obfuscateData(double obfuscationLevel)
+	public DataWrapper obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		// -- Init
 		rand = new RandomBetween();
@@ -115,10 +110,10 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 		if (obfuscationLevel > 1) {
 			obfuscationLevel = 1;
 		}
-		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(geolocation, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
+		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(data, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
 
 		// -- Return
-		IDataWrapper<LocationCoordinates> dataWrapper = new DataWrapper<LocationCoordinates>(obfuscatedLocationCoordinates);
+		DataWrapper dataWrapper = DataWrapperUtils.create(CtxAttributeTypes.LOCATION_COORDINATES, obfuscatedLocationCoordinates);
 		return dataWrapper;
 	}
 

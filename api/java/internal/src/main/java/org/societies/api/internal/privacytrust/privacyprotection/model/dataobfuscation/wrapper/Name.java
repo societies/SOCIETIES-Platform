@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 
 /**
  * Describe your class here...
@@ -32,7 +33,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author olivierm
  *
  */
-public class Name {
+public class Name extends IObfuscable {
 	private String firstName;
 	private String lastName;
 	

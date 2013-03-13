@@ -24,10 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Status;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.StatusObfuscatorInfo;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Status;
 
 /**
  * Obfuscator for status
@@ -35,26 +34,9 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class StatusObfuscator extends DataObfuscator<IDataWrapper<Status>> {
-	/**
-	 * @param data
-	 */
-	public StatusObfuscator(IDataWrapper<Status> data) {
-		super(data);
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Status.class;
+public class StatusObfuscator extends DataObfuscator<Status> {
+	public StatusObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new StatusObfuscatorInfo();
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	@Override
-	public IDataWrapper<Status> obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
-	}
-
 }
