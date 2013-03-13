@@ -52,5 +52,5 @@ public interface IUserFeedback
 	
 	public void submitImplicitResponse(String id, Boolean result);
 	
-	public void getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
+	public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
 }

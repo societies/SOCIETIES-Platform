@@ -114,6 +114,11 @@ public class EventTypes {
 	/** Published by the DisplayDriver service to notify when a display is available to use */
 	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
 
-    public static final String UF_PRIVACY_NEGOTIATION = "org/societies/useragent/feedback/privacyNegotiation";
+    /** Published by Userfeedback - consumed by webapp and android user feedback*/
+	public static final String UF_PRIVACY_NEGOTIATION = "org/societies/useragent/feedback/privacyNegotiation";
+	/** Published by webapp and android user feeedback - consumed by Userfeedback */
     public static final String UF_PRIVACY_NEGOTIATION_RESPONSE = "org/societies/useragent/feedback/privacyNegotiationResponse";
+    /** Published by UserFeedback - consumed by webapp and android user feedback */
+    public static final String UF_PRIVACY_NEGOTIATION_REMOVE_POPUP = "org/societies/useragent/feedback/privacyNegotiationRemovePopup";
+    
 }
