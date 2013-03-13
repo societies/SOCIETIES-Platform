@@ -2,14 +2,19 @@ package org.societies.webapp.controller.privacy;
 
 import org.primefaces.push.PushContext;
 import org.primefaces.push.PushContextFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
-import org.societies.api.internal.useragent.model.UserFeedbackPrivacyNegotiationEvent;
-import org.societies.api.osgi.event.*;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.service.UserService;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -20,69 +25,74 @@ import java.util.Queue;
 @SessionScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
-    private class PubSubListener extends EventListener {
+    private class PubSubListener implements Subscriber {
+
+        public void registerForEvents() {
+            if (getPubsubClient() == null) {
+                log.error("PubSubClient was null, cannot register for events");
+                return;
+            }
+
+            try {
+                getPubsubClient().subscriberSubscribe(getUserService().getIdentity(),
+                        EventTypes.UF_PRIVACY_NEGOTIATION,
+                        this);
+
+                if (log.isDebugEnabled())
+                    log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION + " events");
+            } catch (Exception e) {
+                addGlobalMessage("Error subscribing to pubsub notifications",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error subscribing to pubsub notifications", e);
+            }
+        }
+
+        public void sendResponse(ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
+            if (log.isTraceEnabled())
+                log.trace("sendResponse(): privacyNegotiationResponse");
+
+            UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
+            payload.setResponsePolicy(responsePolicy);
+            payload.setNegotiationDetails(negotiationDetails);
+
+            try {
+                getPubsubClient().publisherPublish(getUserService().getIdentity(),
+                        EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
+                        null,
+                        payload);
+
+                removeCurrentRequestFromQueue();
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing notification of completed negotiation",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing notification of completed negotiation", e);
+            }
+        }
 
         @Override
-        public void handleInternalEvent(InternalEvent event) {
-            log.trace("checkForNotifications(): Privacy Policy Negotiation object found");
+        public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
+            if (log.isTraceEnabled())
+                log.trace("pubsubEvent(): node=" + node + " item=" + item);
 
             // get the policy from the event payload
-            UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) event.geteventInfo();
-//            ResponsePolicy policy = privEvent.getResponsePolicy();
+            UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) item;
 
             // queue the policy
             negotiationEventQueue.add(privEvent);
-//            addResponsePolicyToQueue(policy);
 
             // notify the user
             PushContext pushContext = PushContextFactory.getDefault().getPushContext();
             pushContext.push("/pnb", "");
         }
-
-        @Override
-        public void handleExternalEvent(CSSEvent event) {
-        }
-
-        public void registerForUFeedbackEvents() {
-            if (getEventMgr() == null) {
-                log.error("Event manager was null, cannot register for events");
-                return;
-            }
-
-            String eventFilter = "(&" +
-                    "(" + CSSEventConstants.EVENT_NAME + "=privacyNegotiation)" +
-                    "(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/feedback)" +
-                    ")";
-            getEventMgr().subscribeInternalEvent(this,
-                    new String[]{EventTypes.UF_PRIVACY_NEGOTIATION},
-                    eventFilter);
-            log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION + " events");
-
-        }
-
-        public void sendResponse(ResponsePolicy responsePolicy, NegotiationDetails negotiationDetails) {
-            UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
-            payload.setResponsePolicy(responsePolicy);
-            payload.setNegotiationDetails(negotiationDetails);
-            InternalEvent event = new InternalEvent(
-                    EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
-                    "privacyNegotiationResponse",
-                    "org/societies/useragent/feedback",
-                    payload);
-
-            try {
-                eventMgr.publishInternalEvent(event);
-
-                removeCurrentRequestFromQueue();
-            } catch (EMSException e) {
-                log.error("Error publishing notification of completed negotiation", e);
-            }
-        }
-
     }
 
-    @ManagedProperty(value = "#{eventMgmtRef}")
-    private IEventMgr eventMgr;
+    @ManagedProperty(value = "#{pubsubClient}")
+    private PubsubClient pubsubClient;
+
+    @ManagedProperty(value = "#{userService}")
+    private UserService userService;
 
     private final Queue<UserFeedbackPrivacyNegotiationEvent> negotiationEventQueue = new LinkedList<UserFeedbackPrivacyNegotiationEvent>();
     private final PubSubListener pubSubListener = new PubSubListener();
@@ -91,15 +101,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         log.trace("PrivacyPolicyNegotiationController ctor()");
     }
 
-    public IEventMgr getEventMgr() {
-        return eventMgr;
+    public PubsubClient getPubsubClient() {
+        return pubsubClient;
     }
 
-    public void setEventMgr(IEventMgr eventMgr) {
-//        log.trace("setEventMgr: " + eventMgr);
-        this.eventMgr = eventMgr;
+    @SuppressWarnings("UnusedDeclaration")
+    public void setPubsubClient(PubsubClient pubsubClient) {
+        this.pubsubClient = pubsubClient;
 
-        pubSubListener.registerForUFeedbackEvents();
+        if (userService != null && pubsubClient != null)
+            pubSubListener.registerForEvents();
+    }
+
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+
+        if (userService != null && pubsubClient != null)
+            pubSubListener.registerForEvents();
     }
 
     public Decision[] getDecisionOptions() {
@@ -128,13 +152,17 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     private void removeCurrentRequestFromQueue() {
+        log.trace("removeCurrentRequestFromQueue()");
+
         if (!negotiationEventQueue.isEmpty())
             negotiationEventQueue.remove();
     }
 
     public void completeNegotiation() {
+        log.trace("completeNegotiation()");
+
         ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
-        NegotiationDetails negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
+        NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
 
@@ -142,8 +170,10 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public void cancelNegotiation() {
+        log.trace("cancelNegotiation()");
+
         ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
-        NegotiationDetails negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
+        NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 

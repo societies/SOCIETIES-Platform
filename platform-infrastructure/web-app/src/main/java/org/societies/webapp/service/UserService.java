@@ -12,6 +12,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
+import java.util.EventListener;
 import java.util.Map;
 
 /**
@@ -22,6 +23,10 @@ import java.util.Map;
 @SessionScoped // JSF
 @ManagedBean // JSF
 public class UserService implements Serializable {
+    public interface LoginListener extends EventListener {
+        public void userLoggedIn();
+        public void userLoggedOut();
+    }
 
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
