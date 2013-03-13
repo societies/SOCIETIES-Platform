@@ -25,6 +25,7 @@
 package org.societies.context.api.community.db;
 
 import java.util.List;
+import java.util.Set;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
@@ -121,6 +122,13 @@ public interface ICommunityCtxDBMgr {
 	 */
 	@Deprecated
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
+	
+	/**
+	 * Looks up all CtxModelObjects for the specified type.
+	 * 
+	 * @param type
+	 */
+	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types) throws CtxException;
 	
 	/**
 	 * Looks up CommunityCtxEntities containing the specified attributes
