@@ -207,6 +207,10 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 			
 		}else{
 			this.clientCommsMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
 	
 				@Override
 				public void returnAction(String result) {
@@ -225,7 +229,11 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 						eventsHelper = new EventsHelper(AndroidUserFeedbackService.this.androidContext);
 						Log.d(LOG_TAG, "new EventService");
 						eventsHelper.setUpService(new IMethodCallback() {
-							
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
+	
 							@Override
 							public void returnAction(String result) {
 								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");

@@ -136,6 +136,12 @@ public class PubsubServiceBase implements IPubsubService {
 					PubsubServiceBase.this.androidContext.sendBroadcast(intent);
 				}
 			}
+
+			@Override
+			public void returnException(String result) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		return false;
 	}

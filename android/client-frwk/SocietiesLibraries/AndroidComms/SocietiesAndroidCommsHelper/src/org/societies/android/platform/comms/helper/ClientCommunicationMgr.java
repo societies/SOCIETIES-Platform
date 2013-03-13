@@ -633,6 +633,14 @@ public class ClientCommunicationMgr {
 			    	ClientCommunicationMgr.this.getIdentityJid(callbackId);
 				}
 
+			} else if (intent.getAction().equals(XMPPAgent.LOGIN_EXCEPTION)) {
+				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
+					synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+						IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnException(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.LOGIN)) {
 				if (ClientCommunicationMgr.this.methodCallbackMap.containsKey(callbackId)) {
 			    	//Get the values for DomainAuthority and Identity JID after the XMPP login has been performed
@@ -756,6 +764,21 @@ public class ClientCommunicationMgr {
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						
+						Packet packet;
+						try {
+							packet = marshaller.unmarshallIq(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+							Object payload = marshaller.unmarshallPayload(packet);
+							callback.receiveMessage(stanzaFromPacket(packet), payload);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_RESULT)) {
 			} else if (intent.getAction().equals(XMPPAgent.SEND_MESSAGE_EXCEPTION)) {
 			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY)) {
@@ -793,6 +816,7 @@ public class ClientCommunicationMgr {
         intentFilter.addAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
+        intentFilter.addAction(XMPPAgent.LOGIN_EXCEPTION);
         intentFilter.addAction(XMPPAgent.LOGOUT);
         intentFilter.addAction(XMPPAgent.CONFIGURE_AGENT);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);

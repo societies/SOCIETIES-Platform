@@ -550,6 +550,16 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			intent = new Intent(LOGIN_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+
 		} finally {
 			//Send intent
 			this.serviceContext.sendBroadcast(intent);

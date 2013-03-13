@@ -159,6 +159,10 @@ public class UserFeedbackBase implements IAndroidUserFeedback {
 	public boolean startService() {
 		if (!isCommsConnected){
 			this.clientCommsMgr.bindCommsService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
 	
 				@Override
 				public void returnAction(String result) {
@@ -178,6 +182,10 @@ public class UserFeedbackBase implements IAndroidUserFeedback {
 						Log.d(LOG_TAG, "new EventService");
 						eventsHelper.setUpService(new IMethodCallback() {
 							
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
 							@Override
 							public void returnAction(String result) {
 								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");

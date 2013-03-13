@@ -175,7 +175,9 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(IAndroidCSSManager.LOGIN_CSS);
         intentFilter.addAction(IAndroidCSSManager.LOGOUT_CSS);
         intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
         intentFilter.addAction(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
         intentFilter.addAction(IAndroidCSSManager.SUGGESTED_FRIENDS);
@@ -464,6 +466,30 @@ public class PluginCSSManager extends Plugin {
 
 		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 	}
+	
+	/**
+	 * Return result to Javascript call for the App Services control functions
+	 * 
+	 * @param methodCallbackId
+	 * @param intent
+	 * @param key
+	 * 
+	 */
+	private void sendJavascriptResultForExceptions(String methodCallbackId, Intent intent, String key) {
+		Log.d(LOG_TAG, "sendJavascriptResultForExceptions called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
+
+		PluginResult pResult = null;
+
+		pResult = new PluginResult(PluginResult.Status.ERROR, intent.getStringExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+		pResult.setKeepCallback(false);
+		this.error(pResult, methodCallbackId);
+		
+		//remove callback ID for given method invocation
+		PluginCSSManager.this.methodCallbacks.remove(key);
+
+		Log.d(LOG_TAG, "Plugin error method called, target: " + methodCallbackId);
+	}
+
 	/**
 	 * Return result to Javascript call
 	 * 
@@ -688,12 +714,27 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 				
+			} else if (intent.getAction().equals(IAndroidCSSManager.REGISTER_XMPP_SERVER_EXCEPTION)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResultForExceptions(methodCallbackId, intent, mapKey);
+				}
+				
 			} else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResultForExceptions(methodCallbackId, intent, mapKey);
 				}
 			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
