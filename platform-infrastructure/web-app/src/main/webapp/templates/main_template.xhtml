@@ -35,8 +35,16 @@
 
         <p:growl id="messages" showDetail="true" sticky="true" autoUpdate="true"/>
 
-        <!-- used to listen for responses if there is a privacy policy negotiation request -->
-        <p:socket onMessage="handlePnb" channel="/pnb"/>
+        <!-- notification bar for a privacy policy negotiation request -->
+        <p:notificationBar position="bottom" effect="slide" widgetVar="pnb" id="pnb"
+                           styleClass="bottom"
+                           rendered="#{ppNegotiation.currentNegotiationEvent ne null}">
+            The privacy policy negotatiator wants your attention! Mosey on over
+            <a href="privacy_policy_negotiation.xhtml">here</a>.
+            <p:commandLink value="(ignore)"
+                           actionListener="#{ppNegotiation.cancelNegotiation}"
+                           onclick="pnb.hide();"/>
+        </p:notificationBar>
 
         <!-- used to open the notification bar for a privacy policy negotiation request -->
         <script type="text/javascript">
@@ -45,15 +53,10 @@
             }
         </script>
 
-        <!-- notification bar for a privacy policy negotiation request -->
-        <p:notificationBar id="pnb" position="bottom" effect="slide" widgetVar="pnb"
-                           styleClass="bottom">
-            The privacy policy negotatiator wants your attention! Mosey on over
-            <a href="privacy/privacy_policy_negotiation.xhtml">here</a>.
-            <p:commandLink value="(ignore)"
-                           actionListener="#{ppNegotiation.cancelNegotiation}"
-                           onclick="pnb.hide();"/>
-        </p:notificationBar>
+        <!-- quick hack to get this working until PF push is working -->
+        <p:poll interval="5" update="pnb"/>
+        <!-- used to listen for responses if there is a privacy policy negotiation request -->
+        <!--p:socket onMessage="handlePnb" channel="/pnb"/-->
 
 
         <div id="wrapper" class="clearfix">

@@ -3,7 +3,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
-                template="../templates/main_template.xhtml">
+                template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
         <title>SOCIEITES :: View Response Policy</title>
@@ -27,8 +27,7 @@
                             <p:outputLabel for="decision">Permission:</p:outputLabel>
                             <p:selectOneMenu id="decision" value="#{item.decision}">
                                 <f:selectItems value="#{ppNegotiation.decisionOptions}"
-                                               var="dec"
-                                               itemLabel="#{dec.name}"/>
+                                               var="dec"/>
                             </p:selectOneMenu>
                         </h:panelGrid>
                         <!-- END GENERAL TAB -->
@@ -39,8 +38,9 @@
                         <!-- ACTIONS TAB -->
                         <p:selectManyCheckbox layout="pageDirection" disabled="true">
                             <f:selectItems value="#{item.requestItem.actions}"
+
                                            var="action"
-                                           itemLabel="#{action.actionConstant.value}"
+                                           itemLabel="#{action.actionConstant}"
                                            itemValue="#{action.optional}"/>
                         </p:selectManyCheckbox>
                         <!-- END ACTIONS TAB -->
@@ -55,7 +55,7 @@
                                      paginator="true" rows="10">
 
                             <p:column headerText="Condition" style="width:50%">
-                                #{condition.conditionConstant.value}
+                                #{condition.conditionConstant}
                             </p:column>
 
                             <p:column headerText="Value" style="width:25%">

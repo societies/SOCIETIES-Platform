@@ -44,6 +44,11 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         }
 
         public void registerForUFeedbackEvents() {
+            if (getEventMgr() == null) {
+                log.error("Event manager was null, cannot register for events");
+                return;
+            }
+
             String eventFilter = "(&" +
                     "(" + CSSEventConstants.EVENT_NAME + "=privacyNegotiation)" +
                     "(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/feedback)" +
@@ -84,7 +89,6 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     public PrivacyPolicyNegotiationController() {
         log.trace("PrivacyPolicyNegotiationController ctor()");
-        pubSubListener.registerForUFeedbackEvents();
     }
 
     public IEventMgr getEventMgr() {
@@ -92,7 +96,10 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public void setEventMgr(IEventMgr eventMgr) {
+//        log.trace("setEventMgr: " + eventMgr);
         this.eventMgr = eventMgr;
+
+        pubSubListener.registerForUFeedbackEvents();
     }
 
     public Decision[] getDecisionOptions() {

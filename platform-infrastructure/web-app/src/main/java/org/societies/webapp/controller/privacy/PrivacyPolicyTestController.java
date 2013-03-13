@@ -8,6 +8,8 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -31,6 +33,10 @@ public class PrivacyPolicyTestController extends BasePageController {
         }
 
         public void registerForUFeedbackEvents() {
+            if (getEventMgr() == null) {
+                log.error("Event manager was null, cannot register for events");
+                return;
+            }
             String eventFilter = "(&" +
                     "(" + CSSEventConstants.EVENT_NAME + "=privacyNegotiationResponse)" +
                     "(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/feedback)" +
@@ -71,7 +77,6 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     public PrivacyPolicyTestController() {
         log.trace("PrivacyPolicyTestController ctor()");
-        pubSubListener.registerForUFeedbackEvents();
     }
 
     public IEventMgr getEventMgr() {
@@ -79,7 +84,10 @@ public class PrivacyPolicyTestController extends BasePageController {
     }
 
     public void setEventMgr(IEventMgr eventMgr) {
+//        log.trace("setEventMgr: " + eventMgr);
         this.eventMgr = eventMgr;
+
+        pubSubListener.registerForUFeedbackEvents();
     }
 
     public UserService getUserService() {
@@ -87,6 +95,7 @@ public class PrivacyPolicyTestController extends BasePageController {
     }
 
     public void setUserService(UserService userService) {
+//        log.trace("setUserService: " + userService);
         this.userService = userService;
     }
 
