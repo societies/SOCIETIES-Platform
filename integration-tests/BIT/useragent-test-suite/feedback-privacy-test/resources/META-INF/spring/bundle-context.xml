@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc 
+		http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/osgi-compendium 
+		http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:tx="http://www.springframework.org/schema/tx">
+  <!-- regular spring configuration file defining the beans for this
+       bundle. We've kept the osgi definitions in a separate 
+       configuration file so that this file can easily be used
+       for integration testing outside of an OSGi environment -->
+
+  <!-- >bean id="TestCase749" class="org.societies.integration.test.bit.user_intent_learning.TestCase749" init-method="startTest">
+		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
+  	</bean -->
+
+<!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
+	
+	<bean id="TestCase1926" class="org.societies.integration.test.bit.feedback.privacy.TestFeedback" init-method="run">
+		<property name="pubsub" ref ="pubsub" />
+		<property name="commsMgr" ref="commsMgr"/>		
+  	</bean>
+
+  	
+</beans>
