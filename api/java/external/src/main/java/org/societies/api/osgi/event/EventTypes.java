@@ -120,5 +120,12 @@ public class EventTypes {
     public static final String UF_PRIVACY_NEGOTIATION_RESPONSE = "org/societies/useragent/feedback/privacyNegotiationResponse";
     /** Published by UserFeedback - consumed by webapp and android user feedback */
     public static final String UF_PRIVACY_NEGOTIATION_REMOVE_POPUP = "org/societies/useragent/feedback/privacyNegotiationRemovePopup";
+    /** Published by Userfeedback - consumed by webapp and android user feedback*/
+    public static final String UF_PRIVACY_ACCESS_CONTROL = "org/societies/useragent/feedback/privacyAccessControl";
+    /** Published by webapp and android user feeedback - consumed by Userfeedback */
+    public static final String UF_PRIVACY_ACCESS_CONTROL_RESPONSE = "org/societies/useragent/feedback/privacyAccessControlResponse";
+    /** Published by UserFeedback - consumed by webapp and android user feedback */
+    public static final String UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP = "org/societies/useragent/feedback/privacyAccessControlRemovePopup";
+    
     
 }

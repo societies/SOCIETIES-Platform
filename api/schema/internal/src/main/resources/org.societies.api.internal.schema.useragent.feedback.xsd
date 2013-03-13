@@ -27,9 +27,19 @@
 		<xs:complexType name="NegotiationDetailsBean">
 			<xs:sequence>
 				<xs:element name="negotiationID" type="xs:int"
-					minOccurs="0" />
+					minOccurs="1" maxOccurs="1"/>
 				<xs:element name="requestor" type="ns1:requestorBean" 
-					minOccurs="0"/>		
+					minOccurs="1" maxOccurs="1"/>		
+			</xs:sequence>
+		</xs:complexType>
+	
+
+		<xs:complexType name="UserFeedbackAccessControlEvent">
+			<xs:sequence>
+				<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" />
+				<xs:element name="responseItems" type="ns2:responseItem" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="requestor" type="ns1:requestorBean" 
+					minOccurs="1" maxOccurs="1"/>	
 			</xs:sequence>
 		</xs:complexType>
 	
