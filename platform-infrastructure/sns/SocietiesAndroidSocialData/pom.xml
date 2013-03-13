@@ -31,6 +31,7 @@
 			<groupId>org.societies.platform.socialdata</groupId>
 			<artifactId>SocialDataComms</artifactId>
 			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.platform.sns</groupId>
@@ -44,13 +45,6 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>

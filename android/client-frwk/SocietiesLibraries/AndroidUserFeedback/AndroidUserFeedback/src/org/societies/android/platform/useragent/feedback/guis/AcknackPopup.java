@@ -36,7 +36,7 @@ import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.AndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
@@ -165,18 +165,18 @@ public class AcknackPopup extends Activity{
 			bean.setRequestId(requestID);			
 			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {				
 				@Override				
-				public void returnAction(int result) {					
-					// TODO Auto-generated method stub				
+				public void returnAction(int result) {
 					}				
 				@Override				
-				public void returnAction(boolean resultFlag) {					
-					// TODO Auto-generated method stub				
-					}			
-				});		
-			} catch (PlatformEventsHelperNotConnectedException e) {			
-				// TODO Auto-generated catch block			
-				e.printStackTrace();		
-				}	
-		}
+				public void returnAction(boolean resultFlag) {									
+					}
+				@Override
+				public void returnException(int exception) {
+				}			
+			});
+		} catch (PlatformEventsHelperNotConnectedException e) {
+			e.printStackTrace();		
+		}	
+	}
 
 }

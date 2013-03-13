@@ -3,6 +3,7 @@ package org.societies.android.platform.events;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -49,7 +50,9 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	//Synchronised Maps - require manual synchronisation 
 	private Map<String, String> subscribedToClientEvents = null;
 	private Map<String, Integer> subscribedToEvents = null;
+	private Map<String, String> thirdPartyEvents = null;
 	
+	private ArrayList<ThirdPartyEventsIntents> thirdPartyEventsLookup = null;
 	private ArrayList <String> allPlatformEvents = null; 
 
 	private String cloudNodeDestination;
@@ -80,6 +83,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	this.subscribedToClientEvents = Collections.synchronizedMap(new HashMap<String, String>());
     	//tracks the events subscribed to Android Pubsub
     	this.subscribedToEvents = Collections.synchronizedMap(new HashMap<String, Integer>());
+
+    	//tracks the events created by core services (unlikely) and 3rd party services
+    	this.thirdPartyEvents = Collections.synchronizedMap(new HashMap<String, String>());
+    	//a Pubsub node/Societies Intents lookup
+    	this.thirdPartyEventsLookup = new ArrayList<PlatformEventsBase.ThirdPartyEventsIntents>();
     	
     	this.cloudNodeDestination = null;
         this.cloudNodeIdentity = null;
@@ -194,9 +202,11 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 	public synchronized boolean publishEvent(final String client, String societiesIntent, Object eventPayload) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
 		Dbc.require("Event Payload must be specified", null != eventPayload);
+		Dbc.require("Valid Intent must be specified", null != societiesIntent && societiesIntent.length() > 0);
 		//Invariant condition
 		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of publishEvent for client: " + client);
+		
 		
 		final Intent returnIntent = new Intent(IAndroidSocietiesEvents.PUBLISH_EVENT);
 		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
@@ -204,32 +214,36 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			returnIntent.setPackage(client);
 		}
 
-		try {
-			PlatformEventsBase.this.pubsubClient.publisherPublish(this.cloudNodeIdentity, 
-						translateAndroidIntentToEvent(societiesIntent), 
-						Integer.toString(this.randomGenerator.nextInt()), 
-						eventPayload, new IMethodCallback() {
-				
-				@Override
-				public void returnAction(String result) {
-	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
-	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
-	    			Log.d(LOG_TAG, "Publish event return result sent");
-				}
-				
-				@Override
-				public void returnAction(boolean resultFlag) {
-				}
-			});
-		} catch (XMPPError e) {
-			Log.e(LOG_TAG, "XMPPError", e);
-			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
-			Log.d(LOG_TAG, "Publish event return result sent");
-		} catch (CommunicationException e) {
-			Log.e(LOG_TAG, "Comunication Exception", e);
-			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
-			Log.d(LOG_TAG, "Publish event return result sent");
-		} 
+		//check if intent is invalid. If so, signal with an exception intent otherwise proceed as normal 
+		if (this.isIntentValid(societiesIntent, IAndroidSocietiesEvents.PUBLISH_EVENT, client, true)) {
+			try {
+				PlatformEventsBase.this.pubsubClient.publisherPublish(this.cloudNodeIdentity, 
+							translateAndroidIntentToEvent(societiesIntent), 
+							Integer.toString(this.randomGenerator.nextInt()), 
+							eventPayload, new IMethodCallback() {
+					
+					@Override
+					public void returnAction(String result) {
+		    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
+		    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+		    			Log.d(LOG_TAG, "Publish event return result sent");
+					}
+					
+					@Override
+					public void returnAction(boolean resultFlag) {
+					}
+				});
+			} catch (XMPPError e) {
+				Log.e(LOG_TAG, "XMPPError", e);
+				PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+				Log.d(LOG_TAG, "Publish event return result sent");
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Comunication Exception", e);
+				PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+				Log.d(LOG_TAG, "Publish event return result sent");
+			} 
+		}
+
 		return false;
 	}
 
@@ -244,26 +258,30 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 	public boolean subscribeToEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
+		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0);
 		//Invariant condition
 		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of subscribeToEvent for client: " + client + " and intent: " + intent);
 		assignConnectionParameters();
 
-		//store client/event
-		synchronized (this.subscribedToClientEvents) {
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
-			
-			this.subscribedToClientEvents.put(generateClientEventKey(client, intent), intent);
-
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
-
-			ArrayList<String> events = new ArrayList<String>();
-			events.add(intent);
-			
-	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.cloudNodeIdentity); 
-	    	subPubSub.execute(events);
+		//check if intent is invalid. If so, signal with an exception intent otherwise proceed as normal 
+		if (this.isIntentValid(intent, IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, true)) {
+				//store client/event
+			synchronized (this.subscribedToClientEvents) {
+				Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
+				
+				this.subscribedToClientEvents.put(generateClientEventKey(client, intent), intent);
+	
+				Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
+	
+				ArrayList<String> events = new ArrayList<String>();
+				events.add(intent);
+				
+		    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT, client, this.cloudNodeIdentity); 
+		    	subPubSub.execute(events);
+			}
 		}
+
 
     	return false;
 	}
@@ -322,24 +340,27 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 
 	public synchronized boolean unSubscribeFromEvent(String client, String intent) {
 		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
-		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0 && isEventValid(intent));
+		Dbc.require("Valid Intent must be specified", null != intent && intent.length() > 0);
 		//Invariant condition
 		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
 		Log.d(LOG_TAG, "Invocation of unSubscribeFromEvent for client: " + client + " and intent: " + intent);
 
-		synchronized (this.subscribedToClientEvents) {
-			Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
-			//remove client/event
-			
-			Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(generateClientEventKey(client, intent))
-					+ " for key: " + generateClientEventKey(client, intent));
-			
-			Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
+		//check if intent is invalid. If so, signal with an exception intent otherwise proceed as normal 
+		if (this.isIntentValid(intent, IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, true)) {
+			synchronized (this.subscribedToClientEvents) {
+				Log.d(LOG_TAG, "Before size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
+				//remove client/event
+				
+				Log.d(LOG_TAG, "Removed value: " + this.subscribedToClientEvents.remove(generateClientEventKey(client, intent))
+						+ " for key: " + generateClientEventKey(client, intent));
+				
+				Log.d(LOG_TAG, "After size of subscribedClientEvents: " + this.subscribedToClientEvents.size());
 
-			ArrayList<String> events = new ArrayList<String>();
-			events.add(intent);
-			UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.cloudNodeIdentity); 
-			unsubPubSub.execute(events);
+				ArrayList<String> events = new ArrayList<String>();
+				events.add(intent);
+				UnSubscribeFromPubsub unsubPubSub = new UnSubscribeFromPubsub(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENT, client, this.cloudNodeIdentity); 
+				unsubPubSub.execute(events);
+			}
 		}
 		
     	return false;
@@ -389,6 +410,65 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 		
 		return false;
 	}
+
+	@Override
+	public boolean createEvent(String client, String pubsubNode, String societiesIntent) {
+		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+		Dbc.require("Societies Intent must be specified", null != societiesIntent && societiesIntent.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
+		Log.d(LOG_TAG, "Invocation of createEvent for client: " + client + " and pubsub node: " + pubsubNode + " and Societies intent: " + societiesIntent);
+
+		//check if the intent is already valid, i.e. already allocated
+		if (!this.isIntentValid(societiesIntent, IAndroidSocietiesEvents.CREATE_EVENT, client, false)) {
+			
+			//check if the Pubsub node is already valid, i.e. already allocated
+			if (!this.isPubsubNodeValid(pubsubNode, IAndroidSocietiesEvents.CREATE_EVENT, client, false)) {
+				CreateEvent invokeTask = new CreateEvent(client, this.cloudNodeIdentity, pubsubNode, societiesIntent);
+				invokeTask.execute();
+				
+			} else {
+		    	//Create intent to signal exception
+	    		Intent returnIntent = new Intent(IAndroidSocietiesEvents.CREATE_EVENT);
+	    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+	    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, INVALID_PUBSUB_NODE_ALREADY_EXISTS);
+	    		if (PlatformEventsBase.this.restrictBroadcast) {
+	    			returnIntent.setPackage(client);
+	    		}
+				PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+				Log.d(LOG_TAG, "Pubsub Node already exists return result sent");
+				
+			}
+		} else {
+	    	//Create intent to signal exception
+	    		Intent returnIntent = new Intent(IAndroidSocietiesEvents.CREATE_EVENT);
+	    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+	    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, INVALID_SOCIETIES_INTENT_ALREADY_EXISTS);
+	    		if (PlatformEventsBase.this.restrictBroadcast) {
+	    			returnIntent.setPackage(client);
+	    		}
+				PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+				Log.d(LOG_TAG, "Societies Intent already exists return result sent");
+		}
+		return false;
+	}
+
+	@Override
+	public boolean deleteEvent(String client, String pubsubNode) {
+		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+		//Invariant condition
+		Dbc.invariant("Comms services must be connected", this.connectedToComms && this.connectedToPubsub);
+		Log.d(LOG_TAG, "Invocation of deleteEvent for client: " + client + " and pubsub node: " + pubsubNode);
+
+		if (isPubsubNodeValidAndOwned(pubsubNode, IAndroidSocietiesEvents.DELETE_EVENT, client, true)) {
+			DeleteEvent invokeTask = new DeleteEvent(client, this.cloudNodeIdentity, pubsubNode);
+			invokeTask.execute();
+		}
+		return false;
+	}
+	
 
 	/**
 	 * Configure for Pubsub events
@@ -639,6 +719,166 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	}
     }
 
+    
+    /**
+     * 
+     * Async task to create Societies Pubsub events
+     *
+     */
+    private class CreateEvent extends AsyncTask<Void, Void, Boolean> {
+    	private String client;
+    	private String societiesIntent;
+    	private IIdentity pubsubService;
+    	private String pubsubNode;
+    	/**
+    	 * Constructor
+    	 * 
+    	 * @param intentValue
+    	 * @param client
+    	 */
+    	public CreateEvent(String client, IIdentity pubsubService, String pubsubNode, String societiesIntent) {
+    		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+    		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+    		Dbc.require("Societies Intent must be specified", null != societiesIntent && societiesIntent.length() > 0);
+    		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
+    		Log.d(LOG_TAG, "CreateEvent async task for client: " + client + " and pubsub node: " + pubsubNode);
+    		
+    		this.societiesIntent = societiesIntent;
+    		this.client = client;
+    		this.pubsubService = pubsubService;
+    		this.pubsubNode = pubsubNode;
+		}
+    	
+		private boolean resultStatus = true;
+    	
+    	protected Boolean doInBackground(Void... args) {
+
+			final Intent returnIntent = new Intent(IAndroidSocietiesEvents.CREATE_EVENT);
+			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+			if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(this.client);
+			}
+
+    		try {
+    			
+       			synchronized (PlatformEventsBase.this.thirdPartyEvents) {
+    				Log.d(LOG_TAG, "Before size of thirdPartyEvents: " + PlatformEventsBase.this.thirdPartyEvents.size());
+
+    				if (!PlatformEventsBase.this.thirdPartyEvents.containsKey(pubsubNode)) {
+    					
+    					PlatformEventsBase.this.pubsubClient.ownerCreate(pubsubService, pubsubNode, new IMethodCallback() {
+							
+							@Override
+							public void returnAction(String result) {
+								if (null != result) {
+			    					PlatformEventsBase.this.thirdPartyEvents.put(pubsubNode, client);
+			    					ThirdPartyEventsIntents thirdPartyEvent = new ThirdPartyEventsIntents(pubsubNode, societiesIntent);
+			    					PlatformEventsBase.this.thirdPartyEventsLookup.add(thirdPartyEvent);
+			    					
+			    	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
+			    	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			    	    			Log.d(LOG_TAG, "Create event return result sent");
+								}
+							}
+							
+							@Override
+							public void returnAction(boolean resultFlag) {
+							}
+						});
+    				} else {
+    	    			this.resultStatus = false;
+    	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+    	    			Log.d(LOG_TAG, "Create event return result sent");
+    				}
+       			}
+
+			} catch (Exception e) {
+    			this.resultStatus = false;
+				Log.e(LOG_TAG, "Unable to create event for Societies events", e);
+    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+ 			}
+    		return resultStatus;
+    	}
+    }
+
+    /**
+     * 
+     * Async task to delete Societies Pubsub events
+     *
+     */
+    private class DeleteEvent extends AsyncTask<Void, Void, Boolean> {
+    	private String client;
+    	private IIdentity pubsubService;
+    	private String pubsubNode;
+    	/**
+    	 * Constructor
+    	 * 
+    	 * @param intentValue
+    	 * @param client
+    	 */
+    	public DeleteEvent(String client, IIdentity pubsubService, String pubsubNode) {
+    		Dbc.require("Client subscriber must be specified", null != client && client.length() > 0);
+    		Dbc.require("Pubsub node must be specified", null != pubsubNode && pubsubNode.length() > 0);
+    		Dbc.require("Pubsub service identity cannot be null", null != pubsubService);
+    		Log.d(LOG_TAG, "DeleteEvent async task for client: " + client + " and pubsub node: " + pubsubNode);
+    		
+    		this.client = client;
+    		this.pubsubService = pubsubService;
+    		this.pubsubNode = pubsubNode;
+		}
+    	
+		private boolean resultStatus = true;
+    	
+    	protected Boolean doInBackground(Void... args) {
+
+			final Intent returnIntent = new Intent(IAndroidSocietiesEvents.DELETE_EVENT);
+			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+			if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(this.client);
+			}
+
+    		try {
+    			
+       			synchronized (PlatformEventsBase.this.thirdPartyEvents) {
+    				Log.d(LOG_TAG, "Before size of thirdPartyEvents: " + PlatformEventsBase.this.thirdPartyEvents.size());
+
+    				if (PlatformEventsBase.this.thirdPartyEvents.containsKey(pubsubNode) &&
+    						PlatformEventsBase.this.thirdPartyEvents.get(pubsubNode).equals(client)) {
+    					
+    					PlatformEventsBase.this.pubsubClient.ownerDelete(pubsubService, pubsubNode, new IMethodCallback() {
+							
+							@Override
+							public void returnAction(String result) {
+								if (null != result) {
+			    					PlatformEventsBase.this.thirdPartyEvents.remove(pubsubNode);
+			    					PlatformEventsBase.this.removeThirdPartyEvent(pubsubNode);
+			    					
+			    	    			returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, true);
+			    	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			    	    			Log.d(LOG_TAG, "Delete event return result sent");
+								}
+							}
+							
+							@Override
+							public void returnAction(boolean resultFlag) {
+							}
+						});
+    				} else {
+    	    			this.resultStatus = false;
+    	    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+    	    			Log.d(LOG_TAG, "Create event return result sent");
+    				}
+       			}
+
+			} catch (Exception e) {
+    			this.resultStatus = false;
+				Log.e(LOG_TAG, "Unable to create event for Societies events", e);
+    			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+ 			}
+    		return resultStatus;
+    	}
+    }
+
     /**
      * Assign connection parameters (must happen after successful XMPP login)
      */
@@ -691,7 +931,6 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	return this.allPlatformEvents;
     }
     
-    
     /**
      * Generate the Map key for client/event pair
      * 
@@ -706,11 +945,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     /**
      * Translate Societies platform inter-node Pubsub event to an internal Android Societies internal intent.
      * Uses the two Events/Intents arrays to maps inter-node events to Android equivalent intents
+     * Also uses the Third party created events array of events.
      * 
      * @param platformEvent
      * @return String Android Societies internal intent
      */
-    private static String translatePlatformEventToIntent(String platformEvent) {
+    private String translatePlatformEventToIntent(String platformEvent) {
     	String retValue = null;
     	
     	for (int i = 0; i < IAndroidSocietiesEvents.societiesAndroidEvents.length; i++) {
@@ -719,22 +959,40 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     			break;
     		}
     	}
+    	
+    	if (null == retValue) {
+    		for (ThirdPartyEventsIntents event: this.thirdPartyEventsLookup) {
+    			if (event.getSocietiesIntent().equals(platformEvent)) {
+    				retValue = event.getSocietiesIntent();
+    			}
+    		}
+    	}
+
      	return retValue;
     }
     /**
      * Translate Societies Android Pubsub intent to an inter-node Societies platform Pubsub event.
-     * Uses the two Events/Intents arrays to maps Android intents to Societies equivalent Pubsub events
+     * Uses the two Events/Intents arrays to maps Android intents to Societies equivalent Pubsub events.
+     * Also uses the Third party created events array of events.
      * 
      * @param androidIntent
      * @return String Pubsub inter-node event
      */
-    private static String translateAndroidIntentToEvent(String androidIntent) {
+    private String translateAndroidIntentToEvent(String androidIntent) {
     	String retValue = null;
     	
     	for (int i = 0; i < IAndroidSocietiesEvents.societiesAndroidIntents.length; i++) {
     		if (androidIntent.equals(IAndroidSocietiesEvents.societiesAndroidIntents[i])) {
     			retValue = IAndroidSocietiesEvents.societiesAndroidEvents[i];
     			break;
+    		}
+    	}
+    	
+    	if (null == retValue) {
+    		for (ThirdPartyEventsIntents event: this.thirdPartyEventsLookup) {
+    			if (event.getSocietiesIntent().equals(androidIntent)) {
+    				retValue = event.getPubsubNode();
+    			}
     		}
     	}
      	return retValue;
@@ -769,11 +1027,90 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     	return retValue;
     }
     /**
+     * Is a specified Pubsub node valid 
+     * 
+     * @param node
+     * @param intent current service's return value intent
+     * @param client 
+     * @param sendIntent should a return intent be sent ? 
+     * @return boolean 
+     */
+    private boolean isPubsubNodeValid(String node, String serviceIntent, String client, boolean sendIntent) {
+    	boolean retValue = false;
+    	
+    	for (String validNode : IAndroidSocietiesEvents.societiesAndroidEvents) {
+    		if (validNode.equals(node)) {
+    			retValue = true;
+    			break;
+    		}
+    	}
+    	
+    	synchronized (PlatformEventsBase.this.thirdPartyEvents) {
+        	if (!retValue) {
+        		for (ThirdPartyEventsIntents event: this.thirdPartyEventsLookup) {
+        			if (event.getPubsubNode().equals(node)) {
+        				retValue = true;
+        				break;
+        			}
+        		}
+        	}
+    	}
+    	//Create intent to signal exception
+    	if (!retValue && sendIntent) {
+    		Intent returnIntent = new Intent(serviceIntent);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, INVALID_PUBSUB_NODE);
+    		if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(client);
+    		}
+			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			Log.d(LOG_TAG, "Invalid Pubsub node return result sent");
+    	}
+   	
+    	return retValue;
+    }
+    
+    /**
+     * Is a specified Pubsub node valid and owned by client wishing to delete it ?
+     * 
+     * @param node
+     * @param intent current service's return value intent
+     * @param client 
+     * @param sendIntent should a return intent be sent ? 
+     * @return boolean 
+     */
+    private boolean isPubsubNodeValidAndOwned(String node, String serviceIntent, String client, boolean sendIntent) {
+    	boolean retValue = false;
+    	
+    	synchronized (PlatformEventsBase.this.thirdPartyEvents) {
+    		if (PlatformEventsBase.this.thirdPartyEvents.get(node).equals(client)) {
+ 				retValue = true;
+    		}
+    	}
+    	//Create intent to signal exception
+    	if (!retValue && sendIntent) {
+    		Intent returnIntent = new Intent(serviceIntent);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, INVALID_PUBSUB_NODE);
+    		if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(client);
+    		}
+			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			Log.d(LOG_TAG, "Invalid Pubsub node return result sent");
+    	}
+   	
+    	return retValue;
+    }
+
+    /**
      * Is a specified intent a valid , recognised intent
-     * @param intent
+     * @param intent Societies intent corresponding to a Pubsub node
+     * @param intent current service's return value intent
+     * @param client 
+     * @param sendIntent should a return intent be sent ? 
      * @return boolean true if valid
      */
-    private static boolean isEventValid(String intent) {
+    private boolean isIntentValid(String intent, String serviceIntent, String client, boolean sendIntent) {
     	boolean retValue = false;
     	
     	for (String validIntent : IAndroidSocietiesEvents.societiesAndroidIntents) {
@@ -782,6 +1119,72 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     			break;
     		}
     	}
+    	
+    	synchronized (PlatformEventsBase.this.thirdPartyEvents) {
+        	if (!retValue) {
+        		for (ThirdPartyEventsIntents event: this.thirdPartyEventsLookup) {
+        			if (event.getSocietiesIntent().equals(intent)) {
+        				retValue = true;
+        				break;
+        			}
+        		}
+        	}
+    	}
+    	//Create intent to signal exception
+    	if (!retValue && sendIntent) {
+    		Intent returnIntent = new Intent(serviceIntent);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false);
+    		returnIntent.putExtra(IAndroidSocietiesEvents.INTENT_EXCEPTION_VALUE_KEY, INVALID_SOCIETIES_INTENT);
+    		if (PlatformEventsBase.this.restrictBroadcast) {
+    			returnIntent.setPackage(client);
+    		}
+			PlatformEventsBase.this.androidContext.sendBroadcast(returnIntent);
+			Log.d(LOG_TAG, "Invalid Societies Intent return result sent");
+    	}
     	return retValue;
     }
+
+	/**
+	 * Utility class that allow an association between a Pubsub node and Societies Android intent
+	 *
+	 */
+	private class ThirdPartyEventsIntents {
+		private String pubsubNode;
+		private String societiesIntent;
+		
+		public ThirdPartyEventsIntents(String pubsubNode, String societiesEvent) {
+			this.pubsubNode = pubsubNode;
+			this.societiesIntent = societiesEvent;
+		}
+		
+		public String getPubsubNode() {
+			return pubsubNode;
+		}
+		
+		public void setPubsubNode(String pubsubNode) {
+			this.pubsubNode = pubsubNode;
+		}
+		
+		public String getSocietiesIntent() {
+			return societiesIntent;
+		}
+		
+		public void setSocietiesIntent(String societiesIntent) {
+			this.societiesIntent = societiesIntent;
+		}
+	}
+	
+	/**
+	 * Remove a {@link ThirdPartyEventsIntents} object from the array of created objects
+	 * 
+	 * @param pubsubNode
+	 */
+	private void removeThirdPartyEvent(String pubsubNode) {
+		for (Iterator<ThirdPartyEventsIntents> iter = this.thirdPartyEventsLookup.iterator(); iter.hasNext();) {
+			if (iter.next().getPubsubNode().equals(pubsubNode)) {
+				iter.remove();
+				break;
+			}
+		}
+	}
 }

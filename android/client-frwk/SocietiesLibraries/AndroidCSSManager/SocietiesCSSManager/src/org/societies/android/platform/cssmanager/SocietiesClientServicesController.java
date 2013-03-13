@@ -516,7 +516,7 @@ public class SocietiesClientServicesController {
         	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
 
         	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Subscribed Service");
-        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
+        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_SUBSCRIBED_SERVICE_INTENT);
         	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
 
         	//LOCAL PLATFORM SERVICES

@@ -14,7 +14,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		This is the master version number!
 		 <Public release>.<wp7 bugfix release>
 	-->
-	<release.version>0.5</release.version>
+	<release.version>0.6</release.version>
 
 	<!-- master properties for component blocks -->
 	<release.groupId>org.societies</release.groupId>

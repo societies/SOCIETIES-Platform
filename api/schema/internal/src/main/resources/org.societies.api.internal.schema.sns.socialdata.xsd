@@ -6,7 +6,7 @@
              xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 
-  <xs:element name="SocialdataMessageBean">
+  <xs:element name="socialdataMessageBean">
   <xs:complexType >
     <xs:sequence>
       <xs:element name="identity" 	type="xs:string" minOccurs="0"/>
@@ -20,7 +20,7 @@
   </xs:complexType>
  </xs:element>
 
- <xs:element name="SocialdataResultBean">
+ <xs:element name="socialdataResultBean">
 	 <xs:complexType>
 	     <xs:choice minOccurs='0'>
 	      <xs:element name="id" type="xs:string"/>
@@ -34,13 +34,13 @@
   <xs:element name='connectorsList'>
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref='ConnectorBean' minOccurs='0' maxOccurs='unbounded'/>
+        <xs:element ref='connectorBean' minOccurs='0' maxOccurs='unbounded'/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
 
-<xs:element name="ConnectorBean">
+<xs:element name="connectorBean">
   <xs:complexType>
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>

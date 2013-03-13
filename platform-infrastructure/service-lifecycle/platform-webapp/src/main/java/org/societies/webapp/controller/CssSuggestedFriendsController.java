@@ -193,19 +193,20 @@ public class CssSuggestedFriendsController {
 			FriendFilter filter = new FriendFilter();
 			Integer filterFlag = 0x00000001111;
 			filter = cssLocalManager.getFriendfilter();
-			filterFlag = filter.getFilterFlag();
-			filter.setFilterFlag(filterFlag );
-			LOG.info("SuggestedFriendsController called with filter: " +filter);
-			
-//			int filterFlag = 0x0000000000;
-			
-			LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
+			if(filter==null){
+				filter = new FriendFilter();
+				filterFlag=0x00000011111;
+				filter.setFilterFlag(filterFlag);
+			}else{
+				filterFlag = filter.getFilterFlag();
+				filter.setFilterFlag(filterFlag );
+			}
 			
 
 			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
 			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 
-			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends +" Size is: " +snsSuggestedFriends.size());
+			
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -218,8 +219,6 @@ public class CssSuggestedFriendsController {
 
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
-
-			LOG.info("SuggestedFriendsController allcssDetails size : " +allcssDetails.size());
 
 
 			for (int index = 0; index < allcssDetails.size(); index++) {
@@ -253,7 +252,6 @@ public class CssSuggestedFriendsController {
 							if(entry.getKey().getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId())){	
 								bAlreadySuggested = true;
 								if(snsFriends.contains(entry.getKey())){
-									LOG.info("Already added NOT adding again");
 								}else {
 									snsFriends.add(allcssDetails.get(index));
 								}
@@ -266,9 +264,7 @@ public class CssSuggestedFriendsController {
 					}
 				}
 			}
-			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
-			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
-
+			
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 			

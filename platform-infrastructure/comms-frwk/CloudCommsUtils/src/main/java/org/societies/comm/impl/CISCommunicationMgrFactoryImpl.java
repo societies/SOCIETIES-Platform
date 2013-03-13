@@ -65,6 +65,10 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		
 		// TODO verify if cisIdentity exists already
 		
+		// manipulate threadContextClassloader so that XCCommunicationMgr threads are created with the CommsBundle classloader
+		ClassLoader threadContextClassLoader = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(XCCommunicationMgr.class.getClassLoader());
+		
 		// CIS Comms
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid());
 		commMgr.loginFromConfig();
@@ -77,6 +81,9 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			psr = new PubsubServiceRouter(commMgr);
 		else
 			psr = new PubsubServiceRouter(commMgr,sf);
+		
+		// restore threadContextClassloader
+		Thread.currentThread().setContextClassLoader(threadContextClassLoader);
 		
 		cisCommManagers.put(cisIdentity, commMgr);
 		cisPubsubServices.put(cisIdentity, psr);

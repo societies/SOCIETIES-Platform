@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.societies.android.api.identity.DataIdentifierUtil;
+import org.societies.android.api.identity.util.DataIdentifierUtils;
+import org.societies.android.api.identity.util.RequestorUtils;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.android.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.android.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -86,7 +86,7 @@ public class PrivacyPermissionDao {
 		Cursor c = db.query(Constants.TABLE_PRIVACY_PERMISSION,
 				Constants.TABLE_PRIVACY_PERMISSION_FIELDS,
 				" requestor=? ",
-				new String[] {RequestorUtils.toFormattedString(requestor), DataIdentifierUtil.toUriString(dataId), ActionUtils.toFormattedString(actions)}, null, null, null);
+				new String[] {RequestorUtils.toFormattedString(requestor), DataIdentifierUtils.toUriString(dataId), ActionUtils.toFormattedString(actions)}, null, null, null);
 		ResponseItem permission = cursorToPermission(c);
 		c.close();
 		return permission;

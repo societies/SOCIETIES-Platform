@@ -8,7 +8,8 @@ The test for secure policy negotiation has two parts:
 - consumer
 
 Any roles can be grouped into one node. E.g., you can use only one node that
-has all 3 roles, i.e., run both parts of test on domain authority node.
+has all 3 roles, i.e., run both parts of test on a combined node (domain
+authority + platform).
 
 How to run the test:
 

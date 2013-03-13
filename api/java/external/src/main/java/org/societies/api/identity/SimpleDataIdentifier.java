@@ -25,6 +25,7 @@
 package org.societies.api.identity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 
 /**
@@ -36,7 +37,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 public class SimpleDataIdentifier extends DataIdentifier {
 	@Override
 	public String getUri() {
-		uri = DataIdentifierUtil.toUriString(this);
+		uri = DataIdentifierUtils.toUriString(this);
 		return uri;
 	}
 	

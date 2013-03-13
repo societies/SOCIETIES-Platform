@@ -43,7 +43,9 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -51,6 +53,7 @@ import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenc
 import org.societies.personalisation.UserPreferenceManagement.impl.management.Registry;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -80,8 +83,14 @@ public class TestContextEvent  {
 	
 	@Before
 	public void Setup(){
+
 		pcm = new UserPreferenceConditionMonitor();
-		pcm.initialisePreferenceManagement(broker, persoMgr);
+		pcm.setCtxBroker(broker);
+		pcm.setEventMgr(Mockito.mock(IEventMgr.class));
+		pcm.setPersoMgr(persoMgr);
+		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
+		pcm.initialisePreferenceManagement();
+
 		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
 		ctxEntityId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		ctxEntity = new CtxEntity(ctxEntityId);	

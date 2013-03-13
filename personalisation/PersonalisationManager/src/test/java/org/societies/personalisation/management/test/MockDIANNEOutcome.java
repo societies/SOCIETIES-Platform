@@ -27,6 +27,7 @@ package org.societies.personalisation.management.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 
@@ -36,7 +37,7 @@ import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
  * @author Eliza
  *
  */
-public class MockDIANNEOutcome implements IDIANNEOutcome{
+public class MockDIANNEOutcome extends Action implements IDIANNEOutcome{
 
 	private ServiceResourceIdentifier serviceID;
 	private String serviceType;

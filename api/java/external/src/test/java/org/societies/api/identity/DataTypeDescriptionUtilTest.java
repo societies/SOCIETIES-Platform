@@ -27,6 +27,7 @@ package org.societies.api.identity;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.societies.api.identity.util.DataTypeDescriptionUtils;
 import org.societies.api.schema.identity.DataTypeDescription;
 
 /**
@@ -39,7 +40,7 @@ public class DataTypeDescriptionUtilTest {
 	public void testComputedFriendlyName() {
 		String dataType = "HELLO_THE_WORLD";
 		String expectedResult = "Hello The World";
-		DataTypeDescription dataTypeDescriptionResult = DataTypeDescriptionUtil.create(dataType);
+		DataTypeDescription dataTypeDescriptionResult = DataTypeDescriptionUtils.create(dataType);
 		assertNotNull("Result should not be null", dataTypeDescriptionResult);
 		assertNotNull("Computed friendly name should not be null", dataTypeDescriptionResult.getFriendlyName());
 		assertEquals("Data type friendly name should be the same", expectedResult, dataTypeDescriptionResult.getFriendlyName());

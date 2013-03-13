@@ -46,6 +46,6 @@ public interface IInternalTrustClient extends ITrustClient {
 
     String methodsArray [] = {
     		"retrieveTrust(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-            "addTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean type, org.societies.android.api.privacytrust.trust.ADate timestamp, Serializable info"
+            "addTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.privacytrust.trust.ADate timestamp, Serializable info"
             };
 }

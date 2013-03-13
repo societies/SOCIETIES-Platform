@@ -39,13 +39,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.schema.cis.community.*;
 import org.societies.api.schema.identity.RequestorBean;
-import org.springframework.scheduling.annotation.AsyncResult;
-
 import javax.persistence.*;
-import java.util.concurrent.Future;
-
-//import org.societies.api.schema.cis.community.GetInfo;
-//import org.societies.api.schema.cis.community.SetInfo;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -61,8 +55,7 @@ public class CisSubscribedImp implements ICis {
 	private Long id;
 	
 	@Transient
-	private static Logger LOG = LoggerFactory
-			.getLogger(CisSubscribedImp.class);
+	private static Logger LOG = LoggerFactory.getLogger(CisSubscribedImp.class);
 	
 	@OneToOne(cascade=CascadeType.ALL)
 	private CisRecord cisRecord;
@@ -135,9 +128,7 @@ public class CisSubscribedImp implements ICis {
 			LOG.debug("Wrong format of CIS jid in cisRecord");
 			e.printStackTrace();
 		}
-
 	}
-	
 	
 	@Override
 	public void getInfo(Requestor req, ICisManagerCallback callback){
@@ -282,9 +273,6 @@ public class CisSubscribedImp implements ICis {
 		return true;
 	}
 	
-	
-	
-	
 	private void sendXmpp(CommunityMethods c,ICisManagerCallback callback){
 		IIdentity toIdentity;
 		try {
@@ -305,22 +293,6 @@ public class CisSubscribedImp implements ICis {
 			e1.printStackTrace();
 		}	
 	}
-	
-	
-/*	public Future<IActivityFeed> getCisActivityFeed(){
-		IIdentity remoteCISid;
-		IActivityFeed i = null;
-		try {
-			remoteCISid = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
-			i = new RemoteActivityFeed(this.cisManag.getiCommMgr(),remoteCISid);
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		return new AsyncResult<IActivityFeed>(i);
-	}*/
 
 	@Override
 	public void getMembershipCriteria(ICisManagerCallback callback) {
@@ -337,7 +309,9 @@ public class CisSubscribedImp implements ICis {
 	public void fillCommmunityXMPPobj(Community c){
 		c.setCommunityJid(this.getCisId());
 		c.setCommunityName(this.getName());
-		
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.cisRecord.getDescription());
+		c.setCommunityType(this.cisRecord.getType());
 	} 
 
 }

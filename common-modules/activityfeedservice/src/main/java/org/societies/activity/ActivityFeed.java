@@ -404,7 +404,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             e.printStackTrace();
 
         } finally {
-            if (session != null)
+                if (session != null)
                 session.close();
         }
 
@@ -601,7 +601,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     public String getContentIfNotNull(ActivityObject a){
-        if(a == null) return null;
+        if(a == null || a.getObjectType() == null) return null;
         if(a.getObjectType().contains("person"))
             return a.getDisplayName();
         if(a.getObjectType().contains("note"))

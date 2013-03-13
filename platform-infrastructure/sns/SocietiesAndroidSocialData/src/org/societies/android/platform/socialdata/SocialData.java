@@ -107,7 +107,7 @@ public class SocialData extends Service implements ISocialData {
     public boolean startService() {
     	if (!connectedToComms) {
         	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+        	Log.d(LOG_TAG, "SocialData startService binding to comms");
 	        this.commMgr.bindCommsService(new IMethodCallback() {	
 				@Override
 				public void returnAction(boolean resultFlag) {
@@ -148,7 +148,7 @@ public class SocialData extends Service implements ISocialData {
     public boolean stopService() {
     	if (connectedToComms) {
         	//UNREGISTER AND DISCONNECT FROM COMMS
-        	Log.d(LOG_TAG, "CisDirectoryBase stopService unregistering namespaces");
+        	Log.d(LOG_TAG, "SocialData stopService unregistering namespaces");
         	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
 				@Override
 				public void returnAction(boolean resultFlag) {

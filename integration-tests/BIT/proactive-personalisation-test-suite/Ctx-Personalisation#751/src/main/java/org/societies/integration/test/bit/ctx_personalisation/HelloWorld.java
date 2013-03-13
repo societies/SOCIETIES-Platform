@@ -36,6 +36,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
@@ -129,5 +130,9 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	}
 	private void log(String msg){
 		logging.debug(this.getClass().getName()+": "+msg);
+	}
+	@Override
+	public List<PersonalisablePreferenceIdentifier> getPersonalisablePreferences() {
+		return new ArrayList<PersonalisablePreferenceIdentifier>();
 	}
 }

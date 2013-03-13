@@ -17,4 +17,9 @@ public interface IPlatformEventsCallback {
 	 * @param result
 	 */
 	void returnAction(int result);
+	/**
+	 * A generic method to receive the callback exception
+	 * @param result
+	 */
+	void returnException(int exception);
 }

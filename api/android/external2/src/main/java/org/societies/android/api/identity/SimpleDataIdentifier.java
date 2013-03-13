@@ -25,6 +25,7 @@
 package org.societies.android.api.identity;
 
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.android.api.identity.util.DataIdentifierUtils;
 
 /**
  * Simple data identifier implementations that helps managing data identifiers
@@ -35,7 +36,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 public class SimpleDataIdentifier extends DataIdentifier {
 	@Override
 	public String getUri() {
-		uri = DataIdentifierUtil.toUriString(this);
+		uri = DataIdentifierUtils.toUriString(this);
 		return uri;
 	}
 	

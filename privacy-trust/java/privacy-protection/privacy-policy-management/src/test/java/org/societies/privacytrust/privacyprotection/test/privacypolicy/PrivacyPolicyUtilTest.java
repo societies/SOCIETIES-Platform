@@ -47,7 +47,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.util.commonmock.MockIdentity;
@@ -84,7 +84,7 @@ public class PrivacyPolicyUtilTest extends AbstractJUnit4SpringContextTests {
 		LOG.info(testTitle+": start");
 		String privacyPolicyXml = null;
 		try {
-			privacyPolicyXml = PrivacyPolicyUtil.toXmlString(null);
+			privacyPolicyXml = PrivacyPolicyUtils.toXmlString(null);
 		} catch (Exception e) {
 			LOG.info("[Exception] "+testTitle+": "+e.getMessage(), e);
 			fail("[Exception] "+testTitle+": "+e.getMessage());
@@ -102,7 +102,7 @@ public class PrivacyPolicyUtilTest extends AbstractJUnit4SpringContextTests {
 		String privacyPolicyXml = null;
 		String exepectedPrivacyPolicyXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString();
 		try {
-			privacyPolicyXml = PrivacyPolicyUtil.toXmlString(RequestPolicyUtils.toRequestPolicyBean(cisPolicy));
+			privacyPolicyXml = PrivacyPolicyUtils.toXmlString(RequestPolicyUtils.toRequestPolicyBean(cisPolicy));
 		} catch (Exception e) {
 			LOG.info("[Exception] "+testTitle+": "+e.getMessage(), e);
 			fail("[Exception] "+testTitle+": "+e.getMessage());

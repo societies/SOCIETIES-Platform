@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -45,5 +46,5 @@ public interface IUserPreferenceManagement extends org.societies.api.internal.pe
 	public IPreferenceTreeModel getModel(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 	public boolean deletePreference(IIdentity ownerID,	PreferenceDetails details);
 	public boolean storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference);
-	
+
 }

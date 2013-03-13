@@ -26,10 +26,13 @@ package org.societies.context.user.db.impl.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.societies.api.context.model.CtxIdentifier;
@@ -55,6 +58,9 @@ public abstract class CtxModelObjectDAO implements Serializable {
 	@Version
 	private Date lastModified;
 	
+	@Transient
+	final private Set<String> eventTopics = new CopyOnWriteArraySet<String>();
+	
 	CtxModelObjectDAO(String id) {
 		
 		this.id = id;
@@ -70,6 +76,11 @@ public abstract class CtxModelObjectDAO implements Serializable {
 	public void setLastModified(Date lastModified) {
 		
 		this.lastModified = lastModified;
+	}
+	
+	public Set<String> getEventTopics() {
+		
+		return this.eventTopics;
 	}
 	
 	/**
