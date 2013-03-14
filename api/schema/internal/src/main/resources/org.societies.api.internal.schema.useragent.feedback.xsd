@@ -13,36 +13,30 @@
 	<xs:import namespace="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.privacy.model.privacypolicy.xsd"/>
 
-	
-		<xs:complexType name="userFeedbackPrivacyNegotiationEvent">
+	<xs:element name="userFeedbackPrivacyNegotiationEvent">
+		<xs:complexType >
 			<xs:sequence>
 				<xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
 				<xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
 			</xs:sequence>
 		</xs:complexType>
-	
+	</xs:element>
 
-
+	<xs:complexType name="negotiationDetailsBean">
+		<xs:sequence>
+			<xs:element name="negotiationID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>		
+		</xs:sequence>
+	</xs:complexType>
 	
-		<xs:complexType name="negotiationDetailsBean">
-			<xs:sequence>
-				<xs:element name="negotiationID" type="xs:int"
-					minOccurs="1" maxOccurs="1"/>
-				<xs:element name="requestor" type="ns1:requestorBean" 
-					minOccurs="1" maxOccurs="1"/>		
-			</xs:sequence>
-		</xs:complexType>
-	
-
-		<xs:complexType name="userFeedbackAccessControlEvent">
+	<xs:element name="userFeedbackAccessControlEvent">
+		<xs:complexType >
 			<xs:sequence>
 				<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" />
 				<xs:element name="responseItems" type="ns2:responseItem" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="requestor" type="ns1:requestorBean" 
-					minOccurs="1" maxOccurs="1"/>	
+				<xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>	
 			</xs:sequence>
 		</xs:complexType>
+	</xs:element>
 	
-
 </xs:schema>
-	
