@@ -26,32 +26,32 @@
 	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.wepapp</groupId>
-	<artifactId>societies-webapp</artifactId>
-	<packaging>war</packaging>
-	<version>${release.version}</version>
-	<name>societies-webapp</name>
-	<url>http://maven.apache.org</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.societies.wepapp</groupId>
+    <artifactId>societies-webapp</artifactId>
+    <packaging>war</packaging>
+    <version>${release.version}</version>
+    <name>societies-webapp</name>
+    <url>http://maven.apache.org</url>
 
-	<developers>
-		<developer>
-			<id>pkudaiyar</id>
-			<name>Perumal K</name>
-			<email>kperumalin@hotmail.com</email>
-			<organization>Intel</organization>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>pkudaiyar</id>
+            <name>Perumal K</name>
+            <email>kperumalin@hotmail.com</email>
+            <organization>Intel</organization>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 
-	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<version>RELEASE</version>
-	</parent>
+    <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>spring-osgi-parent</artifactId>
+        <version>RELEASE</version>
+    </parent>
 
     <repositories>
         <repository>
@@ -63,85 +63,85 @@
     </repositories>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>org.aspectj-library</artifactId>
-			<type>libd</type>
-			<version>1.6.2.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet</artifactId>
-			<version>3.0.0.v201103241009</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.web.servlet</artifactId>
-			<version>3.0.5.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<!-- the following jars should be available in the repository/usr folder -->
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>com.springsource.javax.validation</artifactId>
-			<version>1.0.0.GA</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>com.springsource.javax.servlet.jsp.jstl</artifactId>
-			<version>1.2.0.v20110728</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>org.springframework.osgi.web</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<scope>provided</scope>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.spring-library</artifactId>
+            <type>libd</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>org.aspectj-library</artifactId>
+            <type>libd</type>
+            <version>1.6.2.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>3.0.0.v201103241009</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.web.servlet</artifactId>
+            <version>3.0.5.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+        <!-- the following jars should be available in the repository/usr folder -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>com.springsource.javax.validation</artifactId>
+            <version>1.0.0.GA</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>com.springsource.javax.servlet.jsp.jstl</artifactId>
+            <version>1.2.0.v20110728</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>org.springframework.osgi.web</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.api.external</groupId>
+            <artifactId>societies-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.societies.platform</groupId>
-			<artifactId>socialdata</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.societies.platform</groupId>
+            <artifactId>socialdata</artifactId>
+            <version>${release.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>org.societies.personalisation</groupId>
             <artifactId>personalisation_api</artifactId>
             <version>${release.version}</version>
@@ -149,88 +149,104 @@
         </dependency>
 
         <dependency>
-			<groupId>org.apache.shindig</groupId>
-			<artifactId>shindig-social-api</artifactId>
-			<version>3.0.0-beta4</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.cis</groupId>
-			<artifactId>CisDirectoryClient</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>activityfeed-client</artifactId>
-			<version>${version.cis}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-		  <groupId>org.societies.cis</groupId>
-		  <artifactId>cis-management-client</artifactId>
-		  <version>${version.cis}</version>
-		  <scope>provided</scope>
-		</dependency>
-		  
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.7.1</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.7.1</version>
-		</dependency>
-		
-		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
-			<version>${release.version}</version> <scope>provided</scope> </dependency> -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>com.springsource.javax.servlet</artifactId>
-			<version>2.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>2.6.4</version>
-			<scope>provided</scope>
-			<exclusions>
-				<!-- StAX is not available on Android -->
-				<exclusion>
-					<artifactId>stax</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>stax-api</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<!-- Provided by Android -->
-				<exclusion>
-					<artifactId>xpp3</artifactId>
-					<groupId>xpp3</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+            <groupId>org.apache.shindig</groupId>
+            <artifactId>shindig-social-api</artifactId>
+            <version>3.0.0-beta4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.cis</groupId>
+            <artifactId>CisDirectoryClient</artifactId>
+            <version>${release.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>activityfeed-client</artifactId>
+            <version>${version.cis}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.societies.cis</groupId>
+            <artifactId>cis-management-client</artifactId>
+            <version>${version.cis}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
+        <!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId>
+            <version>${release.version}</version> <scope>provided</scope> </dependency> -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>com.springsource.javax.servlet</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+            <version>2.6.4</version>
+            <scope>provided</scope>
+            <exclusions>
+                <!-- StAX is not available on Android -->
+                <exclusion>
+                    <artifactId>stax</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+                <!-- Provided by Android -->
+                <exclusion>
+                    <artifactId>xpp3</artifactId>
+                    <groupId>xpp3</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- PrimeFaces dependencies -->
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>3.5</version>
+        </dependency>
+        <!-- needed for PrimeFaces push -->
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>1.0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.atmosphere</groupId>
+                    <artifactId>atmosphere-compat-tomcat</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.atmosphere</groupId>
+                    <artifactId>atmosphere-compat-tomcat7</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Java EE6 dependencies -->
@@ -305,41 +321,41 @@
             <version>5.1.22</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
 
-	<build>
-		<finalName>societies-webapp</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<manifestLocation>${project.build.directory}/META-INF</manifestLocation>
-					<supportedProjectTypes>
-						<supportedProjectType>bundle</supportedProjectType>
-						<supportedProjectType>war</supportedProjectType>
-					</supportedProjectTypes>
-					<instructions>
-						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-						<Export-Package>!*</Export-Package>
-						<Import-Package>
-							org.simpleframework.xml;resolution:=optional,
-							org.simpleframework.xml.convert;resolution:=optional,
-							org.societies.maven.converters;resolution:=optional,
-							org.societies.simple.basic;resolution:=optional,
-							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
-							javax.servlet;version="[3.0.0, 4.0.0)",
+    <build>
+        <finalName>societies-webapp</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <manifestLocation>${project.build.directory}/META-INF</manifestLocation>
+                    <supportedProjectTypes>
+                        <supportedProjectType>bundle</supportedProjectType>
+                        <supportedProjectType>war</supportedProjectType>
+                    </supportedProjectTypes>
+                    <instructions>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
+                        <Import-Package>
+                            org.simpleframework.xml;resolution:=optional,
+                            org.simpleframework.xml.convert;resolution:=optional,
+                            org.societies.maven.converters;resolution:=optional,
+                            org.societies.simple.basic;resolution:=optional,
+                            javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
+                            javax.servlet;version="[3.0.0, 4.0.0)",
                             javax.servlet.resources;version="[2.4.0, 4.0.0)",
                             <!-- JSF 2.0 -->
                             com.sun.faces,
@@ -513,7 +529,6 @@
                             org.primefaces.model.map,
                             org.primefaces.model.mindmap,
                             org.primefaces.model.tagcloud,
-                            org.primefaces.push,
                             org.primefaces.renderkit,
                             org.primefaces.util,
                             org.primefaces.visit,
@@ -524,135 +539,151 @@
                             org.springframework.web.jsf.el,
                             org.springframework.osgi.config,
                             com.sun.faces.vendor,
-							<!-- spring DM -->
-							org.springframework.beans.factory.config,
-							org.springframework.osgi.web.context.support,
-							org.springframework.web.context.request,
-							org.springframework.web.context.support,
-							org.springframework.web.context,
-							org.springframework.stereotype,
-							org.springframework.web.bind.annotation,
-							org.springframework.web.servlet,
-							org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
-							org.springframework.beans.factory.annotation,
-							org.springframework.context.config,
-							org.springframework.web.util,
-							<!-- servlet -->
-							org.springframework.web.servlet.config;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.view;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.handler;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.mvc;version="[3.0.0, 4.0.0)",
-							org.springframework.web.servlet.resource;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.support;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.tags;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.tags.form;version="[3.0.0,4.0.0)",
-							org.springframework.web.servlet.theme;version="[3.0.0,4.0.0)",
-							<!-- JSTL lib -->
-							org.apache.taglibs.standard; version="[1.2.0,2)",
-							org.apache.taglibs.standard.extra.spath; version="[1.2.0,2)",
-							org.apache.taglibs.standard.functions; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.parser;version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.test; version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.jstl.test.beans;version="[1.2.0,2)",
-							org.apache.taglibs.standard.lang.support; version="[1.2.0,2)",
-							org.apache.taglibs.standard.resources; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.common.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.el.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.core; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.fmt; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.sql; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
-							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
-							org.springframework.aop.scope;resolution:=optional,
-							org.springframework.aop.framework;resolution:=optional,
-							org.springframework.aop;resolution:=optional,
-							net.sf.cglib.proxy;resolution:=optional,
-							org.aopalliance.aop;resolution:=optional,
-							net.sf.cglib.core;resolution:=optional,
-							org.springframework.aop.config;resolution:=optional,
-							net.sf.cglib.reflect;resolution:=optional,
-							org.springframework.web.servlet.view.json;resolution:=optional,
-							org.osgi.framework,
-							<!-- Form validation -->
-							javax.validation,
-							*;resolution:=optional
-						</Import-Package>
-						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
-						<Webapp-Context>societies</Webapp-Context>
-						<Web-ContextPath>societies</Web-ContextPath>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<attachClasses>true</attachClasses>
-					<archive>
-						<manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-					<!-- Make a skinny WAR -->
-					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
+                            <!-- PrimeFaces push -->
+                            org.primefaces.push,
+                            org.atmosphere.cpr,
+                            <!--org.apache.catalina,-->
+                            <!-- spring DM -->
+                            org.springframework.beans.factory.config,
+                            org.springframework.osgi.web.context.support,
+                            org.springframework.web.context.request,
+                            org.springframework.web.context.support,
+                            org.springframework.web.context,
+                            org.springframework.stereotype,
+                            org.springframework.web.bind.annotation,
+                            org.springframework.web.servlet,
+                            org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
+                            org.springframework.beans.factory.annotation,
+                            org.springframework.context.config,
+                            org.springframework.web.util,
+                            <!-- servlet -->
+                            org.springframework.web.servlet.config;version="[3.0.0, 4.0.0)",
+                            org.springframework.web.servlet.view;version="[3.0.0, 4.0.0)",
+                            org.springframework.web.servlet.handler;version="[3.0.0, 4.0.0)",
+                            org.springframework.web.servlet.mvc;version="[3.0.0, 4.0.0)",
+                            org.springframework.web.servlet.resource;version="[3.0.0,4.0.0)",
+                            org.springframework.web.servlet.support;version="[3.0.0,4.0.0)",
+                            org.springframework.web.servlet.tags;version="[3.0.0,4.0.0)",
+                            org.springframework.web.servlet.tags.form;version="[3.0.0,4.0.0)",
+                            org.springframework.web.servlet.theme;version="[3.0.0,4.0.0)",
+                            <!-- JSTL lib -->
+                            org.apache.taglibs.standard; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.extra.spath; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.functions; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.lang.jstl; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.lang.jstl.parser;version="[1.2.0,2)",
+                            org.apache.taglibs.standard.lang.jstl.test; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.lang.jstl.test.beans;version="[1.2.0,2)",
+                            org.apache.taglibs.standard.lang.support; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.resources; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.common.core; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.common.fmt; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.common.sql; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.common.xml; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.el.core; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.el.fmt; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.el.sql; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.el.xml; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.rt.core; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.rt.fmt; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.rt.sql; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tei; version="[1.2.0,2)",
+                            org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
+                            org.springframework.aop.scope;resolution:=optional,
+                            org.springframework.aop.framework;resolution:=optional,
+                            org.springframework.aop;resolution:=optional,
+                            net.sf.cglib.proxy;resolution:=optional,
+                            org.aopalliance.aop;resolution:=optional,
+                            net.sf.cglib.core;resolution:=optional,
+                            org.springframework.aop.config;resolution:=optional,
+                            net.sf.cglib.reflect;resolution:=optional,
+                            org.springframework.web.servlet.view.json;resolution:=optional,
+                            org.osgi.framework,
+                            <!-- Form validation -->
+                            javax.validation,
+                            *;resolution:=optional
+                        </Import-Package>
+                        <Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
+                        <Webapp-Context>societies</Webapp-Context>
+                        <Web-ContextPath>societies</Web-ContextPath>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-installed</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>javax.validation</groupId>
-									<artifactId>com.springsource.javax.validation</artifactId>
-									<version>1.0.0.GA</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.springframework.osgi</groupId>
-									<artifactId>org.springframework.osgi.web</artifactId>
-									<version>1.2.1</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>javax.servlet</groupId>
-									<artifactId>com.springsource.javax.servlet</artifactId>
-									<version>2.5.0</version>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.codehaus.jackson</groupId>
-									<artifactId>jackson-mapper-asl</artifactId>
-									<version>1.7.1</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.codehaus.jackson</groupId>
-									<artifactId>jackson-core-asl</artifactId>
-									<version>1.7.1</version>
-									<type>jar</type>
-								</artifactItem>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <archive>
+                        <manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                    <!-- Make a skinny WAR -->
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                            <type>war</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-installed</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.validation</groupId>
+                                    <artifactId>com.springsource.javax.validation</artifactId>
+                                    <version>1.0.0.GA</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.springframework.osgi</groupId>
+                                    <artifactId>org.springframework.osgi.web</artifactId>
+                                    <version>1.2.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.servlet</groupId>
+                                    <artifactId>com.springsource.javax.servlet</artifactId>
+                                    <version>2.5.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-mapper-asl</artifactId>
+                                    <version>1.7.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-core-asl</artifactId>
+                                    <version>1.7.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
@@ -689,28 +720,19 @@
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                                 </artifactItem>
-							</artifactItems>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<type>war</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+                                <artifactItem>
+                                    <groupId>org.atmosphere</groupId>
+                                    <artifactId>atmosphere-runtime</artifactId>
+                                    <version>1.0.9</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

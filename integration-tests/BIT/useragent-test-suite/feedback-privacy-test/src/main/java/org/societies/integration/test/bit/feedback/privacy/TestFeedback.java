@@ -22,39 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.integration.test.bit.feedback.privacy;
 
-package org.societies.api.internal.useragent.feedback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.integration.test.IntegrationTestCase;
 
-import java.util.List;
-import java.util.concurrent.Future;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.FeedbackForm;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 /**
- * 
- * @author S.Gallacher@hw.ac.uk
+ * @author Eliza
  *
  */
-public interface IUserFeedback
-{
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
-	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
-	
-	public void showNotification(String notificationText);
-	
-	public FeedbackForm getNextRequest();
-	
-	public void submitExplicitResponse(String id, List<String> result);
-	
-	public void submitImplicitResponse(String id, Boolean result);
-	
-	public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
-	
-	public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items);
+public class TestFeedback extends IntegrationTestCase{
+
+	private static PubsubClient pubsub;
+	private static ICommManager commsMgr;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
+	public TestFeedback() {
+		super(1926, new Class[]{Tester.class});
+		logging.debug("Starting testFeedback");
+		
+	}
+
+	public static PubsubClient getPubsub() {
+		return pubsub;
+	}
+
+	public void setPubsub(PubsubClient pubsub) {
+		this.pubsub = pubsub;
+	}
+
+	public static IIdentityManager getIdMgr() {
+		return commsMgr.getIdManager();
+	}
+
+	public static ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+	}
+
 }
