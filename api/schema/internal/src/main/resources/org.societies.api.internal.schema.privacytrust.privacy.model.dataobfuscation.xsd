@@ -10,12 +10,15 @@
 	<xs:import namespace="http://societies.org/api/schema/identity"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
 
+<xs:element name="obfuscable" type="tns:iObfuscable">
+	</xs:element>
+	
 	<xs:complexType name="iObfuscable" abstract="true">
 	</xs:complexType>
 
 	<xs:complexType name="dataWrapper">
 		<xs:sequence>
-			<xs:element name="dataType" type="xs:string" />
+			<xs:element name="dataType" type="xs:string" minOccurs="1" />
 			<xs:element name="data" type="tns:iObfuscable" />
 		</xs:sequence>
 	</xs:complexType>

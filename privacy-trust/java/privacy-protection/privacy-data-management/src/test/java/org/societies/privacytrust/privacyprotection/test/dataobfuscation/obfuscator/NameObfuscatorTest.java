@@ -79,9 +79,9 @@ public class NameObfuscatorTest {
 			fail("testObfuscateData(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
+		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
 		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (0 == obfuscationLevel) {
 			Name expected = NameUtils.create("", "");
@@ -117,9 +117,9 @@ public class NameObfuscatorTest {
 			fail("testObfuscateDataOutOfBound(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
+		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
 		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (obfuscationLevel < 0) {
 			Name expected = NameUtils.create("", "");

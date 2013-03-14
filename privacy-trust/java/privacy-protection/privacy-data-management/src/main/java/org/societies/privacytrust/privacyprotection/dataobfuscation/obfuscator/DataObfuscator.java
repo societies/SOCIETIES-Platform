@@ -53,7 +53,6 @@ public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfu
 
 
 	public DataObfuscator(DataWrapper dataWrapper) {
-		super();
 		this.dataWrapper = dataWrapper;
 		this.data = (E) this.dataWrapper.getData();
 	}

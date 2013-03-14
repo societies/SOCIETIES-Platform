@@ -24,22 +24,12 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Activity;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.PostalLocation;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Status;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Temperature;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.dataobfuscation.IDataObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.ActivityObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.PostalLocationObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.StatusObfuscator;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.TemperatureObfuscator;
+import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.ObfuscatorFactory;
 
 /**
  * Implementation of IDataObfuscationManager
@@ -47,16 +37,10 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.T
  */
 public class DataObfuscationManager implements IDataObfuscationManager {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#obfuscateData(org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper, double)
-	 */
 	@Override
 	public DataWrapper obfuscateData(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-
 		// -- Verify params
-		// Obfuscation level in [0, 1]
+		// Obfuscation level in ]0, 1]
 		if (obfuscationLevel > 1) {
 			obfuscationLevel = 1;
 		}
@@ -70,7 +54,7 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 
 
 		// -- Mapping: retrieve the relevant obfuscator
-		IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+		IDataObfuscator obfuscator = ObfuscatorFactory.getDataObfuscator(dataWrapper);
 
 		// -- Obfuscate
 		DataWrapper obfuscatedDataWrapper = null;
@@ -78,10 +62,9 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 			// - Obfuscation
 			obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
 			// - Persistence
-			//			if (dataWrapper.isPersistenceEnabled()) {
-			// TODO: persiste the obfuscated data using a data broker
-			//				System.out.println("Persist the data "+dataWrapper.getDataId());
-			//			}
+			if (obfuscator.getObfuscatorInfo().isPersistable()) {
+				persistDataWrapper(obfuscatedDataWrapper);
+			}
 		}
 		catch(Exception e) {
 			throw new PrivacyException("Obfuscation aborted", e);
@@ -94,36 +77,7 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return dataWrapper;
 	}
 
-	/**
-	 * Retrieve the relevant obfuscator
-	 * @param dataWrapper
-	 * @return
-	 * @throws PrivacyException
-	 */
-	private IDataObfuscator getDataObfuscator(DataWrapper dataWrapper) throws PrivacyException {
-		IDataObfuscator obfuscator = null;
-		if (dataWrapper.getData() instanceof LocationCoordinates) {
-			obfuscator = new LocationCoordinatesObfuscator(dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Name) {
-			obfuscator = new NameObfuscator(dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Temperature) {
-			obfuscator = new TemperatureObfuscator(dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Activity) {
-			obfuscator = new ActivityObfuscator(dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Status) {
-			obfuscator = new StatusObfuscator(dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof PostalLocation) {
-			obfuscator = new PostalLocationObfuscator(dataWrapper);
-		}
-		else {
-			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");
-		}
-		return obfuscator;
+	private DataIdentifier persistDataWrapper(DataWrapper dataWrapper) {
+		return null;
 	}
-
 }

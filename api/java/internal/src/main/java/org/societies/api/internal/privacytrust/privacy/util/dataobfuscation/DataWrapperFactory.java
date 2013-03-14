@@ -32,8 +32,7 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
 
 /**
  * Utilities to instantiate DataWrapper for data obfuscation
- * @state skeleton 
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 14 oct. 2011
  */
 public class DataWrapperFactory {
@@ -55,6 +54,13 @@ public class DataWrapperFactory {
 		LocationCoordinates data = LocationCoordinatesUtils.create(latitude, longitude, accuracy);
 		return DataWrapperUtils.create(dataType, data);
 	}
+	public static LocationCoordinates retrieveLocationCoordinates(DataWrapper dataWrapper) {
+		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
+		if (dataType.equals(dataWrapper.getDataType())) {
+			return null;
+		}
+		return (LocationCoordinates) dataWrapper.getData();
+	}
 
 	// -- NAME
 	/**
@@ -68,5 +74,12 @@ public class DataWrapperFactory {
 		String dataType = CtxAttributeTypes.NAME;
 		Name data = NameUtils.create(firstName, lastName);
 		return DataWrapperUtils.create(dataType, data);
+	}
+	public static Name retrieveName(DataWrapper dataWrapper) {
+		String dataType = CtxAttributeTypes.NAME;
+		if (dataType.equals(dataWrapper.getDataType())) {
+			return null;
+		}
+		return (Name) dataWrapper.getData();
 	}
 }

@@ -44,6 +44,9 @@ public class LocationCoordinatesUtils {
 	}
 
 	public static String toXmlString(LocationCoordinates data) {
+		if (null == data) {
+			return "<geolocation></geolocation>";
+		}
 		return "<geolocation>\n" +
 				"\t<latitude>" + data.getLatitude() + "</latitude>\n" +
 				"\t<longitude>" + data.getLongitude()+ "</longitude>\n" +
@@ -51,6 +54,9 @@ public class LocationCoordinatesUtils {
 				"</geolocation>";
 	}
 	public static String toJsonString(LocationCoordinates data) {
+		if (null == data) {
+			return "{}";
+		}
 		return "{\n" +
 				"\"latitude\": \""+data.getLatitude()+"\",\n" +
 				"\"longitude\": \""+data.getLongitude()+"\",\n" +
@@ -58,7 +64,7 @@ public class LocationCoordinatesUtils {
 				"}";
 	}
 
-	public boolean equals(LocationCoordinates origin, Object obj) {
+	public static boolean equal(LocationCoordinates origin, Object obj) {
 		// -- Verify reference equality
 		if (obj == null) { return false; }
 		if (origin == obj) { return true; }
@@ -73,4 +79,30 @@ public class LocationCoordinatesUtils {
 		}
 		return false;
 	}
+
+	public static boolean similar(LocationCoordinates o1, LocationCoordinates o2) {
+		return similar(o1, o2, 3);
+	}
+	public static boolean similar(LocationCoordinates o1, LocationCoordinates o2, int precision) {
+		// Equals
+		if (o1 == o2 || (null != o1 && o1.equals(o2))) {
+			return true;
+		}
+		// Just to be sure
+		if (null == o1 || null == o2) {
+			return false;
+		}
+
+		// Similar
+		return (round(o1.getLatitude(), precision) == round(o2.getLatitude(), precision)
+				&& round(o1.getLongitude(), precision) == round(o2.getLongitude(), precision)
+				&& round(o1.getAccuracy(), precision) == round(o2.getAccuracy(), precision)
+				);
+	}
+
+	private static double round(double d, int precision) {
+		int temp=(int)((d*Math.pow(10, precision)));
+		return (((double)temp)/Math.pow(10, precision));
+	}
+
 }
