@@ -23,6 +23,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 * as called methods usually involve making asynchronous calls. 
 	 */
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.events.ReturnValue";
+	public static final String INTENT_EXCEPTION_VALUE_KEY = "org.societies.android.platform.events.ExceptionValue";
 
 	public static final String PUBLISH_EVENT = "org.societies.android.platform.events.PUBLISH_EVENT";
 	public static final String SUBSCRIBE_TO_ALL_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_ALL_EVENTS";
@@ -32,6 +33,15 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	public static final String UNSUBSCRIBE_FROM_EVENT = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENT";
 	public static final String UNSUBSCRIBE_FROM_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENTS";
 	public static final String NUM_EVENT_LISTENERS = "org.societies.android.platform.events.NUM_EVENT_LISTENERS";
+	public static final String CREATE_EVENT = "org.societies.android.platform.events.CREATE_EVENT";
+	public static final String DELETE_EVENT = "org.societies.android.platform.events.DELETE_EVENT";
+	/**
+	 * Invalid values to signify that invalid parameters have been provided to the remote service
+	 */
+	public static final int INVALID_PUBSUB_NODE = 0;
+	public static final int INVALID_SOCIETIES_INTENT = 1;
+	public static final int INVALID_SOCIETIES_INTENT_ALREADY_EXISTS = 2;
+	public static final int INVALID_PUBSUB_NODE_ALREADY_EXISTS = 3;
 
 	/**
 	 * Android intent Societies platform Pubsub related intents 
@@ -135,7 +145,9 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 			"publishEvent(String client, String societiesIntent, Object payload)",
 			"getNumSubscribedNodes(String client)",
 			"startService()",
-			"stopService()"
+			"stopService()",
+			"createEvent(String client, String pubsubNode, String societiesIntent)",
+			"deleteEvent(String client, String pubsubNode)"
 	};
 
 	//Pubsub event payload classes
@@ -143,9 +155,11 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
-	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String USER_FEEDBACK_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
+	static final String USER_FEEDBACK_IMP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_RES_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS, USER_FEEDBACK_IMP_RES_EVENT_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	
@@ -226,7 +240,24 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 * Obtain the current number of subscribed to events
 	 * 
 	 * @param client
-	 * @return int number of subscribed to events
+	 * @return int number of subscribed to events - returned via Android intent
 	 */
 	int getNumSubscribedNodes(String client);
+	
+	/**
+	 * Create a new Societies Pubsub node
+	 * @param client
+	 * @param pubsubNode Pubsub node to be used in Societies, e.g. org.3rdpartyservice.sampleevent
+	 * @param societiesIntent should use Societies format , i.e. org.societies.3rdpartyservice.sampleevent
+	 * @return boolean - returned via Android intent
+	 */
+	boolean createEvent(String client, String pubsubNode, String societiesIntent);
+	/**
+	 * Delete a Societies Pubsub node. Can only be used to delete Pubsub nodes previously created by the same client.
+	 * 
+	 * @param client
+	 * @param pubsubNode Pubsub node to be used in Societies, e.g. org.3rdpartyservice.sampleevent
+	 * @return boolean - returned via Android intent
+	 */
+	boolean deleteEvent(String client, String pubsubNode);
 }

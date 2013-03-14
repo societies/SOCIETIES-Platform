@@ -22,14 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.privacytrust.privacy.util.privacypolicy;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
@@ -39,8 +41,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Privacy
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.schema.cis.community.MembershipCrit;
-import org.societies.api.schema.identity.DataIdentifierScheme;
 
 
 /**
@@ -50,7 +50,9 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @author Olivier Maridat (Trialog)
  * @created 18-dec.-2012 19:41:29
  */
-public class PrivacyPolicyUtil {
+public class PrivacyPolicyUtils {
+	private final static String TAG = PrivacyPolicyUtils.class.getSimpleName();
+
 	/**
 	 * Generic function to help a developer or a user to create a privacy policy by inferring a default
 	 * one using information about the CIS or the 3P service. The privacy policy in
@@ -117,7 +119,9 @@ public class PrivacyPolicyUtil {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("globalBehaviour", globalBehaviour);
 		parameters.put("membershipCriteria", membershipCriteria);
-		parameters.putAll(configuration);
+		if (null != configuration) {
+			parameters.putAll(configuration);
+		}
 		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
 	}
 

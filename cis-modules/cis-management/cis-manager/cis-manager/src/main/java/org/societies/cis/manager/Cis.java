@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.client.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
@@ -75,11 +74,12 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -88,7 +88,6 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
@@ -145,13 +144,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private final static List<String> PACKAGES = Collections
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
-			"org.societies.api.schema.activityfeed",
-		"org.societies.api.schema.cis.community"));
+									 "org.societies.api.schema.activityfeed",
+									 "org.societies.api.schema.cis.community"));
 	@Transient
 	private SessionFactory sessionFactory;
+
 	@Transient
 	private Session session;
-	
 	
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -161,17 +160,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.sessionFactory = sessionFactory;
 	}
 
-	
-
-
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="cis_id")
 	private Long id;
 
-
-
-// minimun attributes
+	// minimun attributes
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
 	
@@ -186,8 +180,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	IPrivacyDataManager privacyDataManager = null;
 	
-	
-	
 	public IPrivacyDataManager getPrivacyDataManager() {
 		return privacyDataManager;
 	}
@@ -200,8 +192,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.privacyPolicyManager = privacyPolicyManager;
 	}
 
-
-
 	@Transient
 	private IIdentity cisIdentity;
 	//@Transient
@@ -213,10 +203,17 @@ public class Cis implements IFeatureServer, ICisOwned {
             inverseJoinColumns = @JoinColumn( name="cisparticipant_id")
     )
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
+
 	@Column
 	public String cisType;
-	//@Column
-	//public String owner;
+	@Column
+	public String owner;
+	@Column
+	public String description = "";
+	@Column
+	public String cisName = "";
+	
+	
 	
 	//@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
 	//@Transient
@@ -227,10 +224,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Column(name="criteria",length=500)
 	public Set<String> membershipCritOnDb;// we will store it in the db as "context,rank,operator,value1,value2"
 
-
 	@Transient
 	Hashtable<String, MembershipCriteria> cisCriteria = null;
-	
 	
 	private Set<String> getMembershipCritOnDb() {
 		return membershipCritOnDb;
@@ -241,7 +236,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 	public boolean checkQualification(HashMap<String,String> qualification){
-		
 		for (String cisContext : cisCriteria.keySet()) { // loop through all my criterias
 		    if(qualification.containsKey(cisContext)){
 		    	MembershipCriteria m = cisCriteria.get(cisContext); // retrieves the context for that criteria
@@ -250,16 +244,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		    		if (! (m.getRule().checkRule(CtxAttributeValueType.STRING, valueToBeCompared))) //TODO: this CtxAttributeValueType.STRING should be changed!! 
 		    			return false;
 		    	}
-
 		    }
 		    else{// did not have a needed context attribute in its qualification
 		    	return false;
 		    }
-			
 		}
-				
 		return true;
-		
 	}
 
 	private void buildCriteriaFromDb(){
@@ -288,7 +278,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				cisCriteria.put(tokens[0], m);
 				LOG.debug("added on table");
 			}
-			
 		}
 	}
 	
@@ -353,15 +342,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			cisCriteria.remove(contextAtribute); // TODO: maybe inver this from the remove
 			return true;
 			
-		}else{
+		} else {
 			return false;
 		}
-		
 	}
-
-	
-	@Column
-	String description = "";
 	
 	@Override
 	public String getDescription() {
@@ -401,29 +385,22 @@ public class Cis implements IFeatureServer, ICisOwned {
 					return element;
 		}
 		return null;
-		
 	}
 
 	//  constructor of a CIS without a pre-determined ID or host
-	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
-			,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
-			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
-			IActivityFeedManager iActivityFeedManager) {
+	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory, IPrivacyPolicyManager privacyPolicyManager, 
+			   SessionFactory sessionFactory, String description, Hashtable<String, MembershipCriteria> inputCisCriteria,IActivityFeedManager iActivityFeedManager) {
 
 		this.privacyPolicyManager = privacyPolicyManager;
-		
 		this.description = description;
-		
-		//this.owner = cssOwner;
+		this.owner = cssOwner;
 		this.cisType = cisType;
+		this.cisName = cisName;
 		
-		membershipCritOnDb= new HashSet<String>();
-		
+		membershipCritOnDb= new HashSet<String>();		
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
-
-		cisCriteria = new Hashtable<String, MembershipCriteria> ();
-		
+		cisCriteria = new Hashtable<String, MembershipCriteria> ();		
 		LOG.debug("before adding membership criteria");
 		
 		// adding membership criteria
@@ -438,20 +415,15 @@ public class Cis implements IFeatureServer, ICisOwned {
 		    }
 		}
 
-
-		
-		
 		LOG.debug("CIS editor created");
-		
 		try{ 
-		CISendpoint = ccmFactory.getNewCommManager();
+			CISendpoint = ccmFactory.getNewCommManager();
 		} catch  (CommunicationException e) {
 			e.printStackTrace();
 			LOG.debug("could not start comm manager!");
 		}
 		
 		LOG.debug("CIS got new comm manager");
-		
 		try {
 		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
 		} catch (Exception e) {
@@ -459,8 +431,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 			
 		LOG.debug("CIS endpoint created");
-		
-
 		try {
 			CISendpoint.register(this);
 		} catch (CommunicationException e) {
@@ -469,20 +439,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.debug("could not start comm manager!");
 		} 
 		LOG.debug("CIS listener registered");
-		
-		
-		cisRecord = new CisRecord(cisName, cisIdentity.getJid(),cssOwner);
-		
+	
+		cisRecord = new CisRecord(cisName, cisIdentity.getJid(), cssOwner, description, cisType);
 		LOG.debug("getting a new activity feed");
 
 		activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cisIdentity.getJid());
-
 		
 		// TODO: broadcast its creation to other nodes?
-		
-		//session = sessionFactory.openSession();
 		LOG.debug("activityFeed: "+activityFeed);
-
 		this.sessionFactory = sessionFactory;
         //activityFeed.setSessionFactory(this.sessionFactory);
 		this.persist(this);
@@ -491,20 +455,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		iActivity.setActor(this.getOwnerId());
 		iActivity.setObject(cisIdentity.getJid());
 		iActivity.setVerb("created");
-		
-		
-
-		
 		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
-		
-
-		//activityFeed.getActivities("0 1339689547000");
-
 	}
-	
-
-
-	
+		
 	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager,
 			IPrivacyDataManager	privacyDataManager, IActivityFeedManager iActivityFeedManager){
 
@@ -831,7 +784,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.debug("community type received");
 			CommunityMethods c = (CommunityMethods) payload;
 
-			// JOIN
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> JOIN >>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getJoin() != null) {
 				//String jid = "";
 				LOG.debug("join received");
@@ -865,7 +818,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 							LOG.debug("qualification mismatched");
 							return result;
 						}
-							
 					}
 					else{
 						j.setResult(addresult);
@@ -873,37 +825,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 						return result;
 					}
 				}
-				
-				
-				
-				
-				
 				addresult = this.insertMember(senderjid, MembershipType.participant);
 				j.setResult(addresult);
-				
-				
-				
-				
 				// TODO: add the criteria to the response
-								
 				if(addresult == true){
 					// information sent on the xmpp just in the case of success
 					p.setRole( ParticipantRole.fromValue("participant")  );
 				}
-					
 				j.setParticipant(p);
-					
 				return result;
-
-				//return result;
 			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> LEAVE CIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getLeave() != null) {
 				LOG.debug("get leave received");
 				CommunityMethods result = new CommunityMethods();
 				String jid = stanza.getFrom().getBareJid();
 				boolean b = false;
 				b = this.removeMember(jid);
-
 				
 				LeaveResponse l = new LeaveResponse();
 				l.setCommunityJid(this.getCisId());
@@ -911,6 +849,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				result.setLeaveResponse(l);
 				return result;
 			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> LIST MEMBERS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getWhoRequest() != null) {
 				// WHO
 				LOG.debug("get who received");
@@ -934,11 +873,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
-				
-				
 				return result;
-				// END OF WHO
 			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADD MEMBER >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getAddMember() != null) {
 				// ADD
 				CommunityMethods result = new CommunityMethods();
@@ -946,7 +883,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String senderJid = stanza.getFrom().getBareJid();
 				Participant p = c.getAddMember().getParticipant();
 				ar.setParticipant(p);			
-				
 				
 //				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 					//requester is not the owner
@@ -971,14 +907,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 							ar.setResult(false);
 						}
 					}					
-					
 //				}
-				
 				result.setAddMemberResponse(ar);
 				return result;
-				// END OF ADD
 			}
-
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE MEMBER >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getDeleteMember() != null) {
 				// DELETE MEMBER
 				CommunityMethods result = new CommunityMethods();
@@ -986,8 +919,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String senderJid = stanza.getFrom().getBareJid();
 				Participant p = c.getDeleteMember().getParticipant();
 				dr.setParticipant(p);			
-				
-				
 //				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 					//requester is not the owner
 //					dr.setResult(false);
@@ -999,18 +930,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 						e.printStackTrace();
 						dr.setResult(false);
 					}
-					
 //				}
-				
 				result.setDeleteMemberResponse(dr);
 				return result;
-				// END OF DELETE MEMBER
 			}
-
-			
-			
-			
-			// get Info
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET INFO >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getGetInfo()!= null) {
 				CommunityMethods result = new CommunityMethods();
 				Community com = new Community();
@@ -1033,12 +957,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
-
 				return result;
-
-			}				// END OF GET INFO
-
-			// set Info
+			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET INFO >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			// at the moment we limit this to description and type
 			if (c.getSetInfo()!= null && c.getSetInfo().getCommunity() != null) {
 				CommunityMethods result = new CommunityMethods();
@@ -1049,28 +970,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				Community inputCommunity = c.getSetInfo().getCommunity();
+					Community inputCommunity = c.getSetInfo().getCommunity();
 					if( (inputCommunity.getCommunityType() != null) &&  (!inputCommunity.getCommunityType().isEmpty()) && 
 							(!inputCommunity.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
 						this.setCisType(inputCommunity.getCommunityType());
 					if( (inputCommunity.getDescription() != null) &&  (!inputCommunity.getDescription().isEmpty()) && 
 							(!inputCommunity.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
 						this.setDescription(inputCommunity.getDescription());
-					r.setResult(true);	
-					
+					r.setResult(true);
 					// updating at DB
-					this.updatePersisted(this);
-					
+					this.updatePersisted(this);					
 				//}
-				
 					this.fillCommmunityXMPPobj(com);
 					r.setCommunity(com);
 					result.setSetInfoResponse(r);
 				return result;
-
-			}				// END OF GET INFO
-			
-			// get Membership Criteria
+			}
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> GET MEMBERSHIP CRITERIA >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getGetMembershipCriteria()!= null) {
 				CommunityMethods result = new CommunityMethods();
 				GetMembershipCriteriaResponse g = new GetMembershipCriteriaResponse();				
@@ -1079,19 +995,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 				g.setMembershipCrit(m);
 				result.setGetMembershipCriteriaResponse(g);
 				return result;
-
 			}	
-			
-			// set Membership Criteria
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> SET MEMBERSHIP CRITERIA
 			if (c.getSetMembershipCriteria()!= null) {
 				CommunityMethods result = new CommunityMethods();
 				SetMembershipCriteriaResponse r = new SetMembershipCriteriaResponse();
 				result.setSetMembershipCriteriaResponse(r);
-				
-				
-				
 				// retrieving from marshalled object the incoming criteria
-				
 				MembershipCrit m = c.getSetMembershipCriteria().getMembershipCrit();
 				if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
 					
@@ -1107,29 +1017,21 @@ public class Cis implements IFeatureServer, ICisOwned {
 						if( rule.setValues(a) == false) {r.setResult(false); return result;}
 						meb.setRule(rule);
 						if( this.addCriteria(crit.getAttrib(), meb) == false) {r.setResult(false); return result;}
-						
 					}
 				}
-				
-				
 				r.setResult(true);
 				m = new MembershipCrit();
 				this.fillMembershipCritXMPPobj(m);
 				r.setMembershipCrit(m);
 				return result;
-
-
 			}	
-
-			
-			
 		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>> ACTIVITIES MESSAGE BEAN >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (payload.getClass().equals(MarshaledActivityFeed.class)) {
 			LOG.info("activity feed type received");
             MarshaledActivityFeed c = (MarshaledActivityFeed) payload;
-			
-			// delete Activity
 
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>> DELETE ACTIVITY >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getDeleteActivity() != null) {
                 MarshaledActivityFeed result = new MarshaledActivityFeed();
 				DeleteActivityResponse r = new DeleteActivityResponse();
@@ -1156,15 +1058,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 					LOG.warn("no callback object after immediate call of delecte activity feed");
 					r.setResult(false);
 				}
-
 				result.setDeleteActivityResponse(r);		
 				return result;
-
-			}				// END OF delete Activity
-
-			
-			
-			// get Activities
+			}
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> GET ACTIVITIES >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getGetActivities() != null) {
 				LOG.debug("get activities called");
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
@@ -1172,7 +1069,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String senderJid = stanza.getFrom().getBareJid();
 				List<IActivity> iActivityList;
 				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-				
 				
 				ActivityFeedClient d = new ActivityFeedClient();
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
@@ -1195,14 +1091,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
 					}
 					
-					
 				result.setGetActivitiesResponse(r);		
 				return result;
-
-			}				// END OF get ACTIVITIES
-			
-			// add Activity
-
+			}
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> ADD ACTIVITY >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getAddActivity() != null) {
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				AddActivityResponse r = new AddActivityResponse();
@@ -1221,24 +1113,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 				ActivityFeedClient d = new ActivityFeedClient();
 				activityFeed.addActivity(iActivity,d);
 				
-				MarshaledActivityFeed m = d.getActivityFeed();
-				
+				MarshaledActivityFeed m = d.getActivityFeed();				
 				if(null != m && null != m.getAddActivityResponse()){
 					r.setResult(m.getAddActivityResponse().isResult());
 				}else{
 					LOG.warn("no callback object after immediate call of add activity");
 					r.setResult(false);
 				}
-				
-				
 				result.setAddActivityResponse(r);		
 				return result;
-
-			}				// END OF add Activity
-			
-						
-			
-			// cleanup activities
+			}
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> CLEAN UP ACTIVITIES >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getCleanUpActivityFeed() != null) {
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
 				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
@@ -1260,19 +1145,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 					LOG.warn("no callback object after immediate call of clean up activity feed");
 					r.setResult(0);
 				}
-				
-				
+
 				result.setCleanUpActivityFeedResponse(r);		
 				return result;
-
-			}				// END OF cleanup activities
-
-			
-			
-			
-		}
-		
-		
+			}
+		}	
 		return null;
 	}
 
@@ -1285,15 +1162,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		return s;
 	}
 	
-
-	
-	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
 		LOG.debug("getListOfMembers: callback");
 		LOG.debug("local get member list WITH CALLBACK called");
 
-		
 		CommunityMethods c = new CommunityMethods();
 		WhoResponse w = new WhoResponse();
 		c.setWhoResponse(w);
@@ -1309,13 +1182,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 			p.setJid(element.getMembersJid());
 			p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
 			l.add(p);
-	     }
-		
+	    }
 		w.setParticipant(l);
-		
 		callback.receiveResult(c);	
-		
 	}
+	
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback){
 		LOG.debug("local get member list WITH CALLBACK called with requestor");
 
@@ -1561,7 +1432,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 				){
 			r.setResult(false);
-			
 		}
 		else{
 			r.setResult(true);
@@ -1583,10 +1453,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		callback.receiveResult(result);	
 	}
 
-	
-	
 	// session related methods
-
 	private void persist(Object o){
         Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
@@ -1607,7 +1474,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 		}
 	}
-	
 	
 	private void deletePersisted(Object o){
         Session session = this.sessionFactory.openSession();
@@ -1649,9 +1515,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 		}
 	}
-	
-	
-
 
 	// local method
 	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {
@@ -1666,11 +1529,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			clone.setRule(new Rule(orig.getRule().getOperation(), orig.getRule().getValues()));
 			h.put(new String(entry.getKey()),clone );
 		}
-		
-	
-		
-		return h;
-		
+		return h;		
 	}
 
 	@Override

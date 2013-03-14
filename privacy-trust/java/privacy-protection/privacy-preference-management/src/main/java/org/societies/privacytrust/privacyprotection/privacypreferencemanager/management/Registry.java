@@ -39,6 +39,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfMappings;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSMappings;
@@ -46,7 +47,6 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNMappings;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;

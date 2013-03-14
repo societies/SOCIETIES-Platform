@@ -35,7 +35,7 @@ import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ImpProposalContent;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.platform.events.helper.EventsHelper;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -251,6 +251,9 @@ public class AndroidUserFeedbackService extends Service implements IAndroidUserF
 												if (resultFlag){
 													Log.d(LOG_TAG, "resultFlag true - Subscribed to "+AndroidUserFeedbackService.USER_FEEDBACK_EVENTS_ALL+" events");
 												}
+											}
+											@Override
+											public void returnException(int exception) {
 												
 											}
 										});

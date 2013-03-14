@@ -37,7 +37,8 @@
     <application
         android:icon="@drawable/launcher_societies"
         android:label="@string/app_name"
-        android:configChanges="orientation|keyboardHidden"> 
+        android:configChanges="orientation|keyboardHidden"
+        android:debuggable="true"> 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -48,16 +49,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MasterPreferences"
-			android:label="@string/app_name">
-		</activity>
-        <activity android:name=".AboutActivity"
-			android:label="@string/app_name">
-		</activity>
-        
+        <activity android:name=".MasterPreferences" android:label="@string/app_name" />
+        <activity android:name=".AboutActivity" android:label="@string/app_name" />
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" android:label="@string/societies_Notifications" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />

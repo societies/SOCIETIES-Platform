@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.identity;
+package org.societies.android.api.identity.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,14 +38,14 @@ import org.societies.api.schema.identity.DataTypeDescription;
  * 
  * @author Olivier Maridat (Trialog)
  */
-public class DataTypeUtil {
+public class DataTypeUtils {
 	private static Map<String, Set<String>> dataTypeHierarchy;
 	private static Map<String, String> dataTypeAntiHierarchy;
 	private static Map<String, DataTypeDescription> dataTypeDescription;
 	private static boolean loaded = false;
 
 
-	public DataTypeUtil() {
+	public DataTypeUtils() {
 		if (!loaded) {
 			dataTypeHierarchy = new HashMap<String, Set<String>>();
 			dataTypeAntiHierarchy = new HashMap<String, String>();
@@ -157,7 +157,7 @@ public class DataTypeUtil {
 		}
 		// No description available, or retrieved description null: compute one as good as possible
 		if (null == description) {
-			description = DataTypeDescriptionUtil.create(dataType); 
+			description = DataTypeDescriptionUtils.create(dataType); 
 		}
 		return description;
 	}
@@ -227,10 +227,10 @@ public class DataTypeUtil {
 	}
 
 	private void addDataTypeDescription(String dataTypeIdentifier, String dataTypeFriendlyName, String dataTypeFriendlyDescription) {
-		dataTypeDescription.put(dataTypeIdentifier, DataTypeDescriptionUtil.create(dataTypeIdentifier, dataTypeFriendlyName, dataTypeFriendlyDescription));
+		dataTypeDescription.put(dataTypeIdentifier, DataTypeDescriptionUtils.create(dataTypeIdentifier, dataTypeFriendlyName, dataTypeFriendlyDescription));
 	}
 
 	private void addDataTypeDescription(String dataTypeIdentifier, String dataTypeFriendlyDescription) {
-		dataTypeDescription.put(dataTypeIdentifier, DataTypeDescriptionUtil.create(dataTypeIdentifier, null, dataTypeFriendlyDescription));
+		dataTypeDescription.put(dataTypeIdentifier, DataTypeDescriptionUtils.create(dataTypeIdentifier, null, dataTypeFriendlyDescription));
 	}
 }

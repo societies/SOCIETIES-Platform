@@ -2,7 +2,9 @@ package org.societies.cis.manager;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,9 @@ import org.societies.api.schema.cis.community.CommunityMethods;
 
 public class CisManagerClientCallback implements ICommCallback {
 
+	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
+	 private final Map<String, ICisManagerCallback> clients = new HashMap<String, ICisManagerCallback>();
+	
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
@@ -33,12 +38,26 @@ public class CisManagerClientCallback implements ICommCallback {
 	private static Logger LOG = LoggerFactory.getLogger(CisManagerClientCallback.class);
 	
 	private CisManager cisManag;
-	private ICisManagerCallback sourceCallback = null;
+	//private ICisManagerCallback sourceCallback = null;
 	
 	public CisManagerClientCallback (String clientId, ICisManagerCallback sourceCallback,CisManager cisManag) {
-		this.sourceCallback = sourceCallback;
+		clients.put(clientId, sourceCallback);
+		
+		//this.sourceCallback = sourceCallback;
 		this.cisManag = cisManag;
 	}
+	
+	/**Returns the correct client callback for this request
+	 * @param requestID the id of the initiating request
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private ICisManagerCallback getRequestingClient(String requestID) {
+		ICisManagerCallback requestingClient = (ICisManagerCallback) clients.get(requestID);
+		clients.remove(requestID);
+		return requestingClient;
+	}
+	
 	
 	@Override
 	public List<String> getXMLNamespaces() {	
@@ -66,7 +85,11 @@ public class CisManagerClientCallback implements ICommCallback {
 				if(c.getJoinResponse().isResult() && c.getJoinResponse().getCommunity() != null){
 					// updates the list of CIS where I belong
 					cisManag.subscribeToCis(new CisRecord(c.getJoinResponse().getCommunity().getCommunityName(),
-							c.getJoinResponse().getCommunity().getCommunityJid(),c.getJoinResponse().getCommunity().getOwnerJid()));
+														  c.getJoinResponse().getCommunity().getCommunityJid(),
+														  c.getJoinResponse().getCommunity().getOwnerJid(),
+														  c.getJoinResponse().getCommunity().getDescription(),
+														  c.getJoinResponse().getCommunity().getCommunityType()
+														  ));
 					LOG.debug("subscription worked");
 					if(null != cisManag.getiUsrFeedback()){
 						if(cisManag.isPrivacyPolicyNegotiationIncluded())
@@ -119,7 +142,9 @@ public class CisManagerClientCallback implements ICommCallback {
 			}
 
 			// return callback for all cases
-			this.sourceCallback.receiveResult(c);
+			ICisManagerCallback callback = this.getRequestingClient(stanza.getId());
+			callback.receiveResult(c);
+			//this.sourceCallback.receiveResult(c);
 			
 			
 			

@@ -71,15 +71,15 @@
 		<module>../../android/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../android/client-frwk/SocietiesLibraries/FriendsManager/FriendsManager</module>
 		<module>../../android/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
-		<module>../../android/client-frwk/SocietiesLibraries/AndroidUserFeedback/AndroidUserFeedback</module>
 		<!-- Not building
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
 		<!-- Client Framework Service Helpers -->
 		<module>../../android/client-frwk/SocietiesServiceHelpers/CoreServicesHelpers/pom.xml</module>
+		<module>../../android/client-frwk/SocietiesLibraries/AndroidUserFeedback/AndroidUserFeedback</module>
 
 		<!-- SN Connector -->
 		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
-		<module>../../platform-infrastructure/sns/SocialDataComms</module>
+		<module>../../platform-infrastructure/sns/SocialDataComms/android-pom.xml</module>
 		<module>../../platform-infrastructure/sns/SocietiesAndroidSocialData</module>
 
 		<!-- Android User Agent -->

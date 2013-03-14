@@ -115,7 +115,6 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback{
 
-	
 	int nbOfCreatedCIS = 0;
 	int nbOfSubscribedCIS = 0;
 	int nbOfUnsubscribedCIS = 0;
@@ -570,10 +569,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// internal method used to register that the user has subscribed into a CIS
 	// it is triggered by the subscription notification on XMPP
 	// TODO: review
-	public boolean subscribeToCis(CisRecord i) {
+	public boolean subscribeToCis(CisRecord record) {
 
-		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID(),i.getOwner()), this);			
+		if(! this.subscribedCISs.contains(new Cis(record))){
+			CisSubscribedImp csi = new CisSubscribedImp (record, this);
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
 			
@@ -581,11 +580,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			perMess.setSourceComponent(this.getClass()+"");
 			perMess.setD82TestTableName("S49");
 			perMess.setTestContext("CISManagement.CisSubscription.Counter");
-			perMess.setOperationType("Subscribed in CIS " + i.getCisJID());
+			perMess.setOperationType("Subscribed in CIS " + record.getCisJID());
 			perMess.setPerformanceType(IPerformanceMessage.Quanitative);
 			perMess.setPerformanceNameValue((++nbOfSubscribedCIS)+"");
 			PERF_LOG.trace(perMess.toString());
-			
 			
 			// internal eventing
 			if(this.getEventMgr() != null){
@@ -600,11 +598,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					LOG.error("error trying to internally publish SUBS CIS event");
 				}
 			}
-			
 			return true;
 		}
 		return false;
-		
 	}
 	
 	// internal method used to leave from a CIS
@@ -700,15 +696,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			if (c.getCreate() != null && c.getCreate().getCommunity() != null) {
 				
-				// CREATE CIS
+				// >>>>>>>>>>>>>>>>>>>>>>>>>>>> CREATE CIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				LOG.info("create received");
 				String senderjid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + senderjid);
 				
 				//TODO: check if the sender is allowed to create a CIS
-				
 				Create create = c.getCreate(); 
-				
 				//String ownerJid = create.getCommunity().getOwnerJid(); // TODO: owner must be retrieved other way
 				//String cisJid = create.getCommunityJid();
 				String cisType = create.getCommunity().getCommunityType();
@@ -730,9 +724,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						LOG.info("create came with an empty policy");
 						pPolicy = "<RequestPolicy></RequestPolicy>";	
 					};
-											
 					Hashtable<String, MembershipCriteria> h = null;
-					
 					MembershipCrit m = create.getCommunity().getMembershipCrit();
 					if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
 						h =new Hashtable<String, MembershipCriteria>();
@@ -749,7 +741,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							if( r.setValues(a) == false) {create.setResult(false); return c;}
 							meb.setRule(r);
 							h.put(crit.getAttrib(), meb);
-							
 						}
 					}
 					// real create
@@ -778,10 +769,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					
 					// if one of those parameters did not come, we should return an error
 					return c;
-				}
-				// END OF CREATE CIS					
-
+				}					
 			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> LIST MY CIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getList() != null) {
 				LOG.info("list received");
 				
@@ -789,15 +779,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				ListResponse l = new ListResponse();
 				List<Community> comList = new  ArrayList<Community>();
 				
-				
 				if(c.getList().getListCriteria() !=null)
 					listingType = c.getList().getListCriteria();
-												
+				
+				// GET LIST OF ownedCIS
 				if(listingType.equals(ListCrit.OWNED) || listingType.equals(ListCrit.ALL)){
-				// GET LIST CODE of ownedCIS
-					
 					Iterator<Cis> it = ownedCISs.iterator();
-					
 					while(it.hasNext()){
 						Cis element = it.next();
 						Community community = new Community();
@@ -805,36 +792,27 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						comList.add(community);
 				     }
 				}
-
-				// GET LIST CODE of subscribedCIS
+				// GET LIST OF subscribedCIS
 				if(listingType.equals(ListCrit.SUBSCRIBED) || listingType.equals(ListCrit.ALL)){
-					//List<CisRecord> li = this.getSubscribedCisList();
 					Iterator<CisSubscribedImp> it = subscribedCISs.iterator();
-					
 					while(it.hasNext()){
 						CisSubscribedImp element = it.next();
 						Community community = new Community();
 						element.fillCommmunityXMPPobj(community);
-						comList.add(community);
-						
+						comList.add(community);						
 				     }
 				}
-				l.setCommunity(comList);
-				
+				l.setCommunity(comList);				
 				return l;
-
-			}
-				// END OF LIST
-				
-			// DELETE CIS
+			}			
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> DELETE CIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getDelete() != null) {
 
 				LOG.info("delete CIS received");
 				String senderjid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + senderjid);
 				
-				//TODO: check if the sender is allowed to delete a CIS
-				
+				//TODO: check if the sender is allowed to delete a CIS				
 				Delete delete = c.getDelete();
 				Delete d2 = new Delete();
 				
@@ -844,10 +822,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				c.setDelete(d2);
 				return c;
 			}
-			// END OF DELETE
-			
-			
-			// client Request for join
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> REQUESST TO JOIN FROM A CLIENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getAskCisManagerForJoin() != null) {
 				CommunityManager response = new CommunityManager();
 				AskCisManagerForJoinResponse ar = new AskCisManagerForJoinResponse();
@@ -869,10 +844,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					return response;
 				}
 			}
-			// END OF client Request for join
-				
-
-			// client Request for leave
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>> REQUEST TO LEAVE FROM A CLIENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getAskCisManagerForLeave() != null) {
 				CommunityManager response = new CommunityManager();
 				AskCisManagerForLeaveResponse lr = new AskCisManagerForLeaveResponse();
@@ -893,14 +865,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					return response;
 				}
 			}
-			// END OF client Request for leave			
-			
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>> CONFIGURE MY CIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");
 				return c;
 			}
-
-			
 		}
 		return null;
 
@@ -914,38 +883,30 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
         this.iCommMgr = iCommMgr;
     }
 
-
     public class JoinCallBack implements ICisManagerCallback{
-		
-	JoinResponse resp;
+    	JoinResponse resp;
 	
-	public JoinCallBack(JoinResponse resp){
-		this.resp = resp;
-	}
-
-	@Override
-	public void receiveResult(CommunityMethods communityResultObject) {
-		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
-			LOG.info("null return on JoinCallBack");
-			resp.setResult(false);
+		public JoinCallBack(JoinResponse resp){
+			this.resp = resp;
 		}
-		else{
-			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
-			resp = communityResultObject.getJoinResponse();
+	
+		@Override
+		public void receiveResult(CommunityMethods communityResultObject) {
+			if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
+				LOG.info("null return on JoinCallBack");
+				resp.setResult(false);
+			}
+			else{
+				LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
+				resp = communityResultObject.getJoinResponse();
+			}
 		}
 	}
-}
-	
-	
-	
-	
 
 	@Override
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;
 	}
-
-
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
@@ -954,25 +915,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			CommunityManager c = (CommunityManager) payload;
 
-			// treating getSubscribedTo notifications
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>treating getSubscribedTo notifications >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()
-						,c.getNotification().getSubscribedTo().getCommunity().getOwnerJid()));
-				
-				
-				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
-						LOG.info("CIS is already part of the list of subscribed CISs");
-					}
-					else{
-						SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
-						CisRecord r = new CisRecord(s.getCisJid());
-						this.subscribeToCis(r);
-					}*/
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), 
+												  c.getNotification().getSubscribedTo().getCommunity().getCommunityJid(),
+												  c.getNotification().getSubscribedTo().getCommunity().getOwnerJid(),
+												  c.getNotification().getSubscribedTo().getCommunity().getDescription(),
+												  c.getNotification().getSubscribedTo().getCommunity().getCommunityType()
+												  ));
 				return;
 			}
 			
-			// treating delete CIS notifications
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>treating delete CIS notifications >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
 				this.unsubscribeToCis(stanza.getFrom().getBareJid());
@@ -991,7 +946,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;*/
 			}
 			
-			// treating deleteMember notifications
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>treating deleteMember notifications >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (c.getNotification().getDeleteMemberNotification() != null) {
 				LOG.info("delete member notification received");
 				DeleteMemberNotification d = (DeleteMemberNotification) c.getNotification().getDeleteMemberNotification();
@@ -1012,25 +967,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;
 			}
 		}
-
-		
-		
 	}
-
-
 
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
 	@Deprecated
 	public boolean deleteCis(String cssId, String cssPassword, String cisId){
 		return false;
 	}
-
 
 	@Override
 	public boolean deleteCis(String cisId) {
@@ -1044,10 +992,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// add subscribed CIS to the list to be returned
 		List<ICis> l = new ArrayList<ICis>();
 		l.addAll(subscribedCISs);
-
-	
 		l.addAll(ownedCISs);
-		
 		return l;
 	}
 	
@@ -1078,20 +1023,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	@Override
 	public List<ICisOwned> getListOfOwnedCis(){
-		
 		// add subscribed CIS to the list to be returned
 		List<ICisOwned> l = new ArrayList<ICisOwned>();
-		l.addAll(ownedCISs);
-		
+		l.addAll(ownedCISs);		
 		return l;
 	}
 
 	@Override
 	public List<ICis> getRemoteCis(){
-			List<ICis> l = new ArrayList<ICis>();
-			l.addAll(subscribedCISs);
-			
-			return l;
+		List<ICis> l = new ArrayList<ICis>();
+		l.addAll(subscribedCISs);
+		return l;
 	}
 	
 	@Override
@@ -1104,12 +1046,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return l;
 	}
 
-
-
-
-
-	
-	
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * 
@@ -1137,11 +1073,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				 return element;
 	     }
 		
-		
 		return null;
 	}
-
-
 
 	@Override
 	public ICisOwned getOwnedCis(String cisId) {
@@ -1157,7 +1090,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 	// session related methods
-
 	private void persist(Object o){
 		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
@@ -1226,7 +1158,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
 				//session.close();
 			}
-			
 		}
 	}
 	
@@ -1242,11 +1173,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			cis.setSessionFactory(sessionFactory);
 	}
 
-	
-
 	// getters and setters
-	
-	
 	public List<Cis> getOwnedCISs() {
 		return ownedCISs;
 	}
@@ -1310,11 +1237,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							  lq.add(q);
 							  LOG.debug("qualification value " + attribute.getStringValue());
 						  }
-							  
 					}
-	
-					
-					
 				}
 				
 			}
@@ -1323,9 +1246,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// End of qualification retrieaval
 		if (lq.size()>0)
 			j.setQualification(lq);
-		
 	}
-	
 	
 	// TODO just for test purposes, delete later
 	// set the user as a protestant from Paris =D

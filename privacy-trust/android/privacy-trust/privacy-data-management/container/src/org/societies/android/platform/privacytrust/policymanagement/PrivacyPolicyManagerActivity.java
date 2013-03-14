@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
@@ -130,7 +130,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 						}
 						else {
 							retrievedPrivacyPolicy.setRequestor(null);
-							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtil.toXmlString(retrievedPrivacyPolicy), owner);
+							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy), owner);
 						}
 					}
 				}
@@ -167,7 +167,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 				retrievedPrivacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
 				sb.append("Privacy policy retrieved: "+(null != retrievedPrivacyPolicy));
 				if (null != retrievedPrivacyPolicy) {
-					sb.append(PrivacyPolicyUtil.toXmlString(retrievedPrivacyPolicy));
+					sb.append(PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy));
 				}
 			}
 			txtLocation.setText(sb.toString());
@@ -242,7 +242,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 
 		// Mock data
 		try {
-			defaultPrivacyPolicy = PrivacyPolicyUtil.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
+			defaultPrivacyPolicy = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
 		}
 		catch(PrivacyException e) {
 			Log.e(TAG, "Cannot generate default privacy policy: "+e.getMessage());

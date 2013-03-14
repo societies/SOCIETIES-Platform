@@ -334,13 +334,17 @@ public class CommsServer implements IFeatureServer {
 				receivedID = stanza.getFrom();				
 				targetcssId = bean.getTargetCssId();
 				request.setCssIdentity(targetcssId);
-								
+				IIdentity targetFriendId = null;
 				LOG.info("ACCEPT_CSS_FRIEND_REQUEST_INTERNAL COMMSServer targetcssId " +targetcssId);
-				
-				request.setRequestStatus(bean.getRequestStatus());
-				request.setOrigin(CssRequestOrigin.REMOTE);
-				//this.cssManager.acceptCssFriendRequest(request);
-				this.cssManager.handleInternalFriendRequest(receivedID, bean.getRequestStatus());
+				try {
+					targetFriendId = this.getCommManager().getIdManager().fromJid(targetcssId);					
+					request.setRequestStatus(bean.getRequestStatus());
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					//this.cssManager.acceptCssFriendRequest(request);
+					this.cssManager.handleInternalFriendRequest(targetFriendId, bean.getRequestStatus());
+				} catch (InvalidFormatException e) {
+					e.printStackTrace();
+				}
 			break;
 			case ACCEPT_CSS_FRIEND_REQUEST:
 				receivedID = stanza.getFrom();

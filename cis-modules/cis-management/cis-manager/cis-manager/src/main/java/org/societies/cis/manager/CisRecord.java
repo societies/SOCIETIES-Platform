@@ -33,13 +33,11 @@ package org.societies.cis.manager;
  * @version 0
  */
 
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 
 @Entity
 @Table(name = "org_societies_cis_manager_CisRecord")
@@ -50,64 +48,36 @@ public class CisRecord {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 
-
 	public Long getId() {
 		return id;
 	}
-
-
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-
-
 	public String cisName;
 	public String cisJID;
 	public String owner;
+	public String description;
+	public String type;
 	
-
 	public CisRecord(){}
-
-	/** permaLink is a permanent URL to this CIS. A type of CIS homepage.
-	 * 
-	 
-	 public String cisType;
-	 
-	@Column
-	public String permaLink; // all those have been moved to the Editor
 	
-	// public Set<CisParticipant> membersCss; moved to only CIS Editor 
-	@Column
-	private String password = "none";
-	@Column
-	private String host = "none";
-	//@OneToMany(cascade=CascadeType.ALL)
-	*/
-	// public Set<IServiceSharingRecord> sharedServices; moved to only CIS Editor
-	
-
-	
-	public CisRecord(String cisName, String cisJid, String cisOwner) {
+	public CisRecord(String cisName, String cisJid, String cisOwner, String description, String type) {
 		super();
 		this.cisName = cisName;
-		
 		this.cisJID = cisJid;
 		this.owner = cisOwner;
-
+		this.description = description;
+		this.type = type;
 	}
-	
-
-	
 	
 	public CisRecord(String cisJid) {		
 		this.cisJID = cisJid;
-		
 	}
 
 	 // hash code and equals using CISjID
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -115,8 +85,6 @@ public class CisRecord {
 		result = prime * result + ((cisJID == null) ? 0 : cisJID.hashCode());
 		return result;
 	}
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -134,54 +102,46 @@ public class CisRecord {
 			return false;
 		return true;
 	}
-	
-
-	
-
 
 	public String getCisName() {
 		return this.cisName;
 	}
 
-
 	public void setCisName(String cisId) {
 		// TODO: double check that this is consistent with the fulljid
 		this.cisName = cisId;
 	}
-
-
 	
 	public String getCisJID() {
 		return this.cisJID;
 	}
 
-
-
 	public void setCisJID(String cisJID) {
 		this.cisJID = cisJID;
 	}
-
-
 
 	public String getOwner() {
 		return owner;
 	}
 
-
-
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-
-
-
-
-
-
-
-
 	
+	public String getDescription() {
+		return description;
+	}
 
-	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

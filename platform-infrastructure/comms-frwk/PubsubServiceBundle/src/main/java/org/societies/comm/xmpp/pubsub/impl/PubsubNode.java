@@ -163,7 +163,8 @@ public class PubsubNode extends HostedNode {
 	}
 	
 	public Collection<IIdentity> getSubscribers() {
-		return subscriptionsByUser.keySet();
+		//return subscriptionsByUser.keySet(); 
+		return subscriptionsById.values();
 	}
 
 	public void unsubscribe(String string) {

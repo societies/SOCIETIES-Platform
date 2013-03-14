@@ -22,8 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.identity;
+package org.societies.api.identity.util;
 
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -41,15 +44,15 @@ public class DataIdentifierFactory {
 	 * @return the relevant DataIdentifier instance
 	 * @throws MalformedCtxIdentifierException 
 	 */
-	public static DataIdentifier fromUri(String dataIdUri)
+	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
 		String[] uri = dataIdUri.split("://");
 		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
 
-		//		// Context
-		//		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {
-		//			return CtxIdentifierFactory.getInstance().fromString(dataIdUri);
-		//		}
+		// Context
+		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {
+			return CtxIdentifierFactory.getInstance().fromString(dataIdUri);
+		}
 		//		// CIS
 		//		if (DataIdentifierScheme.CIS.equals(scheme)) {
 		//			
@@ -66,11 +69,15 @@ public class DataIdentifierFactory {
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
 		String path = uri[1];
-		int pos = 0, end = 0;
+		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
 			dataId.setOwnerId(path.substring(pos, end));
 		}
-		dataId.setType(path.substring(end+1, path.length()));
+		endType = path.length();
+		if (path.endsWith("/") && endType > 1) {
+			endType--;
+		}
+		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
 
@@ -85,7 +92,7 @@ public class DataIdentifierFactory {
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
 		dataId.setType(dataType);
-		dataId.setUri(DataIdentifierUtil.toUriString(scheme, dataType));
-		return null;
+		dataId.setUri(DataIdentifierUtils.toUriString(scheme, dataType));
+		return dataId;
 	}
 }
