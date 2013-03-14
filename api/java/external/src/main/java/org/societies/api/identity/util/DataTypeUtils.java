@@ -74,9 +74,9 @@ public class DataTypeUtils {
 	 * @return True if the data type is a leaf, false otherwise
 	 */
 	public boolean isLeaf(String dataType) {
-		// In the anti-hierarchy (i.e. children of someone)
+		// In the anti-hierarchy (i.e. children of someone), but not in the hierarchy (i.e. not a parent)
 		// Or nor in the hierarchy, neither in the anti-hierarchy (i.e. not referenced type: root and leaf by default)
-		return  (dataTypeAntiHierarchy.containsKey(dataType)
+		return  ((dataTypeAntiHierarchy.containsKey(dataType) && !dataTypeHierarchy.containsKey(dataType))
 				|| (!dataTypeHierarchy.containsKey(dataType) && !dataTypeAntiHierarchy.containsKey(dataType)));
 	}
 
@@ -87,9 +87,9 @@ public class DataTypeUtils {
 	 * @return True if the data type is a root, false otherwise
 	 */
 	public boolean isRoot(String dataType) {
-		// In the hierarchy (i.e. has got children)
+		// In the hierarchy (i.e. has got children), but not in the anti-hierarchy (i.e. has no parent)
 		// Or nor in the hierarchy, neither in the anti-hierarchy (i.e. not referenced type: root and leaf by default)
-		return (dataTypeHierarchy.containsKey(dataType)
+		return (dataTypeHierarchy.containsKey(dataType) && !dataTypeAntiHierarchy.containsKey(dataType)
 				|| (!dataTypeHierarchy.containsKey(dataType) && !dataTypeAntiHierarchy.containsKey(dataType)));
 	}
 
@@ -108,8 +108,26 @@ public class DataTypeUtils {
 		if (null == children) {
 			children = new HashSet<String>();
 			children.add(dataType);
+			return children;
 		}
-		return children;
+		// Recursive
+		Set<String> recursiveChildren = new HashSet<String>();
+		for(String child : children) {
+			recursiveChildren.addAll(getLookableDataTypes(child));
+		}
+		return recursiveChildren;
+	}
+
+	/**
+	 * To retrieve the children data types of a data type in the data hierarchy (not recursive)
+	 * E.g. children of NAME (root with children) are: NAME_FIRST, NAME_LAST,
+	 * E.g. children of ACTION (root) are: null,
+	 * E.g. children of NAME_FIRST (leaf) are: null
+	 * @param dataType Data type name
+	 * @return The list of children data type if dataType is a root type with children, or null if dataType is a leaf or a root without children
+	 */
+	public Set<String> getChildren(String dataType) {
+		return getChildren(dataType, false);
 	}
 
 	/**
@@ -118,9 +136,10 @@ public class DataTypeUtils {
 	 * E.g. children of ACTION (root) are: null,
 	 * E.g. children of NAME_FIRST (leaf) are: null
 	 * @param dataType Data type name
+	 * @param recursive To enable the recursive mode: children of children are retrieved also
 	 * @return The list of children data type if dataType is a root type with children, or null if dataType is a leaf or a root without children
 	 */
-	public Set<String> getChildren(String dataType) {
+	public Set<String> getChildren(String dataType, boolean recursive) {
 		// Leaf: no children
 		if (isLeaf(dataType)) {
 			return null;
@@ -128,7 +147,24 @@ public class DataTypeUtils {
 		// Otherwise: return the children
 		Set<String> children = dataTypeHierarchy.get(dataType);
 		// Robustness: return null if it is empty for some reason (but if data hiearchy is configured correctly, it should not)
-		return children.isEmpty() ? null : children;
+		if (null == children || children.isEmpty()) {
+			return null;
+		}
+		// Recursive
+		if (recursive) {
+			Set<String> recursiveChildren = new HashSet<String>();
+			for(String child : children) {
+				Set<String> tmp = getChildren(child, true);
+				if (null == tmp) {
+					recursiveChildren.add(child);
+				}
+				else {
+					recursiveChildren.addAll(tmp);
+				}
+			}
+			return recursiveChildren;
+		}
+		return children;
 	}
 
 	/**
@@ -147,7 +183,7 @@ public class DataTypeUtils {
 		// No parent
 		return null;
 	}
-
+	
 	/**
 	 * To retrieve the friendly description of a data type
 	 * If no existing friendly description is retrieved, the data type is sanitized and returned
@@ -193,31 +229,38 @@ public class DataTypeUtils {
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_CITY);
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_COUNTRY);
-		dataTypeHierarchy.put("ADDRESS_HOME", postAddressHomeChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NUMBER, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_CITY, "ADDRESS_HOME");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_HOME_COUNTRY, "ADDRESS_HOME");
+		addChildren("ADDRESS_HOME", postAddressHomeChildren);
 
 		Set<String> postAddressWorkChildren = new HashSet<String>();
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_CITY);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_COUNTRY);
-		dataTypeHierarchy.put("ADDRESS_WORK", postAddressWorkChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_CITY, "ADDRESS_WORK");
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.ADDRESS_WORK_COUNTRY, "ADDRESS_WORK");
+		addChildren("ADDRESS_WORK", postAddressWorkChildren);
 
 		Set<String> nameChildren = new HashSet<String>();
 		nameChildren.add(CtxAttributeTypes.NAME_FIRST);
 		nameChildren.add(CtxAttributeTypes.NAME_LAST);
-		dataTypeHierarchy.put(CtxAttributeTypes.NAME, nameChildren);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_FIRST, CtxAttributeTypes.NAME);
-		dataTypeAntiHierarchy.put(CtxAttributeTypes.NAME_LAST, CtxAttributeTypes.NAME);
+		addChildren(CtxAttributeTypes.NAME, nameChildren);
+
+		Set<String> legumeChildren = new HashSet<String>();
+		legumeChildren.add("middle");
+		legumeChildren.add("leaf1");
+		addChildren("root", legumeChildren);
+		
+		Set<String> courgeChildren = new HashSet<String>();
+		courgeChildren.add("leaf2");
+		addChildren("middle", courgeChildren);
 		return true;
 	}
+
+	private void addChildren(String parentType, Set<String> childTypes) {
+		dataTypeHierarchy.put(parentType, childTypes);
+		for(String child : childTypes) {
+			dataTypeAntiHierarchy.put(child, parentType);
+		}
+	}
+
 
 	/**
 	 * Load friendly description for whole Societies data
