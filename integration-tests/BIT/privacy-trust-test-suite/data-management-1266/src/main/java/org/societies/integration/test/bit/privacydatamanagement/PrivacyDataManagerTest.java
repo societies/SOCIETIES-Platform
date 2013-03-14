@@ -19,9 +19,9 @@
  */
 package org.societies.integration.test.bit.privacydatamanagement;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
@@ -36,10 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -66,15 +64,15 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.integration.test.IntegrationTest;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataManagerTest
+public class PrivacyDataManagerTest extends IntegrationTest
 {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class);
-	public static Integer testCaseNumber = 0;
 
 	private DataIdentifier dataId;
 	private DataIdentifier cisPublicDataId;
@@ -365,8 +363,8 @@ public class PrivacyDataManagerTest
 			assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 			Name originalData = DataWrapperFactory.retrieveName(wrapper);
 			Name obfuscatedData = DataWrapperFactory.retrieveName(obfuscatedDataWrapper);
-			LOG.info("Orginal name: "+NameUtils.toString(originalData));
-			LOG.info("Obfuscated name: "+NameUtils.toString(obfuscatedData));
+			LOG.info("[#"+testCaseNumber+"] Orginal name: "+NameUtils.toString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated name: "+NameUtils.toString(obfuscatedData));
 		}
 		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
@@ -396,8 +394,8 @@ public class PrivacyDataManagerTest
 			LocationCoordinates originalData = DataWrapperFactory.retrieveLocationCoordinates(wrapper);
 			LocationCoordinates obfuscatedData = DataWrapperFactory.retrieveLocationCoordinates(obfuscatedDataWrapper);
 			assertNotNull("Obfuscated data should not be null", obfuscatedDataWrapper);
-			LOG.info("### Orginal location:\n"+LocationCoordinatesUtils.toJsonString(originalData));
-			LOG.info("### Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedData));
+			LOG.info("[#"+testCaseNumber+"] Orginal location:\n"+LocationCoordinatesUtils.toJsonString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedData));
 		}
 		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
