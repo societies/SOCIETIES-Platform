@@ -36,8 +36,7 @@ import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialTokenManager;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -203,7 +202,7 @@ public class PluginSNConnector extends Plugin {
 			if (action.equals(ServiceMethodTranslator.getMethodName(ISocialTokenManager.methodsArray, 0))) {
 				try {
 					//SocialNetwork sn = ISocialConnector.SocialNetwork.valueOf(data.getString(1));
-					Socialnetwork sn = Socialnetwork.fromValue(data.getString(1));
+					SocialNetwork sn = SocialNetwork.fromValue(data.getString(1));
 					this.snActivityManager.getToken(data.getString(0), sn);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -261,7 +260,7 @@ public class PluginSNConnector extends Plugin {
 					//UNMARSHALL RETURN VALUES
 					String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
 					String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
-					Socialnetwork sn = intent.getParcelableExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
+					SocialNetwork sn = intent.getParcelableExtra(SocialTokenManager.SOCIAL_NETWORK_KEY);
 							
 					PluginResult result = new PluginResult(PluginResult.Status.OK, expires);
 					result.setKeepCallback(false);
