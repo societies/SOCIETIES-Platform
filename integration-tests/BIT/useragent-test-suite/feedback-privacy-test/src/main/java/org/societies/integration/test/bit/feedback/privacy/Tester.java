@@ -26,6 +26,7 @@ import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyN
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -204,16 +205,20 @@ public class Tester implements Subscriber{
 	
 	
 	private RequestorBean getRequestorBean(){
-		ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
-		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+/*		ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
+		myServiceID
+				.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		try {
-			myServiceID.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+			myServiceID.setIdentifier(new URI(
+					"css://eliza@societies.org/HelloEarth"));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		RequestorServiceBean bean = new RequestorServiceBean();
-		bean.setRequestorServiceId(myServiceID);
+		}*/
+		
+		
+		RequestorCisBean bean = new RequestorCisBean();
+		bean.setCisRequestorId("cisJid.ict-societies.eu");
 		bean.setRequestorId(this.userID.getJid());
 		return bean;
 		
