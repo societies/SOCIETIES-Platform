@@ -684,6 +684,7 @@ public class PluginCSSManager extends Plugin {
 				}
 				
 			} else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
+				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Logging in...", Toast.LENGTH_SHORT).show();
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
