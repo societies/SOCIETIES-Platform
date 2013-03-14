@@ -27,8 +27,12 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.sns.Checkin;
+import org.societies.api.sns.Event;
+import org.societies.api.sns.Message;
+import org.societies.api.sns.SocialNetwork;
+import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
@@ -94,10 +98,10 @@ public class SocialData implements ISocialData{
 	
 	HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
 
-	Map<String, Object> 			socialFriends;
-	Map<String, Object>				socialGroups;
-	Map<String, Object>				socialProfiles;
-	Map<String, Object>	 			socialActivities;
+	Map<String, Object> 	socialFriends;
+	Map<String, Object>	socialGroups;
+	Map<String, Object>	socialProfiles;
+	Map<String, Object>	socialActivities;
 
 
 
@@ -113,7 +117,7 @@ public class SocialData implements ISocialData{
 
 		lastUpate				= new Date().getTime();
 		
-		logger.info("SocialData Bundle is started");
+		logger.info("SocialData Bundle started");
 		
 	}
 
@@ -121,32 +125,35 @@ public class SocialData implements ISocialData{
 
 	 private void initSocialData(){
 		
-		 /*
-		 	socialFriends 			= new HashMap<String, Object>();
+		    logger.debug("SocialData initialization ....");
+		    logger.debug("Inititalize Friends, Groups, Profiles, Activities data structures... ");
+		 	
+		    socialFriends 			= new HashMap<String, Object>();
 			socialGroups			= new HashMap<String, Object>();
 			socialProfiles			= new HashMap<String, Object>();
 			socialActivities		= new HashMap<String, Object>();
-
 			lastUpate				= new Date().getTime();
-	    	*/
-	    	
+			
+			logger.debug(" Start time:"+lastUpate);
 
 	    	try  {
 
 	    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
 	    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
 	 	    		
-	    		logger.info("CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
+	    		logger.info("CSS Data >>>> CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
 	    	} 
 	    	catch (InvalidFormatException e) {
+	    		logger.error("Unable to read CssNode id:"+e,e);
 	    		e.printStackTrace();
 	    	}
 	    
+	    	logger.debug("Prepare CtxBroker to store Social Data ...");
 	    	// store SNS data to context
 			this.ctxUpdater = new ContextUpdater(this.internalCtxBroker,this.cssOwnerId);
 	    	
 	    	
-	    	logger.info("SocialData Bundle is started");
+			
 	    	
 	    	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,11 +161,11 @@ public class SocialData implements ISocialData{
 	    	
 	    	// Save data into the context
 			try {
-				logger.info(internalCtxBroker.toString());
+				logger.debug("CtxBroker instance .... "   + internalCtxBroker.toString());
 				
 				
 				individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-				logger.info("Indivudual Context Entity: " + individualCtxEntity.getId().toString());
+				logger.debug("Indivudual CtxEntity: " + individualCtxEntity.getId().toString());
 				
 				
 				// Restore the connected connector
@@ -174,7 +181,7 @@ public class SocialData implements ISocialData{
 							
 							HashMap<String, String> params = new HashMap<String, String>();
 							params.put(ISocialConnector.AUTH_TOKEN, connectorBlob.getToken());
-							params.put(ISocialConnector.IDENTITY, connectorBlob.getIdentity());
+							params.put(ISocialConnector.IDENTITY,   connectorBlob.getIdentity());
 							
 							connectorsInCtxBroker.put(connectorBlob.getId(), ctxConn.getId());
 							this.addSocialConnector(createConnector(getSocialNetowkName(connectorBlob.getSnName()), params));
@@ -191,11 +198,11 @@ public class SocialData implements ISocialData{
 						
 					}
 				}
-				else logger.warn("No SocialNetworkConnector stored in the Broker!");
+				else logger.warn("No Connector in CtxBroker!");
 				
 			}
 			catch (CtxException e) {
-				// TODO Auto-generated catch block
+			    	logger.error("Error while reading from CtxBroker:"+e);
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -208,17 +215,19 @@ public class SocialData implements ISocialData{
 				restoreState=false;
 			}
 
+			
+			logger.info("SocialData Bundle started correctly");
 	 }
 	 
 	 
-	 private ISocialConnector.SocialNetwork getSocialNetowkName(String name){
+	 private SocialNetworkName getSocialNetowkName(String name){
 			
 			
-			if ("facebook".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Facebook;
-			if ("twitter".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
-			if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
-			if ("linkedin".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.linkedin;
-			if ("googleplus".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.googleplus;
+			if (SocialNetwork.SN_FACEBOOK.equalsIgnoreCase(name)) 		return SocialNetworkName.FACEBOOK;
+			if (SocialNetwork.SN_TWITTER.equalsIgnoreCase(name)) 		return SocialNetworkName.TWITTER;
+			if (SocialNetwork.SN_FOURSQUARE.equalsIgnoreCase(name)) 	return SocialNetworkName.FOURSQUARE;
+			if (SocialNetwork.SN_LINKEDIN.equalsIgnoreCase(name)) 		return SocialNetworkName.LINKEDIN;
+			if (SocialNetwork.SN_GOOGLEPLUS.equalsIgnoreCase(name)) 	return SocialNetworkName.GOOGLEPLUS;
 			
 			
 			return null;
@@ -234,7 +243,7 @@ public class SocialData implements ISocialData{
 		
 		if (connectors.containsKey(socialConnector.getID())){
 			logger.warn("the connector id :"+socialConnector.getID() +" is already loaded");
-			throw new Exception("this connetor already exists");
+			throw new Exception("Connetor already exists");
 		}
 		
 		connectors.put(socialConnector.getID(), socialConnector);
@@ -248,7 +257,7 @@ public class SocialData implements ISocialData{
 				bean.setToken(socialConnector.getToken());
 				bean.setId(socialConnector.getID());
 				bean.setSnName(socialConnector.getConnectorName());
-				bean.setIdentity("");
+				bean.setIdentity(individualCtxEntity.getId().toUriString());  
 				
 				logger.info("[ADD] Connector ID:"+socialConnector.getID()+ " for "+socialConnector.getConnectorName() + " in CtxBroker");
 				logger.info("connector bean:"+bean);
@@ -263,7 +272,7 @@ public class SocialData implements ISocialData{
 			}
 		}
 		
-		log("Add connector "+socialConnector.getID());
+		logger.debug("Add connector "+socialConnector.getID());
 	}
 
 
@@ -309,6 +318,8 @@ public class SocialData implements ISocialData{
 		return list;
 	}
 
+
+	
 	@Override
 	public List<Object> getSocialPeople() {
 		return new ArrayList(socialFriends.values());
@@ -431,7 +442,6 @@ public class SocialData implements ISocialData{
 		PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 		Person profile = parser.load(connector.getUserProfile());
 
-		
 		if (socialProfiles.containsKey(profile.getId())){
 			socialProfiles.remove(profile.getId());
 			// Send notification of UPDATE?
@@ -442,10 +452,7 @@ public class SocialData implements ISocialData{
 		}
 		socialProfiles.put(profile.getId(), profile);
 		logger.debug("Add a new Profile in the list");
-		
-		
-		
-				
+			
 	}
 
 
@@ -455,9 +462,7 @@ public class SocialData implements ISocialData{
 	}
 
 
-	private void log(String out){
-		logger.info("SocialData - " +out);
-	}
+	
 
 	@Override
 	public boolean isAvailable(ISocialConnector connector) {
@@ -482,7 +487,7 @@ public class SocialData implements ISocialData{
 	}
 
 	@Override
-	public ISocialConnector createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
+	public ISocialConnector createConnector(SocialNetworkName socialNetworkName, Map<String, String> params) {
 		
 		String name="me";
 		try{
@@ -491,34 +496,34 @@ public class SocialData implements ISocialData{
 		}
 		catch(Exception ex){}
 
-		logger.info("Create a new connector with "+snName + " name");
-		switch(snName){
-		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
+		logger.info("Create a new connector with "+ socialNetworkName + " name");
+		switch(socialNetworkName){
+		
+		case FACEBOOK:   
+		    	return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
 
-		case twitter:    
-			// Just for now that we don't have a way to use our persona token
-			//return (ISocialConnector) new TwitterConnectorImpl();
-			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), name);
+		case TWITTER:    
 
-		case Foursquare: 
+		    	return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), name);
 
-			// Just for now ...
-			// return (ISocialConnector) new FoursquareConnectorImpl();
+		case FOURSQUARE: 
+
 			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), name);
 
-		case linkedin: 
-
+		case LINKEDIN: 
 
 			return (ISocialConnector) new LinkedinConnector(params.get(ISocialConnector.AUTH_TOKEN), name);
 
-		default : return null;
+		default : 
+		    	
+		    	return null;
 		}
 
 	}
 
 
-	@Override
-	public void postData(SocialNetwork snName, Map<String, ?> data) {
+	
+	public void postData(SocialNetworkName snName, Map<String, ?> data) {
 		String message = genJsonPostMessage(data);
 		logger.info("Post "+message+" to "+ snName + " SN");
 		List<ISocialConnector> results = getConnectorsByName(snName);
@@ -533,8 +538,8 @@ public class SocialData implements ISocialData{
 
 
 
-	@Override
-	public void postMessage(SocialNetwork snName, String data) {
+	
+	public void postMessage(SocialNetworkName snName, String data) {
 		logger.info("Post a Message to "+ snName + " SN");
 		List<ISocialConnector> results = getConnectorsByName(snName);
 		Iterator<ISocialConnector> it = results.iterator();
@@ -547,12 +552,13 @@ public class SocialData implements ISocialData{
 	}
 
 
-	private List<ISocialConnector> getConnectorsByName(SocialNetwork name){
-		Iterator <ISocialConnector> it = connectors.values().iterator();
+	private List<ISocialConnector> getConnectorsByName(SocialNetworkName name){
+		
+	    Iterator <ISocialConnector> it = connectors.values().iterator();
 		ArrayList<ISocialConnector> results = new ArrayList<ISocialConnector>();
 		while (it.hasNext()){
 			ISocialConnector conn = it.next();
-			if (conn.getID().contains(name.toString())){
+			if (conn.getSocialNetworkName().equals(name)){
 				results.add(conn);
 			}
 		}
@@ -605,6 +611,55 @@ public class SocialData implements ISocialData{
 		}
 
 		return result.toString(1);
+	}
+
+	
+	// New Post Methods
+	
+	
+	@Override
+	public boolean isConnected(SocialNetworkName name) {
+		for (ISocialConnector c : connectors.values()){
+		    if (c.getSocialNetworkName().equals(name)) return true;
+		}
+		return false;
+	}
+
+	
+	
+	
+	
+	@Override
+	public void postCheckin(SocialNetworkName name, Checkin bean) {
+		
+	    	Map<String, String> params = new HashMap<String, String>();
+	    	params.put(ISocialData.POST_DESCR, bean.getMessage());
+	    	params.put(ISocialData.POST_LAT,  ""+bean.getLatitude());
+	    	params.put(ISocialData.POST_LAT,   ""+bean.getLatitude());
+	    	params.put(ISocialData.POST_PLACE, ""+bean.getPlaceId());
+	    	postData(name, params);
+	    	
+		
+	}
+
+	@Override
+	public void postEvent(SocialNetworkName name, Event bean) {
+	    	
+	    	Map<String, String> params = new HashMap<String, String>();
+	    	params.put(ISocialData.POST_NAME, bean.getName());
+	    	params.put(ISocialData.POST_FROM, bean.getFromDate());
+	    	params.put(ISocialData.POST_TO,   bean.getToDate());
+	    	params.put(ISocialData.POST_PLACE, bean.getPlace());
+	    	params.put(ISocialData.POST_DESCR, bean.getDescription());
+	    	postData(name, params);
+	    	
+	}
+
+	@Override
+	public void postMessage(SocialNetworkName name, Message bean) {
+	    Map<String, String> params = new HashMap<String, String>();
+	    	params.put(ISocialData.POST_MESSAGE, bean.getData());
+		
 	}
 
 

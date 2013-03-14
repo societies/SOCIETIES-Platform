@@ -38,8 +38,7 @@ import org.societies.platform.socialdata.converters.PersonConverterFactory;
 public class ContextUpdater {
 
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory
-			.getLogger(ContextUpdater.class);
+	private static final Logger LOG = LoggerFactory .getLogger(ContextUpdater.class);
 
 	ICtxBroker internalCtxBroker = null;
 	IIdentity cssId = null;
@@ -50,8 +49,7 @@ public class ContextUpdater {
 
 	public ContextUpdater(ICtxBroker internalCtxBroker, IIdentity cssId) {
 
-		LOG.debug("updating user profile in context: broker service:"
-				+ internalCtxBroker);
+		LOG.debug("updating user profile in context: broker service: " + internalCtxBroker);
 		this.cssId = cssId;
 		this.internalCtxBroker = internalCtxBroker;
 
@@ -192,49 +190,66 @@ public class ContextUpdater {
 
 			Set<CtxAssociationIdentifier> snsAssocSet = individualEntity
 					.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
-			LOG.debug("There are " + snsAssocSet.size() + " associations with SocialNetworks");
+			LOG.debug("There are " + snsAssocSet.size()
+					+ " associations with SocialNetworks");
 
 			if (snsAssocSet.size() > 0) {
 
-				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(snsAssocSet);
+				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(
+						snsAssocSet);
 				for (CtxAssociationIdentifier assocID : snsAssocList) {
-					
-					snsAssoc = (CtxAssociation) this.internalCtxBroker.retrieve(assocID).get();
-					Set<CtxEntityIdentifier> snsEntitiesSet = snsAssoc.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
-					List<CtxEntityIdentifier> snsEntitiesList = new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
+
+					snsAssoc = (CtxAssociation) this.internalCtxBroker
+							.retrieve(assocID).get();
+					Set<CtxEntityIdentifier> snsEntitiesSet = snsAssoc
+							.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
+					List<CtxEntityIdentifier> snsEntitiesList = new ArrayList<CtxEntityIdentifier>(
+							snsEntitiesSet);
 
 					LOG.debug("lookup SN association" + snName);
 
-//					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
+					// List<CtxEntityIdentifier> snEntList =
+					// this.internalCtxBroker.lookupEntities(snsEntitiesList,
+					// CtxAttributeTypes.NAME, snName).get();
 
-					List<CtxEntityIdentifier> snEntList 		= this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.TYPE, snName).get();
-					//List<CtxEntityIdentifier> snEntList 		= this.internalCtxBroker.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
+					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
+							.lookupEntities(snsEntitiesList,
+									CtxAttributeTypes.TYPE, snName).get();
+					// List<CtxEntityIdentifier> snEntList =
+					// this.internalCtxBroker.lookupEntities(snsEntitiesList,
+					// CtxAttributeTypes.NAME, snName).get();
 
 					if (snEntList.size() > 0) {
-						socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(snEntList.get(0)).get();
+						socialNetwork = (CtxEntity) this.internalCtxBroker
+								.retrieve(snEntList.get(0)).get();
 						return socialNetwork;
 					}
 				}
 
 			}
 
-
 			LOG.info("NO Asscotiation found  the User Entity");
-			snsAssoc = this.internalCtxBroker.createAssociation(CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
+			snsAssoc = this.internalCtxBroker.createAssociation(
+					CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
 			LOG.info("---> snsAssoc created ");
 
-			List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK, CtxAttributeTypes.TYPE, snName, snName).get();
+			List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker
+					.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK,
+							CtxAttributeTypes.TYPE, snName, snName).get();
 
 			if (snEntitiesList.size() == 0) {
 				LOG.info("No SocialNetwork entity for this SN:" + snName);
-				socialNetwork = this.internalCtxBroker.createEntity(CtxEntityTypes.SOCIAL_NETWORK).get();
-				LOG.info("SOCIAL_NETWORK entity created " + socialNetwork.getId());
-				CtxAttribute snsNameAttr = this.internalCtxBroker.createAttribute(socialNetwork.getId(),CtxAttributeTypes.TYPE).get();
+				socialNetwork = this.internalCtxBroker.createEntity(
+						CtxEntityTypes.SOCIAL_NETWORK).get();
+				LOG.info("SOCIAL_NETWORK entity created "
+						+ socialNetwork.getId());
+				CtxAttribute snsNameAttr = this.internalCtxBroker
+						.createAttribute(socialNetwork.getId(),
+								CtxAttributeTypes.TYPE).get();
 				snsNameAttr.setStringValue(snName);
 				this.internalCtxBroker.update(snsNameAttr);
 
 			}
-
 
 			else {
 				socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(
@@ -245,17 +260,18 @@ public class ContextUpdater {
 			snsAssoc.addChildEntity(socialNetwork.getId());
 			snsAssoc.addChildEntity(individualEntity.getId());
 			snsAssoc.setParentEntity(individualEntity.getId());
-			snsAssoc = (CtxAssociation) this.internalCtxBroker.update(snsAssoc).get();
+			snsAssoc = (CtxAssociation) this.internalCtxBroker.update(snsAssoc)
+					.get();
 			this.internalCtxBroker.update(individualEntity);
 
 		} catch (InterruptedException e) {
-			LOG.error("Error:"+e,e);
+			LOG.error("Error:" + e, e);
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			LOG.error("Error:"+e,e);
+			LOG.error("Error:" + e, e);
 			e.printStackTrace();
 		} catch (CtxException e) {
-			LOG.error("Error:"+e,e);
+			LOG.error("Error:" + e, e);
 			e.printStackTrace();
 		}
 
@@ -536,12 +552,12 @@ public class ContextUpdater {
 									CtxAttributeTypes.TYPE,
 									connector.getConnectorName()).get();
 
-//					List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
-//							.lookupEntities(snsEntitiesList,
-//									CtxAttributeTypes.NAME,
-//									connector.getConnectorName()).get();
+					// List<CtxEntityIdentifier> snEntList =
+					// this.internalCtxBroker
+					// .lookupEntities(snsEntitiesList,
+					// CtxAttributeTypes.NAME,
+					// connector.getConnectorName()).get();
 
-					
 					if (snEntList.size() > 0) {
 						socialNetwork = (CtxEntity) this.internalCtxBroker
 								.retrieve(snEntList.get(0)).get();
