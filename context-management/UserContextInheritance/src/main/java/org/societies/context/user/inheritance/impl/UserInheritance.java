@@ -25,13 +25,12 @@
 package org.societies.context.user.inheritance.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
@@ -40,17 +39,18 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.identity.IIdentity;
-import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
-import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
+import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author yboul
@@ -64,6 +64,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	
 	@Autowired(required=false)
 	private ICtxBroker internalCtxBroker;
+	private IUserFeedback userFeedback;
 	
 	public UserInheritance() {
 		LOG.info(this.getClass() + "UserCtxInheritance instantiated ");
@@ -79,7 +80,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		ArrayList<CtxAttribute> cssCisCommonAttributes = new ArrayList<CtxAttribute>();
 		ArrayList<CtxAttribute> cssCisUncommonAttributes = new ArrayList<CtxAttribute>();
 		
-		//apo to given ctxId tou css tha paro ta entity ids ton CIS sta opoia anoikei
+		//given the css' ctxId get the entity ids of the CIS that this css is member of
 		try {
 			retrievedCSS =  (CtxEntity) this.internalCtxBroker.retrieve(ctxEntId).get();
 			retrievedCIS = (CommunityCtxEntity) this.internalCtxBroker.retrieve(ctxComId).get();
@@ -94,7 +95,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 				}
 			}
 		
-			// To css eite tha einai hdh melos enos CIS h oxi. Ean den einai 
+			// If css not yet member of a cis
 			if (cisEntityIdList.size()==0){			
 				Set<CtxAttribute> cisAttributes = retrievedCIS.getAttributes();
 				Set<CtxAttribute> cssAttributes = retrievedCSS.getAttributes();
@@ -114,16 +115,36 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 				}
 			}
 			
-			//to css den exei common attributes
-			if (cssCisCommonAttributes.size()==0){
-				for (CtxAttribute ctxAtt:cssCisUncommonAttributes){
-					retrievedCSS.addAttribute(ctxAtt);
-				}
-				//to css exei common attributes
-			}else {
-				for (CtxAttribute ctxAtt:cssCisCommonAttributes){
-				}
-			}		
+			//if css has no common attributes with the cis			
+				
+				if (cssCisUncommonAttributes.size()!=0){
+					
+					String proposalText = "Which attribute do you want to update? ";
+					String[] options = new String[cssCisCommonAttributes.size()];
+					options = (String[]) cssCisUncommonAttributes.toArray();
+					
+					List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, new ExpProposalContent(proposalText, options)).get();
+					
+					for (String select:feedback){
+						for (CtxAttribute ctxAtt:cssCisUncommonAttributes){
+							if (ctxAtt.getStringValue()==select){
+								CtxAttribute ca = (CtxAttribute) this.internalCtxBroker.createAttribute(ctxEntId, select).get();
+								ca.setStringValue(ctxAtt.getStringValue().toString());
+								ca.setValueType(CtxAttributeValueType.STRING);
+								ca = (CtxAttribute) this.internalCtxBroker.update(ca).get();
+								
+								//retrievedCSS.addAttribute(ctxAtt);							
+							}
+						}
+					}
+
+					//if css and cis have common attributes
+				}else {
+					for (CtxAttribute ctxAtt:cssCisCommonAttributes){
+					}
+				}	
+
+		
 			
 
 		} catch (InterruptedException e) {
