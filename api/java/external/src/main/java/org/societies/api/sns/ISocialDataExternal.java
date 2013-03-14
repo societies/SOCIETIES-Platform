@@ -25,6 +25,13 @@ public interface ISocialDataExternal {
 	    
 	    
 	    /**
+	     * Provides the status of the bundle. 
+	     * @return {@link SocialDataState}
+	     */
+	    SocialDataState getStatus();
+	    
+	    
+	    /**
 	     * Post an Update Message to a social network. This can be a Twitt
 	     * @param toSocialNetwotkName
 	     * @param message
