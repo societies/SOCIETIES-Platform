@@ -32,8 +32,9 @@
 		class="org.societies.integration.test.ct.datamanagement.TestCase"
 		depends-on="privacyDataManagerRemote, commManager" init-method="run">
 		<property name="commManager" ref="commManager" />
-		<property name="privacyDataManagerRemote," ref="privacyDataManagerRemote" />
-		<property name="targettedNodeJid" value="${targettedNode.jid}" />
+		<property name="privacyDataManagerRemote" ref="privacyDataManagerRemote" />
+		<property name="receiverJid" value="${receiver.jid}" />
+		<property name="timeout" value="${timeout}" />
 	</bean>
 
 </beans>

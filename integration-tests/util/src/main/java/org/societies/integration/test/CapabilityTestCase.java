@@ -22,65 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.ct.datamanagement;
+package org.societies.integration.test;
+
+import org.junit.runner.Result;
 
 /**
- * The test case 1244 aims to test the privacy policy management
- * real usage, using the context broker and the communication
- * framework.
+ * Specific test case class for capability integration test
+ * which includes several nodes
  * 
+ * This class has to be extended, its entry point is
+ * the "run" method: it launch the whole test case.
+ * This may help to implement integration test case.
+ * This class use the stateless IntegrationTestUtils
+ * 
+ * @author Rafik Said-Mansour (Trialog)
  * @author Olivier Maridat (Trialog)
  *
  */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
-import org.societies.integration.test.CapabilityTestCase;
-import org.societies.integration.test.IntegrationTestCase;
-
-public class TestCase extends CapabilityTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
-
-	public static IPrivacyDataManagerRemote privacyDataManagerRemote;
-	public static ICommManager commManager;
-
-
-	public TestCase() {
-		// Call the super constructor
-		// with test case number
-		// and test case classes to run
-		super(1932, new Class[]{PrivacyDataManagerTest.class});
-		PrivacyDataManagerTest.testCaseNumber = this.testCaseNumber;
+public abstract class CapabilityTestCase extends IntegrationTestCase {
+	private static String receiverJid;
+	private static int timeout;
+	
+	
+	public CapabilityTestCase(int testCaseNumber, Class[] testCaseClasses) {
+		super(testCaseNumber, testCaseClasses);
 	}
-
-
-	/* -- Dependency injection --- */
-	public void setPrivacyDataManagerRemote(IPrivacyDataManagerRemote privacyDataManagerRemote) {
-		this.privacyDataManagerRemote = privacyDataManagerRemote;
-		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyDataManagerRemote injected");
+	
+	
+	public static String getReceiverJid() {
+		return receiverJid;
 	}
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
-		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
+	public void setReceiverJid(String receiverJid) {
+		this.receiverJid = receiverJid;
 	}
-
-	public static boolean isDepencyInjectionDone() {
-		return isDepencyInjectionDone(0);
+	
+	public static int getTimeout() {
+		return timeout;
 	}
-	public static boolean isDepencyInjectionDone(int level) {
-		if (null == commManager) {
-			LOG.info("[Dependency Injection] Missing ICommManager");
-			return false;
-		}
-		if (null == commManager.getIdManager()) {
-			LOG.info("[Dependency Injection] Missing IIdentityManager");
-			return false;
-		}
-		if (null == privacyDataManagerRemote) {
-			LOG.info("[Dependency Injection] Missing IPrivacyDataManagerRemote");
-			return false;
-		}
-		return true;
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 }

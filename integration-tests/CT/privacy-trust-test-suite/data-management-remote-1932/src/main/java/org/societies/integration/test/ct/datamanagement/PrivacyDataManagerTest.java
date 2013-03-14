@@ -27,6 +27,9 @@ package org.societies.integration.test.ct.datamanagement;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,9 +39,11 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.LocationCoordinatesUtils;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.integration.test.IntegrationTest;
@@ -48,12 +53,14 @@ import org.societies.integration.test.IntegrationTest;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataManagerTest extends IntegrationTest implements IDataObfuscationListener {
+public class PrivacyDataManagerTest extends IntegrationTest {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class);
 
 
 	private RequestorBean requestor;
+	private CountDownLatch lock = new CountDownLatch(1);
 
+	
 	@Before
 	public void setUp() {
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::setUp");
@@ -62,12 +69,16 @@ public class PrivacyDataManagerTest extends IntegrationTest implements IDataObfu
 			fail("[Dependency Injection] "+getClass().getSimpleName()+" not ready");
 		}
 		// Data
-		IIdentity currentNode = TestCase.commManager.getIdManager().getThisNetworkNode();
-		requestor = RequestorUtils.create(TestCase.targettedNodeJid);
+		requestor = RequestorUtils.create(TestCase.getReceiverJid());
 	}
 
 	/* --- OBFUSCATION --- */
 
+	boolean succeed = false;
+	String errorMsg = "";
+	Exception errorException = new Exception();
+	DataWrapper obfuscatedDataWrapper = null;
+	
 	@Test
 	public void testObfuscateDataName()
 	{
@@ -75,11 +86,58 @@ public class PrivacyDataManagerTest extends IntegrationTest implements IDataObfu
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		try {
 			DataWrapper wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
-			TestCase.privacyDataManagerRemote.obfuscateData(requestor, wrapper, this);
+			TestCase.privacyDataManagerRemote.obfuscateData(requestor, wrapper, new IDataObfuscationListener()
+		    {
+				@Override
+				public void onObfuscationDone(DataWrapper data) {
+					succeed = true;
+					obfuscatedDataWrapper = data;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscationCancelled(String msg) {
+					succeed = false;
+					errorMsg = msg;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscationAborted(String msg, Exception e) {
+					succeed = false;
+					errorMsg = msg;
+					errorException = e;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
+					succeed = false;
+					errorMsg = "onObfuscatedVersionRetrieved should no be called";
+					lock.countDown();
+				}
+		    });
+
+		    lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+		    
+		    // Error
+		    if (!succeed) {
+		    	LOG.error("[#"+testCaseNumber+"] Error: "+errorMsg, errorException);
+		    	fail("Error: "+errorMsg);
+		    }
+		    // Success
+		    assertNotNull("Obfuscated data wrapper should not be null", obfuscatedDataWrapper);
+		    Name originalData = DataWrapperFactory.retrieveName(wrapper);
+			Name obfuscatedData = DataWrapperFactory.retrieveName(obfuscatedDataWrapper);
+			LOG.info("[#"+testCaseNumber+"] Orginal name: "+NameUtils.toString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated name: "+NameUtils.toString(obfuscatedData));
 		}
 		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
 			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
+		} catch (InterruptedException e) {
+			LOG.error("[#"+testCaseNumber+"] [InterruptedException obfuscator error] "+testTitle, e);
+			fail("InterruptedException obfuscator error ("+e.getMessage()+") "+testTitle);
 		}
 	}
 
@@ -90,39 +148,60 @@ public class PrivacyDataManagerTest extends IntegrationTest implements IDataObfu
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
 		try {
-			DataWrapper wrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
-			TestCase.privacyDataManagerRemote.obfuscateData(requestor, wrapper, this);
+			DataWrapper dataWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+			TestCase.privacyDataManagerRemote.obfuscateData(requestor, dataWrapper, new IDataObfuscationListener()
+		    {
+				@Override
+				public void onObfuscationDone(DataWrapper data) {
+					succeed = true;
+					obfuscatedDataWrapper = data;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscationCancelled(String msg) {
+					succeed = false;
+					errorMsg = msg;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscationAborted(String msg, Exception e) {
+					succeed = false;
+					errorMsg = msg;
+					errorException = e;
+					lock.countDown();
+				}
+
+				@Override
+				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
+					succeed = false;
+					errorMsg = "onObfuscatedVersionRetrieved should no be called";
+					lock.countDown();
+				}
+		    });
+
+		    lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+		    
+		    // Error
+		    if (!succeed) {
+		    	LOG.error("[#"+testCaseNumber+"] Error: "+errorMsg, errorException);
+		    	fail("Error: "+errorMsg);
+		    }
+		    // Success
+		    assertNotNull("Obfuscated data wrapper should not be null", obfuscatedDataWrapper);
+		    LocationCoordinates originalData = DataWrapperFactory.retrieveLocationCoordinates(dataWrapper);
+		    LocationCoordinates obfuscatedData = DataWrapperFactory.retrieveLocationCoordinates(obfuscatedDataWrapper);
+			LOG.info("[#"+testCaseNumber+"] Orginal name: "+LocationCoordinatesUtils.toJsonString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated name: "+LocationCoordinatesUtils.toJsonString(obfuscatedData));
 		}
 		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
 			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
+		} catch (InterruptedException e) {
+			LOG.error("[#"+testCaseNumber+"] [InterruptedException obfuscator error] "+testTitle, e);
+			fail("InterruptedException obfuscator error ("+e.getMessage()+") "+testTitle);
 		}
 	}
 
-
-	/* -- Listener -- */
-
-	@Override
-	public void onObfuscationDone(DataWrapper obfuscatedDataWrapper) {
-		LocationCoordinates obfuscatedData = DataWrapperFactory.retrieveLocationCoordinates(obfuscatedDataWrapper);
-		assertNotNull("Obfuscated data should not be null", obfuscatedDataWrapper);
-		LOG.info("[#"+testCaseNumber+"] Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedData));
-	}
-
-	@Override
-	public void onObfuscationCancelled(String msg) {
-		LOG.error("[#"+testCaseNumber+"] Cancelled: Didn't manage to obfuscate the data: "+msg);
-		fail("Cancelled: Didn't manage to obfuscate the data: "+msg);
-	}
-
-	@Override
-	public void onObfuscationAborted(String msg, Exception e) {
-		LOG.error("[#"+testCaseNumber+"] Aborted: Didn't manage to obfuscate the data: "+msg, e);
-		fail("Aborted: Didn't manage to obfuscate the data: "+msg);
-	}
-
-	@Override
-	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-		LOG.info("[#"+testCaseNumber+"] Obfuscated version retrieved: "+retrieved);
-	}
 }
