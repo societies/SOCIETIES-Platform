@@ -33,6 +33,7 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
  * @author Olivier Maridat (Trialog)
  *
  */
+@Deprecated
 public class PostalLocation extends IObfuscable {
 	private String logicalName;
 	private String streetNumber;

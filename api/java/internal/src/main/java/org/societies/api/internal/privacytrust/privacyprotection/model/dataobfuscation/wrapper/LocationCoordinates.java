@@ -33,6 +33,7 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
  * @author olivierm
  *
  */
+@Deprecated
 public class LocationCoordinates extends IObfuscable {
 	private double latitude;
 	private double longitude;

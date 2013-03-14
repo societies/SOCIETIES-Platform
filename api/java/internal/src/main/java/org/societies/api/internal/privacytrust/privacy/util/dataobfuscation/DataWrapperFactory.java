@@ -56,7 +56,7 @@ public class DataWrapperFactory {
 	}
 	public static LocationCoordinates retrieveLocationCoordinates(DataWrapper dataWrapper) {
 		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
-		if (dataType.equals(dataWrapper.getDataType())) {
+		if (!dataType.equals(dataWrapper.getDataType())) {
 			return null;
 		}
 		return (LocationCoordinates) dataWrapper.getData();
@@ -77,7 +77,7 @@ public class DataWrapperFactory {
 	}
 	public static Name retrieveName(DataWrapper dataWrapper) {
 		String dataType = CtxAttributeTypes.NAME;
-		if (dataType.equals(dataWrapper.getDataType())) {
+		if (!dataType.equals(dataWrapper.getDataType())) {
 			return null;
 		}
 		return (Name) dataWrapper.getData();

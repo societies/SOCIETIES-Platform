@@ -466,38 +466,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return obfuscateData(requestor, dataWrapper);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper)
-	 */
+	@Override
 	public IDataWrapper hasObfuscatedVersion(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
-		// -- Verify parameters
-		if (null == requestor) {
-			throw new NullPointerException("Not enought information: requestor or owner id is missing");
-		}
-		if (null == dataWrapper || null == dataWrapper.getDataId()) {
-			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
-		}
 		return dataWrapper;
-		// Not use at the moment
-		//		if (!isDepencyInjectionDone(2)) {
-		//			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
-		//		}
-		//		
-		//		// -- Retrieve the obfuscation level
-		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
-		//		double obfuscationLevel = 1;
-		//		if (null != dataObfuscationPreferences) {
-		//			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
-		//		}
-		//		
-		//		// -- Check if an obfuscated version is available
-		//		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
 	}
-	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
-	 */
 	@Override
 	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
 		return hasObfuscatedVersion(requestor, dataWrapper).getDataId().getUri();

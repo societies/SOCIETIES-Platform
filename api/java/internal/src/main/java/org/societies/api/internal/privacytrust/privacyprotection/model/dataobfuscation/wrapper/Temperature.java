@@ -33,6 +33,7 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
  * @author olivierm
  *
  */
+@Deprecated
 public class Temperature extends IObfuscable {
 	private double degree;
 	private String degreeString;

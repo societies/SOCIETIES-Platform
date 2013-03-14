@@ -32,22 +32,17 @@
 package org.societies.privacytrust.remote.privacydatamanagement;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierFactory;
-import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -66,30 +61,26 @@ public class PrivacyDataManagerCommServer {
 
 	private ICommManager commManager;
 	private IPrivacyDataManager privacyDataManager;
-	
-	
+
+
 	public PrivacyDataManagerCommServer() {
 	}
 
-	
+
 	public Object getQuery(Stanza stanza, PrivacyDataManagerBean bean){
 		PrivacyDataManagerBeanResult beanResult = new PrivacyDataManagerBeanResult();
 		boolean ack = true;
 
 		// -- Check Permission
 		if (bean.getMethod().equals(MethodType.CHECK_PERMISSION)) {
-			LOG.info("getQuery(): CheckPermission remote called");
 			beanResult.setMethod(MethodType.CHECK_PERMISSION);
 			ack = checkPermission(bean, beanResult);
-			LOG.info("getQuery(): CheckPermission remote response sending");
 		}
 
 		// -- Obfuscate Data
 		else if (bean.getMethod().equals(MethodType.OBFUSCATE_DATA)) {
-			LOG.info("getQuery(): ObfuscateData remote called");
 			beanResult.setMethod(MethodType.OBFUSCATE_DATA);
 			ack = obfuscateData(bean, beanResult);
-			LOG.info("getQuery(): ObfuscateData remote response sending");
 		}
 		else {
 			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
@@ -99,7 +90,7 @@ public class PrivacyDataManagerCommServer {
 		beanResult.setAck(ack);
 		return beanResult;
 	}
-	
+
 	private boolean checkPermission(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
 			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
@@ -107,40 +98,43 @@ public class PrivacyDataManagerCommServer {
 			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
 			ResponseItem permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 			beanResult.setPermission(ResponseItemUtils.toResponseItemBean(permission));
-		} catch (MalformedCtxIdentifierException e) {
+		}
+		catch (MalformedCtxIdentifierException e) {
+			LOG.error("MalformedCtxIdentifierException: "+MethodType.CHECK_PERMISSION, e);
 			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
 			return false;
 		}
 		catch (PrivacyException e) {
+			LOG.error("PrivacyException: "+MethodType.CHECK_PERMISSION, e);
 			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
 			return false;
 		}
 		return true;
 	}
-	
+
 	private boolean obfuscateData(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
-			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			DataWrapper dataWrapper = bean.getDataWrapper();
-//			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, dataWrapper);
-			beanResult.setAckMessage("Sorry, the obfuscation is available, but not remotely yet.");
+			Future<DataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(bean.getRequestor(), bean.getDataWrapper());
+			beanResult.setDataWrapper(obfuscatedDataWrapperAsync.get());
+		}
+		catch (PrivacyException e) {
+			LOG.error("PrivacyException: "+MethodType.OBFUSCATE_DATA, e);
+			beanResult.setAckMessage("Error during data obfuscation: "+e.getMessage());
 			return false;
-		} catch (Exception e) {
-			beanResult.setAckMessage("Error Exception: "+e.getMessage());
+		} catch (InterruptedException e) {
+			LOG.error("InterruptedException: "+MethodType.OBFUSCATE_DATA, e);
+			beanResult.setAckMessage("Error during waiting for data obfuscation: "+e.getMessage());
+			return false;
+		} catch (ExecutionException e) {
+			LOG.error("ExecutionException: "+MethodType.OBFUSCATE_DATA, e);
+			beanResult.setAckMessage("Error during executation of data obfuscation: "+e.getMessage());
 			return false;
 		}
-//		catch (PrivacyException e) {
-//			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
-//			return false;
-//		} catch (InvalidFormatException e) {
-//			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
-//			return false;
-//		}
-//		return true;
+		return true;
 	}
-	
-	
-	
+
+
+
 	// -- Dependency Injection
 
 	public void setCommManager(ICommManager commManager) {

@@ -33,6 +33,7 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
  * @author olivierm
  *
  */
+@Deprecated
 public class Status extends IObfuscable {
 	private String status;
 	
