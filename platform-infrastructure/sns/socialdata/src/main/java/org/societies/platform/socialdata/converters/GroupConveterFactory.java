@@ -1,31 +1,21 @@
 package org.societies.platform.socialdata.converters;
 
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetworkName;
-
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 
 public class GroupConveterFactory{
 	
 	public static GroupConverter getPersonConverter(ISocialConnector connector){
-		if (connector.getConnectorName().equals(SocialNetworkName.FACEBOOK)) 
+		if (connector.getSocialNetwork().equals(SocialNetwork.FACEBOOK)) 
 			return new GroupConverterFromFacebook();
-		else if (connector.getConnectorName().equals(SocialNetworkName.TWITTER))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.TWITTER))
 			return new GroupConverterFromTwitter();
-		else if (connector.getConnectorName().equals(SocialNetworkName.LINKEDIN))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.LINKEDIN))
 			return new GroupConverterFromLinkedin();
-		else if (connector.getConnectorName().equals(SocialNetworkName.FOURSQUARE))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.FOURSQUARE))
 			return new GroupConverterFromFoursquare();
 		else 
-			return new GroupConverterFromSN();
-		
+			return new GroupConverterFromSN();	
 	}
-	
-	
-
-	
-	
-	
-	
-	
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.FacebookConn.FacebookConnector;
 
 import com.restfb.DefaultFacebookClient;
@@ -57,7 +57,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		this.identity		= identity;
 		this.access_token	= access_token;
-		this.name 		= org.societies.api.sns.SocialNetwork.getSocialNetworkName(SocialNetworkName.FACEBOOK);
+		this.name 		= SocialNetwork.FACEBOOK.value();
 		this.id			= this.name + "_" + UUID.randomUUID();
 		facebookClient		= new DefaultFacebookClient(access_token);
 		
@@ -468,11 +468,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
-	    return SocialNetworkName.FACEBOOK;
-	}
-
-	
-	
-	
+	public SocialNetwork getSocialNetwork() {
+	    return SocialNetwork.FACEBOOK;
+	}	
 }

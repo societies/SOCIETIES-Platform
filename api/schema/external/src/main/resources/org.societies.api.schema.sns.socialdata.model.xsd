@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema  elementFormDefault="qualified" version="1.0" 
+             xmlns="http://societies.org/api/schema/sns/socialdata/model"     
+             targetNamespace="http://societies.org/api/schema/sns/socialdata/model"        
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="socialNetwork">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="facebook"/>
+      <xs:enumeration value="twitter"/>
+      <xs:enumeration value="foursquare"/>
+      <xs:enumeration value="linkedin"/>
+      <xs:enumeration value="googleplus"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>

@@ -41,7 +41,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
@@ -186,7 +186,7 @@ public class SocialData extends Service implements ISocialData {
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ISocialData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	public void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity) {
+	public void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity) {
 		Log.d(LOG_TAG, "addSocialConnector");	
 		
 		if (connectedToComms) {

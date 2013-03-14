@@ -35,8 +35,7 @@ import org.scribe.model.Response;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.sns.connector.googleplus.exceptions.HttpException;
 
 
@@ -62,7 +61,7 @@ public class GooglePlusConnector implements ISocialConnector {
 	public static final String MAX_POST_LIMIT_PARAMETER = "maxResults";
 	
 	private String access_token = null;
-	private String name = SocialNetwork.getSocialNetworkName(SocialNetworkName.GOOGLEPLUS);
+	private String name = SocialNetwork.GOOGLEPLUS.value();
 	private String id;
 	private String lastUpdate = "yesterday";
 	private GooglePlusTokenManager token=null;
@@ -195,9 +194,9 @@ public class GooglePlusConnector implements ISocialConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
+	public SocialNetwork getSocialNetwork() {
 	    // TODO Auto-generated method stub
-	    return SocialNetworkName.GOOGLEPLUS;
+	    return SocialNetwork.GOOGLEPLUS;
 	}
 
 	

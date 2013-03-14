@@ -25,7 +25,7 @@
 package org.societies.android.api.internal.sns;
 
 import org.societies.android.api.css.manager.IServiceManager;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 /**
  * Android interface for access SocialData bundle.
@@ -57,7 +57,7 @@ public interface ISocialData extends IServiceManager {
 	 * @param token Token for the connector.
 	 * @param validity Validity of the connector.
 	 */
-	void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity);
+	void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity);
 	
 	/**
 	 * Remove the social connector. 

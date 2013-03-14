@@ -38,8 +38,7 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.FoursquareConnector.FoursquareConnector;
 
 /*
@@ -71,7 +70,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 		this.accessTokenString = access_token;
 		this.identity = identity;
 		
-		this.name = SocialNetwork.getSocialNetworkName(SocialNetworkName.FOURSQUARE);
+		this.name = SocialNetwork.FOURSQUARE.value();
 		this.id = this.name + "_" + UUID.randomUUID();
 		this.service = new ServiceBuilder()
 				.provider(Foursquare2Api.class)
@@ -275,11 +274,8 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
+	public SocialNetwork getSocialNetwork() {
 	    // TODO Auto-generated method stub
-	    return SocialNetworkName.FOURSQUARE;
+	    return SocialNetwork.FOURSQUARE;
 	}
-	
-	
-
 }
