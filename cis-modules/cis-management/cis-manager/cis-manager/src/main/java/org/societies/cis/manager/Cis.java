@@ -443,7 +443,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		cisRecord = new CisRecord(cisName, cisIdentity.getJid(), cssOwner, description, cisType);
 		LOG.debug("getting a new activity feed");
 
-		activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cisIdentity.getJid());
+		activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cisIdentity.getJid(), true );
 		
 		// TODO: broadcast its creation to other nodes?
 		LOG.debug("activityFeed: "+activityFeed);
@@ -502,7 +502,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.debug("done building criteria from db");
 		
 		// retrieve activity feed
-		this.activityFeed = iActivityFeedManager.getOrCreateFeed(this.getOwnerId(), cisIdentity.getJid());
+		this.activityFeed = iActivityFeedManager.getOrCreateFeed(this.getOwnerId(), cisIdentity.getJid(), true);
 		
 		
 //		if(null != this.psc){
