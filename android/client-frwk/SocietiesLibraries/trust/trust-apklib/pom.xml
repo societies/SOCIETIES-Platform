@@ -12,21 +12,7 @@
 	<artifactId>trust-client</artifactId>
 	<name>Trust Management and Evaluation Client</name>
 	<version>${version.pt}</version>
-	<packaging>apklib</packaging>
-	<developers>
-		<developer>
-			<name>Nicolas Liampotis</name>
-			<email>nicolas.liampotis@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
-			<roles>
-				<role>owner</role>
-				<role>developer</role>
-				<role>tester</role>
-			</roles>
-		</developer>
-	</developers>	
-
+	<packaging>apklib</packaging>	
 	<dependencies>
 		<dependency>
 	    	<groupId>com.google.android</groupId>
@@ -39,14 +25,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- 
-		<dependency>
-        		<groupId>org.societies.android.api.external</groupId>
-        		<artifactId>societies-android-api</artifactId>
-        		<version>${release.version}</version>
-        		<type>apklib</type>
-		</dependency>
-		 -->
 		<dependency>
         		<groupId>org.societies.android.api.internal</groupId>
         		<artifactId>societies-android-api-internal</artifactId>
@@ -78,11 +56,26 @@
 	</build>
 
 	<reporting>
-	    <plugins>
-	      <plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>findbugs-maven-plugin</artifactId>
-	      </plugin>
-	    </plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</reporting>
+	
+	<developers>
+		<developer>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+		</developer>
+	</developers>
+	
 </project>

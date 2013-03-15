@@ -22,73 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.impl;
+package org.societies.android.privacytrust.trust;
 
-import org.societies.android.api.privacytrust.trust.TrustException;
+import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
+import org.societies.android.api.utilities.RemoteServiceHandler;
 
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.util.Log;
 
 /**
- * Thrown to indicate that the Trust Evidence Collector could not handle a
- * remote call.
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
+ * @since 1.0
  */
-public class TrustClientException extends TrustException {
+public class TrustClientRemote extends Service {
 
-	private static final long serialVersionUID = -3733487749109997000L;
+	private static final String TAG = TrustClientRemote.class.getName();
 
-	/**
-     * Constructs a <code>TrustClientException</code> with no detail message.
-     */
-    public TrustClientException() {
-    	
-        super();
-    }
+	private Messenger inMessenger;
 
-    /**
-     * Constructs a <code>TrustClientException</code> with the specified detail
-     * message.
-     * 
-     * @param message
-     *            the detail message.
-     */
-    public TrustClientException(String message) {
-    	
-        super(message);
-    }
+	/*
+	 * @see android.app.Service#onCreate()
+	 */
+	@Override
+	public void onCreate () {
 
-    /**
-     * Creates a <code>TrustClientException</code> with the specified detail message
-     * and cause.
-     * 
-     * @param message
-     *            the detail message (which is saved for later retrieval by the
-     *            {@link #getMessage()} method).
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public TrustClientException(String message, Throwable cause) {
-    	
-        super(message, cause);
-    }
+		Log.d(TAG, "onCreate");
+		final TrustClientBase trustClientBase = 
+				new TrustClientBase(this.getApplicationContext());
 
-    /**
-     * Creates a <code>TrustClientException</code> with the specified cause and a
-     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
-     * typically contains the class and detail message of <tt>cause</tt>).
-     * 
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public TrustClientException(Throwable cause) {
-    	
-        super(cause);
-    }
+		this.inMessenger = new Messenger(new RemoteServiceHandler(
+				trustClientBase.getClass(), trustClientBase, IInternalTrustClient.methodsArray));
+	}
+
+	/*
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
+	@Override
+	public IBinder onBind(Intent arg0) {
+		
+		Log.d(TAG, "onBind");
+		return inMessenger.getBinder();
+	}
+
+	/*
+	 * @see android.app.Service#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {
+		
+		Log.d(TAG, "onDestroy");
+	}
 }

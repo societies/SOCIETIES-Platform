@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<properties>
+		<tested.project.dir>${project.basedir}/../trust-container</tested.project.dir>
+		<tested.project.android.coverage>${tested.project.dir}/target/org.societies.android.privacytrust.trust.container/files/coverage.ec</tested.project.android.coverage>
+	</properties>
+	
+	<groupId>org.societies.android.privacytrust.trust.test</groupId>
+	<artifactId>trust-client-test</artifactId>
+	<name>Trust Management and Evaluation Client Tester</name>
+	<version>${version.pt}</version>
+	<packaging>apk</packaging>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId> 
+			<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust.trust</groupId>
+			<artifactId>trust-client</artifactId>
+			<version>${version.pt}</version>
+			<scope>provided</scope>
+			<type>apklib</type>
+		</dependency>   
+		<dependency>
+			<groupId>org.societies.android.privacytrust.trust.container</groupId>
+			<artifactId>trust-client-container</artifactId>
+			<version>${version.pt}</version>
+			<scope>provided</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust.trust.container</groupId>
+			<artifactId>trust-client-container</artifactId>
+			<version>${version.pt}</version>
+			<type>apk</type>
+		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>emma</groupId>
+			<artifactId>emma</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+    	<finalName>${project.artifactId}</finalName>
+    	<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<testCoverage>true</testCoverage>
+					<!-- Change the following to true to enable coverage report -->
+					<testCreateReport>false</testCreateReport>
+					<testTestSize>medium</testTestSize>
+					<testCoverageFile>${tested.project.android.coverage}</testCoverageFile>
+				</configuration>
+				<extensions>true</extensions>
+				<!-- Change the following to true to enable coverage report 
+				<executions>
+					<execution>
+						<id>pull-coverage</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>pull</goal>
+						</goals>
+						<configuration>
+							<pullSource>${tested.project.android.coverage}</pullSource>
+							<pullDestination>${tested.project.dir}/target/emma/coverage.ec</pullDestination>
+						</configuration>
+					</execution>
+				</executions>-->
+			</plugin>
+		</plugins>
+	</build>
+	
+	<developers>
+		<developer>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+		</developer>
+	</developers>
+    
+</project>
