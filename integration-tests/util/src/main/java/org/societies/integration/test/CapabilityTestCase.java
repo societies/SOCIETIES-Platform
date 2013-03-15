@@ -24,7 +24,7 @@
  */
 package org.societies.integration.test;
 
-import org.junit.runner.Result;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Specific test case class for capability integration test
@@ -41,25 +41,18 @@ import org.junit.runner.Result;
  */
 public abstract class CapabilityTestCase extends IntegrationTestCase {
 	private static String receiverJid;
-	private static int timeout;
-	
-	
+
+
 	public CapabilityTestCase(int testCaseNumber, Class[] testCaseClasses) {
 		super(testCaseNumber, testCaseClasses);
 	}
-	
-	
+
+
 	public static String getReceiverJid() {
 		return receiverJid;
 	}
+	@Value("${receiver.jid:emma.societies.local}")
 	public void setReceiverJid(String receiverJid) {
 		this.receiverJid = receiverJid;
-	}
-	
-	public static int getTimeout() {
-		return timeout;
-	}
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
 	}
 }

@@ -63,6 +63,8 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.integration.test.IntegrationTest;
+import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
+import org.societies.integration.test.userfeedback.UserFeedbackType;
 
 
 /**
@@ -112,13 +114,15 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 			// Owner ID
 			IIdentity currentJid = TestCase.commManager.getIdManager().getThisNetworkNode();
 			// Random Data ID
-//			DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+currentJid+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			//			DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+currentJid+"/ENTITY/person/1/ATTRIBUTE/name/13");
 			Random randomer = new Random((new Date()).getTime()); 
 			String randomValue = ""+randomer.nextInt(200);
 			DataIdentifier randomDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+currentJid+"/"+randomValue);
 			// Action list
 			List<Action> actionsRead = new ArrayList<Action>();
 			actionsRead.add(new Action(ActionConstants.READ));
+			// Prepare UserFeedback
+			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
 			// -- Call
 			TestCase.privacyDataManagerRemote.checkPermission(RequestorUtils.toRequestor(requestor, TestCase.commManager.getIdManager()), randomDataId, actionsRead, new IPrivacyDataManagerListener() {
 				@Override
@@ -149,7 +153,7 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 				errorMsg = "Access control aborted due to timeout";
 				errorException = new TimeoutException("Access control aborted due to timeout: more then "+TestCase.getTimeout()+"ms to do this operation.");
 			}
-			
+
 			// -- Verify
 			// Error
 			if (!succeed) {

@@ -27,7 +27,9 @@ import static org.junit.Assert.fail;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -65,6 +67,8 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTest;
+import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
+import org.societies.integration.test.userfeedback.UserFeedbackType;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -167,10 +171,19 @@ public class PrivacyDataManagerTest extends IntegrationTest
 
 		ResponseItem permission = null;
 		try {
-			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
+			// Random Data ID
+			//			DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+currentJid+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			Random randomer = new Random((new Date()).getTime()); 
+			String randomValue = ""+randomer.nextInt(200);
+			DataIdentifier randomDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+myCssId+"/"+randomValue);
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, randomDataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("[#"+testCaseNumber+"] [MalformedCtxIdentifierException] "+testTitle, e);
+			fail("MalformedCtxIdentifierException ("+e.getMessage()+") "+testTitle);
 		}
 		assertNotNull("No permission retrieved", permission);
 		assertNotNull("No (real) permission retrieved", permission.getDecision());
@@ -189,7 +202,9 @@ public class PrivacyDataManagerTest extends IntegrationTest
 		ResponseItem permission1 = null;
 		ResponseItem permission2 = null;
 		try {
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
 			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
+			TestCase1266.getUserFeedbackMocker().removeAllReplies(); // Just to be sure
 			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);

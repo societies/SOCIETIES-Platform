@@ -16,27 +16,14 @@
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<import resource="classpath*:test-bundle-context.xml" />
+	<context:annotation-config />
 
-	<bean id="TestCaseProperties"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreResourceNotFound" value="true"></property>
-		<property name="locations">
-			<list>
-				<value>classpath:META-INF/spring/org.societies.integration.test.properties
-				</value>
-				<value>file:${CONFIG_DIR}/org.societies.integration.test.properties
-				</value>
-			</list>
-		</property>
-	</bean>
-
-	<bean id="TestCase"
-		class="org.societies.integration.test.ct.datamanagement.TestCase"
-		depends-on="privacyDataManagerRemote, commManager" init-method="run">
-		<property name="commManager" ref="commManager" />
-		<property name="privacyDataManagerRemote" ref="privacyDataManagerRemote" />
+	<bean name="UserFeedbackMocker"
+		class="org.societies.integration.test.userfeedback.UserFeedbackMocker"
+		init-method="onCreate" destroy-method="onDestroy">
+		<!-- <property name="commManager" ref="commManager" /> <property name="pubsub" 
+			ref="pubsub" /> <property name="userFeedback" ref="userFeedback" /> <property 
+			name="enabled" value="${userfeedback.mocked:0}" /> -->
 	</bean>
 
 </beans>

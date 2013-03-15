@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
 import org.societies.integration.test.CapabilityTestCase;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.integration.test.userfeedback.UserFeedbackMocker;
 
 public class TestCase extends CapabilityTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
@@ -75,6 +75,10 @@ public class TestCase extends CapabilityTestCase {
 		}
 		if (null == commManager.getIdManager()) {
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
+			return false;
+		}
+		if (null == getUserFeedbackMocker()) {
+			LOG.info("[Dependency Injection] Missing UserFeedbackMock");
 			return false;
 		}
 		if (null == privacyDataManagerRemote) {
