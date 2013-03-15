@@ -2,6 +2,10 @@ package org.societies.platform.sns.connector.linkedin;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +20,7 @@ public class TestLinkedinConnector {
 	private static ISocialConnector connector = null;
 	private final Logger logger = LoggerFactory.getLogger(TestLinkedinConnector.class);
     
-	private String TEST_TOKEN = "f2333695-f25e-4a35-92f1-12508c6f5ad6,4bba1adc-aaf5-4e3f-801c-f8c11beedd5a";
+	private String TEST_TOKEN = "6727558d-2b52-4ecc-96eb-e984c254ab7b,1c3497bf-1d5b-49f7-b2bd-1baa69b0254a";
 	
 	@Before
 	public void setUp() {
@@ -80,15 +84,15 @@ public class TestLinkedinConnector {
 	}
 	
 	
-//	@Test
-//	public void postATestMessage(){
-//		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//		Date date = new Date();
-//		String value="[TEST] Hello World! It's "+dateFormat.format(date);
-//		connector.post(value);
-//		logger.info("Linkedin POST test:"+  value);
-//		
-//	}
+	@Test
+	public void postATestMessage(){
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		String value="[TEST] Hello World! It's "+dateFormat.format(date);
+		connector.post(value);
+		logger.info("Linkedin POST test:"+  value);
+		
+	}
 	
 //	@Test
 //	public void postATestEvent(){

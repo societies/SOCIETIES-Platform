@@ -28,8 +28,10 @@ public class LinkedinConnector implements ISocialConnector {
 	private Properties			parameters;
 
 	public static final String PROFILE_URL 			= "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,languages,skills,educations," +
-													  "date-of-birth,honors,associations,email-address,summary,public-profile-url,picture-url," +
-													  "specialties,industry,headline,formatted-name,maiden-name,patents,interests)";
+													  "date-of-birth,honors,associations,email-address,"  +
+													  "summary,public-profile-url,picture-url," +
+													  "specialties,industry,headline,formatted-name," +
+													  "maiden-name,patents,interests)";
 	
 	
 	public static final String FRIENDS_URL 			= "http://api.linkedin.com/v1/people/~/connections";
@@ -45,7 +47,7 @@ public class LinkedinConnector implements ISocialConnector {
 	
 	public static final String ME 		= "profile";
 	public static final String FEEDS 	= "activities";
-	public static final String GROUPS   = "groups";
+	public static final String GROUPS  	 = "groups";
 	public static final String FRIENDS 	= "friends";
 	
 	
@@ -152,8 +154,7 @@ public class LinkedinConnector implements ISocialConnector {
 	
 
 	public String getUserProfile() {
-		return get("http://api.linkedin.com/v1/people/~:(id,first-name,last-name");
-	    //return get(PROFILE_URL);
+	    return get(PROFILE_URL);
 	}
 
 	
@@ -205,11 +206,29 @@ public class LinkedinConnector implements ISocialConnector {
 			
 			OAuthRequest request = new OAuthRequest(Verb.POST, POST_URL);
 			// set the headers to the server knows what we are sending
-			request.addHeader("Content-Type", "application/json");
-			request.addHeader("x-li-format", "json");
+			request.addHeader("Content-Type", "application/xml");
+			//request.addHeader("x-li-format", "json");
+			
+			String xmlValue="<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+					"<share>" +
+					"<comment>SOCIETIES Social share</comment>" +
+					"<content>" +
+					"<title> Socieites Post </title>" +
+					"<description>"+value+"</description>" +
+					"<submitted-url>http://www.ict-societies.eu/</submitted-url>" +
+					"<submitted-image-url>http://www.ict-societies.eu/wp-content/themes/societies/images/logo.png</submitted-image-url>" +
+					"</content>" +
+					"<visibility>" +
+					"<code>anyone</code>" +
+					"</visibility>" +
+					"</share>";
+			
+			request.addPayload(xmlValue);
 			
 			
-			request.addPayload(value);
+		
+			
+			
 			this.service.signRequest(token.getAccessToken(), request);
 			Response response = request.send();
 
