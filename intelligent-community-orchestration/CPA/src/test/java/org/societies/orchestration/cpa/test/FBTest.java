@@ -111,6 +111,7 @@ public class FBTest {
             index++;
         }
         List<?> activities = socialData.getSocialActivity();
+        this.actFeed.setId("1");
         this.actFeed.importActivityEntries(activities);
 
 

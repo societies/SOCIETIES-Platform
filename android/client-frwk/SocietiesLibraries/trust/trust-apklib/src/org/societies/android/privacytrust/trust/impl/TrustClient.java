@@ -282,6 +282,11 @@ public class TrustClient extends Service implements ITrustClient {
 							}
 							@Override
 							public void returnAction(String result) { }
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
+
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
@@ -291,6 +296,11 @@ public class TrustClient extends Service implements ITrustClient {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {
@@ -319,6 +329,11 @@ public class TrustClient extends Service implements ITrustClient {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {

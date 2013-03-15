@@ -25,6 +25,8 @@
 package org.societies.orchestration.cpa.impl;
 
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.internal.orchestration.ISocialGraph;
 import org.societies.api.internal.orchestration.ISocialGraphEdge;
@@ -37,6 +39,8 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 	private ArrayList<ISocialGraphEdge> edges;
 	private ArrayList<ISocialGraphVertex> vertices;
     private HashMap<String,TrendStats> trends;
+    protected static Logger LOG = LoggerFactory.getLogger(SocialGraph.class);
+
 	public SocialGraph(){
 		edges = new ArrayList<ISocialGraphEdge>();
 		vertices = new ArrayList<ISocialGraphVertex>();
@@ -157,6 +161,7 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
         SocialGraphVertex newVertex = null;
         SocialGraphVertex found = null;
 		for(IActivity act : actDiff){
+            LOG.info("populate from new data, act: " + act.getActor() + " target: "+act.getTarget());
             found = hasVertex(act.getActor());
 			if(found == null){
                 newVertex = new SocialGraphVertex(act.getActor());

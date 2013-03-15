@@ -53,6 +53,7 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.api.comms.xmpp.XMPPNode;
+import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.utilities.DBC.Dbc;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -60,9 +61,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import android.app.Notification;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Debug;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
@@ -70,6 +75,16 @@ public class AndroidCommsBase implements XMPPAgent {
 	private static final long PUBSUB_EVENT_CALBACK_ID = -9999999999999L;
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
 	private static final boolean DEBUG_LOGGING = false;
+	
+	private static final String NOTIFICATION_TITLE = "Societies Communications Problem";
+	private static final String COMMS_NO_CONNECTIVITY = "NotConnected";
+	private static final String COMMS_CANNOT_REGISTER = "RegistrationError";
+	private static final String COMMS_CANNOT_UNREGISTER = "UnRegistrationError";
+	private static final String COMMS_CANNOT_SEND_MESSAGE = "SendMessageError";
+	private static final String COMMS_CANNOT_SEND_IQ = "SendIQError";
+	private static final String COMMS_CANNOT_CREATE_ID = "IdCreationError";
+	private static final String COMMS_CANNOT_LOGIN = "LoginError";
+	private static final String COMMS_CANNOT_LOGOUT = "LogoutError";
 
 	private XMPPConnection connection;
 	private String username, password, resource;
@@ -83,6 +98,7 @@ public class AndroidCommsBase implements XMPPAgent {
 	boolean pubsubRegistered;
 	PacketListener pubsubListener;
 	Context serviceContext;
+	BroadcastReceiver receiver;
 
 	
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
@@ -96,7 +112,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.serviceContext = serviceContext;
 		this.pubsubRegistered = false;
 		this.pubsubListener = null;
-		
+
 		//Android Profiling
 //		Debug.startMethodTracing(this.getClass().getSimpleName());
 	}
@@ -150,9 +166,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.REGISTER_EXCEPTION);
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			
+			createNotification("Error registering namespaces: " + e.getMessage(), COMMS_CANNOT_REGISTER, NOTIFICATION_TITLE);
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 		}
@@ -207,10 +224,11 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);			
-			intent.setAction(XMPPAgent.REGISTER_EXCEPTION);
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
+			intent.setAction(XMPPAgent.UNREGISTER_EXCEPTION);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			
+			createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
@@ -245,10 +263,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
+			createNotification("Error unregistering all namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} finally {
 			this.serviceContext.sendBroadcast(intent);
 		}
@@ -288,10 +306,10 @@ public class AndroidCommsBase implements XMPPAgent {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
+			createNotification("Error sending message: " + e.getMessage(), COMMS_CANNOT_SEND_MESSAGE, NOTIFICATION_TITLE);
 		} finally {
 			this.serviceContext.sendBroadcast(intent);
 		}
@@ -325,12 +343,12 @@ public class AndroidCommsBase implements XMPPAgent {
 			if (AndroidCommsBase.this.restrictBroadcast) {
 				intent.setPackage(client);
 			}
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
 			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
-
+			
+			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		}
 		return false;
 	}
@@ -460,6 +478,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password + " for client: " + client);
 		};
+		this.setupBroadcastReceiver();
 
 		String retValue = null;
 		//Send intent
@@ -468,8 +487,6 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.setPackage(client);
 		}
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
-
-
 		
 		String serverHost = domain;
 		if (null != host) {
@@ -503,16 +520,27 @@ public class AndroidCommsBase implements XMPPAgent {
 					Log.d(LOG_TAG, "Created user JID: " + retValue);
 				};
 			}
+			//Send intent
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			intent = new Intent(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			
+			createNotification("Error creating new identity: " + e.getMessage(), COMMS_CANNOT_CREATE_ID, NOTIFICATION_TITLE);
 		} finally {
 			if (DEBUG_LOGGING) {
 				Log.d(LOG_TAG, "Create intent sent for: " + retValue);
 			}
-			//Send intent
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
+			this.teardownBroadcastReceiver();
 		}
 		
 		return null;
@@ -528,7 +556,8 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host  + " for client: " + client);
 		};
-		
+		this.setupBroadcastReceiver();
+
 		String retValue = null;
 		Intent intent = new Intent(LOGIN);
 		if (this.restrictBroadcast) {
@@ -550,9 +579,20 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			intent = new Intent(LOGIN_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			
+			createNotification("Error logging in: " + e.getMessage(), COMMS_CANNOT_LOGIN , NOTIFICATION_TITLE);
 		} finally {
 			//Send intent
 			this.serviceContext.sendBroadcast(intent);
+			Log.d(LOG_TAG, "Login intent sent");
 		}
 		return null;
 	}
@@ -587,6 +627,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		} finally {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			this.serviceContext.sendBroadcast(intent);
+			this.teardownBroadcastReceiver();
 		}
 
 		return false;
@@ -931,6 +972,8 @@ public class AndroidCommsBase implements XMPPAgent {
 				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
 				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
 				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+				
+				createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 			}
 		}	
 	}
@@ -1023,4 +1066,96 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		return retValue;
 	}
+	
+	/**
+	 * Create Android Notification
+	 * @param message 
+	 * @param title 
+	 * @param type (not dislpayed)
+	 */
+	private void createNotification(String message, String title, String type) {
+		int notifierflags [] = new int [1];
+		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+		AndroidNotifier notifier = new AndroidNotifier(AndroidCommsBase.this.serviceContext,
+														Notification.DEFAULT_SOUND, notifierflags);
+
+		notifier.notifyMessage(message, type, this.getClass(), title);
+	}
+	
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupBroadcastReceiver() {
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Set up connectivity changes broadcast receiver");
+		};
+        
+        this.receiver = new AndroidCommsReceiver();
+        this.serviceContext.registerReceiver(this.receiver, createIntentFilter());    
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Register broadcast receiver");
+		};
+
+        return receiver;
+    }
+    /**
+     * Unregister the broadcast receiver
+     */
+    private void teardownBroadcastReceiver() {
+		if (DEBUG_LOGGING) {
+		       Log.d(LOG_TAG, "Tear down broadcast receiver");
+		};
+    	this.serviceContext.unregisterReceiver(this.receiver);
+    }
+
+	
+    /**
+     * Create a suitable intent filter
+     * @return IntentFilter
+     */
+    private IntentFilter createIntentFilter() {
+    	//register broadcast receiver to receive SocietiesEvents return values 
+        IntentFilter intentFilter = new IntentFilter();
+        
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        return intentFilter;
+    }
+
+    /**
+     * Broadcast receiver to receive intent return values from ConnectionManager
+     * 
+     * TODO: If base API increases extra notification information can be displayed
+     * in the more detailed notification style
+     */
+    private class AndroidCommsReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+				boolean unConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+				if (unConnected) {
+					ConnectivityManager cm =
+					        (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					 
+					NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+					
+					String networkType = null;
+					
+					if (null != activeNetwork) {
+						networkType = activeNetwork.getTypeName();
+					}
+					String reason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
+					String extraInfo = intent.getStringExtra(ConnectivityManager.EXTRA_EXTRA_INFO);
+					boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
+
+					createNotification("Device has lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+				}
+			}
+		}
+    }
+
 }

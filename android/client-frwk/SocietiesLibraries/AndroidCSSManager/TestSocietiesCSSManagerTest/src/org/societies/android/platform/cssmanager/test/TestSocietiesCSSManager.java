@@ -171,6 +171,46 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 	}
 	
 	@MediumTest
+	public void testLoginXMPPServer() throws Exception {
+		testFinished = new CountDownLatch(1);
+
+		this.testCompleted = false;
+		BroadcastReceiver receiver = this.setupLoginXMPPBroadcastReceiver();
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+		
+		Log.d(LOG_TAG, "testLoginXMPP start time: " + this.testStartTime);
+		//try two successive login/out cycles
+		this.loginCount = 1;
+
+		this.cssService.loginXMPPServer(CLIENT, getCssRecord());
+
+	    this.testFinished.await();
+		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
+        unregisterReceiver(receiver);
+		assertTrue(this.testCompleted);
+	}
+	
+//	@MediumTest
+//	public void testStartServices() throws Exception {
+//		testFinished = new CountDownLatch(1);
+//
+//		this.testCompleted = false;
+//		BroadcastReceiver receiver = this.setupAppServicesBroadcastReceiver();
+//		this.testStartTime = System.currentTimeMillis();
+//		this.testEndTime = this.testStartTime;
+//		
+//		Log.d(LOG_TAG, "testLoginXMPP start time: " + this.testStartTime);
+//
+//		this.cssService.startAppServices(CLIENT);
+//
+//	    this.testFinished.await();
+//		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
+//        unregisterReceiver(receiver);
+//		assertTrue(this.testCompleted);
+//	}
+	
+//	@MediumTest
 	public void testLoginCSSUsingIP() throws Exception {
 		testFinished = new CountDownLatch(1);
 
@@ -197,7 +237,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testCreateNewIdentityIPAddress() throws Exception {
 		testFinished = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -229,7 +269,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 	}
 
-//	@MediumTest
+	@MediumTest
 	/**
 	 * Tests for multiple logins/logout sequences
 	 * @throws Exception
@@ -287,6 +327,38 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
         return receiver;
     }
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupLoginXMPPBroadcastReceiver() {
+        BroadcastReceiver receiver = null;
+
+        Log.d(LOG_TAG, "Set up LoginXMPPReceiver broadcast receiver");
+
+        receiver = new LoginXMPPReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());
+        Log.d(LOG_TAG, "Register LoginXMPPReceiver broadcast receiver");
+
+        return receiver;
+    }
+    /**
+     * Create a broadcast receiver
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupAppServicesBroadcastReceiver() {
+        BroadcastReceiver receiver = null;
+
+        Log.d(LOG_TAG, "Set up App Services Receiver broadcast receiver");
+
+        receiver = new StartServicesReceiver();
+        getContext().registerReceiver(receiver, createTestIntentFilter());
+        Log.d(LOG_TAG, "Register App Services Receiver broadcast receiver");
+
+        return receiver;
+    }
     
     /**
      * Create a broadcast receiver
@@ -340,14 +412,27 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		public void onReceive(Context context, Intent intent) {
 	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
 
                 Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 
         		TestSocietiesCSSManager.this.cssService.startAppServices(CLIENT);
  
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getStringExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                
+				TestSocietiesCSSManager.this.testFinished.countDown();
+ 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 	        	
@@ -358,12 +443,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         		
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 TestSocietiesCSSManager.this.cssService.stopAppServices(CLIENT);
                
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 
@@ -372,6 +461,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
                 
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Startup services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
@@ -382,14 +472,97 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 TestSocietiesCSSManager.this.cssService.loginCSS(CLIENT, cssRecord);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.STOP_APP_SERVICES)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Stop services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
 
                 TestSocietiesCSSManager.this.cssService.logoutXMPPServer(CLIENT);
+                
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getStringExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                
+				TestSocietiesCSSManager.this.testFinished.countDown();
+	        } 
+		}
+    }
+    
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class StartServicesReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+	        if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+                
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Startup services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                
+                TestSocietiesCSSManager.this.cssService.stopAppServices(CLIENT);
+                
+	        } else if (intent.getAction().equals(IAndroidCSSManager.STOP_APP_SERVICES)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Stop services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+
+                TestSocietiesCSSManager.this.testCompleted = true;
+				TestSocietiesCSSManager.this.testFinished.countDown();
 	        }
 		}
     }
+
+    /**
+     * Broadcast receiver to receive intent return values from service method calls
+     */
+    private class LoginXMPPReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+
+                Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                
+        		TestSocietiesCSSManager.this.cssService.logoutXMPPServer(CLIENT);
+ 
+	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
+                TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
+                Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
+                
+                if (TestSocietiesCSSManager.this.loginCount < MULTIPLE_LOGIN_COUNT) {
+                    TestSocietiesCSSManager.this.loginCount++;
+                    try {
+                    	TestSocietiesCSSManager.this.cssService.loginXMPPServer(CLIENT, getCssRecord());
+                    } catch (Exception e) {
+                    	Log.d(LOG_TAG, "");
+                    	fail();
+                    }
+                } else {
+    				TestSocietiesCSSManager.this.testCompleted = true;
+    				TestSocietiesCSSManager.this.testFinished.countDown();
+                }
+	        } 
+		}
+    }
+
     /**
      * Broadcast receiver to receive intent return values from service method calls
      */
@@ -399,6 +572,8 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		public void onReceive(Context context, Intent intent) {
 	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
 
                 Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
@@ -407,6 +582,8 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
  
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 	        	
@@ -417,12 +594,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         		
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 TestSocietiesCSSManager.this.cssService.stopAppServices(CLIENT);
                
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 
@@ -431,6 +612,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
                 
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Startup services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
@@ -441,6 +623,9 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 TestSocietiesCSSManager.this.cssService.loginCSS(CLIENT, cssRecord);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.STOP_APP_SERVICES)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Stop services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
@@ -458,12 +643,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 		public void onReceive(Context context, Intent intent) {
 	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+                
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 TestSocietiesCSSManager.this.cssService.startAppServices(CLIENT);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 	        	
@@ -474,12 +663,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         		
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_CSS)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout CSS elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 TestSocietiesCSSManager.this.cssService.stopAppServices(CLIENT);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 if (TestSocietiesCSSManager.this.loginCount < MULTIPLE_LOGIN_COUNT) {
@@ -497,6 +690,7 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.START_APP_SERVICES)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
                 
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Startup services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
@@ -507,6 +701,9 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
                 TestSocietiesCSSManager.this.cssService.loginCSS(CLIENT, cssRecord);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.STOP_APP_SERVICES)) {
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, false));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Stop services elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
@@ -527,12 +724,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 	
 	        if (intent.getAction().equals(IAndroidCSSManager.LOGIN_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Login XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
                 TestSocietiesCSSManager.this.cssService.logoutXMPPServer(CLIENT);
                 
 	        } else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Logout XMPP elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 				TestSocietiesCSSManager.this.testCompleted = true;
@@ -540,6 +741,8 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
 				
 	        } else if (intent.getAction().equals(IAndroidCSSManager.REGISTER_XMPP_SERVER)) {
                 assertTrue(intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false));
+                assertNotNull(intent.getParcelableExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY));
+
                 TestSocietiesCSSManager.this.testEndTime = System.currentTimeMillis();
                 Log.d(LOG_TAG, "Register identity elapse time: " + (TestSocietiesCSSManager.this.testEndTime - TestSocietiesCSSManager.this.testStartTime));
 				TestSocietiesCSSManager.this.testCompleted = true;
@@ -563,13 +766,16 @@ public class TestSocietiesCSSManager extends ServiceTestCase<TestServiceCSSManag
         intentFilter.addAction(IAndroidCSSManager.GET_FRIEND_REQUESTS);
         intentFilter.addAction(IAndroidCSSManager.LOGIN_CSS);
         intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.LOGOUT_CSS);
         intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
         intentFilter.addAction(IAndroidCSSManager.READ_PROFILE_REMOTE);
         intentFilter.addAction(IAndroidCSSManager.REGISTER_CSS);
         intentFilter.addAction(IAndroidCSSManager.REGISTER_CSS_DEVICE);
         intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.REGISTER_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.SEND_FRIEND_REQUEST);
         intentFilter.addAction(IAndroidCSSManager.SET_PRESENCE_STATUS);
         intentFilter.addAction(IAndroidCSSManager.SUGGESTED_FRIENDS);

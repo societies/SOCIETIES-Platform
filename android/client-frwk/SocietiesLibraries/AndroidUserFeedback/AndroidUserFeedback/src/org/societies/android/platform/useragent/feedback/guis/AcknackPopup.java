@@ -113,6 +113,11 @@ public class AcknackPopup extends Activity{
 						}else{	                
 							eventsHelper = new EventsHelper(AcknackPopup.this);	  
 							eventsHelper.setUpService(new IMethodCallback() {			
+								@Override
+								public void returnException(String result) {
+									// TODO Auto-generated method stub
+								}
+
 								@Override							
 								public void returnAction(String result) {		
 									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");	
