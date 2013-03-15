@@ -37,7 +37,7 @@ import org.societies.android.api.events.PlatformEventsHelperNotConnectedExceptio
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.remote.helper.EventsHelper;
-import org.societies.android.platform.useragent.feedback.AndroidUserFeedback;
+//import org.societies.android.platform.useragent.feedback.AndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
@@ -107,17 +107,12 @@ public class AcknackPopup extends Activity{
 
 					Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
 
-					if (clientID.equalsIgnoreCase(AndroidUserFeedback.RETURN_TO_CLOUD)){
+					//if (clientID.equalsIgnoreCase(AndroidUserFeedback.RETURN_TO_CLOUD)){
 						if (isEventsConnected){	    
 							publishEvent();	               
 						}else{	                
 							eventsHelper = new EventsHelper(AcknackPopup.this);	  
-							eventsHelper.setUpService(new IMethodCallback() {			
-								@Override
-								public void returnException(String result) {
-									// TODO Auto-generated method stub
-								}
-
+							eventsHelper.setUpService(new IMethodCallback() {
 								@Override							
 								public void returnAction(String result) {		
 									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");	
@@ -130,13 +125,16 @@ public class AcknackPopup extends Activity{
 										Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");		
 										publishEvent();								
 									}							
+								}
+								@Override
+								public void returnException(String result) {
 								}						
 							});	           
 						}
 
-					}else{
-						returnResultToClient();
-					}
+					//}else{
+					//	returnResultToClient();
+					//}
 				}
 
 
@@ -168,7 +166,7 @@ public class AcknackPopup extends Activity{
 			feedback.add(this.resultPayload);    		
 			bean.setFeedback(feedback);    		
 			bean.setRequestId(requestID);			
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {				
+			eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {				
 				@Override				
 				public void returnAction(int result) {
 					}				

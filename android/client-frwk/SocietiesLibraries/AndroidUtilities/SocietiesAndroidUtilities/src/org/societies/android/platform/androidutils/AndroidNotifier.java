@@ -43,7 +43,7 @@ import android.util.Log;
 public class AndroidNotifier {
 	//Logging tag
 	private static final String LOG_TAG = AndroidNotifier.class.getName();
-	private static final String DEFAULT_SOCIETIES_EVENT_TITLE = "Societies Client";
+	private static final String DEFAULT_SOCIETIES_EVENT_TITLE = "SOCIETIES";
 	private static final boolean DEBUG_FLAG = false;
 	
 	private int defaultSound;

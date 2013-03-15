@@ -119,6 +119,8 @@ public class EventListener extends Service {
 			public void returnAction(String result) { }
 			@Override
 			public void returnAction(boolean resultFlag) { }
+			@Override
+			public void returnException(String result) { }
 		});
 	}
 	
@@ -205,6 +207,9 @@ public class EventListener extends Service {
 					}
 				}
 			}
+			@Override
+			public void returnException(String result) {
+			}
 		});
 	}
 
@@ -219,7 +224,7 @@ public class EventListener extends Service {
 		intent.putExtra(EXTRA_PRIVACY_POLICY, (Parcelable)policy);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		notifier.notifyMessage(description, eventType, NegotiationForm.class, intent);
+		notifier.notifyMessage(description, eventType, NegotiationForm.class, intent, "SOCIETIES");
 	}
 
 }

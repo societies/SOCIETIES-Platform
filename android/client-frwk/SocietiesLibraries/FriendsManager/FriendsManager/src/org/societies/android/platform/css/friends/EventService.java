@@ -255,7 +255,7 @@ public class EventService extends Service {
 		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class, intent, "Societies Friends");
+		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class, intent, "SOCIETIES");
 	}
 
     private void addNotificationAccept(String description, String eventType, CssAdvertisementRecord advert) {
