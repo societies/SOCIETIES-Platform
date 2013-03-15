@@ -22,31 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.trust;
+package org.societies.android.privacytrust.trust.container;
 
-import org.societies.android.api.privacytrust.trust.ITrustClient;
+import org.societies.android.privacytrust.trust.container.R;
 
-/**
- * Describe your class here...
- *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
- */
-public interface IInternalTrustClient extends ITrustClient {
-	
-	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
-    
-    public static final String RETRIEVE_TRUST_VALUE = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_VALUE";
-    public static final String ADD_DIRECT_TRUST_EVIDENCE = 
-    		"org.societies.android.api.privacytrust.trust.ADD_TRUST_EVIDENCE";
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.Menu;
 
-    String methodsArray [] = {
-    		"retrieveTrust(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-            "addDirectTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-			"startService()",
-			"stopService()" };
+public class MainActivity extends Activity {
+
+	/*
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		
+		super.onCreate(savedInstanceState);
+		super.setContentView(R.layout.activity_main);
+	}
+
+	/*
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		super.getMenuInflater().inflate(R.menu.activity_main, menu);
+		return true;
+	}
 }

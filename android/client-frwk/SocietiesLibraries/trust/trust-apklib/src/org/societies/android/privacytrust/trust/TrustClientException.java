@@ -22,31 +22,73 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.trust;
+package org.societies.android.privacytrust.trust;
 
-import org.societies.android.api.privacytrust.trust.ITrustClient;
+import org.societies.android.api.privacytrust.trust.TrustException;
+
 
 /**
- * Describe your class here...
+ * Thrown to indicate that the Trust Evidence Collector could not handle a
+ * remote call.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
-public interface IInternalTrustClient extends ITrustClient {
-	
-	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
-    
-    public static final String RETRIEVE_TRUST_VALUE = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_VALUE";
-    public static final String ADD_DIRECT_TRUST_EVIDENCE = 
-    		"org.societies.android.api.privacytrust.trust.ADD_TRUST_EVIDENCE";
+public class TrustClientException extends TrustException {
 
-    String methodsArray [] = {
-    		"retrieveTrust(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-            "addDirectTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-			"startService()",
-			"stopService()" };
+	private static final long serialVersionUID = -3733487749109997000L;
+
+	/**
+     * Constructs a <code>TrustClientException</code> with no detail message.
+     */
+    public TrustClientException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustClientException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustClientException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustClientException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustClientException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustClientException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustClientException(Throwable cause) {
+    	
+        super(cause);
+    }
 }
