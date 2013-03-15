@@ -6,7 +6,7 @@ import org.societies.api.sns.SocialNetworkName;
 
 public class FriendsConveterFactory{
 	
-	public static FriendsConverter getPersonConverter(ISocialConnector connector){
+	public static FriendsConverter getFriendsConverter(ISocialConnector connector){
 		if (connector.getSocialNetworkName().equals(SocialNetworkName.FACEBOOK)) 
 			return new FriendsConverterFromFacebook();
 		else if (connector.getSocialNetworkName().equals(SocialNetworkName.TWITTER))

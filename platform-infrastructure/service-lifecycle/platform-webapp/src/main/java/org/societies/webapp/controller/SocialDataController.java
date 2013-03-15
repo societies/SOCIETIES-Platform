@@ -65,6 +65,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
@@ -243,6 +245,13 @@ public class SocialDataController {
 	public String getStatus(HttpServletResponse response){
 	   return ""+socialdata.getStatus();
 	}
+	
+	
+	@RequestMapping(value="/status", method=RequestMethod.GET)
+	public @ResponseBody String getSocialDataStatus(@RequestParam String name) {
+	   return ""+socialdata.getStatus();
+	}
+
 	
 
 	@SuppressWarnings("unchecked")

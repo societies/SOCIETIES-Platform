@@ -7,7 +7,7 @@ import org.societies.api.sns.SocialNetworkName;
 public class PersonConverterFactory{
 	
 	public static PersonConverter getPersonConverter(ISocialConnector connector){
-		if (SocialNetworkName.FACEBOOK.equals(connector.getConnectorName())) 
+		if (SocialNetworkName.FACEBOOK.equals(connector.getSocialNetworkName())) 
 			return new PersonConverterFromFacebook();
 		else if (SocialNetworkName.TWITTER.equals(connector.getSocialNetworkName()))
 			return new PersonConverterFromTwitter();

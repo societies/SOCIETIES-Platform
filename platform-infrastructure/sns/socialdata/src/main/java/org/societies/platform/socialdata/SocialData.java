@@ -381,7 +381,7 @@ public class SocialData implements ISocialData{
 	public void updateSocialData() {
 		
 	    
-	    	new PullDataFromSN(this).exevute();
+	    	new PullDataFromSN(this).execute();
 	    	
 //		setState(SocialDataState.DOWNLOADING_FROM_SN);
 //		
@@ -448,6 +448,8 @@ public class SocialData implements ISocialData{
 		    setState(SocialDataState.ANY_CONNECTOR);
 		else
 		    setState(SocialDataState.WITH_SOME_SOCIAL_DATA);
+		
+		logger.debug("Social data State:" + state);
 		
 	}
 	

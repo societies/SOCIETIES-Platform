@@ -31,7 +31,7 @@ public class PullDataFromSN {
     
    
     @Async
-    public void exevute() {
+    public void execute() {
 	
 	sd.setState(SocialDataState.DOWNLOADING_FROM_SN);
 	
@@ -110,7 +110,7 @@ public class PullDataFromSN {
    
     private Map<String, ?> updateGroups(ISocialConnector connector) {
 	logger.debug("Read  " + connector.getSocialNetworkName() + " groups ... ");
-	GroupConverter parser = GroupConveterFactory.getPersonConverter(connector);
+	GroupConverter parser = GroupConveterFactory.getGroupConverter(connector);
 	List<Group> groups = parser.load(connector.getUserGroups());
 	Map<String, Object> gMap= new HashMap<String, Object>();
 	for(Group g: groups){
@@ -128,7 +128,7 @@ public class PullDataFromSN {
      */
     private Map<String, ?> updateFriends(ISocialConnector connector) {
 	logger.debug("Read " + connector.getSocialNetworkName() + " friends ... ");
-	FriendsConverter parser = FriendsConveterFactory.getPersonConverter(connector);
+	FriendsConverter parser = FriendsConveterFactory.getFriendsConverter(connector);
 	List<Person> friends = parser.load(connector.getUserFriends());
 	Map<String, Object> fMap = new HashMap<String, Object>();
 	for(Person f: friends) fMap.put(f.getId(),f);

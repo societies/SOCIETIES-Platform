@@ -22,6 +22,7 @@ import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Organization;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,7 +69,8 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 		this.rawData = data;
 
 		try{
-			db = new JSONObject(data);
+		    
+		    	db = new JSONObject(data);
 			
 			if (db.has("error"))
 				return person;
@@ -98,16 +100,21 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			}
 			else
 				name.setFamilyName("--");
+			
 			if (db.has("formattedName"))
 				name.setFormatted(db.getString("formattedName"));
 			else
 				name.setFormatted(formattedName);
+		
+			
 			person.setName(name);
+			person.setDisplayName(name.getFormatted());
 			
 			
 			if (db.has("summary")){
-				
+				person.setAboutMe(db.getString("summary"));
 			}
+			
 			
 			if (db.has("skills")){
 				JSONObject jSkills = db.getJSONObject("skills");

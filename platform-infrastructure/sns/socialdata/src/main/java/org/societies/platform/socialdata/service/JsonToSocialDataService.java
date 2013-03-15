@@ -1,16 +1,19 @@
 package org.societies.platform.socialdata.service;
 
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
+import org.eclipse.jetty.util.log.Log;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.sns.Message;
 import org.societies.api.sns.SocialDataState;
 import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.socialdata.SocialData;
-import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
 
 
 
@@ -48,11 +51,15 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "98d8df36-b9fc-41bf-abd6-0ab97f07247e,d73af323-2ff8-4625-b919-748576221396";
+		  String access_token = "6727558d-2b52-4ecc-96eb-e984c254ab7b,1c3497bf-1d5b-49f7-b2bd-1baa69b0254a";
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
 		  ISocialConnector c = sd.createConnector(SocialNetworkName.LINKEDIN, pars);
+		  System.out.println("connector id:" + c.getID());
+		  System.out.println("connector token:" + c.getToken());
+		  System.out.println("connector name:" + c.getConnectorName());
+		  
 		  try {
 		    sd.addSocialConnector(c);
 		} catch (Exception e1) {
@@ -71,9 +78,22 @@ public class JsonToSocialDataService {
 		    }
 		  }
 		  
-		  Person profile = (Person)sd.getSocialProfiles().get(0);
-		  System.out.println("Profile  name is "+ profile.getDisplayName());
+		  for(Object p : sd.getSocialProfiles()){
+		      Person profile =(Person)p;
+		      System.out.println("Profile "+profile.getName().getFormatted());
+			  
+		  }
+		  
+		  List<Object> groups =sd.getSocialGroups();
+		  for(Object g: groups){
+		      Group group = (Group)g;
+		      System.out.println("Group: "+ group.getTitle() + " " +group.getDescription());
+		  }
 		 
+		  Message msg = new Message();
+		  msg.setData("test 1");
+		  sd.postMessage(SocialNetworkName.LINKEDIN, msg);
+		  
 		  
 //		  try {
 //			

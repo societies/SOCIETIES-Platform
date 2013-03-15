@@ -127,9 +127,9 @@ function countConnectors(){
  
  function queryBundleStatus() {
 	  $.ajax({
-	    url: 'socialdatastatus.html',
+	    url: 'status',
 	    success: function(data) {
-	    	$('#status').val(data); 
+	    	$('#status').setVal(data); 
 	    }
 	  });
 	  setTimeout(queryBundleStatus, 5000); // you could choose not to continue on failure...
@@ -138,6 +138,8 @@ function countConnectors(){
 	
  
  $(document).ready(function(){ 
+	 
+	  $('#status').val("Reading status..."); 
 	  setTimeout(queryBundleStatus, 5000);
 });
 
