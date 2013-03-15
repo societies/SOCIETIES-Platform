@@ -22,69 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
-
-import java.io.Serializable;
-import java.util.Set;
-
-import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+package org.societies.api.privacytrust.trust.model;
 
 /**
- * This interface is used to represent an entity trusted by the trustor,
- * i.e. the owner of a CSS. Each trusted entity is referenced by its
- * {@link TrustedEntityId}, while the associated {@link Trust} objects express
- * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
- * trust.
- * 
+ * The constants of this enumerated type specify the type of a trust value.
+ * More specifically, trust values can be of one of the following types:
+ * <ul>
+ * <li>{@link #DIRECT}: Denotes a direct trust value, i.e. based on the direct
+ * experiences of a user.</li>
+ * <li>{@link #INDIRECT}: Denotes an indirect trust value, i.e. based on the
+ * trust opinions of other users.</li>
+ * <li>{@link #USER_PERCEIVED}: Denotes a trust value as perceived by the
+ * user, i.e. based on an accumulation of the direct and indirect trust values.
+ * </li>
+ * </ul>
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 1.0
  */
-public interface ITrustedEntity extends Serializable {
+public enum TrustValueType {
 
 	/**
-	 * Returns the identifier of the trustor.
-	 * 
-	 * @return the identifier of this trustor.
-	 * @since 0.5
+	 * The enum constant for direct trust values
 	 */
-	public TrustedEntityId getTrustorId();
+	DIRECT,
 	
 	/**
-	 * Returns the identifier of the trustee.
-	 * 
-	 * @return the identifier of this trustor.
-	 * @since 0.5
+	 * The enum constant for indirect trust values
 	 */
-	public TrustedEntityId getTrusteeId();
-
-	/**
-	 * Returns the direct trust in this entity.
-	 * 
-	 * @return the direct trust in this entity.
-	 */
-	public IDirectTrust getDirectTrust();
-
-	/**
-	 * Returns the indirect trust in this entity.
-	 * 
-	 * @return the indirect trust in this entity.
-	 */
-	public IIndirectTrust getIndirectTrust();
-
-	/**
-	 * Returns the user-perceived trust in this entity.
-	 * 
-	 * @return the user-perceived trust in this entity.
-	 */
-	public IUserPerceivedTrust getUserPerceivedTrust();
+	INDIRECT,
 	
 	/**
-	 * Returns the {@link TrustUpdateEvent trust update events} associated with
-	 * this entity.
-	 * 
-	 * @return
-	 * @since 1.0
+	 * The enum constant for user-perceived trust values
 	 */
-	public Set<TrustUpdateEvent> getTrustUpdateEvents();
+	USER_PERCEIVED,
 }

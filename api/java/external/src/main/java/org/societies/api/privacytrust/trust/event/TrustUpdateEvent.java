@@ -24,6 +24,7 @@
  */
 package org.societies.api.privacytrust.trust.event;
 
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -33,7 +34,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * <p>
  * Normally, TrustUpdateEvents are accompanied by the {@link TrustedEntityId
  * identifiers} of the trustor and the trustee whose trust value was updated,
- * as well as, the old and new value. 
+ * the {@link TrustValueType type} of the value, as well as, the old and new value. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
@@ -45,6 +46,9 @@ public class TrustUpdateEvent extends TrustEvent {
 	/** The trustee identifier. */ 
 	private final TrustedEntityId trusteeId;
 
+	/** The type of the trust value. */
+	private final TrustValueType valueType;
+	
 	/** The old trust value */
 	private final Double oldValue;
 	
@@ -61,6 +65,8 @@ public class TrustUpdateEvent extends TrustEvent {
 	 * @param trusteeId
 	 *            the identifier of the entity whose trust value was updated by
 	 *            the specified trustor
+	 * @param valueType
+	 *            the type of the value
 	 * @param oldValue
 	 *            the old trust value
 	 * @param newValue
@@ -68,11 +74,12 @@ public class TrustUpdateEvent extends TrustEvent {
 	 * @since 0.5
 	 */
 	public TrustUpdateEvent(final TrustedEntityId trustorId, 
-			final TrustedEntityId trusteeId, final Double oldValue, 
-			final Double newValue) {
+			final TrustedEntityId trusteeId, final TrustValueType valueType,
+			final Double oldValue, final Double newValue) {
 		
 		super(trustorId);
 		this.trusteeId = trusteeId;
+		this.valueType = valueType;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
@@ -99,6 +106,17 @@ public class TrustUpdateEvent extends TrustEvent {
 	public TrustedEntityId getTrusteeId() {
 		
 		return this.trusteeId;
+	}
+	
+	/**
+	 * Returns the type of the trust value.
+	 * 
+	 * @return the type of the trust value.
+	 * @since 1.0
+	 */
+	public TrustValueType getValueType() {
+		
+		return this.valueType;
 	}
 	
 	/**
@@ -129,9 +147,11 @@ public class TrustUpdateEvent extends TrustEvent {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("{");
-		sb.append("trustord=" + super.source);
+		sb.append("trustord=" + this.getTrusteeId());
 		sb.append(", ");
 		sb.append("trusteed=" + this.trusteeId);
+		sb.append(", ");
+		sb.append("valueType=" + this.valueType);
 		sb.append(", ");
 		sb.append("oldValue=" + this.oldValue);
 		sb.append(", ");
@@ -139,5 +159,53 @@ public class TrustUpdateEvent extends TrustEvent {
 		sb.append("}");
 		
 		return sb.toString();
+	}
+
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		
+		int result = 1;
+		result = prime * result
+				+ ((this.getTrustorId() == null) ? 0 : this.getTrustorId().hashCode());
+		result = prime * result
+				+ ((this.trusteeId == null) ? 0 : this.trusteeId.hashCode());
+		result = prime * result
+				+ ((this.valueType == null) ? 0 : this.valueType.hashCode());
+		
+		return result;
+	}
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		final TrustUpdateEvent other = (TrustUpdateEvent) that;
+		if (this.getTrustorId() == null) {
+			if (other.getTrustorId() != null)
+				return false;
+		} else if (!this.getTrustorId().equals(other.getTrustorId()))
+			return false;
+		if (this.trusteeId == null) {
+			if (other.trusteeId != null)
+				return false;
+		} else if (!trusteeId.equals(other.trusteeId))
+			return false;
+		if (this.valueType != other.valueType)
+			return false;
+		return true;
 	}
 }
