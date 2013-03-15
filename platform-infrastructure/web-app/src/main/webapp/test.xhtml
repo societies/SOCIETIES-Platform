@@ -2,21 +2,22 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/html"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>SOCIEITES :: View Response Policy</title>
     </ui:define>
 
     <ui:define name="body">
 
-        <p:commandButton value="Message!" actionListener="#{exampleController.showMeAMessage}"/>
 
-        <br/> <br/>
+        <p:commandButton value="Send event"
+                         actionListener="#{ppNegotiationTest.sendEvent}"/>
+        <br/>
+        <br/>
 
-        <p:outputLabel for="stringField">String field</p:outputLabel>
-        <p:inputText id="stringField" value="#{exampleController.stringProperty}"/>
-
+        <f:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

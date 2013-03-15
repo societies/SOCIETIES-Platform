@@ -3,16 +3,13 @@ package org.societies.platform.socialdata.testcase;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
@@ -22,11 +19,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.ContextUpdater;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
+import org.societies.api.sns.Message;
 import org.societies.platform.socialdata.SocialData;
 
 
@@ -209,8 +205,13 @@ public class SocialDataTest {
 
 	@Test
 	public void postMessage(){
-		socialData.postMessage(SocialNetwork.Facebook, "This is a JUNIT Test POST!");
+	    	Message msg = new Message();
+	    	msg.setData("This is a JUNIT Test POST!");
+		socialData.postMessage(SocialNetwork.FACEBOOK, msg);
 	}
+	
+	
+	
 
 
 	/*

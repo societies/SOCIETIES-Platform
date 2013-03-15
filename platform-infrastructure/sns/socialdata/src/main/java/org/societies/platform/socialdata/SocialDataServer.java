@@ -44,8 +44,8 @@ import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 /**
@@ -163,7 +163,10 @@ public class SocialDataServer implements IFeatureServer {
 			
 			switch(messageBean.getMethod()) {
 			case ADD_CONNECTOR:
-				SocialNetwork socialNetwork = SocialDataCommsUtils.socialNetwork(messageBean.getSnName());
+			    
+			       
+				SocialNetwork socialNetwork = messageBean.getSnName();
+				
 				long validity = messageBean.getValidity(); // TODO if 0 remove connector
 				Map<String, String> params = new HashMap<String, String>();
 				params.put(ISocialConnector.AUTH_TOKEN, messageBean.getToken());

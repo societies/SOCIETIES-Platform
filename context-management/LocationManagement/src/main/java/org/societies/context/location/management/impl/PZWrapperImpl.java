@@ -73,7 +73,7 @@ public class PZWrapperImpl implements PZWrapper  {
 	@SuppressWarnings("unused")
 	private void init(){
 		PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
-		PZ_FULL_ENTITY = productionAdminURL + pzPropertiesReader.getEntityFullQuery();
+		PZ_FULL_ENTITY = productionQueryURL +"/"+ pzPropertiesReader.getEntityFullQuery();
 		ENTITY_ID = pzPropertiesReader.getEntityId();
 		
 		/*
@@ -86,16 +86,17 @@ public class PZWrapperImpl implements PZWrapper  {
 	}
 	
 	private void initialPixel2GeoConvertor() throws Exception{
+		JSONObject jsonObject = null;
 		try{
 			if (pix2GeoConvertor == null){
 				PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
-				String url = productionAdminURL + pzPropertiesReader.getMapQuery();
-				JSONObject jsonObject = restCallHelperMethod(url);
+				String url = productionAdminURL +"/" +pzPropertiesReader.getMapQuery();
+				jsonObject = restCallHelperMethod(url);
 				pix2GeoConvertor = new Pix2Geo(jsonObject);
 				convertToGeo = true;
 			}
 		}catch (Exception e) {
-			log.error("can't initial pix2GeoConvertor ; coordinates will be given as in PZ server",e);
+			log.error("can't initial pix2GeoConvertor ; coordinates will be given as in PZ server; rest call to PZ returned: "+jsonObject,e);
 		}	
 	}
 	
@@ -235,10 +236,11 @@ public class PZWrapperImpl implements PZWrapper  {
 		JSONArray zonesArray;
 		try {
 			zonesArray = jsonObject.getJSONArray("zones");
+			
 			if (jsonObject.get("x") == null ||  jsonObject.get("y") == null ||
-				zonesArray.length() == 0){
+				zonesArray.length() == 0 || !hasRealCoordinates(jsonObject) ){
 					
-					log.debug("Json object for isn't valid, no valid location , JSON =  "+jsonObject.toString());	
+					log.debug("Json object isn't valid, no valid location , JSON =  "+jsonObject.toString());	
 					return false;
 			}
 		
@@ -250,7 +252,16 @@ public class PZWrapperImpl implements PZWrapper  {
 		return true;
 	}
 
-	
+	private boolean hasRealCoordinates(JSONObject jsonObject){
+		boolean value = true;
+		try{
+			jsonObject.getDouble("x");
+			jsonObject.getDouble("y");
+		}catch(Exception e){
+			value=false;
+		}
+		return value;
+	}
 	private JSONObject restCallHelperMethod(String url){
 		
 		HttpGet httpGetRequest = new HttpGet(url);
@@ -319,8 +330,4 @@ public class PZWrapperImpl implements PZWrapper  {
 			this.locationSystemActive = locationSystemActive;
 		}
 
-
-	
-	
-	
 }

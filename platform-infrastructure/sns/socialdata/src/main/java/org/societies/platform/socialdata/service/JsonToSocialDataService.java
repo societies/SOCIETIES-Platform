@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.socialdata.SocialData;
 import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
 
@@ -50,7 +51,7 @@ public class JsonToSocialDataService {
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
-		  ISocialConnector c = sd.createConnector(ISocialConnector.SocialNetwork.Facebook, pars);
+		  ISocialConnector c = sd.createConnector(SocialNetwork.FACEBOOK, pars);
 		  
 		 
 		  

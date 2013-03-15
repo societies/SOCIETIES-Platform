@@ -3,15 +3,18 @@
              xmlns="http://societies.org/api/internal/schema/sns/socialdata"      
              targetNamespace="http://societies.org/api/internal/schema/sns/socialdata" 
              xmlns:tns="http://societies.org/api/internal/schema/sns/socialdata"       
+             xmlns:tns2="http://societies.org/api/schema/sns/socialdata/model"
              xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+<xs:import namespace="http://societies.org/api/schema/sns/socialdata/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.sns.socialdata.model.xsd"/>
 
-  <xs:element name="socialdataMessageBean">
+<xs:element name="socialdataMessageBean">
   <xs:complexType >
     <xs:sequence>
       <xs:element name="identity" 	type="xs:string" minOccurs="0"/>
       <xs:element name="method" 	type="tns:socialDataMethod"/>
-      <xs:element name="snName" 	type="tns:socialnetwork" minOccurs="0"/>
+      <xs:element name="snName" 	type="tns2:socialNetwork" minOccurs="0"/>
       <xs:element name="token" 		type="xs:string" minOccurs="0"/>
       <xs:element name="validity" 	type="xs:long" minOccurs="0"/>
       <xs:element name="params" 	type="xs:string" minOccurs="0"/>
@@ -65,17 +68,6 @@
       <xs:enumeration value="getGroups"/>
       <xs:enumeration value="getActivities"/>
       <xs:enumeration value="doPost"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-
-  <xs:simpleType name="socialnetwork">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="facebook"/>
-      <xs:enumeration value="twitter"/>
-      <xs:enumeration value="foursquare"/>
-      <xs:enumeration value="linkedin"/>
-      <xs:enumeration value="googleplus"/>
     </xs:restriction>
   </xs:simpleType>
   
