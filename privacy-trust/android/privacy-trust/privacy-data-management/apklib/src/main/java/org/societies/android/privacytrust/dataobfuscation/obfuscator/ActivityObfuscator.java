@@ -24,54 +24,19 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
-import org.societies.android.privacytrust.api.IDataObfuscator;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Activity;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
-import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-
-
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ActivityObfuscatorInfo;
 
 /**
- * Abstract class helping the creation of an obfuscator
+ * Obfuscator for activity from activity feed
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
-	/**
-	 * Data to obfuscate, wrapped
-	 */
-	protected DataWrapper dataWrapper;
-	/**
-	 * Data to obfuscate
-	 */
-	protected E data;
-	/**
-	 * Algorithm information
-	 */
-	protected ObfuscatorInfo obfuscatorInfo;
-
-
-	public DataObfuscator(DataWrapper dataWrapper) {
-		this.dataWrapper = dataWrapper;
-		this.data = (E) this.dataWrapper.getData();
-	}
-
-
-	@Override
-	public DataWrapper getDataWrapper() {
-		return dataWrapper;
-	}
-
-	@Override
-	public ObfuscatorInfo getObfuscatorInfo() {
-		return obfuscatorInfo;
-	}
-	
-	@Override
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+public class ActivityObfuscator extends DataObfuscator<Activity> {
+	public ActivityObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new ActivityObfuscatorInfo();
 	}
 }

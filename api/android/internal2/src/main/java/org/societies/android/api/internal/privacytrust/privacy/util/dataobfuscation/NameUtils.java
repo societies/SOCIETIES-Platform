@@ -22,56 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.api.internal.privacytrust.privacy.util.dataobfuscation;
 
-import org.societies.android.privacytrust.api.IDataObfuscator;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
-import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-
-
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 
 /**
- * Abstract class helping the creation of an obfuscator
+ * 
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
-	/**
-	 * Data to obfuscate, wrapped
-	 */
-	protected DataWrapper dataWrapper;
-	/**
-	 * Data to obfuscate
-	 */
-	protected E data;
-	/**
-	 * Algorithm information
-	 */
-	protected ObfuscatorInfo obfuscatorInfo;
+public class NameUtils {
 
-
-	public DataObfuscator(DataWrapper dataWrapper) {
-		this.dataWrapper = dataWrapper;
-		this.data = (E) this.dataWrapper.getData();
+	public static Name create(String firstName, String lastName) {
+		Name data = new Name();
+		data.setFirstName(firstName);
+		data.setLastName(lastName);
+		return data;
 	}
 
-
-	@Override
-	public DataWrapper getDataWrapper() {
-		return dataWrapper;
+	public static boolean equal(Name origin, Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (origin == obj) { return true; }
+		if (origin.getClass() != obj.getClass()) { return false; }
+		// -- Verify obj type
+		if (obj instanceof Name) {
+			Name other = (Name) obj;
+			return (origin.getFirstName().equals(other.getFirstName())
+					&& origin.getLastName().equals(other.getLastName())
+					);
+		}
+		return false;
 	}
 
-	@Override
-	public ObfuscatorInfo getObfuscatorInfo() {
-		return obfuscatorInfo;
-	}
-	
-	@Override
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+	public static String toString(Name val) {
+		return "<firstName: "+val.getFirstName()+", last name: "+val.getLastName()+">";
 	}
 }

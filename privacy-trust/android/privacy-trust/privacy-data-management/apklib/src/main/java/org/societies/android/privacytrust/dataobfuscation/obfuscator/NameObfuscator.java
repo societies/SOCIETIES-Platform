@@ -24,10 +24,11 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.NameObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Name;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 
 /**
  * Obfuscator for name
@@ -35,16 +36,13 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Obfu
  * @author Olivier Maridat (Trialog)
  *
  */
-public class NameObfuscator extends DataObfuscator<DataWrapper> {
+public class NameObfuscator extends DataObfuscator<Name> {
 	/**
 	 * @param data
 	 */
-	public NameObfuscator(DataWrapper data) {
-		super(data);
-		available = true;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 4;
-		dataType = Name.class;
+	public NameObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new NameObfuscatorInfo();
 	}
 
 
@@ -64,6 +62,7 @@ public class NameObfuscator extends DataObfuscator<DataWrapper> {
 		}
 
 		// -- Obfuscate
+		int stepNumber = getObfuscatorInfo().getNbOfObfuscationLevelStep();
 		// 0: nothing
 		Name obfuscatedName = new Name();
 		if (obfuscationLevel <= 0) {

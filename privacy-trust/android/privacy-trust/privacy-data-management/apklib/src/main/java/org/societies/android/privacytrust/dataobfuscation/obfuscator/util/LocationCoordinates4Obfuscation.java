@@ -24,7 +24,8 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator.util;
 
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+
 
 
 /**

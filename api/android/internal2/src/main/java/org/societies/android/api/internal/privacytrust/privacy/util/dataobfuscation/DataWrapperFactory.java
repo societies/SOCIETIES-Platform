@@ -22,56 +22,65 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.api.internal.privacytrust.privacy.util.dataobfuscation;
 
-import org.societies.android.privacytrust.api.IDataObfuscator;
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.CtxAttributeTypes;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
-import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 
 
 /**
- * Abstract class helping the creation of an obfuscator
- *
+ * Utilities to instantiate DataWrapper for data obfuscation
  * @author Olivier Maridat (Trialog)
- *
+ * @date 14 oct. 2011
  */
-public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
-	/**
-	 * Data to obfuscate, wrapped
-	 */
-	protected DataWrapper dataWrapper;
-	/**
-	 * Data to obfuscate
-	 */
-	protected E data;
-	/**
-	 * Algorithm information
-	 */
-	protected ObfuscatorInfo obfuscatorInfo;
+public class DataWrapperFactory {
+	// -- CONTEXT ATTRIBUTE
 
-
-	public DataObfuscator(DataWrapper dataWrapper) {
-		this.dataWrapper = dataWrapper;
-		this.data = (E) this.dataWrapper.getData();
-	}
-
-
-	@Override
-	public DataWrapper getDataWrapper() {
-		return dataWrapper;
-	}
-
-	@Override
-	public ObfuscatorInfo getObfuscatorInfo() {
-		return obfuscatorInfo;
-	}
 	
-	@Override
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+
+	// -- GEOLOCATION
+	/**
+	 * To get a LocationCoordinatesWrapper
+	 * The persistence is disabled by default, the obfuscated geolocation will not
+	 * be stored after obfuscation.
+	 * @param latitude Latitude
+	 * @param longitude Longitude
+	 * @param accuracy Accuracy in meters
+	 * @return A LocationCoordinatesWrapper
+	 */
+	public static DataWrapper getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
+		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
+		LocationCoordinates data = LocationCoordinatesUtils.create(latitude, longitude, accuracy);
+		return DataWrapperUtils.create(dataType, data);
+	}
+	public static LocationCoordinates retrieveLocationCoordinates(DataWrapper dataWrapper) {
+		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
+		if (!dataType.equals(dataWrapper.getDataType())) {
+			return null;
+		}
+		return (LocationCoordinates) dataWrapper.getData();
+	}
+
+	// -- NAME
+	/**
+	 * To get a NameWrapper
+	 * The persistence is disabled by default, the obfuscated name will not
+	 * @param firstName
+	 * @param lastName
+	 * @return the NameWrapper
+	 */
+	public static DataWrapper getNameWrapper(String firstName, String lastName) {
+		String dataType = CtxAttributeTypes.NAME;
+		Name data = NameUtils.create(firstName, lastName);
+		return DataWrapperUtils.create(dataType, data);
+	}
+	public static Name retrieveName(DataWrapper dataWrapper) {
+		String dataType = CtxAttributeTypes.NAME;
+		if (!dataType.equals(dataWrapper.getDataType())) {
+			return null;
+		}
+		return (Name) dataWrapper.getData();
 	}
 }

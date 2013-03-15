@@ -22,13 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator;
+package org.societies.android.privacytrust.api;
 
-import java.lang.reflect.Type;
-
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+
 
 
 /**
@@ -49,28 +48,14 @@ public interface IDataObfuscator {
 	public DataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException;
 
 	/**
-	 * To know if obfuscation of this type of data is available on this node or not
-	 * @return true if the obfuscation can be done on this node, false otherwise
-	 */
-	public boolean isAvailable();
-	/**
-	 * Type of the obfuscation
-	 * @return the type of the obfuscation
-	 */
-	public ObfuscationLevelType getObfuscationLevelType();
-	/**
-	 * Number of classes for a discrete obfuscation level
-	 * @return the number of steps available
-	 */
-	int getStepNumber();
-	/**
 	 * Wrapper of the data to obfuscate
 	 * @return the wrapped data to obfuscate
 	 */
 	public DataWrapper getDataWrapper();
+
 	/**
-	 * Type of the data wrapper to obfuscate
-	 * @return the type of the data wrapper to obfuscate
+	 * Retrieve information about this obfuscation algorithm: data obfuscable or not, examples of obfuscations, ...
+	 * @return Information about the obfuscation algorithm
 	 */
-	public Type getDataType();
+	public ObfuscatorInfo getObfuscatorInfo();
 }

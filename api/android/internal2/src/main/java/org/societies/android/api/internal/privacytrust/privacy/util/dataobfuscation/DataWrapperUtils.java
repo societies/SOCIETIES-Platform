@@ -22,56 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.api.internal.privacytrust.privacy.util.dataobfuscation;
 
-import org.societies.android.privacytrust.api.IDataObfuscator;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
-import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-
-
 
 /**
- * Abstract class helping the creation of an obfuscator
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
- *
  */
-public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
-	/**
-	 * Data to obfuscate, wrapped
-	 */
-	protected DataWrapper dataWrapper;
-	/**
-	 * Data to obfuscate
-	 */
-	protected E data;
-	/**
-	 * Algorithm information
-	 */
-	protected ObfuscatorInfo obfuscatorInfo;
+public class DataWrapperUtils {
 
-
-	public DataObfuscator(DataWrapper dataWrapper) {
-		this.dataWrapper = dataWrapper;
-		this.data = (E) this.dataWrapper.getData();
-	}
-
-
-	@Override
-	public DataWrapper getDataWrapper() {
+	public static DataWrapper create(String dataType, IObfuscable data) {
+		DataWrapper dataWrapper = new org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper();
+		dataWrapper.setDataType(dataType);
+		dataWrapper.setData(data);
 		return dataWrapper;
 	}
 
-	@Override
-	public ObfuscatorInfo getObfuscatorInfo() {
-		return obfuscatorInfo;
-	}
-	
-	@Override
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+	public static boolean equal(DataWrapper o1, Object o2) {
+		// -- Verify reference equality
+		if (o2 == null) { return false; }
+		if (o1 == o2) { return true; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		DataWrapper rhs = (DataWrapper) o2;
+		return (o1.getDataType().equals(rhs.getDataType())
+				&& o1.getData().equals(rhs.getData())
+				);
 	}
 }

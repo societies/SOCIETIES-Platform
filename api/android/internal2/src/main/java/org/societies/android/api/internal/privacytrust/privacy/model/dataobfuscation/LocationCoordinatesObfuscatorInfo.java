@@ -22,56 +22,27 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.dataobfuscation.obfuscator;
+package org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation;
 
-import org.societies.android.privacytrust.api.IDataObfuscator;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
-import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import java.util.HashMap;
 
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
 
 /**
- * Abstract class helping the creation of an obfuscator
- *
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
-	/**
-	 * Data to obfuscate, wrapped
-	 */
-	protected DataWrapper dataWrapper;
-	/**
-	 * Data to obfuscate
-	 */
-	protected E data;
-	/**
-	 * Algorithm information
-	 */
-	protected ObfuscatorInfo obfuscatorInfo;
-
-
-	public DataObfuscator(DataWrapper dataWrapper) {
-		this.dataWrapper = dataWrapper;
-		this.data = (E) this.dataWrapper.getData();
-	}
-
-
-	@Override
-	public DataWrapper getDataWrapper() {
-		return dataWrapper;
-	}
-
-	@Override
-	public ObfuscatorInfo getObfuscatorInfo() {
-		return obfuscatorInfo;
-	}
-	
-	@Override
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
+public class LocationCoordinatesObfuscatorInfo extends ObfuscatorInfo {
+	public LocationCoordinatesObfuscatorInfo() {
+		obfuscable = true;
+		persistable = false;
+		obfuscationLevelType = ObfuscationLevelType.CONTINUOUS;
+		nbOfObfuscationLevelStep = 0;
+		obfuscableDataType = CtxAttributeTypes.LOCATION_COORDINATES;
+		obfuscationExamples = new HashMap<Double, String>();
+		obfuscationExamples.put(0.0, "(2.3509, 48.8566, 542) will become (2.350987, 48.8566, 542) (no change)");
+		obfuscationExamples.put(0.5, "(2.3509, 48.8566, 542) will become (2.3491, 48.8555, 693)");
+		obfuscationExamples.put(1.0, "(2.3509, 48.8566, 542) will become (5.2145, 52.2459, 1245)");
 	}
 }

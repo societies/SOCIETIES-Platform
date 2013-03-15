@@ -24,10 +24,11 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.StatusObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Status;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Status;
 
 /**
  * Obfuscator for name
@@ -35,16 +36,13 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Stat
  * @author Olivier Maridat (Trialog)
  *
  */
-public class StatusObfuscator extends DataObfuscator<DataWrapper> {
+public class StatusObfuscator extends DataObfuscator<Status> {
 	/**
 	 * @param data
 	 */
-	public StatusObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Status.class;
+	public StatusObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new StatusObfuscatorInfo();
 	}
 
 
