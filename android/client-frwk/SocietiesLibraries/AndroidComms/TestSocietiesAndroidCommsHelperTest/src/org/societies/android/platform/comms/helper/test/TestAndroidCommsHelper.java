@@ -88,6 +88,12 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 				assertTrue(ccm.unbindCommsService());
 				TestAndroidCommsHelper.this.testCompleted = true;
 			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		Thread.sleep(DELAY);
 		assertTrue(this.testCompleted);
@@ -119,11 +125,105 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 						assertTrue(ccm.unbindCommsService());
 						TestAndroidCommsHelper.this.testCompleted = true;
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);
 		assertTrue(this.testCompleted);
+	}
+	
+	@MediumTest
+	public void testBadUserLogin() throws Exception {
+		this.testCompleted = false;
+		final ClientCommunicationMgr ccm = new ClientCommunicationMgr(this.getContext(), false);
+		assertTrue(null != ccm);
+		
+		ccm.bindCommsService(new IMethodCallback() {
+			
+			@Override
+			public void returnException(String arg0) {
+				fail("Incorrect return object");
+			}
+			
+			@Override
+			public void returnAction(boolean flag) {
+				assertTrue(flag);
+				ccm.isConnected(new IMethodCallback() {
+					
+					@Override
+					public void returnException(String arg0) {
+						fail("Incorrect return object");
+					}
+					
+					@Override
+					public void returnAction(String arg0) {
+						fail("Incorrect return object");
+					}
+					
+					@Override
+					public void returnAction(boolean flag) {
+						assertFalse(flag);
+						ccm.configureAgent(XMPP_DOMAIN_AUTHORITY, XMPP_PORT, XMPP_RESOURCE, false, new IMethodCallback() {
+							
+							@Override
+							public void returnException(String arg0) {
+								fail("Incorrect return object");
+							}
+							
+							@Override
+							public void returnAction(String arg0) {
+								fail("Incorrect return object");
+							}
+							
+							@Override
+							public void returnAction(boolean flag) {
+								assertTrue(flag);
+								ccm.login(XMPP_BAD_IDENTIFIER, XMPP_DOMAIN, XMPP_PASSWORD, new IMethodCallback() {
+									
+									@Override
+									public void returnException(String exception) {
+										assertNotNull(exception);
+										assertTrue(ccm.unbindCommsService());
+										TestAndroidCommsHelper.this.testCompleted = true;
+									}
+									
+									@Override
+									public void returnAction(String arg0) {
+										fail("Incorrect return object");
+									}
+									
+									@Override
+									public void returnAction(boolean arg0) {
+										fail("Incorrect return object");
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+			
+			@Override
+			public void returnAction(String arg0) {
+				fail("Incorrect return object");
+			}
+		});
+		
+		Thread.sleep(DELAY);
+		assertTrue(this.testCompleted);
+
 	}
 	@MediumTest 
 	/**
@@ -191,11 +291,25 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 															assertTrue(ccmOther.unbindCommsService());
 															TestAndroidCommsHelper.this.testCompleted = true;
 														}
+
+														@Override
+														public void returnException(
+																String arg0) {
+															// TODO Auto-generated method stub
+															
+														}
 													});
 												} catch (Exception e) {
 													e.printStackTrace();
 													fail();
 												}
+											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
 											}
 										});
 									}
@@ -203,12 +317,36 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 									public void returnAction(boolean loginResult) {
 										fail();
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		
@@ -288,6 +426,13 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																	assertTrue(ccmOther.unbindCommsService());
 																	TestAndroidCommsHelper.this.testCompleted = true;
 																}
+
+																@Override
+																public void returnException(
+																		String arg0) {
+																	// TODO Auto-generated method stub
+																	
+																}
 															});
 
 														}
@@ -305,6 +450,13 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																	assertTrue(ccm.unbindCommsService());
 																	assertTrue(ccmOther.unbindCommsService());
 																	TestAndroidCommsHelper.this.testCompleted = true;
+																}
+
+																@Override
+																public void returnException(
+																		String arg0) {
+																	// TODO Auto-generated method stub
+																	
 																}
 															});
 														}
@@ -343,18 +495,49 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 													fail();
 												}
 											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
+											}
 										});
 									}
 									
 									public void returnAction(boolean loginResult) {
 										fail();
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		
@@ -412,18 +595,49 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 												assertTrue(ccm.unbindCommsService());
 												TestAndroidCommsHelper.this.testCompleted = true;
 											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
+											}
 										});
 									}
 									
 									public void returnAction(boolean arg0) {
 										fail("Incorrect return object");
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
 
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);	
@@ -505,13 +719,41 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 																		assertTrue(ccm.unbindCommsService());
 																		TestAndroidCommsHelper.this.testCompleted = true;
 																	}
+
+																	@Override
+																	public void returnException(
+																			String arg0) {
+																		// TODO Auto-generated method stub
+																		
+																	}
 																});
 															}
+
+															@Override
+															public void returnException(
+																	String arg0) {
+																// TODO Auto-generated method stub
+																
+															}
 														});
+													}
+
+													@Override
+													public void returnException(
+															String arg0) {
+														// TODO Auto-generated method stub
+														
 													}
 												});
 
 												}
+											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
 											}
 										});
 									}
@@ -519,11 +761,35 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 									public void returnAction(boolean arg0) {
 										fail("Incorrect return object");
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 
@@ -594,18 +860,49 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 												assertTrue(ccm.unbindCommsService());
 												TestAndroidCommsHelper.this.testCompleted = true;
 											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
+											}
 										});
 									}
 									
 									public void returnAction(boolean arg0) {
 										fail("Incorrect return object");
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
 
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);	
@@ -680,18 +977,49 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 												assertTrue(ccm.unbindCommsService());
 												TestAndroidCommsHelper.this.testCompleted = true;
 											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
+											}
 										});
 									}
 									
 									public void returnAction(boolean arg0) {
 										fail("Incorrect return object");
 									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
+							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
 
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);	
@@ -739,6 +1067,12 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 										
 										public void returnAction(boolean arg0) {
 										}
+
+										@Override
+										public void returnException(String arg0) {
+											// TODO Auto-generated method stub
+											
+										}
 									}, null);
 								} catch (XMPPError e) {
 									// TODO Auto-generated catch block
@@ -746,9 +1080,27 @@ public class TestAndroidCommsHelper extends AndroidTestCase {
 									fail();
 								}
 							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
+							}
 						});
 					}
+
+					@Override
+					public void returnException(String arg0) {
+						// TODO Auto-generated method stub
+						
+					}
 				});
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 

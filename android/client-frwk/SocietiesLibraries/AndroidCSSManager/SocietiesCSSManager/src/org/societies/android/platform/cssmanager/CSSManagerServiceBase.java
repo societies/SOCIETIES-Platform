@@ -263,10 +263,8 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 												}
 
 												@Override
-												public void returnException(
-														String result) {
-													// TODO Auto-generated method stub
-													
+												public void returnException(String result) {
+													CSSManagerServiceBase.this.context.sendBroadcast(intent);
 												}
 											});
 										} else {
@@ -276,8 +274,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 									@Override
 									public void returnException(String result) {
-										// TODO Auto-generated method stub
-										
+										CSSManagerServiceBase.this.context.sendBroadcast(intent);
 									}
 								});
 							} else {
@@ -287,8 +284,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 						@Override
 						public void returnException(String result) {
-							// TODO Auto-generated method stub
-							
+							CSSManagerServiceBase.this.context.sendBroadcast(intent);
 						}
 					});
 				} else {
@@ -298,8 +294,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 			@Override
 			public void returnException(String result) {
-				// TODO Auto-generated method stub
-				
+				CSSManagerServiceBase.this.context.sendBroadcast(intent);
 			}
 		});
 		
@@ -344,8 +339,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 						@Override
 						public void returnException(String result) {
-							// TODO Auto-generated method stub
-							
+							CSSManagerServiceBase.this.context.sendBroadcast(intent);
 						}
 					});
 				} else {
@@ -355,8 +349,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 
 			@Override
 			public void returnException(String result) {
-				// TODO Auto-generated method stub
-				
+				CSSManagerServiceBase.this.context.sendBroadcast(intent);
 			}
 		});
 	}
@@ -532,6 +525,15 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "logoutXMPPServer called with client: " + client);
 
+		//Create Exception intent
+		final Intent exception = new Intent(IAndroidCSSManager.LOGOUT_XMPP_SERVER_EXCEPTION);
+		exception.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+		exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "");
+		if (restrictBroadcast) {
+			exception.setPackage(client);
+		}
+
+		
 		this.ccm.logout(new IMethodCallback() {
 			
 			public void returnAction(String result) {
@@ -579,32 +581,40 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 											Log.d(LOG_TAG, "DomainLogout result sent");
 
 											CSSManagerServiceBase.this.context.sendBroadcast(intent);
-										}
+										} else {
+											exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to unbind from Comms service");
+											CSSManagerServiceBase.this.context.sendBroadcast(exception);
+										} 
 									}
 
 									@Override
 									public void returnException(String result) {
-										// TODO Auto-generated method stub
-										
+										exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
+										CSSManagerServiceBase.this.context.sendBroadcast(exception);
 									}
 								});
+							} else {
+								exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to unregister namespaces");
+								CSSManagerServiceBase.this.context.sendBroadcast(exception);
 							}
 						}
 
 						@Override
 						public void returnException(String result) {
-							// TODO Auto-generated method stub
-							
+							exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
+							CSSManagerServiceBase.this.context.sendBroadcast(exception);
 						}
 					});
-
+				}  else {
+					exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to logout from XMPP server");
+					CSSManagerServiceBase.this.context.sendBroadcast(exception);
 				}
 			}
 
 			@Override
 			public void returnException(String result) {
-				// TODO Auto-generated method stub
-				
+				exception.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
+				CSSManagerServiceBase.this.context.sendBroadcast(exception);
 			}
 		});
 	}
@@ -1489,7 +1499,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		if (restrictBroadcast) {
 			exceptionIntent.setPackage(client);
 		}
-		exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
+		exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
 		exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "");
 
     	this.ccm.setLoginCompleted(false);

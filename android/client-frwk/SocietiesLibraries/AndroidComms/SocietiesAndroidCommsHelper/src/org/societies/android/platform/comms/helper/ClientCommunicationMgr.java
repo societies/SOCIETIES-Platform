@@ -112,9 +112,13 @@ public class ClientCommunicationMgr {
 		this.bindCallback = bindCallback;
 
 		if (this.loginCompleted) {
-			this.bindToServiceAfterLogin();
+			if (!this.bindToServiceAfterLogin()) {
+				this.bindCallback.returnException("Societies Android Comms Service not on device");
+			}
 		} else {
-			this.bindToServiceBeforeLogin();
+			if (!this.bindToServiceBeforeLogin()) {
+				this.bindCallback.returnException("Societies Android Comms Service not on device");
+			}
 		}
 
 	}
@@ -233,8 +237,7 @@ public class ClientCommunicationMgr {
 		};
 		
 		try {
-		stanza.setFrom(getIdManager().getThisNetworkNode());
-
+			stanza.setFrom(getIdManager().getThisNetworkNode());
 			String xml = marshaller.marshallMessage(stanza, type, payload);
 			sendMessage(xml);
 		} catch (Exception e) {
@@ -720,6 +723,14 @@ public class ClientCommunicationMgr {
 				}
 
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnException(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+					}
+				}
+				
 			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
 				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
 					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
@@ -729,6 +740,15 @@ public class ClientCommunicationMgr {
 					}
 				}
 
+			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_EXCEPTION)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnException(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+					}
+				}
+				
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_RESULT)) {
 				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
 					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
@@ -789,6 +809,14 @@ public class ClientCommunicationMgr {
 						callback.returnAction(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
+			} else if (intent.getAction().equals(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION)) {
+				synchronized(ClientCommunicationMgr.this.methodCallbackMap) {
+					IMethodCallback callback = ClientCommunicationMgr.this.methodCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.methodCallbackMap.remove(callbackId);
+						callback.returnException(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+					}
+				}
 			}
 		}
     }
@@ -824,23 +852,24 @@ public class ClientCommunicationMgr {
         intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
         intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
+        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
         return intentFilter;
     }
     
-    private void bindToServiceAfterLogin() {
+    private boolean bindToServiceAfterLogin() {
     	Intent serviceIntent = new Intent(ICoreSocietiesServices.COMMS_SERVICE_INTENT);
 		if (DEBUG_LOGGING) {
 	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service after Login");
 		};
-    	this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+    	return this.androidContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private void bindToServiceBeforeLogin() {
+    private boolean bindToServiceBeforeLogin() {
     	Intent serviceIntent = new Intent(ICoreSocietiesServices.COMMS_SERVICE_INTENT);
 		if (DEBUG_LOGGING) {
 	    	Log.d(LOG_TAG, "Bind to Societies Android Comms Service before Login");
 		};
-    	this.androidContext.bindService(serviceIntent, serviceConnectionLogin, Context.BIND_AUTO_CREATE);
+    	return this.androidContext.bindService(serviceIntent, serviceConnectionLogin, Context.BIND_AUTO_CREATE);
     }
 
     /**

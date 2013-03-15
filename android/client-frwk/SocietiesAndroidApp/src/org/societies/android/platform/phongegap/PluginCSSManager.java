@@ -179,6 +179,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER);
         intentFilter.addAction(IAndroidCSSManager.LOGIN_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(IAndroidCSSManager.LOGOUT_XMPP_SERVER_EXCEPTION);
         intentFilter.addAction(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD);
         intentFilter.addAction(IAndroidCSSManager.SUGGESTED_FRIENDS);
         intentFilter.addAction(IAndroidCSSManager.GET_CSS_FRIENDS);
@@ -737,6 +738,13 @@ public class PluginCSSManager extends Plugin {
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(IAndroidCSSManager.LOGOUT_XMPP_SERVER_EXCEPTION)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResultForExceptions(methodCallbackId, intent, mapKey);
 				}
 			} else if (intent.getAction().equals(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11);

@@ -410,7 +410,7 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
 
@@ -419,7 +419,7 @@ public class PubsubCommsMgr {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
 					if (null != callback) {
 						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
-						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
 				
@@ -433,7 +433,7 @@ public class PubsubCommsMgr {
 						if (DEBUG_LOGGING) {
 							Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 						};
-						callback.receiveResult(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+						callback.receiveResult(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_ERROR)) {
@@ -444,11 +444,17 @@ public class PubsubCommsMgr {
 						if (DEBUG_LOGGING) {
 							Log.d(LOG_TAG, "Received result: " +  intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 						};
-						callback.receiveMessage(null, XMPPAgent.INTENT_RETURN_VALUE_KEY);
+						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.SEND_IQ_EXCEPTION)) {
-				
+				synchronized(PubsubCommsMgr.this.xmppCallbackMap) {
+					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+					}
+				}
 			} else if (intent.getAction().equals(XMPPAgent.REGISTER_RESULT)) {
 				synchronized (PubsubCommsMgr.this.xmppCallbackMap) {
 					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
@@ -458,6 +464,14 @@ public class PubsubCommsMgr {
 							Log.d(LOG_TAG, "Received result: " +  intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 						};
 						callback.receiveResult(null, intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
+					}
+				}
+			} else if (intent.getAction().equals(XMPPAgent.REGISTER_EXCEPTION)) {
+				synchronized (PubsubCommsMgr.this.xmppCallbackMap) {
+					ICommCallback callback = PubsubCommsMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						PubsubCommsMgr.this.xmppCallbackMap.remove(callbackId);
+						callback.receiveMessage(null, intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
 					}
 				}
 			} else if (intent.getAction().equals(XMPPAgent.UNREGISTER_RESULT)) {
@@ -493,6 +507,7 @@ public class PubsubCommsMgr {
         intentFilter.addAction(XMPPAgent.SEND_IQ_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.REGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
         intentFilter.addAction(XMPPAgent.PUBSUB_EVENT);
         return intentFilter;
