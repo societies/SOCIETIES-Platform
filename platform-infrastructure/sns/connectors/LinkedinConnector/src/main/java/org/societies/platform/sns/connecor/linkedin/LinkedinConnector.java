@@ -35,12 +35,12 @@ public class LinkedinConnector implements ISocialConnector {
 	public static final String FRIENDS_URL 			= "http://api.linkedin.com/v1/people/~/connections";
 	public static final String GROUPS_URL 			= "http://api.linkedin.com/v1/people/~/group-memberships?membership-state=member";
 	public static final String ACTIVITIES_URL 		= "http://api.linkedin.com/v1/people/~/network/updates?scope=self";
-	public static final String POST_URL		 		= "http://api.linkedin.com/v1/people/~/shares";
+	public static final String POST_URL		 	= "http://api.linkedin.com/v1/people/~/shares";
 	
 	public static final String LK_CLIENT_ID			= "cysdprp40gxn";
 	public static final String LK_ClIENT_SECRET		= "faKKFat0QeJomJjv";
 	public static final String LK_CALLBACK_URL		= "http://127.0.0.1:8080/societies-test/doConnect.html?type=lk";
-	public static final String LK_SCOPES			= "r_basicprofile,r_basicprofile,r_emailaddress,r_network,r_contactinfo,rw_nus,rw_groups";
+	public static final String LK_SCOPES			= "r_basicprofile,r_fullprofile,r_emailaddress,r_network,r_contactinfo,rw_nus,rw_groups";
 	
 	
 	public static final String ME 		= "profile";
@@ -152,7 +152,8 @@ public class LinkedinConnector implements ISocialConnector {
 	
 
 	public String getUserProfile() {
-		return get(PROFILE_URL);
+		return get("http://api.linkedin.com/v1/people/~:(id,first-name,last-name");
+	    //return get(PROFILE_URL);
 	}
 
 	

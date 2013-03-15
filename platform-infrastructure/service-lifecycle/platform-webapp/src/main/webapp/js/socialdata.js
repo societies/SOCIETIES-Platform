@@ -124,5 +124,22 @@ function countConnectors(){
    }
   	   
  }
+ 
+ function queryBundleStatus() {
+	  $.ajax({
+	    url: 'socialdatastatus.html',
+	    success: function(data) {
+	    	$('#status').val(data); 
+	    }
+	  });
+	  setTimeout(queryBundleStatus, 5000); // you could choose not to continue on failure...
+	}
 
+	
+ 
+ $(document).ready(function(){ 
+	  setTimeout(queryBundleStatus, 5000);
+});
 
+ 	
+ 

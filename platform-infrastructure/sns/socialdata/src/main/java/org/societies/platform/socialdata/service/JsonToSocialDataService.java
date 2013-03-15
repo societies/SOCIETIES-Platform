@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.sns.SocialDataState;
 import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.socialdata.SocialData;
 import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
@@ -47,12 +48,31 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "";
+		  String access_token = "98d8df36-b9fc-41bf-abd6-0ab97f07247e,d73af323-2ff8-4625-b919-748576221396";
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
-		  ISocialConnector c = sd.createConnector(SocialNetworkName.FACEBOOK, pars);
+		  ISocialConnector c = sd.createConnector(SocialNetworkName.LINKEDIN, pars);
+		  try {
+		    sd.addSocialConnector(c);
+		} catch (Exception e1) {
+		    // TODO Auto-generated catch block
+		    e1.printStackTrace();
+		}
+		  sd.updateSocialData();
 		  
+		  while(sd.getStatus() != SocialDataState.WITH_SOME_SOCIAL_DATA){
+		     try {
+			Thread.sleep(1000);
+			System.out.println(sd.getStatus());
+		    } catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
+		  }
+		  
+		  Person profile = (Person)sd.getSocialProfiles().get(0);
+		  System.out.println("Profile  name is "+ profile.getDisplayName());
 		 
 		  
 //		  try {
@@ -76,11 +96,11 @@ public class JsonToSocialDataService {
 //		}
 		  
 		  
-		  String data = c.getUserProfile();
-		  logger.info("profile Data:"+data);
-		  System.out.println("data:"+data);
-		  PersonConverterFromFacebook parser = new PersonConverterFromFacebook();
-		  Person p = parser.load(data);
+//		  String data = c.getUserProfile();
+//		  logger.info("profile Data:"+data);
+//		  System.out.println("data:"+data);
+//		  PersonConverterFromFacebook parser = new PersonConverterFromFacebook();
+//		  Person p = parser.load(data);
 		  
 		  
 	  }

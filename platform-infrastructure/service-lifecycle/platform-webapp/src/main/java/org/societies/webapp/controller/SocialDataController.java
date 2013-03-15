@@ -236,6 +236,14 @@ public class SocialDataController {
 
 		return null;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/socialdatastatus.html", method = RequestMethod.GET)
+	public String getStatus(HttpServletResponse response){
+	   return ""+socialdata.getStatus();
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.POST)
@@ -381,8 +389,17 @@ public class SocialDataController {
 					content += "<h1>" + e.getMessage() + "</h1>";
 					e.printStackTrace();
 				}
+				
+				
 
 			}
+			
+			lastUpdate = dateFormat.format(new Date());
+			model.put("sdForm", sdForm);
+			model.put("lastupdate", lastUpdate);
+			model.put("connectors", getConnectorsHTML());
+			return new ModelAndView("socialdata", model);
+			
 		} else if (FRIENDS.equalsIgnoreCase(method)) {
 
 			// DO add Connectore HERE

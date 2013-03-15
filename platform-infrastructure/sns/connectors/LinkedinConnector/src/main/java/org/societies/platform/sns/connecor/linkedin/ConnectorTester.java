@@ -41,8 +41,11 @@ public class ConnectorTester {
 	
 			  
 			
-			JSONObject json = new JSONObject(connector.getUserGroups());
+			JSONObject json = new JSONObject(connector.getUserProfile());
 			System.out.println("RESULT\n:"+ json.toString(1));
+			
+			
+			
 			
 			// make the json payload using json-simple
 //			JSONObject jsonMap = new JSONObject();
