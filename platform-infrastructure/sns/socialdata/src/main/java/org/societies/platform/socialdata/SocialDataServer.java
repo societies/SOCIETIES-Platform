@@ -46,7 +46,7 @@ import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.sns.SocialNetworkName;
-import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
+
 
 /**
  * Comms manager server for SociaData bundle.
@@ -134,9 +134,10 @@ public class SocialDataServer implements IFeatureServer {
 				List<ISocialConnector> connectors = socialData.getSocialConnectors();
 						
 				List<ConnectorBean> connectorBeanList = new ArrayList<ConnectorBean>(connectors.size());
-				for(ISocialConnector connector:connectors) 
-					connectorBeanList.add(SocialDataCommsUtils.convertSocialConnectorToBean(connector));
+				for(ISocialConnector connector : connectors)  {
+					connectorBeanList.add(SocialNetworkUtils.convertSocialConnectorToBean(connector));
 				
+				}
 				ConnectorsList connectorsList = new ConnectorsList();				
 				connectorsList.setConnectorBean(connectorBeanList);
 				
@@ -165,7 +166,7 @@ public class SocialDataServer implements IFeatureServer {
 			case ADD_CONNECTOR:
 			    
 			       
-				SocialNetworkName socialNetwork = SocialDataCommsUtils.socialNetwork(messageBean.getSnName());
+				SocialNetworkName socialNetwork = SocialNetworkUtils.fromSNSchemaBean(messageBean.getSnName());
 				
 				long validity = messageBean.getValidity(); // TODO if 0 remove connector
 				Map<String, String> params = new HashMap<String, String>();

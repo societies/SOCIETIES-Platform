@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.sns.SocialNetwork;
@@ -94,6 +96,36 @@ public class SocialNetworkUtils {
 	return result.toString(1);
     }
     
+    
+    public static SocialNetworkName fromSNSchemaBean(Socialnetwork socialNetwork) {
+	switch(socialNetwork) {
+	case FACEBOOK:
+		return SocialNetworkName.FACEBOOK;
+	case FOURSQUARE:
+		return SocialNetworkName.FOURSQUARE;
+	case TWITTER:
+		return SocialNetworkName.TWITTER;
+	case LINKEDIN:
+		return SocialNetworkName.LINKEDIN;
+	case GOOGLEPLUS:
+		return SocialNetworkName.GOOGLEPLUS;
+	}
+	throw new IllegalArgumentException("Social Network '"+socialNetwork+"' not defined in the internal API.");
+    }
+    
+    public static ISocialConnector convertBeanToSocialConnector(ConnectorBean connectorBean) {
+	return SocialConnectorDTO.createFromBean(connectorBean);
+    }
+    
+    public static ConnectorBean convertSocialConnectorToBean(ISocialConnector socialConnector) {
+	ConnectorBean connectorBean = new ConnectorBean();
+	
+	connectorBean.setId(socialConnector.getID());
+	connectorBean.setName(socialConnector.getConnectorName());
+	connectorBean.setExpires(socialConnector.getTokenExpiration());
+	
+	return connectorBean;
+    }
     
     
     public static List<ISocialConnector> getConnectorsByName(SocialNetworkName name, Collection<ISocialConnector> connectors){
