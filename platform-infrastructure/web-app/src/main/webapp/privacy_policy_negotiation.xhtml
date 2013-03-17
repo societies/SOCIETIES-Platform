@@ -1,0 +1,93 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES :: View Response Policy</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <p:panel>
+            <f:facet name="header">
+                Negotiation with: <p:outputLabel value="#{ppNegotiation.responsePolicy.requestor.requestorId}"/>
+            </f:facet>
+
+            <p:accordionPanel multiple="true" value="#{ppNegotiation.responsePolicy.responseItems}" var="item">
+                <p:tab title="#{item.requestItem.resource.dataIdUri}">
+                    <p:tabView>
+
+                        <p:tab title="General">
+                            <!-- GENERAL TAB -->
+                            <h:panelGrid columns="2" cellpadding="10">
+                                <p:outputLabel for="dataType">Data type:</p:outputLabel>
+                                <p:inputText id="dataType" value="#{item.requestItem.resource.dataType}"
+                                             readonly="true"/>
+
+                                <p:outputLabel for="decision">Permission:</p:outputLabel>
+                                <p:selectOneMenu id="decision" value="#{item.decision}">
+                                    <f:selectItems value="#{ppNegotiation.decisionOptions}"
+                                                   var="dec"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+                            <!-- END GENERAL TAB -->
+                        </p:tab>
+
+
+                        <p:tab title="Actions">
+                            <!-- ACTIONS TAB -->
+                            <p:selectManyCheckbox layout="pageDirection" disabled="true">
+                                <f:selectItems value="#{item.requestItem.actions}"
+
+                                               var="action"
+                                               itemLabel="#{action.actionConstant}"
+                                               itemValue="#{action.optional}"/>
+                            </p:selectManyCheckbox>
+                            <!-- END ACTIONS TAB -->
+                        </p:tab>
+
+
+                        <p:tab title="Conditions">
+                            <!-- CONDITIONS TAB -->
+
+                            <p:dataTable id="multiCars"
+                                         var="condition" value="#{item.requestItem.conditions}"
+                                         paginator="true" rows="10">
+
+                                <p:column headerText="Condition" style="width:50%">
+                                    #{condition.conditionConstant}
+                                </p:column>
+
+                                <p:column headerText="Value" style="width:25%">
+                                    #{condition.value}
+                                </p:column>
+
+                                <p:column headerText="Optional" style="width:25%">
+                                    #{condition.optional}
+                                </p:column>
+
+                            </p:dataTable>
+
+                            <!-- END CONDITIONS TAB -->
+                        </p:tab>
+
+
+                    </p:tabView>
+                </p:tab>
+            </p:accordionPanel>
+
+            <f:facet name="footer">
+                <p:commandButton value="Complete Negotiation"
+                                 actionListener="#{ppNegotiation.completeNegotiation}"/>
+
+                <p:commandButton value="Cancel Negotiation"
+                                 actionListener="#{ppNegotiation.cancelNegotiation}"/>
+            </f:facet>
+        </p:panel>
+
+    </ui:define>
+</ui:composition>
+</html>

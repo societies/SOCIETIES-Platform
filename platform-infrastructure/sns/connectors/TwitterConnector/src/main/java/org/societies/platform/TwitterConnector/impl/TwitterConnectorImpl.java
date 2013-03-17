@@ -34,9 +34,7 @@ import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.TwitterConnector.TwitterConnector;
 import org.societies.platform.TwitterConnector.model.TwitterToken;
 
@@ -61,7 +59,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	public TwitterConnectorImpl(String access_token, String identity) {
 		this.twToken = new TwitterToken(access_token);
 		this.service = twToken.getAuthService();
-		this.name = SocialNetwork.getSocialNetworkName(SocialNetworkName.TWITTER);
+		this.name = SocialNetwork.TWITTER.value();
 		this.id = this.name + "_" + UUID.randomUUID();
 		this.access_token= access_token;
 		this.identity = identity;
@@ -378,10 +376,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
-	    // TODO Auto-generated method stub
-	    return SocialNetworkName.TWITTER;
+	public SocialNetwork getSocialNetwork() {
+	    return SocialNetwork.TWITTER;
 	}
-
 	
 }

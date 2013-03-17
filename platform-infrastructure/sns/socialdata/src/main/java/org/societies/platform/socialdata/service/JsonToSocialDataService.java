@@ -5,14 +5,13 @@ import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.eclipse.jetty.util.log.Log;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.sns.Message;
 import org.societies.api.sns.SocialDataState;
-import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.socialdata.SocialData;
 
 
@@ -55,7 +54,8 @@ public class JsonToSocialDataService {
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
-		  ISocialConnector c = sd.createConnector(SocialNetworkName.LINKEDIN, pars);
+
+		  ISocialConnector c = sd.createConnector(SocialNetwork.LINKEDIN, pars);
 		  System.out.println("connector id:" + c.getID());
 		  System.out.println("connector token:" + c.getToken());
 		  System.out.println("connector name:" + c.getConnectorName());
@@ -92,7 +92,7 @@ public class JsonToSocialDataService {
 		 
 		  Message msg = new Message();
 		  msg.setData("test 1");
-		  sd.postMessage(SocialNetworkName.LINKEDIN, msg);
+		  sd.postMessage(SocialNetwork.LINKEDIN, msg);
 		  
 		  
 //		  try {

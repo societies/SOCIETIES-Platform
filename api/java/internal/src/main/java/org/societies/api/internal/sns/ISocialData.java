@@ -3,8 +3,8 @@ package org.societies.api.internal.sns;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.sns.ISocialDataExternal;
-import org.societies.api.sns.SocialNetworkName;
 
 public interface ISocialData extends ISocialDataExternal{
 
@@ -28,13 +28,8 @@ public interface ISocialData extends ISocialDataExternal{
 	public static final String COLLECTION = "collection";
 	public static final String PLACE = "places";
 	public static final String CHECKIN = "checkin";	
-	
-	
-	
-	
-	
-	
-    /**
+
+	/**
      * Add a new social connector to fetch data from a specific Social network
      * @param socialConnector Interface of the specific connector
      * @throws Exception 
@@ -102,7 +97,7 @@ public interface ISocialData extends ISocialDataExternal{
       * @param params  to generate correctly the connector (Must be present the token)
       * @return the implementation of the spicific social connector castest as the interfeace ISocialConnector
       */
-    ISocialConnector createConnector(SocialNetworkName socialNetworkName, Map<String, String> params);
+    ISocialConnector createConnector(SocialNetwork socialNetworkName, Map<String, String> params);
     
     
     /**

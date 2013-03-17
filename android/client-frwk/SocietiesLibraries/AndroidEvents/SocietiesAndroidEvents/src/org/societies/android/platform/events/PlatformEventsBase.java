@@ -134,8 +134,20 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 									}
 								}
 							}
+
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+								
+							}
 						});
 					}
+				}
+
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+					
 				}
 			});
 		}
@@ -164,6 +176,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 			    		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, result);
 			    		PlatformEventsBase.this.androidContext.sendBroadcast(intent);
 					}
+				}
+
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+					
 				}
 			});
 		}
@@ -231,6 +249,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 					
 					@Override
 					public void returnAction(boolean resultFlag) {
+					}
+
+					@Override
+					public void returnException(String result) {
+						// TODO Auto-generated method stub
+						
 					}
 				});
 			} catch (XMPPError e) {
@@ -599,6 +623,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     							@Override
     							public void returnAction(boolean resultFlag) {
     							}
+
+								@Override
+								public void returnException(String result) {
+									// TODO Auto-generated method stub
+									
+								}
     						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(event), numSubscriptions - 1);
@@ -695,6 +725,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
     							@Override
     							public void returnAction(boolean resultFlag) {
     							}
+
+								@Override
+								public void returnException(String result) {
+									// TODO Auto-generated method stub
+									
+								}
     						});
         				} else {
         					PlatformEventsBase.this.subscribedToEvents.put(translateAndroidIntentToEvent(eventName), numSubscriptions + 1);
@@ -784,6 +820,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 							@Override
 							public void returnAction(boolean resultFlag) {
 							}
+
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+								
+							}
 						});
     				} else {
     	    			this.resultStatus = false;
@@ -861,6 +903,12 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
 							
 							@Override
 							public void returnAction(boolean resultFlag) {
+							}
+
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+								
 							}
 						});
     				} else {

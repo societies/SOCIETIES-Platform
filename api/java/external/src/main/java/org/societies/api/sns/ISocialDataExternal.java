@@ -1,5 +1,6 @@
 package org.societies.api.sns;
 
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public interface ISocialDataExternal {
 		
@@ -21,7 +22,7 @@ public interface ISocialDataExternal {
 	     * @param connector Connetor instance
 	     * @return boolean
 	     */
-	    boolean isConnected(SocialNetworkName socialNetworkName);
+	    boolean isConnected(SocialNetwork socialNetworkName);
 	    
 	    
 	    /**
@@ -36,13 +37,13 @@ public interface ISocialDataExternal {
 	     * @param toSocialNetwotkName
 	     * @param message
 	     */
-	    void postMessage(SocialNetworkName toSocialNetwotkName, Message message);
+	    void postMessage(SocialNetwork toSocialNetwork, Message message);
 	    
 	   
-	    void postCheckin(SocialNetworkName SocialNetwotkName, Checkin checkin);
+	    void postCheckin(SocialNetwork SocialNetwork, Checkin checkin);
 	    
 	   
-	    void postEvent(SocialNetworkName socialNetworkName, Event event);
+	    void postEvent(SocialNetwork socialNetwork, Event event);
 	   
 	    
 

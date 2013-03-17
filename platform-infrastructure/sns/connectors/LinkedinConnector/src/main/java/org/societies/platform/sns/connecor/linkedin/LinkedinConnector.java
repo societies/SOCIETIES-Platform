@@ -12,10 +12,7 @@ import org.scribe.model.Response;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
-
-
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class LinkedinConnector implements ISocialConnector {
 	
@@ -63,7 +60,7 @@ public class LinkedinConnector implements ISocialConnector {
 		
 		this.identity		= identity;
 		this.token			= new LinkedinToken(access_token);
-		this.name 			= SocialNetwork.getSocialNetworkName(SocialNetworkName.LINKEDIN);
+		this.name 			= SocialNetwork.LINKEDIN.value();
 		this.id				= this.name + "_" + UUID.randomUUID();
 		this.service 		= token.getAuthService();
 		this.access_token   = access_token;
@@ -256,11 +253,9 @@ public class LinkedinConnector implements ISocialConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
+	public SocialNetwork getSocialNetwork() {
 	    // TODO Auto-generated method stub
-	    return SocialNetworkName.LINKEDIN;
+	    return SocialNetwork.LINKEDIN;
 	}
-
-	
 	
 }

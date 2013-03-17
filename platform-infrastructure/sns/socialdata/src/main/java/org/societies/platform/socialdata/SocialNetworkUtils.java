@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 import com.restfb.json.JsonObject;
 
@@ -24,17 +22,17 @@ public class SocialNetworkUtils {
      *            String
      * @return {@link SocialNetwork}
      */
-    public static SocialNetworkName getSocialNetowkName(String name) {
-	if (SocialNetwork.SN_FACEBOOK.equalsIgnoreCase(name))
-	    return SocialNetworkName.FACEBOOK;
-	if (SocialNetwork.SN_TWITTER.equalsIgnoreCase(name))
-	    return SocialNetworkName.TWITTER;
-	if (SocialNetwork.SN_FOURSQUARE.equalsIgnoreCase(name))
-	    return SocialNetworkName.FOURSQUARE;
-	if (SocialNetwork.SN_LINKEDIN.equalsIgnoreCase(name))
-	    return SocialNetworkName.LINKEDIN;
-	if (SocialNetwork.SN_GOOGLEPLUS.equalsIgnoreCase(name))
-	    return SocialNetworkName.GOOGLEPLUS;
+    public static SocialNetwork getSocialNetowkName(String name) {
+	if (SocialNetwork.FACEBOOK.value().equalsIgnoreCase(name))
+	    return SocialNetwork.FACEBOOK;
+	if (SocialNetwork.TWITTER.value().equalsIgnoreCase(name))
+	    return SocialNetwork.TWITTER;
+	if (SocialNetwork.FOURSQUARE.value().equalsIgnoreCase(name))
+	    return SocialNetwork.FOURSQUARE;
+	if (SocialNetwork.LINKEDIN.value().equalsIgnoreCase(name))
+	    return SocialNetwork.LINKEDIN;
+	if (SocialNetwork.GOOGLEPLUS.value().equalsIgnoreCase(name))
+	    return SocialNetwork.GOOGLEPLUS;
 	return null;
     }
 
@@ -96,30 +94,16 @@ public class SocialNetworkUtils {
 	return result.toString(1);
     }
     
-    
-    public static SocialNetworkName fromSNSchemaBean(Socialnetwork socialNetwork) {
-	switch(socialNetwork) {
-	case FACEBOOK:
-		return SocialNetworkName.FACEBOOK;
-	case FOURSQUARE:
-		return SocialNetworkName.FOURSQUARE;
-	case TWITTER:
-		return SocialNetworkName.TWITTER;
-	case LINKEDIN:
-		return SocialNetworkName.LINKEDIN;
-	case GOOGLEPLUS:
-		return SocialNetworkName.GOOGLEPLUS;
-	}
-	throw new IllegalArgumentException("Social Network '"+socialNetwork+"' not defined in the internal API.");
-    }
+   
     
     public static ISocialConnector convertBeanToSocialConnector(ConnectorBean connectorBean) {
 	return SocialConnectorDTO.createFromBean(connectorBean);
     }
     
+   
     public static ConnectorBean convertSocialConnectorToBean(ISocialConnector socialConnector) {
-	ConnectorBean connectorBean = new ConnectorBean();
 	
+	ConnectorBean connectorBean = new ConnectorBean();
 	connectorBean.setId(socialConnector.getID());
 	connectorBean.setName(socialConnector.getConnectorName());
 	connectorBean.setExpires(socialConnector.getTokenExpiration());
@@ -128,13 +112,13 @@ public class SocialNetworkUtils {
     }
     
     
-    public static List<ISocialConnector> getConnectorsByName(SocialNetworkName name, Collection<ISocialConnector> connectors){
+    public static List<ISocialConnector> getConnectorsByName(SocialNetwork name, Collection<ISocialConnector> connectors){
 	
 	    Iterator <ISocialConnector> it = connectors.iterator();
 	    ArrayList<ISocialConnector> results = new ArrayList<ISocialConnector>();
 		
 	    for (ISocialConnector conn : connectors){
-	   	if (conn.getSocialNetworkName().equals(name)){
+	   	if (conn.getSocialNetwork().equals(name)){
 			results.add(conn);
 		}
 	     }

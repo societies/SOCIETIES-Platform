@@ -27,10 +27,8 @@ package org.societies.platform.socialdata;
 import java.util.Map;
 
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetwork;
-import org.societies.api.sns.SocialNetworkName;
 
 /**
  * Social connector implemented as a data transfer object 
@@ -147,10 +145,7 @@ public class SocialConnectorDTO implements ISocialConnector {
 	}
 
 	@Override
-	public SocialNetworkName getSocialNetworkName() {
-	    return SocialNetwork.getSocialNetwork(this.name);
-	}
-
-	
-	
+	public SocialNetwork getSocialNetwork() {
+	    return SocialNetwork.fromValue(this.name);
+	}	
 }

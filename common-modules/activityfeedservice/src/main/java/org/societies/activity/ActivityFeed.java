@@ -45,9 +45,6 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.activity.ILocalActivityFeed;
-import org.societies.api.schema.activityfeed.AddActivityResponse;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.activityfeed.DeleteActivityResponse;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
 import javax.persistence.*;
@@ -76,8 +73,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     private PubsubClient pubSubcli;
     @Transient
     private IIdentity ownerCSS;
-    public ActivityFeed(String id, String owner){
-        this.owner = owner; this.setId(id);
+
+    private Boolean pubsub;
+
+    public ActivityFeed(String id, String owner, Boolean pubsub){
+        this.owner = owner; this.setId(id); this.setPubsub(pubsub);
         initClass();
     }
     public ActivityFeed(){
@@ -96,7 +96,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     // version with PubSub
     synchronized public void startUp(SessionFactory sessionFactory){
         this.setSessionFactory(sessionFactory);
-        this.setPubSubcli(pubSubcli);
+
     }
     public void connectPubSub(IIdentity ownerCSS){ //ASSUME PUBSUB NODE PERSISTING (CONFIGURATION), CHECK IF IT EXISTS
         this.ownerCSS = ownerCSS;
@@ -170,6 +170,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         }
         return ret;
     }
+
     @Override
     public void addActivity(IActivity activity) {
 //        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
@@ -202,7 +203,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         if(false == err && getPubSubcli() !=null){
             try {
                 LOG.info("going to call pubsub");
-                getPubSubcli().publisherPublish(this.ownerCSS, this.getId(), Long.toString(actv_id), iactivToMarshActiv(newAct));
+                getPubSubcli().publisherPublish(this.ownerCSS, this.getId(), Long.toString(actv_id), ActivityFeedWorker.iactivToMarshActiv(newAct));
             } catch (XMPPError e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -217,16 +218,8 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     @Override
     public void addActivity(IActivity activity, IActivityFeedCallback c) {
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        AddActivityResponse r = new AddActivityResponse();
-
-        this.addActivity(activity);
-        r.setResult(true); //TODO. add a return on the activity feed method
-
-        result.setAddActivityResponse(r);
-        LOG.debug("going to call callback from addActivity with result " + r.isResult());
-        c.receiveResult(result);
-
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncAddActivity(activity);
     }
 
     synchronized public int cleanupFeed(String criteria) {
@@ -260,16 +253,8 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     @Override
     public void cleanupFeed(String criteria, IActivityFeedCallback c) {
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
-
-        r.setResult(this.cleanupFeed(criteria));
-
-
-        result.setCleanUpActivityFeedResponse(r);
-        c.receiveResult(result);
-
-
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncCleanupFeed(criteria);
     }
 
     public void init()
@@ -308,18 +293,13 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     @Override
     public void deleteActivity(IActivity activity, IActivityFeedCallback c) {
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        DeleteActivityResponse r = new DeleteActivityResponse();
-
-        r.setResult(this.deleteActivity(activity));
-
-        result.setDeleteActivityResponse(r);
-        c.receiveResult(result);
-
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncDeleteActivity(activity);
     }
 
     @Override
     synchronized public long importActivityEntries(List<?> activityEntries) {
+        LOG.info("in importactivities.. activityEntries.size: "+activityEntries.size());
         long ret = 0;
         if(activityEntries.size() == 0){
             LOG.error("list is empty, exiting");
@@ -335,6 +315,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         ParsePosition pp = new ParsePosition(0);
         Session session = null;
         Transaction t = null;
+        int diffcounter = 0;
         try{
 
             session = getSessionFactory().openSession();
@@ -350,7 +331,15 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                 newAct.setTarget(getContentIfNotNull(act.getTarget()));
                 newAct.setVerb(act.getVerb());
                 ret++;
-                session.save(newAct);
+                if(newAct.getTarget()==null && newAct.getActor()!=null)
+                    newAct.setTarget(newAct.getActor()); //if it has no target, it is for yourself..
+                if(newAct.getActor()!=null)
+                    session.save(newAct);
+                else
+                    LOG.error("actor is null in imported entry");
+
+                if(!newAct.getTarget().contentEquals(newAct.getActor()))
+                    diffcounter++;
             }
             t.commit();
         }catch(Exception e){
@@ -363,7 +352,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             if(session!=null)
                 session.close();
         }
-
+        LOG.info("Imported "+ret+" activities, diffcounter: "+diffcounter);
         return ret;
     }
 
@@ -396,9 +385,14 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         try{
             session = this.getSessionFactory().openSession();
 
-            retList = session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).add(Restrictions.eq("ownerId",this.getId())).list();
-            LOG.info(" list size: "+retList.size()+" no criteria: "+session.createCriteria(Activity.class).list().size());
-            LOG.info(" FISK "+session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).list().size());
+            retList = session.createCriteria(Activity.class)
+                    .add(Restrictions.gt("time", new Long(fromTime)))
+                    .add(Restrictions.lt("time", new Long(toTime)))
+                    .add(Restrictions.eq("ownerId",this.getId())).list();
+            //LOG.info(" list size: "+retList.size()+" no criteria: "+session.createCriteria(Activity.class).list().size());
+            //LOG.info(" FISK "+session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).list().size());
+            //List<Activity> heh = session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).list();
+
         } catch (Exception e) {
             LOG.error("getting activities query failed: ");
             e.printStackTrace();
@@ -501,104 +495,31 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
         LOG.debug("local get activities using query WITH CALLBACK called");
 
-        List<IActivity> iActivityList = this.getActivities(query,timePeriod);
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        GetActivitiesResponse g = new GetActivitiesResponse();
-        ac.setGetActivitiesResponse(g);
-
-        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-
-        this.iactivToMarshActvList(iActivityList, marshalledActivList);
-
-        g.setMarshaledActivity(marshalledActivList);
-
-        c.receiveResult(ac);
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncGetActivities(query, timePeriod);
 
     }
 
     @Override
     public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
-
-        List<IActivity> iActivityList = this.getActivities(timePeriod);
-        List<IActivity> ret = new ArrayList<IActivity>();
-        Collections.sort(iActivityList,new Comparator<IActivity>() {
-            @Override
-            public int compare(IActivity iActivity, IActivity iActivity1) {
-                return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
-            }
-        });
-        if(iActivityList.size()<n)
-            n = iActivityList.size();
-        for(int i=0;i<n;i++)
-            ret.add(iActivityList.get(i));
-
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        GetActivitiesResponse g = new GetActivitiesResponse();
-        ac.setGetActivitiesResponse(g);
-
-        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-
-        this.iactivToMarshActvList(ret, marshalledActivList);
-
-        g.setMarshaledActivity(marshalledActivList);
-
-        c.receiveResult(ac);
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncGetActivities(timePeriod, n);
     }
     public void getActivities(String timePeriod, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
-
-        List<IActivity> iActivityList = this.getActivities(timePeriod);
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        GetActivitiesResponse g = new GetActivitiesResponse();
-        ac.setGetActivitiesResponse(g);
-
-        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-
-        this.iactivToMarshActvList(iActivityList, marshalledActivList);
-
-        g.setMarshaledActivity(marshalledActivList);
-
-        c.receiveResult(ac);
-
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncGetActivities(timePeriod);
     }
     @Override
     public void getActivities(String query, String timePeriod, long n, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
+        ActivityFeedWorker worker = new ActivityFeedWorker(c,this);
+        worker.asyncGetActivities(query,timePeriod,n);
 
-        List<IActivity> iActivityList = this.getActivities(query,timePeriod);
-        List<IActivity> ret = new ArrayList<IActivity>();
-        Collections.sort(iActivityList,new Comparator<IActivity>() {
-            @Override
-            public int compare(IActivity iActivity, IActivity iActivity1) {
-                return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
-            }
-        });
-        for(int i=0;i<n;i++)
-            ret.add(iActivityList.get(i));
-
-        org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-        GetActivitiesResponse g = new GetActivitiesResponse();
-        ac.setGetActivitiesResponse(g);
-
-        List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-
-        this.iactivToMarshActvList(ret, marshalledActivList);
-
-        g.setMarshaledActivity(marshalledActivList);
-
-        c.receiveResult(ac);
     }
 
-    public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList){
 
-        Iterator<IActivity> it = iActivityList.iterator();
-
-        while(it.hasNext()){
-            IActivity element = it.next();
-            marshalledActivList.add(iactivToMarshActiv(element));
-        }
-    }
 
     public String getContentIfNotNull(ActivityObject a){
         if(a == null || a.getObjectType() == null) return null;
@@ -611,19 +532,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         return a.getContent();
     }
 
-    public org.societies.api.schema.activity.MarshaledActivity iactivToMarshActiv(IActivity iActivity){
-        org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
-        a.setActor(iActivity.getActor());
-        a.setVerb(iActivity.getVerb());
-        if(iActivity.getObject()!=null && iActivity.getObject().isEmpty() == false )
-            a.setObject(iActivity.getObject());
-        if(iActivity.getPublished()!=null && iActivity.getPublished().isEmpty() == false )
-            a.setPublished(iActivity.getPublished());
-
-        if(iActivity.getTarget()!=null && iActivity.getTarget().isEmpty() == false )
-            a.setTarget(iActivity.getTarget());
-        return a;
-    }
 
     // TODO: dont we need to use a transaction here
     public void clear(){
@@ -682,5 +590,13 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    public Boolean getPubsub() {
+        return pubsub;
+    }
+
+    public void setPubsub(Boolean pubsub) {
+        this.pubsub = pubsub;
     }
 }

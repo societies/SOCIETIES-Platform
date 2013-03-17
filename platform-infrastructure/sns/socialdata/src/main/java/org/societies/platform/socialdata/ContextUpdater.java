@@ -86,8 +86,7 @@ public class ContextUpdater {
 	this.socialNetworkEntity = this.getSnCtxEntity();
 
 	// Update Simple Profile
-	PersonConverter parser = PersonConverterFactory
-		.getPersonConverter(connector);
+	PersonConverter parser = PersonConverterFactory.getConverter(connector);
 	Person profile = parser.load(connector.getUserProfile());
 
 	// updateStringFieldIfExists(snName, CtxAttributeTypes.TYPE);
@@ -145,15 +144,13 @@ public class ContextUpdater {
 	LOG.debug(" Updating Friends List ...");
 	// Add Friends List
 
-	FriendsConverter friendsParser = FriendsConveterFactory
-		.getFriendsConverter(connector);
+	FriendsConverter friendsParser = FriendsConveterFactory.getConverter(connector);
 	List<Person> friends = friendsParser.load(connector.getUserFriends());
 	storeFriendsIntoContextBroker(friends);
 
 	LOG.debug(" Updating Groups list ...");
 	// Add Group List
-	GroupConverter groupConverter = GroupConveterFactory
-		.getGroupConverter(connector);
+	GroupConverter groupConverter = GroupConveterFactory.getConverter(connector);
 	List<Group> groups = groupConverter.load(connector.getUserGroups());
 	storeGroupsIntoContextBroker(groups);
     }

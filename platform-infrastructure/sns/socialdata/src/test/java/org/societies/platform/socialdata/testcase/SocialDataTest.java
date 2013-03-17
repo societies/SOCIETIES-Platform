@@ -21,8 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.sns.Message;
-import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.socialdata.SocialData;
 
 
@@ -204,7 +204,7 @@ public class SocialDataTest {
 	public void postMessage(){
 	    	Message msg = new Message();
 	    	msg.setData("This is a JUNIT Test POST!");
-		socialData.postMessage(SocialNetworkName.FACEBOOK, msg);
+		socialData.postMessage(SocialNetwork.FACEBOOK, msg);
 	}
 	
 	

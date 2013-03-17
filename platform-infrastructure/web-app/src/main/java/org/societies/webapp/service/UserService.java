@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.webapp.ILoginListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,22 +13,24 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Maria Mannion
+ * @author Maria Mannion, Paddy Skillen
  */
 @Service
 @Scope("Session")
 @SessionScoped // JSF
 @ManagedBean // JSF
 public class UserService implements Serializable {
-
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     @ManagedProperty(value = "#{commMngrRef}")
     private ICommManager commMngrRef;
+
+    public final List<ILoginListener> loginListeners = new ArrayList<ILoginListener>();
 
     private boolean userLoggedIn;
     private String username;
@@ -39,54 +42,49 @@ public class UserService implements Serializable {
         userLoggedIn = false;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public ICommManager getCommMngrRef() {
         return commMngrRef;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void setCommMngrRef(ICommManager commMngrRef) {
         this.commMngrRef = commMngrRef;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public boolean addLoginListener(ILoginListener loginListener) {
+        synchronized (loginListeners) {
+            return loginListeners.add(loginListener);
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public boolean removeLoginListener(ILoginListener loginListener) {
+        synchronized (loginListeners) {
+            return loginListeners.remove(loginListener);
+        }
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getUserID() {
         return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
     }
 
     public boolean isUserLoggedIn() {
         return userLoggedIn;
     }
 
-    public void setUserLoggedIn(boolean userLoggedIn) {
-        this.userLoggedIn = userLoggedIn;
-    }
-
-    public void destroyOnSessionEnd() {
-        log.info("UserService destroyOnSessionEnd");
-    }
-
-    public void setIdentity(IIdentity identity) {
-        this.identity = identity;
-    }
-
     public IIdentity getIdentity() {
         return identity;
     }
 
-    public void loadUserDetailsFromCommMgr() {
-        if (!isUserLoggedIn()) {
-            clearCurrentUser();
-            return;
+    public void login() {
+        if (isUserLoggedIn()) {
+            logout();
         }
 
         IIdentity identity = commMngrRef.getIdManager().getThisNetworkNode();
@@ -99,26 +97,41 @@ public class UserService implements Serializable {
         String userID = identity.getBareJid();
         String username = userID.substring(0, userID.indexOf('.'));
 
-        setIdentity(identity);
-        setUserID(userID);
-        setUsername(username);
+        this.userLoggedIn = true;
+        this.identity = identity;
+        this.userID = userID;
+        this.username = username;
+
+        // let listeners know
+        for (ILoginListener listener : loginListeners) {
+            try {
+                listener.userLoggedIn();
+            } catch (Exception ex) {
+                log.error("Exception in login listener", ex);
+                // do nothing?
+            }
+        }
+    }
+
+    public void logout() {
+        clearCurrentUser();
+
+        // let listeners know
+        for (ILoginListener listener : loginListeners) {
+            try {
+                listener.userLoggedOut();
+            } catch (Exception ex) {
+                log.error("Exception in logout listener", ex);
+                // do nothing?
+            }
+        }
     }
 
     private void clearCurrentUser() {
-        setUserLoggedIn(false);
-        setIdentity(null);
-        setUserID(null);
-        setUsername(null);
+        this.userLoggedIn = false;
+        this.identity = null;
+        this.userID = null;
+        this.username = null;
     }
 
-    public void loadUserDetailsIntoModel(Map<String, Object> model) {
-        if (!isUserLoggedIn()) {
-            clearCurrentUser();
-            // don't return - continue to load all the nulls into the model
-        }
-
-        model.put("identity", identity);
-        model.put("userid", userID);
-        model.put("username", username);
-    }
 }

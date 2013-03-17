@@ -82,8 +82,8 @@ public class PullDataFromSN {
      */
     private List<?> getActivities(ISocialConnector connector) {
 	
-	logger.debug("Read " + connector.getSocialNetworkName() + " feed ... ");
-	ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
+	logger.debug("Read " + connector.getSocialNetwork() + " feed ... ");
+	ActivityConverter parser = ActivityConveterFactory.getConverter(connector);
 	return parser.load(connector.getUserActivities());
 	
     }
@@ -96,9 +96,9 @@ public class PullDataFromSN {
      */
     private Person updateProfile(ISocialConnector connector) {
 
-	logger.debug("Update " + connector.getSocialNetworkName() + " Profile ... ");
+	logger.debug("Update " + connector.getSocialNetwork() + " Profile ... ");
 
-	PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
+	PersonConverter parser = PersonConverterFactory.getConverter(connector);
 	return  parser.load(connector.getUserProfile());
     }
     
@@ -109,8 +109,8 @@ public class PullDataFromSN {
      */
    
     private Map<String, ?> updateGroups(ISocialConnector connector) {
-	logger.debug("Read  " + connector.getSocialNetworkName() + " groups ... ");
-	GroupConverter parser = GroupConveterFactory.getGroupConverter(connector);
+	logger.debug("Read  " + connector.getSocialNetwork() + " groups ... ");
+	GroupConverter parser = GroupConveterFactory.getConverter(connector);
 	List<Group> groups = parser.load(connector.getUserGroups());
 	Map<String, Object> gMap= new HashMap<String, Object>();
 	for(Group g: groups){
@@ -127,8 +127,8 @@ public class PullDataFromSN {
      * @return List < {@link Person }
      */
     private Map<String, ?> updateFriends(ISocialConnector connector) {
-	logger.debug("Read " + connector.getSocialNetworkName() + " friends ... ");
-	FriendsConverter parser = FriendsConveterFactory.getFriendsConverter(connector);
+	logger.debug("Read " + connector.getSocialNetwork() + " friends ... ");
+	FriendsConverter parser = FriendsConveterFactory.getConverter(connector);
 	List<Person> friends = parser.load(connector.getUserFriends());
 	Map<String, Object> fMap = new HashMap<String, Object>();
 	for(Person f: friends) fMap.put(f.getId(),f);

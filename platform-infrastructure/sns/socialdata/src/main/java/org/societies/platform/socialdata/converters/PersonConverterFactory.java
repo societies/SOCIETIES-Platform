@@ -1,21 +1,22 @@
 package org.societies.platform.socialdata.converters;
 
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetworkName;
-
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class PersonConverterFactory{
 	
-	public static PersonConverter getPersonConverter(ISocialConnector connector){
-		if (SocialNetworkName.FACEBOOK.equals(connector.getSocialNetworkName())) 
+	public static PersonConverter getConverter(ISocialConnector connector){
+
+	    
+	    if (SocialNetwork.FACEBOOK.equals(connector.getSocialNetwork())) 
 			return new PersonConverterFromFacebook();
-		else if (SocialNetworkName.TWITTER.equals(connector.getSocialNetworkName()))
+		else if (SocialNetwork.TWITTER.equals(connector.getSocialNetwork()))
 			return new PersonConverterFromTwitter();
-		else if (SocialNetworkName.FOURSQUARE.equals(connector.getSocialNetworkName()))
+		else if (SocialNetwork.FOURSQUARE.equals(connector.getSocialNetwork()))
 			return new PersonConverterFromFoursquare();
-		else if (SocialNetworkName.LINKEDIN.equals(connector.getSocialNetworkName()))
+		else if (SocialNetwork.LINKEDIN.equals(connector.getSocialNetwork()))
 			return new PersonConverterFromLinkedin();
-		else if (SocialNetworkName.GOOGLEPLUS.equals(connector.getSocialNetworkName())) 
+		else if (SocialNetwork.GOOGLEPLUS.equals(connector.getSocialNetwork())) 
 			return new PersonConverterFromGooglePlus();
 		else 
 			return new PersonConverterFromSN();

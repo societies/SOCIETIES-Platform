@@ -1,21 +1,19 @@
 package org.societies.platform.socialdata.converters;
 
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.sns.SocialNetworkName;
-
-
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class ActivityConveterFactory{
 	
-	public static ActivityConverter getActivityConverter(ISocialConnector connector){
+	public static ActivityConverter getConverter(ISocialConnector connector){
 		
-	    	if (connector.getSocialNetworkName().equals(SocialNetworkName.FACEBOOK)) 
+	    	if (connector.getSocialNetwork().equals(SocialNetwork.FACEBOOK)) 
 			return new ActivityConverterFromFacebook();
-		else if (connector.getSocialNetworkName().equals(SocialNetworkName.TWITTER))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.TWITTER))
 			return new ActivityConverterFromTwitter();
-		else if (connector.getSocialNetworkName().equals(SocialNetworkName.FOURSQUARE))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.FOURSQUARE))
 			return new ActivityConverterFromFoursquare();
-		else if (connector.getSocialNetworkName().equals(SocialNetworkName.LINKEDIN))
+		else if (connector.getSocialNetwork().equals(SocialNetwork.LINKEDIN))
 			return new ActivityConverterFromLinkedin();
 		else 
 			return new ActivityConverterFromSN();

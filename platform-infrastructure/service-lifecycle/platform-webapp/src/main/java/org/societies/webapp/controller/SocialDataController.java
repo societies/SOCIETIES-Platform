@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.api.sns.SocialNetworkName;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.FacebookConn.FacebookConnector;
 import org.societies.platform.FoursquareConnector.FoursquareConnector;
 import org.societies.platform.TwitterConnector.TwitterConnector;
@@ -213,28 +213,28 @@ public class SocialDataController {
 
 	}
 
-	private SocialNetworkName getSocialNetowkName(String name) {
+	private SocialNetwork getSocialNetowkName(String name) {
 
 		if ("facebook".equalsIgnoreCase(name))
-			return SocialNetworkName.FACEBOOK;
+			return SocialNetwork.FACEBOOK;
 		if ("FB".equalsIgnoreCase(name))
-			return SocialNetworkName.FACEBOOK;
+			return SocialNetwork.FACEBOOK;
 		if ("twitter".equalsIgnoreCase(name))
-			return SocialNetworkName.TWITTER;
+			return SocialNetwork.TWITTER;
 		if ("TW".equalsIgnoreCase(name))
-			return SocialNetworkName.TWITTER;
+			return SocialNetwork.TWITTER;
 		if ("foursquare".equalsIgnoreCase(name))
-			return SocialNetworkName.FOURSQUARE;
+			return SocialNetwork.FOURSQUARE;
 		if ("FQ".equalsIgnoreCase(name))
-			return SocialNetworkName.FOURSQUARE;
+			return SocialNetwork.FOURSQUARE;
 		if ("linkedin".equalsIgnoreCase(name))
-			return SocialNetworkName.LINKEDIN;
+			return SocialNetwork.LINKEDIN;
 		if ("LK".equalsIgnoreCase(name))
-			return SocialNetworkName.LINKEDIN;
+			return SocialNetwork.LINKEDIN;
 		if ("googleplus".equalsIgnoreCase(name))
-			return SocialNetworkName.GOOGLEPLUS;
+			return SocialNetwork.GOOGLEPLUS;
 		if ("G+".equalsIgnoreCase(name))
-			return SocialNetworkName.GOOGLEPLUS;
+			return SocialNetwork.GOOGLEPLUS;
 
 		return null;
 	}
