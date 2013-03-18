@@ -60,3 +60,4 @@ _ReSharper*/
 platform-infrastructure/sns/.DS_Store
 
 *.properties
+!org.societies.integration.test.properties
