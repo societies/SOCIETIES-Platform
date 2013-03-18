@@ -66,9 +66,10 @@ public class UserFeedbackMocker implements Subscriber {
 		enabled = false;
 	}
 
-	public void onCreate() throws Exception {
+	public void onCreate() {
 		if (!isDepencyInjectionDone()) {
-			throw new Exception("[Dependency Injection] UserFeedbackMocker is not ready. Missing dependencies.");
+			LOG.error("[Dependency Injection] UserFeedbackMocker is not ready. Missing dependencies.");
+			return;
 		}
 		LOG.info("### [UserFeedbackMock] init method");
 		// -- Rettrieve cloud node JID
@@ -77,16 +78,28 @@ public class UserFeedbackMocker implements Subscriber {
 
 		// -- Register for events from created pubsub node
 		LOG.debug("### [UserFeedbackMock] Registering for user feedback pubsub node");
-		pubsub.subscriberSubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
-		//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE", this);
-		//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE", this);
+		try {
+			pubsub.subscriberSubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
+			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE", this);
+			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE", this);
+		} catch (XMPPError e) {
+			LOG.error("Can't subscribe to the userfeedback event due to XMPPError", e);
+		} catch (CommunicationException e) {
+			LOG.error("Can't subscribe to the userfeedback event due to communication exception", e);
+		}
 		LOG.debug("### [UserFeedbackMock] Pubsub registration complete!");
 	}
 
-	public void onDestroy() throws XMPPError, CommunicationException {
+	public void onDestroy() {
 		// -- Unregister to events
 		LOG.debug("### [UserFeedbackMock] Unregistering for user feedback pubsub node");
-		pubsub.subscriberUnsubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
+		try {
+			pubsub.subscriberUnsubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
+		} catch (XMPPError e) {
+			LOG.error("Can't unsubscribe to the userfeedback event due to XMPPError", e);
+		} catch (CommunicationException e) {
+			LOG.error("Can't unsubscribe to the userfeedback event due to communication exception", e);
+		}
 	}
 
 
