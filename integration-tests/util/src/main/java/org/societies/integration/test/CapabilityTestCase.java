@@ -51,7 +51,7 @@ public abstract class CapabilityTestCase extends IntegrationTestCase {
 	public static String getReceiverJid() {
 		return receiverJid;
 	}
-	@Value("${receiver.jid:emma.societies.local}")
+	@Value("${receiver.jid:emma.ict-societies.eu}")
 	public void setReceiverJid(String receiverJid) {
 		this.receiverJid = receiverJid;
 	}
