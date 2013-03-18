@@ -20,7 +20,7 @@ public class TestLinkedinConnector {
 	private static ISocialConnector connector = null;
 	private final Logger logger = LoggerFactory.getLogger(TestLinkedinConnector.class);
     
-	private String TEST_TOKEN = "6727558d-2b52-4ecc-96eb-e984c254ab7b,1c3497bf-1d5b-49f7-b2bd-1baa69b0254a";
+	private String TEST_TOKEN = "";
 	
 	@Before
 	public void setUp() {
