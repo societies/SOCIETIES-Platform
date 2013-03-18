@@ -45,13 +45,6 @@ public class UserFeedbackMockResult {
 		this(InfinitelyUsable, result);
 	}
 	/**
-	 * Instantiate a user feedback result that will be used infinitely
-	 * @param result Result index values
-	 */
-	public UserFeedbackMockResult(Integer... resultIndexes) {
-		this(InfinitelyUsable, resultIndexes);
-	}
-	/**
 	 * Instantiate a user feedback result that will be used nbOfUsage time
 	 * @param nbOfUsage Nb of time to use theses values as a user feedback result
 	 * @param result Result values
@@ -70,9 +63,9 @@ public class UserFeedbackMockResult {
 	 * @param nbOfUsage Nb of time to use theses values as a user feedback result
 	 * @param result Result index values
 	 */
-	public UserFeedbackMockResult(int nbOfUsage, Integer... resultIndexes) {
+	public UserFeedbackMockResult(Integer... resultIndexes) {
 		super();
-		this.nbOfUsage = nbOfUsage;
+		this.nbOfUsage = InfinitelyUsable;
 		this.result = new ArrayList<String>();
 		this.resultIndexes = new ArrayList<Integer>();
 		for(Integer resultIndex : resultIndexes) {
