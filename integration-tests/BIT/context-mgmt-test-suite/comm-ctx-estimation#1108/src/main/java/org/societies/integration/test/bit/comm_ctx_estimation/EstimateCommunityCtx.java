@@ -35,15 +35,15 @@ public class EstimateCommunityCtx {
 
 	private static Logger LOG = LoggerFactory.getLogger(EstimateCommunityCtx.class);
 
-	private IIdentity cssIDJane;
-	private IIdentity cssIDJohn;
+	private IIdentity cssIDUniversity;
+	private IIdentity cssIDEmma;
 
-	// run test in jane's container
-	private String targetJane = "jane.societies.local";
-	private String targetJohn= "john.societies.local";
+	// run test in university's container
+	private String targetUniversity = "university.ict-societies.eu";
+	private String targetEmma= "emma.ict-societies.eu";
 
-	//private IndividualCtxEntity john;
-	private IndividualCtxEntity jane;
+	//private IndividualCtxEntity emma;
+	private IndividualCtxEntity university;
 
 	public ICtxBroker ctxBroker;
 	public ICommManager commManager;
@@ -69,37 +69,37 @@ public class EstimateCommunityCtx {
 
 
 		try {
-			this.cssIDJane =  this.commManager.getIdManager().fromJid(targetJane);
-			this.cssIDJohn =  this.commManager.getIdManager().fromJid(targetJohn);
+			this.cssIDUniversity =  this.commManager.getIdManager().fromJid(targetUniversity);
+			this.cssIDEmma =  this.commManager.getIdManager().fromJid(targetEmma);
 
-			// jane's interests 
-			LOG.info("jane's identity : " + this.cssIDJane.toString());
-			//CtxEntityIdentifier janeEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDJane).get();
+			// university's interests 
+			LOG.info("university's identity : " + this.cssIDUniversity.toString());
+			//CtxEntityIdentifier universityEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDUniversity).get();
 
-			CtxAttribute interestsJanes = updateIndividualAttribute(this.cssIDJane, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
-			assertEquals(interestsJanes.getType(), CtxAttributeTypes.INTERESTS);
-			LOG.info("jane's interests created : " + interestsJanes.getId());
+			CtxAttribute interestsUniversitys = updateIndividualAttribute(this.cssIDUniversity, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
+			assertEquals(interestsUniversitys.getType(), CtxAttributeTypes.INTERESTS);
+			LOG.info("university's interests created : " + interestsUniversitys.getId());
 
-			CtxAttribute locationJane = updateIndividualAttribute(this.cssIDJane, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
-			assertEquals(locationJane.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			LOG.info("jane's location created : " + locationJane.getId());
+			CtxAttribute locationUniversity = updateIndividualAttribute(this.cssIDUniversity, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
+			assertEquals(locationUniversity.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			LOG.info("university's location created : " + locationUniversity.getId());
 
-			// john's interest (remote comm will be initiated)
-			LOG.info("john's identity : " + this.cssIDJohn.toString());
+			// emma's interest (remote comm will be initiated)
+			LOG.info("emma's identity : " + this.cssIDEmma.toString());
 
-			CtxAttribute interestsJohn =  updateIndividualAttribute(this.cssIDJohn,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
-			assertEquals(interestsJohn.getType(), CtxAttributeTypes.INTERESTS);
-			LOG.info("johns's interest created : " + interestsJohn.getId());
+			CtxAttribute interestsEmma =  updateIndividualAttribute(this.cssIDEmma,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
+			assertEquals(interestsEmma.getType(), CtxAttributeTypes.INTERESTS);
+			LOG.info("emmas's interest created : " + interestsEmma.getId());
 
-			CtxAttribute locationJohn  = updateIndividualAttribute(this.cssIDJohn,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
-			assertEquals(locationJohn.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			LOG.info("johns's location created : " + locationJohn.getId());
+			CtxAttribute locationEmma  = updateIndividualAttribute(this.cssIDEmma,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
+			assertEquals(locationEmma.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			LOG.info("emmas's location created : " + locationEmma.getId());
 
 
 			// create CIS
 			IIdentity cisID = this.createCIS();
-			// at this point a community Entity should be created in janes container
-			// at this point an association should be created in janes container
+			// at this point a community Entity should be created in universitys container
+			// at this point an association should be created in universitys container
 			LOG.info("wait until community entity and attributes are created for cisID"+ cisID  );
 			Thread.sleep(40000);
 			
@@ -113,7 +113,7 @@ public class EstimateCommunityCtx {
 
 
 			// the following lines will be removed with code adding a css member to the cis
-			// adding john to community
+			// adding emma to community
 			Set<CtxAssociationIdentifier> comAssocIdSet = communityEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS);
 			LOG.info("ctxCommunityEntity members comAssocIdSet : " + comAssocIdSet);
 			LOG.info("ctxCommunityEntity members comAssocIdSet size : " + comAssocIdSet.size());
@@ -127,8 +127,8 @@ public class EstimateCommunityCtx {
 					LOG.info("hasMembersAssoc size: " + hasMembersAssoc.getChildEntities().size());
 					LOG.info("hasMembersAssoc getParentEntity: " + hasMembersAssoc.getParentEntity());
 
-					CtxEntityIdentifier johnEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDJohn).get();
-					hasMembersAssoc.addChildEntity(johnEntityID);
+					CtxEntityIdentifier emmaEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDEmma).get();
+					hasMembersAssoc.addChildEntity(emmaEntityID);
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get();
 				}
 			}
@@ -138,7 +138,7 @@ public class EstimateCommunityCtx {
 			LOG.info("Updated ctxCommunityEntity members : " + communityEntityUpdated.getMembers());
 
 			// the upper lines will be removed with code adding a css member to the cis
-			// a community now exists with two members jane (local) and john (remote)
+			// a community now exists with two members university (local) and emma (remote)
 			String interestValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
 			assertEquals("cinema", interestValue);	
 
@@ -169,7 +169,7 @@ public class EstimateCommunityCtx {
 	
 		CtxAttribute attributeUpdated = null;
 		List<CtxIdentifier> attributeList;
-		//List<CtxIdentifier> johnInterestList = this.ctxBroker.lookup(null, this.cssIDJohn,CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
+		//List<CtxIdentifier> emmaInterestList = this.ctxBroker.lookup(null, this.cssIDEmma,CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
 
 		
 		try {
