@@ -34,6 +34,7 @@ import org.societies.api.privacytrust.trust.event.TrustEvent;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
@@ -181,7 +182,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 			throws TrustEventMgrException {
 		
 		final TrustUpdateEventInfo eventInfo = new TrustUpdateEventInfo(
-				event.getOldValue(), event.getNewValue()); 
+				event.getValueType(), event.getOldValue(), event.getNewValue()); 
 		
 		for (int i = 0; i < topics.length; ++i) {
 			
@@ -287,7 +288,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 				final TrustedEntityId trustorId = new TrustedEntityId(internalEvent.geteventSource());
 				final TrustedEntityId trusteeId = new TrustedEntityId(internalEvent.geteventName());
 				final TrustUpdateEvent event = new TrustUpdateEvent(trustorId,
-						trusteeId, eventInfo.getOldValue(), eventInfo.getNewValue());
+						trusteeId, eventInfo.getValueType(),
+						eventInfo.getOldValue(), eventInfo.getNewValue());
 				if (LOG.isDebugEnabled())
 					LOG.debug("Forwarding TrustUpdateEvent " + event + " to listener");
 				this.listener.onUpdate(event);
@@ -316,15 +318,27 @@ public class TrustEventMgr implements ITrustEventMgr {
 	private class TrustUpdateEventInfo implements Serializable {
 		
 		private static final long serialVersionUID = -8227968800295980580L;
+		
+		private final TrustValueType valueType;
 
 		private final Double oldValue;
 		
 		private final Double newValue;
 		
-		private TrustUpdateEventInfo(final Double oldValue, final Double newValue) {
+		private TrustUpdateEventInfo(final TrustValueType valueType,
+				final Double oldValue, final Double newValue) {
 			
+			if (valueType == null)
+				throw new NullPointerException("valueType can't be null");
+			
+			this.valueType = valueType;
 			this.oldValue = oldValue;
 			this.newValue = newValue;
+		}
+		
+		private TrustValueType getValueType() {
+			
+			return this.valueType;
 		}
 		
 		private Double getOldValue() {
@@ -345,6 +359,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 			
 			final StringBuilder sb = new StringBuilder();
 			sb.append("{");
+			sb.append("valueType=" + this.getValueType());
+			sb.append(",");
 			sb.append("oldValue=" + this.getOldValue());
 			sb.append(",");
 			sb.append("newValue=" + this.getNewValue());

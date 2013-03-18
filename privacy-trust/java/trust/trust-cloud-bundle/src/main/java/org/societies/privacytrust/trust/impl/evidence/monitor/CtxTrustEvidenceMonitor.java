@@ -43,14 +43,18 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
@@ -61,7 +65,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Describe your class here...
+ * This class is used to acquire trust evidence based on the CSS owner's direct
+ * interactions with other CSSs, the CISs they're member of, and their
+ * installed services. More specifically, it adds {@link DirectTrustEvidence}
+ * to the Trust Evidence Repository by monitoring the following context change
+ * events:
+ * <ol>
+ * <li>CSS owner uses a service</li>
+ * <li>CSS owner (un)friends another CSS.</li>
+ * <li>CSS owner joins/leaves a CIS.</li>
+ * <li>Membership changes in a CIS the CSS owner is member of.</li>
+ * </ol>
+ * 
+ * The generated pieces of Direct Trust Evidence are then processed by the
+ * Direct Trust Engine in order to (re)evaluate the direct trust on the
+ * referenced entities, i.e. CSS, CISs or services, on behalf of the CSS owner.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS) 
  * @since 0.4.1
@@ -139,7 +157,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Received MODIFIED event " + event);
 		
-		if (CtxAssociationTypes.IS_FRIENDS_WITH.equals(event.getId().getType()))
+		if (CtxAttributeTypes.LAST_ACTION.equals(event.getId().getType()))
+			this.executorService.execute(new UserLastActionHandler(event.getId()));
+		else if (CtxAssociationTypes.IS_FRIENDS_WITH.equals(event.getId().getType()))
 			this.executorService.execute(new UserIsFriendsWithHandler(event.getId()));
 		else if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType()))
 			this.executorService.execute(new UserIsMemberOfHandler(event.getId()));
@@ -183,6 +203,50 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	void unbindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props) {
 		
 		LOG.info("Unbinding service reference " + ctxBroker);
+	}
+	
+	private class UserLastActionHandler implements Runnable {
+
+		private final CtxIdentifier ctxId;
+		
+		private UserLastActionHandler(CtxIdentifier ctxId) {
+			
+			this.ctxId = ctxId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final CtxAttribute lastActionAttr = (CtxAttribute) ctxBroker.retrieve(ctxId).get();
+				if (lastActionAttr == null) {
+					LOG.error("Could not handle CSS last action: "
+							+ "Could not retrieve '" + this.ctxId + "'");
+					return;
+				}
+				if (lastActionAttr.getBinaryValue() == null) {
+					LOG.error("Could not handle CSS last action: "
+							+ "LAST_ACTION attribute value is null");
+					return;
+				}
+				final IAction lastAction = (IAction) SerialisationHelper.deserialise(
+						lastActionAttr.getBinaryValue(), this.getClass().getClassLoader());
+				if (LOG.isDebugEnabled())
+					LOG.debug("lastAction=" + lastAction);
+				final String userId = lastActionAttr.getId().getOwnerId();
+				final String serviceId = lastAction.getServiceID().getIdentifier().toString();
+				final Date ts = lastActionAttr.getLastModified();
+				addServiceEvidence(userId, serviceId, ts);
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CSS last action: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
 	}
 	
 	private class UserIsFriendsWithHandler implements Runnable {
@@ -300,18 +364,12 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		}	
 	}
 	
-	private class CommunityHasMembersHandler implements CtxChangeEventListener {
+	private class CommunityHasMembersListener implements CtxChangeEventListener {
 
 		private final String communityId;
 		private final Set<String> members = new CopyOnWriteArraySet<String>();
 		
-		private CommunityHasMembersHandler(final String communityId) {
-			
-			this.communityId = communityId;
-			this.members.add(ownerId.toString());
-		}
-		
-		private CommunityHasMembersHandler(final String communityId, final Set<String> members) {
+		private CommunityHasMembersListener(final String communityId, final Set<String> members) {
 			
 			this.communityId = communityId;
 			this.members.addAll(members);
@@ -342,40 +400,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				return;
 			}
 			
-			try {
-				final CtxAssociation hasMembers = 
-						(CtxAssociation) ctxBroker.retrieve(event.getId()).get();
-				if (hasMembers == null) {
-					LOG.error("Could not handle CIS membership change: "
-							+ "Could not retrieve '" + event.getId() + "'");
-					return;
-				}
-				final Set<String> currentMembers = new HashSet<String>();
-				for (final CtxEntityIdentifier cisCtxId : hasMembers.getChildEntities())
-					currentMembers.add(cisCtxId.getOwnerId());
-				// find old members
-				final Set<String> oldMembers = new HashSet<String>(this.members);
-				oldMembers.removeAll(currentMembers);
-				// find new members
-				final Set<String> newMembers = new HashSet<String>(currentMembers);
-				newMembers.removeAll(this.members);
-				// update members
-				this.members.clear();
-				this.members.addAll(currentMembers);
-				
-				final Date ts = hasMembers.getLastModified();
-				
-				for (final String oldMember : oldMembers)
-					addMembershipEvidence(oldMember, this.communityId, TrustEvidenceType.LEFT_COMMUNITY, ts);
-				
-				for (final String newMember : newMembers)
-					addMembershipEvidence(newMember, this.communityId, TrustEvidenceType.JOINED_COMMUNITY, ts);
-						
-			} catch (Exception e) {
-				
-				LOG.error("Could not handle CIS membership change: " 
-						+ e.getLocalizedMessage(), e);
-			}
+			executorService.execute(new CommunityHasMembersHandler(event.getId(), this));
 		}
 
 		/*
@@ -399,8 +424,71 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		}	
 	}
 	
+	private class CommunityHasMembersHandler implements Runnable {
+
+		private final CtxIdentifier hasMembersAssocId;
+		private final CommunityHasMembersListener listener;
+		
+		private CommunityHasMembersHandler(final CtxIdentifier hasMembersAssocId,
+				final CommunityHasMembersListener listener) {
+			
+			this.hasMembersAssocId = hasMembersAssocId;
+			this.listener = listener;
+		}
+
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+		
+			if (LOG.isDebugEnabled())
+				LOG.debug("Retrieving HAS_MEMBERS association '" + this.hasMembersAssocId
+						+ "' to handle membership change of CIS '" + this.listener.communityId + "'");
+			try {
+				final CtxAssociation hasMembersAssoc = 
+						(CtxAssociation) ctxBroker.retrieve(this.hasMembersAssocId).get();
+				if (hasMembersAssoc == null) {
+					LOG.error("Could not handle membership change of CIS '"
+							+ this.listener.communityId + "': '"
+							+ this.hasMembersAssocId + "' is null");
+					return;
+				}
+				final Set<String> currentMembers = new HashSet<String>();
+				for (final CtxEntityIdentifier cisCtxId : hasMembersAssoc.getChildEntities())
+					currentMembers.add(cisCtxId.getOwnerId());
+				// find old members
+				final Set<String> oldMembers = new HashSet<String>(this.listener.members);
+				oldMembers.removeAll(currentMembers);
+				// find new members
+				final Set<String> newMembers = new HashSet<String>(currentMembers);
+				newMembers.removeAll(this.listener.members);
+				// update members
+				this.listener.members.clear();
+				this.listener.members.addAll(currentMembers);
+				
+				final Date ts = hasMembersAssoc.getLastModified();
+				
+				for (final String oldMember : oldMembers)
+					addMembershipEvidence(oldMember, this.listener.communityId,
+							TrustEvidenceType.LEFT_COMMUNITY, ts);
+				
+				for (final String newMember : newMembers)
+					addMembershipEvidence(newMember, this.listener.communityId,
+							TrustEvidenceType.JOINED_COMMUNITY, ts);
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle membership change of CIS '"
+						+ this.listener.communityId + "': "	
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+	}
+	
 	/**
-	 * Runs in the background to perform various maintenance tasks.
+	 * Runs periodically in the background to perform various maintenance
+	 * tasks.
 	 */
 	private class MaintenanceDaemon implements Runnable {
 
@@ -473,6 +561,25 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			
 			return null;
 		}
+	}
+	
+	private void addServiceEvidence(final String userId, 
+			final String serviceId,	final Date ts) throws TrustException {
+		
+		final TrustedEntityId subjectId = new TrustedEntityId(
+				TrustedEntityType.CSS,
+				userId);
+		final TrustedEntityId objectId = new TrustedEntityId(
+				TrustedEntityType.SVC, 
+				serviceId);
+		
+		final TrustEvidenceType type = TrustEvidenceType.USED_SERVICE;
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding direct trust evidence: subjectId="
+					+ subjectId + ", objectId="	+ objectId 
+					+ ", type=" + type + ", ts=" + ts);
+		trustEvidenceCollector.addDirectEvidence(
+				subjectId, objectId, type, ts, null);
 	}
 	
 	private void addFriendshipEvidence(final String userId, 
@@ -571,7 +678,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 			LOG.info("Registering for membership changes of CIS '" + communityEntId.getOwnerId() + "'");
 		if (LOG.isDebugEnabled())
 			LOG.debug("hasMembersId=" + hasMembersId + ", members=" + members);
-		ctxBroker.registerForChanges(new CommunityHasMembersHandler(
+		ctxBroker.registerForChanges(new CommunityHasMembersListener(
 				communityEntId.getOwnerId(), members), hasMembersId);
 	}
 }

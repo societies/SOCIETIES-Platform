@@ -66,7 +66,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
         this.sessionFactory = sessionFactory;
     }
     @Override
-    public IActivityFeed getOrCreateFeed(String owner, String feedId) {
+    public IActivityFeed getOrCreateFeed(String owner, String feedId, Boolean pubSub) {
         LOG.info("In getOrCreateFeed .. ");
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
@@ -87,11 +87,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         //not existing, making a new one..
-        ActivityFeed ret = new ActivityFeed(feedId,owner);
-        ret.setPubSubcli(this.pubSubClient);
+        ActivityFeed ret = new ActivityFeed(feedId,owner,pubSub);
         ret.startUp(this.sessionFactory);
-        ret.connectPubSub(identity);
-
+        if(pubSub) {
+            ret.setPubSubcli(this.pubSubClient);
+            ret.connectPubSub(identity);
+        }
         feeds.add(ret);
         persistNewFeed(ret);
         return ret;
@@ -142,10 +143,28 @@ public class ActivityFeedManager implements IActivityFeedManager {
     }
     public void init(){
         Session session = getSessionFactory().openSession();
-        List<IActivityFeed> tmpFeeds = null;
+        List<ActivityFeed> tmpFeeds = null;
         try{
-        	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
-        	feeds.addAll(tmpFeeds);
+            tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+            feeds.addAll(tmpFeeds);
+            for(ActivityFeed feed : tmpFeeds) {
+                if(feed.getPubsub()){
+                    LOG.info("did not find feedid creating new..");
+                    IIdentity identity = null;
+                    try {
+                        identity = commManager.getIdManager().fromJid(feed.getOwner());
+                    } catch (InvalidFormatException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                    //not existing, making a new one..
+
+
+                    feed.setPubSubcli(this.pubSubClient);
+                    feed.connectPubSub(identity);
+
+                }
+                feed.startUp(this.sessionFactory);
+            }
         }catch(Exception e){
             LOG.error("CISManager startup queries failed..");
             e.printStackTrace();
@@ -184,10 +203,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public void setCommManager(ICommManager commManager) {
         this.commManager = commManager;
     }
-    
+
     @Override
     public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid){
-    	return new RemoteActivityFeed(iCommMgr,remoteCISid);
+        return new RemoteActivityFeed(iCommMgr,remoteCISid);
     }
     private boolean persistNewFeed(ActivityFeed activityFeed){
         Session session = getSessionFactory().openSession();

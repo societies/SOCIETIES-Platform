@@ -39,7 +39,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	public static String LASTNAME 		= "last_name";
 	public static String GENDER 		= "gender";
 	public static String UCT 			= "updated_time";
-	public static String BIO 			= "bio";
+	public static String BIO 			= "headline";
 	public static String BIRTHDAY		= "birthday";
 	public static String EMAIL			= "email";
 	public static String PROFILELINK 	= "link";

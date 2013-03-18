@@ -24,13 +24,10 @@
  */
 package org.societies.api.privacytrust.trust.model;
 
-import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
-import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * Describe your class here...

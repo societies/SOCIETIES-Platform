@@ -35,12 +35,17 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
+/**
+ * Societies utility class that acts a convenience wrapper for Android notifications
+ * TODO: If case API is upgraded use builder to create notification
+ */
 	
 public class AndroidNotifier {
 	//Logging tag
 	private static final String LOG_TAG = AndroidNotifier.class.getName();
-
+	private static final String DEFAULT_SOCIETIES_EVENT_TITLE = "SOCIETIES";
+	private static final boolean DEBUG_FLAG = false;
+	
 	private int defaultSound;
 	private int notifierFlags [];
 	private NotificationManager notifyMgr;
@@ -60,19 +65,22 @@ public class AndroidNotifier {
 		
 		//create Android notifications
 		this.notifyMgr = (NotificationManager) this.context.getSystemService(this.context.NOTIFICATION_SERVICE);
-		
-		Log.d(LOG_TAG, "Android Notifier created");
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "Android Notifier created");
+		}
 	}
 	/**
-	 * Create a notification for CSS Events
+	 * Create a notification for Societies CSS Events
 	 * 
-	 * @param event
-	 * @param notificationTag
+	 * @param event object
+	 * @param notificationTag notification identifier (not displayed)
 	 */
 	public void notifyEvent(CssEvent event, String notificationTag) {
 		Dbc.require("CSS event cannot be null", null != event);
 		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
-		Log.d(LOG_TAG, "notifyEvent: " + event.getType() + " tag: " + notificationTag);
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "notifyEvent: " + event.getType() + " tag: " + notificationTag);
+		}
 
 		// Create Notification
 		Notification notification = new Notification(R.drawable.ic_launcher,
@@ -90,29 +98,59 @@ public class AndroidNotifier {
 	
 	/**
 	 * Create a notification for Societies Events with no re-direction intent
-	 * @param message
-	 * @param notificationTag
-	 * @param clazz
+	 * 
+	 * @param message notification information
+	 * @param notificationTag notification identifier (not displayed)
+	 * @param clazz class of activity
 	 */
 	public void notifyMessage(String message, String notificationTag, Class clazz) {
 		Dbc.require("Message cannot be null", null != message && message.length() > 0);
 		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
-		Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
+		}
 		
-		this.notifyMessage(message, notificationTag, clazz, new Intent());
+		this.notifyMessage(message, notificationTag, clazz, new Intent(), DEFAULT_SOCIETIES_EVENT_TITLE);
+	}
+	
+	/**
+	 * Create a notification for Societies Events with no re-direction intent and a specified title
+	 * 
+	 * @param message notification information
+	 * @param notificationTag notification identifier (not displayed)
+	 * @param clazz class of activity
+	 * @param title notification title - will override default Societies title
+	 */
+	public void notifyMessage(String message, String notificationTag, Class clazz, String title) {
+		Dbc.require("Message cannot be null", null != message && message.length() > 0);
+		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
+		Dbc.require("Notification title must be valid", null != title && title.length() > 0);
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
+		}
+		
+		this.notifyMessage(message, notificationTag, clazz, new Intent(), title);
 	}
 	
 	/**
 	 * Create a notification for Societies Events
-	 * @param message
-	 * @param notificationTag
-	 * @param clazz
-	 * @param intent of activity to be displayed when notification is viewed
+	 * 
+	 * @param message notification information
+	 * @param notificationTag notification identifier (not displayed)
+	 * @param clazz class of activity
+	 * @param intent intent used to start new Activity
+	 * @param title notification title - will override default Societies title
 	 */
-	public void notifyMessage(String message, String notificationTag, Class clazz, Intent intent) {
+	public void notifyMessage(String message, String notificationTag, Class clazz, Intent intent, String title) {
 		Dbc.require("Message cannot be null", null != message && message.length() > 0);
 		Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
-		Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag);
+		Dbc.require("Notification title must be valid", null != title && title.length() > 0);
+		Dbc.require("Activity class must be specified", null != clazz);
+		Dbc.require("Intent must be specified", null != intent);
+		
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "message: " + message + " tag: " + notificationTag + " title: " + title);
+		}
 
 		// Create Notification
 		Notification notification = new Notification(R.drawable.launcher_societies, message, System.currentTimeMillis());
@@ -127,8 +165,7 @@ public class AndroidNotifier {
 		Intent notificationIntent = new Intent(this.context, clazz);
 		
 		PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-		notification.setLatestEventInfo(context, "SOCIETIES", message, contentIntent);
+		notification.setLatestEventInfo(context, title, message, contentIntent);
 		this.notifyMgr.notify(notificationTag, 1, notification);
 	}
-
 }

@@ -16,10 +16,7 @@
     <!-- OSGI aware web application context declaration -->
     <context-param>
         <param-name>contextClass</param-name>
-        <!--<param-value>org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext</param-value>-->
         <param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
-        <!--<param-value>org.societies.osgi.OsgiWebBundleContext</param-value>-->
-        <!--Apparently we should be using the org.eclipse context: http://cubiccow.blogspot.co.uk/2012/06/spring-in-osgi-environments.html-->
     </context-param>
 
     <context-param>
@@ -37,28 +34,16 @@
         </init-param>
         <init-param>
             <param-name>contextClass</param-name>
-            <!--<param-value>org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext</param-value>-->
             <param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
-            <!--<param-value>org.societies.osgi.OsgiWebBundleContext</param-value>-->
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    <!--<servlet>
-        <servlet-name>DispatcherServlet</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>/WEB-INF/applicationContext.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>contextClass</param-name>
-            &lt;!&ndash;<param-value>org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext</param-value>&ndash;&gt;
-            <param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
-            &lt;!&ndash;<param-value>org.societies.osgi.OsgiWebBundleContext</param-value>&ndash;&gt;
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>-->
 
+    <!-- PrimeFaces push servlet -->
+    <servlet>
+        <servlet-name>Push Servlet</servlet-name>
+        <servlet-class>org.primefaces.push.PushServlet</servlet-class>
+    </servlet>
 
     <listener>
         <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
@@ -82,27 +67,11 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
-    <!--<servlet-mapping>
-        <servlet-name>DispatcherServlet</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>-->
 
-    <!-- OLD JSP STUFF -->
+    <servlet-mapping>
+        <servlet-name>Push Servlet</servlet-name>
+        <url-pattern>/primepush/*</url-pattern>
+    </servlet-mapping>
 
-    <!-- name of the servlet to register,
-    Note: the xml configuration should match format of {servlet-name}-servlet.xml also
-    located under WEB-INF folder. Otherwise you have to define custom location and name
-    under servlet declaration -->
-    <!--
-        <servlet>
-            <servlet-name>societies</servlet-name>
-            <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-            <load-on-startup>1</load-on-startup>
-        </servlet>
-
-        <servlet-mapping>
-            <servlet-name>societies</servlet-name>
-            <url-pattern>*.html</url-pattern>
-        </servlet-mapping>-->
 
 </web-app>

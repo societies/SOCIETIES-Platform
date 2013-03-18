@@ -39,8 +39,8 @@ import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataInt
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.schema.identity.DataIdentifier;
@@ -146,9 +146,9 @@ public class PrivacyDataManagerRemote {
 		}
 	}
 
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
+	public DataWrapper hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");
-		return dataWrapper.getDataId();
+		return dataWrapper;
 	}
 
 	// -- Comms
@@ -175,6 +175,11 @@ public class PrivacyDataManagerRemote {
 							}
 							@Override
 							public void returnAction(String result) { }
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
+
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
@@ -184,6 +189,11 @@ public class PrivacyDataManagerRemote {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
 		}
 		else {
@@ -211,6 +221,11 @@ public class PrivacyDataManagerRemote {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
 		}
 		else {

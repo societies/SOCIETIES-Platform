@@ -243,6 +243,12 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					}
 				}
 			}
+
+			@Override
+			public void returnException(String result) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		
 
@@ -343,12 +349,30 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 											CSSManagerServiceBase.this.context.sendBroadcast(intent);
 										}
 									}
+
+									@Override
+									public void returnException(String result) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
 							}
+						}
+
+						@Override
+						public void returnException(String result) {
+							// TODO Auto-generated method stub
+							
 						}
 					});
 
 				}
+			}
+
+			@Override
+			public void returnException(String result) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 	}
@@ -1285,18 +1309,43 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 												CSSManagerServiceBase.this.context.sendBroadcast(intent);
 
 											}
+
+											@Override
+											public void returnException(
+													String result) {
+												// TODO Auto-generated method stub
+												
+											}
 										});								
 									}
 									
 									public void returnAction(boolean resultFlag) {
 									}
+
+									@Override
+									public void returnException(String result) {
+										// TODO Auto-generated method stub
+										
+									}
 								});
 							}
+						}
+
+						@Override
+						public void returnException(String result) {
+							// TODO Auto-generated method stub
+							
 						}
 					});
 				} else {
 					Log.d(LOG_TAG, "Failed to bind to Android Comms");
 				}
+			}
+
+			@Override
+			public void returnException(String result) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
     }
@@ -1384,6 +1433,13 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 										
 										public void returnAction(boolean resultFlag) {
 										}
+
+										@Override
+										public void returnException(
+												String result) {
+											// TODO Auto-generated method stub
+											
+										}
 									}, host);
 									
 								} catch (XMPPError x) {
@@ -1391,8 +1447,19 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 								}
 							}
 						}
+
+						@Override
+						public void returnException(String result) {
+							// TODO Auto-generated method stub
+						}
 					});
 				}
+			}
+
+			@Override
+			public void returnException(String result) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 	}

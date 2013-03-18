@@ -33,9 +33,9 @@ import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialDataMethod;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+//import org.societies.api.sns.SocialNetworkName;
 import org.societies.platform.socialdata.SocialConnectorDTO;
 
 /**
@@ -51,26 +51,28 @@ public class SocialDataCommsUtils {
 	
 	public static final String PARAM_NAME_VALIDITY = "validity";
 
-	public static Socialnetwork socialNetwork(ISocialConnector.SocialNetwork socialNetwork) {
+	/*
+	public static Socialnetwork socialNetwork(SocialNetworkName socialNetwork) {
 		return Socialnetwork.fromValue(socialNetwork.name().toLowerCase());
 	}
 	
-	public static ISocialConnector.SocialNetwork socialNetwork(Socialnetwork socialNetwork) {
+	public static SocialNetworkName socialNetwork(Socialnetwork socialNetwork) {
 		switch(socialNetwork) {
 		case FACEBOOK:
-			return SocialNetwork.Facebook;
+			return SocialNetworkName.FACEBOOK;
 		case FOURSQUARE:
-			return SocialNetwork.Foursquare;
+			return SocialNetworkName.FOURSQUARE;
 		case TWITTER:
-			return SocialNetwork.twitter;
+			return SocialNetworkName.TWITTER;
 		case LINKEDIN:
-			return SocialNetwork.linkedin;
+			return SocialNetworkName.LINKEDIN;
 		case GOOGLEPLUS:
-			return SocialNetwork.googleplus;
+			return SocialNetworkName.GOOGLEPLUS;
 		}
 		throw new IllegalArgumentException("Social Network '"+socialNetwork+"' not defined in the internal API.");
 	}
-	
+	*/
+
 	public static Map<String, String> parseParams(String params) {
 		Map<String, String> paramsMap = new HashMap<String, String>();
 		String[] paramsSplit = params.split(PARAMS_SEPARATOR);
@@ -82,10 +84,9 @@ public class SocialDataCommsUtils {
 		return paramsMap;
 	}
 	
-	public static SocialdataMessageBean createAddConnectorMessageBean(Socialnetwork socialNetwork, String token, long validity) {
+	public static SocialdataMessageBean createAddConnectorMessageBean(SocialNetwork socialNetwork, String token, long validity) {
 		SocialdataMessageBean messageBean = new SocialdataMessageBean();
 		messageBean.setMethod(SocialDataMethod.ADD_CONNECTOR);
-		//messageBean.setSnName(SocialDataCommsUtils.socialNetwork(socialNetwork));
 		messageBean.setSnName(socialNetwork);
 		messageBean.setToken(token);
 		messageBean.setValidity(validity);

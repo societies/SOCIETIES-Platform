@@ -37,7 +37,7 @@
 		<xs:sequence>
 			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
-			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
+			<xs:element name="type" type="tnsm:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
  			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
 			<xs:element name="info" type="xs:base64Binary" minOccurs="0"/>
 		</xs:sequence>
@@ -47,22 +47,11 @@
 		<xs:sequence>
 			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
-			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
+			<xs:element name="type" type="tnsm:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
 			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
 			<xs:element name="info" type="xs:base64Binary" minOccurs="0"/>
 			<xs:element name="sourceId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	
-	<xs:simpleType name="trustEvidenceTypeBean">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="rated"/>
-			<xs:enumeration value="friendedUser"/>
-			<xs:enumeration value="unfriendedUser"/>
-			<xs:enumeration value="joinedCommunity"/>
-			<xs:enumeration value="leftCommunity"/>
-			<xs:enumeration value="usedService"/>
-		</xs:restriction>
-	</xs:simpleType>
   
 </xs:schema>

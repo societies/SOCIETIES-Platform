@@ -33,13 +33,10 @@ import org.hibernate.event.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
-import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
-import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.impl.repo.model.Trust;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,20 +53,16 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateEventUserListener.class);
 	
-	private static final Map<String, String> TRUST_PROPERTY_MAP;
+	private static final Map<String, TrustValueType> TRUST_PROPERTY_MAP;
     
 	static {
 		
-        final Map<String, String> aMap = new HashMap<String, String>();
-        aMap.put("directTrust", TrustEventTopic.DIRECT_TRUST_UPDATED);
-        aMap.put("indirectTrust", TrustEventTopic.INDIRECT_TRUST_UPDATED);
-        aMap.put("userPerceivedTrust", TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED);
+        final Map<String, TrustValueType> aMap = new HashMap<String, TrustValueType>();
+        aMap.put("directTrust", TrustValueType.DIRECT);
+        aMap.put("indirectTrust", TrustValueType.INDIRECT);
+        aMap.put("userPerceivedTrust", TrustValueType.USER_PERCEIVED);
         TRUST_PROPERTY_MAP = Collections.unmodifiableMap(aMap);
     }
-	
-	/** The Trust Event Mgr service reference. */
-	@Autowired
-	private ITrustEventMgr trustEventMgr;
 
 	PostUpdateEventUserListener() {
 		
@@ -103,21 +96,14 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            	final Double newTrustValue = (newValue != null) 
 	            			? ((Trust) newValue).getValue() : null;
 	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
-	            			trustorId, trusteeId, oldTrustValue, newTrustValue);
-	            	final String topic = TRUST_PROPERTY_MAP.get(propName);
+	            			trustorId, trusteeId, TRUST_PROPERTY_MAP.get(propName), 
+	            			oldTrustValue, newTrustValue);
 	            	if (LOG.isDebugEnabled())
-	            		LOG.debug("Posting TrustUpdateEvent " + trustUpdateEvent
-	            				+ " to topic '" + topic + "'");
-	            	try {
-						this.trustEventMgr.postEvent(trustUpdateEvent, 
-								new String[] { topic });
-					} catch (TrustEventMgrException teme) {
-						
-						LOG.error("Could not post TrustUpdateEvent " 
-								+ trustUpdateEvent
-	            				+ " to topic '" + topic + "': " 
-								+ teme.getLocalizedMessage(), teme);
-					}
+	            		LOG.debug("Adding TrustUpdateEvent " + trustUpdateEvent);
+	            	final TrustedEntity entity = (TrustedEntity) event.getEntity();
+	            	if (entity.getTrustUpdateEvents().contains(trustUpdateEvent))
+	            		entity.getTrustUpdateEvents().remove(trustUpdateEvent);
+	            	entity.getTrustUpdateEvents().add(trustUpdateEvent);
 	            }
 	        }
 		}

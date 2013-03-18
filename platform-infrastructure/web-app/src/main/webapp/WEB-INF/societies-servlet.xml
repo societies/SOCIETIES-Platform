@@ -29,25 +29,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:ctx="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
-           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- Configures the annotation-driven Spring MVC Controller programming model -->
     <mvc:annotation-driven/>
 
-    <!-- a HTTP Session-scoped bean exposed as a proxy -->
-<!--
-    <bean id="userService" class="org.societies.webapp.service.UserService" scope="session">
-        <aop:scoped-proxy/>
-    </bean>
-
-    <bean id="openfireLoginService" class="org.societies.webapp.service.OpenfireLoginService">
-
-    </bean>
--->
 
     <!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
     <ctx:component-scan base-package="org.societies.webapp.controller"/>
@@ -78,5 +66,6 @@
             </list>
         </property>
     </bean>
+
 
 </beans>

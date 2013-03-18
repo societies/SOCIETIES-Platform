@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 
 /**
  * Describe your class here...
@@ -32,7 +33,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author olivierm
  *
  */
-public class LocationCoordinates {
+@Deprecated
+public class LocationCoordinates extends IObfuscable {
 	private double latitude;
 	private double longitude;
 	private double accuracy;

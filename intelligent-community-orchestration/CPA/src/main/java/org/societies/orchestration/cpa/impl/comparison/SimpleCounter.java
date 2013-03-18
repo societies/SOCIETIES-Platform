@@ -39,10 +39,8 @@ public class SimpleCounter implements ActorComparator {
 	public double compare(SocialGraphVertex member1,SocialGraphVertex member2, List<IActivity> activityDiff) {
 		double ret = 0;
 		for(IActivity act: activityDiff){
-			if(contains(member1,act) && contains(member2,act)){
-				//add new link (or add weight to an old link)
-				ret += 1.0;
-			}
+            //add new link (or add weight to an old link)
+            if(contains(member1,act) && contains(member2,act)) ret += 1.0;
 				
 		}
 		
@@ -50,11 +48,11 @@ public class SimpleCounter implements ActorComparator {
 	}
 
 	public boolean contains(SocialGraphVertex participant, IActivity act){
-		if(act.getActor().contains(participant.getName()))
+		if(act.getActor()!= null && act.getActor().contains(participant.getName()))
 			return true;
-		if(act.getObject().contains(participant.getName()))
+		if(act.getObject()!= null && act.getObject().contains(participant.getName()))
 			return true;
-		if(act.getTarget().contains(participant.getName()))
+		if(act.getTarget()!= null && act.getTarget().contains(participant.getName()))
 			return true;
 		return false;
 	}

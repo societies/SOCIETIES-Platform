@@ -27,23 +27,17 @@ package org.societies.android.privacytrust.datamanagement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.identity.DataIdentifierFactory;
-import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
-import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.android.api.identity.util.DataIdentifierFactory;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.RequestorBean;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 
 
 /**
@@ -176,7 +170,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
 	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException {
-		return updatePermission(requestor, DataIdentifierFactory.fromUri(permission.getRequestItem().getResource().getDataIdUri()), permission.getRequestItem().getActions(), permission.getDecision());
+		DataIdentifier dataId = null;
+		try {
+			dataId = DataIdentifierFactory.fromUri(permission.getRequestItem().getResource().getDataIdUri());
+		}
+		catch(MalformedCtxIdentifierException e) {
+			throw new PrivacyException("Can't update the permission. DataIdentifier in the resource is badly formatted.", e);
+		}
+		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
 	}
 	/*
 	 * (non-Javadoc)

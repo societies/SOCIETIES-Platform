@@ -27,6 +27,7 @@ package org.societies.platform.socialdata;
 import java.util.Map;
 
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.api.internal.sns.ISocialConnector;
 
 /**
@@ -142,5 +143,9 @@ public class SocialConnectorDTO implements ISocialConnector {
 		socialConnector.setTokenExpiration(bean.getExpires());
 		return socialConnector;
 	}
-	
+
+	@Override
+	public SocialNetwork getSocialNetwork() {
+	    return SocialNetwork.fromValue(this.name);
+	}	
 }

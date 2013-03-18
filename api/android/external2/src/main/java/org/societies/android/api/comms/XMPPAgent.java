@@ -44,6 +44,8 @@ public interface XMPPAgent {
 	public static final String GET_ITEMS_EXCEPTION = "org.societies.android.platform.comms.GET_ITEMS_EXCEPTION";
 	public static final String IS_CONNECTED = "org.societies.android.platform.comms.IS_CONNECTED";
 	public static final String NEW_MAIN_IDENTITY = "org.societies.android.platform.comms.NEW_MAIN_IDENTITY";
+	public static final String NEW_MAIN_IDENTITY_EXCEPTION = "org.societies.android.platform.comms.NEW_MAIN_IDENTITY_EXCEPTION";
+	public static final String LOGIN_EXCEPTION = "org.societies.android.platform.comms.LOGIN_EXCEPTION";
 	public static final String LOGIN = "org.societies.android.platform.comms.LOGIN";
 	public static final String LOGOUT = "org.societies.android.platform.comms.LOGOUT";
 	public static final String DESTROY_MAIN_IDENTITY = "org.societies.android.platform.comms.DESTROY_MAIN_IDENTITY";

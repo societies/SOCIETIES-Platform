@@ -127,8 +127,10 @@ public class ContentComparator implements ActorComparator {
             }
 
         }
+        if(member1Text.length() == 0 || member1Text.length() == 0)
+            return 0;
         System.out.println("comparing two members m1 totaltextlength: "+member1Text.length()+" numberof: "+m1count+ " ratio: "+((double)member1Text.length())/((double)m1count));
-        System.out.println("comparing two members m1 totaltextlength: "+member2Text.length()+" numberof: "+m2count+ " ratio: "+((double)member2Text.length())/((double)m2count));
+        System.out.println("comparing two members m2 totaltextlength: "+member2Text.length()+" numberof: "+m2count+ " ratio: "+((double)member2Text.length())/((double)m2count));
         long start = System.currentTimeMillis();
         Map<String,AnnotationSet> m1annotations = getAnnotations(member1Text);
         long timespent = (System.currentTimeMillis()-start);
@@ -197,11 +199,11 @@ public class ContentComparator implements ActorComparator {
 
     }
     public boolean contains(SocialGraphVertex participant, IActivity act){
-        if(act.getActor().contains(participant.getName()))
+        if(act.getActor()!=null && act.getActor().contains(participant.getName()))
             return true;
-        if(act.getObject().contains(participant.getName()))
+        if(act.getObject()!=null &&  act.getObject().contains(participant.getName()))
             return true;
-        if(act.getTarget().contains(participant.getName()))
+        if(act.getTarget()!=null && act.getTarget().contains(participant.getName()))
             return true;
         return false;
     }

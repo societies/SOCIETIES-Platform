@@ -24,10 +24,12 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.PostalLocationObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.PostalLocation;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.PostalLocation;
+
 
 /**
  * Obfuscator for name
@@ -35,16 +37,13 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Post
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PostalLocationObfuscator extends DataObfuscator<DataWrapper> {
+public class PostalLocationObfuscator extends DataObfuscator<PostalLocation> {
 	/**
 	 * @param data
 	 */
-	public PostalLocationObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = PostalLocation.class;
+	public PostalLocationObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new PostalLocationObfuscatorInfo();
 	}
 
 

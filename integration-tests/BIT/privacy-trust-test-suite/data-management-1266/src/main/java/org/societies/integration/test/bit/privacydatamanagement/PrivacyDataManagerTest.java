@@ -19,15 +19,17 @@
  */
 package org.societies.integration.test.bit.privacydatamanagement;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -37,17 +39,20 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
+import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.LocationCoordinatesUtils;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -61,15 +66,17 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.integration.test.IntegrationTest;
+import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
+import org.societies.integration.test.userfeedback.UserFeedbackType;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataManagerTest
+public class PrivacyDataManagerTest extends IntegrationTest
 {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
-	public static Integer testCaseNumber = 0;
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class);
 
 	private DataIdentifier dataId;
 	private DataIdentifier cisPublicDataId;
@@ -164,10 +171,19 @@ public class PrivacyDataManagerTest
 
 		ResponseItem permission = null;
 		try {
-			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
+			// Random Data ID
+			//			DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+currentJid+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			Random randomer = new Random((new Date()).getTime()); 
+			String randomValue = ""+randomer.nextInt(200);
+			DataIdentifier randomDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+myCssId+"/"+randomValue);
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, randomDataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("[#"+testCaseNumber+"] [MalformedCtxIdentifierException] "+testTitle, e);
+			fail("MalformedCtxIdentifierException ("+e.getMessage()+") "+testTitle);
 		}
 		assertNotNull("No permission retrieved", permission);
 		assertNotNull("No (real) permission retrieved", permission.getDecision());
@@ -186,7 +202,9 @@ public class PrivacyDataManagerTest
 		ResponseItem permission1 = null;
 		ResponseItem permission2 = null;
 		try {
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
 			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
+			TestCase1266.getUserFeedbackMocker().removeAllReplies(); // Just to be sure
 			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -290,7 +308,7 @@ public class PrivacyDataManagerTest
 		assertNotNull("No permission retrieved", permissionOther);
 		assertNotNull("No (real) permission retrieved", permissionOther.getDecision());
 		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther.getDecision().name());
-		
+
 		assertNotNull("No permission retrieved", permissionMe);
 		assertNotNull("No (real) permission retrieved", permissionMe.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe.getDecision().name());
@@ -331,7 +349,7 @@ public class PrivacyDataManagerTest
 		assertNotNull("Other: No (real) permission retrieved", permissionOther2.getDecision());
 		assertEquals("Other: Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
 		assertEquals("Other: Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
-		
+
 		assertNotNull("Me: No permission retrieved", permissionMe1);
 		assertNotNull("Me: No (real) permission retrieved", permissionMe1.getDecision());
 		assertEquals("Me: Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
@@ -347,32 +365,65 @@ public class PrivacyDataManagerTest
 	/* --- OBFUSCATION --- */
 
 	@Test
-	public void testObfuscateData()
+	public void testObfuscateDataName()
 	{
-		String testTitle = new String("ObfuscateData");
+		String testTitle = "ObfuscateData: name";
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
-		IDataWrapper<Name> wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
-		Future<IDataWrapper> obfuscatedDataWrapperAsync = null;
-		IDataWrapper<Name> obfuscatedDataWrapper = null;
 		try {
-			obfuscatedDataWrapperAsync = TestCase1266.privacyDataManager.obfuscateData(requestorCis, wrapper);
-			obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
-		} catch (PrivacyException e) {
+			DataWrapper wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
+			Future<DataWrapper> obfuscatedDataWrapperAsync = TestCase1266.privacyDataManager.obfuscateData(RequestorUtils.toRequestorBean(requestorCis), wrapper);
+			DataWrapper obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
+			// Verify
+			assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
+			Name originalData = DataWrapperFactory.retrieveName(wrapper);
+			Name obfuscatedData = DataWrapperFactory.retrieveName(obfuscatedDataWrapper);
+			LOG.info("[#"+testCaseNumber+"] Orginal name: "+NameUtils.toString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated name: "+NameUtils.toString(obfuscatedData));
+		}
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
 			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			LOG.error("[#"+testCaseNumber+"] [InterruptedException async error] "+testTitle, e);
 			fail("InterruptedException async error ("+e.getMessage()+") "+testTitle);
-		} catch (ExecutionException e) {
+		}
+		catch (ExecutionException e) {
 			LOG.error("[#"+testCaseNumber+"] [InterruptedException async exec error] "+testTitle, e);
 			fail("InterruptedException async exec error ("+e.getMessage()+") "+testTitle);
 		}
+	}
 
-		// Verify
-		LOG.debug("### Orginal name:\n"+wrapper.getData().toString());
-		LOG.debug("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
+	@Test
+	public void testObfuscateDataLocationCoordinates()
+	{
+		String testTitle = new String("ObfuscateData: coordinate location");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		try {
+			DataWrapper wrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+			Future<DataWrapper> obfuscatedDataWrapperAsync = TestCase1266.privacyDataManager.obfuscateData(RequestorUtils.toRequestorBean(requestorCis), wrapper);
+			DataWrapper obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
+			// Verify
+			LocationCoordinates originalData = DataWrapperFactory.retrieveLocationCoordinates(wrapper);
+			LocationCoordinates obfuscatedData = DataWrapperFactory.retrieveLocationCoordinates(obfuscatedDataWrapper);
+			assertNotNull("Obfuscated data should not be null", obfuscatedDataWrapper);
+			LOG.info("[#"+testCaseNumber+"] Orginal location:\n"+LocationCoordinatesUtils.toJsonString(originalData));
+			LOG.info("[#"+testCaseNumber+"] Obfuscated location:\n"+LocationCoordinatesUtils.toJsonString(obfuscatedData));
+		}
+		catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
+			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
+		}
+		catch (InterruptedException e) {
+			LOG.error("[#"+testCaseNumber+"] [InterruptedException async error] "+testTitle, e);
+			fail("InterruptedException async error ("+e.getMessage()+") "+testTitle);
+		}
+		catch (ExecutionException e) {
+			LOG.error("[#"+testCaseNumber+"] [InterruptedException async exec error] "+testTitle, e);
+			fail("InterruptedException async exec error ("+e.getMessage()+") "+testTitle);
+		}
 	}
 
 	@Test
@@ -380,18 +431,14 @@ public class PrivacyDataManagerTest
 	{
 		String testTitle = new String("HasObfuscatedVersion");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-
-		IDataWrapper<Name> wrapper = new DataWrapper<Name>(dataId, null);
-		LOG.info("[#"+testCaseNumber+"] "+wrapper);
 		IDataWrapper actual = null;
 		try {
-			actual = TestCase1266.privacyDataManager.hasObfuscatedVersion(requestorCis, wrapper);
+			actual = TestCase1266.privacyDataManager.hasObfuscatedVersion(requestorCis, null);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
 			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
 		}
-		assertNotNull("Expected data id is not null", actual);
-		assertEquals("Retrieved data id is not same as the first", dataId.getUri(), actual.getDataId().getUri());
+		assertEquals("Data should not have changed", actual, actual);
 	}
 
 

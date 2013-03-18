@@ -27,13 +27,14 @@ package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.LocationCoordinatesObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.util.RandomBetween;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.LocationCoordinates;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 
 import android.util.Log;
 
@@ -43,13 +44,9 @@ import android.util.Log;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class LocationCoordinatesObfuscator extends DataObfuscator<DataWrapper> {
+public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordinates> {
 	private final static String TAG = LocationCoordinatesObfuscator.class.getSimpleName();
 
-	/**
-	 * Copy of the data to obfuscate
-	 */
-	public LocationCoordinates geolocation;
 	/**
 	 * Radius enlargement operation id
 	 */
@@ -88,12 +85,9 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<DataWrapper> {
 	/**
 	 * @param data
 	 */
-	public LocationCoordinatesObfuscator(DataWrapper data) {
-		super(data);
-		available = true;
-		obfuscationLevelType = ObfuscationLevelType.CONTINUOUS;
-		dataType = LocationCoordinates.class;
-		geolocation = (LocationCoordinates) data.getData();
+	public LocationCoordinatesObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new LocationCoordinatesObfuscatorInfo();
 	}
 
 	/*
@@ -108,7 +102,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<DataWrapper> {
 		Integer obfuscationOperation = -1;
 		Double middleObfuscationLevel = (double) -1;
 		Double theta = (double) -1;
-		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(geolocation, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
+		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(data, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
 
 		// -- Return
 		DataWrapper dataWrapper = new DataWrapper();

@@ -24,11 +24,13 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
-import java.lang.reflect.Type;
+import org.societies.android.privacytrust.api.IDataObfuscator;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 
-import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+
 
 /**
  * Abstract class helping the creation of an obfuscator
@@ -36,70 +38,40 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Obfu
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends DataWrapper> implements IDataObfuscator {
+public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
+	/**
+	 * Data to obfuscate, wrapped
+	 */
+	protected DataWrapper dataWrapper;
 	/**
 	 * Data to obfuscate
 	 */
-	protected E dataWrapper;
+	protected E data;
 	/**
-	 * Type of the obfuscation level
+	 * Algorithm information
 	 */
-	protected ObfuscationLevelType obfuscationLevelType;
-	/**
-	 * For a DISCRETE obfuscation level type, there is a number
-	 * of classes available. This step number is this number of
-	 * classes
-	 */
-	protected int stepNumber = 1;
-	/**
-	 * Type of the data to obfuscate
-	 */
-	protected Type dataType;
-	/**
-	 * To know if obfuscation of this type of data is available on this node or not
-	 */
-	protected boolean available = false;
-	
-	
-	public DataObfuscator(E data) {
-		super();
-		this.dataWrapper = data;
+	protected ObfuscatorInfo obfuscatorInfo;
+
+
+	public DataObfuscator(DataWrapper dataWrapper) {
+		this.dataWrapper = dataWrapper;
+		this.data = (E) this.dataWrapper.getData();
 	}
 
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationLevelType()
-	 */
-	public ObfuscationLevelType getObfuscationLevelType() {
-		return obfuscationLevelType;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
-	 */
+
+	@Override
 	public DataWrapper getDataWrapper() {
 		return dataWrapper;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
-	 */
-	public Type getDataType() {
-		return dataType;
+
+	@Override
+	public ObfuscatorInfo getObfuscatorInfo() {
+		return obfuscatorInfo;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
-	 */
-	public int getStepNumber() {
-		return stepNumber;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#isAvailable()
-	 */
-	public boolean isAvailable() {
-		return available;
+	
+	@Override
+	public DataWrapper obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
 	}
 }
