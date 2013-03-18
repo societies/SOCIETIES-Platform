@@ -24,11 +24,12 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import java.lang.reflect.Type;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.privacytrust.privacyprotection.api.dataobfuscation.IDataObfuscator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 
 /**
  * Abstract class helping the creation of an obfuscator
@@ -36,62 +37,40 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
  * @author Olivier Maridat (Trialog)
  *
  */
-public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObfuscator {
+public abstract class DataObfuscator<E extends IObfuscable> implements IDataObfuscator {
+	/**
+	 * Data to obfuscate, wrapped
+	 */
+	protected DataWrapper dataWrapper;
 	/**
 	 * Data to obfuscate
 	 */
-	protected E dataWrapper;
+	protected E data;
 	/**
-	 * Type of the obfuscation level
+	 * Algorithm information
 	 */
-	protected ObfuscationLevelType obfuscationLevelType;
-	/**
-	 * For a DISCRETE obfuscation level type, there is a number
-	 * of classes available. This step number is this number of
-	 * classes
-	 */
-	protected int stepNumber = 1;
-	/**
-	 * Type of the data to obfuscate
-	 */
-	protected Type dataType;
-	
-	
-	public DataObfuscator(E data) {
-		super();
-		this.dataWrapper = data;
+	protected ObfuscatorInfo obfuscatorInfo;
+
+
+	public DataObfuscator(DataWrapper dataWrapper) {
+		this.dataWrapper = dataWrapper;
+		this.data = (E) this.dataWrapper.getData();
 	}
 
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationLevelType()
-	 */
+
 	@Override
-	public ObfuscationLevelType getObfuscationLevelType() {
-		return obfuscationLevelType;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
-	 */
-	public IDataWrapper getDataWrapper() {
+	public DataWrapper getDataWrapper() {
 		return dataWrapper;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
-	 */
+
 	@Override
-	public Type getDataType() {
-		return dataType;
+	public ObfuscatorInfo getObfuscatorInfo() {
+		return obfuscatorInfo;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
-	 */
+	
 	@Override
-	public int getStepNumber() {
-		return stepNumber;
+	public DataWrapper obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
 	}
 }

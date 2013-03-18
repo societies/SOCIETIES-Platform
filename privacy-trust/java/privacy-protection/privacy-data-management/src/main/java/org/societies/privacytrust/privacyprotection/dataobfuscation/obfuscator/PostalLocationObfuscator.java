@@ -24,10 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.PostalLocation;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.PostalLocationObfuscatorInfo;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.PostalLocation;
 
 /**
  * Obfuscator for postal location
@@ -35,26 +34,9 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<PostalLocation>> {
-	/**
-	 * @param data
-	 */
-	public PostalLocationObfuscator(IDataWrapper<PostalLocation> data) {
-		super(data);
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = PostalLocation.class;
+public class PostalLocationObfuscator extends DataObfuscator<PostalLocation> {
+	public PostalLocationObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new PostalLocationObfuscatorInfo();
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
-	 */
-	@Override
-	public IDataWrapper<PostalLocation> obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		return dataWrapper;
-	}
-
 }

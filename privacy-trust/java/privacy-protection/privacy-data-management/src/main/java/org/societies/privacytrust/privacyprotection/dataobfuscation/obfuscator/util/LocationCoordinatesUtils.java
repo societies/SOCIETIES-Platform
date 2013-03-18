@@ -3,7 +3,8 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+
 
 
 /**

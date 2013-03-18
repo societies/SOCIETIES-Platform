@@ -75,11 +75,19 @@ public class RemotePrivacyDataCallback implements ICommCallback {
 		// - Send valid intent
 		// Send intent
 		PrivacyDataManagerBeanResult privacyPaylaod = (PrivacyDataManagerBeanResult)payload;
-		intentSender.sendIntentCheckPermission(clientPackage, privacyPaylaod);
-		// TODO: Update PrivacyPermissions
-		if (privacyPaylaod.isAck() && privacyPaylaod.getMethod().equals(MethodType.CHECK_PERMISSION)) {
-//			PrivacyDataManagerInternal privacyDataManagerInternal = new PrivacyDataManagerInternal();
-//			privacyDataManagerInternal.updatePermission(privacyPaylaod.getPermission());
+		if (MethodType.CHECK_PERMISSION.name().equals(privacyPaylaod.getMethod().name())) {
+			intentSender.sendIntentCheckPermission(clientPackage, privacyPaylaod);
+			// TODO: Update PrivacyPermissions
+			if (privacyPaylaod.isAck() && privacyPaylaod.getMethod().equals(MethodType.CHECK_PERMISSION)) {
+				//			PrivacyDataManagerInternal privacyDataManagerInternal = new PrivacyDataManagerInternal();
+				//			privacyDataManagerInternal.updatePermission(privacyPaylaod.getPermission());
+			}
+		}
+		else if (MethodType.OBFUSCATE_DATA.name().equals(privacyPaylaod.getMethod().name())) {
+			intentSender.sendIntentDataObfuscation(clientPackage, privacyPaylaod.getDataWrapper());
+		}
+		else {
+			intentSender.sendIntentError(clientPackage, IPrivacyDataManager.INTENT_DEFAULT_ACTION, "Wrong method response received.");
 		}
 	}
 
