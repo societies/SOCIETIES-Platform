@@ -37,8 +37,7 @@
 
         <!-- notification bar for a privacy policy negotiation request -->
         <p:notificationBar position="bottom" effect="slide" widgetVar="pnb" id="pnb"
-                           styleClass="bottom"
-                           rendered="#{ppNegotiation.currentNegotiationEvent ne null}">
+                           styleClass="bottom">
             The privacy policy negotatiator wants your attention! Mosey on over
             <a href="privacy_policy_negotiation.xhtml">here</a>.
             <p:commandLink value="(ignore)"
@@ -47,16 +46,17 @@
         </p:notificationBar>
 
         <!-- used to open the notification bar for a privacy policy negotiation request -->
+        <h:inputHidden id="pnbCount" value="#{ppNegotiation.unseenNegotiationCount}"/>
         <script type="text/javascript">
             function handlePnb() {
-                pnb.show();
+                if (document.getElementById('mainForm:pnbCount').value > 0) pnb.show();
             }
         </script>
 
         <!-- quick hack to get this working until PF push is working -->
-        <p:poll interval="5" update="pnb" process="pnb"/>
+        <p:poll interval="2" update="pnbCount" process="@this" oncomplete="handlePnb()"/>
         <!-- used to listen for responses if there is a privacy policy negotiation request -->
-        <!--p:socket onMessage="handlePnb" channel="/pnb"/-->
+        <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 
 
         <div id="wrapper" class="clearfix">

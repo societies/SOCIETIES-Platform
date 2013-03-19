@@ -105,6 +105,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     private final PubSubListener pubSubListener = new PubSubListener();
     private final LoginListener loginListener = new LoginListener();
+    private static int req_counter = 0;
 
     public PrivacyPolicyTestController() {
         log.trace("PrivacyPolicyTestController ctor()");
@@ -138,8 +139,32 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     public void sendEvent() {
         RequestorBean requestorBean = new RequestorBean();
-        requestorBean.setRequestorId("req1");
+        requestorBean.setRequestorId("req" + ++req_counter);
 
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestorBean);
+
+
+        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
+        negotiationDetails.setRequestor(requestorBean);
+        negotiationDetails.setNegotiationID(101);
+
+        pubSubListener.sendEvent(responsePolicy, negotiationDetails);
+    }
+
+    private ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning"));
+//        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
+//        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
+
+        ResponsePolicy responsePolicy = new ResponsePolicy();
+        responsePolicy.setRequestor(requestorBean);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
+        responsePolicy.setResponseItems(responseItems);
+        return responsePolicy;
+    }
+
+    private ResponseItem buildResponseItem(String uri, String dataType) {
         Action action1 = new Action();
         action1.setActionConstant(ActionConstants.CREATE);
         action1.setOptional(true);
@@ -156,7 +181,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         Condition condition1 = new Condition();
         condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
         condition1.setValue("1");
-        condition1.setOptional(true);
+        condition1.setOptional(false);
         Condition condition2 = new Condition();
         condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
         condition2.setValue("2");
@@ -164,15 +189,15 @@ public class PrivacyPolicyTestController extends BasePageController {
         Condition condition3 = new Condition();
         condition3.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
         condition3.setValue("3");
-        condition3.setOptional(true);
+        condition3.setOptional(false);
         Condition condition4 = new Condition();
         condition4.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
         condition4.setValue("4");
         condition4.setOptional(true);
 
         Resource resource = new Resource();
-        resource.setDataIdUri("http://this.is.a.win/");
-        resource.setDataType("winning");
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
 
         RequestItem requestItem = new RequestItem();
         requestItem.getActions().add(action1);
@@ -188,23 +213,9 @@ public class PrivacyPolicyTestController extends BasePageController {
         requestItem.setOptional(false);
         requestItem.setResource(resource);
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-
         ResponseItem responseItem = new ResponseItem();
         responseItem.setDecision(Decision.INDETERMINATE);
         responseItem.setRequestItem(requestItem);
-        responseItems.add(responseItem);
-
-        ResponsePolicy responsePolicy = new ResponsePolicy();
-        responsePolicy.setRequestor(requestorBean);
-        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
-        responsePolicy.setResponseItems(responseItems);
-
-
-        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
-        negotiationDetails.setRequestor(requestorBean);
-        negotiationDetails.setNegotiationID(101);
-
-        pubSubListener.sendEvent(responsePolicy, negotiationDetails);
+        return responseItem;
     }
 }

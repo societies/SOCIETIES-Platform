@@ -35,6 +35,10 @@
     <name>societies-webapp</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+        <primepush-version>1.0.12</primepush-version>
+    </properties>
+
     <developers>
         <developer>
             <id>pkudaiyar</id>
@@ -233,21 +237,16 @@
             <version>3.5</version>
         </dependency>
         <!-- needed for PrimeFaces push -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
-            <version>1.0.9</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.atmosphere</groupId>
-                    <artifactId>atmosphere-compat-tomcat</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.atmosphere</groupId>
-                    <artifactId>atmosphere-compat-tomcat7</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+            <version>${primepush-version}</version>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-compat-tomcat7</artifactId>
+            <version>${primepush-version}</version>
+        </dependency>-->
 
         <!-- Java EE6 dependencies -->
         <dependency>
@@ -349,6 +348,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
+                        <Include-Resource>{maven-resources}</Include-Resource>
                         <Import-Package>
                             org.simpleframework.xml;resolution:=optional,
                             org.simpleframework.xml.convert;resolution:=optional,
@@ -540,9 +540,11 @@
                             org.springframework.osgi.config,
                             com.sun.faces.vendor,
                             <!-- PrimeFaces push -->
-                            org.primefaces.push,
-                            org.atmosphere.cpr,
+                            <!--org.primefaces.push,-->
+                            <!--org.atmosphere.cpr,-->
                             <!--org.apache.catalina,-->
+                            <!--org.apache.catalina.comet,-->
+                            <!--org.atmosphere.weblogic,-->
                             <!-- spring DM -->
                             org.springframework.beans.factory.config,
                             org.springframework.osgi.web.context.support,
@@ -720,13 +722,20 @@
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                                 </artifactItem>
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.atmosphere</groupId>
                                     <artifactId>atmosphere-runtime</artifactId>
-                                    <version>1.0.9</version>
+                                    <version>${primepush-version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-                                </artifactItem>
+                                </artifactItem>-->
+                                <!--<artifactItem>
+                                    <groupId>org.atmosphere</groupId>
+                                    <artifactId>atmosphere-compat-tomcat7</artifactId>
+                                    <version>${primepush-version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>-->
                             </artifactItems>
                             <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                         </configuration>
