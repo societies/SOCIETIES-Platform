@@ -26,6 +26,7 @@ package org.societies.context.api.user.db;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -159,6 +160,14 @@ public interface IUserCtxDBMgr {
 	 */
 	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 
+	/**
+	 * Looks up all CtxModelObjects for the specified set of types and for the specified ownerId.
+	 * 
+	 * @param ownerId
+	 * @param type
+	 */
+	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types) throws CtxException;
+	
 	/**
 	 * Looks up CtxEntities of the specified type, containing the specified
 	 * attributes

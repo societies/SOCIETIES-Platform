@@ -603,6 +603,24 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 
 		return foundList;
 	}
+
+	//TODO description
+	@Override
+	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types)
+			throws CtxException {
+
+		if (types == null) 
+			throw new NullPointerException("types can't be null");
+		
+		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
+		for (String type:types) {
+			ids.addAll(this.lookup(CtxModelType.ENTITY, type));
+			ids.addAll(this.lookup(CtxModelType.ATTRIBUTE, type));
+			ids.addAll(this.lookup(CtxModelType.ASSOCIATION, type));
+		}
+
+		return ids;
+	}
 	
 	/*
 	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#lookupCommunityCtxEntity(java.lang.String)
@@ -678,6 +696,5 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		
 		return objectNumberDAO.getNextValue();
 	}
-
 
 }

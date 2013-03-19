@@ -422,6 +422,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		return foundList;
 	}
 
+	@Override
+	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types)
+			throws CtxException {
+
+		if (types == null) 
+			throw new NullPointerException("types can't be null");
+		
+		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
+		for (String type:types) {
+			ids.addAll(this.lookup(CtxModelType.ENTITY, type));
+			ids.addAll(this.lookup(CtxModelType.ATTRIBUTE, type));
+			ids.addAll(this.lookup(CtxModelType.ASSOCIATION, type));
+		}
+
+		return ids;
+	}
+	
 	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookupEntities(java.lang.String, java.lang.String, java.io.Serializable, java.io.Serializable)
 	 */
@@ -752,4 +769,5 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		
 		return objectNumberDAO.getNextValue();
 	}
+
 }

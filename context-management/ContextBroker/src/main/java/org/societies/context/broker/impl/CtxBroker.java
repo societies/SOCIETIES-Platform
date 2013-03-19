@@ -223,7 +223,15 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 
 	//*************** end of basic CRUD ************************
-
+	
+	@Override
+	@Async
+	public Future<List<CtxIdentifier>> lookup(Requestor requestor, IIdentity targetCss,
+			String type) throws CtxException {
+		
+		LOG.info("skata 1 external requestor " + requestor +" targetCss "+targetCss +" type "+type );
+		return this.internalCtxBroker.lookup(requestor,targetCss, type);
+	}
 
 	@Override
 	@Async
@@ -561,4 +569,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// do nothing
 		}
 	}
+
+
 }
