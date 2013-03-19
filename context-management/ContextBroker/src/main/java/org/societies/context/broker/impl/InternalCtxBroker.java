@@ -361,9 +361,9 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<List<CtxIdentifier>> lookup(IIdentity target,
 			CtxModelType modelType, String type) throws CtxException {
-		
-	
-		
+
+
+
 		return this.lookup(null, target, modelType, type);
 	}
 
@@ -1739,6 +1739,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");
+		//if (modelType == null) return this.lookup(type);
+		
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
@@ -1811,10 +1813,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-
 			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
-
-			//LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
 
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
@@ -1860,7 +1859,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// target is a CIS 
 		if (IdentityType.CIS.equals(target.getType())) {
-			
+
 			if (LOG.isDebugEnabled())
 				LOG.debug("target is a CIS " + target);
 			try {
@@ -1876,7 +1875,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					} else 	objectResult = this.communityCtxDBMgr.retrieve(identifier);
 
 				} else {
-					
+
 					if (LOG.isDebugEnabled())
 						LOG.debug("remote retrieve for CIS " + target);
 					final RetrieveCtxCallback callback = new RetrieveCtxCallback();
@@ -1889,7 +1888,7 @@ public class InternalCtxBroker implements ICtxBroker {
 								objectResult = callback.getResult();
 							else 
 								throw callback.getException();
-						
+
 						} catch (InterruptedException e) {
 							throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 						}
@@ -2655,18 +2654,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxIdentifier>> lookup(Requestor requestor, IIdentity targetCSS,
 			String type) throws CtxException {
-		
+
 		if(requestor == null) requestor = getLocalRequestor();
 		if(targetCSS == null) targetCSS = getLocalIdentity();
-		
+
 		LOG.debug("skata 3 internal empty type "+type );
-		
+
 		if (type == null)
 			throw new NullPointerException("type can't be null");
-		
+
 		List<CtxIdentifier>  localCtxIdListResult = new ArrayList<CtxIdentifier>();
 		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
-		
+
 		if (IdentityType.CSS.equals(targetCSS.getType()) 
 				|| IdentityType.CSS_RICH.equals(targetCSS.getType())
 				|| IdentityType.CSS_LIGHT.equals(targetCSS.getType())){
@@ -2680,12 +2679,12 @@ public class InternalCtxBroker implements ICtxBroker {
 					Set<String> lookableTypes = new HashSet<String>();
 					DataTypeUtils dataType = new DataTypeUtils();
 					lookableTypes = dataType.getLookableDataTypes(type);
-					LOG.debug(" OLIVIER ****  "+lookableTypes);
-					
+					LOG.debug(" lookableTypes ****  "+lookableTypes);
+
 					ctxIdListFromDb = this.userCtxDBMgr.lookup(targetCSS.getJid(), lookableTypes);
-				
+
 					LOG.debug("  ctxIdListFromDb ****  "+ctxIdListFromDb);
-				
+
 				} catch (Exception e) {
 					throw new CtxBrokerException("Platform context broker failed to lookup " 
 							+ type	+ " objects of type " + type + ": " 
@@ -2713,19 +2712,19 @@ public class InternalCtxBroker implements ICtxBroker {
 						throw new CtxAccessControlException("Could not lookup " 
 								+ type	+ " objects of type " + type 
 								+ ": Access denied");
-					
+
 					LOG.debug("  ctxIdListFromDb localCtxIdListResult****  "+localCtxIdListResult);
-					
+
 					return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
 				}
 				// remote call
 			} else {
 				LOG.debug("remote call ");
-				
+
 				final LookupCallback callback = new LookupCallback();
-				
+
 				CtxModelType modelType = null;
-				
+
 				ctxBrokerClient.lookup(requestor, targetCSS, modelType, type, callback);
 
 				synchronized (callback) {
@@ -2739,7 +2738,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
 					}
 				}
-	
+
 				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
 
 			}
@@ -2754,19 +2753,19 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
-		
-		
+
+
 		return null;
 	}
-	
+
 	@Override
 	public Future<List<CtxIdentifier>> lookup(String type) throws CtxException {
-		
+
 		LOG.debug("skata 2 internal empty type "+type );
 		Requestor req = null;
 		IIdentity id = null;
 
 		return this.lookup(req, id, type);
 	}
-	
+
 }
