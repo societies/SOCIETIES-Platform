@@ -80,6 +80,11 @@ import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 //import org.societies.platform.socialdata.SocialData;
 
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedManager;
+import org.societies.activity.client.ActivityFeedClient;
+
 import org.apache.shindig.social.opensocial.model.Person;
 
 import org.societies.api.osgi.event.EMSException;
@@ -135,6 +140,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
         this.idManager = commManager.getIdManager();
         
         this.pubsubID = idManager.getThisNetworkNode();
+        
+        this.getiActivityFeedManager();
+        
+        LOG.info("about to call createActivityFeed from cssManagerInit");
+        this.createCSSActivityfeed(idManager.getThisNetworkNode().toString(), iActivityFeedManager);
         
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
@@ -277,6 +287,33 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		IIdentity cssIdentity = null;
+		ActivityFeedClient client = new ActivityFeedClient();
+		//cssIdentity = idManager.getThisNetworkNode();
+		try {
+			cssIdentity = commManager.getIdManager().fromJid(idManager.getThisNetworkNode().toString());
+		}catch (InvalidFormatException ife) {
+
+			LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+		}
+			
+		LOG.info("cssIdentity is :" +cssIdentity);
+		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(idManager.getThisNetworkNode().toString(), cssIdentity.getJid(), true);
+					
+		IActivity iActivity = activityFeed.getEmptyIActivity();
+		iActivity.setActor(idManager.getThisNetworkNode().toString());
+		iActivity.setObject(cssIdentity.getJid());
+		iActivity.setVerb("Minimal record created");
+
+		
+			
+		client.getActivityFeed();
+		
+			
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
+		
 	}
 	/**
 	 * Workaround for existing problem with database
@@ -839,6 +876,18 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
+	
+	private IActivityFeedManager iActivityFeedManager;
+
+    
+    public IActivityFeedManager getiActivityFeedManager() {
+		return iActivityFeedManager;
+	}
+
+	public void setiActivityFeedManager(IActivityFeedManager iActivityFeedManager) {
+		this.iActivityFeedManager = iActivityFeedManager;
+	}
+	
 	private ISocialData socialdata;
 
 	private FriendFilter filter;
@@ -2771,6 +2820,39 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		LOG.info("CSS MANAGER set friendfilter calledwith filt: " +filter.getFilterFlag());
 		this.filter = filter;
 		
+	}
+	
+public void createCSSActivityfeed(String cssOwner, IActivityFeedManager iActivityFeedManager) {
+		
+		LOG.info("createCSSActivity called with OWNER: " +cssOwner +"and activityfeedmanager: " +iActivityFeedManager);
+		 
+		IIdentity cssIdentity = null;
+		ActivityFeedClient client = new ActivityFeedClient();
+		//cssIdentity = idManager.getThisNetworkNode();
+		try {
+			cssIdentity = commManager.getIdManager().fromJid(cssOwner);
+		}catch (InvalidFormatException ife) {
+
+			LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+		}
+			
+		LOG.info("cssIdentity is :" +cssIdentity);
+		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cssIdentity.getJid(), true);
+					
+		IActivity iActivity = activityFeed.getEmptyIActivity();
+		iActivity.setActor(cssOwner);
+		iActivity.setObject(cssIdentity.getJid());
+		iActivity.setVerb("created");
+			
+		client.getActivityFeed();
+		
+			
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
+		LOG.info("getActivities called : ");
+		activityFeed.getActivities("1363657766804", client);
+		
+		LOG.info("@@@@ Back from call to getActivities: ");
 	}
 	
 
