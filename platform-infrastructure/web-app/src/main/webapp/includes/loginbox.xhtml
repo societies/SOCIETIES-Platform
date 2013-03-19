@@ -39,9 +39,9 @@
 
     <!-- LOGOUT INCLUDE - only displayed if logged in -->
     <ui:fragment rendered="#{loginController.loggedIn}">
-        <div class="login-form"><span>
+        <div class="login-form">
             Logged in as <strong><h:outputText value="#{loginController.username}"/></strong>
-            </span>
+            <h:commandLink action="#{loginController.logoutAction}">LOGOUT</h:commandLink>
         </div>
     </ui:fragment>
 </ui:composition>

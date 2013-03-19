@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 
 /**
  * Postal location
@@ -32,7 +33,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PostalLocation {
+@Deprecated
+public class PostalLocation extends IObfuscable {
 	private String logicalName;
 	private String streetNumber;
 	private String streetName;

@@ -68,13 +68,15 @@
 
 
 		
-
+	
+	
 		<dependency>
 			<groupId>org.societies.platform.socialdata</groupId>
 			<artifactId>SocialDataComms</artifactId>
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+ 	
 
         <!--  CONNECTORS Available -->
 

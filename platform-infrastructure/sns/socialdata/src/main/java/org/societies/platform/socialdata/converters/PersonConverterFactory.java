@@ -5,8 +5,10 @@ import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class PersonConverterFactory{
 	
-	public static PersonConverter getPersonConverter(ISocialConnector connector){
-		if (SocialNetwork.FACEBOOK.equals(connector.getSocialNetwork())) 
+	public static PersonConverter getConverter(ISocialConnector connector){
+
+	    
+	    if (SocialNetwork.FACEBOOK.equals(connector.getSocialNetwork())) 
 			return new PersonConverterFromFacebook();
 		else if (SocialNetwork.TWITTER.equals(connector.getSocialNetwork()))
 			return new PersonConverterFromTwitter();

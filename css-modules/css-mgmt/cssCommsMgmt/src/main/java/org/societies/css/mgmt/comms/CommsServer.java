@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.css.mgmt.comms;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -59,12 +60,32 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+import org.societies.api.schema.activityfeed.AddActivityResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
+import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedManager;
+import org.societies.activity.client.ActivityFeedClient;
+
 public class CommsServer implements IFeatureServer {
 	private ICommManager commManager;
 	//private ICSSLocalManager cssManager;
 	private ICSSInternalManager cssManager;
 	private IIdentityManager idMgr;
 	private FriendFilter FriendFilter;
+public IActivityFeed activityFeed = null;
+	
+	public IActivityFeed getActivityFeed() {
+		return activityFeed;
+	}
+
+
+	private void setActivityFeed(IActivityFeed activityFeed) {
+		this.activityFeed = activityFeed;
+	}
 	
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
@@ -240,6 +261,155 @@ public class CommsServer implements IFeatureServer {
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;
 		}
+		
+		if (payload.getClass().equals(MarshaledActivityFeed.class)) {
+			LOG.info("activity feed type received");
+            MarshaledActivityFeed c = (MarshaledActivityFeed) payload;
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+                MarshaledActivityFeed result = new MarshaledActivityFeed();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = activityFeed.getEmptyIActivity();
+				iActivity.setActor(c.getDeleteActivity().getMarshaledActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getMarshaledActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getMarshaledActivity().getTarget());
+				iActivity.setVerb(c.getDeleteActivity().getMarshaledActivity().getVerb());
+
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.deleteActivity(iActivity,d);
+				
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getDeleteActivityResponse()){
+					r.setResult(m.getDeleteActivityResponse().isResult());
+				}else{
+					LOG.warn("no callback object after immediate call of delecte activity feed");
+					r.setResult(false);
+				}
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+
+			
+			
+			// get Activities
+			if (c.getGetActivities() != null) {
+				LOG.debug("get activities called");
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+				GetActivitiesResponse r = new GetActivitiesResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				List<IActivity> iActivityList;
+				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
+				
+				
+				ActivityFeedClient d = new ActivityFeedClient();
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
+						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
+					else
+						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);										
+				//}
+				
+					MarshaledActivityFeed m = d.getActivityFeed();
+					
+					if(null != m && null != m.getGetActivitiesResponse()){
+						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
+					}else{
+						LOG.warn("no callback object after immediate call of get activities");
+						// ill set an empty list
+						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
+					}
+					
+					
+				result.setGetActivitiesResponse(r);		
+				return result;
+
+			}				// END OF get ACTIVITIES
+			
+			// add Activity
+
+			if (c.getAddActivity() != null) {
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+				AddActivityResponse r = new AddActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = activityFeed.getEmptyIActivity();
+				iActivity.setActor(c.getAddActivity().getMarshaledActivity().getActor());
+				iActivity.setObject(c.getAddActivity().getMarshaledActivity().getObject());
+				iActivity.setTarget(c.getAddActivity().getMarshaledActivity().getTarget());
+				iActivity.setVerb(c.getAddActivity().getMarshaledActivity().getVerb());
+
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.addActivity(iActivity,d);
+				
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getAddActivityResponse()){
+					r.setResult(m.getAddActivityResponse().isResult());
+				}else{
+					LOG.warn("no callback object after immediate call of add activity");
+					r.setResult(false);
+				}
+				
+				
+				result.setAddActivityResponse(r);		
+				return result;
+
+			}				// END OF add Activity
+			
+						
+			
+			// cleanup activities
+			if (c.getCleanUpActivityFeed() != null) {
+				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+
+				ActivityFeedClient d = new ActivityFeedClient();
+				activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria(),d);
+				
+				MarshaledActivityFeed m = d.getActivityFeed();
+				
+				if(null != m && null != m.getCleanUpActivityFeedResponse()){
+					r.setResult(m.getCleanUpActivityFeedResponse().getResult());
+				}else{
+					LOG.warn("no callback object after immediate call of clean up activity feed");
+					r.setResult(0);
+				}
+				
+				
+				result.setCleanUpActivityFeedResponse(r);		
+				return result;
+
+			}				// END OF cleanup activities
+
+			
+			
+			
+		}
+		
 		Dbc.ensure(this.getClass().getName() + " failure to interpret remote method invocation payload", true);
 		return null;
 

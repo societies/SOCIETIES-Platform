@@ -65,6 +65,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
@@ -236,6 +238,21 @@ public class SocialDataController {
 
 		return null;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/socialdatastatus.html", method = RequestMethod.GET)
+	public String getStatus(HttpServletResponse response){
+	   return ""+socialdata.getStatus();
+	}
+	
+	
+	@RequestMapping(value="/status", method=RequestMethod.GET)
+	public @ResponseBody String getSocialDataStatus(@RequestParam String name) {
+	   return ""+socialdata.getStatus();
+	}
+
+	
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.POST)
@@ -381,8 +398,17 @@ public class SocialDataController {
 					content += "<h1>" + e.getMessage() + "</h1>";
 					e.printStackTrace();
 				}
+				
+				
 
 			}
+			
+			lastUpdate = dateFormat.format(new Date());
+			model.put("sdForm", sdForm);
+			model.put("lastupdate", lastUpdate);
+			model.put("connectors", getConnectorsHTML());
+			return new ModelAndView("socialdata", model);
+			
 		} else if (FRIENDS.equalsIgnoreCase(method)) {
 
 			// DO add Connectore HERE

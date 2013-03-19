@@ -44,6 +44,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.socialdata.SocialData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,7 +111,7 @@ AbstractTransactionalJUnit4SpringContextTests {
     @Before
 	public void setupBefore() throws Exception {
         activityFeedManager.setSessionFactory(this.sessionFactory);
-        actFeed = (ActivityFeed) activityFeedManager.getOrCreateFeed(FEED_JID,FEED_ID);
+        actFeed = (ActivityFeed) activityFeedManager.getOrCreateFeed(FEED_JID,FEED_ID, false);
 	}
 	@After
 	public void tearDownAfter() throws Exception {
@@ -132,7 +133,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		iact.setVerb(verb);
 		iact.setObject("message");
 		iact.setTarget("testTarget");
-		actFeed.addActivity(iact);
+		actFeed.addActivityToDB(iact);
 
 		List<IActivity> results = null;
 		try {
@@ -146,7 +147,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 				e.printStackTrace();
 			}
 			LOG.info("sending timeSeries: "+timeSeries+ " act published: "+iact.getPublished());
-			results = actFeed.getActivities(searchQuery.toString(), timeSeries);
+			results = actFeed.getActivitiesFromDB(searchQuery.toString(), timeSeries);
 			LOG.info("testing filtering filter result: "+results.size());
 
 		} catch (Exception e) {
@@ -191,7 +192,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		actFeed.startUp(sessionFactory);
 		String actor="testFilterUser";
 		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
-		actFeed.addActivity(act1);
+		actFeed.addActivityToDB(act1);
 		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
 		JSONObject searchQuery = new JSONObject();
 		try {
@@ -202,7 +203,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 			e.printStackTrace();
 		}
 		LOG.info("sending timeSeries: "+timeSeries+ " act published: "+act1.getPublished());
-		List<IActivity> results = actFeed.getActivities(searchQuery.toString(), timeSeries);
+		List<IActivity> results = actFeed.getActivitiesFromDB(searchQuery.toString(), timeSeries);
 		LOG.info("testing filtering filter result: "+results.size());
 		assert(results.size() > 0);
 	}
@@ -230,11 +231,12 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTSNIMPORTER @@@@@@@");
         actFeed.setId("4");
 		actFeed.startUp(sessionFactory);
-		LOG.info("actFeedcontent: "+ actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
+		LOG.info("actFeedcontent: "+ actFeed.getActivitiesFromDB("0 " + Long.toString(System.currentTimeMillis())).size());
 		ISocialConnector mockedSocialConnector; 
 		mockedSocialConnector = mock(ISocialConnector.class);
 		stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
 		stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
+		stub(mockedSocialConnector.getSocialNetwork()).toReturn(SocialNetwork.FACEBOOK);
 		try {
 			stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
 			stub(mockedSocialConnector.getUserActivities()).toReturn(readFileAsString("mocks/activities.txt"));
@@ -256,9 +258,9 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("testing importing from facebook, raw activities: " + mockedSocialConnector.getUserActivities());
 		LOG.info("testing importing from facebook, activities: " + data.getSocialActivity().size() );
 		
-		LOG.info("feed-hash: "+actFeed.hashCode()+"  feed.getActivities(\"0 \" + Long.toString(System.currentTimeMillis())).size(): " +  actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
+		LOG.info("feed-hash: "+actFeed.hashCode()+"  feed.getActivitiesFromDB(\"0 \" + Long.toString(System.currentTimeMillis())).size(): " +  actFeed.getActivitiesFromDB("0 " + Long.toString(System.currentTimeMillis())).size());
 		LOG.info("comparing with: "+data.getSocialActivity().size());
-		assert(data.getSocialActivity().size() == actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
+		assert(data.getSocialActivity().size() == actFeed.getActivitiesFromDB("0 " + Long.toString(System.currentTimeMillis())).size());
 	}
 
 	//@Ignore
@@ -277,7 +279,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		iact.setObject("message");
 		iact.setTarget("testTarget");
 
-		actFeed.addActivity(iact);
+		actFeed.addActivityToDB(iact);
 //				Session session = ActivityFeed.getStaticSessionFactory().openSession();//getSessionFactory().openSession();
 //				Transaction t = session.beginTransaction();
 //				session.update(actFeed);
@@ -296,7 +298,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 				e.printStackTrace();
 			}
 			LOG.info("sending timeSeries: "+timeSeries+ " act published: "+iact.getPublished());
-			results = actFeed.getActivities(searchQuery.toString(), timeSeries);
+			results = actFeed.getActivitiesFromDB(searchQuery.toString(), timeSeries);
 			LOG.info("testing filtering filter result: "+results.size());
 
 		} catch (Exception e) {
@@ -307,6 +309,58 @@ AbstractTransactionalJUnit4SpringContextTests {
 		assert(results.size()>0);
 		assert(results.get(0).getActor().equals(actor));
 	}
+	
+	
+	@Test
+	@Rollback(false)
+	public void testAddCisActivityAsync() {
+        actFeed.setId("6");
+		actFeed.startUp(sessionFactory);
+		String actor="testAddCisActivityAsync";
+		String verb="published";
+		IActivity iact = new Activity();
+		iact.setActor(actor);
+		iact.setPublished(Long.toString(System.currentTimeMillis()));
+		iact.setVerb(verb);
+		iact.setObject("message");
+		iact.setTarget("testTarget");
+		actFeed.addActivity(iact);
+		// becuase it's async, clients don;t have to wait for it to be added
+		// to continue, but for purpose of test, we need to sleep before we call getactivities
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		List<IActivity> results = null;
+		try {
+			JSONObject searchQuery = new JSONObject();
+			String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
+			try {
+				searchQuery.append("filterBy", "actor");
+				searchQuery.append("filterOp", "equals");
+				searchQuery.append("filterValue", actor);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			LOG.info("sending timeSeries: "+timeSeries+ " act published: "+iact.getPublished());
+			results = actFeed.getActivities(searchQuery.toString(), timeSeries, 0).get();
+			LOG.info("testing filtering filter result: "+results.size());
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		assertNotNull(results);
+		assert(results.size()>0);
+		assert(results.get(0).getActor().equals(actor));
+	}
+
+	
 	private static String readFileAsString(String filePath)
 			throws java.io.IOException{
 		StringBuffer fileData = new StringBuffer(1000);

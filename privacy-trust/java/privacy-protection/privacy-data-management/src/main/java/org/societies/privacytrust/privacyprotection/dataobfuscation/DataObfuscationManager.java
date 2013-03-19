@@ -24,33 +24,23 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.*;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.schema.activity.MarshaledActivity;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.*;
+import org.societies.privacytrust.privacyprotection.api.dataobfuscation.IDataObfuscator;
+import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.ObfuscatorFactory;
 
 /**
  * Implementation of IDataObfuscationManager
  * @author Olivier Maridat (Trialog)
  */
 public class DataObfuscationManager implements IDataObfuscationManager {
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
-	 */
-	@Override
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
 
+	@Override
+	public DataWrapper obfuscateData(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// -- Verify params
-		// Wrapper ready for obfuscation
-		if (!dataWrapper.isReadyForObfuscation()) {
-			throw new PrivacyException("This data wrapper is not ready for obfuscation. Data are needed.");
-		}
-		// Obfuscation level in [0, 1]
+		// Obfuscation level in ]0, 1]
 		if (obfuscationLevel > 1) {
 			obfuscationLevel = 1;
 		}
@@ -64,18 +54,17 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 
 
 		// -- Mapping: retrieve the relevant obfuscator
-		IDataObfuscator obfuscator = getDataObfuscator(dataWrapper);
+		IDataObfuscator obfuscator = ObfuscatorFactory.getDataObfuscator(dataWrapper);
 
 		// -- Obfuscate
-		IDataWrapper obfuscatedDataWrapper = null;
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			// - Obfuscation
 			obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
 			// - Persistence
-			//			if (dataWrapper.isPersistenceEnabled()) {
-			// TODO: persiste the obfuscated data using a data broker
-			//				System.out.println("Persist the data "+dataWrapper.getDataId());
-			//			}
+			if (obfuscator.getObfuscatorInfo().isPersistable()) {
+				persistDataWrapper(obfuscatedDataWrapper);
+			}
 		}
 		catch(Exception e) {
 			throw new PrivacyException("Obfuscation aborted", e);
@@ -83,55 +72,12 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return obfuscatedDataWrapper;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
-	 */
 	@Override
-	public IDataWrapper hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-
-		// -- Search obfuscatred version
-		//		if (dataWrapper.isPersistenceEnabled()) {
-		// TODO: retrieve obfsucated data ID using data broker
-		// An obfuscated version exist
-		//			if (false) {
-		//				System.out.println("Retrieve the persisted data id of data id "+dataWrapper.getDataId());
-		//			}
-		//		}
+	public DataWrapper hasObfuscatedVersion(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		return dataWrapper;
 	}
 
-	/**
-	 * Retrieve the relevant obfuscator
-	 * @param dataWrapper
-	 * @return
-	 * @throws PrivacyException
-	 */
-	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
-		IDataObfuscator obfuscator = null;
-		if (dataWrapper.getData() instanceof LocationCoordinates) {
-			obfuscator = new LocationCoordinatesObfuscator((IDataWrapper<LocationCoordinates>) dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Name) {
-			obfuscator = new NameObfuscator((IDataWrapper<Name>) dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Temperature) {
-			obfuscator = new TemperatureObfuscator((IDataWrapper<Temperature>) dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof MarshaledActivity) {
-			obfuscator = new ActivityObfuscator((IDataWrapper<MarshaledActivity>) dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof Status) {
-			obfuscator = new StatusObfuscator((IDataWrapper<Status>) dataWrapper);
-		}
-		else if (dataWrapper.getData() instanceof PostalLocation) {
-			obfuscator = new PostalLocationObfuscator((IDataWrapper<PostalLocation>) dataWrapper);
-		}
-		else {
-			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");
-		}
-		return obfuscator;
+	private DataIdentifier persistDataWrapper(DataWrapper dataWrapper) {
+		return null;
 	}
-
 }

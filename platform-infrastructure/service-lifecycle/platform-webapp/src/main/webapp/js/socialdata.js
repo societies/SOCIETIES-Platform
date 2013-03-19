@@ -124,5 +124,24 @@ function countConnectors(){
    }
   	   
  }
+ 
+ function queryBundleStatus() {
+	  $.ajax({
+	    url: 'status',
+	    success: function(data) {
+	    	$('#status').setVal(data); 
+	    }
+	  });
+	  setTimeout(queryBundleStatus, 5000); // you could choose not to continue on failure...
+	}
 
+	
+ 
+ $(document).ready(function(){ 
+	 
+	  $('#status').val("Reading status..."); 
+	  setTimeout(queryBundleStatus, 5000);
+});
 
+ 	
+ 

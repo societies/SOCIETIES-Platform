@@ -10,8 +10,8 @@ public interface ISocialConnector extends Serializable {
     /**
      * Constants
      */
-    public final static String AUTH_TOKEN = "auth_token";
-    public final static String IDENTITY = "identity";
+    public final static String AUTH_TOKEN 	= "auth_token";
+    public final static String IDENTITY 	= "identity";
 
     /**
      * Get Social Connector id, because for a single social network there can be

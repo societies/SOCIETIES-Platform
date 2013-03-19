@@ -19,8 +19,8 @@
  */
 package org.societies.privacytrust.privacyprotection.test.dataobfuscation.obfuscator;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -31,9 +31,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
 
@@ -70,7 +71,7 @@ public class NameObfuscatorTest {
 	@Parameters(method = "parametersForObfuscateData")
 	public void testObfuscateData(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateData("+obfuscationLevel+")");
-		IDataWrapper<Name> obfuscatedDataWrapper = null;
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
 		} catch (PrivacyException e) {
@@ -78,23 +79,29 @@ public class NameObfuscatorTest {
 			fail("testObfuscateData(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
+		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
 		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
+		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (0 == obfuscationLevel) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), new Name("", ""));
+			Name expected = NameUtils.create("", "");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else if (1/4 == obfuscationLevel) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), new Name("O.", "M."));
+			Name expected = NameUtils.create("O.", "M.");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else if (2/4 == obfuscationLevel) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), new Name("Olivier", ""));
+			Name expected = NameUtils.create("Olivier", "");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else if (3/4 == obfuscationLevel) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), new Name("", "Maridat"));
+			Name expected = NameUtils.create("", "Maridat");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else if (1 == obfuscationLevel) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), obfuscator.getDataWrapper().getData());
+			Name expected = NameUtils.create("Olivier", "Maridat");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 	}
 
@@ -102,7 +109,7 @@ public class NameObfuscatorTest {
 	@Parameters({ "-1.0", "2.5" })
 	public void testObfuscateDataOutOfBound(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateData("+obfuscationLevel+")");
-		IDataWrapper<Name> obfuscatedDataWrapper = null;
+		DataWrapper obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);
 		} catch (PrivacyException e) {
@@ -110,14 +117,17 @@ public class NameObfuscatorTest {
 			fail("testObfuscateDataOutOfBound(): obfuscation error "+e.getLocalizedMessage());
 		}
 		// Verify
+		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
 		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
+		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (obfuscationLevel < 0) {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), new Name("", ""));
+			Name expected = NameUtils.create("", "");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else {
-			assertEquals("Data not well obfuscated", obfuscatedDataWrapper.getData(), obfuscator.getDataWrapper().getData());
+			Name expected = NameUtils.create("Olivier", "Maridat");
+			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 	}
 }

@@ -25,24 +25,26 @@ public class LinkedinConnector implements ISocialConnector {
 	private Properties			parameters;
 
 	public static final String PROFILE_URL 			= "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,languages,skills,educations," +
-													  "date-of-birth,honors,associations,email-address,summary,public-profile-url,picture-url," +
-													  "specialties,industry,headline,formatted-name,maiden-name,patents,interests)";
+													  "date-of-birth,honors,associations,email-address,"  +
+													  "summary,public-profile-url,picture-url," +
+													  "specialties,industry,headline,formatted-name," +
+													  "maiden-name,patents,interests)";
 	
 	
 	public static final String FRIENDS_URL 			= "http://api.linkedin.com/v1/people/~/connections";
 	public static final String GROUPS_URL 			= "http://api.linkedin.com/v1/people/~/group-memberships?membership-state=member";
 	public static final String ACTIVITIES_URL 		= "http://api.linkedin.com/v1/people/~/network/updates?scope=self";
-	public static final String POST_URL		 		= "http://api.linkedin.com/v1/people/~/shares";
+	public static final String POST_URL		 	= "http://api.linkedin.com/v1/people/~/shares";
 	
 	public static final String LK_CLIENT_ID			= "cysdprp40gxn";
 	public static final String LK_ClIENT_SECRET		= "faKKFat0QeJomJjv";
 	public static final String LK_CALLBACK_URL		= "http://127.0.0.1:8080/societies-test/doConnect.html?type=lk";
-	public static final String LK_SCOPES			= "r_basicprofile,r_basicprofile,r_emailaddress,r_network,r_contactinfo,rw_nus,rw_groups";
+	public static final String LK_SCOPES			= "r_basicprofile,r_fullprofile,r_emailaddress,r_network,r_contactinfo,rw_nus,rw_groups";
 	
 	
 	public static final String ME 		= "profile";
 	public static final String FEEDS 	= "activities";
-	public static final String GROUPS   = "groups";
+	public static final String GROUPS  	 = "groups";
 	public static final String FRIENDS 	= "friends";
 	
 	
@@ -149,7 +151,7 @@ public class LinkedinConnector implements ISocialConnector {
 	
 
 	public String getUserProfile() {
-		return get(PROFILE_URL);
+	    return get(PROFILE_URL);
 	}
 
 	
@@ -201,11 +203,29 @@ public class LinkedinConnector implements ISocialConnector {
 			
 			OAuthRequest request = new OAuthRequest(Verb.POST, POST_URL);
 			// set the headers to the server knows what we are sending
-			request.addHeader("Content-Type", "application/json");
-			request.addHeader("x-li-format", "json");
+			request.addHeader("Content-Type", "application/xml");
+			//request.addHeader("x-li-format", "json");
+			
+			String xmlValue="<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+					"<share>" +
+					"<comment>SOCIETIES Social share</comment>" +
+					"<content>" +
+					"<title> Socieites Post </title>" +
+					"<description>"+value+"</description>" +
+					"<submitted-url>http://www.ict-societies.eu/</submitted-url>" +
+					"<submitted-image-url>http://www.ict-societies.eu/wp-content/themes/societies/images/logo.png</submitted-image-url>" +
+					"</content>" +
+					"<visibility>" +
+					"<code>anyone</code>" +
+					"</visibility>" +
+					"</share>";
+			
+			request.addPayload(xmlValue);
 			
 			
-			request.addPayload(value);
+		
+			
+			
 			this.service.signRequest(token.getAccessToken(), request);
 			Response response = request.send();
 

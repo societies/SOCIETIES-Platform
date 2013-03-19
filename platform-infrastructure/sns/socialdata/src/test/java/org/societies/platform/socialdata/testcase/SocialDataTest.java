@@ -39,9 +39,6 @@ public class SocialDataTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 
-
-
-
 		mockedSocialConnector = mock(ISocialConnector.class);
 		stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
 		stub(mockedSocialConnector.getID()).toReturn("facebook_0001");

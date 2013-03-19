@@ -24,10 +24,11 @@
  */
 package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
+import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.TemperatureObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.ObfuscationLevelType;
-import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temperature;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Temperature;
 
 /**
  * Obfuscator for name
@@ -35,16 +36,13 @@ import org.societies.api.internal.schema.privacytrust.model.dataobfuscation.Temp
  * @author Olivier Maridat (Trialog)
  *
  */
-public class TemperatureObfuscator extends DataObfuscator<DataWrapper> {
+public class TemperatureObfuscator extends DataObfuscator<Temperature> {
 	/**
 	 * @param data
 	 */
-	public TemperatureObfuscator(DataWrapper data) {
-		super(data);
-		available = false;
-		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		stepNumber = 1;
-		dataType = Temperature.class;
+	public TemperatureObfuscator(DataWrapper dataWrapper) {
+		super(dataWrapper);
+		obfuscatorInfo = new TemperatureObfuscatorInfo();
 	}
 
 

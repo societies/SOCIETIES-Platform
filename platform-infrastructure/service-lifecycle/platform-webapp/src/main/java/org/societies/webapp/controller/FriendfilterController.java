@@ -94,6 +94,7 @@ public class FriendfilterController {
 		filters.put("linkedin", "show linkedin friends");
 		filters.put("foursquare", "show foursquare friends");
 		filters.put("googleplus", "show googleplus friends");
+		filters.put("CISMember", "show CIS Members friends");
 		filters.put("all", "show all friends");
 		
 	
@@ -118,12 +119,13 @@ public class FriendfilterController {
 			model.put("errormsg", "CSS Manager reference not available");
 			return new ModelAndView("error", model);
 		}
-		int facebook =		0x00000000001;
-		int twitter = 		0x00000000010;
-		int linkedin =		0x00000000100;
-		int foursquare = 	0x00000001000;
-		int googleplus = 	0x00000010000;
-		int all = 			0x00000011111;
+		int facebook =		0x0000000001;
+		int twitter = 		0x0000000010;
+		int linkedin =		0x0000000100;
+		int foursquare = 	0x0000001000;
+		int googleplus = 	0x0000010000;
+		int all = 			0x0000011111;
+		int CISMemeber = 	0x0000100000;
 		
 		int filterType = 0;
 		
@@ -181,6 +183,13 @@ public class FriendfilterController {
 					LOG.info("setting friend filter with filterflag as : " +filter.getFilterFlag());
 					cssLocalManager.setFriendfilter(filter);
 				} 
+				if (filters.equalsIgnoreCase("CISMember")) {
+					filterType = CISMemeber;
+					filter.setFilterFlag(CISMemeber);
+					LOG.info("setting friend filter with filterflag as : " +filter.getFilterFlag());
+					cssLocalManager.setFriendfilter(filter);
+					
+				}
 				
 				
 

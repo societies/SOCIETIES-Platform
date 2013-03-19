@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 import org.societies.api.schema.identity.DataIdentifier;
 
 
@@ -40,7 +41,7 @@ import org.societies.api.schema.identity.DataIdentifier;
  * @author olivierm
  * @date 14 oct. 2011
  */
-public class DataWrapper<E> implements IDataWrapper<E> {
+public class DataWrapper<E extends IObfuscable> implements IDataWrapper<E> {
 	/**
 	 * ID of the data, useful for persistence
 	 */

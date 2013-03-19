@@ -9,12 +9,9 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 
-
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class ActivityFeedCallback implements ICommCallback {
@@ -32,26 +29,11 @@ public class ActivityFeedCallback implements ICommCallback {
 					//"org.societies.api.schema.cis.community"));
 	
 	
-	//private IActivityFeedCallback sourceCallback = null;
-	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
-	 private final Map<String, IActivityFeedCallback> clients = new HashMap<String, IActivityFeedCallback>();
-
-	
+	private IActivityFeedCallback sourceCallback = null;
 	private static Logger LOG = LoggerFactory.getLogger(ActivityFeedCallback.class);
 	
 	public ActivityFeedCallback (String clientId, IActivityFeedCallback sourceCallback) {
-		clients.put(clientId, sourceCallback);
-	}
-	
-	/**Returns the correct client callback for this request
-	 * @param requestID the id of the initiating request
-	 * @return
-	 * @throws UnavailableException
-	 */
-	private IActivityFeedCallback getRequestingClient(String requestID) {
-		IActivityFeedCallback requestingClient = (IActivityFeedCallback) clients.get(requestID);
-		clients.remove(requestID);
-		return requestingClient;
+		this.sourceCallback = sourceCallback;
 	}
 	
 	@Override
@@ -90,9 +72,7 @@ public class ActivityFeedCallback implements ICommCallback {
 		
 
 		// return callback for all cases
-		IActivityFeedCallback callback = this.getRequestingClient(stanza.getId());
-		callback.receiveResult((MarshaledActivityFeed)payload);
-		//this.sourceCallback.receiveResult((MarshaledActivityFeed)payload);
+		this.sourceCallback.receiveResult((MarshaledActivityFeed)payload);
 
 	}
 

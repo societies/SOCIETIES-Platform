@@ -217,7 +217,7 @@ public class CISSimulator implements IActivityFeedCallback {
         
         CPACreationPatterns cpa = new CPACreationPatterns();
         cpa.init();
-        cpa.analyze(sim.getActFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
+        cpa.analyze(sim.getActFeed().getActivitiesFromDB("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
         
 	}
 

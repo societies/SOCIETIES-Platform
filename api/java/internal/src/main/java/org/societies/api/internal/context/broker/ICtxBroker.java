@@ -205,6 +205,8 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 */
 	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType, String type) throws CtxException;
 	
+	public Future<List<CtxIdentifier>> lookup(String type) throws CtxException;
+	
 	/**
 	  * Looks up context model objects of the specified type associated with the
 	  * identified target CSS or CIS. The method returns a list of

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -35,8 +36,12 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -63,6 +68,10 @@ public class TrustRepository implements ITrustRepository {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
+	
+	/** The Trust Event Mgr service reference. */
+	@Autowired
+	private ITrustEventMgr trustEventMgr;
 	
 	/** The Hibernate session factory. */
 	@Autowired
@@ -162,7 +171,7 @@ public class TrustRepository implements ITrustRepository {
 					.add(Restrictions.and(
 							Restrictions.eq("trustorId", trustorId),
 							Restrictions.eq("trusteeId", trusteeId)
-					));
+					)).setLockMode(LockMode.UPGRADE);
 			
 			//if (TrustedCss.class.equals(entityClass))
 			//	criteria.setFetchMode("communities", FetchMode.SELECT);
@@ -208,6 +217,24 @@ public class TrustRepository implements ITrustRepository {
 		} finally {
 			if (session != null)
 				session.close();
+		}
+		
+		for (final TrustUpdateEvent event : result.getTrustUpdateEvents()) {
+			final String eventTopic;
+			if (TrustValueType.DIRECT == event.getValueType())
+				eventTopic = TrustEventTopic.DIRECT_TRUST_UPDATED;
+			else if (TrustValueType.INDIRECT == event.getValueType())
+				eventTopic = TrustEventTopic.INDIRECT_TRUST_UPDATED;
+			else //if (TrustValueType.USER_PERCEIVED == event.getValueType())
+				eventTopic = TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED;
+			if (this.trustEventMgr == null) {
+				LOG.error("Could not post TrustUpdateEvent " + event
+						+ " to topic '" + eventTopic + "': " 
+						+ "Trust Event Mgr is not available");
+			} else {
+				this.trustEventMgr.postEvent(event, 
+						new String[] { eventTopic });
+			}
 		}
 		
 		return result;

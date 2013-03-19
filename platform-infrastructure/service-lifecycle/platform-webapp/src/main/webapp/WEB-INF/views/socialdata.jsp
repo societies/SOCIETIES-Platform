@@ -9,6 +9,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies services - Social Data</title>
 <script type="text/javascript" src="js/socialdata.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
 <link href="css/socialdata.css" rel="stylesheet" type="text/css"  media="screen" />
 <!-- 
 
@@ -123,6 +125,7 @@ div#addConnector{
          <li><a href="#" onclick="exe('groups');">Show subscribed <strong>Groups</a></strong></li>
          <li><a href="#" onclick="exe('update');"> <strong>Update</strong></a></li>
          <li>Last update: ${lastupdate}</strong></li>
+         <jsp:include page="socialdatastatus.jsp" />
       </ul>
    </div>
 </div>

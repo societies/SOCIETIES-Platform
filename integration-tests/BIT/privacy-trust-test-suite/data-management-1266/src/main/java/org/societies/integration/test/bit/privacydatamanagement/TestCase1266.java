@@ -88,6 +88,10 @@ public class TestCase1266 extends IntegrationTestCase {
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
+		if (null == getUserFeedbackMocker()) {
+			LOG.info("[Dependency Injection] Missing UserFeedbackMock");
+			return false;
+		}
 		if (null == privacyDataManager) {
 			LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
 			return false;

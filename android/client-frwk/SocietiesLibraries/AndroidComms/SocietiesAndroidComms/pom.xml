@@ -46,6 +46,12 @@
 			<groupId>org.asmack</groupId>
 		    <artifactId>asmack</artifactId>
 		</dependency>
+        <dependency>
+   			<groupId>org.societies.android.platform.androidutils</groupId>
+		    <artifactId>SocietiesAndroidUtilities</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>

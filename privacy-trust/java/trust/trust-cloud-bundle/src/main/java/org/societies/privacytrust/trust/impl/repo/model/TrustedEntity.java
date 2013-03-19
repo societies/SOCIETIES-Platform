@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -31,9 +34,11 @@ import javax.persistence.Embedded;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.IIndirectTrust;
@@ -100,6 +105,10 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	})
 	private UserPerceivedTrust userPerceivedTrust = new UserPerceivedTrust();
 
+	/** The {@link TrustUpdateEvent trust update events} associated with this entity. */
+	@Transient
+	final private Set<TrustUpdateEvent> updateEvents = new CopyOnWriteArraySet<TrustUpdateEvent>();
+	
 	/**
 	 * Constructs a <code>TrustedEntity</code> with the specified trustor and 
 	 * trustee identifiers.
@@ -162,6 +171,15 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		// ugly hack - see https://issues.jboss.org/browse/HIBERNATE-50
 		if (this.userPerceivedTrust == null) this.userPerceivedTrust = new UserPerceivedTrust();
 		return this.userPerceivedTrust;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTrustUpdateEvents()
+	 */
+	@Override
+	public Set<TrustUpdateEvent> getTrustUpdateEvents() {
+		
+		return this.updateEvents;
 	}
 	
 	/*

@@ -5,7 +5,7 @@ import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class ActivityConveterFactory{
 	
-	public static ActivityConverter getActivityConverter(ISocialConnector connector){
+	public static ActivityConverter getConverter(ISocialConnector connector){
 		
 	    	if (connector.getSocialNetwork().equals(SocialNetwork.FACEBOOK)) 
 			return new ActivityConverterFromFacebook();

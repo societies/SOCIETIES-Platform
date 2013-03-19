@@ -75,7 +75,7 @@ public class PrivacyDataManagerCommClientCallback {
 			IDataObfuscationListener listener = dataObfuscationlisteners.get(stanza.getId());
 			dataObfuscationlisteners.remove(stanza.getId());
 			if (bean.isAck()) {
-				listener.onObfuscationCancelled(bean.getAckMessage());
+				listener.onObfuscationDone(bean.getDataWrapper());
 			}
 			else {
 				listener.onObfuscationCancelled(bean.getAckMessage());

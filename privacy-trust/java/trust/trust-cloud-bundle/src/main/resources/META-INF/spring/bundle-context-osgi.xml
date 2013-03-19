@@ -29,6 +29,9 @@
 	<osgi:reference id="eventMgr" 
 	    interface="org.societies.api.osgi.event.IEventMgr" 
 	    cardinality="1..1" />
+	<osgi:reference id="pubsubClient"
+		interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"
+		cardinality="1..1" />
 	<osgi:reference id="commMgr" 
 	    interface="org.societies.api.comm.xmpp.interfaces.ICommManager" 
 	    cardinality="1..1" />

@@ -39,20 +39,18 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 public interface ITrustEventMgr {
 
 	/**
-     * Publishes the specified {@link TrustEvent}.
+     * Publishes the specified {@link TrustEvent} to the supplied topics. All
+     * supported event topics are defined in {@link TrustEventTopic}.
      * 
      * @param event
      *            the event to be published.
      * @param topics
      *            the topics to which the event will be published.
-     * @throws TrustEventMgrExceptionException 
-     *             if publishing of the specified event fails.
      * @throws NullPointerException
      *             if any of the specified parameters is <code>null</code>.
      * @since 0.5
      */
-    public void postEvent(final TrustEvent event, final String[] topics)
-    		throws TrustEventMgrException;
+    public void postEvent(final TrustEvent event, final String[] topics);
     
     /**
      * Registers the specified {@link ITrustEventListener} for events of the

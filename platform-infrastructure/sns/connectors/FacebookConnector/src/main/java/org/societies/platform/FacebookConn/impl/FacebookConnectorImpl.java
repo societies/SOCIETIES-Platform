@@ -57,7 +57,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		this.identity		= identity;
 		this.access_token	= access_token;
-		this.name 		= SocialNetwork.FACEBOOK.value();
+		this.name 		= org.societies.api.schema.sns.socialdata.model.SocialNetwork.FACEBOOK.toString();
 		this.id			= this.name + "_" + UUID.randomUUID();
 		facebookClient		= new DefaultFacebookClient(access_token);
 		

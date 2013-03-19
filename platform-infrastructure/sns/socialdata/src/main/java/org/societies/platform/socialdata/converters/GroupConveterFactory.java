@@ -6,7 +6,8 @@ import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 
 public class GroupConveterFactory{
 	
-	public static GroupConverter getPersonConverter(ISocialConnector connector){
+
+	public static GroupConverter getConverter(ISocialConnector connector){
 		if (connector.getSocialNetwork().equals(SocialNetwork.FACEBOOK)) 
 			return new GroupConverterFromFacebook();
 		else if (connector.getSocialNetwork().equals(SocialNetwork.TWITTER))
