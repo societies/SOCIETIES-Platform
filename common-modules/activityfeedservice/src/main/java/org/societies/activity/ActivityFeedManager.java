@@ -66,8 +66,8 @@ public class ActivityFeedManager implements IActivityFeedManager {
         this.sessionFactory = sessionFactory;
     }
     @Override
-    public IActivityFeed getOrCreateFeed(String owner, String feedId, Boolean pubSub) {
-        LOG.info("In getOrCreateFeed .. ");
+    public IActivityFeed getOrCreateFeed(String owner, String feedId, Boolean bPubSub) {
+         LOG.info("In getOrCreateFeed .. ");
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
                 if(!((ActivityFeed)feed).getOwner().contentEquals(owner)) {
@@ -87,12 +87,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         //not existing, making a new one..
-        ActivityFeed ret = new ActivityFeed(feedId,owner,pubSub);
+        ActivityFeed ret = new ActivityFeed(feedId,owner);
+        ret.setPubSubcli(this.pubSubClient);
         ret.startUp(this.sessionFactory);
-        if(pubSub) {
-            ret.setPubSubcli(this.pubSubClient);
-            ret.connectPubSub(identity);
-        }
+        if (bPubSub)
+        	ret.connectPubSub(identity);
+
         feeds.add(ret);
         persistNewFeed(ret);
         return ret;
@@ -110,14 +110,6 @@ public class ActivityFeedManager implements IActivityFeedManager {
                 return feeds.remove(cur);
             }
         }
-/*        for(IActivityFeed feed : feeds){
-            if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
-                    return false;
-
-                return feeds.remove(feed);
-            }
-        }*/
         return false;
     }
     private boolean removeRecord(IActivityFeed feed){
@@ -143,28 +135,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     }
     public void init(){
         Session session = getSessionFactory().openSession();
-        List<ActivityFeed> tmpFeeds = null;
+        List<IActivityFeed> tmpFeeds = null;
         try{
-            tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
-            feeds.addAll(tmpFeeds);
-            for(ActivityFeed feed : tmpFeeds) {
-                if(feed.getPubsub()){
-                    LOG.info("did not find feedid creating new..");
-                    IIdentity identity = null;
-                    try {
-                        identity = commManager.getIdManager().fromJid(feed.getOwner());
-                    } catch (InvalidFormatException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                    //not existing, making a new one..
-
-
-                    feed.setPubSubcli(this.pubSubClient);
-                    feed.connectPubSub(identity);
-
-                }
-                feed.startUp(this.sessionFactory);
-            }
+        	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+        	feeds.addAll(tmpFeeds);
         }catch(Exception e){
             LOG.error("CISManager startup queries failed..");
             e.printStackTrace();
@@ -203,10 +177,10 @@ public class ActivityFeedManager implements IActivityFeedManager {
     public void setCommManager(ICommManager commManager) {
         this.commManager = commManager;
     }
-
+    
     @Override
     public IActivityFeed getRemoteActivityFeedHandler(ICommManager iCommMgr, IIdentity remoteCISid){
-        return new RemoteActivityFeed(iCommMgr,remoteCISid);
+    	return new RemoteActivityFeed(iCommMgr,remoteCISid);
     }
     private boolean persistNewFeed(ActivityFeed activityFeed){
         Session session = getSessionFactory().openSession();
@@ -218,5 +192,6 @@ public class ActivityFeedManager implements IActivityFeedManager {
         }
         return true;
     }
+	
 
 }

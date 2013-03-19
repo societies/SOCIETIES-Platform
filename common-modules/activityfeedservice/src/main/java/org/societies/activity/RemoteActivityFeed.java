@@ -39,6 +39,7 @@ import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.*;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 
 public class RemoteActivityFeed implements IActivityFeed {
@@ -210,6 +211,23 @@ public class RemoteActivityFeed implements IActivityFeed {
 				e.printStackTrace();
 			}
 
+	}
+
+
+
+	@Override
+	public void addActivity(IActivity arg0) {
+		// Not used by remote calls, but since they share the same Interface class ....
+		
+	}
+
+
+
+	@Override
+	public Future<List<IActivity>> getActivities(String arg0, String arg1,
+			long arg2) {
+		//Not used by remote calls, but since they share the same Interface class ....
+		return null;
 	}
 
 }

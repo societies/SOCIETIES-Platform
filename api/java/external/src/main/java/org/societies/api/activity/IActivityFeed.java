@@ -25,6 +25,7 @@
 package org.societies.api.activity;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.cis.management.ICisOwned;
@@ -139,4 +140,13 @@ public interface IActivityFeed {
 	
 	public IActivity getEmptyIActivity();
 	
+	
+	public void addActivity(IActivity activity);
+	
+	public Future<List<IActivity>> getActivities(String query, String timePeriod, long n); 
+
+
+	
+	
+
 }
