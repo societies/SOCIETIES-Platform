@@ -24,10 +24,17 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.identity.util.RequestorUtils;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -50,6 +57,11 @@ public class RequestPolicyUtils {
 		return requestPolicy;
 	}
 
+	/**
+	 * Retrieve a XACML formatted privacy policy
+	 * @param requestPolicy
+	 * @return A real privacy policy in a XACML format (without XML header)
+	 */
 	public static String toXmlString(RequestPolicy requestPolicy){
 		StringBuilder sb = new StringBuilder();
 		if (null != requestPolicy) {
@@ -61,6 +73,53 @@ public class RequestPolicyUtils {
 			sb.append("</RequestPolicy>");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Retrieve a raw XML formatted RequestPolicy. This is not equivalent to a privacy policy.
+	 * @param requestPolicy
+	 * @return A XML formatted RequestPolicy
+	 * @throws PrivacyException 
+	 */
+	public static String toRawXmlString(RequestPolicy privacyPolicy) throws PrivacyException {
+		// -- Empty Privacy Policy
+		if (null == privacyPolicy) {
+			return "";
+		}
+
+		// -- Generate XML RequestPolicy
+		Serializer serializer = new Persister();
+		Writer result = new StringWriter();
+		try {
+			serializer.write(privacyPolicy, result);
+		} catch (Exception e) {
+			throw new PrivacyException("Can't serialize this RequestPolicy to a XML string.", e);
+		}
+		return result.toString();
+	}
+
+	/**
+	 * Retrieve a RequestPolicy from a raw XML formatted
+	 * @param rawXmlString XML formatted RequestPolicy, not equivalent to a privacy policy. A XACML string won't work here!
+	 * @return A RequestPolicy
+	 * @throws PrivacyException 
+	 */
+	public static RequestPolicy fromRawXmlString(String rawXmlString) throws PrivacyException {
+		// -- Empty Privacy Policy
+		if (null == rawXmlString || "".equals(rawXmlString)) {
+			return null;
+		}
+
+		// -- Retrieve RequestPolicy: Convert Xml to Java
+		RequestPolicy result = null;
+		Serializer serializer = new Persister();
+		Reader reader = new StringReader(rawXmlString);
+		try {
+			result = serializer.read(RequestPolicy.class, reader, false);
+		} catch (Exception e) {
+			throw new PrivacyException("Can't parse the XML string to retrieve a RequestPolicy.", e);
+		}
+		return result;
 	}
 
 	public static boolean equals(RequestPolicy o1, Object o2) {
@@ -90,7 +149,7 @@ public class RequestPolicyUtils {
 		}
 		return result;
 	}
-	
+
 
 	/**
 	 * Retrieve all data types requested in a privacy policy

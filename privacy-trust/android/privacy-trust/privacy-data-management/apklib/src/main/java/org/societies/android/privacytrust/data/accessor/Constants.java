@@ -25,9 +25,29 @@
 package org.societies.android.privacytrust.data.accessor;
 
 public class Constants {
-	/* --- DB --- */
-	public static final String TABLE_PRIVACY_PERMISSION = "privacypermission";
+	/* Global params */
 	public static final int DB_VERSION = 1;
 	public static final String DB_NAME = "societiesprivacy.db";
-	public static final String[] TABLE_PRIVACY_PERMISSION_FIELDS = new String[] {"rowid", "requestor", "data_id_uri", "actions", "decision", "conditions", "obfuscation_level", "creation_date", "validity_duration"};
+
+	/* Privacy Permission */
+	public static final String TABLE_PRIVACY_PERMISSION = "privacy_permission";
+	public static final String[] TABLE_PRIVACY_PERMISSION_FIELDS = new String[] {"rowid",
+		"requestor",
+		"data_id_uri",
+		"actions",
+		"decision",
+		"conditions",
+		"obfuscation_level",
+		"creation_date",
+	"validity_duration"};
+
+	/* Privacy Policy */
+	public static final String TABLE_PRIVACY_POLICY = "privacy_policy";
+	public static final String[] TABLE_PRIVACY_POLICY_FIELDS = new String[] {TablePrivacyPolicyFieldNames.RowId.value(),
+		TablePrivacyPolicyFieldNames.RequestorOwnerId.value(),
+		TablePrivacyPolicyFieldNames.RequestorThirdId.value(),
+		TablePrivacyPolicyFieldNames.RawXmlData.value(),
+		TablePrivacyPolicyFieldNames.DateCreated.value(),
+		TablePrivacyPolicyFieldNames.DateModified.value()
+		};
 }   

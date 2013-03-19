@@ -34,6 +34,7 @@ import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.privacytrust.data.accessor.PrivacyPolicyDao;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManagerRemote;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.android.privacytrust.policymanagement.callback.RemotePrivacyPolicyCallback;
@@ -74,13 +75,15 @@ public class PrivacyPolicyManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyPolicyIntentSender intentSender;
+	private PrivacyPolicyDao privacyPolicDao;
 	private boolean remoteReady;
 
 	
-	public PrivacyPolicyManagerRemote(Context context)  {
+	public PrivacyPolicyManagerRemote(Context context, PrivacyPolicyDao privacyPolicDao)  {
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyPolicyIntentSender(context);
+		this.privacyPolicDao = privacyPolicDao;
 		remoteReady = false;
 	}
 
@@ -103,7 +106,7 @@ public class PrivacyPolicyManagerRemote {
 			messageBean.setRequestor(owner);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES, privacyPolicDao);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
 		} catch (InvalidFormatException e) {
@@ -152,7 +155,7 @@ public class PrivacyPolicyManagerRemote {
 			messageBean.setPrivacyPolicy(privacyPolicy);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES, privacyPolicDao);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
 		} catch (Exception e) {
@@ -181,7 +184,7 @@ public class PrivacyPolicyManagerRemote {
 			messageBean.setRequestor(owner);
 
 			// -- Send
-			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES);
+			RemotePrivacyPolicyCallback callback = new RemotePrivacyPolicyCallback(context, clientPackage, ELEMENT_NAMES, NAME_SPACES, PACKAGES, privacyPolicDao);
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
 		} catch (Exception e) {

@@ -59,6 +59,22 @@ public class RequestorUtils {
 		return sb.toString();
 	}
 
+	public static String getRequestorOwnerId(RequestorBean requestor) {
+		return requestor.getRequestorId();
+	}
+
+	public static String getRequestorThirdId(RequestorBean requestor) {
+		if (requestor instanceof RequestorCisBean) {
+			return ((RequestorCisBean)requestor).getCisRequestorId();
+		}
+		else if (requestor instanceof RequestorServiceBean) {
+			return ServiceUtils.serviceResourceIdentifierToString(((RequestorServiceBean)requestor).getRequestorServiceId());
+		}
+		else {
+			return "";
+		}
+	}
+
 	public static RequestorBean fromFormattedString(String requestorString) {
 		String[] requestorInfo = requestorString.split(":");
 		// CIS
@@ -91,11 +107,25 @@ public class RequestorUtils {
 		return requestor;
 	}
 
-	public static RequestorCisBean create(String requestorId, String requestorCisId) {
-		RequestorCisBean requestor = new RequestorCisBean();
-		requestor.setRequestorId(requestorId);
-		requestor.setCisRequestorId(requestorCisId);
-		return requestor;
+	/**
+	 * Create a RequestorCisBean or RequestorServiceBean from two string containing the identifiers
+	 * @param requestorId Owner id
+	 * @param requestorCisOrServiceId CIS ID or 3P service identifier (stringified). A CIS id begins with "cis".
+	 * @return the relevant RequestorCisBean or RequestorServiceBean
+	 */
+	public static RequestorBean create(String requestorId, String requestorCisOrServiceId) {
+		if (requestorCisOrServiceId.startsWith("cis-")) {
+			RequestorCisBean requestor = new RequestorCisBean();
+			requestor.setRequestorId(requestorId);
+			requestor.setCisRequestorId(requestorCisOrServiceId);
+			return requestor;
+		}
+		else {
+			RequestorServiceBean requestor = new RequestorServiceBean();
+			requestor.setRequestorId(requestorId);
+			requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorCisOrServiceId));
+			return requestor;
+		}
 	}
 
 	public static RequestorServiceBean create(String requestorId, ServiceResourceIdentifier requestorServiceId) {

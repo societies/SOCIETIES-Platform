@@ -24,6 +24,8 @@
  */
 package org.societies.android.privacytrust.policymanagement;
 
+import org.societies.android.privacytrust.data.accessor.DBHelper;
+import org.societies.android.privacytrust.data.accessor.PrivacyPolicyDao;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.schema.identity.RequestorBean;
@@ -46,13 +48,19 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 	private Context context;
 	private PrivacyPolicyManagerRemote privacyPolicyManagerRemote;
+	private PrivacyPolicyDao privacyPolicDao;
 	private PrivacyPolicyIntentSender intentSender;
 
 
 	public PrivacyPolicyManager(Context context)  {
 		this.context = context;
-		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
+		// Intent Sender
 		intentSender = new PrivacyPolicyIntentSender(context);
+		// PrivacyPolicyDao
+		DBHelper dbHelper = new DBHelper(context);
+		privacyPolicDao = new PrivacyPolicyDao(dbHelper.getDbWrite());
+		// PrivacyPolicy Remote
+		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context, privacyPolicDao);
 	}
 
 
@@ -95,21 +103,36 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			RequestorBean owner = (RequestorBean) args[0];
 
 			try {
-				// -- TODO Retrieve a stored privacy policy
-				progress += 50;
-				publishProgress(progress, "Check cached version");
+				// -- Retrieve a stored privacy policy
+				progress += 5;
+				publishProgress(progress, "Check stored version...");
+				result = retrieveCachedPrivacyPolicy(owner);
+				if (result) {
+					progress = 100;
+					publishProgress(progress, "Stored privacy policy retrieved");
+					return result;
+				}
+				progress += 45;
+				publishProgress(progress, "No stored version retrieved");
 				if (isCancelled()) {
 					return false;
 				}
 
 				// -- PrivacyPolicy not available: remote call
-				Log.d(TAG, "No Local Privacy policy retrieved: remote call");
+				progress += 5;
+				publishProgress(progress, "Check remote version...");
 				result = privacyPolicyManagerRemote.getPrivacyPolicy(clientPackage, owner);
+				if (result) {
+					progress = 100;
+					publishProgress(progress, "Remote privacy policy retrieved");
+					return result;
+				}
 				progress = 100;
-				publishProgress(progress, "Remote privacy policy retrieved");
+				publishProgress(progress, "No remote privacy policy retrieved");
 				if (isCancelled()) {
 					return false;
 				}
+				intentSender.sendIntentError(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), "Can't find any privacy policy.");
 			}
 			catch (PrivacyException e) {
 				intentSender.sendIntentError(clientPackage, MethodType.GET_PRIVACY_POLICY.name(), "Unexpected error during retrieving: "+e.getMessage());
@@ -118,6 +141,21 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 				result = false;
 			}
 			return result;
+		}
+
+		private boolean retrieveCachedPrivacyPolicy(RequestorBean owner) {
+			try {
+				RequestPolicy requestPolicy = privacyPolicDao.findPrivacyPolicy(owner);
+				if (null != requestPolicy) {
+					intentSender.sendIntentGetPrivacyPolicy(clientPackage, requestPolicy);
+					return true;
+				}
+			}
+			catch (PrivacyException e) {
+				Log.e(TAG, "Error during the search of a cached privacy policy.");
+				return false;
+			}
+			return false;
 		}
 	}
 
@@ -163,17 +201,25 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			RequestPolicy privacyPolicy = (RequestPolicy) args[0];
 
 			try {
-				// -- TODO Update the stored privacy policy
-				progress += 50;
-				publishProgress(progress, "Store a local version");
+				// -- Update the stored privacy policy
+				progress += 5;
+				publishProgress(progress, "Check stored version...");
+				int privacyPolicyId = privacyPolicDao.updatePrivacyPolicy(privacyPolicy);
+				if (-1 != privacyPolicyId) {
+					result = true;
+				}
+				progress += 45;
+				publishProgress(progress, "Privacy policy locally stored.");
 				if (isCancelled()) {
 					return false;
 				}
 
 				// -- PrivacyPolicy not available: remote call
+				progress += 5;
+				publishProgress(progress, "Send the privacy policy to clood node");
 				result = privacyPolicyManagerRemote.updatePrivacyPolicy(clientPackage, privacyPolicy);
 				progress = 100;
-				publishProgress(progress, "Remote privacy policy updated");
+				publishProgress(progress, "Privacy policy updated on clood node");
 				if (isCancelled()) {
 					return false;
 				}
@@ -227,17 +273,22 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			RequestorBean owner = (RequestorBean) args[0];
 
 			try {
-				// -- TODO Delete the stored privacy policy
-				progress += 50;
+				// -- Delete the stored privacy policy
+				progress += 5;
 				publishProgress(progress, "Delete the local version");
+				result = privacyPolicDao.deletePrivacyPolicy(owner);
+				progress += 45;
+				publishProgress(progress, "Local version "+(!result ? "not ": "")+"deleted");
 				if (isCancelled()) {
 					return false;
 				}
 
 				// -- Delete the remote PrivacyPolicy
+				progress += 5;
+				publishProgress(progress, "Delete the privacy policy on the clood");
 				result = privacyPolicyManagerRemote.deletePrivacyPolicy(clientPackage, owner);
 				progress = 100;
-				publishProgress(progress, "Remote privacy policy deleted");
+				publishProgress(progress, "Privacy policy deleted on the clood");
 				if (isCancelled()) {
 					return false;
 				}

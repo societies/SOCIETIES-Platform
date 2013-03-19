@@ -31,6 +31,8 @@ import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
+import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.privacytrust.data.accessor.PrivacyPolicyDao;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
@@ -58,10 +60,11 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 	private Context context;
 	private String clientPackage;
 	private PrivacyPolicyIntentSender intentSender;
+	private PrivacyPolicyDao privacyPolicDao;
 
 
 	public RemotePrivacyPolicyCallback(Context context, String clientPackage, List<String> eLEMENT_NAMES,
-			List<String> nAME_SPACES, List<String> pACKAGES) {
+			List<String> nAME_SPACES, List<String> pACKAGES, PrivacyPolicyDao privacyPolicDao) {
 		super();
 		this.context = context;
 		this.clientPackage = clientPackage;
@@ -69,6 +72,7 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 		NAME_SPACES = nAME_SPACES;
 		PACKAGES = pACKAGES;
 		intentSender = new PrivacyPolicyIntentSender(context);
+		this.privacyPolicDao = privacyPolicDao;
 	}
 
 
@@ -85,6 +89,15 @@ public class RemotePrivacyPolicyCallback implements ICommCallback {
 		// Send intent
 		PrivacyPolicyManagerBeanResult privacyPaylaod = (PrivacyPolicyManagerBeanResult)payload;
 		intentSender.sendIntentSuccess(clientPackage, privacyPaylaod);
+		// Store retrieved privacy policy 
+		if (privacyPaylaod.isAck() && null != privacyPaylaod.getPrivacyPolicy()) {
+			try {
+				privacyPolicDao.updatePrivacyPolicy(privacyPolicy);
+			}
+			catch(PrivacyException e) {
+				Log.e(TAG, "Can't store the retrieved privacy policy: "+e.getMessage());
+			}
+		}
 	}
 
 	public void receiveError(Stanza stanza, XMPPError error) {

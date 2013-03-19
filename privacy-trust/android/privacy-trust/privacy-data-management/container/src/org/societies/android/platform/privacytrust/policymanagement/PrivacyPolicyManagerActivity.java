@@ -128,10 +128,10 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 						if (R.id.btnLaunchTest2 == view.getId()) {
 							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
 						}
-						else {
-							retrievedPrivacyPolicy.setRequestor(null);
-							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy), owner);
-						}
+//						else {
+//							retrievedPrivacyPolicy.setRequestor(null);
+//							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy), owner);
+//						}
 					}
 				}
 				else if (R.id.btnLaunchTest4 == view.getId()) {

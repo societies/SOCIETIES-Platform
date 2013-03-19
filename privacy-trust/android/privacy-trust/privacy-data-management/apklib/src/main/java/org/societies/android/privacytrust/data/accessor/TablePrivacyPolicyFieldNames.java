@@ -22,52 +22,66 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.identity;
+package org.societies.android.privacytrust.data.accessor;
 
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.android.api.identity.util.DataIdentifierUtils;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
- * Simple data identifier implementations that helps managing data identifiers
- *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class SimpleDataIdentifier extends DataIdentifier {
-	private static final long serialVersionUID = 8406793590468954631L;
+public enum TablePrivacyPolicyFieldNames {
+	RowId("rowid"),
+	RequestorOwnerId("requestor_owner_id"),
+	RequestorThirdId("requestor_third_id"),
+	RawXmlData("raw_xml_data"),
+	DateCreated("date_created"),
+	DateModified("date_modified");
 
-	@Override
-	public String getUri() {
-		uri = DataIdentifierUtils.toUriString(this);
-		return uri;
-	}
+	private final String value;
+
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	TablePrivacyPolicyFieldNames(String v) {
+		value = v;
+	}
+	TablePrivacyPolicyFieldNames(Parcel in) {
+		value = in.readString();
+	}
+
+
+	public String value() {
+		return value;
+	}
+
+	public static TablePrivacyPolicyFieldNames fromValue(String v) {
+		for (TablePrivacyPolicyFieldNames c: TablePrivacyPolicyFieldNames.values()) {
+			if (c.value.equals(v)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException(v);
+	}
+
 	@Override
 	public String toString() {
-		return "SimpleDataIdentifier ["
-				+ (scheme != null ? "scheme=" + scheme + ", " : "")
-				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
-				+ (type != null ? "type=" + type + ", " : "")
-				+ (uri != null ? "uri=" + uri : "") + "]";
+		return this.value();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// -- Verify reference equality
-		if (obj == null) { return false; }
-		if (obj == this) { return true; }
-		if (obj.getClass() != getClass()) {
-			return false;
-		}
-		// -- Verify obj type
-		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
-		return this.getScheme().equals(rhs.getScheme()) && this.getOwnerId().equals(rhs.getOwnerId()) && this.getType().equals(rhs.getType());
+	public int describeContents() {
+		return 0;
 	}
+
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(value);
+	}
+
+	public static final Parcelable.Creator<TablePrivacyPolicyFieldNames> CREATOR = new Parcelable.Creator<TablePrivacyPolicyFieldNames>() {
+		public TablePrivacyPolicyFieldNames createFromParcel(final Parcel in) {
+			return TablePrivacyPolicyFieldNames.fromValue(in.readString());
+		}
+		public TablePrivacyPolicyFieldNames[] newArray(int size) {
+			return new TablePrivacyPolicyFieldNames[size];
+		}
+	};
 }

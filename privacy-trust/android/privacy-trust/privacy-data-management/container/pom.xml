@@ -127,23 +127,23 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<!-- <configuration>
+				<configuration>
 					<emulator>
-						<avd>${test.android.avd}</avd>
+						<avd>${test.android.avd>}</avd>
 						<wait>60000</wait>
 						<options>-no-skin</options>
 					</emulator>
-					emma start
+					<!-- emma start -->
 					<emmaEnable>true</emmaEnable>
 					<emmaClassFolders>${project.basedir}/target/classes</emmaClassFolders>
 					<emmaOutputMetaFile>${project.basedir}/target/emma/coverage.em</emmaOutputMetaFile>
-					emma stop
+					<!-- emma stop -->
 					<dex>
 						<noLocals>true</noLocals>
-						must be set for emma
+						<!-- must be set for emma -->
 					</dex>
 				</configuration>
-				<executions>
+				<!-- <executions>
 					<execution>
 						<id>startEmulator</id>
 						<phase>initialize</phase>
@@ -151,8 +151,8 @@
 							<goal>emulator-start</goal>
 						</goals>
 					</execution>
-				</executions>
-				<extensions>true</extensions> -->
+				</executions> -->
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>
