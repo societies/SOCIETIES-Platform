@@ -72,9 +72,9 @@ public class LoginController extends BasePageController {
 
         userService.login();
 
-        String summary = "User " + getUsername() + " logged in";
-        String detail = "User successfully logged in";
-        addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
+//        String summary = "User " + getUsername() + " logged in";
+//        String detail = "User successfully logged in";
+//        addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
 
         // clean up
         setLoginDialogUsername("");
