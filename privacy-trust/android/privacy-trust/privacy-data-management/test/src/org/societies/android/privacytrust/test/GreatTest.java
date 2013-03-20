@@ -22,39 +22,26 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.test.datamanagement;
+package org.societies.android.privacytrust.test;
 
-import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;
+import org.societies.android.privacytrust.PrivacyDataManagerServiceTest;
 
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.util.Log;
 
 
-public class PrivacyDataManager extends ServiceTestCase <PrivacyDataManagerLocalService> {
-	//Logging tag
-	private static final String LOG_TAG = PrivacyDataManager.class.getName();
+public class GreatTest extends ServiceTestCase<PrivacyDataManagerServiceTest> {
+	private static final String TAG = GreatTest.class.getName();
 
-	public PrivacyDataManager() {
-		super(PrivacyDataManagerLocalService.class);
+	public GreatTest() {
+		super(PrivacyDataManagerServiceTest.class);
 	}
+
 	
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-    
-    /**
-     * The name 'test preconditions' is a convention to signal that if this
-     * test doesn't pass, the test case was not set up properly and it might
-     * explain any and all failures in other tests.  This is not guaranteed
-     * to run before other tests, as JUnit uses reflection to find the tests.
-     */
     @MediumTest
-    public void testPreconditions() {
-    }
-    
-    @MediumTest
-    protected void testTrue() {
+    public void testTrue() {
+    	Log.i(TAG, "### Hey, here I am!");
     	assertTrue("Should be true", true);
     }
 }

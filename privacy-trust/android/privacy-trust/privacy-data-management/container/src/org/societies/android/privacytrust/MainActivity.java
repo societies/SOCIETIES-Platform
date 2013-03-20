@@ -22,10 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.privacytrust;
+package org.societies.android.privacytrust;
 
-import org.societies.android.platform.privacytrust.datamanagement.PrivacyDataManagerActivity;
-import org.societies.android.platform.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
+import org.societies.android.privacytrust.datamanagement.PrivacyDataManagerActivity;
+import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
 
 import android.app.Activity;
 import android.app.TabActivity;

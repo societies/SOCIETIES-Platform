@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.societies.android.platform.privacytrust"
+    package="org.societies.android.privacytrust"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -25,6 +25,7 @@
             android:name=".policymanagement.PrivacyPolicyManagerActivity">
         </activity>
 
+        <service android:name="org.societies.android.privacytrust.PrivacyDataManagerServiceTest" />
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
     </application>

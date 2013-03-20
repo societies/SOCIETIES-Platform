@@ -54,21 +54,15 @@
 
 	<dependencies>
 		<!-- Societies -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-			<type>apklib</type>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.android.platform.androidutils</groupId>
-			<artifactId>SocietiesAndroidUtilities</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
@@ -85,10 +79,6 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<!-- Tools -->
-		<!-- <dependency> <groupId>org.societies.android.platform.androidutils</groupId> 
-			<artifactId>SocietiesAndroidUtilities</artifactId> <version>${release.version}</version> 
-			<type>apklib</type> </dependency> -->
 		<!-- Android -->
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -115,15 +105,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.phonegap</groupId>
-			<artifactId>cordova</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -135,7 +116,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<reporting>
 		<plugins>
 			<plugin>

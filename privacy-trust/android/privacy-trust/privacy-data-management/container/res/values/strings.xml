@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, PrivacyProtectionTester!</string>
-    <string name="app_name">PrivacyProtectionTester</string>
+    <string name="app_name">PrivacyProtectionContainer</string>
     
     <string name="title_connectivity">Connectivity Status</string>
     <string name="title_battery">Battery Status</string>

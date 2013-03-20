@@ -22,23 +22,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.privacytrust.policymanagement;
+package org.societies.android.privacytrust.datamanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.android.api.identity.util.DataIdentifierFactory;
+import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
-import org.societies.android.platform.privacytrust.R;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
-import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
+import org.societies.android.privacytrust.R;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
+import org.societies.android.privacytrust.policymanagement.PrivacyPolicyManagerActivity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Activity;
@@ -62,23 +69,22 @@ import android.widget.Toast;
  * @author Olivier Maridat (Trialog)
  * @date 28 nov. 2011
  */
-public class PrivacyPolicyManagerActivity extends Activity implements OnClickListener {
-	private final static String TAG = PrivacyPolicyManagerActivity.class.getSimpleName();
+public class PrivacyDataManagerActivity extends Activity implements OnClickListener {
+	private final static String TAG = PrivacyDataManagerActivity.class.getSimpleName();
 
-	private TextView txtLocation;
-	private TextView txtConnectivity;
+	private TextView txtResult;
 
 	private boolean ipBoundToService = false;
-	private IPrivacyPolicyManager privacyPolicyManagerService = null;
+	private IPrivacyDataManager privacyDataManagerService = null;
 	private ClientCommunicationMgr clientCommManager;
-	private RequestPolicy retrievedPrivacyPolicy;
-	private RequestPolicy defaultPrivacyPolicy;
+	private ResponseItem retrievedpermission;
 
 
 	//Enter local user credentials and domain name
 	private static final String USER_NAME = "university";
 	private static final String USER_PASS = "university";
 	private static final String XMPP_DOMAIN = "societies.local";
+
 
 	/* **************
 	 * Business
@@ -92,99 +98,67 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	 * @param view
 	 */
 	public void onLaunchTest(View view) {
-		txtLocation.setText(R.string.txt_nothing);
+		txtResult.setText(R.string.txt_nothing);
 		// If this service is available
 		if (ipBoundToService) {
 			try {
-				txtLocation.setText("Waiting");
-				RequestorCisBean owner = new RequestorCisBean();
-				owner.setRequestorId("university.societies.local");
-				owner.setCisRequestorId("cis-aa667d2a-9330-4d44-8c0d-c7d2df32a782.societies.local");
-				if (R.id.btnLaunchTest1 == view.getId()) {
-					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
-				}
-				if (R.id.btnLaunchTest1bis == view.getId()) {
-					owner.setRequestorId("emma.societies.local");
-					owner.setCisRequestorId("cis-0ba9b78b-611d-4f45-ab04-87934edba84a.societies.local");
-					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
-				}
-				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
-					if (null == retrievedPrivacyPolicy) {
-						txtLocation.setText("Hum, for testing purpose, we will use a default privacy policy");
-						retrievedPrivacyPolicy = defaultPrivacyPolicy;
-					}
-					if (null == retrievedPrivacyPolicy) {
-						txtLocation.setText("Hum, but there is no default privacy policy");
-					}
-					else {
-						RequestItem requestItem = new RequestItem();
-						Resource resource = new Resource();
-						resource.setScheme(DataIdentifierScheme.CIS);
-						resource.setDataType("member-list");
-						requestItem.setResource(resource);
-						List<RequestItem> requestItemList = retrievedPrivacyPolicy.getRequestItems();
-						requestItemList.add(requestItem);
-						retrievedPrivacyPolicy.setRequestItems(requestItemList);
-						if (R.id.btnLaunchTest2 == view.getId()) {
-							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
-						}
-//						else {
-//							retrievedPrivacyPolicy.setRequestor(null);
-//							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy), owner);
-//						}
-					}
-				}
-				else if (R.id.btnLaunchTest4 == view.getId()) {
-					privacyPolicyManagerService.deletePrivacyPolicy(this.getPackageName(), owner);
-				}
+				txtResult.setText("Waiting");
+				RequestorCisBean requestor = new RequestorCisBean();
+				requestor.setRequestorId("university.societies.local");
+				requestor.setCisRequestorId("cis-aa667d2a-9330-4d44-8c0d-c7d2df32a782.societies.local");
+				DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+requestor.getCisRequestorId()+"/cis-member-list");
+				List<Action> actions = new ArrayList<Action>();
+				Action action = new Action();
+				action.setActionConstant(ActionConstants.READ);
+				actions.add(action);
+				privacyDataManagerService.checkPermission(this.getPackageName(), requestor, dataId, actions);
 			} catch (PrivacyException e) {
-				Log.e(TAG, "Error during the privacy policy retrieving", e);
-				txtLocation.setText(R.string.txt_nothing);
-				Toast.makeText(this, "Error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
+				Log.e(TAG, "Error during the checkPermission", e);
+				txtResult.setText(R.string.txt_nothing);
+				Toast.makeText(this, "Error during the checkPermission: "+e.getMessage(), Toast.LENGTH_SHORT);
 			}
 			catch (Exception e) {
-				Log.e(TAG, "Fatal error during the privacy policy retrieving", e);
-				txtLocation.setText(R.string.txt_nothing);
-				Toast.makeText(this, "Fatal error during the privacy policy retrieving: "+e.getMessage(), Toast.LENGTH_SHORT);
+				Log.e(TAG, "Fatal error during the checkPermission", e);
+				txtResult.setText(R.string.txt_nothing);
+				Toast.makeText(this, "Fatal error during the checkPermission: "+e.getMessage(), Toast.LENGTH_SHORT);
 			}
 		}
 		else {
-			txtLocation.setText(R.string.txt_nothing);
+			txtResult.setText(R.string.txt_nothing);
 			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
 	}
 
 	// Receiver
 	private class bReceiver extends BroadcastReceiver  {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(TAG, intent.getAction());
 
-			boolean ack =  intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
+			boolean ack =  intent.getBooleanExtra(IPrivacyDataManager.INTENT_RETURN_STATUS_KEY, false);
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
-			if (ack && (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name()))) {
-				retrievedPrivacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY);
-				sb.append("Privacy policy retrieved: "+(null != retrievedPrivacyPolicy));
-				if (null != retrievedPrivacyPolicy) {
-					sb.append(PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy));
+			if (ack && (intent.getAction().equals(MethodType.CHECK_PERMISSION.name()))) {
+				retrievedpermission = (ResponseItem) intent.getSerializableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
+				sb.append("Privacy permission retrieved: "+(null != retrievedpermission));
+				if (null != retrievedpermission) {
+					sb.append("\nDecision: "+retrievedpermission.getDecision().name());
+					sb.append("\nOn resource: "+retrievedpermission.getRequestItem().getResource().getDataIdUri());
 				}
 			}
-			txtLocation.setText(sb.toString());
+			txtResult.setText(sb.toString());
 		}
 	}
+
 
 	/* **************
 	 * Button Listeners
 	 * ************** */
 
 	public void onClick(View v) {
-		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
+		if (R.id.btnLaunchTestCheckPermission == v.getId()) {
 			onLaunchTest(v);
-		}
-		else if (R.id.btnConnect == v.getId()) {
-			Log.d(TAG, "Not implemented yet.");
-//			clientCommManager.login();
 		}
 		else if (R.id.btnReset == v.getId()) {
 			onButtonResetClick(v);
@@ -199,7 +173,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	 * @param view
 	 */
 	public void onButtonResetClick(View view) {
-		txtLocation.setText(R.string.txt_nothing);
+		txtResult.setText(R.string.txt_nothing);
 	}
 
 	/* **************
@@ -209,17 +183,12 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.privacypolicy);
+		setContentView(R.layout.privacydata);
 
 		// -- Create a link with editable area
-		txtLocation = (TextView) findViewById(R.id.txtLocation);
+		txtResult = (TextView) findViewById(R.id.txtResult);
 		// -- Create a link with buttons
-		((Button) findViewById(R.id.btnConnect)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest1)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest1bis)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest2)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest3)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest4)).setOnClickListener(this);
+		((Button) findViewById(R.id.btnLaunchTestCheckPermission)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
 
 		clientCommManager = new ClientCommunicationMgr(this.getApplicationContext(), true);
@@ -227,26 +196,16 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 
 
 		// -- Create a link with services
-		Intent ipIntent = new Intent(getApplicationContext(), PrivacyPolicyManagerLocalService.class);
+		Intent ipIntent = new Intent(getApplicationContext(), PrivacyDataManagerLocalService.class);
 		getApplicationContext().bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
 
 		//REGISTER BROADCAST
 		IntentFilter intentFilter = new IntentFilter() ;
-		intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
-		intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.DELETE_PRIVACY_POLICY.name());
-		intentFilter.addAction(MethodType.INFER_PRIVACY_POLICY.name());
+		intentFilter.addAction(IPrivacyDataManager.INTENT_DEFAULT_ACTION);
+		intentFilter.addAction(MethodType.CHECK_PERMISSION.name());
+		intentFilter.addAction(MethodType.OBFUSCATE_DATA.name());
 
-		this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
-
-		// Mock data
-		try {
-			defaultPrivacyPolicy = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
-		}
-		catch(PrivacyException e) {
-			Log.e(TAG, "Cannot generate default privacy policy: "+e.getMessage());
-		}
+		getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
 	}
 
 	protected void onStop() {
@@ -264,9 +223,9 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			ipBoundToService = false;
 		}
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.d(TAG, "Connect to service: IPrivacyPolicyManager");
+			Log.d(TAG, "Connect to service: IPrivacyDataManager");
 			LocalBinder binder = (LocalBinder) service;
-			privacyPolicyManagerService = (IPrivacyPolicyManager) binder.getService();
+			privacyDataManagerService = (IPrivacyDataManager) binder.getService();
 			ipBoundToService = true;
 		}
 	};
