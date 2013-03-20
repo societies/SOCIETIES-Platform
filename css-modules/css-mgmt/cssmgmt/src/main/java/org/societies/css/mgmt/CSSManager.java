@@ -1,24 +1,49 @@
+/**
+ * Copyright (c) 2011-2013, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.css.mgmt;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.List;
 
-import javax.xml.bind.JAXBException;
-
+import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.client.ActivityFeedClient;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -48,14 +73,24 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.css.CSSManagerEnums;
 import org.societies.api.internal.css.CSSNode;
 import org.societies.api.internal.css.ICSSInternalManager;
-import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.css.cssRegistry.ICssRegistry;
+import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
 import org.societies.api.internal.css.management.ICSSLocalManager;
-import org.societies.api.css.ICSSManager;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialData;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.WhoResponse;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -63,34 +98,12 @@ import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
-import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.DBC.Dbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.societies.api.internal.css.cssRegistry.ICssRegistry;
-import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.utilities.DBC.Dbc;
-
-import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialData;
-//import org.societies.platform.socialdata.SocialData;
-
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.activity.IActivityFeedManager;
-import org.societies.activity.client.ActivityFeedClient;
-
-import org.apache.shindig.social.opensocial.model.Person;
-
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
 
 public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
@@ -133,6 +146,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private boolean pubsubInitialised = false;
 
 	private IEventMgr eventMgr = null;
+	
+	private IActivityFeed activityFeed;
 
 	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
@@ -141,10 +156,10 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
         
         this.pubsubID = idManager.getThisNetworkNode();
         
-        this.getiActivityFeedManager();
-        
-        LOG.info("about to call createActivityFeed from cssManagerInit");
-        this.createCSSActivityfeed(idManager.getThisNetworkNode().toString(), iActivityFeedManager);
+        /**
+         * added false as we don't want to create a pubsub node
+         */
+        activityFeed = getiActivityFeedManager().getOrCreateFeed(idManager.getThisNetworkNode().toString(), idManager.getThisNetworkNode().toString(), false);
         
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
@@ -152,7 +167,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
         
 		this.createPubSubNodes();
         this.subscribeToPubSubNodes();
-
 	}
 
 	/**
@@ -287,33 +301,24 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		IIdentity cssIdentity = null;
-		ActivityFeedClient client = new ActivityFeedClient();
-		//cssIdentity = idManager.getThisNetworkNode();
-		try {
-			cssIdentity = commManager.getIdManager().fromJid(idManager.getThisNetworkNode().toString());
-		}catch (InvalidFormatException ife) {
-
-			LOG.error("Invalid CSS IIdentity found in CSS record: " 
-						+ ife.getLocalizedMessage(), ife);
-		}
 			
-		LOG.info("cssIdentity is :" +cssIdentity);
-		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(idManager.getThisNetworkNode().toString(), cssIdentity.getJid(), true);
-					
+		addActivityToCSSAF("CSS Record created");
+	
+	}
+	
+	/**
+	 * Private method for adding activities
+	 * 
+	 * @param activityVerb
+	 */
+	private void addActivityToCSSAF(String activityVerb){
+			
 		IActivity iActivity = activityFeed.getEmptyIActivity();
 		iActivity.setActor(idManager.getThisNetworkNode().toString());
-		iActivity.setObject(cssIdentity.getJid());
-		iActivity.setVerb("Minimal record created");
-
-		
+		iActivity.setObject(idManager.getThisNetworkNode().toString());
+		iActivity.setVerb(activityVerb);
 			
-		client.getActivityFeed();
-		
-			
-		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
-		
+		activityFeed.addActivity(iActivity);
 	}
 	/**
 	 * Workaround for existing problem with database
@@ -2821,39 +2826,4 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		this.filter = filter;
 		
 	}
-	
-public void createCSSActivityfeed(String cssOwner, IActivityFeedManager iActivityFeedManager) {
-		
-		LOG.info("createCSSActivity called with OWNER: " +cssOwner +"and activityfeedmanager: " +iActivityFeedManager);
-		 
-		IIdentity cssIdentity = null;
-		ActivityFeedClient client = new ActivityFeedClient();
-		//cssIdentity = idManager.getThisNetworkNode();
-		try {
-			cssIdentity = commManager.getIdManager().fromJid(cssOwner);
-		}catch (InvalidFormatException ife) {
-
-			LOG.error("Invalid CSS IIdentity found in CSS record: " 
-						+ ife.getLocalizedMessage(), ife);
-		}
-			
-		LOG.info("cssIdentity is :" +cssIdentity);
-		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cssIdentity.getJid(), true);
-					
-		IActivity iActivity = activityFeed.getEmptyIActivity();
-		iActivity.setActor(cssOwner);
-		iActivity.setObject(cssIdentity.getJid());
-		iActivity.setVerb("created");
-			
-		client.getActivityFeed();
-		
-			
-		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
-		LOG.info("getActivities called : ");
-		activityFeed.getActivities("1363657766804", client);
-		
-		LOG.info("@@@@ Back from call to getActivities: ");
-	}
-	
-
 }
