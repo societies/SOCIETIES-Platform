@@ -1,7 +1,5 @@
 package org.societies.webapp.controller.privacy;
 
-import org.primefaces.push.PushContext;
-import org.primefaces.push.PushContextFactory;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
@@ -86,8 +84,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
 
             // notify the user
-            PushContext pushContext = PushContextFactory.getDefault().getPushContext();
-            pushContext.push("/pnb", "");
+//            PushContext pushContext = PushContextFactory.getDefault().getPushContext();
+//            pushContext.push("/pnb", "");
         }
     }
 
